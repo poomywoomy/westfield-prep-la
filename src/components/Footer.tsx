@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Mail, MapPin } from "lucide-react";
 
 const Footer = () => {
@@ -27,6 +28,14 @@ const Footer = () => {
             <p className="text-sm text-white/80">
               Westfield Prep — a DBA of Sathatham LLC
             </p>
+            <div className="flex justify-center gap-4 mt-3 mb-2">
+              <Link
+                to="/terms"
+                className="text-xs text-white/80 hover:text-secondary transition-colors"
+              >
+                Terms of Service
+              </Link>
+            </div>
             <p className="text-xs text-white/60 mt-2">
               © {new Date().getFullYear()} Westfield Prep. All rights reserved.
             </p>

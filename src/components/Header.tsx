@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/westfield-logo.png";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,20 +37,37 @@ const Header = () => {
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => scrollToSection("services")}
+            {isHomePage ? (
+              <>
+                <button
+                  onClick={() => scrollToSection("services")}
+                  className="text-foreground hover:text-primary transition-colors font-medium"
+                >
+                  Services
+                </button>
+                <button
+                  onClick={() => scrollToSection("pricing")}
+                  className="text-foreground hover:text-primary transition-colors font-medium"
+                >
+                  Pricing
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/"
+                className="text-foreground hover:text-primary transition-colors font-medium"
+              >
+                Home
+              </Link>
+            )}
+            <Link
+              to="/faq"
               className="text-foreground hover:text-primary transition-colors font-medium"
             >
-              Services
-            </button>
-            <button
-              onClick={() => scrollToSection("pricing")}
-              className="text-foreground hover:text-primary transition-colors font-medium"
-            >
-              Pricing
-            </button>
+              FAQ
+            </Link>
             <Button
-              onClick={() => scrollToSection("contact")}
+              onClick={() => isHomePage ? scrollToSection("contact") : window.location.href = "/#contact"}
               className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
             >
               Get Started
