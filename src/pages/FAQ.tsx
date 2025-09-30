@@ -29,7 +29,7 @@ const FAQ = () => {
     },
     {
       question: "Where is Westfield Prep located?",
-      answer: "We're based in Los Angeles, CA, with easy access to major carriers for efficient shipping to fulfillment centers nationwide."
+      answer: "As a boutique fulfillment company, we provide our warehouse address only to active clients. We're based in Los Angeles, CA, with easy access to major carriers for efficient shipping to fulfillment centers nationwide."
     },
     {
       question: "What is the monthly minimum?",
