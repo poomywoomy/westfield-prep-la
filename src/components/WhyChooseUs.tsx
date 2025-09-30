@@ -3,8 +3,8 @@ import { Clock, Camera, DollarSign, MapPin } from "lucide-react";
 const reasons = [
   {
     icon: Clock,
-    title: "Same-Day Turnaround",
-    description: "Fast processing to keep your inventory moving and sales flowing.",
+    title: "Boutique Speed",
+    description: "Our small, dedicated team processes orders faster than large fulfillment centers—often same-day turnaround.",
   },
   {
     icon: Camera,
@@ -30,7 +30,7 @@ const WhyChooseUs = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose Westfield Prep Center</h2>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            Experience the difference of working with a dedicated fulfillment partner
+            Experience the boutique advantage—personalized service with faster turnaround times
           </p>
         </div>
 

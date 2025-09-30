@@ -41,7 +41,7 @@ const Services = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Our Services</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Comprehensive fulfillment solutions designed to streamline your ecommerce business
+            Boutique fulfillment solutions with faster processing times than larger prep centers
           </p>
         </div>
 

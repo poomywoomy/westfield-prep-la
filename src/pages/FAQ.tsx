@@ -12,12 +12,16 @@ import logo from "@/assets/westfield-logo.png";
 const FAQ = () => {
   const faqs = [
     {
+      question: "What makes Westfield Prep Center different?",
+      answer: "We're a boutique prep center, which means our dedicated team can check in products and ship them out much faster than traditional large-scale fulfillment centers. You get personalized attention and quicker turnaround times."
+    },
+    {
       question: "What services does Westfield Prep Center offer?",
       answer: "We offer comprehensive ecommerce fulfillment services including receiving & inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack & carton prep, LTL & SPD shipping, and photo proof of every step. We also provide storage solutions."
     },
     {
       question: "What are your turnaround times?",
-      answer: "We pride ourselves on same-day turnaround for most orders. Rush services are available for urgent shipments, with an additional 30-60% fee."
+      answer: "As a boutique operation, we pride ourselves on same-day turnaround for most orders. Our small team allows us to process and ship significantly faster than larger prep centers. Rush services are available for urgent shipments, with an additional 30-60% fee."
     },
     {
       question: "How do you ensure marketplace compliance?",
