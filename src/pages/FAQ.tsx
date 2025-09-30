@@ -12,7 +12,7 @@ import logo from "@/assets/westfield-logo.png";
 const FAQ = () => {
   const faqs = [
     {
-      question: "What services does Westfield Prep offer?",
+      question: "What services does Westfield Prep Center offer?",
       answer: "We offer comprehensive ecommerce fulfillment services including receiving & inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack & carton prep, LTL & SPD shipping, and photo proof of every step. We also provide storage solutions."
     },
     {
@@ -28,7 +28,7 @@ const FAQ = () => {
       answer: "Yes! We provide photo verification and quality control documentation for every step of the prep process. This ensures transparency and peace of mind for our clients."
     },
     {
-      question: "Where is Westfield Prep located?",
+      question: "Where is Westfield Prep Center located?",
       answer: "As a boutique fulfillment company, we provide our warehouse address only to active clients. We're based in Los Angeles, CA, with easy access to major carriers for efficient shipping to fulfillment centers nationwide."
     },
     {
@@ -63,8 +63,8 @@ const FAQ = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <img src={logo} alt="Westfield Prep Logo" className="h-12 w-12" />
-              <span className="text-xl font-bold text-primary">Westfield Prep</span>
+              <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-12" />
+              <span className="text-xl font-bold text-primary">Westfield Prep Center</span>
             </Link>
             <Link to="/">
               <Button variant="outline" size="sm">
@@ -83,7 +83,7 @@ const FAQ = () => {
               Frequently Asked Questions
             </h1>
             <p className="text-lg text-muted-foreground">
-              Everything you need to know about Westfield Prep's fulfillment services
+              Everything you need to know about Westfield Prep Center's fulfillment services
             </p>
           </div>
 
@@ -123,10 +123,10 @@ const FAQ = () => {
       <footer className="bg-primary text-white py-8 mt-12">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">
-            Westfield Prep — a DBA of Sathatham LLC
+            Westfield Prep Center — a DBA of Sathatham LLC
           </p>
           <p className="text-xs text-white/60 mt-2">
-            © {new Date().getFullYear()} Westfield Prep. All rights reserved.
+            © {new Date().getFullYear()} Westfield Prep Center. All rights reserved.
           </p>
         </div>
       </footer>

@@ -10,8 +10,8 @@ const TOS = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <img src={logo} alt="Westfield Prep Logo" className="h-12 w-12" />
-              <span className="text-xl font-bold text-primary">Westfield Prep</span>
+              <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-12" />
+              <span className="text-xl font-bold text-primary">Westfield Prep Center</span>
             </Link>
             <Link to="/">
               <Button variant="outline" size="sm">
@@ -34,15 +34,15 @@ const TOS = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">1. Agreement to Terms</h2>
             <p className="text-foreground mb-4">
-              By using Westfield Prep's services, you agree to be bound by these Terms of Service. 
-              Westfield Prep is a DBA of Sathatham LLC, operating an ecommerce fulfillment center in Los Angeles, CA.
+              By using Westfield Prep Center's services, you agree to be bound by these Terms of Service. 
+              Westfield Prep Center is a DBA of Sathatham LLC, operating an ecommerce fulfillment center in Los Angeles, CA.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">2. Services Provided</h2>
             <p className="text-foreground mb-4">
-              Westfield Prep provides ecommerce fulfillment services including, but not limited to: 
+              Westfield Prep Center provides ecommerce fulfillment services including, but not limited to: 
               receiving, inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack preparation, 
               shipping coordination, and storage services for all major ecommerce platforms.
             </p>
@@ -51,7 +51,7 @@ const TOS = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">3. Pricing and Payment</h2>
             <p className="text-foreground mb-4">
-              All services are subject to our published pricing structure. A monthly minimum of $150 applies to all accounts. 
+              All services are subject to our published pricing structure. A monthly minimum of $300 applies to all accounts. 
               Prices are subject to change with 30 days' notice. Payment is due upon receipt of invoice. 
               Late payments may result in service suspension and additional fees.
             </p>
@@ -69,7 +69,7 @@ const TOS = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">5. Liability and Insurance</h2>
             <p className="text-foreground mb-4">
-              While Westfield Prep maintains General Liability and Warehouse Legal Liability insurance, 
+              While Westfield Prep Center maintains General Liability and Warehouse Legal Liability insurance, 
               our liability is limited to the declared value of products or $100 per unit, whichever is less. 
               Clients are encouraged to maintain their own insurance coverage for inventory.
             </p>
@@ -119,7 +119,7 @@ const TOS = () => {
 
           <div className="mt-12 p-6 bg-card border border-border rounded-lg">
             <p className="text-sm text-muted-foreground text-center">
-              By using Westfield Prep's services, you acknowledge that you have read, understood, 
+              By using Westfield Prep Center's services, you acknowledge that you have read, understood, 
               and agree to be bound by these Terms of Service.
             </p>
           </div>
@@ -129,10 +129,10 @@ const TOS = () => {
       <footer className="bg-primary text-white py-8 mt-12">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">
-            Westfield Prep — a DBA of Sathatham LLC
+            Westfield Prep Center — a DBA of Sathatham LLC
           </p>
           <p className="text-xs text-white/60 mt-2">
-            © {new Date().getFullYear()} Westfield Prep. All rights reserved.
+            © {new Date().getFullYear()} Westfield Prep Center. All rights reserved.
           </p>
         </div>
       </footer>
