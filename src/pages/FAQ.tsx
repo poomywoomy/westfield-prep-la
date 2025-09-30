@@ -24,10 +24,6 @@ const FAQ = () => {
       answer: "We stay up-to-date with all major marketplace requirements including Amazon FBA, Walmart, and other platforms. This includes polybag suffocation warnings, weight limits, and accurate case labels. We're fully insured with General Liability and Warehouse Legal Liability coverage."
     },
     {
-      question: "What is your pricing structure?",
-      answer: "Our pricing is transparent and competitive: Receiving starts at $6/carton, FNSKU labels $0.50-$0.70/unit, Polybag + Label $1.40/unit, Bubble Wrap + Label $2.10-$2.60/unit, Bundling +$0.50/unit, and Storage $0.80/unit/month. We have a $150 monthly minimum."
-    },
-    {
       question: "Do you provide photo proof of your work?",
       answer: "Yes! We provide photo verification and quality control documentation for every step of the prep process. This ensures transparency and peace of mind for our clients."
     },
