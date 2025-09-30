@@ -30,7 +30,7 @@ const WhyChooseUs = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose Westfield Prep</h2>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            Experience the difference of working with a dedicated FBA prep partner
+            Experience the difference of working with a dedicated fulfillment partner
           </p>
         </div>
 

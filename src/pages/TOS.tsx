@@ -35,16 +35,16 @@ const TOS = () => {
             <h2 className="text-2xl font-bold text-primary mb-4">1. Agreement to Terms</h2>
             <p className="text-foreground mb-4">
               By using Westfield Prep's services, you agree to be bound by these Terms of Service. 
-              Westfield Prep is a DBA of Sathatham LLC, operating an Amazon FBA prep and fulfillment center in Los Angeles, CA.
+              Westfield Prep is a DBA of Sathatham LLC, operating an ecommerce fulfillment center in Los Angeles, CA.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">2. Services Provided</h2>
             <p className="text-foreground mb-4">
-              Westfield Prep provides Amazon FBA preparation services including, but not limited to: 
-              receiving, inspection, polybagging, bubble wrap, bundling, FNSKU labeling, case pack preparation, 
-              shipping coordination, and storage services.
+              Westfield Prep provides ecommerce fulfillment services including, but not limited to: 
+              receiving, inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack preparation, 
+              shipping coordination, and storage services for all major ecommerce platforms.
             </p>
           </section>
 
@@ -61,7 +61,7 @@ const TOS = () => {
             <h2 className="text-2xl font-bold text-primary mb-4">4. Client Responsibilities</h2>
             <p className="text-foreground mb-4">
               Clients must provide accurate shipping information and product specifications. 
-              All products must comply with Amazon FBA requirements and applicable laws. 
+              All products must comply with relevant marketplace requirements and applicable laws. 
               Clients are responsible for any customs duties, taxes, or fees associated with their shipments.
             </p>
           </section>
@@ -87,9 +87,9 @@ const TOS = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">7. Compliance</h2>
             <p className="text-foreground mb-4">
-              All services are performed in compliance with Amazon FBA requirements. However, clients remain 
-              ultimately responsible for ensuring their products meet all Amazon policies and requirements. 
-              We do not guarantee acceptance of shipments by Amazon fulfillment centers.
+              All services are performed in compliance with major marketplace requirements including Amazon, Walmart, and other platforms. However, clients remain 
+              ultimately responsible for ensuring their products meet all marketplace policies and requirements. 
+              We do not guarantee acceptance of shipments by fulfillment centers.
             </p>
           </section>
 

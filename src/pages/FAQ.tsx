@@ -13,15 +13,15 @@ const FAQ = () => {
   const faqs = [
     {
       question: "What services does Westfield Prep offer?",
-      answer: "We offer comprehensive FBA prep services including receiving & inspection, polybagging, bubble wrap, bundling, FNSKU labeling, case pack & carton prep, LTL & SPD shipping, and photo proof of every step. We also provide storage solutions."
+      answer: "We offer comprehensive ecommerce fulfillment services including receiving & inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack & carton prep, LTL & SPD shipping, and photo proof of every step. We also provide storage solutions."
     },
     {
       question: "What are your turnaround times?",
       answer: "We pride ourselves on same-day turnaround for most orders. Rush services are available for urgent shipments, with an additional 30-60% fee."
     },
     {
-      question: "How do you ensure Amazon FBA compliance?",
-      answer: "We stay up-to-date with all Amazon FBA requirements including polybag suffocation warnings, 50-lb box rule, and accurate case labels. We're fully insured with General Liability and Warehouse Legal Liability coverage."
+      question: "How do you ensure marketplace compliance?",
+      answer: "We stay up-to-date with all major marketplace requirements including Amazon FBA, Walmart, and other platforms. This includes polybag suffocation warnings, weight limits, and accurate case labels. We're fully insured with General Liability and Warehouse Legal Liability coverage."
     },
     {
       question: "What is your pricing structure?",
@@ -33,7 +33,7 @@ const FAQ = () => {
     },
     {
       question: "Where is Westfield Prep located?",
-      answer: "We're based in Los Angeles, CA, with easy access to major carriers for efficient shipping to Amazon fulfillment centers nationwide."
+      answer: "We're based in Los Angeles, CA, with easy access to major carriers for efficient shipping to fulfillment centers nationwide."
     },
     {
       question: "What is the monthly minimum?",
@@ -53,11 +53,11 @@ const FAQ = () => {
     },
     {
       question: "What carriers do you work with?",
-      answer: "We work with all major carriers and have established relationships to ensure competitive shipping rates and reliable delivery to Amazon fulfillment centers."
+      answer: "We work with all major carriers and have established relationships to ensure competitive shipping rates and reliable delivery to fulfillment centers for all ecommerce platforms."
     },
     {
       question: "Do you offer storage services?",
-      answer: "Yes, we offer secure storage at $0.80/unit/month for inventory awaiting prep or shipment to Amazon."
+      answer: "Yes, we offer secure storage at $0.80/unit/month for inventory awaiting prep or shipment to your fulfillment destination."
     }
   ];
 
@@ -87,7 +87,7 @@ const FAQ = () => {
               Frequently Asked Questions
             </h1>
             <p className="text-lg text-muted-foreground">
-              Everything you need to know about Westfield Prep's FBA services
+              Everything you need to know about Westfield Prep's fulfillment services
             </p>
           </div>
 

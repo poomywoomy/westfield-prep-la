@@ -15,12 +15,12 @@ const services = [
   {
     icon: Box,
     title: "Bundling & Case Prep",
-    description: "Expert bundling and carton preparation to Amazon FBA specifications.",
+    description: "Expert bundling and carton preparation to platform specifications.",
   },
   {
     icon: Tag,
-    title: "FNSKU Labeling",
-    description: "Accurate FNSKU labeling for seamless Amazon inventory management.",
+    title: "Product Labeling",
+    description: "Accurate labeling including FNSKU for seamless inventory management.",
   },
   {
     icon: Truck,
@@ -41,7 +41,7 @@ const Services = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Our Services</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Comprehensive FBA prep solutions designed to streamline your Amazon business
+            Comprehensive fulfillment solutions designed to streamline your ecommerce business
           </p>
         </div>
 
