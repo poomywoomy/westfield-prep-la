@@ -13,6 +13,7 @@ const pricingData = [
   { service: "Polybag + Label", price: "$1.40/unit" },
   { service: "Bubble Wrap + Label", price: "$2.10 – $2.60/unit" },
   { service: "Bundling", price: "+$0.50/unit" },
+  { service: "Storage", price: "$0.80/unit/month" },
   { service: "Rush Service", price: "+30% – 60%" },
   { service: "Monthly Minimum", price: "$150" },
 ];
