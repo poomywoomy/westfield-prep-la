@@ -33,7 +33,7 @@ const FAQ = () => {
     },
     {
       question: "What is the monthly minimum?",
-      answer: "We have a $150 monthly minimum to maintain our high-quality service standards and dedicated account management."
+      answer: "We have a $300 monthly minimum to maintain our high-quality service standards and dedicated account management."
     },
     {
       question: "How do I get started?",
