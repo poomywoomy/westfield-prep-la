@@ -26,13 +26,13 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background shadow-md" : "bg-background/95 backdrop-blur-sm"
+        isScrolled ? "bg-primary shadow-md" : "bg-primary/95 backdrop-blur-sm"
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           <div className="flex items-center">
-            <img src={logo} alt="Westfield Prep Center Logo" className="h-16 w-auto" />
+            <img src={logo} alt="Westfield Prep Center Logo" className="h-20 w-auto" />
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -40,13 +40,13 @@ const Header = () => {
               <>
                 <button
                   onClick={() => scrollToSection("services")}
-                  className="text-foreground hover:text-primary transition-colors font-medium"
+                  className="text-white hover:text-secondary transition-colors font-medium"
                 >
                   Services
                 </button>
                 <button
                   onClick={() => scrollToSection("pricing")}
-                  className="text-foreground hover:text-primary transition-colors font-medium"
+                  className="text-white hover:text-secondary transition-colors font-medium"
                 >
                   Pricing
                 </button>
@@ -54,20 +54,20 @@ const Header = () => {
             ) : (
               <Link
                 to="/"
-                className="text-foreground hover:text-primary transition-colors font-medium"
+                className="text-white hover:text-secondary transition-colors font-medium"
               >
                 Home
               </Link>
             )}
             <Link
               to="/faq"
-              className="text-foreground hover:text-primary transition-colors font-medium"
+              className="text-white hover:text-secondary transition-colors font-medium"
             >
               FAQ
             </Link>
             <Button
               onClick={() => isHomePage ? scrollToSection("contact") : window.location.href = "/#contact"}
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+              className="bg-secondary hover:bg-secondary/90 text-primary font-semibold"
             >
               Get Started
             </Button>
@@ -75,7 +75,7 @@ const Header = () => {
 
           <Button
             onClick={() => scrollToSection("contact")}
-            className="md:hidden bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+            className="md:hidden bg-secondary hover:bg-secondary/90 text-primary"
             size="sm"
           >
             Get Started
