@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ const contactSchema = z.object({
 
 const ContactForm = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -44,19 +46,8 @@ const ContactForm = () => {
       // Here you would typically send to a backend/API
       console.log("Form submitted:", validatedData);
 
-      toast({
-        title: "Request Submitted!",
-        description: "We'll get back to you within 24 hours with your pricing sheet.",
-      });
-
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        business: "",
-        volume: "",
-      });
-      setErrors({});
+      // Navigate to thank you page
+      navigate("/thank-you");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
