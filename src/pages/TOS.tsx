@@ -27,92 +27,100 @@ const TOS = () => {
           <h1 className="text-4xl font-bold text-primary mb-8">Terms of Service</h1>
           
           <p className="text-muted-foreground mb-6">
-            Last Updated: {new Date().toLocaleDateString()}
+            Last Updated: September 30, 2025
           </p>
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">1. Agreement to Terms</h2>
             <p className="text-foreground mb-4">
-              By using Westfield Prep Center's services, you agree to be bound by these Terms of Service. 
-              Westfield Prep Center is a DBA of Sathatham LLC, operating an ecommerce fulfillment center in Los Angeles, CA.
+              By accessing or using the services of Westfield Prep Center ("we," "us," or "our"), you agree to be bound by these Terms of Service. 
+              Westfield Prep Center is a DBA of Sathatham LLC, operating an e-commerce fulfillment center in Los Angeles, California.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">2. Services Provided</h2>
             <p className="text-foreground mb-4">
-              Westfield Prep Center provides ecommerce fulfillment services including, but not limited to: 
-              receiving, inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack preparation, 
-              shipping coordination, and storage services for all major ecommerce platforms.
+              Westfield Prep Center provides e-commerce fulfillment and logistics services, including but not limited to:
             </p>
+            <ul className="list-disc list-inside text-foreground mb-4 space-y-2">
+              <li>Receiving and inspection of inventory</li>
+              <li>Polybagging, bubble wrapping, and bundling</li>
+              <li>Product labeling (including FNSKU and case pack prep)</li>
+              <li>Shipping coordination and pallet forwarding</li>
+              <li>Storage and inventory handling for major e-commerce platforms</li>
+            </ul>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-primary mb-4">3. Pricing and Payment</h2>
-            <p className="text-foreground mb-4">
-              All services are subject to our published pricing structure. A monthly minimum of $300 applies to all accounts. 
-              Prices are subject to change with 30 days' notice. Payment is due upon receipt of invoice. 
-              Late payments may result in service suspension and additional fees.
-            </p>
+            <h2 className="text-2xl font-bold text-primary mb-4">3. Pricing & Payment</h2>
+            <ul className="list-disc list-inside text-foreground mb-4 space-y-2">
+              <li>All services follow our published pricing structure.</li>
+              <li>A monthly minimum charge of $300 applies to all accounts.</li>
+              <li>Prices may change with 30 days' written notice.</li>
+              <li>Payment is due upon invoice receipt. Late payments may result in service suspension and/or late fees.</li>
+            </ul>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">4. Client Responsibilities</h2>
+            <ul className="list-disc list-inside text-foreground mb-4 space-y-2">
+              <li>Provide accurate and complete shipping information and product details.</li>
+              <li>Ensure all products comply with applicable laws, safety regulations, and marketplace requirements (e.g., Amazon, Walmart).</li>
+              <li>Cover all customs duties, taxes, and import/export fees associated with shipments.</li>
+            </ul>
             <p className="text-foreground mb-4">
-              Clients must provide accurate shipping information and product specifications. 
-              All products must comply with relevant marketplace requirements and applicable laws. 
-              Clients are responsible for any customs duties, taxes, or fees associated with their shipments.
+              Westfield Prep Center is not responsible for penalties or rejections due to inaccurate product data or non-compliance with marketplace policies.
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-primary mb-4">5. Liability and Insurance</h2>
-            <p className="text-foreground mb-4">
-              While Westfield Prep Center maintains General Liability and Warehouse Legal Liability insurance, 
-              our liability is limited to the declared value of products or $100 per unit, whichever is less. 
-              Clients are encouraged to maintain their own insurance coverage for inventory.
-            </p>
+            <h2 className="text-2xl font-bold text-primary mb-4">5. Liability & Insurance</h2>
+            <ul className="list-disc list-inside text-foreground mb-4 space-y-2">
+              <li>We maintain General Liability and Warehouse Legal Liability insurance.</li>
+              <li>Our liability is limited to the declared value of goods or $100 per unit, whichever is less.</li>
+              <li>Clients are strongly encouraged to carry their own insurance for inventory stored with us.</li>
+            </ul>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">6. Storage Terms</h2>
+            <ul className="list-disc list-inside text-foreground mb-4 space-y-2">
+              <li>Standard storage: $0.80 per unit per month.</li>
+              <li>Products stored over 90 days without activity may incur additional fees or require removal.</li>
+              <li>We reserve the right to refuse hazardous, perishable, or illegal goods.</li>
+            </ul>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-bold text-primary mb-4">7. Compliance & Marketplace Rules</h2>
             <p className="text-foreground mb-4">
-              Storage services are provided at $0.80/unit/month. Products stored for more than 90 days 
-              without activity may incur additional fees or be subject to removal. We reserve the right to 
-              refuse storage of hazardous, perishable, or illegal materials.
+              We operate in accordance with major marketplace standards (Amazon, Walmart, etc.), but ultimate compliance responsibility remains with the client. 
+              We do not guarantee acceptance of any shipment by fulfillment centers.
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-primary mb-4">7. Compliance</h2>
-            <p className="text-foreground mb-4">
-              All services are performed in compliance with major marketplace requirements including Amazon, Walmart, and other platforms. However, clients remain 
-              ultimately responsible for ensuring their products meet all marketplace policies and requirements. 
-              We do not guarantee acceptance of shipments by fulfillment centers.
-            </p>
+            <h2 className="text-2xl font-bold text-primary mb-4">8. Termination of Services</h2>
+            <ul className="list-disc list-inside text-foreground mb-4 space-y-2">
+              <li>Either party may terminate with 30 days' written notice.</li>
+              <li>Upon termination, clients must remove or arrange shipping for all inventory within 14 days. Storage fees continue to apply until inventory is cleared.</li>
+              <li>We may suspend or terminate services immediately for non-payment or material violations of these terms.</li>
+            </ul>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-primary mb-4">8. Termination</h2>
+            <h2 className="text-2xl font-bold text-primary mb-4">9. Dispute Resolution & Governing Law</h2>
             <p className="text-foreground mb-4">
-              Either party may terminate services with 30 days' written notice. Upon termination, 
-              client must arrange for pickup of all inventory within 14 days or storage fees will continue to accrue. 
-              We reserve the right to terminate services immediately for non-payment or violation of these terms.
-            </p>
-          </section>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-primary mb-4">9. Disputes and Governing Law</h2>
-            <p className="text-foreground mb-4">
-              These Terms of Service are governed by the laws of the State of California. 
-              Any disputes shall be resolved through arbitration in Los Angeles County, CA.
+              These Terms are governed by the laws of the State of California. Any dispute shall be resolved by binding arbitration in Los Angeles County, CA.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">10. Contact Information</h2>
             <p className="text-foreground mb-4">
-              For questions about these Terms of Service, please contact us at info@westfieldprep.com
+              For questions regarding these Terms, contact us at:<br />
+              📧 info@westfieldprep.com
             </p>
           </section>
 
