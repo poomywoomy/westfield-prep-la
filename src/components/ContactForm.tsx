@@ -42,9 +42,12 @@ const ContactForm = () => {
     setIsSubmitting(true);
 
     try {
+      console.log("Starting form submission...");
       const validatedData = contactSchema.parse(formData);
+      console.log("Form data validated:", validatedData);
 
       // Send email via edge function
+      console.log("Calling edge function...");
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
         body: {
           ...validatedData,
@@ -52,19 +55,28 @@ const ContactForm = () => {
         },
       });
 
+      console.log("Edge function response:", { data, error });
+
       if (error) {
         console.error("Error sending email:", error);
         toast({
           title: "Error",
-          description: "Failed to send your message. Please try again.",
+          description: `Failed to send your message: ${error.message}`,
           variant: "destructive",
         });
         return;
       }
 
       console.log("Email sent successfully:", data);
-      navigate("/thank-you");
+      toast({
+        title: "Success!",
+        description: "Your message has been sent. We'll get back to you soon!",
+      });
+      
+      // Navigate to thank you page after a short delay
+      setTimeout(() => navigate("/thank-you"), 1500);
     } catch (error) {
+      console.error("Form submission error:", error);
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
         error.errors.forEach((err) => {
