@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
+import Footer from "@/components/Footer";
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
@@ -153,11 +154,7 @@ const PrivacyPolicy = () => {
         </div>
       </main>
 
-      <footer className="bg-muted py-8 mt-12">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Westfield Prep Center. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
