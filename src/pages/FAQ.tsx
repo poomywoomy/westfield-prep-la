@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -10,6 +11,10 @@ import { ArrowLeft } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
 
 const FAQ = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const faqs = [
     {
       question: "What makes Westfield Prep Center different?",
@@ -131,6 +136,11 @@ const FAQ = () => {
           <p className="text-xs text-white/60 mt-2">
             © {new Date().getFullYear()} Westfield Prep Center. All rights reserved.
           </p>
+          <div className="mt-4">
+            <Link to="/terms" className="text-xs text-white/80 hover:text-white underline">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

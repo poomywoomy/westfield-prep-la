@@ -1,9 +1,14 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
 
 const TOS = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-background shadow-sm sticky top-0 z-50">
