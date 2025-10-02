@@ -136,7 +136,7 @@ const TOS = () => {
             <h2 className="text-2xl font-bold text-primary mb-4">10. Contact Information</h2>
             <p className="text-foreground mb-4">
               For questions regarding these Terms, contact us at:<br />
-              📧 info@westfieldprep.com
+              📧 info@westfieldprepcenter.com
             </p>
           </section>
 

@@ -21,10 +21,10 @@ const Footer = () => {
             <div className="flex items-center gap-2">
               <Mail className="w-5 h-5 text-secondary" />
               <a
-                href="mailto:info@westfieldprep.com"
+                href="mailto:info@westfieldprepcenter.com"
                 className="hover:text-secondary transition-colors"
               >
-                info@westfieldprep.com
+                info@westfieldprepcenter.com
               </a>
             </div>
             <div className="flex items-center gap-2">

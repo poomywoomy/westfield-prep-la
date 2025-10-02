@@ -146,7 +146,7 @@ const PrivacyPolicy = () => {
             </p>
             <div className="space-y-1">
               <p><strong>Westfield Prep Center (Sathatham LLC)</strong></p>
-              <p><strong>Email:</strong> <a href="mailto:info@westfieldprep.com" className="text-primary hover:underline">info@westfieldprep.com</a></p>
+              <p><strong>Email:</strong> <a href="mailto:info@westfieldprepcenter.com" className="text-primary hover:underline">info@westfieldprepcenter.com</a></p>
               <p><strong>Phone:</strong> <a href="tel:+18189355478" className="text-primary hover:underline">+1 (818) 935-5478</a></p>
               <p>Los Angeles, CA</p>
             </div>
