@@ -11,7 +11,7 @@ const pricingData = [
   { service: "Receiving", price: "$3/carton" },
   { service: "FNSKU Label", price: "$0.50 – $0.70/unit" },
   { service: "Polybag + Label", price: "$1.20/unit" },
-  { service: "Bubble Wrap + Label", price: "+$0.50/unit" },
+  { service: "Bubble Wrap", price: "+$0.50/unit" },
   { service: "Bundling", price: "+$0.50/unit" },
   { service: "Storage", price: "$0.80/unit/month" },
   { service: "Rush Service", price: "+30% – 60%" },
