@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Westfield 3PL <onboarding@resend.dev>",
+        from: "Westfield 3PL <noreply@westfieldprepcenter.com>",
         to: [recipientEmail],
         reply_to: email,
         subject: `New Contact Form Submission from ${name}`,
