@@ -88,9 +88,9 @@ const handler = async (req: Request): Promise<Response> => {
                     <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                       <!-- Header with Logo -->
                       <tr>
-                        <td style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 40px; text-align: center;">
-                          <a href="https://${Deno.env.get('SUPABASE_URL')?.split('//')[1].split('.')[0]}.lovable.app" style="display: inline-block;">
-                            <img src="https://${Deno.env.get('SUPABASE_URL')?.split('//')[1].split('.')[0]}.lovable.app/westfield-logo.png" alt="Westfield 3PL" style="max-width: 200px; height: auto;">
+                        <td style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); padding: 40px; text-align: center;">
+                          <a href="https://westfieldprepcenter.com" style="display: inline-block;">
+                            <img src="https://westfieldprepcenter.com/westfield-logo.png" alt="Westfield 3PL" style="max-width: 200px; height: auto;">
                           </a>
                         </td>
                       </tr>
@@ -98,7 +98,7 @@ const handler = async (req: Request): Promise<Response> => {
                       <!-- Content -->
                       <tr>
                         <td style="padding: 40px;">
-                          <h1 style="color: #1e3a8a; margin: 0 0 20px 0; font-size: 28px; font-weight: 700;">Thank You for Reaching Out!</h1>
+                          <h1 style="color: #0F172A; margin: 0 0 20px 0; font-size: 28px; font-weight: 700;">Thank You for Reaching Out!</h1>
                           
                           <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
                             Hi ${name},
@@ -108,8 +108,8 @@ const handler = async (req: Request): Promise<Response> => {
                             We've successfully received your contact request and our team will review your requirements shortly. We'll get back to you within 1-2 business days with your custom pricing sheet and next steps for onboarding.
                           </p>
                           
-                          <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 20px; margin: 30px 0; border-radius: 4px;">
-                            <h2 style="color: #1e3a8a; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">Your Submission Details:</h2>
+                          <div style="background-color: #f8fafc; border-left: 4px solid #F97316; padding: 20px; margin: 30px 0; border-radius: 4px;">
+                            <h2 style="color: #0F172A; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">Your Submission Details:</h2>
                             <table width="100%" cellpadding="8" cellspacing="0">
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Name:</td>
@@ -140,7 +140,7 @@ const handler = async (req: Request): Promise<Response> => {
                           
                           <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 30px 0 0 0;">
                             Best regards,<br>
-                            <strong style="color: #1e3a8a;">The Westfield 3PL Team</strong>
+                            <strong style="color: #0F172A;">The Westfield 3PL Team</strong>
                           </p>
                         </td>
                       </tr>
