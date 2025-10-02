@@ -51,7 +51,7 @@ const ContactForm = () => {
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
         body: {
           ...validatedData,
-          recipientEmail: "info@westfield3pl.com", // Change this to your email
+          recipientEmail: "info@westfieldprepcenter.com",
         },
       });
 
