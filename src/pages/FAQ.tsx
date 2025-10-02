@@ -40,6 +40,10 @@ const FAQ = () => {
       answer: "As a boutique operation, we pride ourselves on same-day turnaround for most orders. Our small team allows us to process and ship significantly faster than larger prep centers. Rush services are available for urgent shipments, with an additional 30-60% fee."
     },
     {
+      question: "What are the payment terms for new clients?",
+      answer: "New clients are required to provide a mandatory $500 deposit at the beginning of the month for the first 2 months of service. This deposit will be charged for prep work completed during the month. Any remaining balance, if any, will be charged at the end of the month."
+    },
+    {
       question: "How do you ensure marketplace compliance?",
       answer: "We stay up-to-date with all major marketplace requirements including Amazon FBA, Walmart, and other platforms. This includes polybag suffocation warnings, weight limits, and accurate case labels. We're fully insured with General Liability and Warehouse Legal Liability coverage."
     },
@@ -50,10 +54,6 @@ const FAQ = () => {
     {
       question: "Where is Westfield Prep Center located?",
       answer: "As a boutique fulfillment company, we provide our warehouse address only to active clients. We're based in Los Angeles, CA, with easy access to major carriers for efficient shipping to fulfillment centers nationwide."
-    },
-    {
-      question: "What is the monthly minimum?",
-      answer: "We have a $300 monthly minimum to maintain our high-quality service standards and dedicated account management."
     },
     {
       question: "How do I get started?",
