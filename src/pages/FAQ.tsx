@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowLeft } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
+import Footer from "@/components/Footer";
 
 const FAQ = () => {
   const navigate = useNavigate();
@@ -138,21 +139,7 @@ const FAQ = () => {
         </div>
       </main>
 
-      <footer className="bg-primary text-white py-8 mt-12">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm">
-            Westfield Prep Center — a DBA of Sathatham LLC
-          </p>
-          <p className="text-xs text-white/60 mt-2">
-            © {new Date().getFullYear()} Westfield Prep Center. All rights reserved.
-          </p>
-          <div className="mt-4">
-            <Link to="/terms" className="text-xs text-white/80 hover:text-white underline">
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
