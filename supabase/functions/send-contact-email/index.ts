@@ -88,7 +88,7 @@ const handler = async (req: Request): Promise<Response> => {
                     <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                       <!-- Header with Logo -->
                       <tr>
-                        <td style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); padding: 40px; text-align: center;">
+                        <td style="background: #ffffff; padding: 40px; text-align: center; border-bottom: 3px solid #F97316;">
                           <a href="https://westfieldprepcenter.com" style="display: inline-block;">
                             <img src="https://westfieldprepcenter.com/westfield-logo.png" alt="Westfield 3PL" style="max-width: 200px; height: auto;">
                           </a>
