@@ -25,7 +25,7 @@ const Hero = () => {
       <div className="container mx-auto px-4 relative z-10 pt-16">
         <div className="max-w-4xl mx-auto text-center text-white">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-            Your Boutique Ecommerce Fulfillment Partner in Los Angeles
+            Your Boutique Ecommerce Fulfillment Partner in Los&nbsp;Angeles
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
             As a boutique prep center, our dedicated team checks in and ships your products faster than traditional fulfillment centers.
