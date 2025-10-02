@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 
 const contactSchema = z.object({
@@ -43,10 +44,25 @@ const ContactForm = () => {
     try {
       const validatedData = contactSchema.parse(formData);
 
-      // Here you would typically send to a backend/API
-      console.log("Form submitted:", validatedData);
+      // Send email via edge function
+      const { data, error } = await supabase.functions.invoke("send-contact-email", {
+        body: {
+          ...validatedData,
+          recipientEmail: "info@westfield3pl.com", // Change this to your email
+        },
+      });
 
-      // Navigate to thank you page
+      if (error) {
+        console.error("Error sending email:", error);
+        toast({
+          title: "Error",
+          description: "Failed to send your message. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log("Email sent successfully:", data);
       navigate("/thank-you");
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -57,6 +73,12 @@ const ContactForm = () => {
           }
         });
         setErrors(newErrors);
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
       }
     } finally {
       setIsSubmitting(false);
