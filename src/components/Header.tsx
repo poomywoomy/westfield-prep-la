@@ -31,9 +31,13 @@ const Header = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
+          <Link 
+            to="/" 
+            className="flex items-center cursor-pointer"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
             <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" />
-          </div>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-8">
             {isHomePage ? (
