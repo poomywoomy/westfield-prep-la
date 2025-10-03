@@ -60,6 +60,11 @@ const TOS = () => {
               Westfield Prep Center provides e-commerce fulfillment and logistics services, including but not limited to:
             </p>
             <ul className="list-disc list-inside text-foreground mb-4 space-y-2">
+              <li>Amazon FBA prep and fulfillment services</li>
+              <li>Walmart Marketplace fulfillment</li>
+              <li>TikTok Shop order fulfillment</li>
+              <li>Shopify store fulfillment</li>
+              <li>Self-fulfilled and dropship order processing</li>
               <li>Receiving and inspection of inventory</li>
               <li>Polybagging, bubble wrapping, and bundling</li>
               <li>Product labeling (including FNSKU and case pack prep)</li>
@@ -119,7 +124,7 @@ const TOS = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-primary mb-4">7. Compliance & Marketplace Rules</h2>
             <p className="text-foreground mb-4">
-              We operate in accordance with major marketplace standards (Amazon, Walmart, etc.), but ultimate compliance responsibility remains with the client. 
+              We operate in accordance with major marketplace standards (Amazon, Walmart, TikTok Shop, Shopify, etc.), but ultimate compliance responsibility remains with the client. 
               We do not guarantee acceptance of any shipment by fulfillment centers.
             </p>
           </section>

@@ -33,7 +33,7 @@ const FAQ = () => {
     },
     {
       question: "What services does Westfield Prep Center offer?",
-      answer: "We offer comprehensive ecommerce fulfillment services including receiving & inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack & carton prep, LTL & SPD shipping, and photo proof of every step. We also provide storage solutions."
+      answer: "We offer comprehensive ecommerce fulfillment services including Amazon FBA prep, Walmart fulfillment, TikTok Shop fulfillment, Shopify order fulfillment, receiving & inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack & carton prep, self-fulfilled/dropship orders, LTL & SPD shipping, and photo proof of every step. We also provide storage solutions."
     },
     {
       question: "What are your turnaround times?",
@@ -45,7 +45,7 @@ const FAQ = () => {
     },
     {
       question: "How do you ensure marketplace compliance?",
-      answer: "We stay up-to-date with all major marketplace requirements including Amazon FBA, Walmart, and other platforms. This includes polybag suffocation warnings, weight limits, and accurate case labels. We're fully insured with General Liability and Warehouse Legal Liability coverage."
+      answer: "We stay up-to-date with all major marketplace requirements including Amazon FBA, Walmart, TikTok Shop, Shopify, and other e-commerce platforms. This includes polybag suffocation warnings, weight limits, and accurate case labels. We're fully insured with General Liability and Warehouse Legal Liability coverage."
     },
     {
       question: "Do you provide photo proof of your work?",
@@ -74,6 +74,10 @@ const FAQ = () => {
     {
       question: "Do you offer storage services?",
       answer: "Yes, we offer secure storage at $0.80/unit/month for inventory awaiting prep or shipment to your fulfillment destination."
+    },
+    {
+      question: "Do you handle self-fulfilled and dropship orders?",
+      answer: "Yes! We provide fulfillment services for self-fulfilled orders and direct-to-consumer shipping. Standard orders are $2.50 per order, and oversized items are $8.00 per order. This is perfect for dropshipping or shipping directly to your customers."
     }
   ];
 

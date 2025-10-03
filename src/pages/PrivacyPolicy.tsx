@@ -80,7 +80,8 @@ const PrivacyPolicy = () => {
             <p className="mb-2">We may share your information with:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Service Providers:</strong> Third-party vendors who help operate our business (e.g., shipping carriers, payment processors).</li>
-              <li><strong>Marketplace Platforms:</strong> Amazon, eBay, Walmart, and other platforms where we fulfill orders on your behalf.</li>
+              <li><strong>Marketplace Platforms:</strong> Amazon, Walmart, TikTok Shop, Shopify, and other e-commerce platforms where we fulfill orders on your behalf.</li>
+              <li><strong>Advertising Partners:</strong> Google Ads and other advertising platforms to measure campaign performance and reach potential customers.</li>
               <li><strong>Legal Authorities:</strong> When required by law or to protect our rights and safety.</li>
               <li><strong>Business Transfers:</strong> In connection with a merger, sale, or acquisition of our business.</li>
             </ul>
@@ -109,8 +110,15 @@ const PrivacyPolicy = () => {
 
           <section>
             <h2 className="text-2xl font-semibold mb-3 text-foreground">6. Cookies & Tracking Technologies</h2>
-            <p>
-              We use cookies and similar tracking technologies to enhance your experience.
+            <p className="mb-2">
+              We use cookies and similar tracking technologies to enhance your experience and analyze site traffic. This includes:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Essential Cookies:</strong> Required for the website to function properly</li>
+              <li><strong>Analytics Cookies:</strong> Help us understand how visitors interact with our website</li>
+              <li><strong>Advertising Cookies:</strong> We use Google Ads tracking to measure the effectiveness of our advertising campaigns and reach potential customers</li>
+            </ul>
+            <p className="mt-2">
               You can control cookies through your browser settings, but disabling them may affect site functionality.
             </p>
           </section>
