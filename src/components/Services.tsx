@@ -1,7 +1,27 @@
-import { Package, Camera, Shield, Tag, Box, Truck, ShoppingCart, Video, Store } from "lucide-react";
+import { Package, Camera, Shield, Tag, Box, Truck, ShoppingCart, Video, Store, ShoppingBag } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const services = [
+  {
+    icon: ShoppingBag,
+    title: "Amazon Fulfillment",
+    description: "Expert FBA prep and fulfillment services for Amazon sellers with FNSKU labeling.",
+  },
+  {
+    icon: ShoppingCart,
+    title: "Walmart Fulfillment",
+    description: "Specialized prep and fulfillment services for Walmart Marketplace sellers.",
+  },
+  {
+    icon: Video,
+    title: "TikTok Shop Fulfillment",
+    description: "Fast-turnaround fulfillment solutions optimized for TikTok Shop orders.",
+  },
+  {
+    icon: Store,
+    title: "Shopify Fulfillment",
+    description: "Seamless integration and order fulfillment for your Shopify store.",
+  },
   {
     icon: Package,
     title: "Receiving & Inspection",
@@ -31,21 +51,6 @@ const services = [
     icon: Camera,
     title: "Photo Proof QC",
     description: "Detailed photo documentation of every step for complete transparency.",
-  },
-  {
-    icon: ShoppingCart,
-    title: "Walmart Fulfillment",
-    description: "Specialized prep and fulfillment services for Walmart Marketplace sellers.",
-  },
-  {
-    icon: Video,
-    title: "TikTok Shop Fulfillment",
-    description: "Fast-turnaround fulfillment solutions optimized for TikTok Shop orders.",
-  },
-  {
-    icon: Store,
-    title: "Shopify Fulfillment",
-    description: "Seamless integration and order fulfillment for your Shopify store.",
   },
 ];
 
