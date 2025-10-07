@@ -1,4 +1,6 @@
 import { Clock, Camera, DollarSign, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const reasons = [
   {
@@ -24,6 +26,8 @@ const reasons = [
 ];
 
 const WhyChooseUs = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-20 bg-primary text-white">
       <div className="container mx-auto px-4">
@@ -47,6 +51,16 @@ const WhyChooseUs = () => {
               </div>
             );
           })}
+        </div>
+
+        <div className="text-center mt-12">
+          <Button
+            onClick={() => navigate("/contact")}
+            size="lg"
+            className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-6 font-semibold"
+          >
+            Get Started
+          </Button>
         </div>
       </div>
     </section>
