@@ -39,6 +39,20 @@ const Footer = () => {
             </p>
             <div className="flex justify-center gap-4 mt-3 mb-2">
               <Link
+                to="/faq"
+                className="text-xs text-white/80 hover:text-secondary transition-colors"
+              >
+                FAQ
+              </Link>
+              <span className="text-white/40">•</span>
+              <Link
+                to="/contact"
+                className="text-xs text-white/80 hover:text-secondary transition-colors"
+              >
+                Contact
+              </Link>
+              <span className="text-white/40">•</span>
+              <Link
                 to="/terms"
                 className="text-xs text-white/80 hover:text-secondary transition-colors"
               >

@@ -134,7 +134,7 @@ const FAQ = () => {
             <p className="text-muted-foreground mb-6">
               We're here to help! Contact us for personalized assistance.
             </p>
-            <Link to="/#contact">
+            <Link to="/contact">
               <Button className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold">
                 Contact Us
               </Button>

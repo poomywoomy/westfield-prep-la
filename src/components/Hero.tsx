@@ -1,12 +1,12 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-warehouse.jpg";
 
 const Hero = () => {
-  const scrollToContact = () => {
-    const element = document.getElementById("contact");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+  const navigate = useNavigate();
+
+  const goToContact = () => {
+    navigate("/contact");
   };
 
   return (
@@ -31,7 +31,7 @@ const Hero = () => {
             As a boutique prep center, our dedicated team checks in and ships your products faster than traditional fulfillment centers.
           </p>
           <Button
-            onClick={scrollToContact}
+            onClick={goToContact}
             size="lg"
             className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-6 font-semibold"
           >

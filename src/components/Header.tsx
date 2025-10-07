@@ -83,7 +83,7 @@ const Header = () => {
               FAQ
             </Link>
             <Button
-              onClick={() => isHomePage ? scrollToSection("contact") : window.location.href = "/#contact"}
+              onClick={() => navigate("/contact")}
               className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
             >
               Get Started
@@ -91,7 +91,7 @@ const Header = () => {
           </nav>
 
           <Button
-            onClick={() => scrollToSection("contact")}
+            onClick={() => navigate("/contact")}
             className="md:hidden bg-secondary hover:bg-secondary/90 text-secondary-foreground"
             size="sm"
           >
