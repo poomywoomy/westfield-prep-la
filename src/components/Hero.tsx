@@ -35,7 +35,7 @@ const Hero = () => {
             size="lg"
             className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-6 font-semibold"
           >
-            Get Started
+            Get a Free Quote
           </Button>
         </div>
       </div>

@@ -5,23 +5,18 @@ import { useNavigate } from "react-router-dom";
 const reasons = [
   {
     icon: Clock,
-    title: "Boutique Speed",
-    description: "Our small, dedicated team processes orders faster than large fulfillment centers—often same-day turnaround.",
+    title: "Fast check-in",
+    description: "Quick receiving and processing to get your products moving fast.",
   },
   {
     icon: Camera,
-    title: "Photo Proof QC",
-    description: "Visual confirmation of every step for complete transparency.",
-  },
-  {
-    icon: DollarSign,
-    title: "Transparent Invoicing",
-    description: "Clear, itemized billing with no surprise fees or hidden charges.",
+    title: "Dedicated support",
+    description: "Personalized service from a team that knows your business.",
   },
   {
     icon: MapPin,
-    title: "LA-Based Location",
-    description: "Strategic Los Angeles location with easy access to all major carriers.",
+    title: "Local LA warehouse",
+    description: "Strategic Los Angeles location for efficient nationwide shipping.",
   },
 ];
 
@@ -32,13 +27,13 @@ const WhyChooseUs = () => {
     <section className="py-20 bg-primary text-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose Westfield Prep Center</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Sellers Choose Us</h2>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
             Experience the boutique advantage—personalized service with faster turnaround times
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {reasons.map((reason, index) => {
             const Icon = reason.icon;
             return (
@@ -59,7 +54,7 @@ const WhyChooseUs = () => {
             size="lg"
             className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-6 font-semibold"
           >
-            Get Started
+            Get a Free Quote
           </Button>
         </div>
       </div>

@@ -86,7 +86,7 @@ const Header = () => {
               onClick={() => navigate("/contact")}
               className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
             >
-              Get Started
+              Get a Free Quote
             </Button>
           </nav>
 
@@ -95,7 +95,7 @@ const Header = () => {
             className="md:hidden bg-secondary hover:bg-secondary/90 text-secondary-foreground"
             size="sm"
           >
-            Get Started
+            Get a Free Quote
           </Button>
         </div>
       </div>
