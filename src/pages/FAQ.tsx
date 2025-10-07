@@ -41,7 +41,7 @@ const FAQ = () => {
     },
     {
       question: "What are the payment terms for new clients?",
-      answer: "New clients are required to provide a mandatory $500 deposit at the beginning of the month for the first 2 months of service. This deposit will be charged for prep work completed during the month. Any remaining balance, if any, will be charged at the end of the month."
+      answer: "New clients are required to provide a mandatory $300 deposit at the beginning of the month for the first 2 months of service. This deposit will be charged for prep work completed during the month. Any remaining balance, if any, will be charged at the end of the month."
     },
     {
       question: "How do you ensure marketplace compliance?",

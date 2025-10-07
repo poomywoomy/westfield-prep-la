@@ -81,7 +81,7 @@ const TOS = () => {
             
             <h3 className="text-xl font-semibold text-foreground mb-3">Payment Terms</h3>
             <p className="text-foreground mb-4">
-              All new accounts are required to maintain a $500 refundable deposit prior to the start of any services. This deposit will be applied to outstanding invoices or refunded if no balance is owed upon account closure.
+              All new accounts are required to maintain a $300 refundable deposit prior to the start of any services. This deposit will be applied to outstanding invoices or refunded if no balance is owed upon account closure.
             </p>
             <p className="text-foreground mb-4">
               Services are billed on a monthly basis. An invoice summarizing all work completed during the month will be issued on the last calendar day of that month. Payment is due upon receipt of invoice. Late payments may result in service suspension and/or additional late fees. We reserve the right to hold or release client inventory until the account balance is paid in full.

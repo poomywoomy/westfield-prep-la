@@ -25,7 +25,7 @@ const pricingData = [
   { service: "Self-Fulfilled Shipment", price: "$1.50/shipment" },
   { service: "Storage", price: "$0.80/unit/month" },
   { service: "Rush Service", price: "+30% – 60%" },
-  { service: "Deposit (New Clients)", price: "$500" },
+  { service: "Deposit (New Clients)", price: "$300" },
 ];
 
 const Pricing = () => {
