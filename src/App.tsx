@@ -12,6 +12,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ThankYou from "./pages/ThankYou";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import SetupAdmin from "./pages/SetupAdmin";
 import AdminDashboard from "./pages/AdminDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/setup-admin" element={<SetupAdmin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/client/dashboard" element={<ClientDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
