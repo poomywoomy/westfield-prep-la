@@ -16,12 +16,32 @@ interface CreateClientDialogProps {
 }
 
 const generatePassword = () => {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-  let password = "";
-  for (let i = 0; i < 8; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const special = '!@#$%^&*';
+  const allChars = uppercase + lowercase + numbers + special;
+  
+  // Ensure at least one of each character type
+  const array = new Uint32Array(16);
+  crypto.getRandomValues(array);
+  
+  let password = [
+    uppercase[array[0] % uppercase.length],
+    lowercase[array[1] % lowercase.length],
+    numbers[array[2] % numbers.length],
+    special[array[3] % special.length],
+  ];
+  
+  // Fill rest with random characters
+  for (let i = 4; i < 16; i++) {
+    password.push(allChars[array[i] % allChars.length]);
   }
-  return password;
+  
+  // Shuffle to randomize positions
+  const shuffleArray = new Uint32Array(16);
+  crypto.getRandomValues(shuffleArray);
+  return password.sort(() => 0.5 - shuffleArray[0] / 0xFFFFFFFF).join('');
 };
 
 const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialogProps) => {

@@ -60,7 +60,7 @@ const Login = () => {
 
       if (roleError) {
         await supabase.auth.signOut();
-        throw new Error("Account not found. Please contact support.");
+        throw new Error("Invalid email or password. Please try again.");
       }
 
       // Check for expired temp password (clients only)
@@ -75,7 +75,7 @@ const Login = () => {
           const expiryDate = new Date(clientData.password_expires_at);
           if (expiryDate < new Date()) {
             await supabase.auth.signOut();
-            throw new Error("Your temporary password has expired. Please contact support.");
+            throw new Error("Invalid email or password. Please try again.");
           }
         }
       }
