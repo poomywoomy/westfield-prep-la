@@ -22,6 +22,8 @@ const pricingData = [
   { service: "Polybag + Label", price: "$1.40/unit" },
   { service: "Bubble Wrap", price: "+$0.50/unit" },
   { service: "Bundling", price: "+$0.50/unit" },
+  { service: "Additional Label", price: "+$0.20/unit" },
+  { service: "Special Prep", price: "Contact for pricing" },
   { service: "Amazon/Walmart Shipment Box", price: "$2/box" },
   { service: "Self-Fulfilled Shipment", price: "$1.50/shipment" },
   { service: "Storage", price: "Contact for pricing" },
