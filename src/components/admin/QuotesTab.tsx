@@ -97,30 +97,46 @@ const QuotesTab = () => {
     const quoteData = quote.quote_data;
     const doc = new jsPDF();
 
-    try {
-      const logoImg = new Image();
-      logoImg.src = '/westfield-logo.png';
-      await new Promise((resolve, reject) => {
-        logoImg.onload = resolve;
-        logoImg.onerror = reject;
-      });
-      doc.addImage(logoImg, 'PNG', 80, 10, 50, 25);
-    } catch (error) {
-      console.error('Error loading logo:', error);
+    // Company info (left side)
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text("Westfield Prep Center", 20, 15);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    doc.text("Navapoom Sathatham", 20, 21);
+    doc.text("info@westfieldprepcenter.com", 20, 27);
+    doc.text("818-935-5478", 20, 33);
+
+    // Client info (right side)
+    const client = clients.find(c => c.id === quote.client_id);
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(11);
+    doc.text(quoteData.client_name || 'Not Assigned', 210 - 20, 15, { align: "right" });
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    if (quoteData.contact_name) doc.text(quoteData.contact_name, 210 - 20, 21, { align: "right" });
+    if (quoteData.email) doc.text(quoteData.email, 210 - 20, 27, { align: "right" });
+    if (quoteData.phone) doc.text(quoteData.phone, 210 - 20, 33, { align: "right" });
+    if (!quoteData.contact_name && client) {
+      doc.text(client.contact_name || "", 210 - 20, 21, { align: "right" });
+      doc.text(client.email || "", 210 - 20, 27, { align: "right" });
+      doc.text(client.phone_number || "", 210 - 20, 33, { align: "right" });
     }
 
+    // Header
     doc.setFillColor(13, 33, 66);
     doc.rect(0, 40, 210, 15, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
     doc.text("SERVICE QUOTE", 105, 50, { align: "center" });
 
+    // Date
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(11);
-    doc.text(`Client: ${quoteData.client_name || 'Not Assigned'}`, 20, 65);
-    doc.text(`Date: ${new Date(quote.created_at).toLocaleDateString()}`, 20, 72);
+    doc.text(`Date: ${new Date(quote.created_at).toLocaleDateString()}`, 20, 65);
 
-    let y = 85;
+    let y = 80;
 
     if (quoteData.standard_operations?.length > 0) {
       doc.setFontSize(13);
@@ -198,6 +214,25 @@ const QuotesTab = () => {
         y += 5;
       }
     });
+
+    // Additional Comments
+    if (quoteData.additional_comments) {
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      
+      doc.setFontSize(13);
+      doc.setFont(undefined, 'bold');
+      doc.text("Additional Comments", 20, y);
+      y += 7;
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      const splitComments = doc.splitTextToSize(quoteData.additional_comments, 170);
+      doc.text(splitComments, 20, y);
+      y += (splitComments.length * 5);
+    }
 
     doc.save(`quote-${quoteData.client_name || 'unassigned'}-${Date.now()}.pdf`);
     
@@ -280,17 +315,6 @@ const QuotesTab = () => {
                         >
                           <Download className="h-4 w-4 mr-1" />
                           PDF
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setEditingQuote(quote);
-                            setIsDialogOpen(true);
-                          }}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Update
                         </Button>
                         <Button
                           variant="outline"

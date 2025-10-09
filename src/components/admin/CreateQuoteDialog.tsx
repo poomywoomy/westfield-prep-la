@@ -69,6 +69,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
   const [useManualEntry, setUseManualEntry] = useState(false);
   const [standardItems, setStandardItems] = useState<LineItem[]>([]);
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
+  const [additionalComments, setAdditionalComments] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -82,6 +83,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
       setUseManualEntry(!editingQuote.client_id);
       setStandardItems(quoteData.standard_operations || []);
       setFulfillmentSections(quoteData.fulfillment_sections || []);
+      setAdditionalComments(quoteData.additional_comments || "");
     } else if (!open) {
       resetForm();
     }
@@ -167,17 +169,32 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
 
     const doc = new jsPDF();
     
-    // Add logo with proper aspect ratio
-    try {
-      const logoImg = new Image();
-      logoImg.src = '/westfield-logo.png';
-      await new Promise((resolve, reject) => {
-        logoImg.onload = resolve;
-        logoImg.onerror = reject;
-      });
-      doc.addImage(logoImg, 'PNG', 80, 10, 50, 25);
-    } catch (error) {
-      console.error('Error loading logo:', error);
+    // Company info (left side)
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text("Westfield Prep Center", 20, 15);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    doc.text("Navapoom Sathatham", 20, 21);
+    doc.text("info@westfieldprepcenter.com", 20, 27);
+    doc.text("818-935-5478", 20, 33);
+
+    // Client info (right side)
+    const client = clients.find(c => c.id === selectedClientId);
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(11);
+    doc.text(clientName, 210 - 20, 15, { align: "right" });
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    if (useManualEntry) {
+      if (manualContactName) doc.text(manualContactName, 210 - 20, 21, { align: "right" });
+      if (manualEmail) doc.text(manualEmail, 210 - 20, 27, { align: "right" });
+      if (manualPhone) doc.text(manualPhone, 210 - 20, 33, { align: "right" });
+    } else if (client) {
+      doc.text(client.contact_name || "", 210 - 20, 21, { align: "right" });
+      doc.text(client.email || "", 210 - 20, 27, { align: "right" });
+      doc.text(client.phone_number || "", 210 - 20, 33, { align: "right" });
     }
 
     // Header
@@ -187,18 +204,12 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
     doc.setFontSize(16);
     doc.text("SERVICE QUOTE", 105, 50, { align: "center" });
 
-    // Client info
+    // Date
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(11);
-    doc.text(`Client: ${clientName}`, 20, 65);
-    if (useManualEntry) {
-      if (manualContactName) doc.text(`Contact: ${manualContactName}`, 20, 72);
-      if (manualEmail) doc.text(`Email: ${manualEmail}`, 20, 79);
-      if (manualPhone) doc.text(`Phone: ${manualPhone}`, 20, 86);
-    }
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, useManualEntry ? 93 : 72);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 65);
 
-    let y = useManualEntry ? 105 : 85;
+    let y = 80;
 
     // Standard Operations
     if (standardItems.length > 0) {
@@ -279,6 +290,25 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
       }
     });
 
+    // Additional Comments
+    if (additionalComments) {
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      
+      doc.setFontSize(13);
+      doc.setFont(undefined, 'bold');
+      doc.text("Additional Comments", 20, y);
+      y += 7;
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      const splitComments = doc.splitTextToSize(additionalComments, 170);
+      doc.text(splitComments, 20, y);
+      y += (splitComments.length * 5);
+    }
+
     doc.save(`quote-${clientName.replace(/\s/g, '-')}-${Date.now()}.pdf`);
     
     toast({
@@ -320,6 +350,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         phone: useManualEntry ? manualPhone : "",
         standard_operations: standardItems,
         fulfillment_sections: fulfillmentSections,
+        additional_comments: additionalComments,
         created_date: new Date().toISOString()
       };
 
@@ -447,6 +478,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
     setUseManualEntry(false);
     setStandardItems([]);
     setFulfillmentSections([]);
+    setAdditionalComments("");
   };
 
   const getServiceOptions = (sectionType?: FulfillmentSection["type"]) => {
@@ -839,6 +871,17 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
                 ))}
               </div>
             ))}
+          </div>
+
+          {/* Additional Comments */}
+          <div className="space-y-2 border rounded-lg p-4">
+            <Label className="text-lg font-semibold">Additional Comments</Label>
+            <Textarea
+              value={additionalComments}
+              onChange={(e) => setAdditionalComments(e.target.value)}
+              placeholder="Enter any additional comments or special instructions for this quote"
+              rows={3}
+            />
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-4 border-t">
