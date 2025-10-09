@@ -50,47 +50,27 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24);
 
-      // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: tempPassword,
+      // Create client using edge function with service role
+      const { data: clientData, error: clientError } = await supabase.functions.invoke('create-client', {
+        body: {
+          email: formData.email,
+          tempPassword: tempPassword,
+          company_name: formData.company_name,
+          contact_name: formData.contact_name,
+          phone_number: formData.phone_number,
+          estimated_units_per_month: formData.estimated_units_per_month ? parseInt(formData.estimated_units_per_month) : null,
+          receiving_format: formData.receiving_format,
+          extra_prep: formData.extra_prep,
+          storage: formData.storage,
+          storage_units_per_month: formData.storage_units_per_month ? parseInt(formData.storage_units_per_month) : null,
+          admin_notes: formData.admin_notes,
+          fulfillment_services: formData.fulfillment_services,
+          password_expires_at: expiresAt.toISOString(),
+        }
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("Failed to create user");
-
-      // Create profile
-      await supabase.from("profiles").insert({
-        id: authData.user.id,
-        email: formData.email,
-        full_name: formData.contact_name,
-        company_name: formData.company_name,
-        phone_number: formData.phone_number,
-      });
-
-      // Assign client role
-      await supabase.from("user_roles").insert({
-        user_id: authData.user.id,
-        role: "client",
-      });
-
-      // Create client record
-      await supabase.from("clients").insert({
-        user_id: authData.user.id,
-        company_name: formData.company_name,
-        contact_name: formData.contact_name,
-        email: formData.email,
-        phone_number: formData.phone_number,
-        estimated_units_per_month: formData.estimated_units_per_month ? parseInt(formData.estimated_units_per_month) : null,
-        receiving_format: formData.receiving_format,
-        extra_prep: formData.extra_prep,
-        storage: formData.storage,
-        storage_units_per_month: formData.storage_units_per_month ? parseInt(formData.storage_units_per_month) : null,
-        admin_notes: formData.admin_notes,
-        fulfillment_services: formData.fulfillment_services,
-        temp_password: tempPassword,
-        password_expires_at: expiresAt.toISOString(),
-      });
+      if (clientError) throw clientError;
+      if (!clientData?.success) throw new Error(clientData?.error || "Failed to create client");
 
       // Send credentials email
       try {
