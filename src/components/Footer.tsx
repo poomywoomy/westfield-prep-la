@@ -74,7 +74,7 @@ const Footer = () => {
               </Link>
               <span className="text-white/40">•</span>
               <Link
-                to="/admin/login"
+                to="/login"
                 className="text-xs text-white/60 hover:text-white/80 transition-colors"
               >
                 Sign In

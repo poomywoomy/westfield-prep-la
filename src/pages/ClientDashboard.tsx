@@ -18,7 +18,7 @@ const ClientDashboard = () => {
 
   useEffect(() => {
     if (!loading && (!user || role !== "client")) {
-      navigate("/client/login");
+      navigate("/login");
     }
   }, [user, role, loading, navigate]);
 
@@ -28,7 +28,7 @@ const ClientDashboard = () => {
       title: "Logged out",
       description: "You have been logged out successfully.",
     });
-    navigate("/client/login");
+    navigate("/login");
   };
 
   if (loading) {

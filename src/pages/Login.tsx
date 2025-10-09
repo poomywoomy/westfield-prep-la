@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 
-const AdminLogin = () => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -28,16 +28,33 @@ const AdminLogin = () => {
 
       if (error) throw error;
 
-      // Check if user has admin role
+      // Check user role
       const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", data.user.id)
         .single();
 
-      if (roleError || roleData?.role !== "admin") {
+      if (roleError) {
         await supabase.auth.signOut();
-        throw new Error("Access denied. Admin privileges required.");
+        throw new Error("Account not found. Please contact support.");
+      }
+
+      // Check for expired temp password (clients only)
+      if (roleData.role === "client") {
+        const { data: clientData, error: clientError } = await supabase
+          .from("clients")
+          .select("password_expires_at")
+          .eq("user_id", data.user.id)
+          .single();
+
+        if (!clientError && clientData.password_expires_at) {
+          const expiryDate = new Date(clientData.password_expires_at);
+          if (expiryDate < new Date()) {
+            await supabase.auth.signOut();
+            throw new Error("Your temporary password has expired. Please contact support.");
+          }
+        }
       }
 
       toast({
@@ -45,7 +62,12 @@ const AdminLogin = () => {
         description: "Welcome back!",
       });
 
-      navigate("/admin/dashboard");
+      // Redirect based on role
+      if (roleData.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/client/dashboard");
+      }
     } catch (error: any) {
       toast({
         title: "Login failed",
@@ -69,9 +91,9 @@ const AdminLogin = () => {
             />
           </div>
           
-          <h1 className="text-2xl font-bold text-center mb-2">Admin Portal</h1>
+          <h1 className="text-2xl font-bold text-center mb-2">Portal Login</h1>
           <p className="text-muted-foreground text-center mb-6">
-            Sign in to access your admin dashboard
+            Sign in to access your account
           </p>
 
           <form onSubmit={handleLogin} className="space-y-4">
@@ -80,7 +102,7 @@ const AdminLogin = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -124,4 +146,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default Login;

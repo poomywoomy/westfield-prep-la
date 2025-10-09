@@ -19,7 +19,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (!loading && (!user || role !== "admin")) {
-      navigate("/admin/login");
+      navigate("/login");
     }
   }, [user, role, loading, navigate]);
 
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
       title: "Logged out",
       description: "You have been logged out successfully.",
     });
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   if (loading) {
