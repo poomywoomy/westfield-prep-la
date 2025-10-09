@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,29 @@ const ClientDashboard = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [clientName, setClientName] = useState<string>("");
+
+  useEffect(() => {
+    if (user) {
+      fetchClientName();
+    }
+  }, [user]);
+
+  const fetchClientName = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("clients")
+        .select("contact_name")
+        .eq("user_id", user?.id)
+        .single();
+
+      if (!error && data) {
+        setClientName(data.contact_name);
+      }
+    } catch (error) {
+      console.error("Error fetching client name:", error);
+    }
+  };
 
   useEffect(() => {
     if (!loading && (!user || role !== "client")) {
@@ -78,6 +101,11 @@ const ClientDashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {clientName && (
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold">Hello, {clientName}</h2>
+          </div>
+        )}
         <Tabs defaultValue="pricing" className="space-y-6">
           <TabsList className="grid grid-cols-3 w-full max-w-xl">
             <TabsTrigger value="pricing">
