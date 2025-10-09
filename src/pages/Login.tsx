@@ -60,7 +60,7 @@ const Login = () => {
 
       if (roleError) {
         await supabase.auth.signOut();
-        throw new Error("Invalid email or password. Please try again.");
+        throw new Error("Authentication failed. Please check your credentials.");
       }
 
       // Check for expired temp password (clients only)
@@ -75,7 +75,7 @@ const Login = () => {
           const expiryDate = new Date(clientData.password_expires_at);
           if (expiryDate < new Date()) {
             await supabase.auth.signOut();
-            throw new Error("Invalid email or password. Please try again.");
+            throw new Error("Authentication failed. Please check your credentials.");
           }
         }
       }
@@ -94,7 +94,7 @@ const Login = () => {
     } catch (error: any) {
       toast({
         title: "Login failed",
-        description: error.message,
+        description: error.message || "Authentication failed. Please check your credentials.",
         variant: "destructive",
       });
     } finally {

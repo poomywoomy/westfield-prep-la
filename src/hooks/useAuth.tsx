@@ -16,9 +16,7 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          setTimeout(() => {
-            fetchUserRole(session.user.id);
-          }, 0);
+          fetchUserRole(session.user.id);
         } else {
           setRole(null);
           setLoading(false);

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -7,6 +8,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
+
+const clientCredentialsSchema = z.object({
+  email: z.string().email().max(255),
+  companyName: z.string().trim().min(1).max(200),
+  contactName: z.string().trim().min(1).max(200),
+  tempPassword: z.string().min(8).max(100),
+});
 
 interface ClientCredentialsRequest {
   email: string;
@@ -21,7 +29,22 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, companyName, contactName, tempPassword }: ClientCredentialsRequest = await req.json();
+    const body = await req.json();
+    
+    // Validate input
+    const validationResult = clientCredentialsSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error);
+      return new Response(
+        JSON.stringify({ error: "Invalid request data" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+    
+    const { email, companyName, contactName, tempPassword }: ClientCredentialsRequest = validationResult.data;
 
     console.log("Sending credentials email to:", email);
 
@@ -141,7 +164,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!emailResponse.ok) {
       console.error("Resend API error:", data);
-      throw new Error(data.message || "Failed to send email");
+      throw new Error("Email service error");
     }
 
     console.log("Client credentials email sent successfully:", data);
@@ -156,7 +179,7 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error sending client credentials email:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Unable to send credentials email. Please contact support." }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

@@ -55,8 +55,7 @@ serve(async (req) => {
       console.error("Validation error:", validationResult.error);
       return new Response(
         JSON.stringify({ 
-          error: "Invalid input data provided",
-          details: validationResult.error.issues 
+          error: "Invalid input data provided"
         }),
         {
           status: 400,
