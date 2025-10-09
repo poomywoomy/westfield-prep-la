@@ -44,12 +44,38 @@ const Login = () => {
     setLoading(true);
 
     try {
+      // Track failed login attempts for this email
+      const failedKey = `failedLogin_${email}`;
+      const failedAttempts = JSON.parse(localStorage.getItem(failedKey) || "[]");
+      const now = Date.now();
+      const thirtyMinutesAgo = now - 30 * 60 * 1000;
+      
+      const recentFailures = failedAttempts.filter((time: number) => time > thirtyMinutesAgo);
+      
+      if (recentFailures.length >= 5) {
+        toast({
+          title: "Account temporarily locked",
+          description: "Too many failed login attempts. Please try again in 30 minutes or reset your password.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Track failed attempt
+        recentFailures.push(now);
+        localStorage.setItem(failedKey, JSON.stringify(recentFailures));
+        throw error;
+      }
+
+      // Clear failed attempts on successful login
+      localStorage.removeItem(failedKey);
 
       // Check user role
       const { data: roleData, error: roleError } = await supabase
@@ -107,6 +133,26 @@ const Login = () => {
     setResetLoading(true);
 
     try {
+      // Rate limiting for password reset
+      const attempts = JSON.parse(localStorage.getItem("resetAttempts") || "[]");
+      const now = Date.now();
+      const fifteenMinutesAgo = now - 15 * 60 * 1000;
+      
+      const recentAttempts = attempts.filter((time: number) => time > fifteenMinutesAgo);
+      
+      if (recentAttempts.length >= 3) {
+        toast({
+          title: "Too many attempts",
+          description: "Please wait 15 minutes before requesting another reset link.",
+          variant: "destructive",
+        });
+        setResetLoading(false);
+        return;
+      }
+      
+      recentAttempts.push(now);
+      localStorage.setItem("resetAttempts", JSON.stringify(recentAttempts));
+
       const redirectUrl = `${window.location.origin}/reset-password`;
       
       const { error } = await supabase.functions.invoke('send-password-reset', {

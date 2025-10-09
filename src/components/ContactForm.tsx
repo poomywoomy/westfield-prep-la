@@ -25,9 +25,29 @@ const ContactForm = () => {
     phone: "",
     business: "",
     volume: "",
+    honeypot: "", // Bot detection field
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Rate limiting: track submission attempts
+  const checkRateLimit = () => {
+    const attempts = JSON.parse(localStorage.getItem("contactAttempts") || "[]");
+    const now = Date.now();
+    const fiveMinutesAgo = now - 5 * 60 * 1000;
+    
+    // Filter out attempts older than 5 minutes
+    const recentAttempts = attempts.filter((time: number) => time > fiveMinutesAgo);
+    
+    if (recentAttempts.length >= 3) {
+      return false;
+    }
+    
+    // Add current attempt
+    recentAttempts.push(now);
+    localStorage.setItem("contactAttempts", JSON.stringify(recentAttempts));
+    return true;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -42,8 +62,26 @@ const ContactForm = () => {
     setIsSubmitting(true);
 
     try {
+      // Check honeypot field (should be empty)
+      if (formData.honeypot) {
+        console.log("Bot detected via honeypot");
+        return;
+      }
+
+      // Check rate limit
+      if (!checkRateLimit()) {
+        toast({
+          title: "Too many attempts",
+          description: "Please wait a few minutes before submitting again.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       console.log("Starting form submission...");
-      const validatedData = contactSchema.parse(formData);
+      const { honeypot, ...submitData } = formData;
+      const validatedData = contactSchema.parse(submitData);
       console.log("Form data validated:", validatedData);
 
       // Send email via edge function
@@ -178,6 +216,17 @@ const ContactForm = () => {
               />
               {errors.volume && <p className="text-sm text-destructive mt-1">{errors.volume}</p>}
             </div>
+
+            {/* Honeypot field - hidden from users */}
+            <input
+              type="text"
+              name="honeypot"
+              value={formData.honeypot}
+              onChange={handleChange}
+              style={{ display: "none" }}
+              tabIndex={-1}
+              autoComplete="off"
+            />
 
             <Button
               type="submit"
