@@ -14,16 +14,306 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      billing_charges: {
+        Row: {
+          billing_month: string
+          charge_date: string
+          client_id: string
+          created_at: string
+          description: string | null
+          id: string
+          quantity: number
+          service_name: string
+          total_amount: number
+          unit_price: number
+        }
+        Insert: {
+          billing_month: string
+          charge_date?: string
+          client_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          quantity: number
+          service_name: string
+          total_amount: number
+          unit_price: number
+        }
+        Update: {
+          billing_month?: string
+          charge_date?: string
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          quantity?: number
+          service_name?: string
+          total_amount?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_charges_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          billing_frequency:
+            | Database["public"]["Enums"]["billing_frequency"]
+            | null
+          channels: Database["public"]["Enums"]["channel_type"][]
+          company_name: string
+          contact_name: string
+          created_at: string
+          email: string
+          estimated_units_per_month: number | null
+          extra_prep: boolean | null
+          id: string
+          password_expires_at: string | null
+          phone_number: string
+          pricing_active: boolean | null
+          receiving_format:
+            | Database["public"]["Enums"]["receiving_format"]
+            | null
+          storage: boolean | null
+          storage_units_per_month: number | null
+          temp_password: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_frequency?:
+            | Database["public"]["Enums"]["billing_frequency"]
+            | null
+          channels?: Database["public"]["Enums"]["channel_type"][]
+          company_name: string
+          contact_name: string
+          created_at?: string
+          email: string
+          estimated_units_per_month?: number | null
+          extra_prep?: boolean | null
+          id?: string
+          password_expires_at?: string | null
+          phone_number: string
+          pricing_active?: boolean | null
+          receiving_format?:
+            | Database["public"]["Enums"]["receiving_format"]
+            | null
+          storage?: boolean | null
+          storage_units_per_month?: number | null
+          temp_password?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_frequency?:
+            | Database["public"]["Enums"]["billing_frequency"]
+            | null
+          channels?: Database["public"]["Enums"]["channel_type"][]
+          company_name?: string
+          contact_name?: string
+          created_at?: string
+          email?: string
+          estimated_units_per_month?: number | null
+          extra_prep?: boolean | null
+          id?: string
+          password_expires_at?: string | null
+          phone_number?: string
+          pricing_active?: boolean | null
+          receiving_format?:
+            | Database["public"]["Enums"]["receiving_format"]
+            | null
+          storage?: boolean | null
+          storage_units_per_month?: number | null
+          temp_password?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      custom_pricing: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          price_per_unit: number | null
+          service_name: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          price_per_unit?: number | null
+          service_name: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          price_per_unit?: number | null
+          service_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_pricing_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          phone_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          phone_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          phone_number?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      qc_images: {
+        Row: {
+          client_id: string
+          expires_at: string
+          id: string
+          image_url: string
+          upload_date: string
+        }
+        Insert: {
+          client_id: string
+          expires_at?: string
+          id?: string
+          image_url: string
+          upload_date?: string
+        }
+        Update: {
+          client_id?: string
+          expires_at?: string
+          id?: string
+          image_url?: string
+          upload_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qc_images_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          quote_data: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          quote_data: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          quote_data?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_expired_qc_images: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "client"
+      billing_frequency: "pay_as_go" | "end_of_month"
+      channel_type: "amazon" | "walmart" | "shopify" | "ebay" | "other"
+      receiving_format: "pallets" | "cartons" | "both"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +440,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "client"],
+      billing_frequency: ["pay_as_go", "end_of_month"],
+      channel_type: ["amazon", "walmart", "shopify", "ebay", "other"],
+      receiving_format: ["pallets", "cartons", "both"],
+    },
   },
 } as const
