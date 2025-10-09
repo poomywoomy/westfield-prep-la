@@ -262,7 +262,7 @@ export type Database = {
       }
       quotes: {
         Row: {
-          client_id: string
+          client_id: string | null
           created_at: string
           id: string
           quote_data: Json
@@ -270,7 +270,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          client_id: string
+          client_id?: string | null
           created_at?: string
           id?: string
           quote_data: Json
@@ -278,7 +278,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          client_id?: string
+          client_id?: string | null
           created_at?: string
           id?: string
           quote_data?: Json

@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Download, Check } from "lucide-react";
+import { Plus, Trash2, Download, Check, Edit2 } from "lucide-react";
 import jsPDF from "jspdf";
 
 interface LineItem {
@@ -15,6 +15,7 @@ interface LineItem {
   service_name: string;
   service_price: number;
   notes: string;
+  isEditing?: boolean;
 }
 
 interface FulfillmentSection {
@@ -284,23 +285,34 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
     });
   };
 
-  const saveQuote = async () => {
-    const clientName = useManualEntry ? manualClientName : clients.find(c => c.id === selectedClientId)?.company_name;
-    
-    if (!clientName && !useManualEntry) {
-      toast({
-        title: "Error",
-        description: "Please select or enter a client name",
-        variant: "destructive",
-      });
-      return;
+  const toggleItemEdit = (id: string, isStandard: boolean, sectionId?: string) => {
+    if (isStandard) {
+      setStandardItems(standardItems.map(item => 
+        item.id === id ? { ...item, isEditing: !item.isEditing } : item
+      ));
+    } else if (sectionId) {
+      setFulfillmentSections(fulfillmentSections.map(section => 
+        section.id === sectionId 
+          ? {
+              ...section,
+              items: section.items.map(item => 
+                item.id === id ? { ...item, isEditing: !item.isEditing } : item
+              )
+            }
+          : section
+      ));
     }
+  };
 
+  const saveQuote = async () => {
+    // Allow saving with any data - no validation required
     setIsSubmitting(true);
 
     try {
+      const clientName = useManualEntry ? manualClientName : clients.find(c => c.id === selectedClientId)?.company_name;
+      
       const quoteData = {
-        client_name: clientName,
+        client_name: clientName || "Unnamed Quote",
         contact_name: useManualEntry ? manualContactName : "",
         email: useManualEntry ? manualEmail : "",
         phone: useManualEntry ? manualPhone : "",
@@ -527,69 +539,116 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
             </div>
 
             {standardItems.map((item) => (
-              <div key={item.id} className="border-b pb-3 space-y-2">
-                <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
-                  <div>
-                    <Label className="text-xs">Service</Label>
-                    {item.service_name === "Custom Entry" ? (
-                      <Input
-                        value={item.service_name}
-                        onChange={(e) => updateStandardItem(item.id, "service_name", e.target.value)}
-                        placeholder="Enter custom service"
-                      />
-                    ) : (
-                      <Select 
-                        value={item.service_name} 
-                        onValueChange={(value) => {
-                          if (value === "Custom Entry") {
-                            updateStandardItem(item.id, "service_name", "");
-                          } else {
-                            updateStandardItem(item.id, "service_name", value);
-                          }
-                        }}
+              <div key={item.id} className={`border-b pb-3 ${item.isEditing || !item.service_name ? 'space-y-2' : ''}`}>
+                {!item.isEditing && item.service_name ? (
+                  // Compact view
+                  <div className="flex items-center justify-between py-2">
+                    <div className="flex-1">
+                      <span className="font-medium">{item.service_name}</span>
+                      <span className="ml-4 text-muted-foreground">${item.service_price.toFixed(2)}</span>
+                      {item.notes && (
+                        <p className="text-sm text-muted-foreground mt-1">{item.notes}</p>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleItemEdit(item.id, true)}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select service" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {STANDARD_SERVICES.map((service) => (
-                            <SelectItem key={service} value={service}>
-                              {service}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeStandardItem(item.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <div>
-                    <Label className="text-xs">Price ($)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={item.service_price}
-                      onChange={(e) => updateStandardItem(item.id, "service_price", parseFloat(e.target.value) || 0)}
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeStandardItem(item.id)}
-                    className="mt-6"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div>
-                  <Label className="text-xs">Notes (optional)</Label>
-                  <Textarea
-                    value={item.notes}
-                    onChange={(e) => updateStandardItem(item.id, "notes", e.target.value)}
-                    placeholder="Add notes for this service"
-                    rows={2}
-                  />
-                </div>
+                ) : (
+                  // Edit view
+                  <>
+                    <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
+                      <div>
+                        <Label className="text-xs">Service</Label>
+                        {item.service_name === "Custom Entry" ? (
+                          <Input
+                            value={item.service_name}
+                            onChange={(e) => updateStandardItem(item.id, "service_name", e.target.value)}
+                            placeholder="Enter custom service"
+                          />
+                        ) : (
+                          <Select 
+                            value={item.service_name} 
+                            onValueChange={(value) => {
+                              if (value === "Custom Entry") {
+                                updateStandardItem(item.id, "service_name", "");
+                              } else {
+                                updateStandardItem(item.id, "service_name", value);
+                              }
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select service" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {STANDARD_SERVICES.map((service) => (
+                                <SelectItem key={service} value={service}>
+                                  {service}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-xs">Price ($)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={item.service_price}
+                          onChange={(e) => updateStandardItem(item.id, "service_price", parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className="flex gap-1">
+                        {item.service_name && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleItemEdit(item.id, true)}
+                            className="mt-6"
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeStandardItem(item.id)}
+                          className="mt-6"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Notes (optional)</Label>
+                      <Textarea
+                        value={item.notes}
+                        onChange={(e) => updateStandardItem(item.id, "notes", e.target.value)}
+                        placeholder="Add notes for this service"
+                        rows={2}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
@@ -664,69 +723,116 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
                 </div>
 
                 {section.items.map((item) => (
-                  <div key={item.id} className="border-b pb-3 space-y-2">
-                    <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
-                      <div>
-                        <Label className="text-xs">Service</Label>
-                        {item.service_name === "custom entry" || (item.service_name && !getServiceOptions(section.type).includes(item.service_name)) ? (
-                          <Input
-                            value={item.service_name === "custom entry" ? "" : item.service_name}
-                            onChange={(e) => updateFulfillmentItem(section.id, item.id, "service_name", e.target.value)}
-                            placeholder="Enter custom service"
-                          />
-                        ) : (
-                          <Select 
-                            value={item.service_name} 
-                            onValueChange={(value) => {
-                              if (value === "custom entry") {
-                                updateFulfillmentItem(section.id, item.id, "service_name", "");
-                              } else {
-                                updateFulfillmentItem(section.id, item.id, "service_name", value);
-                              }
-                            }}
+                  <div key={item.id} className={`border-b pb-3 ${item.isEditing || !item.service_name ? 'space-y-2' : ''}`}>
+                    {!item.isEditing && item.service_name ? (
+                      // Compact view
+                      <div className="flex items-center justify-between py-2">
+                        <div className="flex-1">
+                          <span className="font-medium">{item.service_name}</span>
+                          <span className="ml-4 text-muted-foreground">${item.service_price.toFixed(2)}</span>
+                          {item.notes && (
+                            <p className="text-sm text-muted-foreground mt-1">{item.notes}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleItemEdit(item.id, false, section.id)}
                           >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select service" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {getServiceOptions(section.type).map((service) => (
-                                <SelectItem key={service} value={service}>
-                                  {service}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFulfillmentItem(section.id, item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div>
-                        <Label className="text-xs">Price ($)</Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={item.service_price}
-                          onChange={(e) => updateFulfillmentItem(section.id, item.id, "service_price", parseFloat(e.target.value) || 0)}
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFulfillmentItem(section.id, item.id)}
-                        className="mt-6"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div>
-                      <Label className="text-xs">Notes (optional)</Label>
-                      <Textarea
-                        value={item.notes}
-                        onChange={(e) => updateFulfillmentItem(section.id, item.id, "notes", e.target.value)}
-                        placeholder="Add notes for this service"
-                        rows={2}
-                      />
-                    </div>
+                    ) : (
+                      // Edit view
+                      <>
+                        <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
+                          <div>
+                            <Label className="text-xs">Service</Label>
+                            {item.service_name === "custom entry" || (item.service_name && !getServiceOptions(section.type).includes(item.service_name)) ? (
+                              <Input
+                                value={item.service_name === "custom entry" ? "" : item.service_name}
+                                onChange={(e) => updateFulfillmentItem(section.id, item.id, "service_name", e.target.value)}
+                                placeholder="Enter custom service"
+                              />
+                            ) : (
+                              <Select 
+                                value={item.service_name} 
+                                onValueChange={(value) => {
+                                  if (value === "custom entry") {
+                                    updateFulfillmentItem(section.id, item.id, "service_name", "");
+                                  } else {
+                                    updateFulfillmentItem(section.id, item.id, "service_name", value);
+                                  }
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select service" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {getServiceOptions(section.type).map((service) => (
+                                    <SelectItem key={service} value={service}>
+                                      {service}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
+                          <div>
+                            <Label className="text-xs">Price ($)</Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={item.service_price}
+                              onChange={(e) => updateFulfillmentItem(section.id, item.id, "service_price", parseFloat(e.target.value) || 0)}
+                            />
+                          </div>
+                          <div className="flex gap-1">
+                            {item.service_name && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleItemEdit(item.id, false, section.id)}
+                                className="mt-6"
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                            )}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFulfillmentItem(section.id, item.id)}
+                              className="mt-6"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-xs">Notes (optional)</Label>
+                          <Textarea
+                            value={item.notes}
+                            onChange={(e) => updateFulfillmentItem(section.id, item.id, "notes", e.target.value)}
+                            placeholder="Add notes for this service"
+                            rows={2}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
@@ -747,7 +853,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
               type="button"
               variant="outline"
               onClick={saveQuote}
-              disabled={isSubmitting || (!selectedClientId && !manualClientName) || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
+              disabled={isSubmitting}
             >
               {editingQuote ? 'Update Quote' : 'Save Quote'}
             </Button>
