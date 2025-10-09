@@ -607,7 +607,13 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
                 type="button"
                 variant={useManualEntry ? "default" : "outline"}
                 size="sm"
-                onClick={() => setUseManualEntry(!useManualEntry)}
+                onClick={() => {
+                  setUseManualEntry(!useManualEntry);
+                  // Clear selections when toggling modes
+                  if (!useManualEntry) {
+                    setSelectedClientId("");
+                  }
+                }}
               >
                 {useManualEntry ? "Using Manual Entry" : "Manual Entry"}
               </Button>
@@ -652,7 +658,16 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
             ) : (
               <div>
                 <Label>Select Client</Label>
-                <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                <Select 
+                  value={selectedClientId} 
+                  onValueChange={(value) => {
+                    setSelectedClientId(value);
+                    // When switching to client selection, ensure useManualEntry is false
+                    if (value && useManualEntry) {
+                      setUseManualEntry(false);
+                    }
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Choose a client" />
                   </SelectTrigger>

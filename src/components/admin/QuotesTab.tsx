@@ -367,7 +367,11 @@ const QuotesTab = () => {
                           <h3 className="font-semibold">
                             {quoteData.client_name || 'Unassigned Quote'}
                           </h3>
-                          {!quote.client_id && (
+                          {quote.client_id ? (
+                            <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/20">
+                              Assigned to {clientName}
+                            </Badge>
+                          ) : (
                             <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 border-yellow-500/20">
                               Not Assigned to Client
                             </Badge>
