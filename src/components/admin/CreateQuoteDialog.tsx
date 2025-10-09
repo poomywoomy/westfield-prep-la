@@ -92,7 +92,8 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
       id: crypto.randomUUID(), 
       service_name: "", 
       service_price: 0, 
-      notes: ""
+      notes: "",
+      isEditing: true
     }]);
   };
 
@@ -125,7 +126,8 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
             id: crypto.randomUUID(), 
             service_name: "", 
             service_price: 0, 
-            notes: "" 
+            notes: "",
+            isEditing: true
           }]}
         : section
     ));
