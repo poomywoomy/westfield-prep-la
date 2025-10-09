@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -10,6 +11,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
+
+const passwordResetSchema = z.object({
+  email: z.string().email().max(255),
+  redirectUrl: z.string().url().max(500),
+});
 
 interface PasswordResetRequest {
   email: string;
@@ -22,7 +28,25 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, redirectUrl }: PasswordResetRequest = await req.json();
+    const body = await req.json();
+    
+    // Validate input
+    const validationResult = passwordResetSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error);
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input data provided",
+          details: validationResult.error.issues 
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+    
+    const { email, redirectUrl }: PasswordResetRequest = validationResult.data;
 
     console.log("Processing password reset request for:", email);
 
@@ -163,7 +187,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.error("Error in send-password-reset function:", error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: "Unable to send password reset email. Please try again or contact support.",
         success: false 
       }),
       {

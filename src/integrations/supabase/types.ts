@@ -122,7 +122,6 @@ export type Database = {
           status: Database["public"]["Enums"]["client_status"] | null
           storage: boolean | null
           storage_units_per_month: number | null
-          temp_password: string | null
           updated_at: string
           user_id: string
         }
@@ -153,7 +152,6 @@ export type Database = {
           status?: Database["public"]["Enums"]["client_status"] | null
           storage?: boolean | null
           storage_units_per_month?: number | null
-          temp_password?: string | null
           updated_at?: string
           user_id: string
         }
@@ -184,7 +182,6 @@ export type Database = {
           status?: Database["public"]["Enums"]["client_status"] | null
           storage?: boolean | null
           storage_units_per_month?: number | null
-          temp_password?: string | null
           updated_at?: string
           user_id?: string
         }

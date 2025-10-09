@@ -1,10 +1,28 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+const createClientSchema = z.object({
+  email: z.string().email().max(255),
+  tempPassword: z.string().min(8).max(100),
+  company_name: z.string().trim().min(1).max(200),
+  first_name: z.string().trim().min(1).max(100),
+  last_name: z.string().trim().min(1).max(100),
+  phone_number: z.string().trim().min(1).max(20),
+  estimated_units_per_month: z.number().int().positive().nullable(),
+  receiving_format: z.string().max(100),
+  extra_prep: z.boolean(),
+  storage: z.boolean(),
+  storage_units_per_month: z.number().int().positive().nullable(),
+  admin_notes: z.string().max(2000),
+  fulfillment_services: z.array(z.string()),
+  password_expires_at: z.string(),
+});
 
 interface CreateClientRequest {
   email: string;
@@ -29,7 +47,25 @@ serve(async (req) => {
   }
 
   try {
-    const requestData: CreateClientRequest = await req.json();
+    const body = await req.json();
+    
+    // Validate input
+    const validationResult = createClientSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error);
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input data provided",
+          details: validationResult.error.issues 
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+    
+    const requestData: CreateClientRequest = validationResult.data;
     console.log("Creating client for email:", requestData.email);
 
     const supabaseAdmin = createClient(
@@ -121,7 +157,7 @@ serve(async (req) => {
 
     console.log("Client role assigned");
 
-    // Upsert client record
+    // Upsert client record (NOT storing temp_password for security)
     const { error: clientError } = await supabaseAdmin
       .from("clients")
       .upsert({
@@ -139,7 +175,6 @@ serve(async (req) => {
         storage_units_per_month: requestData.storage_units_per_month,
         admin_notes: requestData.admin_notes,
         fulfillment_services: requestData.fulfillment_services,
-        temp_password: requestData.tempPassword,
         password_expires_at: requestData.password_expires_at,
         status: 'pending',
       }, {
@@ -167,7 +202,9 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("Error creating client:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: "Unable to create client account. Please try again or contact support."
+      }),
       {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

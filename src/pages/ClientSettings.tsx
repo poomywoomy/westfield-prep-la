@@ -52,8 +52,8 @@ const ClientSettings = () => {
       setCompanyName(data.company_name || "");
       setPhoneNumber(data.phone_number || "");
       
-      // Check if user has already set their password
-      setHasSetPassword(!data.temp_password);
+      // Check if user has password expiration set (indicates temporary password)
+      setHasSetPassword(!data.password_expires_at);
     }
   };
 

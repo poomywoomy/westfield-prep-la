@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -7,6 +8,27 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
+
+const contactEmailSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  email: z.string().email().max(255),
+  phone: z.string().trim().min(1).max(20),
+  business: z.string().trim().min(1).max(200),
+  volume: z.string().trim().min(1).max(1000),
+  recipientEmail: z.string().email().max(255),
+});
+
+// HTML escape function to prevent XSS
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
 
 interface ContactEmailRequest {
   name: string;
@@ -23,7 +45,32 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, phone, business, volume, recipientEmail }: ContactEmailRequest = await req.json();
+    const body = await req.json();
+    
+    // Validate input
+    const validationResult = contactEmailSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error);
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input data provided",
+          details: validationResult.error.issues 
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+    
+    const { name, email, phone, business, volume, recipientEmail }: ContactEmailRequest = validationResult.data;
+    
+    // Escape HTML to prevent XSS
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safePhone = escapeHtml(phone);
+    const safeBusiness = escapeHtml(business);
+    const safeVolume = escapeHtml(volume);
 
     console.log("Sending contact form email to:", recipientEmail);
 
@@ -41,14 +88,14 @@ const handler = async (req: Request): Promise<Response> => {
         subject: `New Contact Form Submission from ${name}`,
         html: `
           <h2>New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Phone:</strong> ${phone}</p>
-          <p><strong>Business:</strong> ${business}</p>
+          <p><strong>Name:</strong> ${safeName}</p>
+          <p><strong>Email:</strong> ${safeEmail}</p>
+          <p><strong>Phone:</strong> ${safePhone}</p>
+          <p><strong>Business:</strong> ${safeBusiness}</p>
           <p><strong>Monthly Volume & Requirements:</strong></p>
-          <p>${volume}</p>
+          <p>${safeVolume}</p>
           <hr>
-          <p style="color: #666; font-size: 12px;">You can reply directly to this email to respond to ${name}</p>
+          <p style="color: #666; font-size: 12px;">You can reply directly to this email to respond to ${safeName}</p>
         `,
       }),
     });
@@ -101,7 +148,7 @@ const handler = async (req: Request): Promise<Response> => {
                           <h1 style="color: #0F172A; margin: 0 0 20px 0; font-size: 28px; font-weight: 700;">Thank You for Reaching Out!</h1>
                           
                           <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                            Hi ${name},
+                            Hi ${safeName},
                           </p>
                           
                           <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
@@ -113,23 +160,23 @@ const handler = async (req: Request): Promise<Response> => {
                             <table width="100%" cellpadding="8" cellspacing="0">
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Name:</td>
-                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${name}</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeName}</td>
                               </tr>
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Email:</td>
-                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${email}</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeEmail}</td>
                               </tr>
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Phone:</td>
-                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${phone}</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safePhone}</td>
                               </tr>
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Business:</td>
-                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${business}</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeBusiness}</td>
                               </tr>
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0; vertical-align: top;">Requirements:</td>
-                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${volume}</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeVolume}</td>
                               </tr>
                             </table>
                           </div>
@@ -186,7 +233,9 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error sending contact email:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: "Unable to send contact email. Please try again or contact support."
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

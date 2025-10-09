@@ -32,7 +32,7 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("contact_name, temp_password, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, fulfillment_services")
+        .select("contact_name, password_expires_at, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, fulfillment_services")
         .eq("user_id", user?.id)
         .single();
 
@@ -40,8 +40,8 @@ const ClientDashboard = () => {
         setClientName(data.contact_name);
         setClientStats(data);
         
-        // Show password change dialog if temp password exists
-        if (data.temp_password) {
+        // Show password change dialog if password_expires_at is set (indicating temporary password)
+        if (data.password_expires_at) {
           setShowPasswordChange(true);
         }
       }
