@@ -29,10 +29,10 @@ const ServiceBreakdown = () => {
   ];
 
   const amazonPrepServices = [
-    "FNSKU Labeling - $0.70/unit",
-    "Polybag + Label - $1.40/unit",
-    "Bubble Wrap - +$0.50/unit",
-    "Bundling - +$0.50/unit",
+    "FNSKU Labeling",
+    "Polybag + Label",
+    "Bubble Wrap",
+    "Bundling",
     "Box Content Labels",
     "Case Packing",
   ];
@@ -47,8 +47,8 @@ const ServiceBreakdown = () => {
 
   const walmartPrepServices = [
     "Walmart Barcode Application",
-    "Polybag + Label - $1.40/unit",
-    "Bubble Wrap - +$0.50/unit",
+    "Polybag + Label",
+    "Bubble Wrap",
     "Case Pack Requirements",
     "Box Content Labels",
     "Returns Processing",
@@ -83,7 +83,7 @@ const ServiceBreakdown = () => {
     "Custom Branding & Packaging",
     "Influencer Kit Assembly",
     "Fast-Track Processing",
-    "Polybag + Label - $1.40/unit",
+    "Polybag + Label",
     "Seasonal Campaign Prep",
     "Order Tracking Integration",
   ];
