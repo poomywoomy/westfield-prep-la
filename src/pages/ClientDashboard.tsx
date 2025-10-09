@@ -11,12 +11,14 @@ import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientPricingTab from "@/components/client/ClientPricingTab";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientQCImagesTab from "@/components/client/ClientQCImagesTab";
+import FirstPasswordChangeDialog from "@/components/client/FirstPasswordChangeDialog";
 
 const ClientDashboard = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [clientName, setClientName] = useState<string>("");
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -28,12 +30,17 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("contact_name")
+        .select("contact_name, temp_password")
         .eq("user_id", user?.id)
         .single();
 
       if (!error && data) {
         setClientName(data.contact_name);
+        
+        // Show password change dialog if temp password exists
+        if (data.temp_password) {
+          setShowPasswordChange(true);
+        }
       }
     } catch (error) {
       console.error("Error fetching client name:", error);
@@ -45,6 +52,11 @@ const ClientDashboard = () => {
       navigate("/login");
     }
   }, [user, role, loading, navigate]);
+
+  const handlePasswordChangeSuccess = () => {
+    setShowPasswordChange(false);
+    fetchClientName(); // Refresh to update state
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -68,8 +80,13 @@ const ClientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+    <>
+      <FirstPasswordChangeDialog 
+        open={showPasswordChange} 
+        onSuccess={handlePasswordChangeSuccess}
+      />
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/">
@@ -135,7 +152,8 @@ const ClientDashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
-    </div>
+      </div>
+    </>
   );
 };
 

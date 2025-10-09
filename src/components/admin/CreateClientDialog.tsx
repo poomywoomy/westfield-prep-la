@@ -28,7 +28,8 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     company_name: "",
-    contact_name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     phone_number: "",
     estimated_units_per_month: "",
@@ -56,7 +57,8 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
           email: formData.email,
           tempPassword: tempPassword,
           company_name: formData.company_name,
-          contact_name: formData.contact_name,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           phone_number: formData.phone_number,
           estimated_units_per_month: formData.estimated_units_per_month ? parseInt(formData.estimated_units_per_month) : null,
           receiving_format: formData.receiving_format,
@@ -78,7 +80,7 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
           body: {
             email: formData.email,
             companyName: formData.company_name,
-            contactName: formData.contact_name,
+            contactName: `${formData.first_name} ${formData.last_name}`,
             tempPassword: tempPassword,
           },
         });
@@ -129,11 +131,21 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="contact_name">Contact Name *</Label>
+              <Label htmlFor="first_name">First Name *</Label>
               <Input
-                id="contact_name"
-                value={formData.contact_name}
-                onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
+                id="first_name"
+                value={formData.first_name}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="last_name">Last Name *</Label>
+              <Input
+                id="last_name"
+                value={formData.last_name}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                 required
               />
             </div>

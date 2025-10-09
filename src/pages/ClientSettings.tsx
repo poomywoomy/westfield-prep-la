@@ -19,10 +19,12 @@ const ClientSettings = () => {
   const [lastName, setLastName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [hasSetPassword, setHasSetPassword] = useState(true);
 
   useEffect(() => {
     if (!loading && (!user || role !== "client")) {
@@ -49,6 +51,9 @@ const ClientSettings = () => {
       setLastName(data.last_name || "");
       setCompanyName(data.company_name || "");
       setPhoneNumber(data.phone_number || "");
+      
+      // Check if user has already set their password
+      setHasSetPassword(!data.temp_password);
     }
   };
 
@@ -96,35 +101,59 @@ const ClientSettings = () => {
       return;
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       toast({
         title: "Error",
-        description: "Password must be at least 6 characters",
+        description: "Password must be at least 8 characters",
         variant: "destructive",
       });
       return;
     }
 
     setIsUpdating(true);
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
 
-    setIsUpdating(false);
+    try {
+      // If user has already set their password, verify current password
+      if (hasSetPassword) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: user?.email || "",
+          password: currentPassword,
+        });
 
-    if (error) {
+        if (signInError) {
+          toast({
+            title: "Error",
+            description: "Current password is incorrect",
+            variant: "destructive",
+          });
+          setIsUpdating(false);
+          return;
+        }
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Password updated successfully",
+      });
+      
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setHasSetPassword(true);
+    } catch (error: any) {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Success",
-        description: "Password updated successfully",
-      });
-      setNewPassword("");
-      setConfirmPassword("");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -220,6 +249,19 @@ const ClientSettings = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handlePasswordChange} className="space-y-4">
+                {hasSetPassword && (
+                  <div>
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <Input
+                      id="currentPassword"
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Enter current password"
+                      required
+                    />
+                  </div>
+                )}
                 <div>
                   <Label htmlFor="newPassword">New Password</Label>
                   <Input

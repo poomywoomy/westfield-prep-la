@@ -10,7 +10,8 @@ interface CreateClientRequest {
   email: string;
   tempPassword: string;
   company_name: string;
-  contact_name: string;
+  first_name: string;
+  last_name: string;
   phone_number: string;
   estimated_units_per_month: number | null;
   receiving_format: string;
@@ -86,7 +87,9 @@ serve(async (req) => {
       .upsert({
         id: userId,
         email: requestData.email,
-        full_name: requestData.contact_name,
+        first_name: requestData.first_name,
+        last_name: requestData.last_name,
+        full_name: `${requestData.first_name} ${requestData.last_name}`,
         company_name: requestData.company_name,
         phone_number: requestData.phone_number,
       }, {
@@ -124,7 +127,9 @@ serve(async (req) => {
       .upsert({
         user_id: userId,
         company_name: requestData.company_name,
-        contact_name: requestData.contact_name,
+        first_name: requestData.first_name,
+        last_name: requestData.last_name,
+        contact_name: `${requestData.first_name} ${requestData.last_name}`,
         email: requestData.email,
         phone_number: requestData.phone_number,
         estimated_units_per_month: requestData.estimated_units_per_month,
