@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -26,7 +27,7 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
     extra_prep: false,
     storage: false,
     storage_units_per_month: "",
-    billing_frequency: "end_of_month" as "pay_as_go" | "end_of_month",
+    admin_notes: "",
   });
   const { toast } = useToast();
 
@@ -41,7 +42,7 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
         extra_prep: client.extra_prep || false,
         storage: client.storage || false,
         storage_units_per_month: client.storage_units_per_month?.toString() || "",
-        billing_frequency: client.billing_frequency || "end_of_month",
+        admin_notes: client.admin_notes || "",
       });
     }
   }, [client]);
@@ -62,7 +63,7 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
           extra_prep: formData.extra_prep,
           storage: formData.storage,
           storage_units_per_month: formData.storage_units_per_month ? parseInt(formData.storage_units_per_month) : null,
-          billing_frequency: formData.billing_frequency,
+          admin_notes: formData.admin_notes,
         })
         .eq("id", client.id);
 
@@ -154,31 +155,17 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="billing_frequency">Billing Frequency</Label>
-              <Select
-                value={formData.billing_frequency}
-                onValueChange={(value: any) => setFormData({ ...formData, billing_frequency: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pay_as_go">Pay As Go</SelectItem>
-                  <SelectItem value="end_of_month">End of Month</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="storage_units">Storage Units/Month</Label>
-              <Input
-                id="storage_units"
-                type="number"
-                value={formData.storage_units_per_month}
-                onChange={(e) => setFormData({ ...formData, storage_units_per_month: e.target.value })}
-              />
-            </div>
+            {formData.storage && (
+              <div className="space-y-2">
+                <Label htmlFor="storage_units">Storage Units/Month</Label>
+                <Input
+                  id="storage_units"
+                  type="number"
+                  value={formData.storage_units_per_month}
+                  onChange={(e) => setFormData({ ...formData, storage_units_per_month: e.target.value })}
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">
@@ -199,6 +186,17 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
               />
               <Label htmlFor="storage">Storage</Label>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="admin_notes">Admin Notes (Internal Only)</Label>
+            <Textarea
+              id="admin_notes"
+              value={formData.admin_notes}
+              onChange={(e) => setFormData({ ...formData, admin_notes: e.target.value })}
+              placeholder="Internal notes visible only to admin..."
+              rows={4}
+            />
           </div>
 
           <div className="flex justify-end space-x-2">

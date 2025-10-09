@@ -63,6 +63,7 @@ export type Database = {
       }
       clients: {
         Row: {
+          admin_notes: string | null
           billing_frequency:
             | Database["public"]["Enums"]["billing_frequency"]
             | null
@@ -87,6 +88,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin_notes?: string | null
           billing_frequency?:
             | Database["public"]["Enums"]["billing_frequency"]
             | null
@@ -111,6 +113,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin_notes?: string | null
           billing_frequency?:
             | Database["public"]["Enums"]["billing_frequency"]
             | null
