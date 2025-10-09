@@ -20,12 +20,58 @@ const ServiceBreakdown = () => {
     setTimeout(() => window.scrollTo(0, 0), 100);
   };
 
-  const amazonProcess = [
-    "Receiving & Inspection",
-    "Quality Control Check",
-    "FNSKU Label Application",
-    "Prep Services (Polybag, Bubble Wrap, Bundling)",
-    "Shipment Creation & Forwarding to Amazon FBA",
+  const amazonFBAProcess = [
+    {
+      title: "Receiving & Quality Inspection",
+      description: "All inbound shipments are carefully received, counted, and inspected for accuracy and condition."
+    },
+    {
+      title: "Photo Proofs & Quality Control",
+      description: "High-resolution photos and detailed QC checks provided for transparency and assurance."
+    },
+    {
+      title: "Secure Storage Until Shipment",
+      description: "Units are safely stored in our facility until you're ready to ship to Amazon or another destination."
+    },
+    {
+      title: "Professional Prep Services",
+      description: "Comprehensive prep including FNSKU labeling, polybagging, bubble wrapping, and bundling — done to Amazon's exact standards."
+    },
+    {
+      title: "Shipment Planning & Creation",
+      description: "We handle Amazon shipment creation, box content uploads, and all required documentation."
+    },
+    {
+      title: "Ship Directly to Amazon FBA",
+      description: "We finalize and dispatch shipments directly to Amazon fulfillment centers for fast, seamless delivery."
+    }
+  ];
+
+  const amazonFBMProcess = [
+    {
+      title: "Receiving & Quality Inspection",
+      description: "Inbound inventory is received, counted, and inspected for quality and accuracy."
+    },
+    {
+      title: "Secure Storage & Inventory Management",
+      description: "Products are stored securely with real-time inventory tracking and management."
+    },
+    {
+      title: "Order Receipt & Processing",
+      description: "Orders are received from your sales channels and immediately processed for fulfillment."
+    },
+    {
+      title: "Pick, Pack & Quality Check",
+      description: "Items are picked, carefully packed with protective materials, and quality checked before shipping."
+    },
+    {
+      title: "Shipping Label Creation",
+      description: "Shipping labels are generated with the most cost-effective carrier for your customer's location."
+    },
+    {
+      title: "Ship Direct to Customer",
+      description: "Packages are dispatched directly to your customers with tracking information provided."
+    }
   ];
 
   const amazonPrepServices = [
@@ -114,23 +160,47 @@ const ServiceBreakdown = () => {
             <TabsContent value="amazon">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl">Amazon FBA Services</CardTitle>
+                  <CardTitle className="text-2xl">Amazon FBA & FBM Services</CardTitle>
                   <CardDescription>
                     Complete prep and fulfillment for Amazon sellers
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations</h3>
-                    <div className="space-y-3">
-                      {amazonProcess.map((step, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
-                            {index + 1}
+                  <div className="grid md:grid-cols-2 gap-8 mb-8">
+                    {/* FBA Process */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations for FBA Shipment</h3>
+                      <div className="space-y-4">
+                        {amazonFBAProcess.map((step, index) => (
+                          <div key={index} className="flex gap-3">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground">{step.title}</p>
+                              <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                            </div>
                           </div>
-                          <span className="text-foreground pt-1">{step}</span>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* FBM Process */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations for FBM Shipments</h3>
+                      <div className="space-y-4">
+                        {amazonFBMProcess.map((step, index) => (
+                          <div key={index} className="flex gap-3">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground">{step.title}</p>
+                              <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
