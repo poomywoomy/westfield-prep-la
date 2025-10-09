@@ -25,10 +25,10 @@ const Hero = () => {
       <div className="container mx-auto px-4 relative z-10 pt-16">
         <div className="max-w-4xl mx-auto text-center text-white">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-            FBA Prep & Fulfillment for Amazon Sellers
+            Prep & Fulfillment for Amazon & Shopify Sellers—Simplified.
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-            Fast, reliable receiving, inspection, labeling, bundling & shipping — trusted by Amazon FBA sellers.
+            Save hours and scale faster with done-for-you prep, bundling, and shipping for Amazon & Shopify sellers.
           </p>
           <Button
             onClick={goToContact}
