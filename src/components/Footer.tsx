@@ -72,6 +72,13 @@ const Footer = () => {
               >
                 Privacy Policy
               </Link>
+              <span className="text-white/40">•</span>
+              <Link
+                to="/admin/login"
+                className="text-xs text-white/60 hover:text-white/80 transition-colors"
+              >
+                Sign In
+              </Link>
             </div>
             <p className="text-xs text-white/60 mt-2">
               © {new Date().getFullYear()} Westfield Prep Center. All rights reserved.
