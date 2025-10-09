@@ -84,11 +84,30 @@ const ServiceBreakdown = () => {
   ];
 
   const walmartProcess = [
-    "Receiving & Inspection",
-    "Quality Control Check",
-    "Walmart Barcode Application",
-    "Prep Services (Polybag, Protective Packaging)",
-    "Shipment Creation & Routing to WFS",
+    {
+      title: "Receiving & Quality Inspection",
+      description: "All inbound shipments are carefully received, counted, and inspected for accuracy and condition."
+    },
+    {
+      title: "Photo Proofs & Quality Control",
+      description: "High-resolution photos and detailed QC checks provided for transparency and assurance."
+    },
+    {
+      title: "Secure Storage Until Shipment",
+      description: "Units are safely stored in our facility until you're ready to ship to Walmart or another destination."
+    },
+    {
+      title: "Professional Prep Services",
+      description: "Comprehensive prep including Walmart barcode labeling, polybagging, bubble wrapping, and bundling — done to Walmart's exact standards."
+    },
+    {
+      title: "Shipment Planning & Creation",
+      description: "We handle Walmart WFS shipment creation, box content uploads, and all required documentation."
+    },
+    {
+      title: "Ship Directly to Walmart WFS",
+      description: "We finalize and dispatch shipments directly to Walmart fulfillment centers for fast, seamless delivery."
+    }
   ];
 
   const walmartPrepServices = [
@@ -235,14 +254,17 @@ const ServiceBreakdown = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations</h3>
-                    <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations for WFS Integrated</h3>
+                    <div className="space-y-4">
                       {walmartProcess.map((step, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                        <div key={index} className="flex gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
                             {index + 1}
                           </div>
-                          <span className="text-foreground pt-1">{step}</span>
+                          <div>
+                            <p className="font-semibold text-foreground">{step.title}</p>
+                            <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                          </div>
                         </div>
                       ))}
                     </div>
