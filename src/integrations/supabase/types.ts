@@ -444,6 +444,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clear_password_expiration: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       delete_expired_qc_images: {
         Args: Record<PropertyKey, never>
         Returns: undefined

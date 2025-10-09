@@ -47,20 +47,12 @@ const FirstPasswordChangeDialog = ({ open, onSuccess }: FirstPasswordChangeDialo
 
       if (error) throw error;
 
-      // Clear the password expiration (temp_password no longer stored in DB for security)
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { error: updateError } = await supabase
-          .from('clients')
-          .update({ 
-            password_expires_at: null,
-            status: 'active'
-          })
-          .eq('user_id', user.id);
-
-        if (updateError) {
-          console.error('Error clearing password expiration:', updateError);
-        }
+      // Clear the password expiration using secure RPC function
+      const { error: clearError } = await supabase.rpc('clear_password_expiration');
+      
+      if (clearError) {
+        console.error('Error clearing password expiration:', clearError);
+        throw clearError;
       }
 
       toast({
