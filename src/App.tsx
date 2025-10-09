@@ -15,6 +15,8 @@ import Login from "./pages/Login";
 import SetupAdmin from "./pages/SetupAdmin";
 import AdminDashboard from "./pages/AdminDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
+import AdminSettings from "./pages/AdminSettings";
+import ClientSettings from "./pages/ClientSettings";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +37,9 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/setup-admin" element={<SetupAdmin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/client/dashboard" element={<ClientDashboard />} />
+          <Route path="/client/settings" element={<ClientSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
