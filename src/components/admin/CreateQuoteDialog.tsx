@@ -705,19 +705,19 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
                     <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
                       <div>
                         <Label className="text-xs">Service</Label>
-                        {item.service_name === "" || item.service_name === "Custom Entry" || !STANDARD_SERVICES.includes(item.service_name) ? (
+                        {(item.service_name === "Custom Entry" || (item.service_name && !STANDARD_SERVICES.includes(item.service_name))) ? (
                           <Input
-                            value={item.service_name === "Custom Entry" || item.service_name === "" ? "" : item.service_name}
+                            value={item.service_name === "Custom Entry" ? "" : item.service_name}
                             onChange={(e) => updateStandardItem(item.id, "service_name", e.target.value)}
                             placeholder="Enter custom service"
                             autoFocus
                           />
                         ) : (
                           <Select 
-                            value={item.service_name} 
+                            value={item.service_name || undefined} 
                             onValueChange={(value) => {
                               if (value === "Custom Entry") {
-                                updateStandardItem(item.id, "service_name", "");
+                                updateStandardItem(item.id, "service_name", "Custom Entry");
                               } else {
                                 updateStandardItem(item.id, "service_name", value);
                               }
@@ -890,19 +890,19 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
                         <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
                           <div>
                             <Label className="text-xs">Service</Label>
-                            {item.service_name === "" || item.service_name === "Custom Entry" || item.service_name === "custom entry" || (item.service_name && !getServiceOptions(section.type).includes(item.service_name)) ? (
+                            {(item.service_name === "Custom Entry" || (item.service_name && !getServiceOptions(section.type).includes(item.service_name))) ? (
                               <Input
-                                value={item.service_name === "Custom Entry" || item.service_name === "custom entry" || item.service_name === "" ? "" : item.service_name}
+                                value={item.service_name === "Custom Entry" ? "" : item.service_name}
                                 onChange={(e) => updateFulfillmentItem(section.id, item.id, "service_name", e.target.value)}
                                 placeholder="Enter custom service"
                                 autoFocus
                               />
                             ) : (
                               <Select 
-                                value={item.service_name} 
+                                value={item.service_name || undefined} 
                                 onValueChange={(value) => {
-                                  if (value === "Custom Entry" || value === "custom entry") {
-                                    updateFulfillmentItem(section.id, item.id, "service_name", "");
+                                  if (value === "Custom Entry") {
+                                    updateFulfillmentItem(section.id, item.id, "service_name", "Custom Entry");
                                   } else {
                                     updateFulfillmentItem(section.id, item.id, "service_name", value);
                                   }
