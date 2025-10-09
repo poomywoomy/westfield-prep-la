@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Download, Check, FileText } from "lucide-react";
+import { Plus, Trash2, Download, Check } from "lucide-react";
 import jsPDF from "jspdf";
 
 interface LineItem {
@@ -15,8 +15,40 @@ interface LineItem {
   service_name: string;
   service_price: number;
   notes: string;
-  showNotes: boolean;
 }
+
+interface FulfillmentSection {
+  id: string;
+  type: "Amazon FBA" | "Walmart WFS" | "TikTok Shop" | "Self Fulfillment";
+  items: LineItem[];
+}
+
+const STANDARD_SERVICES = [
+  "Monthly Deposit",
+  "Pallet Receiving",
+  "Carton Receiving",
+  "Cubic Feet Storage",
+  "Shelf Storage",
+  "Custom Entry"
+];
+
+const MARKETPLACE_SERVICES = [
+  "FNSKU Label",
+  "Polybox+Label",
+  "Bubble Wrap",
+  "Bundling",
+  "Additional Label",
+  "Shipment Box",
+  "Custom Entry"
+];
+
+const SELF_FULFILLMENT_SERVICES = [
+  "Single Product",
+  "Oversized Product",
+  "Bundling",
+  "Bubble Wrapping",
+  "Custom Entry"
+];
 
 interface CreateQuoteDialogProps {
   open: boolean;
@@ -30,40 +62,76 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
   const [selectedClientId, setSelectedClientId] = useState("");
   const [manualClientName, setManualClientName] = useState("");
   const [useManualEntry, setUseManualEntry] = useState(false);
-  const [lineItems, setLineItems] = useState<LineItem[]>([
-    { id: crypto.randomUUID(), service_name: "", service_price: 0, notes: "", showNotes: false }
-  ]);
+  const [standardItems, setStandardItems] = useState<LineItem[]>([]);
+  const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const addLineItem = () => {
-    setLineItems([...lineItems, { 
+  const addStandardItem = () => {
+    setStandardItems([...standardItems, { 
       id: crypto.randomUUID(), 
       service_name: "", 
       service_price: 0, 
-      notes: "",
-      showNotes: false
+      notes: ""
     }]);
   };
 
-  const removeLineItem = (id: string) => {
-    if (lineItems.length > 1) {
-      setLineItems(lineItems.filter(item => item.id !== id));
-    }
+  const removeStandardItem = (id: string) => {
+    setStandardItems(standardItems.filter(item => item.id !== id));
   };
 
-  const updateLineItem = (id: string, field: keyof LineItem, value: any) => {
-    setLineItems(lineItems.map(item => 
+  const updateStandardItem = (id: string, field: keyof LineItem, value: any) => {
+    setStandardItems(standardItems.map(item => 
       item.id === id ? { ...item, [field]: value } : item
     ));
   };
 
-  const toggleNotes = (id: string) => {
-    setLineItems(lineItems.map(item =>
-      item.id === id ? { ...item, showNotes: !item.showNotes } : item
+  const addFulfillmentSection = (type: FulfillmentSection["type"]) => {
+    setFulfillmentSections([...fulfillmentSections, {
+      id: crypto.randomUUID(),
+      type,
+      items: []
+    }]);
+  };
+
+  const removeFulfillmentSection = (id: string) => {
+    setFulfillmentSections(fulfillmentSections.filter(section => section.id !== id));
+  };
+
+  const addFulfillmentItem = (sectionId: string) => {
+    setFulfillmentSections(fulfillmentSections.map(section => 
+      section.id === sectionId 
+        ? { ...section, items: [...section.items, { 
+            id: crypto.randomUUID(), 
+            service_name: "", 
+            service_price: 0, 
+            notes: "" 
+          }]}
+        : section
     ));
   };
 
-  const generatePDF = () => {
+  const removeFulfillmentItem = (sectionId: string, itemId: string) => {
+    setFulfillmentSections(fulfillmentSections.map(section => 
+      section.id === sectionId 
+        ? { ...section, items: section.items.filter(item => item.id !== itemId) }
+        : section
+    ));
+  };
+
+  const updateFulfillmentItem = (sectionId: string, itemId: string, field: keyof LineItem, value: any) => {
+    setFulfillmentSections(fulfillmentSections.map(section => 
+      section.id === sectionId 
+        ? { 
+            ...section, 
+            items: section.items.map(item => 
+              item.id === itemId ? { ...item, [field]: value } : item
+            )
+          }
+        : section
+    ));
+  };
+
+  const generatePDF = async () => {
     const clientName = useManualEntry ? manualClientName : clients.find(c => c.id === selectedClientId)?.company_name;
     if (!clientName) {
       toast({
@@ -76,47 +144,111 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
 
     const doc = new jsPDF();
     
-    // Add logo and header
-    doc.setFillColor(13, 33, 66); // Deep Navy
-    doc.rect(0, 0, 210, 40, 'F');
+    // Add logo
+    try {
+      const logoImg = new Image();
+      logoImg.src = '/westfield-logo.png';
+      await new Promise((resolve, reject) => {
+        logoImg.onload = resolve;
+        logoImg.onerror = reject;
+      });
+      doc.addImage(logoImg, 'PNG', 85, 10, 40, 20);
+    } catch (error) {
+      console.error('Error loading logo:', error);
+    }
+
+    // Header
+    doc.setFillColor(13, 33, 66);
+    doc.rect(0, 35, 210, 15, 'F');
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.text("WESTFIELD", 105, 20, { align: "center" });
-    doc.setFontSize(12);
-    doc.text("Service Quote", 105, 30, { align: "center" });
+    doc.setFontSize(16);
+    doc.text("SERVICE QUOTE", 105, 45, { align: "center" });
 
     // Client info
     doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    doc.text(`Client: ${clientName}`, 20, 55);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 62);
+    doc.setFontSize(11);
+    doc.text(`Client: ${clientName}`, 20, 60);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 67);
 
-    // Line items
     let y = 80;
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.text("Service", 20, y);
-    doc.text("Price", 170, y, { align: "right" });
-    
-    y += 7;
-    doc.setFont(undefined, 'normal');
-    
-    lineItems.forEach(item => {
-      doc.text(item.service_name, 20, y);
-      doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
-      
-      if (item.notes && item.showNotes) {
-        y += 5;
-        doc.setFontSize(8);
-        doc.setTextColor(100, 100, 100);
-        const splitNotes = doc.splitTextToSize(`Notes: ${item.notes}`, 150);
-        doc.text(splitNotes, 20, y);
-        y += (splitNotes.length * 3);
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-      }
-      
+
+    // Standard Operations
+    if (standardItems.length > 0) {
+      doc.setFontSize(13);
+      doc.setFont(undefined, 'bold');
+      doc.text("Standard Operations", 20, y);
       y += 7;
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      
+      standardItems.forEach(item => {
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+        
+        doc.text(item.service_name, 20, y);
+        doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
+        y += 5;
+        
+        if (item.notes) {
+          doc.setFontSize(8);
+          doc.setTextColor(100, 100, 100);
+          const splitNotes = doc.splitTextToSize(`Notes: ${item.notes}`, 150);
+          doc.text(splitNotes, 25, y);
+          y += (splitNotes.length * 3) + 2;
+          doc.setFontSize(10);
+          doc.setTextColor(0, 0, 0);
+        }
+        
+        y += 2;
+      });
+      
+      y += 5;
+    }
+
+    // Fulfillment Sections
+    fulfillmentSections.forEach(section => {
+      if (section.items.length > 0) {
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+        
+        doc.setFontSize(13);
+        doc.setFont(undefined, 'bold');
+        doc.text(section.type, 20, y);
+        y += 7;
+        
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        
+        section.items.forEach(item => {
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+          }
+          
+          doc.text(item.service_name, 20, y);
+          doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
+          y += 5;
+          
+          if (item.notes) {
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            const splitNotes = doc.splitTextToSize(`Notes: ${item.notes}`, 150);
+            doc.text(splitNotes, 25, y);
+            y += (splitNotes.length * 3) + 2;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+          }
+          
+          y += 2;
+        });
+        
+        y += 5;
+      }
     });
 
     doc.save(`quote-${clientName.replace(/\s/g, '-')}-${Date.now()}.pdf`);
@@ -140,23 +272,25 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
     setIsSubmitting(true);
 
     try {
+      const allItems = [
+        ...standardItems,
+        ...fulfillmentSections.flatMap(section => section.items)
+      ];
+
       const quoteData = {
         client_name: clients.find(c => c.id === selectedClientId)?.company_name,
-        line_items: lineItems.map(item => ({
-          service_name: item.service_name,
-          service_price: item.service_price,
-          notes: item.notes
-        })),
+        standard_operations: standardItems,
+        fulfillment_sections: fulfillmentSections,
         created_date: new Date().toISOString()
       };
 
       const { error } = await supabase
         .from("quotes")
-        .insert({
+        .insert([{
           client_id: selectedClientId,
-          quote_data: quoteData,
+          quote_data: quoteData as any,
           status: 'saved'
-        });
+        }]);
 
       if (error) throw error;
 
@@ -192,14 +326,26 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
     setIsSubmitting(true);
 
     try {
-      // Delete existing pricing for this client
+      const allItems = [
+        ...standardItems,
+        ...fulfillmentSections.flatMap(section => section.items)
+      ];
+
+      if (allItems.length === 0) {
+        toast({
+          title: "Error",
+          description: "Please add at least one service",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await supabase
         .from("custom_pricing")
         .delete()
         .eq("client_id", selectedClientId);
 
-      // Insert new pricing records
-      const pricingRecords = lineItems.map(item => ({
+      const pricingRecords = allItems.map(item => ({
         client_id: selectedClientId,
         service_name: item.service_name,
         price_per_unit: item.service_price,
@@ -212,7 +358,6 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
 
       if (error) throw error;
 
-      // Update client pricing_active flag
       await supabase
         .from("clients")
         .update({ pricing_active: true })
@@ -241,7 +386,14 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
     setSelectedClientId("");
     setManualClientName("");
     setUseManualEntry(false);
-    setLineItems([{ id: crypto.randomUUID(), service_name: "", service_price: 0, notes: "", showNotes: false }]);
+    setStandardItems([]);
+    setFulfillmentSections([]);
+  };
+
+  const getServiceOptions = (sectionType?: FulfillmentSection["type"]) => {
+    if (!sectionType) return STANDARD_SERVICES;
+    if (sectionType === "Self Fulfillment") return SELF_FULFILLMENT_SERVICES;
+    return MARKETPLACE_SERVICES;
   };
 
   return (
@@ -292,70 +444,191 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
             )}
           </div>
 
-          <div className="space-y-4">
+          {/* Standard Operations */}
+          <div className="space-y-4 border rounded-lg p-4">
             <div className="flex items-center justify-between">
-              <Label>Line Items</Label>
-              <Button type="button" size="sm" onClick={addLineItem}>
+              <Label className="text-lg font-semibold">Standard Operations</Label>
+              <Button type="button" size="sm" onClick={addStandardItem}>
                 <Plus className="h-4 w-4 mr-1" />
-                Add Line
+                Add Service
               </Button>
             </div>
 
-            {lineItems.map((item, index) => (
+            {standardItems.map((item) => (
               <div key={item.id} className="border-b pb-3 space-y-2">
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-xs">Service Name</Label>
-                      <Input
-                        value={item.service_name}
-                        onChange={(e) => updateLineItem(item.id, "service_name", e.target.value)}
-                        placeholder="e.g., FBA Prep"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Service Price ($)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={item.service_price}
-                        onChange={(e) => updateLineItem(item.id, "service_price", parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
+                <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
+                  <div>
+                    <Label className="text-xs">Service</Label>
+                    <Select 
+                      value={item.service_name} 
+                      onValueChange={(value) => updateStandardItem(item.id, "service_name", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select service" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STANDARD_SERVICES.map((service) => (
+                          <SelectItem key={service} value={service}>
+                            {service}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  {lineItems.length > 1 && (
+                  <div>
+                    <Label className="text-xs">Price ($)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={item.service_price}
+                      onChange={(e) => updateStandardItem(item.id, "service_price", parseFloat(e.target.value) || 0)}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeStandardItem(item.id)}
+                    className="mt-6"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div>
+                  <Label className="text-xs">Notes (optional)</Label>
+                  <Textarea
+                    value={item.notes}
+                    onChange={(e) => updateStandardItem(item.id, "notes", e.target.value)}
+                    placeholder="Add notes for this service"
+                    rows={2}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Fulfillment Sections */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-lg font-semibold">Fulfillment Services</Label>
+              <div className="flex gap-2">
+                <Button 
+                  type="button" 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => addFulfillmentSection("Amazon FBA")}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Amazon FBA
+                </Button>
+                <Button 
+                  type="button" 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => addFulfillmentSection("Walmart WFS")}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Walmart WFS
+                </Button>
+                <Button 
+                  type="button" 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => addFulfillmentSection("TikTok Shop")}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  TikTok Shop
+                </Button>
+                <Button 
+                  type="button" 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => addFulfillmentSection("Self Fulfillment")}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Self Fulfillment
+                </Button>
+              </div>
+            </div>
+
+            {fulfillmentSections.map((section) => (
+              <div key={section.id} className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="font-semibold">{section.type}</Label>
+                  <div className="flex gap-2">
+                    <Button 
+                      type="button" 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => addFulfillmentItem(section.id)}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Service
+                    </Button>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={() => removeLineItem(item.id)}
+                      onClick={() => removeFulfillmentSection(section.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  )}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => toggleNotes(item.id)}
-                  >
-                    <FileText className="h-3 w-3 mr-1" />
-                    {item.showNotes ? "Hide Note" : "Add Note"}
-                  </Button>
-                </div>
-
-                {item.showNotes && (
-                  <Textarea
-                    value={item.notes}
-                    onChange={(e) => updateLineItem(item.id, "notes", e.target.value)}
-                    placeholder="Additional notes for this service"
-                    rows={2}
-                  />
-                )}
+                {section.items.map((item) => (
+                  <div key={item.id} className="border-b pb-3 space-y-2">
+                    <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
+                      <div>
+                        <Label className="text-xs">Service</Label>
+                        <Select 
+                          value={item.service_name} 
+                          onValueChange={(value) => updateFulfillmentItem(section.id, item.id, "service_name", value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select service" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getServiceOptions(section.type).map((service) => (
+                              <SelectItem key={service} value={service}>
+                                {service}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs">Price ($)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={item.service_price}
+                          onChange={(e) => updateFulfillmentItem(section.id, item.id, "service_price", parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFulfillmentItem(section.id, item.id)}
+                        className="mt-6"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Notes (optional)</Label>
+                      <Textarea
+                        value={item.notes}
+                        onChange={(e) => updateFulfillmentItem(section.id, item.id, "notes", e.target.value)}
+                        placeholder="Add notes for this service"
+                        rows={2}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
@@ -365,7 +638,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
               type="button"
               variant="outline"
               onClick={generatePDF}
-              disabled={(!selectedClientId && !manualClientName) || lineItems.some(item => !item.service_name)}
+              disabled={(!selectedClientId && !manualClientName) || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
             >
               <Download className="h-4 w-4 mr-2" />
               Download PDF
@@ -376,14 +649,13 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                   type="button"
                   variant="outline"
                   onClick={saveQuote}
-                  disabled={isSubmitting || !selectedClientId || lineItems.some(item => !item.service_name)}
+                  disabled={isSubmitting || !selectedClientId || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
                 >
-                  <FileText className="h-4 w-4 mr-2" />
                   Save Quote
                 </Button>
                 <Button
                   onClick={applyToPricing}
-                  disabled={isSubmitting || !selectedClientId || lineItems.some(item => !item.service_name)}
+                  disabled={isSubmitting || !selectedClientId || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
                 >
                   <Check className="h-4 w-4 mr-2" />
                   Apply to Client Pricing
