@@ -115,50 +115,75 @@ const QuotesTab = () => {
     doc.setTextColor(13, 33, 66);
     doc.text("SERVICE QUOTE", 105, headerY, { align: "center" });
     
-    // Customer info section
-    const infoStartY = headerY + 10;
+    // Business and Customer info section (side by side)
+    const infoStartY = headerY + 12;
     const client = clients.find(c => c.id === quote.client_id);
     
-    doc.setFontSize(11);
+    // Left side - Business info
+    doc.setFontSize(10);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(0, 0, 0);
-    doc.text(quoteData.client_name || 'Not Assigned', 105, infoStartY, { align: "center" });
+    doc.text("Westfield Prep Center", 20, infoStartY);
     
     doc.setFont(undefined, 'normal');
-    doc.setFontSize(10);
-    let contactInfoY = infoStartY + 5;
+    doc.text("Navapoom Sathatham", 20, infoStartY + 5);
+    doc.text("info@westfieldprepcenter.com", 20, infoStartY + 10);
+    doc.text("818-935-5478", 20, infoStartY + 15);
+    
+    // Right side - Customer info
+    const rightX = 140;
+    doc.setFont(undefined, 'bold');
+    doc.text(quoteData.client_name || 'Not Assigned', rightX, infoStartY);
+    
+    doc.setFont(undefined, 'normal');
+    let customerInfoY = infoStartY + 5;
     
     const contactName = quoteData.contact_name || client?.contact_name;
     const email = quoteData.email || client?.email;
     const phone = quoteData.phone || client?.phone_number;
     
     if (contactName) {
-      doc.text(contactName, 105, contactInfoY, { align: "center" });
-      contactInfoY += 5;
+      doc.text(contactName, rightX, customerInfoY);
+      customerInfoY += 5;
     }
     if (email) {
-      doc.text(email, 105, contactInfoY, { align: "center" });
-      contactInfoY += 5;
+      doc.text(email, rightX, customerInfoY);
+      customerInfoY += 5;
     }
     if (phone) {
-      doc.text(phone, 105, contactInfoY, { align: "center" });
-      contactInfoY += 5;
+      doc.text(phone, rightX, customerInfoY);
+      customerInfoY += 5;
     }
     
-    // Date
+    // Date below the info sections
+    const dateY = Math.max(infoStartY + 20, customerInfoY);
     doc.setFontSize(10);
-    doc.text(`Date: ${new Date(quote.created_at).toLocaleDateString()}`, 20, contactInfoY + 5);
+    doc.text(`Date: ${new Date(quote.created_at).toLocaleDateString()}`, 20, dateY + 5);
 
-    let y = contactInfoY + 15;
+    let y = dateY + 15;
 
     if (quoteData.standard_operations?.length > 0) {
       doc.setFontSize(13);
       doc.setFont(undefined, 'bold');
+      doc.setTextColor(0, 0, 0);
       doc.text("Standard Operations", 20, y);
-      y += 7;
+      y += 5;
+      
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'italic');
+      doc.setTextColor(80, 80, 80);
+      doc.text("Basic warehouse intake and account setup fees.", 20, y);
+      y += 8;
+      
+      // Horizontal line
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.line(20, y, 190, y);
+      y += 5;
       
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
+      doc.setTextColor(0, 0, 0);
       
       quoteData.standard_operations.forEach((item: any) => {
         if (y > 270) {
@@ -166,8 +191,10 @@ const QuotesTab = () => {
           y = 20;
         }
         
+        doc.setFont(undefined, 'bold');
         doc.text(item.service_name, 20, y);
         doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
+        doc.setFont(undefined, 'normal');
         y += 5;
         
         if (item.notes) {
@@ -183,7 +210,7 @@ const QuotesTab = () => {
         y += 2;
       });
       
-      y += 5;
+      y += 8;
     }
 
     quoteData.fulfillment_sections?.forEach((section: any) => {
@@ -195,11 +222,31 @@ const QuotesTab = () => {
         
         doc.setFontSize(13);
         doc.setFont(undefined, 'bold');
+        doc.setTextColor(0, 0, 0);
         doc.text(section.type, 20, y);
-        y += 7;
+        y += 5;
+        
+        // Add sub-descriptions for each section type
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'italic');
+        doc.setTextColor(80, 80, 80);
+        
+        if (section.type === "Amazon FBA") {
+          doc.text("Standard prep services for FBA shipments.", 20, y);
+        } else if (section.type === "Self Fulfillment") {
+          doc.text("Prep, pack, and ship for non-FBA or DTC orders.", 20, y);
+        }
+        y += 8;
+        
+        // Horizontal line
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.3);
+        doc.line(20, y, 190, y);
+        y += 5;
         
         doc.setFontSize(10);
         doc.setFont(undefined, 'normal');
+        doc.setTextColor(0, 0, 0);
         
         section.items.forEach((item: any) => {
           if (y > 270) {
@@ -207,8 +254,10 @@ const QuotesTab = () => {
             y = 20;
           }
           
+          doc.setFont(undefined, 'bold');
           doc.text(item.service_name, 20, y);
           doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
+          doc.setFont(undefined, 'normal');
           y += 5;
           
           if (item.notes) {
@@ -224,7 +273,7 @@ const QuotesTab = () => {
           y += 2;
         });
         
-        y += 5;
+        y += 8;
       }
     });
 

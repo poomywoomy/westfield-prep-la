@@ -187,62 +187,87 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
     doc.setTextColor(13, 33, 66);
     doc.text("SERVICE QUOTE", 105, headerY, { align: "center" });
     
-    // Customer info section
-    const infoStartY = headerY + 10;
+    // Business and Customer info section (side by side)
+    const infoStartY = headerY + 12;
     const client = clients.find(c => c.id === selectedClientId);
     
-    doc.setFontSize(11);
+    // Left side - Business info
+    doc.setFontSize(10);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(0, 0, 0);
-    doc.text(clientName, 105, infoStartY, { align: "center" });
+    doc.text("Westfield Prep Center", 20, infoStartY);
     
     doc.setFont(undefined, 'normal');
-    doc.setFontSize(10);
-    let contactInfoY = infoStartY + 5;
+    doc.text("Navapoom Sathatham", 20, infoStartY + 5);
+    doc.text("info@westfieldprepcenter.com", 20, infoStartY + 10);
+    doc.text("818-935-5478", 20, infoStartY + 15);
+    
+    // Right side - Customer info
+    const rightX = 140;
+    doc.setFont(undefined, 'bold');
+    doc.text(clientName, rightX, infoStartY);
+    
+    doc.setFont(undefined, 'normal');
+    let customerInfoY = infoStartY + 5;
     
     if (useManualEntry) {
       if (manualContactName) {
-        doc.text(manualContactName, 105, contactInfoY, { align: "center" });
-        contactInfoY += 5;
+        doc.text(manualContactName, rightX, customerInfoY);
+        customerInfoY += 5;
       }
       if (manualEmail) {
-        doc.text(manualEmail, 105, contactInfoY, { align: "center" });
-        contactInfoY += 5;
+        doc.text(manualEmail, rightX, customerInfoY);
+        customerInfoY += 5;
       }
       if (manualPhone) {
-        doc.text(manualPhone, 105, contactInfoY, { align: "center" });
-        contactInfoY += 5;
+        doc.text(manualPhone, rightX, customerInfoY);
+        customerInfoY += 5;
       }
     } else if (client) {
       if (client.contact_name) {
-        doc.text(client.contact_name, 105, contactInfoY, { align: "center" });
-        contactInfoY += 5;
+        doc.text(client.contact_name, rightX, customerInfoY);
+        customerInfoY += 5;
       }
       if (client.email) {
-        doc.text(client.email, 105, contactInfoY, { align: "center" });
-        contactInfoY += 5;
+        doc.text(client.email, rightX, customerInfoY);
+        customerInfoY += 5;
       }
       if (client.phone_number) {
-        doc.text(client.phone_number, 105, contactInfoY, { align: "center" });
-        contactInfoY += 5;
+        doc.text(client.phone_number, rightX, customerInfoY);
+        customerInfoY += 5;
       }
     }
     
-    // Date
+    // Date below the info sections
+    const dateY = Math.max(infoStartY + 20, customerInfoY);
     doc.setFontSize(10);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, contactInfoY + 5);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, dateY + 5);
 
-    let y = contactInfoY + 15;
+    let y = dateY + 15;
 
     // Standard Operations
     if (standardItems.length > 0) {
       doc.setFontSize(13);
       doc.setFont(undefined, 'bold');
+      doc.setTextColor(0, 0, 0);
       doc.text("Standard Operations", 20, y);
-      y += 7;
+      y += 5;
+      
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'italic');
+      doc.setTextColor(80, 80, 80);
+      doc.text("Basic warehouse intake and account setup fees.", 20, y);
+      y += 8;
+      
+      // Horizontal line
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.line(20, y, 190, y);
+      y += 5;
       
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
+      doc.setTextColor(0, 0, 0);
       
       standardItems.forEach(item => {
         if (y > 270) {
@@ -250,8 +275,10 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
           y = 20;
         }
         
+        doc.setFont(undefined, 'bold');
         doc.text(item.service_name, 20, y);
         doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
+        doc.setFont(undefined, 'normal');
         y += 5;
         
         if (item.notes) {
@@ -267,7 +294,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         y += 2;
       });
       
-      y += 5;
+      y += 8;
     }
 
     // Fulfillment Sections
@@ -280,11 +307,31 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         
         doc.setFontSize(13);
         doc.setFont(undefined, 'bold');
+        doc.setTextColor(0, 0, 0);
         doc.text(section.type, 20, y);
-        y += 7;
+        y += 5;
+        
+        // Add sub-descriptions for each section type
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'italic');
+        doc.setTextColor(80, 80, 80);
+        
+        if (section.type === "Amazon FBA") {
+          doc.text("Standard prep services for FBA shipments.", 20, y);
+        } else if (section.type === "Self Fulfillment") {
+          doc.text("Prep, pack, and ship for non-FBA or DTC orders.", 20, y);
+        }
+        y += 8;
+        
+        // Horizontal line
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.3);
+        doc.line(20, y, 190, y);
+        y += 5;
         
         doc.setFontSize(10);
         doc.setFont(undefined, 'normal');
+        doc.setTextColor(0, 0, 0);
         
         section.items.forEach(item => {
           if (y > 270) {
@@ -292,8 +339,10 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
             y = 20;
           }
           
+          doc.setFont(undefined, 'bold');
           doc.text(item.service_name, 20, y);
           doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
+          doc.setFont(undefined, 'normal');
           y += 5;
           
           if (item.notes) {
@@ -309,7 +358,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
           y += 2;
         });
         
-        y += 5;
+        y += 8;
       }
     });
 
