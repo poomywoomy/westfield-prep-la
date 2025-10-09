@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Eye, Download, Trash2, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -97,46 +98,58 @@ const QuotesTab = () => {
     const quoteData = quote.quote_data;
     const doc = new jsPDF();
 
-    // Company info (left side)
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(0, 0, 0);
-    doc.text("Westfield Prep Center", 20, 15);
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(10);
-    doc.text("Navapoom Sathatham", 20, 21);
-    doc.text("info@westfieldprepcenter.com", 20, 27);
-    doc.text("818-935-5478", 20, 33);
-
-    // Client info (right side)
-    const client = clients.find(c => c.id === quote.client_id);
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(11);
-    doc.text(quoteData.client_name || 'Not Assigned', 210 - 20, 15, { align: "right" });
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(10);
-    if (quoteData.contact_name) doc.text(quoteData.contact_name, 210 - 20, 21, { align: "right" });
-    if (quoteData.email) doc.text(quoteData.email, 210 - 20, 27, { align: "right" });
-    if (quoteData.phone) doc.text(quoteData.phone, 210 - 20, 33, { align: "right" });
-    if (!quoteData.contact_name && client) {
-      doc.text(client.contact_name || "", 210 - 20, 21, { align: "right" });
-      doc.text(client.email || "", 210 - 20, 27, { align: "right" });
-      doc.text(client.phone_number || "", 210 - 20, 33, { align: "right" });
-    }
-
-    // Header
-    doc.setFillColor(13, 33, 66);
-    doc.rect(0, 40, 210, 15, 'F');
-    doc.setTextColor(255, 255, 255);
+    // Load and add logo
+    const img = new Image();
+    img.src = westfieldLogo;
+    await new Promise((resolve) => { img.onload = resolve; });
+    
+    // Add logo at top center (30mm wide, maintaining aspect ratio)
+    const logoWidth = 30;
+    const logoHeight = (img.height / img.width) * logoWidth;
+    doc.addImage(img, 'JPEG', (210 - logoWidth) / 2, 10, logoWidth, logoHeight);
+    
+    // SERVICE QUOTE header below logo
+    const headerY = 10 + logoHeight + 5;
     doc.setFontSize(16);
-    doc.text("SERVICE QUOTE", 105, 50, { align: "center" });
-
-    // Date
-    doc.setTextColor(0, 0, 0);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(13, 33, 66);
+    doc.text("SERVICE QUOTE", 105, headerY, { align: "center" });
+    
+    // Customer info section
+    const infoStartY = headerY + 10;
+    const client = clients.find(c => c.id === quote.client_id);
+    
     doc.setFontSize(11);
-    doc.text(`Date: ${new Date(quote.created_at).toLocaleDateString()}`, 20, 65);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(quoteData.client_name || 'Not Assigned', 105, infoStartY, { align: "center" });
+    
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    let contactInfoY = infoStartY + 5;
+    
+    const contactName = quoteData.contact_name || client?.contact_name;
+    const email = quoteData.email || client?.email;
+    const phone = quoteData.phone || client?.phone_number;
+    
+    if (contactName) {
+      doc.text(contactName, 105, contactInfoY, { align: "center" });
+      contactInfoY += 5;
+    }
+    if (email) {
+      doc.text(email, 105, contactInfoY, { align: "center" });
+      contactInfoY += 5;
+    }
+    if (phone) {
+      doc.text(phone, 105, contactInfoY, { align: "center" });
+      contactInfoY += 5;
+    }
+    
+    // Date
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date(quote.created_at).toLocaleDateString()}`, 20, contactInfoY + 5);
 
-    let y = 80;
+    let y = contactInfoY + 15;
 
     if (quoteData.standard_operations?.length > 0) {
       doc.setFontSize(13);
@@ -231,8 +244,32 @@ const QuotesTab = () => {
       doc.setFont(undefined, 'normal');
       const splitComments = doc.splitTextToSize(quoteData.additional_comments, 170);
       doc.text(splitComments, 20, y);
-      y += (splitComments.length * 5);
+      y += (splitComments.length * 5) + 5;
     }
+    
+    // Standard disclaimer comments
+    if (y > 230) {
+      doc.addPage();
+      y = 20;
+    }
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'italic');
+    doc.setTextColor(80, 80, 80);
+    
+    const disclaimer1 = "All pricing provided in this quote is based on the unit volumes disclosed at the time of issuance. If the number of units received, stored, or processed fluctuates materially (up or down), Westfield Prep Center reserves the right to adjust pricing to reflect the updated volume and service requirements. Please contact us if your monthly inbound or stored unit counts change and you wish to request a re-evaluation of this quote.";
+    const splitDisclaimer1 = doc.splitTextToSize(disclaimer1, 170);
+    doc.text(splitDisclaimer1, 20, y);
+    y += (splitDisclaimer1.length * 4) + 5;
+    
+    if (y > 260) {
+      doc.addPage();
+      y = 20;
+    }
+    
+    const disclaimer2 = "If there is any materials that we are missing that will be used in your brands shipment operations, or if we are missing anything/ made any mistake, please let us know so we can adjust the quote accordingly.";
+    const splitDisclaimer2 = doc.splitTextToSize(disclaimer2, 170);
+    doc.text(splitDisclaimer2, 20, y);
 
     doc.save(`quote-${quoteData.client_name || 'unassigned'}-${Date.now()}.pdf`);
     
