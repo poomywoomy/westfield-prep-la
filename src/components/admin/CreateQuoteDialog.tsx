@@ -257,7 +257,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
       doc.setFont(undefined, 'italic');
       doc.setTextColor(80, 80, 80);
       doc.text("Basic warehouse intake and account setup fees.", 20, y);
-      y += 8;
+      y += 4;
       
       // Horizontal line
       doc.setDrawColor(200, 200, 200);
@@ -321,7 +321,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         } else if (section.type === "Self Fulfillment") {
           doc.text("Prep, pack, and ship for non-FBA or DTC orders.", 20, y);
         }
-        y += 8;
+        y += 4;
         
         // Horizontal line
         doc.setDrawColor(200, 200, 200);
