@@ -156,11 +156,30 @@ const ServiceBreakdown = () => {
   ];
 
   const tiktokProcess = [
-    "Receiving & Fast Processing",
-    "Quality Check",
-    "Custom Branding & Packaging",
-    "Same-Day/Next-Day Prep",
-    "Ship to Customer or TikTok Warehouse",
+    {
+      title: "Receiving & Quality Check",
+      description: "We receive, verify, and inspect all incoming TikTok inventory to ensure each SKU is ready for fast, high-volume fulfillment."
+    },
+    {
+      title: "Product Photos & Content-Ready QC",
+      description: "Detailed photo proofs and quality checks provided for transparency — perfect for content creators, live sellers, and brand partners."
+    },
+    {
+      title: "Organized Storage for Fast Turnaround",
+      description: "Products are stored safely and efficiently for quick pick-and-pack, supporting daily order spikes and influencer campaigns."
+    },
+    {
+      title: "Kitting & Custom Packaging",
+      description: "We assemble kits, apply branding materials, and handle promotional inserts or influencer packaging exactly as you specify."
+    },
+    {
+      title: "Order Syncing & Fulfillment",
+      description: "We process orders through TikTok Shop, handling packing, labeling, and shipment creation directly within the platform."
+    },
+    {
+      title: "Direct Shipping to Customers or Creators",
+      description: "We ship orders directly to customers or influencers with fast turnaround — maintaining the unboxing experience your brand promises."
+    }
   ];
 
   const tiktokPrepServices = [
@@ -368,13 +387,16 @@ const ServiceBreakdown = () => {
                 <CardContent>
                   <div className="mb-8">
                     <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations</h3>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {tiktokProcess.map((step, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                        <div key={index} className="flex gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
                             {index + 1}
                           </div>
-                          <span className="text-foreground pt-1">{step}</span>
+                          <div>
+                            <p className="font-semibold text-foreground">{step.title}</p>
+                            <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                          </div>
                         </div>
                       ))}
                     </div>
