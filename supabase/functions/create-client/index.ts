@@ -42,30 +42,55 @@ serve(async (req) => {
       }
     );
 
-    // Create auth user
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email: requestData.email,
-      password: requestData.tempPassword,
-      email_confirm: true,
-    });
+    // Check if user already exists
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const existingUser = existingUsers?.users.find(u => u.email === requestData.email);
 
-    if (authError) {
-      console.error("Auth error:", authError);
-      throw authError;
+    let userId: string;
+
+    if (existingUser) {
+      console.log("User already exists, updating password for:", requestData.email);
+      userId = existingUser.id;
+      
+      // Update password for existing user
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+        userId,
+        { password: requestData.tempPassword }
+      );
+      
+      if (updateError) {
+        console.error("Error updating password:", updateError);
+        throw updateError;
+      }
+    } else {
+      // Create new auth user
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email: requestData.email,
+        password: requestData.tempPassword,
+        email_confirm: true,
+      });
+
+      if (authError) {
+        console.error("Auth error:", authError);
+        throw authError;
+      }
+      if (!authData.user) throw new Error("Failed to create user");
+
+      userId = authData.user.id;
+      console.log("User created with ID:", userId);
     }
-    if (!authData.user) throw new Error("Failed to create user");
 
-    console.log("User created with ID:", authData.user.id);
-
-    // Create profile
+    // Upsert profile
     const { error: profileError } = await supabaseAdmin
       .from("profiles")
-      .insert({
-        id: authData.user.id,
+      .upsert({
+        id: userId,
         email: requestData.email,
         full_name: requestData.contact_name,
         company_name: requestData.company_name,
         phone_number: requestData.phone_number,
+      }, {
+        onConflict: 'id'
       });
 
     if (profileError) {
@@ -75,12 +100,15 @@ serve(async (req) => {
 
     console.log("Profile created");
 
-    // Assign client role
+    // Upsert client role
     const { error: roleError } = await supabaseAdmin
       .from("user_roles")
-      .insert({
-        user_id: authData.user.id,
+      .upsert({
+        user_id: userId,
         role: "client",
+      }, {
+        onConflict: 'user_id,role',
+        ignoreDuplicates: true
       });
 
     if (roleError) {
@@ -90,11 +118,11 @@ serve(async (req) => {
 
     console.log("Client role assigned");
 
-    // Create client record
+    // Upsert client record
     const { error: clientError } = await supabaseAdmin
       .from("clients")
-      .insert({
-        user_id: authData.user.id,
+      .upsert({
+        user_id: userId,
         company_name: requestData.company_name,
         contact_name: requestData.contact_name,
         email: requestData.email,
@@ -108,6 +136,8 @@ serve(async (req) => {
         fulfillment_services: requestData.fulfillment_services,
         temp_password: requestData.tempPassword,
         password_expires_at: requestData.password_expires_at,
+      }, {
+        onConflict: 'user_id'
       });
 
     if (clientError) {
@@ -120,8 +150,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Client account created successfully",
-        user_id: authData.user.id 
+        message: existingUser ? "Client account updated successfully" : "Client account created successfully",
+        user_id: userId 
       }),
       {
         status: 200,
