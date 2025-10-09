@@ -28,7 +28,7 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
     storage: false,
     storage_units_per_month: "",
     admin_notes: "",
-    fulfillment_services: [] as Array<"fba_prep" | "wfs_prep" | "tiktok_prep" | "self_fulfilled" | "storage" | "returns_processing">,
+    fulfillment_services: [] as Array<"fba_prep" | "wfs_prep" | "tiktok_prep" | "self_fulfilled" | "shopify" | "returns_processing">,
   });
   const { toast } = useToast();
 
@@ -236,17 +236,17 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
               
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="storage_service"
-                  checked={formData.fulfillment_services.includes('storage')}
+                  id="shopify"
+                  checked={formData.fulfillment_services.includes('shopify')}
                   onCheckedChange={(checked) => {
                     if (checked) {
-                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'storage'] });
+                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'shopify'] });
                     } else {
-                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'storage') });
+                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'shopify') });
                     }
                   }}
                 />
-                <Label htmlFor="storage_service" className="font-normal cursor-pointer">Storage</Label>
+                <Label htmlFor="shopify" className="font-normal cursor-pointer">Shopify</Label>
               </div>
               
               <div className="flex items-center space-x-2">

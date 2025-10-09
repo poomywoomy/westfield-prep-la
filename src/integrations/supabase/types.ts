@@ -330,7 +330,7 @@ export type Database = {
         | "wfs_prep"
         | "tiktok_prep"
         | "self_fulfilled"
-        | "storage"
+        | "shopify"
         | "returns_processing"
       receiving_format: "pallets" | "cartons" | "both"
     }
@@ -468,7 +468,7 @@ export const Constants = {
         "wfs_prep",
         "tiktok_prep",
         "self_fulfilled",
-        "storage",
+        "shopify",
         "returns_processing",
       ],
       receiving_format: ["pallets", "cartons", "both"],

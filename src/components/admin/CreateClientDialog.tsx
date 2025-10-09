@@ -37,7 +37,7 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
     storage: false,
     storage_units_per_month: "",
     admin_notes: "",
-    fulfillment_services: [] as Array<"fba_prep" | "wfs_prep" | "tiktok_prep" | "self_fulfilled" | "storage" | "returns_processing">,
+    fulfillment_services: [] as Array<"fba_prep" | "wfs_prep" | "tiktok_prep" | "self_fulfilled" | "shopify" | "returns_processing">,
   });
   const { toast } = useToast();
 
@@ -92,9 +92,25 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
         password_expires_at: expiresAt.toISOString(),
       });
 
+      // Send credentials email
+      try {
+        await supabase.functions.invoke('send-client-credentials', {
+          body: {
+            email: formData.email,
+            companyName: formData.company_name,
+            contactName: formData.contact_name,
+            tempPassword: tempPassword,
+          },
+        });
+        console.log('Credentials email sent successfully');
+      } catch (emailError: any) {
+        console.error('Failed to send credentials email:', emailError);
+        // Don't throw - client was created successfully
+      }
+
       toast({
         title: "Client created",
-        description: `Temporary password: ${tempPassword} (expires in 24 hours)`,
+        description: `An email with login credentials has been sent to ${formData.email}`,
       });
 
       onSuccess();
@@ -268,17 +284,17 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
               
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="storage_service"
-                  checked={formData.fulfillment_services.includes('storage')}
+                  id="shopify"
+                  checked={formData.fulfillment_services.includes('shopify')}
                   onCheckedChange={(checked) => {
                     if (checked) {
-                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'storage'] });
+                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'shopify'] });
                     } else {
-                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'storage') });
+                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'shopify') });
                     }
                   }}
                 />
-                <Label htmlFor="storage_service" className="font-normal cursor-pointer">Storage</Label>
+                <Label htmlFor="shopify" className="font-normal cursor-pointer">Shopify</Label>
               </div>
               
               <div className="flex items-center space-x-2">
