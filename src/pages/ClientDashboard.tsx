@@ -43,6 +43,8 @@ const ClientDashboard = () => {
         // Show password change dialog if password_expires_at is set (indicating temporary password)
         if (data.password_expires_at) {
           setShowPasswordChange(true);
+        } else {
+          setShowPasswordChange(false);
         }
       }
     } catch (error) {
