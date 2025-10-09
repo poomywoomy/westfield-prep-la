@@ -46,11 +46,15 @@ const ClientsList = ({ clients, loading, onRefresh }: ClientsListProps) => {
               <TableCell>{client.contact_name}</TableCell>
               <TableCell>{client.email}</TableCell>
               <TableCell>
-                {client.pricing_active ? (
-                  <Badge variant="default">Active</Badge>
-                ) : (
-                  <Badge variant="secondary">Pending</Badge>
-                )}
+                <Badge 
+                  variant={
+                    client.status === 'active' ? 'default' : 
+                    client.status === 'inactive' ? 'destructive' : 
+                    'secondary'
+                  }
+                >
+                  {client.status ? client.status.charAt(0).toUpperCase() + client.status.slice(1) : 'Pending'}
+                </Badge>
               </TableCell>
               <TableCell>{format(new Date(client.created_at), "MMM d, yyyy")}</TableCell>
               <TableCell className="text-right space-x-2">
