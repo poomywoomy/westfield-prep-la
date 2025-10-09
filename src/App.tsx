@@ -11,6 +11,10 @@ import TOS from "./pages/TOS";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ThankYou from "./pages/ThankYou";
 import NotFound from "./pages/NotFound";
+import AdminLogin from "./pages/AdminLogin";
+import ClientLogin from "./pages/ClientLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import ClientDashboard from "./pages/ClientDashboard";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +32,10 @@ const App = () => (
           <Route path="/terms" element={<TOS />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/client/login" element={<ClientLogin />} />
+          <Route path="/client/dashboard" element={<ClientDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
