@@ -24,25 +24,25 @@ const ClientPricingTab = () => {
       // Get client info
       const { data: clientData, error: clientError } = await supabase
         .from("clients")
-        .select("id, pricing_active")
+        .select("id")
         .eq("user_id", user?.id)
         .single();
 
       if (clientError) throw clientError;
 
-      setPricingActive(clientData.pricing_active);
+      // Check if pricing is active by attempting to fetch custom_pricing
+      const { data, error } = await supabase
+        .from("custom_pricing")
+        .select("*")
+        .eq("client_id", clientData.id)
+        .order("service_name");
 
-      if (clientData.pricing_active) {
-        // Get custom pricing
-        const { data, error } = await supabase
-          .from("custom_pricing")
-          .select("*")
-          .eq("client_id", clientData.id)
-          .order("service_name");
-
-        if (error) throw error;
-        setPricing(data || []);
-      }
+      if (error) throw error;
+      
+      // Pricing is active if there are records
+      const hasActivePricing = data && data.length > 0;
+      setPricingActive(hasActivePricing);
+      setPricing(data || []);
     } catch (error: any) {
       toast({
         title: "Error",

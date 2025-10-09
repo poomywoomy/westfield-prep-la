@@ -41,7 +41,7 @@ const ClientSettings = () => {
   const fetchClientData = async () => {
     const { data, error } = await supabase
       .from("clients")
-      .select("*")
+      .select("id, first_name, last_name, company_name, email, phone_number, password_expires_at")
       .eq("user_id", user?.id)
       .single();
 

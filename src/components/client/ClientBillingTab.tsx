@@ -28,7 +28,7 @@ const ClientBillingTab = () => {
     try {
       const { data: client, error: clientError } = await supabase
         .from("clients")
-        .select("*")
+        .select("id, company_name, contact_name, email")
         .eq("user_id", user?.id)
         .single();
 
