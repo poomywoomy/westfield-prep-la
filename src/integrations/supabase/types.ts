@@ -74,10 +74,12 @@ export type Database = {
           email: string
           estimated_units_per_month: number | null
           extra_prep: boolean | null
+          first_name: string | null
           fulfillment_services:
             | Database["public"]["Enums"]["fulfillment_service"][]
             | null
           id: string
+          last_name: string | null
           password_expires_at: string | null
           phone_number: string
           pricing_active: boolean | null
@@ -102,10 +104,12 @@ export type Database = {
           email: string
           estimated_units_per_month?: number | null
           extra_prep?: boolean | null
+          first_name?: string | null
           fulfillment_services?:
             | Database["public"]["Enums"]["fulfillment_service"][]
             | null
           id?: string
+          last_name?: string | null
           password_expires_at?: string | null
           phone_number: string
           pricing_active?: boolean | null
@@ -130,10 +134,12 @@ export type Database = {
           email?: string
           estimated_units_per_month?: number | null
           extra_prep?: boolean | null
+          first_name?: string | null
           fulfillment_services?:
             | Database["public"]["Enums"]["fulfillment_service"][]
             | null
           id?: string
+          last_name?: string | null
           password_expires_at?: string | null
           phone_number?: string
           pricing_active?: boolean | null
@@ -191,8 +197,10 @@ export type Database = {
           company_name: string | null
           created_at: string
           email: string
+          first_name: string | null
           full_name: string | null
           id: string
+          last_name: string | null
           phone_number: string | null
           updated_at: string
         }
@@ -200,8 +208,10 @@ export type Database = {
           company_name?: string | null
           created_at?: string
           email: string
+          first_name?: string | null
           full_name?: string | null
           id: string
+          last_name?: string | null
           phone_number?: string | null
           updated_at?: string
         }
@@ -209,8 +219,10 @@ export type Database = {
           company_name?: string | null
           created_at?: string
           email?: string
+          first_name?: string | null
           full_name?: string | null
           id?: string
+          last_name?: string | null
           phone_number?: string | null
           updated_at?: string
         }

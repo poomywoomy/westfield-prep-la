@@ -7,15 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Download, Check } from "lucide-react";
+import { Plus, Trash2, Download, Check, FileText } from "lucide-react";
 import jsPDF from "jspdf";
 
 interface LineItem {
   id: string;
   service_name: string;
-  quantity: number;
-  unit_price: number;
+  service_price: number;
   notes: string;
+  showNotes: boolean;
 }
 
 interface CreateQuoteDialogProps {
@@ -28,8 +28,10 @@ interface CreateQuoteDialogProps {
 const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: CreateQuoteDialogProps) => {
   const { toast } = useToast();
   const [selectedClientId, setSelectedClientId] = useState("");
+  const [manualClientName, setManualClientName] = useState("");
+  const [useManualEntry, setUseManualEntry] = useState(false);
   const [lineItems, setLineItems] = useState<LineItem[]>([
-    { id: crypto.randomUUID(), service_name: "", quantity: 1, unit_price: 0, notes: "" }
+    { id: crypto.randomUUID(), service_name: "", service_price: 0, notes: "", showNotes: false }
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,9 +39,9 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
     setLineItems([...lineItems, { 
       id: crypto.randomUUID(), 
       service_name: "", 
-      quantity: 1, 
-      unit_price: 0, 
-      notes: "" 
+      service_price: 0, 
+      notes: "",
+      showNotes: false
     }]);
   };
 
@@ -55,13 +57,22 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
     ));
   };
 
-  const calculateTotal = () => {
-    return lineItems.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+  const toggleNotes = (id: string) => {
+    setLineItems(lineItems.map(item =>
+      item.id === id ? { ...item, showNotes: !item.showNotes } : item
+    ));
   };
 
   const generatePDF = () => {
-    const client = clients.find(c => c.id === selectedClientId);
-    if (!client) return;
+    const clientName = useManualEntry ? manualClientName : clients.find(c => c.id === selectedClientId)?.company_name;
+    if (!clientName) {
+      toast({
+        title: "Error",
+        description: "Please provide a client name",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const doc = new jsPDF();
     
@@ -72,39 +83,35 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
     doc.setFontSize(24);
     doc.text("WESTFIELD", 105, 20, { align: "center" });
     doc.setFontSize(12);
-    doc.text("Quote", 105, 30, { align: "center" });
+    doc.text("Service Quote", 105, 30, { align: "center" });
 
     // Client info
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(12);
-    doc.text(`Client: ${client.company_name}`, 20, 55);
-    doc.text(`Contact: ${client.contact_name}`, 20, 62);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 69);
+    doc.text(`Client: ${clientName}`, 20, 55);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 62);
 
-    // Line items table
-    let y = 85;
+    // Line items
+    let y = 80;
     doc.setFontSize(10);
     doc.setFont(undefined, 'bold');
     doc.text("Service", 20, y);
-    doc.text("Qty", 110, y);
-    doc.text("Unit Price", 130, y);
-    doc.text("Total", 170, y, { align: "right" });
+    doc.text("Price", 170, y, { align: "right" });
     
     y += 7;
     doc.setFont(undefined, 'normal');
     
     lineItems.forEach(item => {
-      const total = item.quantity * item.unit_price;
       doc.text(item.service_name, 20, y);
-      doc.text(item.quantity.toString(), 110, y);
-      doc.text(`$${item.unit_price.toFixed(2)}`, 130, y);
-      doc.text(`$${total.toFixed(2)}`, 170, y, { align: "right" });
+      doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
       
-      if (item.notes) {
+      if (item.notes && item.showNotes) {
         y += 5;
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Notes: ${item.notes}`, 20, y);
+        const splitNotes = doc.splitTextToSize(`Notes: ${item.notes}`, 150);
+        doc.text(splitNotes, 20, y);
+        y += (splitNotes.length * 3);
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
       }
@@ -112,18 +119,64 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
       y += 7;
     });
 
-    // Total
-    y += 5;
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(14);
-    doc.text(`Total: $${calculateTotal().toFixed(2)}`, 170, y, { align: "right" });
-
-    doc.save(`quote-${client.company_name}-${Date.now()}.pdf`);
+    doc.save(`quote-${clientName.replace(/\s/g, '-')}-${Date.now()}.pdf`);
     
     toast({
       title: "PDF Generated",
       description: "Quote has been downloaded as PDF",
     });
+  };
+
+  const saveQuote = async () => {
+    if (!selectedClientId) {
+      toast({
+        title: "Error",
+        description: "Please select a client to save the quote",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const quoteData = {
+        client_name: clients.find(c => c.id === selectedClientId)?.company_name,
+        line_items: lineItems.map(item => ({
+          service_name: item.service_name,
+          service_price: item.service_price,
+          notes: item.notes
+        })),
+        created_date: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from("quotes")
+        .insert({
+          client_id: selectedClientId,
+          quote_data: quoteData,
+          status: 'saved'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Quote has been saved",
+      });
+
+      onQuoteCreated();
+      onOpenChange(false);
+      resetForm();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const applyToPricing = async () => {
@@ -149,7 +202,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
       const pricingRecords = lineItems.map(item => ({
         client_id: selectedClientId,
         service_name: item.service_name,
-        price_per_unit: item.unit_price,
+        price_per_unit: item.service_price,
         notes: item.notes,
       }));
 
@@ -186,7 +239,9 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
 
   const resetForm = () => {
     setSelectedClientId("");
-    setLineItems([{ id: crypto.randomUUID(), service_name: "", quantity: 1, unit_price: 0, notes: "" }]);
+    setManualClientName("");
+    setUseManualEntry(false);
+    setLineItems([{ id: crypto.randomUUID(), service_name: "", service_price: 0, notes: "", showNotes: false }]);
   };
 
   return (
@@ -197,20 +252,44 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
         </DialogHeader>
 
         <div className="space-y-6">
-          <div>
-            <Label>Select Client</Label>
-            <Select value={selectedClientId} onValueChange={setSelectedClientId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a client" />
-              </SelectTrigger>
-              <SelectContent>
-                {clients.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.company_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant={useManualEntry ? "default" : "outline"}
+                size="sm"
+                onClick={() => setUseManualEntry(!useManualEntry)}
+              >
+                {useManualEntry ? "Using Manual Entry" : "Manual Entry"}
+              </Button>
+            </div>
+
+            {useManualEntry ? (
+              <div>
+                <Label>Client Name</Label>
+                <Input
+                  value={manualClientName}
+                  onChange={(e) => setManualClientName(e.target.value)}
+                  placeholder="Enter client name"
+                />
+              </div>
+            ) : (
+              <div>
+                <Label>Select Client</Label>
+                <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clients.map((client) => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.company_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -223,9 +302,28 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
             </div>
 
             {lineItems.map((item, index) => (
-              <div key={item.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">Item #{index + 1}</span>
+              <div key={item.id} className="border-b pb-3 space-y-2">
+                <div className="flex items-center gap-4">
+                  <div className="flex-1 grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs">Service Name</Label>
+                      <Input
+                        value={item.service_name}
+                        onChange={(e) => updateLineItem(item.id, "service_name", e.target.value)}
+                        placeholder="e.g., FBA Prep"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Service Price ($)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={item.service_price}
+                        onChange={(e) => updateLineItem(item.id, "service_price", parseFloat(e.target.value) || 0)}
+                      />
+                    </div>
+                  </div>
                   {lineItems.length > 1 && (
                     <Button
                       type="button"
@@ -238,81 +336,60 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Service Name</Label>
-                    <Input
-                      value={item.service_name}
-                      onChange={(e) => updateLineItem(item.id, "service_name", e.target.value)}
-                      placeholder="e.g., FBA Prep"
-                    />
-                  </div>
-                  <div>
-                    <Label>Quantity</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) => updateLineItem(item.id, "quantity", parseInt(e.target.value) || 1)}
-                    />
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleNotes(item.id)}
+                  >
+                    <FileText className="h-3 w-3 mr-1" />
+                    {item.showNotes ? "Hide Note" : "Add Note"}
+                  </Button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Unit Price ($)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={item.unit_price}
-                      onChange={(e) => updateLineItem(item.id, "unit_price", parseFloat(e.target.value) || 0)}
-                    />
-                  </div>
-                  <div>
-                    <Label>Total</Label>
-                    <Input
-                      value={`$${(item.quantity * item.unit_price).toFixed(2)}`}
-                      disabled
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Notes</Label>
+                {item.showNotes && (
                   <Textarea
                     value={item.notes}
                     onChange={(e) => updateLineItem(item.id, "notes", e.target.value)}
-                    placeholder="Additional notes for this line item"
+                    placeholder="Additional notes for this service"
                     rows={2}
                   />
-                </div>
+                )}
               </div>
             ))}
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t">
-            <div className="text-xl font-bold">
-              Total: ${calculateTotal().toFixed(2)}
-            </div>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={generatePDF}
-                disabled={!selectedClientId || lineItems.some(item => !item.service_name)}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download PDF
-              </Button>
-              <Button
-                onClick={applyToPricing}
-                disabled={isSubmitting || !selectedClientId || lineItems.some(item => !item.service_name)}
-              >
-                <Check className="h-4 w-4 mr-2" />
-                Apply to Client Pricing
-              </Button>
-            </div>
+          <div className="flex items-center justify-end gap-2 pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={generatePDF}
+              disabled={(!selectedClientId && !manualClientName) || lineItems.some(item => !item.service_name)}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF
+            </Button>
+            {!useManualEntry && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={saveQuote}
+                  disabled={isSubmitting || !selectedClientId || lineItems.some(item => !item.service_name)}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Save Quote
+                </Button>
+                <Button
+                  onClick={applyToPricing}
+                  disabled={isSubmitting || !selectedClientId || lineItems.some(item => !item.service_name)}
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Apply to Client Pricing
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </DialogContent>

@@ -125,16 +125,20 @@ const ClientSettings = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Email</Label>
-                <Input value={clientData?.email || ""} disabled />
+                <Label>First Name</Label>
+                <Input value={clientData?.first_name || ""} disabled />
               </div>
               <div>
-                <Label>Contact Name</Label>
-                <Input value={clientData?.contact_name || ""} disabled />
+                <Label>Last Name</Label>
+                <Input value={clientData?.last_name || ""} disabled />
               </div>
               <div>
                 <Label>Company Name</Label>
                 <Input value={clientData?.company_name || ""} disabled />
+              </div>
+              <div>
+                <Label>Email</Label>
+                <Input value={clientData?.email || ""} disabled />
               </div>
               <div>
                 <Label>Phone Number</Label>

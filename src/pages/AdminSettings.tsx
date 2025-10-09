@@ -125,27 +125,25 @@ const AdminSettings = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
+                <Label>First Name</Label>
+                <Input value={profile?.first_name || ""} disabled />
+              </div>
+              <div>
+                <Label>Last Name</Label>
+                <Input value={profile?.last_name || ""} disabled />
+              </div>
+              <div>
+                <Label>Company Name</Label>
+                <Input value={profile?.company_name || ""} disabled />
+              </div>
+              <div>
                 <Label>Email</Label>
                 <Input value={user?.email || ""} disabled />
               </div>
-              {profile?.full_name && (
-                <div>
-                  <Label>Full Name</Label>
-                  <Input value={profile.full_name} disabled />
-                </div>
-              )}
-              {profile?.company_name && (
-                <div>
-                  <Label>Company Name</Label>
-                  <Input value={profile.company_name} disabled />
-                </div>
-              )}
-              {profile?.phone_number && (
-                <div>
-                  <Label>Phone Number</Label>
-                  <Input value={profile.phone_number} disabled />
-                </div>
-              )}
+              <div>
+                <Label>Phone Number</Label>
+                <Input value={profile?.phone_number || ""} disabled />
+              </div>
             </CardContent>
           </Card>
 
