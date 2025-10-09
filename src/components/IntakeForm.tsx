@@ -65,11 +65,35 @@ export const IntakeForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Here you would typically send this to your backend/database
-      console.log("Intake Form Submission:", formData);
+      // Save to Supabase with proper security
+      const { error } = await supabase.from('intake_forms').insert([{
+        business_name: formData.businessName,
+        contact_name: formData.contactName,
+        email: formData.email,
+        phone: formData.phone,
+        amazon_seller_name: formData.amazonSellerName,
+        amazon_seller_central: formData.amazonSellerCentral,
+        shipping_address: formData.shippingAddress,
+        city: formData.city,
+        state: formData.state,
+        zip_code: formData.zipCode,
+        product_type: formData.productType,
+        estimated_monthly_volume: parseInt(formData.estimatedMonthlyVolume) || 0,
+        average_units_per_shipment: parseInt(formData.averageUnitsPerShipment) || 0,
+        need_receiving: formData.needReceiving,
+        need_inspection: formData.needInspection,
+        need_labeling: formData.needLabeling,
+        need_bundling: formData.needBundling,
+        need_shipping: formData.needShipping,
+        need_storage: formData.needStorage,
+        special_requirements: formData.specialRequirements,
+        hazmat_products: formData.hazmatProducts,
+        preferred_shipping_carrier: formData.preferredShippingCarrier,
+        referral_source: formData.referralSource,
+        agreed_to_deposit: formData.agreedToDeposit,
+      }]);
       
-      // Example: Save to Supabase (you'd need to create a table first)
-      // const { error } = await supabase.from('intake_forms').insert([formData]);
+      if (error) throw error;
       
       toast.success("Intake form submitted successfully!");
       

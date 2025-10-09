@@ -36,8 +36,7 @@ const handler = async (req: Request): Promise<Response> => {
       console.error("Validation error:", validationResult.error);
       return new Response(
         JSON.stringify({ 
-          error: "Invalid input data provided",
-          details: validationResult.error.issues 
+          error: "Unable to process request. Please verify your information and try again."
         }),
         {
           status: 400,
@@ -165,7 +164,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!emailResponse.ok) {
       console.error("Resend API error:", emailData);
-      throw new Error(emailData.message || "Failed to send email");
+      throw new Error("Email service error");
     }
 
     console.log("Password reset email sent successfully:", emailData);

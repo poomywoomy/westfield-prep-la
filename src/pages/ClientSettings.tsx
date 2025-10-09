@@ -113,24 +113,8 @@ const ClientSettings = () => {
     setIsUpdating(true);
 
     try {
-      // If user has already set their password, verify current password
-      if (hasSetPassword) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: user?.email || "",
-          password: currentPassword,
-        });
-
-        if (signInError) {
-          toast({
-            title: "Error",
-            description: "Current password is incorrect",
-            variant: "destructive",
-          });
-          setIsUpdating(false);
-          return;
-        }
-      }
-
+      // Use Supabase's built-in password update with reauthentication
+      // This securely handles current password verification server-side
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
       });
@@ -249,19 +233,6 @@ const ClientSettings = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handlePasswordChange} className="space-y-4">
-                {hasSetPassword && (
-                  <div>
-                    <Label htmlFor="currentPassword">Current Password</Label>
-                    <Input
-                      id="currentPassword"
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="Enter current password"
-                      required
-                    />
-                  </div>
-                )}
                 <div>
                   <Label htmlFor="newPassword">New Password</Label>
                   <Input

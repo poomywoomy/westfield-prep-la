@@ -225,6 +225,96 @@ export type Database = {
           },
         ]
       }
+      intake_forms: {
+        Row: {
+          agreed_to_deposit: boolean
+          amazon_seller_central: string | null
+          amazon_seller_name: string
+          average_units_per_shipment: number | null
+          business_name: string
+          city: string
+          contact_name: string
+          created_at: string
+          email: string
+          estimated_monthly_volume: number
+          hazmat_products: string
+          id: string
+          need_bundling: boolean
+          need_inspection: boolean
+          need_labeling: boolean
+          need_receiving: boolean
+          need_shipping: boolean
+          need_storage: boolean
+          phone: string
+          preferred_shipping_carrier: string | null
+          product_type: string
+          referral_source: string | null
+          shipping_address: string
+          special_requirements: string | null
+          state: string
+          status: string
+          zip_code: string
+        }
+        Insert: {
+          agreed_to_deposit?: boolean
+          amazon_seller_central?: string | null
+          amazon_seller_name: string
+          average_units_per_shipment?: number | null
+          business_name: string
+          city: string
+          contact_name: string
+          created_at?: string
+          email: string
+          estimated_monthly_volume?: number
+          hazmat_products: string
+          id?: string
+          need_bundling?: boolean
+          need_inspection?: boolean
+          need_labeling?: boolean
+          need_receiving?: boolean
+          need_shipping?: boolean
+          need_storage?: boolean
+          phone: string
+          preferred_shipping_carrier?: string | null
+          product_type: string
+          referral_source?: string | null
+          shipping_address: string
+          special_requirements?: string | null
+          state: string
+          status?: string
+          zip_code: string
+        }
+        Update: {
+          agreed_to_deposit?: boolean
+          amazon_seller_central?: string | null
+          amazon_seller_name?: string
+          average_units_per_shipment?: number | null
+          business_name?: string
+          city?: string
+          contact_name?: string
+          created_at?: string
+          email?: string
+          estimated_monthly_volume?: number
+          hazmat_products?: string
+          id?: string
+          need_bundling?: boolean
+          need_inspection?: boolean
+          need_labeling?: boolean
+          need_receiving?: boolean
+          need_shipping?: boolean
+          need_storage?: boolean
+          phone?: string
+          preferred_shipping_carrier?: string | null
+          product_type?: string
+          referral_source?: string | null
+          shipping_address?: string
+          special_requirements?: string | null
+          state?: string
+          status?: string
+          zip_code?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company_name: string | null
