@@ -120,11 +120,30 @@ const ServiceBreakdown = () => {
   ];
 
   const shopifyProcess = [
-    "Receiving & Inventory Sync",
-    "Storage & Organization",
-    "Order Receipt from Shopify Store",
-    "Pick, Pack & Custom Packaging",
-    "Ship Direct to Customer",
+    {
+      title: "Receiving & Quality Inspection",
+      description: "We receive and verify all incoming inventory with accuracy checks to ensure every SKU and variant arrives in perfect condition."
+    },
+    {
+      title: "Product Photos & Quality Control",
+      description: "High-quality product photos and QC verification provided to confirm condition, packaging, and readiness for fulfillment."
+    },
+    {
+      title: "Organized Storage & Inventory Management",
+      description: "Your products are stored securely in our warehouse with clear labeling and real-time organization for fast, accurate pick-and-pack fulfillment."
+    },
+    {
+      title: "Order Fulfillment & Packaging",
+      description: "We handle all order prep — picking, packing, custom packaging, inserts, or marketing materials — for a seamless customer unboxing experience."
+    },
+    {
+      title: "Shopify Integration & Shipment Creation",
+      description: "Your Shopify store integrates directly with our system for automated order syncing, real-time tracking, and shipment creation."
+    },
+    {
+      title: "Direct-to-Customer Shipping",
+      description: "We ship directly to your customers using your preferred carriers, ensuring fast delivery and an exceptional post-purchase experience."
+    }
   ];
 
   const shopifyPrepServices = [
@@ -302,13 +321,16 @@ const ServiceBreakdown = () => {
                 <CardContent>
                   <div className="mb-8">
                     <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations</h3>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {shopifyProcess.map((step, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                        <div key={index} className="flex gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
                             {index + 1}
                           </div>
-                          <span className="text-foreground pt-1">{step}</span>
+                          <div>
+                            <p className="font-semibold text-foreground">{step.title}</p>
+                            <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                          </div>
                         </div>
                       ))}
                     </div>
