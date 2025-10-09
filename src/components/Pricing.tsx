@@ -17,14 +17,14 @@ import { ChevronDown, ChevronUp, Info } from "lucide-react";
 
 const pricingData = [
   { service: "Receiving", price: "$3/carton" },
-  { service: "FNSKU Label", price: "$0.50 – $0.70/unit" },
-  { service: "Polybag + Label", price: "$1.20/unit" },
+  { service: "Pallet Receiving", price: "$50/pallet" },
+  { service: "FNSKU Label", price: "$0.70/unit" },
+  { service: "Polybag + Label", price: "$1.40/unit" },
   { service: "Bubble Wrap", price: "+$0.50/unit" },
   { service: "Bundling", price: "+$0.50/unit" },
   { service: "Amazon/Walmart Shipment Box", price: "$1.50/box" },
   { service: "Self-Fulfilled Shipment", price: "$1.50/shipment" },
-  { service: "Storage", price: "$0.80/unit/month" },
-  { service: "Rush Service", price: "+30% – 60%" },
+  { service: "Storage", price: "Contact for pricing" },
   { service: "Deposit (New Clients)", price: "$300" },
 ];
 
