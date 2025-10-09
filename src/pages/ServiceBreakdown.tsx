@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CheckCircle2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import logo from "@/assets/westfield-logo.png";
 
 const ServiceBreakdown = () => {
   const navigate = useNavigate();
@@ -14,11 +13,6 @@ const ServiceBreakdown = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const handleLogoClick = () => {
-    navigate("/");
-    setTimeout(() => window.scrollTo(0, 0), 100);
-  };
 
   const amazonFBAProcess = [
     {

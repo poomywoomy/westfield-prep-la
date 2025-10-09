@@ -69,12 +69,38 @@ const Header = () => {
                 </button>
               </>
             ) : (
-              <Link
-                to="/"
-                className="text-foreground hover:text-primary transition-colors font-medium"
-              >
-                Home
-              </Link>
+              <>
+                <Link
+                  to="/"
+                  className="text-foreground hover:text-primary transition-colors font-medium"
+                >
+                  Home
+                </Link>
+                <button
+                  onClick={() => {
+                    navigate("/");
+                    setTimeout(() => {
+                      const element = document.getElementById("services");
+                      if (element) element.scrollIntoView({ behavior: "smooth" });
+                    }, 100);
+                  }}
+                  className="text-foreground hover:text-primary transition-colors font-medium"
+                >
+                  Services
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/");
+                    setTimeout(() => {
+                      const element = document.getElementById("pricing");
+                      if (element) element.scrollIntoView({ behavior: "smooth" });
+                    }, 100);
+                  }}
+                  className="text-foreground hover:text-primary transition-colors font-medium"
+                >
+                  Pricing
+                </button>
+              </>
             )}
             <Link
               to="/services"
