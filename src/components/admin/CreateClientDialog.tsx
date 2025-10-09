@@ -37,6 +37,7 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
     storage: false,
     storage_units_per_month: "",
     admin_notes: "",
+    fulfillment_services: [] as Array<"fba_prep" | "wfs_prep" | "tiktok_prep" | "self_fulfilled" | "storage" | "returns_processing">,
   });
   const { toast } = useToast();
 
@@ -86,6 +87,7 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
         storage: formData.storage,
         storage_units_per_month: formData.storage_units_per_month ? parseInt(formData.storage_units_per_month) : null,
         admin_notes: formData.admin_notes,
+        fulfillment_services: formData.fulfillment_services,
         temp_password: tempPassword,
         password_expires_at: expiresAt.toISOString(),
       });
@@ -199,6 +201,101 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
                 />
               </div>
             )}
+          </div>
+
+          <div className="space-y-3">
+            <Label>Fulfillment Services</Label>
+            <div className="grid grid-cols-2 gap-3 p-4 bg-muted/50 rounded-lg border">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="fba_prep"
+                  checked={formData.fulfillment_services.includes('fba_prep')}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'fba_prep'] });
+                    } else {
+                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'fba_prep') });
+                    }
+                  }}
+                />
+                <Label htmlFor="fba_prep" className="font-normal cursor-pointer">FBA Prep</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="wfs_prep"
+                  checked={formData.fulfillment_services.includes('wfs_prep')}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'wfs_prep'] });
+                    } else {
+                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'wfs_prep') });
+                    }
+                  }}
+                />
+                <Label htmlFor="wfs_prep" className="font-normal cursor-pointer">WFS Prep</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="tiktok_prep"
+                  checked={formData.fulfillment_services.includes('tiktok_prep')}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'tiktok_prep'] });
+                    } else {
+                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'tiktok_prep') });
+                    }
+                  }}
+                />
+                <Label htmlFor="tiktok_prep" className="font-normal cursor-pointer">TikTok Shop Prep</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="self_fulfilled"
+                  checked={formData.fulfillment_services.includes('self_fulfilled')}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'self_fulfilled'] });
+                    } else {
+                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'self_fulfilled') });
+                    }
+                  }}
+                />
+                <Label htmlFor="self_fulfilled" className="font-normal cursor-pointer">Self-Fulfilled Shipment</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="storage_service"
+                  checked={formData.fulfillment_services.includes('storage')}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'storage'] });
+                    } else {
+                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'storage') });
+                    }
+                  }}
+                />
+                <Label htmlFor="storage_service" className="font-normal cursor-pointer">Storage</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="returns_processing"
+                  checked={formData.fulfillment_services.includes('returns_processing')}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'returns_processing'] });
+                    } else {
+                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'returns_processing') });
+                    }
+                  }}
+                />
+                <Label htmlFor="returns_processing" className="font-normal cursor-pointer">Returns Processing</Label>
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center space-x-4">

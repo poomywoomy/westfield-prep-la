@@ -74,6 +74,9 @@ export type Database = {
           email: string
           estimated_units_per_month: number | null
           extra_prep: boolean | null
+          fulfillment_services:
+            | Database["public"]["Enums"]["fulfillment_service"][]
+            | null
           id: string
           password_expires_at: string | null
           phone_number: string
@@ -99,6 +102,9 @@ export type Database = {
           email: string
           estimated_units_per_month?: number | null
           extra_prep?: boolean | null
+          fulfillment_services?:
+            | Database["public"]["Enums"]["fulfillment_service"][]
+            | null
           id?: string
           password_expires_at?: string | null
           phone_number: string
@@ -124,6 +130,9 @@ export type Database = {
           email?: string
           estimated_units_per_month?: number | null
           extra_prep?: boolean | null
+          fulfillment_services?:
+            | Database["public"]["Enums"]["fulfillment_service"][]
+            | null
           id?: string
           password_expires_at?: string | null
           phone_number?: string
@@ -316,6 +325,13 @@ export type Database = {
       app_role: "admin" | "client"
       billing_frequency: "pay_as_go" | "end_of_month"
       channel_type: "amazon" | "walmart" | "shopify" | "ebay" | "other"
+      fulfillment_service:
+        | "fba_prep"
+        | "wfs_prep"
+        | "tiktok_prep"
+        | "self_fulfilled"
+        | "storage"
+        | "returns_processing"
       receiving_format: "pallets" | "cartons" | "both"
     }
     CompositeTypes: {
@@ -447,6 +463,14 @@ export const Constants = {
       app_role: ["admin", "client"],
       billing_frequency: ["pay_as_go", "end_of_month"],
       channel_type: ["amazon", "walmart", "shopify", "ebay", "other"],
+      fulfillment_service: [
+        "fba_prep",
+        "wfs_prep",
+        "tiktok_prep",
+        "self_fulfilled",
+        "storage",
+        "returns_processing",
+      ],
       receiving_format: ["pallets", "cartons", "both"],
     },
   },
