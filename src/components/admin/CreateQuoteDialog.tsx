@@ -433,8 +433,18 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
   };
 
   const saveQuote = async () => {
-    // Allow saving with any data - no validation required
     setIsSubmitting(true);
+
+    // Validate that a client is selected when not using manual entry
+    if (!useManualEntry && !selectedClientId) {
+      toast({
+        title: "Error",
+        description: "Please select a client or use manual entry",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const clientName = useManualEntry ? manualClientName : clients.find(c => c.id === selectedClientId)?.company_name;
@@ -454,7 +464,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         const { error } = await supabase
           .from("quotes")
           .update({
-            client_id: useManualEntry ? null : selectedClientId,
+            client_id: useManualEntry ? null : (selectedClientId || null),
             quote_data: quoteData as any,
           })
           .eq("id", editingQuote.id);
@@ -469,7 +479,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         const { error } = await supabase
           .from("quotes")
           .insert([{
-            client_id: useManualEntry ? null : selectedClientId,
+            client_id: useManualEntry ? null : (selectedClientId || null),
             quote_data: quoteData as any,
             status: 'saved'
           }]);
