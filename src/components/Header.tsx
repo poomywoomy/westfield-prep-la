@@ -77,6 +77,12 @@ const Header = () => {
               </Link>
             )}
             <Link
+              to="/services"
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
+              Platforms
+            </Link>
+            <Link
               to="/faq"
               className="text-foreground hover:text-primary transition-colors font-medium"
             >

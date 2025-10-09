@@ -37,7 +37,14 @@ const Footer = () => {
             <p className="text-sm text-white/80">
               Westfield Prep Center — a DBA of Sathatham LLC
             </p>
-            <div className="flex justify-center gap-4 mt-3 mb-2">
+            <div className="flex justify-center flex-wrap gap-4 mt-3 mb-2">
+              <Link
+                to="/services"
+                className="text-xs text-white/80 hover:text-secondary transition-colors"
+              >
+                Platforms
+              </Link>
+              <span className="text-white/40">•</span>
               <Link
                 to="/faq"
                 className="text-xs text-white/80 hover:text-secondary transition-colors"
