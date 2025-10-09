@@ -149,11 +149,13 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="bg-card border border-border rounded-lg shadow-lg p-8">
           <div className="flex justify-center mb-8">
-            <img 
-              src={westfieldLogo} 
-              alt="Westfield Logo" 
-              className="h-16"
-            />
+            <a href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
+              <img 
+                src={westfieldLogo} 
+                alt="Westfield Logo" 
+                className="h-16"
+              />
+            </a>
           </div>
           
           <h1 className="text-2xl font-bold text-center mb-2">Portal Login</h1>
