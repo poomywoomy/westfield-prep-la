@@ -15,9 +15,14 @@ const AdminSettings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || role !== "admin")) {
@@ -40,6 +45,42 @@ const AdminSettings = () => {
 
     if (!error && data) {
       setProfile(data);
+      setFirstName(data.first_name || "");
+      setLastName(data.last_name || "");
+      setCompanyName(data.company_name || "");
+      setPhoneNumber(data.phone_number || "");
+    }
+  };
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingProfile(true);
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        first_name: firstName,
+        last_name: lastName,
+        company_name: companyName,
+        phone_number: phoneNumber,
+        full_name: `${firstName} ${lastName}`.trim(),
+      })
+      .eq("id", user?.id);
+
+    setIsSavingProfile(false);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+      fetchProfile();
     }
   };
 
@@ -121,29 +162,54 @@ const AdminSettings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Account Information</CardTitle>
-              <CardDescription>Your basic account details</CardDescription>
+              <CardDescription>Update your basic account details</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>First Name</Label>
-                <Input value={profile?.first_name || ""} disabled />
-              </div>
-              <div>
-                <Label>Last Name</Label>
-                <Input value={profile?.last_name || ""} disabled />
-              </div>
-              <div>
-                <Label>Company Name</Label>
-                <Input value={profile?.company_name || ""} disabled />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input value={user?.email || ""} disabled />
-              </div>
-              <div>
-                <Label>Phone Number</Label>
-                <Input value={profile?.phone_number || ""} disabled />
-              </div>
+            <CardContent>
+              <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <div>
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input 
+                    id="firstName"
+                    value={firstName} 
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Enter first name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input 
+                    id="lastName"
+                    value={lastName} 
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Enter last name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="companyName">Company Name</Label>
+                  <Input 
+                    id="companyName"
+                    value={companyName} 
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="Enter company name"
+                  />
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <Input value={user?.email || ""} disabled />
+                </div>
+                <div>
+                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Input 
+                    id="phoneNumber"
+                    value={phoneNumber} 
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="Enter phone number"
+                  />
+                </div>
+                <Button type="submit" disabled={isSavingProfile}>
+                  {isSavingProfile ? "Saving..." : "Save Changes"}
+                </Button>
+              </form>
             </CardContent>
           </Card>
 

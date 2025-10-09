@@ -15,9 +15,14 @@ const ClientSettings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [clientData, setClientData] = useState<any>(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || role !== "client")) {
@@ -40,6 +45,42 @@ const ClientSettings = () => {
 
     if (!error && data) {
       setClientData(data);
+      setFirstName(data.first_name || "");
+      setLastName(data.last_name || "");
+      setCompanyName(data.company_name || "");
+      setPhoneNumber(data.phone_number || "");
+    }
+  };
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingProfile(true);
+
+    const { error } = await supabase
+      .from("clients")
+      .update({
+        first_name: firstName,
+        last_name: lastName,
+        company_name: companyName,
+        phone_number: phoneNumber,
+        contact_name: `${firstName} ${lastName}`.trim(),
+      })
+      .eq("user_id", user?.id);
+
+    setIsSavingProfile(false);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+      fetchClientData();
     }
   };
 
@@ -121,29 +162,54 @@ const ClientSettings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Account Information</CardTitle>
-              <CardDescription>Your basic account details</CardDescription>
+              <CardDescription>Update your basic account details</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>First Name</Label>
-                <Input value={clientData?.first_name || ""} disabled />
-              </div>
-              <div>
-                <Label>Last Name</Label>
-                <Input value={clientData?.last_name || ""} disabled />
-              </div>
-              <div>
-                <Label>Company Name</Label>
-                <Input value={clientData?.company_name || ""} disabled />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input value={clientData?.email || ""} disabled />
-              </div>
-              <div>
-                <Label>Phone Number</Label>
-                <Input value={clientData?.phone_number || ""} disabled />
-              </div>
+            <CardContent>
+              <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <div>
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input 
+                    id="firstName"
+                    value={firstName} 
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Enter first name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input 
+                    id="lastName"
+                    value={lastName} 
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Enter last name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="companyName">Company Name</Label>
+                  <Input 
+                    id="companyName"
+                    value={companyName} 
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="Enter company name"
+                  />
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <Input value={clientData?.email || ""} disabled />
+                </div>
+                <div>
+                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Input 
+                    id="phoneNumber"
+                    value={phoneNumber} 
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="Enter phone number"
+                  />
+                </div>
+                <Button type="submit" disabled={isSavingProfile}>
+                  {isSavingProfile ? "Saving..." : "Save Changes"}
+                </Button>
+              </form>
             </CardContent>
           </Card>
 

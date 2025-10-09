@@ -12,7 +12,6 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ThankYou from "./pages/ThankYou";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import SetupAdmin from "./pages/SetupAdmin";
 import AdminDashboard from "./pages/AdminDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import AdminSettings from "./pages/AdminSettings";
@@ -35,7 +34,6 @@ const App = () => (
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/setup-admin" element={<SetupAdmin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/client/dashboard" element={<ClientDashboard />} />

@@ -743,26 +743,22 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>
-            {!useManualEntry && (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={saveQuote}
-                  disabled={isSubmitting || (!selectedClientId && !manualClientName) || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
-                >
-                  {editingQuote ? 'Update Quote' : 'Save Quote'}
-                </Button>
-                {!useManualEntry && (
-                  <Button
-                    onClick={applyToPricing}
-                    disabled={isSubmitting || !selectedClientId || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
-                  >
-                    <Check className="h-4 w-4 mr-2" />
-                    Apply to Client Pricing
-                  </Button>
-                )}
-              </>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={saveQuote}
+              disabled={isSubmitting || (!selectedClientId && !manualClientName) || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
+            >
+              {editingQuote ? 'Update Quote' : 'Save Quote'}
+            </Button>
+            {!useManualEntry && selectedClientId && (
+              <Button
+                onClick={applyToPricing}
+                disabled={isSubmitting || !selectedClientId || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Apply to Client Pricing
+              </Button>
             )}
           </div>
         </div>
