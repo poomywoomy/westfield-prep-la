@@ -86,6 +86,7 @@ export type Database = {
           receiving_format:
             | Database["public"]["Enums"]["receiving_format"]
             | null
+          status: Database["public"]["Enums"]["client_status"] | null
           storage: boolean | null
           storage_units_per_month: number | null
           temp_password: string | null
@@ -116,6 +117,7 @@ export type Database = {
           receiving_format?:
             | Database["public"]["Enums"]["receiving_format"]
             | null
+          status?: Database["public"]["Enums"]["client_status"] | null
           storage?: boolean | null
           storage_units_per_month?: number | null
           temp_password?: string | null
@@ -146,6 +148,7 @@ export type Database = {
           receiving_format?:
             | Database["public"]["Enums"]["receiving_format"]
             | null
+          status?: Database["public"]["Enums"]["client_status"] | null
           storage?: boolean | null
           storage_units_per_month?: number | null
           temp_password?: string | null
@@ -337,6 +340,7 @@ export type Database = {
       app_role: "admin" | "client"
       billing_frequency: "pay_as_go" | "end_of_month"
       channel_type: "amazon" | "walmart" | "shopify" | "ebay" | "other"
+      client_status: "pending" | "active" | "inactive"
       fulfillment_service:
         | "fba_prep"
         | "wfs_prep"
@@ -475,6 +479,7 @@ export const Constants = {
       app_role: ["admin", "client"],
       billing_frequency: ["pay_as_go", "end_of_month"],
       channel_type: ["amazon", "walmart", "shopify", "ebay", "other"],
+      client_status: ["pending", "active", "inactive"],
       fulfillment_service: [
         "fba_prep",
         "wfs_prep",

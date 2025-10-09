@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Image, LogOut, Receipt, Settings, ChevronDown } from "lucide-react";
+import { DollarSign, Image, LogOut, Receipt, Settings, ChevronDown, Package, Warehouse, Box } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientPricingTab from "@/components/client/ClientPricingTab";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
@@ -19,6 +20,7 @@ const ClientDashboard = () => {
   const { toast } = useToast();
   const [clientName, setClientName] = useState<string>("");
   const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [clientStats, setClientStats] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -30,12 +32,13 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("contact_name, temp_password")
+        .select("contact_name, temp_password, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, fulfillment_services")
         .eq("user_id", user?.id)
         .single();
 
       if (!error && data) {
         setClientName(data.contact_name);
+        setClientStats(data);
         
         // Show password change dialog if temp password exists
         if (data.temp_password) {
@@ -123,6 +126,47 @@ const ClientDashboard = () => {
             <h2 className="text-3xl font-bold">Hello, {clientName}</h2>
           </div>
         )}
+        
+        {clientStats && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Estimated Units/Month</CardTitle>
+                <Package className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{clientStats.estimated_units_per_month || "N/A"}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Receiving Format</CardTitle>
+                <Warehouse className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold capitalize">{clientStats.receiving_format || "N/A"}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Services</CardTitle>
+                <Box className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1">
+                  {clientStats.extra_prep && <div className="text-sm">✓ Extra Prep</div>}
+                  {clientStats.storage && <div className="text-sm">✓ Storage ({clientStats.storage_units_per_month} units/mo)</div>}
+                  {clientStats.fulfillment_services?.length > 0 && (
+                    <div className="text-sm">✓ {clientStats.fulfillment_services.length} Fulfillment Service(s)</div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
         <Tabs defaultValue="pricing" className="space-y-6">
           <TabsList className="grid grid-cols-3 w-full max-w-xl">
             <TabsTrigger value="pricing">

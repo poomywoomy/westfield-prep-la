@@ -20,7 +20,8 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     company_name: "",
-    contact_name: "",
+    first_name: "",
+    last_name: "",
     phone_number: "",
     estimated_units_per_month: "",
     receiving_format: "both" as "pallets" | "cartons" | "both",
@@ -36,7 +37,8 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
     if (client) {
       setFormData({
         company_name: client.company_name || "",
-        contact_name: client.contact_name || "",
+        first_name: client.first_name || "",
+        last_name: client.last_name || "",
         phone_number: client.phone_number || "",
         estimated_units_per_month: client.estimated_units_per_month?.toString() || "",
         receiving_format: client.receiving_format || "both",
@@ -58,7 +60,9 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
         .from("clients")
         .update({
           company_name: formData.company_name,
-          contact_name: formData.contact_name,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          contact_name: `${formData.first_name} ${formData.last_name}`.trim(),
           phone_number: formData.phone_number,
           estimated_units_per_month: formData.estimated_units_per_month ? parseInt(formData.estimated_units_per_month) : null,
           receiving_format: formData.receiving_format,
@@ -112,11 +116,21 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="contact_name">Contact Name *</Label>
+              <Label htmlFor="first_name">First Name *</Label>
               <Input
-                id="contact_name"
-                value={formData.contact_name}
-                onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
+                id="first_name"
+                value={formData.first_name}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="last_name">Last Name *</Label>
+              <Input
+                id="last_name"
+                value={formData.last_name}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                 required
               />
             </div>

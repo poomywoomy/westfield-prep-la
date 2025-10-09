@@ -141,6 +141,7 @@ serve(async (req) => {
         fulfillment_services: requestData.fulfillment_services,
         temp_password: requestData.tempPassword,
         password_expires_at: requestData.password_expires_at,
+        status: 'pending',
       }, {
         onConflict: 'user_id'
       });
