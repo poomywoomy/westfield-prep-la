@@ -20,48 +20,72 @@ const ServiceBreakdown = () => {
     setTimeout(() => window.scrollTo(0, 0), 100);
   };
 
-  const amazonServices = [
-    "FBA Prep & Labeling",
+  const amazonProcess = [
+    "Receiving & Inspection",
+    "Quality Control Check",
     "FNSKU Label Application",
-    "Polybag & Bubble Wrap",
-    "Case Pack & Bundling",
+    "Prep Services (Polybag, Bubble Wrap, Bundling)",
+    "Shipment Creation & Forwarding to Amazon FBA",
+  ];
+
+  const amazonPrepServices = [
+    "FNSKU Labeling - $0.70/unit",
+    "Polybag + Label - $1.40/unit",
+    "Bubble Wrap - +$0.50/unit",
+    "Bundling - +$0.50/unit",
     "Box Content Labels",
-    "Shipment Creation & Forwarding",
-    "Inventory Storage",
-    "Amazon Compliance & Inspection",
+    "Case Packing",
   ];
 
-  const walmartServices = [
-    "WFS Prep & Labeling",
+  const walmartProcess = [
+    "Receiving & Inspection",
+    "Quality Control Check",
     "Walmart Barcode Application",
-    "Polybag & Protective Packaging",
-    "Case Pack Requirements",
-    "Shipment Creation & Routing",
-    "Quality Control & Inspection",
-    "Returns Processing",
-    "Inventory Management",
+    "Prep Services (Polybag, Protective Packaging)",
+    "Shipment Creation & Routing to WFS",
   ];
 
-  const shopifyServices = [
-    "Direct-to-Consumer Fulfillment",
-    "Pick, Pack & Ship",
+  const walmartPrepServices = [
+    "Walmart Barcode Application",
+    "Polybag + Label - $1.40/unit",
+    "Bubble Wrap - +$0.50/unit",
+    "Case Pack Requirements",
+    "Box Content Labels",
+    "Returns Processing",
+  ];
+
+  const shopifyProcess = [
+    "Receiving & Inventory Sync",
+    "Storage & Organization",
+    "Order Receipt from Shopify Store",
+    "Pick, Pack & Custom Packaging",
+    "Ship Direct to Customer",
+  ];
+
+  const shopifyPrepServices = [
     "Custom Packaging Solutions",
     "Branded Inserts & Materials",
-    "Order Management Integration",
-    "Real-Time Inventory Sync",
-    "Returns & Exchanges",
+    "Gift Wrapping",
+    "Kitting & Assembly",
+    "Returns & Exchanges Processing",
     "Multi-Channel Integration",
   ];
 
-  const tiktokServices = [
-    "TikTok Shop Fulfillment",
-    "Fast Processing for Viral Products",
+  const tiktokProcess = [
+    "Receiving & Fast Processing",
+    "Quality Check",
     "Custom Branding & Packaging",
-    "Influencer Collaboration Support",
-    "Same-Day & Next-Day Shipping",
+    "Same-Day/Next-Day Prep",
+    "Ship to Customer or TikTok Warehouse",
+  ];
+
+  const tiktokPrepServices = [
+    "Custom Branding & Packaging",
+    "Influencer Kit Assembly",
+    "Fast-Track Processing",
+    "Polybag + Label - $1.40/unit",
+    "Seasonal Campaign Prep",
     "Order Tracking Integration",
-    "Returns Management",
-    "Seasonal Campaign Support",
   ];
 
   return (
@@ -96,14 +120,32 @@ const ServiceBreakdown = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {amazonServices.map((service, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span className="text-foreground">{service}</span>
-                      </div>
-                    ))}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations</h3>
+                    <div className="space-y-3">
+                      {amazonProcess.map((step, index) => (
+                        <div key={index} className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                            {index + 1}
+                          </div>
+                          <span className="text-foreground pt-1">{step}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Prep Services Available</h3>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {amazonPrepServices.map((service, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <CheckCircle2 className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <span className="text-foreground text-sm">{service}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="mt-8">
                     <Button onClick={() => navigate("/contact")} size="lg">
                       Get Started with Amazon FBA
@@ -122,14 +164,32 @@ const ServiceBreakdown = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {walmartServices.map((service, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span className="text-foreground">{service}</span>
-                      </div>
-                    ))}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations</h3>
+                    <div className="space-y-3">
+                      {walmartProcess.map((step, index) => (
+                        <div key={index} className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                            {index + 1}
+                          </div>
+                          <span className="text-foreground pt-1">{step}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Prep Services Available</h3>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {walmartPrepServices.map((service, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <CheckCircle2 className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <span className="text-foreground text-sm">{service}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="mt-8">
                     <Button onClick={() => navigate("/contact")} size="lg">
                       Get Started with Walmart WFS
@@ -148,14 +208,32 @@ const ServiceBreakdown = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {shopifyServices.map((service, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span className="text-foreground">{service}</span>
-                      </div>
-                    ))}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations</h3>
+                    <div className="space-y-3">
+                      {shopifyProcess.map((step, index) => (
+                        <div key={index} className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                            {index + 1}
+                          </div>
+                          <span className="text-foreground pt-1">{step}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Prep Services Available</h3>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {shopifyPrepServices.map((service, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <CheckCircle2 className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <span className="text-foreground text-sm">{service}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="mt-8">
                     <Button onClick={() => navigate("/contact")} size="lg">
                       Get Started with Shopify
@@ -174,14 +252,32 @@ const ServiceBreakdown = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {tiktokServices.map((service, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span className="text-foreground">{service}</span>
-                      </div>
-                    ))}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Order of Operations</h3>
+                    <div className="space-y-3">
+                      {tiktokProcess.map((step, index) => (
+                        <div key={index} className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                            {index + 1}
+                          </div>
+                          <span className="text-foreground pt-1">{step}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Prep Services Available</h3>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {tiktokPrepServices.map((service, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <CheckCircle2 className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <span className="text-foreground text-sm">{service}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="mt-8">
                     <Button onClick={() => navigate("/contact")} size="lg">
                       Get Started with TikTok Shop
