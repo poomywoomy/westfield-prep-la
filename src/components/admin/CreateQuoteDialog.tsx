@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,16 +55,36 @@ interface CreateQuoteDialogProps {
   onOpenChange: (open: boolean) => void;
   clients: any[];
   onQuoteCreated: () => void;
+  editingQuote?: any;
 }
 
-const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: CreateQuoteDialogProps) => {
+const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editingQuote }: CreateQuoteDialogProps) => {
   const { toast } = useToast();
   const [selectedClientId, setSelectedClientId] = useState("");
   const [manualClientName, setManualClientName] = useState("");
+  const [manualContactName, setManualContactName] = useState("");
+  const [manualEmail, setManualEmail] = useState("");
+  const [manualPhone, setManualPhone] = useState("");
   const [useManualEntry, setUseManualEntry] = useState(false);
   const [standardItems, setStandardItems] = useState<LineItem[]>([]);
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (editingQuote && open) {
+      const quoteData = editingQuote.quote_data;
+      setSelectedClientId(editingQuote.client_id || "");
+      setManualClientName(quoteData.client_name || "");
+      setManualContactName(quoteData.contact_name || "");
+      setManualEmail(quoteData.email || "");
+      setManualPhone(quoteData.phone || "");
+      setUseManualEntry(!editingQuote.client_id);
+      setStandardItems(quoteData.standard_operations || []);
+      setFulfillmentSections(quoteData.fulfillment_sections || []);
+    } else if (!open) {
+      resetForm();
+    }
+  }, [editingQuote, open]);
 
   const addStandardItem = () => {
     setStandardItems([...standardItems, { 
@@ -144,7 +164,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
 
     const doc = new jsPDF();
     
-    // Add logo
+    // Add logo with proper aspect ratio
     try {
       const logoImg = new Image();
       logoImg.src = '/westfield-logo.png';
@@ -152,25 +172,30 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
         logoImg.onload = resolve;
         logoImg.onerror = reject;
       });
-      doc.addImage(logoImg, 'PNG', 85, 10, 40, 20);
+      doc.addImage(logoImg, 'PNG', 80, 10, 50, 25);
     } catch (error) {
       console.error('Error loading logo:', error);
     }
 
     // Header
     doc.setFillColor(13, 33, 66);
-    doc.rect(0, 35, 210, 15, 'F');
+    doc.rect(0, 40, 210, 15, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-    doc.text("SERVICE QUOTE", 105, 45, { align: "center" });
+    doc.text("SERVICE QUOTE", 105, 50, { align: "center" });
 
     // Client info
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(11);
-    doc.text(`Client: ${clientName}`, 20, 60);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 67);
+    doc.text(`Client: ${clientName}`, 20, 65);
+    if (useManualEntry) {
+      if (manualContactName) doc.text(`Contact: ${manualContactName}`, 20, 72);
+      if (manualEmail) doc.text(`Email: ${manualEmail}`, 20, 79);
+      if (manualPhone) doc.text(`Phone: ${manualPhone}`, 20, 86);
+    }
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, useManualEntry ? 93 : 72);
 
-    let y = 80;
+    let y = useManualEntry ? 105 : 85;
 
     // Standard Operations
     if (standardItems.length > 0) {
@@ -260,10 +285,12 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
   };
 
   const saveQuote = async () => {
-    if (!selectedClientId) {
+    const clientName = useManualEntry ? manualClientName : clients.find(c => c.id === selectedClientId)?.company_name;
+    
+    if (!clientName && !useManualEntry) {
       toast({
         title: "Error",
-        description: "Please select a client to save the quote",
+        description: "Please select or enter a client name",
         variant: "destructive",
       });
       return;
@@ -272,32 +299,47 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
     setIsSubmitting(true);
 
     try {
-      const allItems = [
-        ...standardItems,
-        ...fulfillmentSections.flatMap(section => section.items)
-      ];
-
       const quoteData = {
-        client_name: clients.find(c => c.id === selectedClientId)?.company_name,
+        client_name: clientName,
+        contact_name: useManualEntry ? manualContactName : "",
+        email: useManualEntry ? manualEmail : "",
+        phone: useManualEntry ? manualPhone : "",
         standard_operations: standardItems,
         fulfillment_sections: fulfillmentSections,
         created_date: new Date().toISOString()
       };
 
-      const { error } = await supabase
-        .from("quotes")
-        .insert([{
-          client_id: selectedClientId,
-          quote_data: quoteData as any,
-          status: 'saved'
-        }]);
+      if (editingQuote) {
+        const { error } = await supabase
+          .from("quotes")
+          .update({
+            client_id: useManualEntry ? null : selectedClientId,
+            quote_data: quoteData as any,
+          })
+          .eq("id", editingQuote.id);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Quote has been saved",
-      });
+        toast({
+          title: "Success",
+          description: "Quote has been updated",
+        });
+      } else {
+        const { error } = await supabase
+          .from("quotes")
+          .insert([{
+            client_id: useManualEntry ? null : selectedClientId,
+            quote_data: quoteData as any,
+            status: 'saved'
+          }]);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Quote has been saved",
+        });
+      }
 
       onQuoteCreated();
       onOpenChange(false);
@@ -385,6 +427,9 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
   const resetForm = () => {
     setSelectedClientId("");
     setManualClientName("");
+    setManualContactName("");
+    setManualEmail("");
+    setManualPhone("");
     setUseManualEntry(false);
     setStandardItems([]);
     setFulfillmentSections([]);
@@ -400,7 +445,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Quote</DialogTitle>
+          <DialogTitle>{editingQuote ? 'Update Quote' : 'Create Quote'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -417,13 +462,40 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
             </div>
 
             {useManualEntry ? (
-              <div>
-                <Label>Client Name</Label>
-                <Input
-                  value={manualClientName}
-                  onChange={(e) => setManualClientName(e.target.value)}
-                  placeholder="Enter client name"
-                />
+              <div className="space-y-4">
+                <div>
+                  <Label>Company Name</Label>
+                  <Input
+                    value={manualClientName}
+                    onChange={(e) => setManualClientName(e.target.value)}
+                    placeholder="Enter company name"
+                  />
+                </div>
+                <div>
+                  <Label>Contact Name</Label>
+                  <Input
+                    value={manualContactName}
+                    onChange={(e) => setManualContactName(e.target.value)}
+                    placeholder="Enter contact name"
+                  />
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    value={manualEmail}
+                    onChange={(e) => setManualEmail(e.target.value)}
+                    placeholder="Enter email"
+                  />
+                </div>
+                <div>
+                  <Label>Phone Number</Label>
+                  <Input
+                    value={manualPhone}
+                    onChange={(e) => setManualPhone(e.target.value)}
+                    placeholder="Enter phone number"
+                  />
+                </div>
               </div>
             ) : (
               <div>
@@ -448,7 +520,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
           <div className="space-y-4 border rounded-lg p-4">
             <div className="flex items-center justify-between">
               <Label className="text-lg font-semibold">Standard Operations</Label>
-              <Button type="button" size="sm" onClick={addStandardItem}>
+              <Button type="button" size="sm" onClick={addStandardItem} variant="secondary">
                 <Plus className="h-4 w-4 mr-1" />
                 Add Service
               </Button>
@@ -459,21 +531,35 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                 <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
                   <div>
                     <Label className="text-xs">Service</Label>
-                    <Select 
-                      value={item.service_name} 
-                      onValueChange={(value) => updateStandardItem(item.id, "service_name", value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select service" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {STANDARD_SERVICES.map((service) => (
-                          <SelectItem key={service} value={service}>
-                            {service}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {item.service_name === "Custom Entry" ? (
+                      <Input
+                        value={item.service_name}
+                        onChange={(e) => updateStandardItem(item.id, "service_name", e.target.value)}
+                        placeholder="Enter custom service"
+                      />
+                    ) : (
+                      <Select 
+                        value={item.service_name} 
+                        onValueChange={(value) => {
+                          if (value === "Custom Entry") {
+                            updateStandardItem(item.id, "service_name", "");
+                          } else {
+                            updateStandardItem(item.id, "service_name", value);
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select service" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {STANDARD_SERVICES.map((service) => (
+                            <SelectItem key={service} value={service}>
+                              {service}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                   <div>
                     <Label className="text-xs">Price ($)</Label>
@@ -516,7 +602,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                 <Button 
                   type="button" 
                   size="sm" 
-                  variant="outline"
+                  variant="secondary"
                   onClick={() => addFulfillmentSection("Amazon FBA")}
                 >
                   <Plus className="h-4 w-4 mr-1" />
@@ -525,7 +611,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                 <Button 
                   type="button" 
                   size="sm" 
-                  variant="outline"
+                  variant="secondary"
                   onClick={() => addFulfillmentSection("Walmart WFS")}
                 >
                   <Plus className="h-4 w-4 mr-1" />
@@ -534,7 +620,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                 <Button 
                   type="button" 
                   size="sm" 
-                  variant="outline"
+                  variant="secondary"
                   onClick={() => addFulfillmentSection("TikTok Shop")}
                 >
                   <Plus className="h-4 w-4 mr-1" />
@@ -543,7 +629,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                 <Button 
                   type="button" 
                   size="sm" 
-                  variant="outline"
+                  variant="secondary"
                   onClick={() => addFulfillmentSection("Self Fulfillment")}
                 >
                   <Plus className="h-4 w-4 mr-1" />
@@ -560,7 +646,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                     <Button 
                       type="button" 
                       size="sm" 
-                      variant="outline"
+                      variant="secondary"
                       onClick={() => addFulfillmentItem(section.id)}
                     >
                       <Plus className="h-4 w-4 mr-1" />
@@ -582,21 +668,35 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                     <div className="grid grid-cols-[1fr,150px,auto] gap-4 items-start">
                       <div>
                         <Label className="text-xs">Service</Label>
-                        <Select 
-                          value={item.service_name} 
-                          onValueChange={(value) => updateFulfillmentItem(section.id, item.id, "service_name", value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select service" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {getServiceOptions(section.type).map((service) => (
-                              <SelectItem key={service} value={service}>
-                                {service}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        {item.service_name === "custom entry" || (item.service_name && !getServiceOptions(section.type).includes(item.service_name)) ? (
+                          <Input
+                            value={item.service_name === "custom entry" ? "" : item.service_name}
+                            onChange={(e) => updateFulfillmentItem(section.id, item.id, "service_name", e.target.value)}
+                            placeholder="Enter custom service"
+                          />
+                        ) : (
+                          <Select 
+                            value={item.service_name} 
+                            onValueChange={(value) => {
+                              if (value === "custom entry") {
+                                updateFulfillmentItem(section.id, item.id, "service_name", "");
+                              } else {
+                                updateFulfillmentItem(section.id, item.id, "service_name", value);
+                              }
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select service" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getServiceOptions(section.type).map((service) => (
+                                <SelectItem key={service} value={service}>
+                                  {service}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
                       </div>
                       <div>
                         <Label className="text-xs">Price ($)</Label>
@@ -649,17 +749,19 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated }: Crea
                   type="button"
                   variant="outline"
                   onClick={saveQuote}
-                  disabled={isSubmitting || !selectedClientId || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
+                  disabled={isSubmitting || (!selectedClientId && !manualClientName) || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
                 >
-                  Save Quote
+                  {editingQuote ? 'Update Quote' : 'Save Quote'}
                 </Button>
-                <Button
-                  onClick={applyToPricing}
-                  disabled={isSubmitting || !selectedClientId || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
-                >
-                  <Check className="h-4 w-4 mr-2" />
-                  Apply to Client Pricing
-                </Button>
+                {!useManualEntry && (
+                  <Button
+                    onClick={applyToPricing}
+                    disabled={isSubmitting || !selectedClientId || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Apply to Client Pricing
+                  </Button>
+                )}
               </>
             )}
           </div>
