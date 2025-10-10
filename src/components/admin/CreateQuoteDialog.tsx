@@ -81,6 +81,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
       setManualContactName(quoteData.contact_name || "");
       setManualEmail(quoteData.email || "");
       setManualPhone(quoteData.phone || "");
+      // CRITICAL FIX: Set useManualEntry based on whether client_id exists
       setUseManualEntry(!editingQuote.client_id);
       setStandardItems(quoteData.standard_operations || []);
       setFulfillmentSections(quoteData.fulfillment_sections || []);
@@ -560,6 +561,46 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         title: "Success",
         description: "Pricing has been applied to client account",
       });
+
+      // Ensure the quote itself is assigned to the selected client
+      const client = clients.find(c => c.id === selectedClientId);
+      if (editingQuote) {
+        const updatedQuoteData = {
+          ...(editingQuote.quote_data || {}),
+          client_name: client?.company_name || (editingQuote.quote_data?.client_name ?? ""),
+          contact_name: client?.contact_name || editingQuote.quote_data?.contact_name || "",
+          email: client?.email || editingQuote.quote_data?.email || "",
+          phone: client?.phone_number || editingQuote.quote_data?.phone || "",
+        };
+
+        const { error: quoteUpdateError } = await supabase
+          .from("quotes")
+          .update({
+            client_id: selectedClientId,
+            quote_data: updatedQuoteData as any,
+          })
+          .eq("id", editingQuote.id);
+
+        if (quoteUpdateError) throw quoteUpdateError;
+      } else {
+        // If this is a new quote (not yet saved), create it now with assignment
+        const quoteData = {
+          client_name: client?.company_name || "Unnamed Quote",
+          contact_name: client?.contact_name || "",
+          email: client?.email || "",
+          phone: client?.phone_number || "",
+          standard_operations: standardItems,
+          fulfillment_sections: fulfillmentSections,
+          additional_comments: additionalComments,
+          created_date: new Date().toISOString()
+        };
+
+        const { error: insertQuoteError } = await supabase
+          .from("quotes")
+          .insert([{ client_id: selectedClientId, quote_data: quoteData as any, status: 'saved' }]);
+
+        if (insertQuoteError) throw insertQuoteError;
+      }
 
       onQuoteCreated();
       onOpenChange(false);

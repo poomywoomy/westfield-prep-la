@@ -64,12 +64,16 @@ const ClientDashboard = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Logout error:", error);
+    }
+    // Force navigate to login regardless of error
+    navigate("/login", { replace: true });
     toast({
       title: "Logged out",
       description: "You have been logged out successfully.",
     });
-    navigate("/login");
   };
 
   if (loading) {
