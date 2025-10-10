@@ -12,14 +12,12 @@ import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientPricingTab from "@/components/client/ClientPricingTab";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientQCImagesTab from "@/components/client/ClientQCImagesTab";
-import FirstPasswordChangeDialog from "@/components/client/FirstPasswordChangeDialog";
 
 const ClientDashboard = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [clientName, setClientName] = useState<string>("");
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [clientStats, setClientStats] = useState<any>(null);
 
   useEffect(() => {
@@ -32,20 +30,13 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("contact_name, password_expires_at, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, fulfillment_services")
+        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, fulfillment_services")
         .eq("user_id", user?.id)
         .single();
 
       if (!error && data) {
         setClientName(data.contact_name);
         setClientStats(data);
-        
-        // Show password change dialog if password_expires_at is set (indicating temporary password)
-        if (data.password_expires_at) {
-          setShowPasswordChange(true);
-        } else {
-          setShowPasswordChange(false);
-        }
       }
     } catch (error) {
       console.error("Error fetching client name:", error);
@@ -57,14 +48,6 @@ const ClientDashboard = () => {
       navigate("/login");
     }
   }, [user, role, loading, navigate]);
-
-  const handlePasswordChangeSuccess = () => {
-    setShowPasswordChange(false);
-    // Delay refetch slightly to ensure backend has cleared expiration
-    setTimeout(() => {
-      fetchClientName();
-    }, 1200);
-  };
 
   const handleDeleteAccount = async () => {
     try {
@@ -117,12 +100,7 @@ const ClientDashboard = () => {
   }
 
   return (
-    <>
-      <FirstPasswordChangeDialog 
-        open={showPasswordChange} 
-        onSuccess={handlePasswordChangeSuccess}
-      />
-      <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
         <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -234,8 +212,7 @@ const ClientDashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
-      </div>
-    </>
+    </div>
   );
 };
 

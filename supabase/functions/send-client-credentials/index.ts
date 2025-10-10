@@ -115,13 +115,13 @@ const handler = async (req: Request): Promise<Response> => {
                               <li>Visit our website: <a href="https://westfieldprepcenter.com" style="color: #F97316; text-decoration: none; font-weight: 600;">westfieldprepcenter.com</a></li>
                               <li>Click on the <strong>"Sign In"</strong> link located in the footer section at the bottom of the page</li>
                               <li>Enter your email address and temporary password shown above</li>
-                              <li>You'll be prompted to change your password on first login for security</li>
+                              <li>Once logged in, go to <strong>Account → Settings</strong> to change your password</li>
                             </ol>
                           </div>
 
                           <div style="background-color: #fef3c7; border: 1px solid #fbbf24; border-radius: 6px; padding: 16px; margin: 20px 0;">
                             <p style="color: #92400e; font-size: 14px; line-height: 1.6; margin: 0;">
-                              <strong>⚠️ Important:</strong> Your temporary password will expire in 24 hours. Please log in and change your password as soon as possible.
+                              <strong>⚠️ Security Recommendation:</strong> For your account security, please change your password as soon as possible after logging in. You can do this by clicking on the <strong>Account</strong> dropdown in the top right of your dashboard and selecting <strong>Settings</strong>.
                             </p>
                           </div>
                           
