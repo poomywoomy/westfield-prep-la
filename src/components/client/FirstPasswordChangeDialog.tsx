@@ -72,6 +72,16 @@ const FirstPasswordChangeDialog = ({ open, onSuccess }: FirstPasswordChangeDialo
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
+    try { localStorage.removeItem('sb-gqnvkecmxjijrxhggcro-auth-token'); } catch {}
+    window.location.replace('/login');
+  };
+
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
@@ -110,6 +120,13 @@ const FirstPasswordChangeDialog = ({ open, onSuccess }: FirstPasswordChangeDialo
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Changing Password..." : "Change Password"}
           </Button>
+
+          <div className="pt-4 space-y-2">
+            <div className="text-sm text-muted-foreground text-center">Or</div>
+            <Button type="button" variant="secondary" onClick={handleLogout} className="w-full">
+              Log out and sign in with a different account
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
