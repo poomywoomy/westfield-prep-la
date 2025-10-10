@@ -60,7 +60,10 @@ const ClientDashboard = () => {
 
   const handlePasswordChangeSuccess = () => {
     setShowPasswordChange(false);
-    fetchClientName(); // Refresh to update state
+    // Delay refetch slightly to ensure backend has cleared expiration
+    setTimeout(() => {
+      fetchClientName();
+    }, 1200);
   };
 
   const handleLogout = async () => {
