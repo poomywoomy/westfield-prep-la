@@ -25,16 +25,15 @@ const AdminDashboard = () => {
   }, [user, role, loading, navigate]);
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Logout error:", error);
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch (e) {
+      console.error('Logout error:', e);
     }
-    // Force navigate to login regardless of error
-    navigate("/login", { replace: true });
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully.",
-    });
+    // Force-clear auth token and redirect to home
+    try { localStorage.removeItem('sb-gqnvkecmxjijrxhggcro-auth-token'); } catch {}
+    toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
+    window.location.replace('/');
   };
 
   if (loading) {
