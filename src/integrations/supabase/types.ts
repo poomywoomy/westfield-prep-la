@@ -225,6 +225,36 @@ export type Database = {
           },
         ]
       }
+      generated_documents: {
+        Row: {
+          client_name_1: string | null
+          client_name_2: string | null
+          created_at: string
+          document_type: string
+          generated_by: string | null
+          generated_date: string
+          id: string
+        }
+        Insert: {
+          client_name_1?: string | null
+          client_name_2?: string | null
+          created_at?: string
+          document_type: string
+          generated_by?: string | null
+          generated_date?: string
+          id?: string
+        }
+        Update: {
+          client_name_1?: string | null
+          client_name_2?: string | null
+          created_at?: string
+          document_type?: string
+          generated_by?: string | null
+          generated_date?: string
+          id?: string
+        }
+        Relationships: []
+      }
       intake_forms: {
         Row: {
           agreed_to_deposit: boolean

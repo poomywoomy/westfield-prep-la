@@ -6,12 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Users, FileText, DollarSign, Image, LogOut, Settings, ChevronDown } from "lucide-react";
+import { Users, FileText, DollarSign, Image, LogOut, Settings, ChevronDown, FileSignature } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientsTab from "@/components/admin/ClientsTab";
 import QuotesTab from "@/components/admin/QuotesTab";
 import BillingTab from "@/components/admin/BillingTab";
 import QCImagesTab from "@/components/admin/QCImagesTab";
+import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
 
 const AdminDashboard = () => {
   const { user, role, loading } = useAuth();
@@ -83,7 +84,7 @@ const AdminDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+          <TabsList className="grid grid-cols-5 w-full max-w-3xl">
             <TabsTrigger value="clients">
               <Users className="mr-2 h-4 w-4" />
               Clients
@@ -99,6 +100,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="qc-images">
               <Image className="mr-2 h-4 w-4" />
               QC Images
+            </TabsTrigger>
+            <TabsTrigger value="documents">
+              <FileSignature className="mr-2 h-4 w-4" />
+              Documents
             </TabsTrigger>
           </TabsList>
 
@@ -116,6 +121,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="qc-images">
             <QCImagesTab />
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <DocumentGeneratorTab />
           </TabsContent>
         </Tabs>
       </main>
