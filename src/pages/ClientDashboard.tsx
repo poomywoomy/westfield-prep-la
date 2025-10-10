@@ -49,33 +49,6 @@ const ClientDashboard = () => {
     }
   }, [user, role, loading, navigate]);
 
-  const handleDeleteAccount = async () => {
-    try {
-      const { error } = await supabase.rpc('delete_own_client_account');
-      
-      if (error) throw error;
-      
-      toast({ title: 'Account deleted', description: 'Your account has been permanently deleted.' });
-      
-      // Force logout and redirect
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (e) {
-        console.error('Logout error:', e);
-      }
-      try { localStorage.removeItem('sb-gqnvkecmxjijrxhggcro-auth-token'); } catch {}
-      
-      window.location.replace('/');
-    } catch (error) {
-      console.error('Delete account error:', error);
-      toast({ 
-        title: 'Error', 
-        description: 'Failed to delete account. Please try again.',
-        variant: 'destructive'
-      });
-    }
-  };
-
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut({ scope: 'global' });
@@ -123,10 +96,6 @@ const ClientDashboard = () => {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleDeleteAccount} className="text-destructive">
-                <LogOut className="mr-2 h-4 w-4" />
-                Delete Account
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
