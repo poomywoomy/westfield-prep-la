@@ -92,6 +92,15 @@ const ClientSettings = () => {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!currentPassword) {
+      toast({
+        title: "Error",
+        description: "Current password is required",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (newPassword !== confirmPassword) {
       toast({
         title: "Error",
@@ -113,8 +122,17 @@ const ClientSettings = () => {
     setIsUpdating(true);
 
     try {
-      // Use Supabase's built-in password update with reauthentication
-      // This securely handles current password verification server-side
+      // First, verify current password by attempting to sign in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: clientData.email,
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        throw new Error("Current password is incorrect");
+      }
+
+      // If sign in successful, update to new password
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
       });
@@ -233,6 +251,17 @@ const ClientSettings = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div>
+                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Enter current password"
+                    required
+                  />
+                </div>
                 <div>
                   <Label htmlFor="newPassword">New Password</Label>
                   <Input

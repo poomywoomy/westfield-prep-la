@@ -355,9 +355,14 @@ export const generateDocumentPDF = async (
     yPosition += 4;
   });
 
-  // Add signature section on new page
-  doc.addPage();
-  yPosition = margin + 10;
+  // Add signature section (same page, with spacing)
+  yPosition += 15;
+  
+  // Check if we need a new page
+  if (yPosition > pageHeight - 80) {
+    doc.addPage();
+    yPosition = margin + 10;
+  }
 
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");

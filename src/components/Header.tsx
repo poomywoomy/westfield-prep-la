@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/westfield-logo.png";
+import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, role } = useAuth();
   const isHomePage = location.pathname === "/";
 
   useEffect(() => {
@@ -26,7 +28,15 @@ const Header = () => {
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (isHomePage) {
+    
+    // If user is logged in, redirect to their dashboard
+    if (user && role) {
+      if (role === 'admin') {
+        navigate("/admin/dashboard");
+      } else if (role === 'client') {
+        navigate("/client/dashboard");
+      }
+    } else if (isHomePage) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       navigate("/");

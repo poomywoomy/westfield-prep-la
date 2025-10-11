@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Image, LogOut, Receipt, Settings, ChevronDown, Package, Warehouse, Box } from "lucide-react";
+import { DollarSign, Image, LogOut, Receipt, Settings, ChevronDown, Package, Warehouse, Box, ChevronRight } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientPricingTab from "@/components/client/ClientPricingTab";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientQCImagesTab from "@/components/client/ClientQCImagesTab";
+import FirstPasswordChangeDialog from "@/components/client/FirstPasswordChangeDialog";
 
 const ClientDashboard = () => {
   const { user, role, loading } = useAuth();
@@ -19,6 +21,9 @@ const ClientDashboard = () => {
   const { toast } = useToast();
   const [clientName, setClientName] = useState<string>("");
   const [clientStats, setClientStats] = useState<any>(null);
+  const [servicesExpanded, setServicesExpanded] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [hasCheckedStatus, setHasCheckedStatus] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -30,13 +35,31 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, fulfillment_services")
+        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, fulfillment_services, status, password_expires_at")
         .eq("user_id", user?.id)
         .single();
 
       if (!error && data) {
         setClientName(data.contact_name);
         setClientStats(data);
+        
+        // Check if this is first login and status should be changed
+        if (!hasCheckedStatus && data.status === 'pending' && !data.password_expires_at) {
+          // User has logged in and changed their password, update status to active
+          await supabase
+            .from("clients")
+            .update({ status: 'active' })
+            .eq("user_id", user?.id);
+          setHasCheckedStatus(true);
+        }
+
+        // Check if password needs to be changed
+        if (data.password_expires_at) {
+          const expiresAt = new Date(data.password_expires_at);
+          if (expiresAt > new Date()) {
+            setShowPasswordDialog(true);
+          }
+        }
       }
     } catch (error) {
       console.error("Error fetching client name:", error);
@@ -134,21 +157,54 @@ const ClientDashboard = () => {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Services</CardTitle>
-                <Box className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-1">
-                  {clientStats.extra_prep && <div className="text-sm">✓ Extra Prep</div>}
-                  {clientStats.storage && <div className="text-sm">✓ Storage ({clientStats.storage_units_per_month} units/mo)</div>}
-                  {clientStats.fulfillment_services?.length > 0 && (
-                    <div className="text-sm">✓ {clientStats.fulfillment_services.length} Fulfillment Service(s)</div>
+            <Collapsible open={servicesExpanded} onOpenChange={setServicesExpanded}>
+              <Card className="cursor-pointer">
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Services</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Box className="h-4 w-4 text-muted-foreground" />
+                      <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${servicesExpanded ? 'rotate-90' : ''}`} />
+                    </div>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CardContent>
+                  <CollapsibleContent>
+                    <div className="space-y-2 pt-2">
+                      <div className="text-sm font-medium border-b pb-2">Active Services:</div>
+                      {clientStats.extra_prep && (
+                        <div className="text-sm pl-2">✓ <span className="font-medium">Extra Prep</span> - Additional preparation services</div>
+                      )}
+                      {clientStats.storage && (
+                        <div className="text-sm pl-2">✓ <span className="font-medium">Storage</span> - {clientStats.storage_units_per_month} units per month</div>
+                      )}
+                      {clientStats.fulfillment_services?.length > 0 && (
+                        <>
+                          <div className="text-sm font-medium border-b pb-2 mt-3">Fulfillment Services:</div>
+                          {clientStats.fulfillment_services.map((service: string) => (
+                            <div key={service} className="text-sm pl-2">
+                              ✓ <span className="font-medium capitalize">{service.replace(/_/g, ' ')}</span>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                      {!clientStats.extra_prep && !clientStats.storage && (!clientStats.fulfillment_services || clientStats.fulfillment_services.length === 0) && (
+                        <div className="text-sm text-muted-foreground pl-2">No additional services enabled</div>
+                      )}
+                    </div>
+                  </CollapsibleContent>
+                  {!servicesExpanded && (
+                    <div className="space-y-1">
+                      {clientStats.extra_prep && <div className="text-sm">✓ Extra Prep</div>}
+                      {clientStats.storage && <div className="text-sm">✓ Storage ({clientStats.storage_units_per_month} units/mo)</div>}
+                      {clientStats.fulfillment_services?.length > 0 && (
+                        <div className="text-sm">✓ {clientStats.fulfillment_services.length} Fulfillment Service(s)</div>
+                      )}
+                    </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Collapsible>
           </div>
         )}
         
@@ -181,6 +237,14 @@ const ClientDashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
+      
+      <FirstPasswordChangeDialog 
+        open={showPasswordDialog}
+        onSuccess={() => {
+          setShowPasswordDialog(false);
+          fetchClientName();
+        }}
+      />
     </div>
   );
 };
