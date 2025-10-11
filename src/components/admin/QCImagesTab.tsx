@@ -149,6 +149,26 @@ const QCImagesTab = () => {
       return;
     }
 
+    // Validate that quantities are entered for damaged/missing products
+    for (const image of images) {
+      if (image.is_damaged && (!image.damage_quantity || image.damage_quantity <= 0)) {
+        toast({
+          title: "Error",
+          description: `Please enter quantity for damaged product in ${image.file.name}`,
+          variant: "destructive",
+        });
+        return;
+      }
+      if (image.is_missing && (!image.missing_quantity || image.missing_quantity <= 0)) {
+        toast({
+          title: "Error",
+          description: `Please enter quantity for missing product in ${image.file.name}`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsUploading(true);
 
     try {
@@ -322,13 +342,16 @@ const QCImagesTab = () => {
                                 {image.is_damaged && (
                                   <Input
                                     type="number"
-                                    placeholder="Quantity"
+                                    placeholder="Quantity *"
+                                    min="1"
+                                    required
                                     value={image.damage_quantity || ""}
                                     onChange={(e) =>
                                       updateImage(image.id, {
                                         damage_quantity: parseInt(e.target.value) || 0,
                                       })
                                     }
+                                    className={!image.damage_quantity || image.damage_quantity <= 0 ? "border-red-500" : ""}
                                   />
                                 )}
                               </div>
@@ -351,13 +374,16 @@ const QCImagesTab = () => {
                                 {image.is_missing && (
                                   <Input
                                     type="number"
-                                    placeholder="Quantity"
+                                    placeholder="Quantity *"
+                                    min="1"
+                                    required
                                     value={image.missing_quantity || ""}
                                     onChange={(e) =>
                                       updateImage(image.id, {
                                         missing_quantity: parseInt(e.target.value) || 0,
                                       })
                                     }
+                                    className={!image.missing_quantity || image.missing_quantity <= 0 ? "border-red-500" : ""}
                                   />
                                 )}
                               </div>

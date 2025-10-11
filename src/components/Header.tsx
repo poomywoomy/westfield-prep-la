@@ -29,9 +29,9 @@ const Header = () => {
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
-    // If user is logged in, refresh the current page
+    // If user is logged in, do nothing (no navigation or refresh)
     if (user && role) {
-      window.location.reload();
+      return;
     } else if (isHomePage) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
