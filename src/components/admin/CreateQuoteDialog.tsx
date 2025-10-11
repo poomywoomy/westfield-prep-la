@@ -72,6 +72,8 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
   const [additionalComments, setAdditionalComments] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTeamQuote, setIsTeamQuote] = useState(false);
+  const [teamQuoteItems, setTeamQuoteItems] = useState<LineItem[]>([]);
 
   useEffect(() => {
     if (editingQuote && open) {
@@ -169,6 +171,9 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
       return;
     }
 
+    // Use team quote items if in team quote mode
+    const itemsToUse = isTeamQuote ? [{ type: "Team Quote", items: teamQuoteItems }] : null;
+
     const doc = new jsPDF();
     
     // Load and add logo
@@ -246,8 +251,50 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
 
     let y = dateY + 15;
 
-    // Standard Operations
-    if (standardItems.length > 0) {
+    // Team Quote Mode
+    if (itemsToUse) {
+      const section = itemsToUse[0];
+      doc.setFontSize(13);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(0, 0, 0);
+      doc.text(section.type, 20, y);
+      y += 5;
+      
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'italic');
+      doc.setTextColor(80, 80, 80);
+      doc.text("Custom services and pricing for your team.", 20, y);
+      y += 4;
+      
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.line(20, y, 190, y);
+      y += 5;
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(0, 0, 0);
+      
+      section.items.forEach(item => {
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+        
+        doc.setFont(undefined, 'bold');
+        doc.text(item.service_name, 20, y);
+        if (item.notes) {
+          doc.text(`Qty: ${item.notes}`, 120, y);
+        }
+        doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
+        doc.setFont(undefined, 'normal');
+        y += 7;
+      });
+      
+      y += 8;
+    } else {
+      // Standard Operations
+      if (standardItems.length > 0) {
       doc.setFontSize(13);
       doc.setFont(undefined, 'bold');
       doc.setTextColor(0, 0, 0);
@@ -362,6 +409,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         y += 8;
       }
     });
+    }
 
     // Additional Comments
     if (additionalComments) {
@@ -455,8 +503,10 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         contact_name: useManualEntry ? manualContactName : "",
         email: useManualEntry ? manualEmail : "",
         phone: useManualEntry ? manualPhone : "",
-        standard_operations: standardItems,
-        fulfillment_sections: fulfillmentSections,
+        standard_operations: isTeamQuote ? [] : standardItems,
+        fulfillment_sections: isTeamQuote ? [] : fulfillmentSections,
+        team_quote_items: isTeamQuote ? teamQuoteItems : [],
+        is_team_quote: isTeamQuote,
         additional_comments: additionalComments,
         created_date: new Date().toISOString()
       };
@@ -626,6 +676,8 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
     setStandardItems([]);
     setFulfillmentSections([]);
     setAdditionalComments("");
+    setIsTeamQuote(false);
+    setTeamQuoteItems([]);
   };
 
   const getServiceOptions = (sectionType?: FulfillmentSection["type"]) => {
@@ -724,8 +776,109 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
             )}
           </div>
 
-          {/* Standard Operations */}
-          <div className="space-y-4 border rounded-lg p-4">
+          {/* Team Quote Toggle */}
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant={isTeamQuote ? "default" : "outline"}
+              size="sm"
+              onClick={() => setIsTeamQuote(!isTeamQuote)}
+            >
+              {isTeamQuote ? "Team Quote Mode" : "Team Quote"}
+            </Button>
+            {isTeamQuote && (
+              <span className="text-sm text-muted-foreground">
+                Custom services only
+              </span>
+            )}
+          </div>
+
+          {isTeamQuote ? (
+            /* Team Quote Section - Custom Services Only */
+            <div className="space-y-4 border rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-lg font-semibold">Team Quote Services</Label>
+                <Button 
+                  type="button" 
+                  size="sm" 
+                  onClick={() => {
+                    setTeamQuoteItems([...teamQuoteItems, { 
+                      id: crypto.randomUUID(), 
+                      service_name: "", 
+                      service_price: 0, 
+                      notes: "",
+                      isEditing: true
+                    }]);
+                  }}
+                  variant="secondary"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Service
+                </Button>
+              </div>
+
+              {teamQuoteItems.map((item) => (
+                <div key={item.id} className="border-b pb-3 space-y-2">
+                  <div className="grid grid-cols-[1fr,150px,100px,auto] gap-4 items-start">
+                    <div>
+                      <Label className="text-xs">Custom Service</Label>
+                      <Input
+                        value={item.service_name}
+                        onChange={(e) => {
+                          setTeamQuoteItems(teamQuoteItems.map(i => 
+                            i.id === item.id ? { ...i, service_name: e.target.value } : i
+                          ));
+                        }}
+                        placeholder="Enter service name"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Quantity</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={item.notes || "1"}
+                        onChange={(e) => {
+                          setTeamQuoteItems(teamQuoteItems.map(i => 
+                            i.id === item.id ? { ...i, notes: e.target.value } : i
+                          ));
+                        }}
+                        placeholder="Qty"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Price ($)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={item.service_price}
+                        onChange={(e) => {
+                          setTeamQuoteItems(teamQuoteItems.map(i => 
+                            i.id === item.id ? { ...i, service_price: parseFloat(e.target.value) || 0 } : i
+                          ));
+                        }}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setTeamQuoteItems(teamQuoteItems.filter(i => i.id !== item.id));
+                      }}
+                      className="mt-6"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Standard Operations */}
+              <div className="space-y-4 border rounded-lg p-4">
             <div className="flex items-center justify-between">
               <Label className="text-lg font-semibold">Standard Operations</Label>
               <Button type="button" size="sm" onClick={addStandardItem} variant="secondary">
@@ -1036,6 +1189,8 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
               </div>
             ))}
           </div>
+            </>
+          )}
 
           {/* Additional Comments */}
           <div className="space-y-2 border rounded-lg p-4">
@@ -1053,7 +1208,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
               type="button"
               variant="outline"
               onClick={generatePDF}
-              disabled={(!selectedClientId && !manualClientName) || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
+              disabled={(!selectedClientId && !manualClientName) || (isTeamQuote ? teamQuoteItems.length === 0 : (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0)))}
             >
               <Download className="h-4 w-4 mr-2" />
               Download PDF
@@ -1069,7 +1224,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
             {!useManualEntry && selectedClientId && (
               <Button
                 onClick={applyToPricing}
-                disabled={isSubmitting || !selectedClientId || (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0))}
+                disabled={isSubmitting || !selectedClientId || (isTeamQuote ? teamQuoteItems.length === 0 : (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0)))}
               >
                 <Check className="h-4 w-4 mr-2" />
                 Apply to Client Pricing

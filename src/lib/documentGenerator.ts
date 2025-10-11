@@ -310,7 +310,7 @@ export const generateDocumentPDF = async (
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
+  const margin = 15;
   const maxWidth = pageWidth - 2 * margin;
   
   const content = DOCUMENT_CONTENT[documentType as keyof typeof DOCUMENT_CONTENT];
@@ -318,94 +318,94 @@ export const generateDocumentPDF = async (
     throw new Error("Invalid document type");
   }
 
-  // Add logo
-  const logoWidth = 40;
-  const logoHeight = 15;
-  doc.addImage(westfieldLogo, "JPEG", (pageWidth - logoWidth) / 2, 10, logoWidth, logoHeight);
+  // Add logo (smaller)
+  const logoWidth = 30;
+  const logoHeight = 12;
+  doc.addImage(westfieldLogo, "JPEG", (pageWidth - logoWidth) / 2, 8, logoWidth, logoHeight);
 
-  // Add title
-  doc.setFontSize(16);
+  // Add title (closer to logo)
+  doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   const titleLines = doc.splitTextToSize(content.title, maxWidth);
-  let yPosition = 35;
+  let yPosition = 25;
   titleLines.forEach((line: string) => {
     doc.text(line, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 7;
+    yPosition += 6;
   });
 
   // Add date
   const today = new Date();
   const formattedDate = `${String(today.getMonth() + 1).padStart(2, "0")}/${String(today.getDate()).padStart(2, "0")}/${today.getFullYear()}`;
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  yPosition += 5;
+  yPosition += 3;
   doc.text(`Date: ${formattedDate}`, pageWidth / 2, yPosition, { align: "center" });
 
-  // Add content
-  yPosition += 10;
+  // Add content (tighter line spacing)
+  yPosition += 8;
   doc.setFontSize(9);
   const lines = doc.splitTextToSize(content.content, maxWidth);
   
   lines.forEach((line: string) => {
-    if (yPosition > pageHeight - 80) {
+    if (yPosition > pageHeight - 30) {
       doc.addPage();
       yPosition = margin;
     }
     doc.text(line, margin, yPosition);
-    yPosition += 5;
+    yPosition += 4;
   });
 
   // Add signature section on new page
   doc.addPage();
   yPosition = margin + 10;
 
-  doc.setFontSize(12);
+  doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
   doc.text("SIGNATURES", pageWidth / 2, yPosition, { align: "center" });
-  yPosition += 15;
+  yPosition += 12;
 
   // Left column - Service Provider signatures
   const leftX = margin;
   const rightX = pageWidth / 2 + 5;
   
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
   doc.text("SERVICE PROVIDER:", leftX, yPosition);
-  yPosition += 10;
+  yPosition += 8;
 
   doc.setFont("helvetica", "normal");
   doc.line(leftX, yPosition, leftX + 70, yPosition);
-  yPosition += 5;
+  yPosition += 4;
   doc.text("Navapoom Sathatham", leftX, yPosition);
-  yPosition += 4;
+  yPosition += 3;
   doc.text("Co-Owner, Westfield Prep Center", leftX, yPosition);
-  yPosition += 4;
+  yPosition += 3;
   doc.text("DBA Sathatham LLC", leftX, yPosition);
-  yPosition += 15;
+  yPosition += 12;
 
   doc.line(leftX, yPosition, leftX + 70, yPosition);
-  yPosition += 5;
+  yPosition += 4;
   doc.text("Yessica Michell Chiguichon", leftX, yPosition);
-  yPosition += 4;
+  yPosition += 3;
   doc.text("Co-Owner, Westfield Prep Center", leftX, yPosition);
-  yPosition += 4;
+  yPosition += 3;
   doc.text("DBA Sathatham LLC", leftX, yPosition);
 
   // Right column - Client signatures
-  yPosition = margin + 25;
+  yPosition = margin + 22;
   doc.setFont("helvetica", "bold");
   doc.text("CLIENT:", rightX, yPosition);
-  yPosition += 10;
+  yPosition += 8;
 
   doc.setFont("helvetica", "normal");
   doc.line(rightX, yPosition, rightX + 70, yPosition);
-  yPosition += 5;
+  yPosition += 4;
   doc.text(clientName1, rightX, yPosition);
-  yPosition += 15;
+  yPosition += 12;
 
   if (clientName2) {
     doc.line(rightX, yPosition, rightX + 70, yPosition);
-    yPosition += 5;
+    yPosition += 4;
     doc.text(clientName2, rightX, yPosition);
   }
 

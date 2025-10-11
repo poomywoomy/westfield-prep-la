@@ -384,23 +384,38 @@ export type Database = {
       qc_images: {
         Row: {
           client_id: string
+          damage_quantity: number | null
           expires_at: string
           id: string
           image_url: string
+          is_damaged: boolean | null
+          is_missing: boolean | null
+          missing_quantity: number | null
+          notes: string | null
           upload_date: string
         }
         Insert: {
           client_id: string
+          damage_quantity?: number | null
           expires_at?: string
           id?: string
           image_url: string
+          is_damaged?: boolean | null
+          is_missing?: boolean | null
+          missing_quantity?: number | null
+          notes?: string | null
           upload_date?: string
         }
         Update: {
           client_id?: string
+          damage_quantity?: number | null
           expires_at?: string
           id?: string
           image_url?: string
+          is_damaged?: boolean | null
+          is_missing?: boolean | null
+          missing_quantity?: number | null
+          notes?: string | null
           upload_date?: string
         }
         Relationships: [
