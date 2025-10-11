@@ -29,13 +29,9 @@ const Header = () => {
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
-    // If user is logged in, redirect to their dashboard
+    // If user is logged in, refresh the current page
     if (user && role) {
-      if (role === 'admin') {
-        navigate("/admin/dashboard");
-      } else if (role === 'client') {
-        navigate("/client/dashboard");
-      }
+      window.location.reload();
     } else if (isHomePage) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {

@@ -3,8 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Download, AlertCircle, PackageX, Clock } from "lucide-react";
+import { Download, AlertCircle, PackageX, Clock, ZoomIn } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface QCImage {
   id: string;
@@ -22,6 +24,8 @@ const ClientQCImagesTab = () => {
   const { toast } = useToast();
   const [images, setImages] = useState<QCImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<QCImage | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchImages();
@@ -93,6 +97,38 @@ const ClientQCImagesTab = () => {
     return days;
   };
 
+  const groupImagesByDate = () => {
+    const grouped: { [key: string]: QCImage[] } = {};
+    images.forEach(image => {
+      const date = new Date(image.upload_date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      if (!grouped[date]) {
+        grouped[date] = [];
+      }
+      grouped[date].push(image);
+    });
+    return grouped;
+  };
+
+  const handleImageClick = (image: QCImage) => {
+    setSelectedImage(image);
+    setDialogOpen(true);
+  };
+
+  const getIssueText = (image: QCImage) => {
+    const issues = [];
+    if (image.is_damaged) {
+      issues.push(`Damaged Product (Qty: ${image.damage_quantity})`);
+    }
+    if (image.is_missing) {
+      issues.push(`Missing Product (Qty: ${image.missing_quantity})`);
+    }
+    return issues.join(' • ');
+  };
+
   if (loading) {
     return (
       <Card>
@@ -103,93 +139,193 @@ const ClientQCImagesTab = () => {
     );
   }
 
+  const groupedImages = groupImagesByDate();
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>QC Images</CardTitle>
-        <CardDescription>
-          View quality control images for your products. Images auto-delete after 30 days.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {images.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">
-            No images available yet.
-          </p>
-        ) : (
-          <div className="grid gap-4">
-            {images.map(image => {
-              const daysLeft = getDaysUntilExpiry(image.expires_at);
-              return (
-                <Card key={image.id}>
-                  <CardContent className="p-4">
-                    <div className="flex gap-4">
-                      <img
-                        src={image.image_url}
-                        alt="QC Image"
-                        className="w-48 h-48 object-cover rounded"
-                      />
-                      <div className="flex-1 space-y-3">
-                        <div className="flex justify-between items-start">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Clock className="h-4 w-4" />
-                              Uploaded {new Date(image.upload_date).toLocaleDateString()}
-                            </div>
-                            <Badge variant={daysLeft <= 7 ? "destructive" : "secondary"}>
-                              Expires in {daysLeft} days
-                            </Badge>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              downloadImage(
-                                image.image_url,
-                                `qc-image-${image.id}.jpg`
-                              )
-                            }
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            Save
-                          </Button>
-                        </div>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>QC Images</CardTitle>
+          <CardDescription>
+            View quality control images for your products. Images auto-delete after 30 days.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {images.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              No images available yet.
+            </p>
+          ) : (
+            <div className="space-y-8">
+              {Object.entries(groupedImages).map(([date, dateImages]) => (
+                <div key={date} className="space-y-4">
+                  <div className="flex items-center gap-2 border-b pb-2">
+                    <Clock className="h-5 w-5 text-muted-foreground" />
+                    <h3 className="text-lg font-semibold">{date}</h3>
+                    <Badge variant="secondary" className="ml-2">
+                      {dateImages.length} {dateImages.length === 1 ? 'image' : 'images'}
+                    </Badge>
+                  </div>
 
-                        {(image.is_damaged || image.is_missing) && (
-                          <div className="space-y-2">
-                            {image.is_damaged && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <AlertCircle className="h-4 w-4 text-destructive" />
-                                <span className="font-medium">Damaged Product:</span>
-                                <span>Quantity {image.damage_quantity}</span>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[200px]">Image</TableHead>
+                        <TableHead>Issue Details</TableHead>
+                        <TableHead className="w-[150px]">Expires In</TableHead>
+                        <TableHead className="w-[100px]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {dateImages.map(image => {
+                        const daysLeft = getDaysUntilExpiry(image.expires_at);
+                        const hasIssue = image.is_damaged || image.is_missing;
+                        return (
+                          <TableRow key={image.id}>
+                            <TableCell>
+                              <div
+                                className={`relative cursor-pointer group ${
+                                  hasIssue ? 'border-4 border-red-600 rounded' : ''
+                                }`}
+                                onClick={() => handleImageClick(image)}
+                              >
+                                <img
+                                  src={image.image_url}
+                                  alt="QC Image"
+                                  className="w-40 h-40 object-cover rounded"
+                                />
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded">
+                                  <ZoomIn className="h-8 w-8 text-white" />
+                                </div>
                               </div>
-                            )}
-                            {image.is_missing && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <PackageX className="h-4 w-4 text-destructive" />
-                                <span className="font-medium">Missing Product:</span>
-                                <span>Quantity {image.missing_quantity}</span>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                            </TableCell>
+                            <TableCell>
+                              {hasIssue ? (
+                                <div className="space-y-2">
+                                  {image.is_damaged && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                                      <span className="font-medium text-red-600">
+                                        Damaged Product: Quantity {image.damage_quantity}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {image.is_missing && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <PackageX className="h-4 w-4 text-red-600 flex-shrink-0" />
+                                      <span className="font-medium text-red-600">
+                                        Missing Product: Quantity {image.missing_quantity}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">No issues reported</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={daysLeft <= 7 ? "destructive" : "secondary"}>
+                                {daysLeft} days
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  downloadImage(
+                                    image.image_url,
+                                    `qc-image-${image.id}.jpg`
+                                  )
+                                }
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-                        {image.notes && (
-                          <div className="p-3 bg-muted rounded text-sm">
-                            <p className="font-medium mb-1">Notes:</p>
-                            <p className="text-muted-foreground">{image.notes}</p>
-                          </div>
-                        )}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>QC Image Details</DialogTitle>
+          </DialogHeader>
+          {selectedImage && (
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <img
+                  src={selectedImage.image_url}
+                  alt="QC Image Enlarged"
+                  className="max-h-[60vh] w-auto object-contain rounded"
+                />
+              </div>
+              
+              <div className="grid gap-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  Uploaded {new Date(selectedImage.upload_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </div>
+
+                {(selectedImage.is_damaged || selectedImage.is_missing) && (
+                  <div className="space-y-2 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded">
+                    <h4 className="font-semibold text-red-600 dark:text-red-400">Issues Detected</h4>
+                    {selectedImage.is_damaged && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                        <span>Damaged Product: Quantity {selectedImage.damage_quantity}</span>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                    )}
+                    {selectedImage.is_missing && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <PackageX className="h-4 w-4 text-red-600 dark:text-red-400" />
+                        <span>Missing Product: Quantity {selectedImage.missing_quantity}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {selectedImage.notes && (
+                  <div className="p-4 bg-muted rounded">
+                    <h4 className="font-semibold mb-2">Additional Notes:</h4>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {selectedImage.notes}
+                    </p>
+                  </div>
+                )}
+
+                <Button
+                  onClick={() =>
+                    downloadImage(
+                      selectedImage.image_url,
+                      `qc-image-${selectedImage.id}.jpg`
+                    )
+                  }
+                  className="w-full"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download Image
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
