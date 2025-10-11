@@ -50,13 +50,19 @@ const Header = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link 
-            to="/" 
-            className="flex items-center cursor-pointer"
-            onClick={handleLogoClick}
-          >
-            <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" />
-          </Link>
+          {user && role ? (
+            <div className="flex items-center select-none">
+              <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" />
+            </div>
+          ) : (
+            <Link 
+              to="/" 
+              className="flex items-center cursor-pointer"
+              onClick={handleLogoClick}
+            >
+              <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" />
+            </Link>
+          )}
 
           <nav className="hidden md:flex items-center gap-8">
             {isHomePage ? (
