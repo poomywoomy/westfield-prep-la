@@ -13,7 +13,6 @@ import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientPricingTab from "@/components/client/ClientPricingTab";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientQCImagesTab from "@/components/client/ClientQCImagesTab";
-import FirstPasswordChangeDialog from "@/components/client/FirstPasswordChangeDialog";
 
 const ClientDashboard = () => {
   const { user, role, loading } = useAuth();
@@ -22,7 +21,6 @@ const ClientDashboard = () => {
   const [clientName, setClientName] = useState<string>("");
   const [clientStats, setClientStats] = useState<any>(null);
   const [servicesExpanded, setServicesExpanded] = useState(false);
-  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [hasCheckedStatus, setHasCheckedStatus] = useState(false);
 
   useEffect(() => {
@@ -44,21 +42,13 @@ const ClientDashboard = () => {
         setClientStats(data);
         
         // Check if this is first login and status should be changed
-        if (!hasCheckedStatus && data.status === 'pending' && !data.password_expires_at) {
-          // User has logged in and changed their password, update status to active
+        if (!hasCheckedStatus && data.status === 'pending') {
+          // User has logged in, update status to active
           await supabase
             .from("clients")
             .update({ status: 'active' })
             .eq("user_id", user?.id);
           setHasCheckedStatus(true);
-        }
-
-        // Check if password needs to be changed
-        if (data.password_expires_at) {
-          const expiresAt = new Date(data.password_expires_at);
-          if (expiresAt > new Date()) {
-            setShowPasswordDialog(true);
-          }
         }
       }
     } catch (error) {
@@ -237,14 +227,6 @@ const ClientDashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
-      
-      <FirstPasswordChangeDialog 
-        open={showPasswordDialog}
-        onSuccess={() => {
-          setShowPasswordDialog(false);
-          fetchClientName();
-        }}
-      />
     </div>
   );
 };
