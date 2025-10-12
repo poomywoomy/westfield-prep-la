@@ -33,7 +33,7 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, fulfillment_services, status, password_expires_at")
+        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, storage_method, fulfillment_services, status, password_expires_at")
         .eq("user_id", user?.id)
         .single();
 
@@ -166,7 +166,12 @@ const ClientDashboard = () => {
                         <div className="text-sm pl-2">✓ <span className="font-medium">Extra Prep</span> - Additional preparation services</div>
                       )}
                       {clientStats.storage && (
-                        <div className="text-sm pl-2">✓ <span className="font-medium">Storage</span> - {clientStats.storage_units_per_month} units per month</div>
+                        <div className="text-sm pl-2">
+                          ✓ <span className="font-medium">Storage</span> - {clientStats.storage_units_per_month} units per month
+                          {clientStats.storage_method && (
+                            <span className="text-muted-foreground"> ({clientStats.storage_method.replace(/_/g, ' ')})</span>
+                          )}
+                        </div>
                       )}
                       {clientStats.fulfillment_services?.length > 0 && (
                         <>
@@ -186,7 +191,12 @@ const ClientDashboard = () => {
                   {!servicesExpanded && (
                     <div className="space-y-1">
                       {clientStats.extra_prep && <div className="text-sm">✓ Extra Prep</div>}
-                      {clientStats.storage && <div className="text-sm">✓ Storage ({clientStats.storage_units_per_month} units/mo)</div>}
+                      {clientStats.storage && (
+                        <div className="text-sm">
+                          ✓ Storage ({clientStats.storage_units_per_month} units/mo)
+                          {clientStats.storage_method && ` - ${clientStats.storage_method.replace(/_/g, ' ')}`}
+                        </div>
+                      )}
                       {clientStats.fulfillment_services?.length > 0 && (
                         <div className="text-sm">✓ {clientStats.fulfillment_services.length} Fulfillment Service(s)</div>
                       )}

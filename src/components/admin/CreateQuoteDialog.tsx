@@ -584,11 +584,15 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         return;
       }
 
-      await supabase
+      // Delete existing pricing first and wait for completion
+      const { error: deleteError } = await supabase
         .from("custom_pricing")
         .delete()
         .eq("client_id", selectedClientId);
 
+      if (deleteError) throw deleteError;
+
+      // Build pricing records
       const pricingRecords = allItems.map(item => ({
         client_id: selectedClientId,
         service_name: item.service_name,
@@ -596,21 +600,17 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
         notes: item.notes,
       }));
 
-      const { error } = await supabase
+      // Insert new pricing records
+      const { error: insertError } = await supabase
         .from("custom_pricing")
         .insert(pricingRecords);
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
       await supabase
         .from("clients")
         .update({ pricing_active: true })
         .eq("id", selectedClientId);
-
-      toast({
-        title: "Success",
-        description: "Pricing has been applied to client account",
-      });
 
       // Ensure the quote itself is assigned to the selected client
       const client = clients.find(c => c.id === selectedClientId);
@@ -621,6 +621,9 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
           contact_name: client?.contact_name || editingQuote.quote_data?.contact_name || "",
           email: client?.email || editingQuote.quote_data?.email || "",
           phone: client?.phone_number || editingQuote.quote_data?.phone || "",
+          standard_operations: standardItems,
+          fulfillment_sections: fulfillmentSections,
+          additional_comments: additionalComments,
         };
 
         const { error: quoteUpdateError } = await supabase
@@ -651,6 +654,11 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
 
         if (insertQuoteError) throw insertQuoteError;
       }
+
+      toast({
+        title: "Success",
+        description: "Pricing applied and saved to client account",
+      });
 
       onQuoteCreated();
       onOpenChange(false);

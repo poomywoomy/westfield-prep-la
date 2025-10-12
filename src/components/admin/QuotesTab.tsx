@@ -72,7 +72,16 @@ const QuotesTab = () => {
     if (!deleteQuoteId) return;
 
     try {
-      // First, delete all associated billing cycles and their items/payments
+      // Get the quote to find client_id
+      const { data: quote, error: quoteError } = await supabase
+        .from("quotes")
+        .select("client_id")
+        .eq("id", deleteQuoteId)
+        .single();
+
+      if (quoteError) throw quoteError;
+
+      // Delete all associated billing cycles and their items/payments
       const { data: cycles, error: cyclesError } = await supabase
         .from("monthly_billing_cycles")
         .select("id")
@@ -102,6 +111,20 @@ const QuotesTab = () => {
           .eq("quote_id", deleteQuoteId);
       }
 
+      // Delete custom pricing if quote is assigned to a client
+      if (quote.client_id) {
+        await supabase
+          .from("custom_pricing")
+          .delete()
+          .eq("client_id", quote.client_id);
+
+        // Set pricing_active to false
+        await supabase
+          .from("clients")
+          .update({ pricing_active: false })
+          .eq("id", quote.client_id);
+      }
+
       // Finally, delete the quote
       const { error } = await supabase
         .from("quotes")
@@ -112,7 +135,7 @@ const QuotesTab = () => {
 
       toast({
         title: "Success",
-        description: "Quote and associated billing data deleted successfully",
+        description: "Quote and all associated data deleted successfully",
       });
 
       setDeleteQuoteId(null);
@@ -472,7 +495,7 @@ const QuotesTab = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Quote</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this quote? This action cannot be undone.
+              Are you sure you want to delete this quote? This will also delete all associated billing data and custom pricing. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
