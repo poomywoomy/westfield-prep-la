@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Upload, X, FileText } from "lucide-react";
 
 interface EditClientDialogProps {
   open: boolean;
@@ -18,6 +19,10 @@ interface EditClientDialogProps {
 
 const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientDialogProps) => {
   const [loading, setLoading] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [existingFileUrl, setExistingFileUrl] = useState<string>("");
   const [formData, setFormData] = useState({
     company_name: "",
     first_name: "",
@@ -50,14 +55,110 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
         admin_notes: client.admin_notes || "",
         fulfillment_services: client.fulfillment_services || [],
       });
+      setExistingFileUrl(client.pricing_document_url || "");
+      setSelectedFile(null);
     }
   }, [client]);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setSelectedFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) return null;
+
+    setUploadingFile(true);
+    try {
+      const fileExt = selectedFile.name.split('.').pop();
+      const fileName = `${client.id}-${Date.now()}.${fileExt}`;
+      const filePath = `pricing-docs/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('qc-images')
+        .upload(filePath, selectedFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('qc-images')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error: any) {
+      toast({
+        title: "File upload failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
+  };
+
+  const removeExistingFile = async () => {
+    try {
+      await supabase
+        .from("clients")
+        .update({ pricing_document_url: null })
+        .eq("id", client.id);
+      
+      setExistingFileUrl("");
+      toast({
+        title: "File removed",
+        description: "Pricing document has been removed.",
+      });
+      onSuccess();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      let documentUrl = existingFileUrl;
+      
+      // Upload new file if selected
+      if (selectedFile) {
+        const uploadedUrl = await handleFileUpload();
+        if (uploadedUrl) {
+          documentUrl = uploadedUrl;
+        }
+      }
+
       const { error } = await supabase
         .from("clients")
         .update({
@@ -74,6 +175,7 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
           storage_method: formData.storage_method || null,
           admin_notes: formData.admin_notes,
           fulfillment_services: formData.fulfillment_services,
+          pricing_document_url: documentUrl || null,
         })
         .eq("id", client.id);
 
@@ -329,6 +431,72 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
               placeholder="Internal notes visible only to admin..."
               rows={4}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Pricing Document</Label>
+            <div className="space-y-3">
+              {existingFileUrl && !selectedFile && (
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">Current pricing document</span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={removeExistingFile}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              
+              {selectedFile ? (
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">{selectedFile.name}</span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={removeFile}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                    dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25"
+                  }`}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                >
+                  <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Drag and drop a file here, or click to browse
+                  </p>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                    accept=".pdf,.doc,.docx,.xls,.xlsx"
+                  />
+                  <label htmlFor="file-upload">
+                    <Button type="button" variant="outline" size="sm" asChild>
+                      <span>Browse Files</span>
+                    </Button>
+                  </label>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex justify-end space-x-2">

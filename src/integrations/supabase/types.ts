@@ -152,6 +152,7 @@ export type Database = {
           password_expires_at: string | null
           phone_number: string
           pricing_active: boolean | null
+          pricing_document_url: string | null
           receiving_format:
             | Database["public"]["Enums"]["receiving_format"]
             | null
@@ -183,6 +184,7 @@ export type Database = {
           password_expires_at?: string | null
           phone_number: string
           pricing_active?: boolean | null
+          pricing_document_url?: string | null
           receiving_format?:
             | Database["public"]["Enums"]["receiving_format"]
             | null
@@ -214,6 +216,7 @@ export type Database = {
           password_expires_at?: string | null
           phone_number?: string
           pricing_active?: boolean | null
+          pricing_document_url?: string | null
           receiving_format?:
             | Database["public"]["Enums"]["receiving_format"]
             | null

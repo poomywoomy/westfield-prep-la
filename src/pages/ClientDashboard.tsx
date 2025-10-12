@@ -5,12 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Image, LogOut, Receipt, Settings, ChevronDown, Package, Warehouse, Box, ChevronRight } from "lucide-react";
+import { DollarSign, Image, LogOut, Settings, ChevronDown, Package, Warehouse, FileText, Download, Sparkles } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
-import ClientPricingTab from "@/components/client/ClientPricingTab";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientQCImagesTab from "@/components/client/ClientQCImagesTab";
 
@@ -20,7 +19,7 @@ const ClientDashboard = () => {
   const { toast } = useToast();
   const [clientName, setClientName] = useState<string>("");
   const [clientStats, setClientStats] = useState<any>(null);
-  const [servicesExpanded, setServicesExpanded] = useState(false);
+  const [pricingDocUrl, setPricingDocUrl] = useState<string>("");
   const [hasCheckedStatus, setHasCheckedStatus] = useState(false);
 
   useEffect(() => {
@@ -33,13 +32,14 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, storage_method, fulfillment_services, status, password_expires_at")
+        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, storage_method, fulfillment_services, status, password_expires_at, pricing_document_url")
         .eq("user_id", user?.id)
         .single();
 
       if (!error && data) {
         setClientName(data.contact_name);
         setClientStats(data);
+        setPricingDocUrl(data.pricing_document_url || "");
         
         // Check if this is first login and status should be changed
         if (!hasCheckedStatus && data.status === 'pending') {
@@ -120,100 +120,102 @@ const ClientDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         {clientName && (
-          <div className="mb-6">
-            <h2 className="text-3xl font-bold">Hello, {clientName}</h2>
+          <div className="mb-8">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Welcome back, {clientName}
+            </h2>
+            <p className="text-muted-foreground mt-2">Here's an overview of your account</p>
           </div>
         )}
         
         {clientStats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-primary">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Estimated Units/Month</CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Volume</CardTitle>
+                <Package className="h-5 w-5 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{clientStats.estimated_units_per_month || "N/A"}</div>
+                <div className="text-3xl font-bold">{clientStats.estimated_units_per_month?.toLocaleString() || "N/A"}</div>
+                <p className="text-xs text-muted-foreground mt-1">Estimated units</p>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Receiving Format</CardTitle>
-                <Warehouse className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-muted-foreground">Receiving Format</CardTitle>
+                <Warehouse className="h-5 w-5 text-blue-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold capitalize">{clientStats.receiving_format || "N/A"}</div>
+                <div className="text-3xl font-bold capitalize">{clientStats.receiving_format || "N/A"}</div>
+                <p className="text-xs text-muted-foreground mt-1">Inbound method</p>
               </CardContent>
             </Card>
             
-            <Collapsible open={servicesExpanded} onOpenChange={setServicesExpanded}>
-              <Card className="cursor-pointer">
-                <CollapsibleTrigger asChild>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Services</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Box className="h-4 w-4 text-muted-foreground" />
-                      <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${servicesExpanded ? 'rotate-90' : ''}`} />
-                    </div>
-                  </CardHeader>
-                </CollapsibleTrigger>
-                <CardContent>
-                  <CollapsibleContent>
-                    <div className="space-y-2 pt-2">
-                      <div className="text-sm font-medium border-b pb-2">Active Services:</div>
-                      {clientStats.extra_prep && (
-                        <div className="text-sm pl-2">✓ <span className="font-medium">Extra Prep</span> - Additional preparation services</div>
-                      )}
-                      {clientStats.storage && (
-                        <div className="text-sm pl-2">
-                          ✓ <span className="font-medium">Storage</span> - {clientStats.storage_units_per_month} units per month
-                          {clientStats.storage_method && (
-                            <span className="text-muted-foreground"> ({clientStats.storage_method.replace(/_/g, ' ')})</span>
-                          )}
-                        </div>
-                      )}
-                      {clientStats.fulfillment_services?.length > 0 && (
-                        <>
-                          <div className="text-sm font-medium border-b pb-2 mt-3">Fulfillment Services:</div>
-                          {clientStats.fulfillment_services.map((service: string) => (
-                            <div key={service} className="text-sm pl-2">
-                              ✓ <span className="font-medium capitalize">{service.replace(/_/g, ' ')}</span>
-                            </div>
-                          ))}
-                        </>
-                      )}
-                      {!clientStats.extra_prep && !clientStats.storage && (!clientStats.fulfillment_services || clientStats.fulfillment_services.length === 0) && (
-                        <div className="text-sm text-muted-foreground pl-2">No additional services enabled</div>
-                      )}
-                    </div>
-                  </CollapsibleContent>
-                  {!servicesExpanded && (
-                    <div className="space-y-1">
-                      {clientStats.extra_prep && <div className="text-sm">✓ Extra Prep</div>}
-                      {clientStats.storage && (
-                        <div className="text-sm">
-                          ✓ Storage ({clientStats.storage_units_per_month} units/mo)
-                          {clientStats.storage_method && ` - ${clientStats.storage_method.replace(/_/g, ' ')}`}
-                        </div>
-                      )}
-                      {clientStats.fulfillment_services?.length > 0 && (
-                        <div className="text-sm">✓ {clientStats.fulfillment_services.length} Fulfillment Service(s)</div>
-                      )}
-                    </div>
+            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-purple-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Active Services</CardTitle>
+                <Sparkles className="h-5 w-5 text-purple-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">
+                  {[
+                    clientStats.extra_prep,
+                    clientStats.storage,
+                    ...(clientStats.fulfillment_services || [])
+                  ].filter(Boolean).length}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Enabled features</p>
+                <div className="flex flex-wrap gap-1 mt-3">
+                  {clientStats.extra_prep && <Badge variant="secondary" className="text-xs">Prep</Badge>}
+                  {clientStats.storage && <Badge variant="secondary" className="text-xs">Storage</Badge>}
+                  {clientStats.fulfillment_services?.slice(0, 2).map((service: string) => (
+                    <Badge key={service} variant="secondary" className="text-xs capitalize">
+                      {service.replace(/_/g, ' ').substring(0, 8)}
+                    </Badge>
+                  ))}
+                  {clientStats.fulfillment_services?.length > 2 && (
+                    <Badge variant="secondary" className="text-xs">+{clientStats.fulfillment_services.length - 2}</Badge>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {pricingDocUrl ? (
+              <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-green-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Pricing Document</CardTitle>
+                  <FileText className="h-5 w-5 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-2"
+                    onClick={() => window.open(pricingDocUrl, '_blank')}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Pricing
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">Your custom pricing sheet</p>
                 </CardContent>
               </Card>
-            </Collapsible>
+            ) : (
+              <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-muted">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Pricing Document</CardTitle>
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mt-2">No pricing document available yet</p>
+                  <Badge variant="secondary" className="mt-3">Pending</Badge>
+                </CardContent>
+              </Card>
+            )}
           </div>
         )}
         
-        <Tabs defaultValue="pricing" className="space-y-6">
-          <TabsList className="grid grid-cols-3 w-full max-w-xl">
-            <TabsTrigger value="pricing">
-              <Receipt className="mr-2 h-4 w-4" />
-              Pricing
-            </TabsTrigger>
+        <Tabs defaultValue="billing" className="space-y-6">
+          <TabsList className="grid grid-cols-2 w-full max-w-md">
             <TabsTrigger value="billing">
               <DollarSign className="mr-2 h-4 w-4" />
               Billing
@@ -223,10 +225,6 @@ const ClientDashboard = () => {
               QC Images
             </TabsTrigger>
           </TabsList>
-
-          <TabsContent value="pricing">
-            <ClientPricingTab />
-          </TabsContent>
 
           <TabsContent value="billing">
             <ClientBillingTab />
