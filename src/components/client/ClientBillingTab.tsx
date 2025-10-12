@@ -23,6 +23,15 @@ const ClientBillingTab = () => {
   const [clientData, setClientData] = useState<any>(null);
   const { toast } = useToast();
 
+  // Get current month in LA timezone
+  const getCurrentMonthLA = () => {
+    const now = new Date();
+    const laDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    const year = laDate.getFullYear();
+    const month = String(laDate.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}-01`;
+  };
+
   useEffect(() => {
     if (user) {
       fetchBillingData();
@@ -50,8 +59,8 @@ const ClientBillingTab = () => {
       if (cyclesError) throw cyclesError;
       setAvailableCycles(allCycles || []);
 
-      // Set current month as default if no selection
-      const currentMonth = new Date().toISOString().slice(0, 7) + "-01";
+      // Set current month as default if no selection - use LA timezone
+      const currentMonth = getCurrentMonthLA();
       const monthToLoad = selectedMonth || currentMonth;
       setSelectedMonth(monthToLoad);
       

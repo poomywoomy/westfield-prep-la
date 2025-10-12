@@ -54,10 +54,19 @@ const BillingEntryDialog = ({
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const { toast } = useToast();
 
+  // Get current month in LA timezone
+  const getCurrentMonthLA = () => {
+    const now = new Date();
+    const laDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    const year = laDate.getFullYear();
+    const month = String(laDate.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}-01`;
+  };
+
   useEffect(() => {
     if (open) {
-      // Reset selected month when dialog opens
-      const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
+      // Reset selected month when dialog opens - use LA timezone
+      const currentMonth = getCurrentMonthLA();
       setSelectedMonth(currentMonth);
       loadBillingData();
     }
@@ -84,12 +93,12 @@ const BillingEntryDialog = ({
       setAvailableCycles(allCycles || []);
 
       // Get or create the selected month's billing cycle
-      const monthToLoad = selectedMonth || new Date().toISOString().slice(0, 7) + '-01';
+      const monthToLoad = selectedMonth || getCurrentMonthLA();
       let cycle = allCycles?.find(c => c.billing_month === monthToLoad);
 
       if (!cycle) {
         // Only create a new cycle if we're looking at the current month
-        const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
+        const currentMonth = getCurrentMonthLA();
         if (monthToLoad === currentMonth) {
           const { data: newCycle, error: createError } = await supabase
             .from("monthly_billing_cycles")
