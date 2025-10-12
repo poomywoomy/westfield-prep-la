@@ -7,6 +7,7 @@ import { Download, AlertCircle, PackageX, Clock, ZoomIn } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { sanitizeError } from "@/lib/errorHandler";
 
 interface QCImage {
   id: string;
@@ -20,11 +21,15 @@ interface QCImage {
   notes: string | null;
 }
 
+interface QCImageWithSignedUrl extends QCImage {
+  signedUrl?: string;
+}
+
 const ClientQCImagesTab = () => {
   const { toast } = useToast();
-  const [images, setImages] = useState<QCImage[]>([]);
+  const [images, setImages] = useState<QCImageWithSignedUrl[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<QCImage | null>(null);
+  const [selectedImage, setSelectedImage] = useState<QCImageWithSignedUrl | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -52,11 +57,30 @@ const ClientQCImagesTab = () => {
 
       if (error) throw error;
 
-      setImages(data || []);
+      // Create signed URLs for all images
+      const imagesWithSignedUrls = await Promise.all(
+        (data || []).map(async (image) => {
+          try {
+            const { data: signedData } = await supabase.storage
+              .from('qc-images')
+              .createSignedUrl(image.image_url, 3600); // 1 hour expiry
+            
+            return {
+              ...image,
+              signedUrl: signedData?.signedUrl || ''
+            };
+          } catch (err) {
+            console.error('Failed to create signed URL:', err);
+            return { ...image, signedUrl: '' };
+          }
+        })
+      );
+
+      setImages(imagesWithSignedUrls);
     } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to load QC images",
+        description: sanitizeError(error, 'database'),
         variant: "destructive",
       });
     } finally {
@@ -64,9 +88,17 @@ const ClientQCImagesTab = () => {
     }
   };
 
-  const downloadImage = async (imageUrl: string, fileName: string) => {
+  const downloadImage = async (imagePath: string, fileName: string) => {
     try {
-      const response = await fetch(imageUrl);
+      // Create a fresh signed URL for download
+      const { data, error } = await supabase.storage
+        .from('qc-images')
+        .createSignedUrl(imagePath, 60); // 1 minute expiry for download
+      
+      if (error) throw error;
+      if (!data?.signedUrl) throw new Error('Failed to generate download URL');
+
+      const response = await fetch(data.signedUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -84,13 +116,13 @@ const ClientQCImagesTab = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to download image",
+        description: sanitizeError(error, 'storage'),
         variant: "destructive",
       });
     }
   };
 
-  const downloadAllImagesForDate = async (dateImages: QCImage[], date: string) => {
+  const downloadAllImagesForDate = async (dateImages: QCImageWithSignedUrl[], date: string) => {
     toast({
       title: "Downloading...",
       description: `Starting download of ${dateImages.length} images`,
@@ -99,7 +131,17 @@ const ClientQCImagesTab = () => {
     for (let i = 0; i < dateImages.length; i++) {
       const image = dateImages[i];
       try {
-        const response = await fetch(image.image_url);
+        // Create a fresh signed URL for each download
+        const { data, error } = await supabase.storage
+          .from('qc-images')
+          .createSignedUrl(image.image_url, 60);
+        
+        if (error || !data?.signedUrl) {
+          console.error(`Failed to get signed URL for image ${i + 1}`, error);
+          continue;
+        }
+
+        const response = await fetch(data.signedUrl);
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -131,7 +173,7 @@ const ClientQCImagesTab = () => {
   };
 
   const groupImagesByDate = () => {
-    const grouped: { [key: string]: QCImage[] } = {};
+    const grouped: { [key: string]: QCImageWithSignedUrl[] } = {};
     images.forEach(image => {
       const date = new Date(image.upload_date).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -146,12 +188,12 @@ const ClientQCImagesTab = () => {
     return grouped;
   };
 
-  const handleImageClick = (image: QCImage) => {
+  const handleImageClick = (image: QCImageWithSignedUrl) => {
     setSelectedImage(image);
     setDialogOpen(true);
   };
 
-  const getIssueText = (image: QCImage) => {
+  const getIssueText = (image: QCImageWithSignedUrl) => {
     const issues = [];
     if (image.is_damaged) {
       issues.push(`Damaged Product (Qty: ${image.damage_quantity})`);
@@ -230,10 +272,10 @@ const ClientQCImagesTab = () => {
                                 className={`relative cursor-pointer group ${
                                   hasIssue ? 'border-4 border-red-600 rounded' : ''
                                 }`}
-                                onClick={() => handleImageClick(image)}
+                                 onClick={() => handleImageClick(image)}
                               >
                                 <img
-                                  src={image.image_url}
+                                  src={image.signedUrl || ''}
                                   alt="QC Image"
                                   className="w-40 h-40 object-cover rounded"
                                 />
@@ -306,7 +348,7 @@ const ClientQCImagesTab = () => {
             <div className="space-y-4">
               <div className="flex justify-center">
                 <img
-                  src={selectedImage.image_url}
+                  src={selectedImage.signedUrl || ''}
                   alt="QC Image Enlarged"
                   className="max-h-[60vh] w-auto object-contain rounded"
                 />

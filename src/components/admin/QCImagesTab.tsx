@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, X, Save, AlertCircle, PackageX } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { validateImageFile } from "@/lib/fileValidation";
+import { sanitizeError } from "@/lib/errorHandler";
 
 interface QCImage {
   id: string;
@@ -42,7 +44,7 @@ const QCImagesTab = () => {
     if (error) {
       toast({
         title: "Error",
-        description: "Failed to load clients",
+        description: sanitizeError(error, 'database'),
         variant: "destructive",
       });
       return;
@@ -100,7 +102,22 @@ const QCImagesTab = () => {
   };
 
   const addFiles = (files: File[]) => {
-    const newImages: QCImage[] = files.map(file => ({
+    const validFiles: File[] = [];
+    
+    for (const file of files) {
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        toast({
+          title: "Invalid file",
+          description: `${file.name}: ${validation.error}`,
+          variant: "destructive",
+        });
+        continue;
+      }
+      validFiles.push(file);
+    }
+    
+    const newImages: QCImage[] = validFiles.map(file => ({
       id: crypto.randomUUID(),
       file,
       preview: URL.createObjectURL(file),
@@ -183,15 +200,12 @@ const QCImagesTab = () => {
 
         if (uploadError) throw uploadError;
 
-        const { data: urlData } = supabase.storage
-          .from("qc-images")
-          .getPublicUrl(fileName);
-
+        // Store file path instead of public URL (bucket is now private)
         const { error: dbError } = await supabase
           .from("qc_images")
           .insert({
             client_id: selectedClientId,
-            image_url: urlData.publicUrl,
+            image_url: fileName,
             is_damaged: image.is_damaged,
             damage_quantity: image.damage_quantity,
             is_missing: image.is_missing,
@@ -215,7 +229,7 @@ const QCImagesTab = () => {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: sanitizeError(error, 'storage'),
         variant: "destructive",
       });
     } finally {

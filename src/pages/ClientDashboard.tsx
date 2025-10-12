@@ -12,6 +12,7 @@ import { DollarSign, Image, LogOut, Settings, ChevronDown, Package, Warehouse, F
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientQCImagesTab from "@/components/client/ClientQCImagesTab";
+import { sanitizeError } from "@/lib/errorHandler";
 
 const ClientDashboard = () => {
   const { user, role, loading } = useAuth();
@@ -191,7 +192,24 @@ const ClientDashboard = () => {
                   <Button
                     variant="outline"
                     className="w-full mt-2"
-                    onClick={() => window.open(pricingDocUrl, '_blank')}
+                    onClick={async () => {
+                      try {
+                        const { data, error } = await supabase.storage
+                          .from('qc-images')
+                          .createSignedUrl(pricingDocUrl, 3600); // 1 hour expiry
+                        
+                        if (error) throw error;
+                        if (data?.signedUrl) {
+                          window.open(data.signedUrl, '_blank');
+                        }
+                      } catch (error: any) {
+                        toast({
+                          title: "Error",
+                          description: sanitizeError(error, 'storage'),
+                          variant: "destructive",
+                        });
+                      }
+                    }}
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Download Pricing

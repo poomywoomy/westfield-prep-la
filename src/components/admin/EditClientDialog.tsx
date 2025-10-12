@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, FileText } from "lucide-react";
+import { validatePricingDocument } from "@/lib/fileValidation";
+import { sanitizeError } from "@/lib/errorHandler";
 
 interface EditClientDialogProps {
   open: boolean;
@@ -76,13 +78,37 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
     setDragActive(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setSelectedFile(e.dataTransfer.files[0]);
+      const file = e.dataTransfer.files[0];
+      const validation = validatePricingDocument(file);
+      
+      if (!validation.valid) {
+        toast({
+          title: "Invalid file",
+          description: validation.error,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setSelectedFile(file);
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      const validation = validatePricingDocument(file);
+      
+      if (!validation.valid) {
+        toast({
+          title: "Invalid file",
+          description: validation.error,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setSelectedFile(file);
     }
   };
 
@@ -101,15 +127,12 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('qc-images')
-        .getPublicUrl(filePath);
-
-      return publicUrl;
+      // Return the file path, not a public URL (bucket is now private)
+      return filePath;
     } catch (error: any) {
       toast({
         title: "File upload failed",
-        description: error.message,
+        description: sanitizeError(error, 'storage'),
         variant: "destructive",
       });
       return null;
@@ -138,7 +161,7 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: sanitizeError(error, 'database'),
         variant: "destructive",
       });
     }
@@ -153,9 +176,9 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
       
       // Upload new file if selected
       if (selectedFile) {
-        const uploadedUrl = await handleFileUpload();
-        if (uploadedUrl) {
-          documentUrl = uploadedUrl;
+        const uploadedPath = await handleFileUpload();
+        if (uploadedPath) {
+          documentUrl = uploadedPath;
         }
       }
 
@@ -190,7 +213,7 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: sanitizeError(error, 'database'),
         variant: "destructive",
       });
     } finally {
