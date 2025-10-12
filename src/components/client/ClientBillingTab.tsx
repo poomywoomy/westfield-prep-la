@@ -176,10 +176,11 @@ const ClientBillingTab = () => {
     // Billing date range - show the manually set statement dates
     const formatMDYLocal = (dateStr: string) => {
       if (!dateStr) return '';
-      const dt = new Date(dateStr);
-      const mm = String(dt.getMonth() + 1).padStart(2, '0');
-      const dd = String(dt.getDate()).padStart(2, '0');
-      const yyyy = dt.getFullYear();
+      // Parse as local date to avoid timezone shifts
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const mm = String(month).padStart(2, '0');
+      const dd = String(day).padStart(2, '0');
+      const yyyy = year;
       return `${mm}/${dd}/${yyyy}`;
     };
 
