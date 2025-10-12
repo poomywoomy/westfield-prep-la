@@ -510,12 +510,16 @@ const BillingEntryDialog = ({
 
     yPos += 25;
 
-    // Billing period
-    const billingDate = new Date(currentCycle.billing_month);
-    const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
-    const todayDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' });
+    // Billing date range - show the manually set statement dates
     doc.setFontSize(10);
-    doc.text(`Billing Period: ${monthYear}`, leftX, yPos);
+    if (currentCycle.statement_start_date && currentCycle.statement_end_date) {
+      doc.text(`Billing Date: ${formatMDY(currentCycle.statement_start_date)} - ${formatMDY(currentCycle.statement_end_date)}`, leftX, yPos);
+    } else {
+      const billingDate = new Date(currentCycle.billing_month);
+      const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
+      doc.text(`Billing Period: ${monthYear}`, leftX, yPos);
+    }
+    const todayDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' });
     doc.text(`Statement Date: ${todayDate}`, rightX, yPos);
     yPos += 15;
 
@@ -657,7 +661,16 @@ const BillingEntryDialog = ({
     // Draw box around totals
     doc.rect(boxX, yPos - 4, boxWidth, boxY - yPos + 8);
 
-    const fileName = `${clientName.replace(/\s+/g, "_")}_Billing_${monthYear.replace(/\s+/g, "_")}.pdf`;
+    // Generate filename based on statement dates or billing month
+    let filenameDatePart;
+    if (currentCycle.statement_start_date && currentCycle.statement_end_date) {
+      filenameDatePart = `${formatMDY(currentCycle.statement_start_date).replace(/\//g, '-')}_to_${formatMDY(currentCycle.statement_end_date).replace(/\//g, '-')}`;
+    } else {
+      const billingDate = new Date(currentCycle.billing_month);
+      const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
+      filenameDatePart = monthYear.replace(/\s+/g, "_");
+    }
+    const fileName = `${clientName.replace(/\s+/g, "_")}_Billing_${filenameDatePart}.pdf`;
     doc.save(fileName);
 
     toast({

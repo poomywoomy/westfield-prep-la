@@ -173,12 +173,25 @@ const ClientBillingTab = () => {
 
     yPos += 25;
 
-    // Billing period
-    const billingDate = new Date(cycle.billing_month);
-    const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
-    const todayDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' });
+    // Billing date range - show the manually set statement dates
+    const formatMDYLocal = (dateStr: string) => {
+      if (!dateStr) return '';
+      const dt = new Date(dateStr);
+      const mm = String(dt.getMonth() + 1).padStart(2, '0');
+      const dd = String(dt.getDate()).padStart(2, '0');
+      const yyyy = dt.getFullYear();
+      return `${mm}/${dd}/${yyyy}`;
+    };
+
     doc.setFontSize(10);
-    doc.text(`Billing Period: ${monthYear}`, leftX, yPos);
+    if (cycle.statement_start_date && cycle.statement_end_date) {
+      doc.text(`Billing Date: ${formatMDYLocal(cycle.statement_start_date)} - ${formatMDYLocal(cycle.statement_end_date)}`, leftX, yPos);
+    } else {
+      const billingDate = new Date(cycle.billing_month);
+      const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
+      doc.text(`Billing Period: ${monthYear}`, leftX, yPos);
+    }
+    const todayDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' });
     doc.text(`Statement Date: ${todayDate}`, rightX, yPos);
     yPos += 15;
 
@@ -320,7 +333,16 @@ const ClientBillingTab = () => {
     // Draw box around totals
     doc.rect(boxX, yPos - 4, boxWidth, boxY - yPos + 8);
 
-    const fileName = `${clientName.replace(/\s+/g, "_")}_Billing_${monthYear.replace(/\s+/g, "_")}.pdf`;
+    // Generate filename based on statement dates or billing month
+    let filenameDatePart;
+    if (cycle.statement_start_date && cycle.statement_end_date) {
+      filenameDatePart = `${formatMDYLocal(cycle.statement_start_date).replace(/\//g, '-')}_to_${formatMDYLocal(cycle.statement_end_date).replace(/\//g, '-')}`;
+    } else {
+      const billingDate = new Date(cycle.billing_month);
+      const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
+      filenameDatePart = monthYear.replace(/\s+/g, "_");
+    }
+    const fileName = `${clientName.replace(/\s+/g, "_")}_Billing_${filenameDatePart}.pdf`;
     doc.save(fileName);
 
     toast({

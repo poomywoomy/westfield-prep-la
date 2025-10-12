@@ -71,27 +71,59 @@ const QuotesTab = () => {
   const handleDeleteQuote = async () => {
     if (!deleteQuoteId) return;
 
-    const { error } = await supabase
-      .from("quotes")
-      .delete()
-      .eq("id", deleteQuoteId);
+    try {
+      // First, delete all associated billing cycles and their items/payments
+      const { data: cycles, error: cyclesError } = await supabase
+        .from("monthly_billing_cycles")
+        .select("id")
+        .eq("quote_id", deleteQuoteId);
 
-    if (error) {
+      if (cyclesError) throw cyclesError;
+
+      if (cycles && cycles.length > 0) {
+        const cycleIds = cycles.map(c => c.id);
+        
+        // Delete billing items
+        await supabase
+          .from("monthly_billing_items")
+          .delete()
+          .in("cycle_id", cycleIds);
+
+        // Delete billing payments
+        await supabase
+          .from("billing_payments")
+          .delete()
+          .in("cycle_id", cycleIds);
+
+        // Delete billing cycles
+        await supabase
+          .from("monthly_billing_cycles")
+          .delete()
+          .eq("quote_id", deleteQuoteId);
+      }
+
+      // Finally, delete the quote
+      const { error } = await supabase
+        .from("quotes")
+        .delete()
+        .eq("id", deleteQuoteId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Quote and associated billing data deleted successfully",
+      });
+
+      setDeleteQuoteId(null);
+      fetchQuotes();
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to delete quote",
+        description: error.message,
         variant: "destructive",
       });
-      return;
     }
-
-    toast({
-      title: "Success",
-      description: "Quote deleted successfully",
-    });
-
-    setDeleteQuoteId(null);
-    fetchQuotes();
   };
 
   const generatePDFFromQuote = async (quote: any) => {
