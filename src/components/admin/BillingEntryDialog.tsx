@@ -3,12 +3,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Download, Lock, Edit2 } from "lucide-react";
-import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { Lock, Unlock, Download, Plus, DollarSign, Trash2 } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
+import AddCustomBillingItemDialog from "./AddCustomBillingItemDialog";
+import AddBillingPaymentDialog from "./AddBillingPaymentDialog";
 
 interface BillingEntryDialogProps {
   open: boolean;
@@ -23,157 +24,221 @@ interface BillingItem {
   unit_price: number;
   quantity: number;
   section_type?: string;
+  item_type: string;
 }
 
-const BillingEntryDialog = ({ open, onOpenChange, client, quote, onSuccess }: BillingEntryDialogProps) => {
+interface Payment {
+  id: string;
+  payment_name: string;
+  amount: number;
+  payment_method: string;
+  payment_date: string;
+}
+
+const BillingEntryDialog = ({
+  open,
+  onOpenChange,
+  client,
+  quote,
+  onSuccess,
+}: BillingEntryDialogProps) => {
+  const [billingItems, setBillingItems] = useState<BillingItem[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [currentCycle, setCurrentCycle] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [customDialogOpen, setCustomDialogOpen] = useState(false);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const { toast } = useToast();
-  const [items, setItems] = useState<BillingItem[]>([]);
-  const [cycle, setCycle] = useState<any>(null);
-  const [isLocked, setIsLocked] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const currentMonth = new Date().toISOString().slice(0, 7) + "-01";
+
+  const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
 
   useEffect(() => {
-    if (open && client && quote) {
+    if (open) {
       loadBillingData();
     }
-  }, [open, client, quote]);
+  }, [open, client.id, quote.id]);
 
   const loadBillingData = async () => {
-    // Fetch or create billing cycle for current month
-    let { data: cycleData, error: cycleError } = await supabase
-      .from("monthly_billing_cycles")
-      .select("*")
-      .eq("client_id", client.id)
-      .eq("billing_month", currentMonth)
-      .single();
-
-    if (cycleError && cycleError.code !== 'PGRST116') {
-      toast({
-        title: "Error",
-        description: "Failed to load billing data",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Create cycle if doesn't exist
-    if (!cycleData) {
-      const { data: newCycle, error: createError } = await supabase
+    setLoading(true);
+    try {
+      // Get or create current month's billing cycle
+      let { data: cycle, error: cycleError } = await supabase
         .from("monthly_billing_cycles")
-        .insert({
-          client_id: client.id,
-          quote_id: quote.id,
-          billing_month: currentMonth,
-          status: 'active'
-        })
-        .select()
-        .single();
+        .select("*")
+        .eq("client_id", client.id)
+        .eq("quote_id", quote.id)
+        .eq("billing_month", currentMonth)
+        .maybeSingle();
 
-      if (createError) {
-        toast({
-          title: "Error",
-          description: "Failed to create billing cycle",
-          variant: "destructive",
-        });
-        return;
+      if (cycleError) throw cycleError;
+
+      if (!cycle) {
+        const { data: newCycle, error: createError } = await supabase
+          .from("monthly_billing_cycles")
+          .insert({
+            client_id: client.id,
+            quote_id: quote.id,
+            billing_month: currentMonth,
+            status: "active",
+            total_amount: 0,
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        cycle = newCycle;
       }
-      cycleData = newCycle;
-    }
 
-    setCycle(cycleData);
-    setIsLocked(cycleData.status === 'locked');
+      setCurrentCycle(cycle);
 
-    // Load existing items or initialize from quote
-    const { data: itemsData, error: itemsError } = await supabase
-      .from("monthly_billing_items")
-      .select("*")
-      .eq("cycle_id", cycleData.id);
+      // Load existing billing items
+      const { data: items, error: itemsError } = await supabase
+        .from("monthly_billing_items")
+        .select("*")
+        .eq("cycle_id", cycle.id);
 
-    if (itemsError) {
+      if (itemsError) throw itemsError;
+
+      if (items && items.length > 0) {
+        setBillingItems(
+          items.map((item) => ({
+            service_name: item.service_name,
+            unit_price: Number(item.unit_price),
+            quantity: item.quantity,
+            section_type: item.section_type,
+            item_type: item.item_type || "quote",
+          }))
+        );
+      } else {
+        initializeFromQuote();
+      }
+
+      // Load payments
+      const { data: paymentsData, error: paymentsError } = await supabase
+        .from("billing_payments")
+        .select("*")
+        .eq("cycle_id", cycle.id)
+        .order("payment_date", { ascending: false });
+
+      if (paymentsError) throw paymentsError;
+      setPayments(paymentsData || []);
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to load billing items",
+        description: error.message,
         variant: "destructive",
       });
-      return;
-    }
-
-    // If items exist, use them, otherwise initialize from quote
-    if (itemsData && itemsData.length > 0) {
-      setItems(itemsData.map(item => ({
-        service_name: item.service_name,
-        unit_price: Number(item.unit_price),
-        quantity: item.quantity,
-        section_type: item.section_type
-      })));
-    } else {
-      initializeFromQuote();
+    } finally {
+      setLoading(false);
     }
   };
 
   const initializeFromQuote = () => {
     const quoteData = quote.quote_data;
-    const billingItems: BillingItem[] = [];
+    const items: BillingItem[] = [];
 
-    // Add standard operations
+    // Standard operations
     if (quoteData.standard_operations) {
       quoteData.standard_operations.forEach((item: any) => {
-        billingItems.push({
+        items.push({
           service_name: item.service_name,
           unit_price: Number(item.service_price),
           quantity: 0,
-          section_type: 'Standard Operations'
+          section_type: "Standard Operations",
+          item_type: "quote",
         });
       });
     }
 
-    // Add fulfillment sections
+    // Fulfillment sections
     if (quoteData.fulfillment_sections) {
       quoteData.fulfillment_sections.forEach((section: any) => {
         section.items.forEach((item: any) => {
-          billingItems.push({
+          items.push({
             service_name: item.service_name,
             unit_price: Number(item.service_price),
             quantity: 0,
-            section_type: section.type
+            section_type: section.type,
+            item_type: "quote",
           });
         });
       });
     }
 
-    setItems(billingItems);
+    setBillingItems(items);
   };
 
-  const updateQuantity = (index: number, quantity: number) => {
-    const newItems = [...items];
-    newItems[index].quantity = Math.max(0, quantity);
-    setItems(newItems);
+  const updateQuantity = (index: number, newQuantity: number) => {
+    const updated = [...billingItems];
+    updated[index].quantity = newQuantity;
+    setBillingItems(updated);
   };
 
-  const calculateTotal = () => {
-    return items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
+  const addCustomItem = (item: {
+    service_name: string;
+    unit_price: number;
+    quantity: number;
+    item_type: string;
+  }) => {
+    setBillingItems([
+      ...billingItems,
+      {
+        ...item,
+        section_type: "Custom",
+      },
+    ]);
+  };
+
+  const removeItem = (index: number) => {
+    const updated = billingItems.filter((_, i) => i !== index);
+    setBillingItems(updated);
+  };
+
+  const calculateSubtotal = () => {
+    return billingItems.reduce(
+      (sum, item) => sum + item.unit_price * item.quantity,
+      0
+    );
+  };
+
+  const calculateTotalPayments = () => {
+    return payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
+  };
+
+  const calculateOutstanding = () => {
+    return calculateSubtotal() - calculateTotalPayments();
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
   };
 
   const saveBilling = async () => {
-    if (!cycle) return;
-    setIsSaving(true);
+    if (!currentCycle) return;
 
+    setSaving(true);
     try {
       // Delete existing items
       await supabase
         .from("monthly_billing_items")
         .delete()
-        .eq("cycle_id", cycle.id);
+        .eq("cycle_id", currentCycle.id);
 
-      // Insert new items
-      const itemsToInsert = items.map(item => ({
-        cycle_id: cycle.id,
+      // Insert updated items
+      const itemsToInsert = billingItems.map((item) => ({
+        cycle_id: currentCycle.id,
         service_name: item.service_name,
         unit_price: item.unit_price,
         quantity: item.quantity,
         total_amount: item.unit_price * item.quantity,
-        section_type: item.section_type
+        section_type: item.section_type,
+        item_type: item.item_type,
       }));
 
       const { error: insertError } = await supabase
@@ -183,11 +248,11 @@ const BillingEntryDialog = ({ open, onOpenChange, client, quote, onSuccess }: Bi
       if (insertError) throw insertError;
 
       // Update cycle total
-      const total = calculateTotal();
+      const total = calculateSubtotal();
       const { error: updateError } = await supabase
         .from("monthly_billing_cycles")
         .update({ total_amount: total })
-        .eq("id", cycle.id);
+        .eq("id", currentCycle.id);
 
       if (updateError) throw updateError;
 
@@ -204,69 +269,74 @@ const BillingEntryDialog = ({ open, onOpenChange, client, quote, onSuccess }: Bi
         variant: "destructive",
       });
     } finally {
-      setIsSaving(false);
+      setSaving(false);
     }
   };
 
   const lockCycle = async () => {
-    if (!cycle) return;
+    if (!currentCycle) return;
 
-    const { error } = await supabase
-      .from("monthly_billing_cycles")
-      .update({ 
-        status: 'locked',
-        locked_at: new Date().toISOString()
-      })
-      .eq("id", cycle.id);
+    try {
+      const { error } = await supabase
+        .from("monthly_billing_cycles")
+        .update({
+          status: "locked",
+          locked_at: new Date().toISOString(),
+        })
+        .eq("id", currentCycle.id);
 
-    if (error) {
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Billing cycle locked successfully",
+      });
+
+      loadBillingData();
+      onSuccess();
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to lock billing cycle",
+        description: error.message,
         variant: "destructive",
       });
-      return;
     }
-
-    setIsLocked(true);
-    toast({
-      title: "Success",
-      description: "Billing cycle locked. You can now download PDF.",
-    });
   };
 
   const unlockCycle = async () => {
-    if (!cycle) return;
+    if (!currentCycle) return;
 
-    const { error } = await supabase
-      .from("monthly_billing_cycles")
-      .update({ 
-        status: 'active',
-        locked_at: null
-      })
-      .eq("id", cycle.id);
+    try {
+      const { error } = await supabase
+        .from("monthly_billing_cycles")
+        .update({
+          status: "active",
+          locked_at: null,
+        })
+        .eq("id", currentCycle.id);
 
-    if (error) {
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Billing cycle unlocked successfully",
+      });
+
+      loadBillingData();
+      onSuccess();
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to unlock billing cycle",
+        description: error.message,
         variant: "destructive",
       });
-      return;
     }
-
-    setIsLocked(false);
-    toast({
-      title: "Success",
-      description: "Billing cycle unlocked for editing.",
-    });
   };
 
   const generatePDF = async () => {
     const doc = new jsPDF();
     const clientName = client.company_name || `${client.first_name || ''} ${client.last_name || ''}`.trim();
-    const monthYear = format(new Date(currentMonth), "MMMM yyyy");
-
+    
     // Add logo
     const img = new Image();
     img.src = westfieldLogo;
@@ -276,86 +346,125 @@ const BillingEntryDialog = ({ open, onOpenChange, client, quote, onSuccess }: Bi
     const logoHeight = (img.height / img.width) * logoWidth;
     doc.addImage(img, 'JPEG', (210 - logoWidth) / 2, 10, logoWidth, logoHeight);
 
-    // Header
-    const headerY = 10 + logoHeight + 5;
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(13, 33, 66);
-    doc.text("MONTHLY INVOICE", 105, headerY, { align: "center" });
+    let yPos = 10 + logoHeight + 10;
 
-    // Business info
-    const infoStartY = headerY + 12;
+    // Header
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Westfield Prep Center", 105, yPos, { align: "center" });
+    yPos += 10;
+
     doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(0, 0, 0);
-    doc.text("Westfield Prep Center", 20, infoStartY);
-    doc.setFont(undefined, 'normal');
-    doc.text("info@westfieldprepcenter.com", 20, infoStartY + 5);
-    doc.text("818-935-5478", 20, infoStartY + 10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Monthly Billing Statement", 105, yPos, { align: "center" });
+    yPos += 15;
 
     // Client info
-    const rightX = 140;
-    doc.setFont(undefined, 'bold');
-    doc.text(clientName, rightX, infoStartY);
-    doc.setFont(undefined, 'normal');
-    if (client.email) doc.text(client.email, rightX, infoStartY + 5);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Client Information:", 20, yPos);
+    yPos += 7;
 
-    // Date
-    const dateY = infoStartY + 20;
-    doc.text(`Billing Period: ${monthYear}`, 20, dateY);
-    doc.text(`Invoice Date: ${format(new Date(), "MMM d, yyyy")}`, 20, dateY + 5);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Name: ${clientName}`, 20, yPos);
+    yPos += 5;
+    doc.text(`Email: ${client.email}`, 20, yPos);
+    yPos += 5;
+    doc.text(`Phone: ${client.phone_number}`, 20, yPos);
+    yPos += 10;
 
-    let y = dateY + 15;
+    // Billing period
+    const billingDate = new Date(currentMonth);
+    const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
+    doc.text(`Billing Period: ${monthYear}`, 20, yPos);
+    yPos += 5;
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })} ${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles' })}`, 20, yPos);
+    yPos += 10;
 
     // Group items by section
-    const sections: { [key: string]: BillingItem[] } = {};
-    items.filter(item => item.quantity > 0).forEach(item => {
-      const section = item.section_type || 'Other';
-      if (!sections[section]) sections[section] = [];
-      sections[section].push(item);
+    const groupedItems: Record<string, BillingItem[]> = {};
+    billingItems.forEach((item) => {
+      const section = item.section_type || "Other";
+      if (!groupedItems[section]) groupedItems[section] = [];
+      groupedItems[section].push(item);
     });
 
-    // Render each section
-    Object.entries(sections).forEach(([sectionName, sectionItems]) => {
-      if (y > 260) {
-        doc.addPage();
-        y = 20;
-      }
+    // Services section
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Services", 20, yPos);
+    yPos += 7;
 
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text(sectionName, 20, y);
-      y += 7;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
 
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
+    Object.entries(groupedItems).forEach(([section, items]) => {
+      const sectionTitle = section;
+      doc.setFont("helvetica", "bold");
+      doc.text(sectionTitle, 20, yPos);
+      yPos += 5;
+      doc.setFont("helvetica", "normal");
 
-      sectionItems.forEach(item => {
-        if (y > 270) {
+      items.forEach((item) => {
+        const lineTotal = item.unit_price * item.quantity;
+        const itemType = item.item_type === "adjustment" ? " (Adjustment)" : item.item_type === "custom" ? " (Custom)" : "";
+        doc.text(
+          `${item.service_name}${itemType}: ${formatCurrency(item.unit_price)} × ${item.quantity} = ${formatCurrency(lineTotal)}`,
+          25,
+          yPos
+        );
+        yPos += 5;
+
+        if (yPos > 270) {
           doc.addPage();
-          y = 20;
+          yPos = 20;
         }
-
-        doc.text(item.service_name, 25, y);
-        doc.text(`Qty: ${item.quantity}`, 110, y);
-        doc.text(`$${item.unit_price.toFixed(2)}`, 140, y);
-        doc.text(`$${(item.unit_price * item.quantity).toFixed(2)}`, 170, y, { align: "right" });
-        y += 6;
       });
 
-      y += 5;
+      yPos += 3;
     });
 
-    // Total
-    y += 10;
-    doc.setDrawColor(200, 200, 200);
-    doc.line(20, y, 190, y);
-    y += 10;
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(14);
-    doc.text(`Total: $${calculateTotal().toFixed(2)}`, 170, y, { align: 'right' });
+    // Payments section
+    if (payments.length > 0) {
+      yPos += 5;
+      doc.setFont("helvetica", "bold");
+      doc.text("Payments/Deposits", 20, yPos);
+      yPos += 7;
+      doc.setFont("helvetica", "normal");
 
-    doc.save(`Invoice-${clientName.replace(/\s/g, '-')}-${monthYear.replace(' ', '-')}.pdf`);
+      payments.forEach((payment) => {
+        doc.text(
+          `${payment.payment_name} (${payment.payment_method}) - ${new Date(payment.payment_date).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })}: ${formatCurrency(Number(payment.amount))}`,
+          25,
+          yPos
+        );
+        yPos += 5;
+
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+      });
+    }
+
+    // Totals
+    yPos += 10;
+    doc.setFont("helvetica", "bold");
+    doc.text(`Subtotal: ${formatCurrency(calculateSubtotal())}`, 160, yPos);
+    yPos += 7;
+    doc.text(`Total Payments: ${formatCurrency(calculateTotalPayments())}`, 160, yPos);
+    yPos += 7;
+    
+    const outstanding = calculateOutstanding();
+    if (outstanding < 0) {
+      doc.text(`Credit Balance: ${formatCurrency(Math.abs(outstanding))}`, 160, yPos);
+    } else {
+      doc.text(`Outstanding Balance: ${formatCurrency(outstanding)}`, 160, yPos);
+    }
+
+    const fileName = `${clientName.replace(/\s+/g, "_")}_Billing_${monthYear.replace(/\s+/g, "_")}.pdf`;
+    doc.save(fileName);
 
     toast({
       title: "PDF Generated",
@@ -363,92 +472,219 @@ const BillingEntryDialog = ({ open, onOpenChange, client, quote, onSuccess }: Bi
     });
   };
 
+  if (loading) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <p className="text-center py-8">Loading billing data...</p>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  const isLocked = currentCycle?.status === "locked";
+  const subtotal = calculateSubtotal();
+  const totalPayments = calculateTotalPayments();
+  const outstanding = subtotal - totalPayments;
+
   // Group items by section for display
-  const sections: { [key: string]: BillingItem[] } = {};
-  items.forEach((item, index) => {
+  const sections: { [key: string]: any[] } = {};
+  billingItems.forEach((item, index) => {
     const section = item.section_type || 'Other';
     if (!sections[section]) sections[section] = [];
-    sections[section].push({ ...item, index } as any);
+    sections[section].push({ ...item, index });
   });
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>
-              Billing Entry - {client?.company_name || client?.contact_name}
-              <span className="text-sm text-muted-foreground ml-2">
-                ({format(new Date(currentMonth), "MMMM yyyy")})
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>
+                Billing for{" "}
+                {client.company_name ||
+                  `${client.first_name || ""} ${client.last_name || ""}`.trim()}
               </span>
-            </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={isLocked ? unlockCycle : lockCycle}
+                >
+                  {isLocked ? (
+                    <>
+                      <Unlock className="w-4 h-4 mr-2" />
+                      Edit Closed Quote
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4 mr-2" />
+                      Lock Month
+                    </>
+                  )}
+                </Button>
+                <Button variant="outline" size="sm" onClick={generatePDF}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download PDF
+                </Button>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Action buttons */}
             <div className="flex gap-2">
-              {isLocked ? (
-                <Button variant="outline" size="sm" onClick={unlockCycle}>
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Edit Locked
-                </Button>
-              ) : (
-                <Button variant="outline" size="sm" onClick={lockCycle}>
-                  <Lock className="h-4 w-4 mr-2" />
-                  Lock Month
-                </Button>
-              )}
-              <Button variant="outline" size="sm" onClick={generatePDF} disabled={!isLocked}>
-                <Download className="h-4 w-4 mr-2" />
-                PDF
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCustomDialogOpen(true)}
+                disabled={isLocked}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Custom Entry
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPaymentDialogOpen(true)}
+                disabled={isLocked}
+              >
+                <DollarSign className="w-4 h-4 mr-2" />
+                Record Deposit / Payment
               </Button>
             </div>
-          </DialogTitle>
-        </DialogHeader>
 
-        <div className="space-y-6">
-          {Object.entries(sections).map(([sectionName, sectionItems]) => (
-            <div key={sectionName} className="border rounded-lg p-4">
-              <h3 className="font-semibold text-lg mb-4">{sectionName}</h3>
+            {/* Billing items grouped by section */}
+            {Object.entries(sections).map(([section, items]) => (
+              <div key={section} className="space-y-3">
+                <h3 className="font-semibold text-lg">{section}</h3>
+                <div className="space-y-2">
+                  {items.map(({ index, ...item }) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-[2fr,1fr,1fr,1fr,auto] gap-4 items-center p-3 border rounded"
+                    >
+                      <div>
+                        <p className="font-medium">{item.service_name}</p>
+                        {item.item_type !== "quote" && (
+                          <p className="text-xs text-muted-foreground">
+                            {item.item_type === "adjustment" ? "Adjustment" : "Custom"}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {formatCurrency(item.unit_price)}
+                      </div>
+                      <div>
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            updateQuantity(index, Number(e.target.value))
+                          }
+                          disabled={isLocked}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="text-right font-semibold">
+                        {formatCurrency(item.unit_price * item.quantity)}
+                      </div>
+                      {item.item_type !== "quote" && !isLocked && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeItem(index)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {/* Payments section */}
+            {payments.length > 0 && (
               <div className="space-y-3">
-                {(sectionItems as any[]).map((item) => (
-                  <div key={item.index} className="grid grid-cols-12 gap-4 items-center">
-                    <div className="col-span-5">
-                      <Label className="text-sm">{item.service_name}</Label>
+                <h3 className="font-semibold text-lg">Payments/Deposits</h3>
+                <div className="space-y-2">
+                  {payments.map((payment) => (
+                    <div
+                      key={payment.id}
+                      className="grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 items-center p-3 border rounded bg-green-50"
+                    >
+                      <div>
+                        <p className="font-medium">{payment.payment_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {payment.payment_method}
+                        </p>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(payment.payment_date).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })}
+                      </div>
+                      <div></div>
+                      <div className="text-right font-semibold text-green-600">
+                        {formatCurrency(Number(payment.amount))}
+                      </div>
                     </div>
-                    <div className="col-span-2">
-                      <Label className="text-sm text-muted-foreground">
-                        ${item.unit_price.toFixed(2)}
-                      </Label>
-                    </div>
-                    <div className="col-span-2">
-                      <Input
-                        type="number"
-                        min="0"
-                        value={item.quantity}
-                        onChange={(e) => updateQuantity(item.index, parseInt(e.target.value) || 0)}
-                        disabled={isLocked}
-                        className="h-9"
-                      />
-                    </div>
-                    <div className="col-span-3 text-right">
-                      <Label className="text-sm font-semibold">
-                        ${(item.unit_price * item.quantity).toFixed(2)}
-                      </Label>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Totals section */}
+            <div className="border-t pt-4 space-y-2">
+              <div className="flex justify-between text-lg">
+                <span className="font-semibold">Subtotal (MTD Charges):</span>
+                <span className="font-bold">{formatCurrency(subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-lg">
+                <span className="font-semibold">Deposits / Payments (MTD):</span>
+                <span className="font-bold text-green-600">
+                  {formatCurrency(totalPayments)}
+                </span>
+              </div>
+              <div className="flex justify-between text-xl border-t pt-2">
+                <span className="font-bold">Outstanding Balance:</span>
+                <span className={`font-bold ${outstanding < 0 ? 'text-green-600' : 'text-foreground'}`}>
+                  {outstanding < 0
+                    ? `Credit ${formatCurrency(Math.abs(outstanding))}`
+                    : formatCurrency(outstanding)}
+                </span>
               </div>
             </div>
-          ))}
 
-          <div className="border-t pt-4 flex items-center justify-between">
-            <div className="text-2xl font-bold">
-              Monthly Total: ${calculateTotal().toFixed(2)}
+            {/* Save button */}
+            <div className="flex justify-end pt-4 border-t">
+              <Button onClick={saveBilling} disabled={saving || isLocked} size="lg">
+                {saving ? "Saving..." : "Save Billing"}
+              </Button>
             </div>
-            <Button onClick={saveBilling} disabled={isSaving || isLocked} size="lg">
-              {isSaving ? "Saving..." : "Save Billing"}
-            </Button>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <AddCustomBillingItemDialog
+        open={customDialogOpen}
+        onOpenChange={setCustomDialogOpen}
+        onAdd={addCustomItem}
+      />
+
+      {currentCycle && (
+        <AddBillingPaymentDialog
+          open={paymentDialogOpen}
+          onOpenChange={setPaymentDialogOpen}
+          clientId={client.id}
+          cycleId={currentCycle.id}
+          onSuccess={() => {
+            loadBillingData();
+            onSuccess();
+          }}
+        />
+      )}
+    </>
   );
 };
 

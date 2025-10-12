@@ -23,7 +23,49 @@ const BillingTab = () => {
 
       if (clientsError) throw clientsError;
 
-      setClients(clientsData || []);
+      // For each client, calculate MTD totals
+      const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
+      
+      const clientsWithTotals = await Promise.all(
+        (clientsData || []).map(async (client) => {
+          // Fetch current month's billing cycle
+          const { data: cycles } = await supabase
+            .from("monthly_billing_cycles")
+            .select("id, total_amount")
+            .eq("client_id", client.id)
+            .eq("billing_month", currentMonth)
+            .maybeSingle();
+
+          let mtdSubtotal = 0;
+          let mtdDeposits = 0;
+
+          if (cycles) {
+            // Get billing items total
+            const { data: items } = await supabase
+              .from("monthly_billing_items")
+              .select("total_amount")
+              .eq("cycle_id", cycles.id);
+
+            mtdSubtotal = items?.reduce((sum, item) => sum + Number(item.total_amount), 0) || 0;
+
+            // Get payments total
+            const { data: payments } = await supabase
+              .from("billing_payments")
+              .select("amount")
+              .eq("cycle_id", cycles.id);
+
+            mtdDeposits = payments?.reduce((sum, payment) => sum + Number(payment.amount), 0) || 0;
+          }
+
+          return {
+            ...client,
+            mtd_subtotal: mtdSubtotal,
+            mtd_deposits: mtdDeposits,
+          };
+        })
+      );
+
+      setClients(clientsWithTotals);
     } catch (error: any) {
       toast({
         title: "Error",

@@ -14,6 +14,7 @@ import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 const ClientBillingTab = () => {
   const { user } = useAuth();
   const [items, setItems] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
   const [cycle, setCycle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [clientData, setClientData] = useState<any>(null);
@@ -60,6 +61,16 @@ const ClientBillingTab = () => {
 
         if (itemsError) throw itemsError;
         setItems(itemsData || []);
+
+        // Fetch payments
+        const { data: paymentsData, error: paymentsError } = await supabase
+          .from("billing_payments")
+          .select("*")
+          .eq("cycle_id", cycleData.id)
+          .order("payment_date", { ascending: false });
+
+        if (paymentsError) throw paymentsError;
+        setPayments(paymentsData || []);
       }
     } catch (error: any) {
       toast({
@@ -72,13 +83,33 @@ const ClientBillingTab = () => {
     }
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  const calculateSubtotal = () => {
+    return items.reduce((sum, item) => sum + Number(item.total_amount), 0);
+  };
+
+  const calculateTotalPayments = () => {
+    return payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
+  };
+
+  const calculateOutstanding = () => {
+    return calculateSubtotal() - calculateTotalPayments();
+  };
+
   const generateBillingPDF = async () => {
     if (!cycle || !clientData) return;
 
     const doc = new jsPDF();
     const clientName = clientData.company_name || `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim();
-    const monthYear = format(new Date(cycle.billing_month), "MMMM yyyy");
-
+    
     // Add logo
     const img = new Image();
     img.src = westfieldLogo;
@@ -88,86 +119,121 @@ const ClientBillingTab = () => {
     const logoHeight = (img.height / img.width) * logoWidth;
     doc.addImage(img, 'JPEG', (210 - logoWidth) / 2, 10, logoWidth, logoHeight);
 
-    // Header
-    const headerY = 10 + logoHeight + 5;
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(13, 33, 66);
-    doc.text("MONTHLY INVOICE", 105, headerY, { align: "center" });
+    let yPos = 10 + logoHeight + 10;
 
-    // Business info
-    const infoStartY = headerY + 12;
+    // Header
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Westfield Prep Center", 105, yPos, { align: "center" });
+    yPos += 10;
+
     doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(0, 0, 0);
-    doc.text("Westfield Prep Center", 20, infoStartY);
-    doc.setFont(undefined, 'normal');
-    doc.text("info@westfieldprepcenter.com", 20, infoStartY + 5);
-    doc.text("818-935-5478", 20, infoStartY + 10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Monthly Billing Statement", 105, yPos, { align: "center" });
+    yPos += 15;
 
     // Client info
-    const rightX = 140;
-    doc.setFont(undefined, 'bold');
-    doc.text(clientName, rightX, infoStartY);
-    doc.setFont(undefined, 'normal');
-    if (clientData.email) doc.text(clientData.email, rightX, infoStartY + 5);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Client Information:", 20, yPos);
+    yPos += 7;
 
-    // Date
-    const dateY = infoStartY + 20;
-    doc.text(`Billing Period: ${monthYear}`, 20, dateY);
-    doc.text(`Invoice Date: ${format(new Date(), "MMM d, yyyy")}`, 20, dateY + 5);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Name: ${clientName}`, 20, yPos);
+    yPos += 5;
+    doc.text(`Email: ${clientData.email}`, 20, yPos);
+    yPos += 10;
 
-    let y = dateY + 15;
+    // Billing period
+    const billingDate = new Date(cycle.billing_month);
+    const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
+    doc.text(`Billing Period: ${monthYear}`, 20, yPos);
+    yPos += 5;
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })} ${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles' })}`, 20, yPos);
+    yPos += 10;
 
     // Group items by section
     const sections: { [key: string]: any[] } = {};
-    items.filter(item => item.quantity > 0).forEach(item => {
+    items.forEach(item => {
       const section = item.section_type || 'Other';
       if (!sections[section]) sections[section] = [];
       sections[section].push(item);
     });
 
-    // Render each section
+    // Services section
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Services", 20, yPos);
+    yPos += 7;
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+
     Object.entries(sections).forEach(([sectionName, sectionItems]) => {
-      if (y > 260) {
-        doc.addPage();
-        y = 20;
-      }
-
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text(sectionName, 20, y);
-      y += 7;
-
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
+      doc.setFont("helvetica", "bold");
+      doc.text(sectionName, 20, yPos);
+      yPos += 5;
+      doc.setFont("helvetica", "normal");
 
       sectionItems.forEach(item => {
-        if (y > 270) {
-          doc.addPage();
-          y = 20;
-        }
+        const itemType = item.item_type === "adjustment" ? " (Adjustment)" : item.item_type === "custom" ? " (Custom)" : "";
+        doc.text(
+          `${item.service_name}${itemType}: ${formatCurrency(Number(item.unit_price))} × ${item.quantity} = ${formatCurrency(Number(item.total_amount))}`,
+          25,
+          yPos
+        );
+        yPos += 5;
 
-        doc.text(item.service_name, 25, y);
-        doc.text(`Qty: ${item.quantity}`, 110, y);
-        doc.text(`$${Number(item.unit_price).toFixed(2)}`, 140, y);
-        doc.text(`$${Number(item.total_amount).toFixed(2)}`, 170, y, { align: "right" });
-        y += 6;
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
       });
 
-      y += 5;
+      yPos += 3;
     });
 
-    // Total
-    y += 10;
-    doc.setDrawColor(200, 200, 200);
-    doc.line(20, y, 190, y);
-    y += 10;
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(14);
-    doc.text(`Total: $${Number(cycle.total_amount).toFixed(2)}`, 170, y, { align: 'right' });
+    // Payments section
+    if (payments.length > 0) {
+      yPos += 5;
+      doc.setFont("helvetica", "bold");
+      doc.text("Payments/Deposits", 20, yPos);
+      yPos += 7;
+      doc.setFont("helvetica", "normal");
 
-    doc.save(`Invoice-${clientName.replace(/\s/g, '-')}-${monthYear.replace(' ', '-')}.pdf`);
+      payments.forEach((payment) => {
+        doc.text(
+          `${payment.payment_name} (${payment.payment_method}) - ${new Date(payment.payment_date).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })}: ${formatCurrency(Number(payment.amount))}`,
+          25,
+          yPos
+        );
+        yPos += 5;
+
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+      });
+    }
+
+    // Totals
+    yPos += 10;
+    doc.setFont("helvetica", "bold");
+    doc.text(`Subtotal: ${formatCurrency(calculateSubtotal())}`, 160, yPos);
+    yPos += 7;
+    doc.text(`Total Payments: ${formatCurrency(calculateTotalPayments())}`, 160, yPos);
+    yPos += 7;
+    
+    const outstanding = calculateOutstanding();
+    if (outstanding < 0) {
+      doc.text(`Credit Balance: ${formatCurrency(Math.abs(outstanding))}`, 160, yPos);
+    } else {
+      doc.text(`Outstanding Balance: ${formatCurrency(outstanding)}`, 160, yPos);
+    }
+
+    const fileName = `${clientName.replace(/\s+/g, "_")}_Billing_${monthYear.replace(/\s+/g, "_")}.pdf`;
+    doc.save(fileName);
 
     toast({
       title: "PDF Generated",
@@ -193,6 +259,10 @@ const ClientBillingTab = () => {
     sections[section].push(item);
   });
 
+  const subtotal = calculateSubtotal();
+  const totalPayments = calculateTotalPayments();
+  const outstanding = calculateOutstanding();
+
   return (
     <Card>
       <CardHeader>
@@ -200,7 +270,7 @@ const ClientBillingTab = () => {
           <div>
             <CardTitle>Current Month Billing</CardTitle>
             <CardDescription className="flex items-center gap-2">
-              {format(new Date(), "MMMM yyyy")} - Total: ${cycle ? Number(cycle.total_amount).toFixed(2) : '0.00'}
+              {format(new Date(), "MMMM yyyy")}
               {cycle?.status === 'locked' && (
                 <Badge variant="secondary">
                   <Lock className="h-3 w-3 mr-1" />
@@ -210,7 +280,7 @@ const ClientBillingTab = () => {
             </CardDescription>
           </div>
           {cycle && items.length > 0 && (
-            <Button onClick={generateBillingPDF} variant="outline" disabled={cycle.status !== 'locked'}>
+            <Button onClick={generateBillingPDF} variant="outline">
               <Download className="mr-2 h-4 w-4" />
               Download PDF
             </Button>
@@ -237,16 +307,74 @@ const ClientBillingTab = () => {
                   <TableBody>
                     {sectionItems.map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.service_name}</TableCell>
+                        <TableCell className="font-medium">
+                          {item.service_name}
+                          {item.item_type && item.item_type !== "quote" && (
+                            <span className="text-xs text-muted-foreground ml-2">
+                              ({item.item_type === "adjustment" ? "Adjustment" : "Custom"})
+                            </span>
+                          )}
+                        </TableCell>
                         <TableCell className="text-right">{item.quantity}</TableCell>
-                        <TableCell className="text-right">${Number(item.unit_price).toFixed(2)}</TableCell>
-                        <TableCell className="text-right font-semibold">${Number(item.total_amount).toFixed(2)}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(Number(item.unit_price))}</TableCell>
+                        <TableCell className="text-right font-semibold">{formatCurrency(Number(item.total_amount))}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </div>
             ))}
+
+            {/* Payments section */}
+            {payments.length > 0 && (
+              <div className="border rounded-lg p-4 bg-green-50">
+                <h3 className="font-semibold text-lg mb-3">Payments/Deposits</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Payment Name</TableHead>
+                      <TableHead>Method</TableHead>
+                      <TableHead className="text-right">Date</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {payments.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell className="font-medium">{payment.payment_name}</TableCell>
+                        <TableCell>{payment.payment_method}</TableCell>
+                        <TableCell className="text-right">
+                          {new Date(payment.payment_date).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-green-600">
+                          {formatCurrency(Number(payment.amount))}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+
+            {/* Totals section */}
+            <div className="border-t pt-4 space-y-2">
+              <div className="flex justify-between text-lg">
+                <span className="font-semibold">Subtotal (MTD Charges):</span>
+                <span className="font-bold">{formatCurrency(subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-lg">
+                <span className="font-semibold">Deposits / Payments (MTD):</span>
+                <span className="font-bold text-green-600">{formatCurrency(totalPayments)}</span>
+              </div>
+              <div className="flex justify-between text-xl border-t pt-2">
+                <span className="font-bold">Outstanding Balance:</span>
+                <span className={`font-bold ${outstanding < 0 ? 'text-green-600' : 'text-foreground'}`}>
+                  {outstanding < 0
+                    ? `Credit ${formatCurrency(Math.abs(outstanding))}`
+                    : formatCurrency(outstanding)}
+                </span>
+              </div>
+            </div>
           </div>
         )}
       </CardContent>

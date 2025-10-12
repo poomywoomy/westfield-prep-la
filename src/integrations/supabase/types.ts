@@ -94,6 +94,42 @@ export type Database = {
           },
         ]
       }
+      billing_payments: {
+        Row: {
+          amount: number
+          client_id: string
+          created_at: string
+          cycle_id: string
+          id: string
+          payment_date: string
+          payment_method: string
+          payment_name: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          client_id: string
+          created_at?: string
+          cycle_id: string
+          id?: string
+          payment_date?: string
+          payment_method: string
+          payment_name?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          created_at?: string
+          cycle_id?: string
+          id?: string
+          payment_date?: string
+          payment_method?: string
+          payment_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           admin_notes: string | null
@@ -401,6 +437,7 @@ export type Database = {
           created_at: string
           cycle_id: string
           id: string
+          item_type: string
           quantity: number
           section_type: string | null
           service_name: string
@@ -412,6 +449,7 @@ export type Database = {
           created_at?: string
           cycle_id: string
           id?: string
+          item_type?: string
           quantity?: number
           section_type?: string | null
           service_name: string
@@ -423,6 +461,7 @@ export type Database = {
           created_at?: string
           cycle_id?: string
           id?: string
+          item_type?: string
           quantity?: number
           section_type?: string | null
           service_name?: string
