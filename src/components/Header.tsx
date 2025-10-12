@@ -29,10 +29,7 @@ const Header = () => {
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
-    // If user is logged in, do nothing (no navigation or refresh)
-    if (user && role) {
-      return;
-    } else if (isHomePage) {
+    if (isHomePage) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       navigate("/");
@@ -42,6 +39,11 @@ const Header = () => {
     }
   };
 
+  // Don't render header at all when logged in
+  if (user && role) {
+    return null;
+  }
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -50,15 +52,13 @@ const Header = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {!user && !role && (
-            <Link 
-              to="/" 
-              className="flex items-center cursor-pointer"
-              onClick={handleLogoClick}
-            >
-              <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" />
-            </Link>
-          )}
+          <Link 
+            to="/" 
+            className="flex items-center cursor-pointer"
+            onClick={handleLogoClick}
+          >
+            <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" />
+          </Link>
 
           <nav className="hidden md:flex items-center gap-8">
             {isHomePage ? (
