@@ -30,11 +30,13 @@ const ClientPricingTab = () => {
 
       if (clientError) throw clientError;
 
-      // Fetch custom pricing with proper ordering matching quote PDF structure
+      // Fetch custom pricing with section types preserved
       const { data, error } = await supabase
         .from("custom_pricing")
         .select("*")
-        .eq("client_id", clientData.id);
+        .eq("client_id", clientData.id)
+        .order("section_type")
+        .order("service_name");
 
       if (error) throw error;
       
@@ -42,36 +44,8 @@ const ClientPricingTab = () => {
       const hasActivePricing = clientData.pricing_active && data && data.length > 0;
       setPricingActive(hasActivePricing);
       
-      // Order pricing to match quote PDF structure
-      // Standard services first, then fulfillment services
-      const standardServices = [
-        "Monthly Deposit",
-        "Pallet Receiving",
-        "Carton Receiving",
-        "Cubic Feet Storage",
-        "Shelf Storage"
-      ];
-      
-      const orderedPricing = data ? [...data].sort((a, b) => {
-        const aIsStandard = standardServices.includes(a.service_name);
-        const bIsStandard = standardServices.includes(b.service_name);
-        
-        // Standard services come first
-        if (aIsStandard && !bIsStandard) return -1;
-        if (!aIsStandard && bIsStandard) return 1;
-        
-        // Within standard services, maintain defined order
-        if (aIsStandard && bIsStandard) {
-          const aIndex = standardServices.indexOf(a.service_name);
-          const bIndex = standardServices.indexOf(b.service_name);
-          if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-        }
-        
-        // For other services, sort alphabetically
-        return a.service_name.localeCompare(b.service_name);
-      }) : [];
-      
-      setPricing(orderedPricing);
+      // Pricing is already ordered by section_type then service_name from query
+      setPricing(data || []);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -112,22 +86,27 @@ const ClientPricingTab = () => {
     );
   }
 
-  // Group pricing by sections matching PDF structure
-  const standardServices = [
-    "Monthly Deposit",
-    "Pallet Receiving",
-    "Carton Receiving",
-    "Cubic Feet Storage",
-    "Shelf Storage"
-  ];
+  // Group pricing by section_type exactly like admin quote view
+  const sectionTypes = Array.from(new Set(pricing.map(item => item.section_type || 'Standard Operations')));
   
-  const standardItems = pricing.filter(item => 
-    standardServices.includes(item.service_name) || item.service_name === "Custom Entry"
-  );
-  
-  const fulfillmentItems = pricing.filter(item => 
-    !standardServices.includes(item.service_name) && item.service_name !== "Custom Entry"
-  );
+  const getSectionDescription = (sectionType: string) => {
+    switch(sectionType) {
+      case 'Standard Operations':
+        return 'Basic warehouse intake and account setup fees.';
+      case 'Amazon FBA':
+        return 'Standard prep services for FBA shipments.';
+      case 'Self Fulfillment':
+        return 'Prep, pack, and ship for non-FBA or DTC orders.';
+      case 'Walmart WFS':
+        return 'Prep services for Walmart Fulfillment Services.';
+      case 'TikTok Shop':
+        return 'Prep services for TikTok Shop orders.';
+      case 'Team Quote':
+        return 'Custom services and pricing for your team.';
+      default:
+        return '';
+    }
+  };
 
   return (
     <Card>
@@ -140,63 +119,42 @@ const ClientPricingTab = () => {
           <p className="text-muted-foreground text-center py-8">No pricing configured yet.</p>
         ) : (
           <>
-            {standardItems.length > 0 && (
-              <div className="space-y-3">
-                <div>
-                  <h3 className="text-lg font-semibold mb-1">Standard Operations</h3>
-                  <p className="text-sm text-muted-foreground">Basic warehouse intake and account setup fees.</p>
-                </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Service</TableHead>
-                      <TableHead>Price per Unit</TableHead>
-                      <TableHead>Notes</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {standardItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.service_name}</TableCell>
-                        <TableCell>
-                          {item.price_per_unit ? `$${parseFloat(item.price_per_unit).toFixed(2)}` : "Contact for pricing"}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">{item.notes || "-"}</TableCell>
+            {sectionTypes.map((sectionType) => {
+              const sectionItems = pricing.filter(item => 
+                (item.section_type || 'Standard Operations') === sectionType
+              );
+              
+              if (sectionItems.length === 0) return null;
+              
+              return (
+                <div key={sectionType} className="space-y-3">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">{sectionType}</h3>
+                    <p className="text-sm text-muted-foreground">{getSectionDescription(sectionType)}</p>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Service</TableHead>
+                        <TableHead>Price per Unit</TableHead>
+                        <TableHead>Notes</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-            
-            {fulfillmentItems.length > 0 && (
-              <div className="space-y-3">
-                <div>
-                  <h3 className="text-lg font-semibold mb-1">Fulfillment Services</h3>
-                  <p className="text-sm text-muted-foreground">Additional prep and fulfillment services.</p>
+                    </TableHeader>
+                    <TableBody>
+                      {sectionItems.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.service_name}</TableCell>
+                          <TableCell>
+                            {item.price_per_unit ? `$${parseFloat(item.price_per_unit).toFixed(2)}` : "Contact for pricing"}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">{item.notes || "-"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Service</TableHead>
-                      <TableHead>Price per Unit</TableHead>
-                      <TableHead>Notes</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {fulfillmentItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.service_name}</TableCell>
-                        <TableCell>
-                          {item.price_per_unit ? `$${parseFloat(item.price_per_unit).toFixed(2)}` : "Contact for pricing"}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">{item.notes || "-"}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+              );
+            })}
           </>
         )}
       </CardContent>

@@ -570,12 +570,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
     setIsSubmitting(true);
 
     try {
-      const allItems = [
-        ...standardItems,
-        ...fulfillmentSections.flatMap(section => section.items)
-      ];
-
-      if (allItems.length === 0) {
+      if (standardItems.length === 0 && fulfillmentSections.every(s => s.items.length === 0)) {
         toast({
           title: "Error",
           description: "Please add at least one service",
@@ -592,13 +587,32 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
 
       if (deleteError) throw deleteError;
 
-      // Build pricing records
-      const pricingRecords = allItems.map(item => ({
-        client_id: selectedClientId,
-        service_name: item.service_name,
-        price_per_unit: item.service_price,
-        notes: item.notes,
-      }));
+      // Build pricing records with section types preserved
+      const pricingRecords: any[] = [];
+      
+      // Add standard operations
+      standardItems.forEach(item => {
+        pricingRecords.push({
+          client_id: selectedClientId,
+          service_name: item.service_name,
+          price_per_unit: item.service_price,
+          notes: item.notes,
+          section_type: 'Standard Operations',
+        });
+      });
+
+      // Add fulfillment sections with their specific types
+      fulfillmentSections.forEach(section => {
+        section.items.forEach(item => {
+          pricingRecords.push({
+            client_id: selectedClientId,
+            service_name: item.service_name,
+            price_per_unit: item.service_price,
+            notes: item.notes,
+            section_type: section.type,
+          });
+        });
+      });
 
       // Insert new pricing records
       const { error: insertError } = await supabase

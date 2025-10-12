@@ -233,6 +233,7 @@ export type Database = {
           id: string
           notes: string | null
           price_per_unit: number | null
+          section_type: string | null
           service_name: string
           updated_at: string
         }
@@ -242,6 +243,7 @@ export type Database = {
           id?: string
           notes?: string | null
           price_per_unit?: number | null
+          section_type?: string | null
           service_name: string
           updated_at?: string
         }
@@ -251,6 +253,7 @@ export type Database = {
           id?: string
           notes?: string | null
           price_per_unit?: number | null
+          section_type?: string | null
           service_name?: string
           updated_at?: string
         }
