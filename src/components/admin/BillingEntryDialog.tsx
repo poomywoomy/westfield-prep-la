@@ -48,6 +48,8 @@ const BillingEntryDialog = ({
   const [currentCycle, setCurrentCycle] = useState<any>(null);
   const [availableCycles, setAvailableCycles] = useState<any[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [statementStart, setStatementStart] = useState<string>("");
+  const [statementEnd, setStatementEnd] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [customDialogOpen, setCustomDialogOpen] = useState(false);
@@ -61,6 +63,15 @@ const BillingEntryDialog = ({
     const year = laDate.getFullYear();
     const month = String(laDate.getMonth() + 1).padStart(2, '0');
     return `${year}-${month}-01`;
+  };
+
+  const formatMDY = (dateStr: string) => {
+    if (!dateStr) return '';
+    const dt = new Date(dateStr);
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const dd = String(dt.getDate()).padStart(2, '0');
+    const yyyy = dt.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
   };
 
   useEffect(() => {
@@ -121,6 +132,8 @@ const BillingEntryDialog = ({
       }
 
       setCurrentCycle(cycle || null);
+      setStatementStart(cycle?.statement_start_date || "");
+      setStatementEnd(cycle?.statement_end_date || "");
 
       // Load existing billing items
       const { data: items, error: itemsError } = await supabase
@@ -385,12 +398,23 @@ const BillingEntryDialog = ({
   const lockCycle = async () => {
     if (!currentCycle) return;
 
+    if (!statementStart || !statementEnd) {
+      toast({
+        title: "Date range required",
+        description: "Please set Statement Start and End dates (mm/dd/yyyy) before closing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("monthly_billing_cycles")
         .update({
           status: "locked",
           locked_at: new Date().toISOString(),
+          statement_start_date: statementStart,
+          statement_end_date: statementEnd,
         })
         .eq("id", currentCycle.id);
 
@@ -685,7 +709,9 @@ const BillingEntryDialog = ({
                     <SelectContent>
                       {availableCycles.map((c) => (
                         <SelectItem key={c.id} value={c.billing_month}>
-                          {new Date(c.billing_month).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' })}
+                          {c.statement_start_date && c.statement_end_date
+                            ? `${formatMDY(c.statement_start_date)} - ${formatMDY(c.statement_end_date)}`
+                            : new Date(c.billing_month).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' })}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -727,23 +753,49 @@ const BillingEntryDialog = ({
             </div>
           ) : (
             <div className="space-y-6">
-            {/* Action buttons */}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCustomDialogOpen(true)}
-                disabled={isLocked}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Custom Entry
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPaymentDialogOpen(true)}
-                disabled={isLocked}
-              >
+              {/* Statement date range (mm/dd/yyyy) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded bg-muted/30">
+                <div className="space-y-2">
+                  <Label htmlFor="statement_start">Statement Start Date</Label>
+                  <Input
+                    id="statement_start"
+                    type="date"
+                    value={statementStart}
+                    onChange={(e) => setStatementStart(e.target.value)}
+                    disabled={isLocked}
+                  />
+                  <p className="text-xs text-muted-foreground">Format: mm/dd/yyyy</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="statement_end">Statement End Date</Label>
+                  <Input
+                    id="statement_end"
+                    type="date"
+                    value={statementEnd}
+                    onChange={(e) => setStatementEnd(e.target.value)}
+                    disabled={isLocked}
+                  />
+                  <p className="text-xs text-muted-foreground">Format: mm/dd/yyyy</p>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCustomDialogOpen(true)}
+                  disabled={isLocked}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Custom Entry
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPaymentDialogOpen(true)}
+                  disabled={isLocked}
+                >
                 <DollarSign className="w-4 h-4 mr-2" />
                 Record Deposit / Payment
               </Button>

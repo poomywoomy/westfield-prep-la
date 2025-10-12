@@ -392,6 +392,8 @@ export type Database = {
           id: string
           locked_at: string | null
           quote_id: string
+          statement_end_date: string | null
+          statement_start_date: string | null
           status: string
           total_amount: number | null
           updated_at: string
@@ -403,6 +405,8 @@ export type Database = {
           id?: string
           locked_at?: string | null
           quote_id: string
+          statement_end_date?: string | null
+          statement_start_date?: string | null
           status?: string
           total_amount?: number | null
           updated_at?: string
@@ -414,6 +418,8 @@ export type Database = {
           id?: string
           locked_at?: string | null
           quote_id?: string
+          statement_end_date?: string | null
+          statement_start_date?: string | null
           status?: string
           total_amount?: number | null
           updated_at?: string
