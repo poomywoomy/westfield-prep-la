@@ -190,11 +190,16 @@ const BillingEntryDialog = ({
             .eq("id", existingDepositPayment.id);
 
           if (!error) {
-            setPayments(payments.map(p => 
-              p.id === existingDepositPayment.id 
-                ? { ...p, amount: depositAmount }
-                : p
-            ));
+            // Reload payments to ensure totals update
+            const { data: updatedPayments } = await supabase
+              .from("billing_payments")
+              .select("*")
+              .eq("cycle_id", currentCycle.id)
+              .order("payment_date", { ascending: false });
+            
+            if (updatedPayments) {
+              setPayments(updatedPayments);
+            }
           }
         } else {
           // Create new payment
@@ -212,7 +217,16 @@ const BillingEntryDialog = ({
             .single();
 
           if (!error && data) {
-            setPayments([...payments, data]);
+            // Reload payments to ensure totals update
+            const { data: updatedPayments } = await supabase
+              .from("billing_payments")
+              .select("*")
+              .eq("cycle_id", currentCycle.id)
+              .order("payment_date", { ascending: false });
+            
+            if (updatedPayments) {
+              setPayments(updatedPayments);
+            }
           }
         }
       } else if (existingDepositPayment) {
@@ -222,7 +236,16 @@ const BillingEntryDialog = ({
           .delete()
           .eq("id", existingDepositPayment.id);
 
-        setPayments(payments.filter(p => p.id !== existingDepositPayment.id));
+        // Reload payments to ensure totals update
+        const { data: updatedPayments } = await supabase
+          .from("billing_payments")
+          .select("*")
+          .eq("cycle_id", currentCycle.id)
+          .order("payment_date", { ascending: false });
+        
+        if (updatedPayments) {
+          setPayments(updatedPayments);
+        }
       }
     }
   };
