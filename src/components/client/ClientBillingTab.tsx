@@ -140,10 +140,9 @@ const ClientBillingTab = () => {
     doc.setFont("helvetica", "bold");
     doc.text("Westfield Prep Center", leftX, yPos);
     doc.setFont("helvetica", "normal");
-    doc.text("12345 Main Street", leftX, yPos + 5);
-    doc.text("City, State 12345", leftX, yPos + 10);
-    doc.text("contact@westfieldprep.com", leftX, yPos + 15);
-    doc.text("(555) 123-4567", leftX, yPos + 20);
+    doc.text("Navapoom Sathatham", leftX, yPos + 5);
+    doc.text("info@westfieldprepcenter.com", leftX, yPos + 10);
+    doc.text("818-935-5478", leftX, yPos + 15);
 
     // Client info (right)
     doc.setFont("helvetica", "bold");
@@ -155,14 +154,15 @@ const ClientBillingTab = () => {
       doc.text(clientData.phone_number, rightX, yPos + 15);
     }
 
-    yPos += 30;
+    yPos += 25;
 
     // Billing period
     const billingDate = new Date(cycle.billing_month);
     const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
+    const todayDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' });
     doc.setFontSize(10);
     doc.text(`Billing Period: ${monthYear}`, leftX, yPos);
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })}`, rightX, yPos);
+    doc.text(`Statement Date: ${todayDate}`, rightX, yPos);
     yPos += 15;
 
     // Group items by section and filter out 0 quantity

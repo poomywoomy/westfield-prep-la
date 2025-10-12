@@ -57,6 +57,7 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
     extra_prep: false,
     storage: false,
     storage_units_per_month: "",
+    storage_method: "" as "shelf_storage" | "cubic_foot_storage" | "",
     admin_notes: "",
     fulfillment_services: [] as Array<"fba_prep" | "wfs_prep" | "tiktok_prep" | "self_fulfilled" | "shopify" | "returns_processing">,
   });
@@ -85,6 +86,7 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
           extra_prep: formData.extra_prep,
           storage: formData.storage,
           storage_units_per_month: formData.storage_units_per_month ? parseInt(formData.storage_units_per_month) : null,
+          storage_method: formData.storage_method || null,
           admin_notes: formData.admin_notes,
           fulfillment_services: formData.fulfillment_services,
           password_expires_at: expiresAt.toISOString(),
@@ -218,15 +220,32 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
             </div>
 
             {formData.storage && (
-              <div className="space-y-2">
-                <Label htmlFor="storage_units">Storage Units/Month</Label>
-                <Input
-                  id="storage_units"
-                  type="number"
-                  value={formData.storage_units_per_month}
-                  onChange={(e) => setFormData({ ...formData, storage_units_per_month: e.target.value })}
-                />
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="storage_units">Storage Units/Month</Label>
+                  <Input
+                    id="storage_units"
+                    type="number"
+                    value={formData.storage_units_per_month}
+                    onChange={(e) => setFormData({ ...formData, storage_units_per_month: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="storage_method">Storage Method</Label>
+                  <Select
+                    value={formData.storage_method}
+                    onValueChange={(value: any) => setFormData({ ...formData, storage_method: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select storage method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="shelf_storage">Shelf Storage</SelectItem>
+                      <SelectItem value="cubic_foot_storage">Cubic Foot Storage</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
             )}
           </div>
 

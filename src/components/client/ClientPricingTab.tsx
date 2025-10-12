@@ -21,10 +21,10 @@ const ClientPricingTab = () => {
 
   const fetchPricing = async () => {
     try {
-      // Get client info
+      // Get client info including pricing_active flag
       const { data: clientData, error: clientError } = await supabase
         .from("clients")
-        .select("id")
+        .select("id, pricing_active")
         .eq("user_id", user?.id)
         .single();
 
@@ -38,8 +38,8 @@ const ClientPricingTab = () => {
 
       if (error) throw error;
       
-      // Pricing is active if there are records
-      const hasActivePricing = data && data.length > 0;
+      // Pricing is active if the flag is set AND there are records
+      const hasActivePricing = clientData.pricing_active && data && data.length > 0;
       setPricingActive(hasActivePricing);
       
       // Order pricing to match quote PDF structure
