@@ -40,15 +40,19 @@ const BillingTab = () => {
           let mtdDeposits = 0;
 
           if (cycles) {
-            // Get billing items total
+            // Get billing items total (excluding Monthly Deposit as it's a payment)
             const { data: items } = await supabase
               .from("monthly_billing_items")
-              .select("total_amount")
+              .select("service_name, total_amount")
               .eq("cycle_id", cycles.id);
 
-            mtdSubtotal = items?.reduce((sum, item) => sum + Number(item.total_amount), 0) || 0;
+            mtdSubtotal = items?.reduce((sum, item) => {
+              // Exclude "Monthly Deposit" from charges
+              if (item.service_name === "Monthly Deposit") return sum;
+              return sum + Number(item.total_amount);
+            }, 0) || 0;
 
-            // Get payments total
+            // Get payments total (including auto-deposits from Monthly Deposit items)
             const { data: payments } = await supabase
               .from("billing_payments")
               .select("amount")

@@ -93,7 +93,11 @@ const ClientBillingTab = () => {
   };
 
   const calculateSubtotal = () => {
-    return items.reduce((sum, item) => sum + Number(item.total_amount), 0);
+    return items.reduce((sum, item) => {
+      // Exclude "Monthly Deposit" from charges as it's a payment
+      if (item.service_name === "Monthly Deposit") return sum;
+      return sum + Number(item.total_amount);
+    }, 0);
   };
 
   const calculateTotalPayments = () => {
@@ -177,6 +181,9 @@ const ClientBillingTab = () => {
       doc.setFont("helvetica", "normal");
 
       sectionItems.forEach(item => {
+        // Skip "Monthly Deposit" in services section as it appears in payments
+        if (item.service_name === "Monthly Deposit") return;
+        
         const itemType = item.item_type === "adjustment" ? " (Adjustment)" : item.item_type === "custom" ? " (Custom)" : "";
         doc.text(
           `${item.service_name}${itemType}: ${formatCurrency(Number(item.unit_price))} × ${item.quantity} = ${formatCurrency(Number(item.total_amount))}`,
@@ -305,21 +312,32 @@ const ClientBillingTab = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sectionItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">
-                          {item.service_name}
-                          {item.item_type && item.item_type !== "quote" && (
-                            <span className="text-xs text-muted-foreground ml-2">
-                              ({item.item_type === "adjustment" ? "Adjustment" : "Custom"})
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">{item.quantity}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(Number(item.unit_price))}</TableCell>
-                        <TableCell className="text-right font-semibold">{formatCurrency(Number(item.total_amount))}</TableCell>
-                      </TableRow>
-                    ))}
+                    {sectionItems.map((item) => {
+                      const isMonthlyDeposit = item.service_name === "Monthly Deposit";
+                      
+                      return (
+                        <TableRow key={item.id} className={isMonthlyDeposit ? "bg-green-50" : ""}>
+                          <TableCell className="font-medium">
+                            {item.service_name}
+                            {isMonthlyDeposit && (
+                              <span className="text-xs text-green-600 ml-2">(Applied as Payment)</span>
+                            )}
+                            {item.item_type && item.item_type !== "quote" && !isMonthlyDeposit && (
+                              <span className="text-xs text-muted-foreground ml-2">
+                                ({item.item_type === "adjustment" ? "Adjustment" : "Custom"})
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">{item.quantity}</TableCell>
+                          <TableCell className="text-right">{formatCurrency(Number(item.unit_price))}</TableCell>
+                          <TableCell className={`text-right font-semibold ${
+                            isMonthlyDeposit ? 'text-green-600' : ''
+                          }`}>
+                            {formatCurrency(Number(item.total_amount))}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
