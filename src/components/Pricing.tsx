@@ -24,7 +24,7 @@ const pricingData = [
   { service: "Bundling", price: "+$0.50/unit" },
   { service: "Additional Label", price: "+$0.20/unit" },
   { service: "Special Prep", price: "Contact for pricing" },
-  { service: "Amazon/Walmart Shipment Box", price: "$2/box" },
+  { service: "Amazon/Walmart Shipment Box", price: "$3/box" },
   { service: "Self-Fulfilled Shipment", price: "$1.50/shipment" },
   { service: "Storage", price: "Contact for pricing" },
   { service: "Deposit", price: "$300" },
@@ -85,7 +85,7 @@ const Pricing = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-right text-foreground">
-                            $2.50/order
+                            $3.00/order
                           </TableCell>
                         </TableRow>
                         {selfFulfilledExpanded && (
@@ -95,7 +95,7 @@ const Pricing = () => {
                                 Standard
                               </TableCell>
                               <TableCell className="text-right text-sm text-muted-foreground">
-                                $2.50/order
+                                $3.00/order
                               </TableCell>
                             </TableRow>
                             <TableRow className="bg-muted/20">
