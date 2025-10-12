@@ -90,6 +90,39 @@ const ClientQCImagesTab = () => {
     }
   };
 
+  const downloadAllImagesForDate = async (dateImages: QCImage[], date: string) => {
+    toast({
+      title: "Downloading...",
+      description: `Starting download of ${dateImages.length} images`,
+    });
+
+    for (let i = 0; i < dateImages.length; i++) {
+      const image = dateImages[i];
+      try {
+        const response = await fetch(image.image_url);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${date.replace(/\s+/g, '_')}_image_${i + 1}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        // Small delay between downloads
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (error) {
+        console.error(`Failed to download image ${i + 1}`, error);
+      }
+    }
+
+    toast({
+      title: "Complete",
+      description: `Downloaded ${dateImages.length} images`,
+    });
+  };
+
   const getDaysUntilExpiry = (expiresAt: string) => {
     const expiry = new Date(expiresAt);
     const now = new Date();
@@ -159,12 +192,22 @@ const ClientQCImagesTab = () => {
             <div className="space-y-8">
               {Object.entries(groupedImages).map(([date, dateImages]) => (
                 <div key={date} className="space-y-4">
-                  <div className="flex items-center gap-2 border-b pb-2">
-                    <Clock className="h-5 w-5 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold">{date}</h3>
-                    <Badge variant="secondary" className="ml-2">
-                      {dateImages.length} {dateImages.length === 1 ? 'image' : 'images'}
-                    </Badge>
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-muted-foreground" />
+                      <h3 className="text-lg font-semibold">{date}</h3>
+                      <Badge variant="secondary" className="ml-2">
+                        {dateImages.length} {dateImages.length === 1 ? 'image' : 'images'}
+                      </Badge>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => downloadAllImagesForDate(dateImages, date)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download All
+                    </Button>
                   </div>
 
                   <Table>

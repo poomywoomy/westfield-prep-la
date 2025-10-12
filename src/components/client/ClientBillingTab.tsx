@@ -30,7 +30,7 @@ const ClientBillingTab = () => {
     try {
       const { data: client, error: clientError } = await supabase
         .from("clients")
-        .select("id, company_name, contact_name, email, first_name, last_name")
+        .select("id, company_name, contact_name, email, first_name, last_name, phone_number")
         .eq("user_id", user?.id)
         .single();
 
@@ -128,116 +128,180 @@ const ClientBillingTab = () => {
     // Header
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
-    doc.text("Westfield Prep Center", 105, yPos, { align: "center" });
-    yPos += 10;
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
     doc.text("Monthly Billing Statement", 105, yPos, { align: "center" });
     yPos += 15;
 
-    // Client info
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Client Information:", 20, yPos);
-    yPos += 7;
-
-    doc.setFont("helvetica", "normal");
+    // Two columns: Westfield on left, Client on right
+    const leftX = 20;
+    const rightX = 120;
+    
+    // Westfield Prep Center info (left)
     doc.setFontSize(10);
-    doc.text(`Name: ${clientName}`, 20, yPos);
-    yPos += 5;
-    doc.text(`Email: ${clientData.email}`, 20, yPos);
-    yPos += 10;
+    doc.setFont("helvetica", "bold");
+    doc.text("Westfield Prep Center", leftX, yPos);
+    doc.setFont("helvetica", "normal");
+    doc.text("12345 Main Street", leftX, yPos + 5);
+    doc.text("City, State 12345", leftX, yPos + 10);
+    doc.text("contact@westfieldprep.com", leftX, yPos + 15);
+    doc.text("(555) 123-4567", leftX, yPos + 20);
+
+    // Client info (right)
+    doc.setFont("helvetica", "bold");
+    doc.text("Bill To:", rightX, yPos);
+    doc.setFont("helvetica", "normal");
+    doc.text(clientName, rightX, yPos + 5);
+    doc.text(clientData.email, rightX, yPos + 10);
+    if (clientData.phone_number) {
+      doc.text(clientData.phone_number, rightX, yPos + 15);
+    }
+
+    yPos += 30;
 
     // Billing period
     const billingDate = new Date(cycle.billing_month);
     const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
-    doc.text(`Billing Period: ${monthYear}`, 20, yPos);
-    yPos += 5;
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })} ${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles' })}`, 20, yPos);
-    yPos += 10;
+    doc.setFontSize(10);
+    doc.text(`Billing Period: ${monthYear}`, leftX, yPos);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })}`, rightX, yPos);
+    yPos += 15;
 
-    // Group items by section
-    const sections: { [key: string]: any[] } = {};
+    // Group items by section and filter out 0 quantity
+    const groupedItems: { [key: string]: any[] } = {};
     items.forEach(item => {
+      // Skip items with 0 quantity and Monthly Deposit
+      if (item.quantity === 0 || item.service_name === "Monthly Deposit") return;
+      
       const section = item.section_type || 'Other';
-      if (!sections[section]) sections[section] = [];
-      sections[section].push(item);
+      if (!groupedItems[section]) groupedItems[section] = [];
+      groupedItems[section].push(item);
     });
 
-    // Services section
+    // Services section header
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text("Services", 20, yPos);
-    yPos += 7;
+    doc.text("Itemized Services", leftX, yPos);
+    yPos += 8;
 
-    doc.setFontSize(10);
+    // Table header
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("Service", leftX, yPos);
+    doc.text("Qty", 120, yPos, { align: "right" });
+    doc.text("Unit Price", 150, yPos, { align: "right" });
+    doc.text("Total", 185, yPos, { align: "right" });
+    
+    // Draw line under header
+    doc.line(leftX, yPos + 1, 190, yPos + 1);
+    yPos += 6;
+
     doc.setFont("helvetica", "normal");
 
-    Object.entries(sections).forEach(([sectionName, sectionItems]) => {
+    Object.entries(groupedItems).forEach(([section, sectionItems]) => {
+      // Section header
       doc.setFont("helvetica", "bold");
-      doc.text(sectionName, 20, yPos);
+      doc.text(section, leftX, yPos);
       yPos += 5;
       doc.setFont("helvetica", "normal");
 
       sectionItems.forEach(item => {
-        // Skip "Monthly Deposit" in services section as it appears in payments
-        if (item.service_name === "Monthly Deposit") return;
+        const lineTotal = Number(item.total_amount);
+        const itemType = item.item_type === "adjustment" ? " (Adj)" : item.item_type === "custom" ? " (Custom)" : "";
         
-        const itemType = item.item_type === "adjustment" ? " (Adjustment)" : item.item_type === "custom" ? " (Custom)" : "";
-        doc.text(
-          `${item.service_name}${itemType}: ${formatCurrency(Number(item.unit_price))} × ${item.quantity} = ${formatCurrency(Number(item.total_amount))}`,
-          25,
-          yPos
-        );
-        yPos += 5;
+        // Service name (with wrapping if too long)
+        const serviceName = `${item.service_name}${itemType}`;
+        const maxWidth = 100;
+        const lines = doc.splitTextToSize(serviceName, maxWidth);
+        doc.text(lines, leftX + 2, yPos);
+        
+        // Qty, Unit Price, Total
+        doc.text(String(item.quantity), 120, yPos, { align: "right" });
+        doc.text(formatCurrency(Number(item.unit_price)), 150, yPos, { align: "right" });
+        doc.text(formatCurrency(lineTotal), 185, yPos, { align: "right" });
+        
+        yPos += 5 * lines.length;
 
-        if (yPos > 270) {
+        if (yPos > 260) {
           doc.addPage();
           yPos = 20;
         }
       });
 
-      yPos += 3;
+      yPos += 2;
     });
 
     // Payments section
     if (payments.length > 0) {
-      yPos += 5;
+      yPos += 8;
+      doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
-      doc.text("Payments/Deposits", 20, yPos);
-      yPos += 7;
-      doc.setFont("helvetica", "normal");
+      doc.text("Payments/Deposits", leftX, yPos);
+      yPos += 8;
 
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text("Payment", leftX, yPos);
+      doc.text("Method", 90, yPos);
+      doc.text("Date", 130, yPos);
+      doc.text("Amount", 185, yPos, { align: "right" });
+      doc.line(leftX, yPos + 1, 190, yPos + 1);
+      yPos += 6;
+
+      doc.setFont("helvetica", "normal");
       payments.forEach((payment) => {
-        doc.text(
-          `${payment.payment_name} (${payment.payment_method}) - ${new Date(payment.payment_date).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })}: ${formatCurrency(Number(payment.amount))}`,
-          25,
-          yPos
-        );
+        doc.text(payment.payment_name, leftX + 2, yPos);
+        doc.text(payment.payment_method, 90, yPos);
+        doc.text(new Date(payment.payment_date).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' }), 130, yPos);
+        doc.text(formatCurrency(Number(payment.amount)), 185, yPos, { align: "right" });
         yPos += 5;
 
-        if (yPos > 270) {
+        if (yPos > 260) {
           doc.addPage();
           yPos = 20;
         }
       });
     }
 
-    // Totals
+    // Totals section (in a box at bottom right)
     yPos += 10;
-    doc.setFont("helvetica", "bold");
-    doc.text(`Subtotal: ${formatCurrency(calculateSubtotal())}`, 160, yPos);
-    yPos += 7;
-    doc.text(`Total Payments: ${formatCurrency(calculateTotalPayments())}`, 160, yPos);
-    yPos += 7;
-    
-    const outstanding = calculateOutstanding();
-    if (outstanding < 0) {
-      doc.text(`Credit Balance: ${formatCurrency(Math.abs(outstanding))}`, 160, yPos);
-    } else {
-      doc.text(`Outstanding Balance: ${formatCurrency(outstanding)}`, 160, yPos);
+    if (yPos > 240) {
+      doc.addPage();
+      yPos = 20;
     }
+
+    const boxX = 135;
+    const boxWidth = 55;
+    let boxY = yPos;
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    
+    // Subtotal
+    doc.text("Subtotal:", boxX + 2, boxY);
+    doc.text(formatCurrency(calculateSubtotal()), boxX + boxWidth - 2, boxY, { align: "right" });
+    boxY += 6;
+    
+    // Total Payments
+    doc.text("Total Payments:", boxX + 2, boxY);
+    doc.text(formatCurrency(calculateTotalPayments()), boxX + boxWidth - 2, boxY, { align: "right" });
+    boxY += 6;
+    
+    // Draw line
+    doc.line(boxX + 2, boxY, boxX + boxWidth - 2, boxY);
+    boxY += 5;
+    
+    // Outstanding Balance
+    const outstanding = calculateOutstanding();
+    doc.setFontSize(11);
+    if (outstanding < 0) {
+      doc.text("Credit Balance:", boxX + 2, boxY);
+      doc.text(formatCurrency(Math.abs(outstanding)), boxX + boxWidth - 2, boxY, { align: "right" });
+    } else {
+      doc.text("Balance Due:", boxX + 2, boxY);
+      doc.text(formatCurrency(outstanding), boxX + boxWidth - 2, boxY, { align: "right" });
+    }
+    
+    // Draw box around totals
+    doc.rect(boxX, yPos - 4, boxWidth, boxY - yPos + 8);
 
     const fileName = `${clientName.replace(/\s+/g, "_")}_Billing_${monthYear.replace(/\s+/g, "_")}.pdf`;
     doc.save(fileName);
