@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useAutoLogout } from "./useAutoLogout";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<"admin" | "client" | null>(null);
+
+  // Auto-logout on tab close or 30 minutes inactivity
+  useAutoLogout(!!user);
 
   useEffect(() => {
     // Set up auth state listener
