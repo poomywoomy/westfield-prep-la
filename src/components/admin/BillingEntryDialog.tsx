@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Lock, Unlock, Download, Plus, DollarSign, Trash2 } from "lucide-react";
@@ -45,52 +46,72 @@ const BillingEntryDialog = ({
   const [billingItems, setBillingItems] = useState<BillingItem[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [currentCycle, setCurrentCycle] = useState<any>(null);
+  const [availableCycles, setAvailableCycles] = useState<any[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [customDialogOpen, setCustomDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
-
   useEffect(() => {
     if (open) {
+      // Reset selected month when dialog opens
+      const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
+      setSelectedMonth(currentMonth);
       loadBillingData();
     }
   }, [open, client.id, quote.id]);
 
+  useEffect(() => {
+    if (open && selectedMonth) {
+      loadBillingData();
+    }
+  }, [selectedMonth]);
+
   const loadBillingData = async () => {
     setLoading(true);
     try {
-      // Get or create current month's billing cycle
-      let { data: cycle, error: cycleError } = await supabase
+      // Fetch all available billing cycles for this client/quote
+      const { data: allCycles, error: cyclesError } = await supabase
         .from("monthly_billing_cycles")
         .select("*")
         .eq("client_id", client.id)
         .eq("quote_id", quote.id)
-        .eq("billing_month", currentMonth)
-        .maybeSingle();
+        .order("billing_month", { ascending: false });
 
-      if (cycleError) throw cycleError;
+      if (cyclesError) throw cyclesError;
+      setAvailableCycles(allCycles || []);
+
+      // Get or create the selected month's billing cycle
+      const monthToLoad = selectedMonth || new Date().toISOString().slice(0, 7) + '-01';
+      let cycle = allCycles?.find(c => c.billing_month === monthToLoad);
 
       if (!cycle) {
-        const { data: newCycle, error: createError } = await supabase
-          .from("monthly_billing_cycles")
-          .insert({
-            client_id: client.id,
-            quote_id: quote.id,
-            billing_month: currentMonth,
-            status: "active",
-            total_amount: 0,
-          })
-          .select()
-          .single();
+        // Only create a new cycle if we're looking at the current month
+        const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
+        if (monthToLoad === currentMonth) {
+          const { data: newCycle, error: createError } = await supabase
+            .from("monthly_billing_cycles")
+            .insert({
+              client_id: client.id,
+              quote_id: quote.id,
+              billing_month: monthToLoad,
+              status: "active",
+              total_amount: 0,
+            })
+            .select()
+            .single();
 
-        if (createError) throw createError;
-        cycle = newCycle;
+          if (createError) throw createError;
+          cycle = newCycle;
+          
+          // Refresh available cycles
+          setAvailableCycles([newCycle, ...(allCycles || [])]);
+        }
       }
 
-      setCurrentCycle(cycle);
+      setCurrentCycle(cycle || null);
 
       // Load existing billing items
       const { data: items, error: itemsError } = await supabase
@@ -457,7 +478,7 @@ const BillingEntryDialog = ({
     yPos += 25;
 
     // Billing period
-    const billingDate = new Date(currentMonth);
+    const billingDate = new Date(currentCycle.billing_month);
     const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
     const todayDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' });
     doc.setFontSize(10);
@@ -640,39 +661,63 @@ const BillingEntryDialog = ({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span>
+            <div className="flex items-center justify-between gap-4">
+              <DialogTitle>
                 Billing for{" "}
                 {client.company_name ||
                   `${client.first_name || ""} ${client.last_name || ""}`.trim()}
-              </span>
+              </DialogTitle>
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={isLocked ? unlockCycle : lockCycle}
-                >
-                  {isLocked ? (
-                    <>
-                      <Unlock className="w-4 h-4 mr-2" />
-                      Edit Closed Quote
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4 mr-2" />
-                      Lock Month
-                    </>
-                  )}
-                </Button>
-                <Button variant="outline" size="sm" onClick={generatePDF}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Download PDF
-                </Button>
+                {availableCycles.length > 0 && (
+                  <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCycles.map((c) => (
+                        <SelectItem key={c.id} value={c.billing_month}>
+                          {new Date(c.billing_month).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' })}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                {currentCycle && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={isLocked ? unlockCycle : lockCycle}
+                  >
+                    {isLocked ? (
+                      <>
+                        <Unlock className="w-4 h-4 mr-2" />
+                        Edit Closed Quote
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4 mr-2" />
+                        Lock Month
+                      </>
+                    )}
+                  </Button>
+                )}
+                {currentCycle && (
+                  <Button variant="outline" size="sm" onClick={generatePDF}>
+                    <Download className="w-4 h-4 mr-2" />
+                    Download PDF
+                  </Button>
+                )}
               </div>
-            </DialogTitle>
+            </div>
           </DialogHeader>
 
-          <div className="space-y-6">
+          {!currentCycle ? (
+            <div className="py-8 text-center text-muted-foreground">
+              <p>No billing data for this month yet.</p>
+              <p className="text-sm mt-2">Select the current month to create a new billing cycle.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
             {/* Action buttons */}
             <div className="flex gap-2">
               <Button
@@ -816,6 +861,7 @@ const BillingEntryDialog = ({
               </Button>
             </div>
           </div>
+          )}
         </DialogContent>
       </Dialog>
 

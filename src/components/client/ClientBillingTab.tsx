@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { Download, Lock } from "lucide-react";
 import jsPDF from "jspdf";
@@ -16,6 +17,8 @@ const ClientBillingTab = () => {
   const [items, setItems] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [cycle, setCycle] = useState<any>(null);
+  const [availableCycles, setAvailableCycles] = useState<any[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [clientData, setClientData] = useState<any>(null);
   const { toast } = useToast();
@@ -24,7 +27,7 @@ const ClientBillingTab = () => {
     if (user) {
       fetchBillingData();
     }
-  }, [user]);
+  }, [user, selectedMonth]);
 
   const fetchBillingData = async () => {
     try {
@@ -37,19 +40,24 @@ const ClientBillingTab = () => {
       if (clientError) throw clientError;
       setClientData(client);
 
-      const currentMonth = new Date().toISOString().slice(0, 7) + "-01";
-      
-      // Fetch billing cycle
-      const { data: cycleData, error: cycleError } = await supabase
+      // Fetch all available billing cycles for this client
+      const { data: allCycles, error: cyclesError } = await supabase
         .from("monthly_billing_cycles")
         .select("*")
         .eq("client_id", client.id)
-        .eq("billing_month", currentMonth)
-        .single();
+        .order("billing_month", { ascending: false });
 
-      if (cycleError && cycleError.code !== 'PGRST116') throw cycleError;
+      if (cyclesError) throw cyclesError;
+      setAvailableCycles(allCycles || []);
 
-      setCycle(cycleData);
+      // Set current month as default if no selection
+      const currentMonth = new Date().toISOString().slice(0, 7) + "-01";
+      const monthToLoad = selectedMonth || currentMonth;
+      setSelectedMonth(monthToLoad);
+      
+      // Fetch specific billing cycle
+      const cycleData = allCycles?.find(c => c.billing_month === monthToLoad);
+      setCycle(cycleData || null);
 
       if (cycleData) {
         // Fetch billing items
@@ -338,10 +346,10 @@ const ClientBillingTab = () => {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Current Month Billing</CardTitle>
-            <CardDescription className="flex items-center gap-2">
-              {format(new Date(), "MMMM yyyy")}
+          <div className="flex-1">
+            <CardTitle>Billing Statement</CardTitle>
+            <CardDescription className="flex items-center gap-2 mt-1">
+              {cycle && format(new Date(cycle.billing_month), "MMMM yyyy")}
               {cycle?.status === 'locked' && (
                 <Badge variant="secondary">
                   <Lock className="h-3 w-3 mr-1" />
@@ -350,12 +358,28 @@ const ClientBillingTab = () => {
               )}
             </CardDescription>
           </div>
-          {cycle && items.length > 0 && (
-            <Button onClick={generateBillingPDF} variant="outline">
-              <Download className="mr-2 h-4 w-4" />
-              Download PDF
-            </Button>
-          )}
+          <div className="flex items-center gap-3">
+            {availableCycles.length > 0 && (
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select month" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableCycles.map((c) => (
+                    <SelectItem key={c.id} value={c.billing_month}>
+                      {format(new Date(c.billing_month), "MMMM yyyy")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {cycle && items.length > 0 && (
+              <Button onClick={generateBillingPDF} variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>
