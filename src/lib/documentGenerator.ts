@@ -369,49 +369,55 @@ export const generateDocumentPDF = async (
   doc.text("SIGNATURES", pageWidth / 2, yPosition, { align: "center" });
   yPosition += 12;
 
+  // Store the starting Y position for both columns
+  const signatureStartY = yPosition;
+
   // Left column - Service Provider signatures
   const leftX = margin;
   const rightX = pageWidth / 2 + 5;
   
+  // Reset to starting position for left column
+  let leftY = signatureStartY;
+  
   doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
-  doc.text("SERVICE PROVIDER:", leftX, yPosition);
-  yPosition += 8;
+  doc.text("SERVICE PROVIDER:", leftX, leftY);
+  leftY += 8;
 
   doc.setFont("helvetica", "normal");
-  doc.line(leftX, yPosition, leftX + 70, yPosition);
-  yPosition += 4;
-  doc.text("Navapoom Sathatham", leftX, yPosition);
-  yPosition += 3;
-  doc.text("Co-Owner, Westfield Prep Center", leftX, yPosition);
-  yPosition += 3;
-  doc.text("DBA Sathatham LLC", leftX, yPosition);
-  yPosition += 12;
+  doc.line(leftX, leftY, leftX + 70, leftY);
+  leftY += 4;
+  doc.text("Navapoom Sathatham", leftX, leftY);
+  leftY += 3;
+  doc.text("Co-Owner, Westfield Prep Center", leftX, leftY);
+  leftY += 3;
+  doc.text("DBA Sathatham LLC", leftX, leftY);
+  leftY += 12;
 
-  doc.line(leftX, yPosition, leftX + 70, yPosition);
-  yPosition += 4;
-  doc.text("Yessica Michell Chiguichon", leftX, yPosition);
-  yPosition += 3;
-  doc.text("Co-Owner, Westfield Prep Center", leftX, yPosition);
-  yPosition += 3;
-  doc.text("DBA Sathatham LLC", leftX, yPosition);
+  doc.line(leftX, leftY, leftX + 70, leftY);
+  leftY += 4;
+  doc.text("Yessica Michell Chiguichon", leftX, leftY);
+  leftY += 3;
+  doc.text("Co-Owner, Westfield Prep Center", leftX, leftY);
+  leftY += 3;
+  doc.text("DBA Sathatham LLC", leftX, leftY);
 
-  // Right column - Client signatures
-  yPosition = margin + 22;
+  // Right column - Client signatures (aligned with left column)
+  let rightY = signatureStartY;
   doc.setFont("helvetica", "bold");
-  doc.text("CLIENT:", rightX, yPosition);
-  yPosition += 8;
+  doc.text("CLIENT:", rightX, rightY);
+  rightY += 8;
 
   doc.setFont("helvetica", "normal");
-  doc.line(rightX, yPosition, rightX + 70, yPosition);
-  yPosition += 4;
-  doc.text(clientName1, rightX, yPosition);
-  yPosition += 12;
+  doc.line(rightX, rightY, rightX + 70, rightY);
+  rightY += 4;
+  doc.text(clientName1, rightX, rightY);
+  rightY += 12;
 
   if (clientName2) {
-    doc.line(rightX, yPosition, rightX + 70, yPosition);
-    yPosition += 4;
-    doc.text(clientName2, rightX, yPosition);
+    doc.line(rightX, rightY, rightX + 70, rightY);
+    rightY += 4;
+    doc.text(clientName2, rightX, rightY);
   }
 
   // Save the PDF
