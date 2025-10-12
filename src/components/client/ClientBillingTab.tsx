@@ -5,30 +5,31 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Download } from "lucide-react";
+import { Download, Lock } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 
 const ClientBillingTab = () => {
   const { user } = useAuth();
-  const [charges, setCharges] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([]);
+  const [cycle, setCycle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [totalAmount, setTotalAmount] = useState(0);
   const [clientData, setClientData] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
-      fetchCharges();
+      fetchBillingData();
     }
   }, [user]);
 
-  const fetchCharges = async () => {
+  const fetchBillingData = async () => {
     try {
       const { data: client, error: clientError } = await supabase
         .from("clients")
-        .select("id, company_name, contact_name, email")
+        .select("id, company_name, contact_name, email, first_name, last_name")
         .eq("user_id", user?.id)
         .single();
 
@@ -36,18 +37,30 @@ const ClientBillingTab = () => {
       setClientData(client);
 
       const currentMonth = new Date().toISOString().slice(0, 7) + "-01";
-      const { data, error } = await supabase
-        .from("billing_charges")
+      
+      // Fetch billing cycle
+      const { data: cycleData, error: cycleError } = await supabase
+        .from("monthly_billing_cycles")
         .select("*")
         .eq("client_id", client.id)
         .eq("billing_month", currentMonth)
-        .order("charge_date", { ascending: false });
+        .single();
 
-      if (error) throw error;
+      if (cycleError && cycleError.code !== 'PGRST116') throw cycleError;
 
-      setCharges(data || []);
-      const total = (data || []).reduce((sum, charge) => sum + Number(charge.total_amount), 0);
-      setTotalAmount(total);
+      setCycle(cycleData);
+
+      if (cycleData) {
+        // Fetch billing items
+        const { data: itemsData, error: itemsError } = await supabase
+          .from("monthly_billing_items")
+          .select("*")
+          .eq("cycle_id", cycleData.id)
+          .order("section_type");
+
+        if (itemsError) throw itemsError;
+        setItems(itemsData || []);
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -59,72 +72,90 @@ const ClientBillingTab = () => {
     }
   };
 
-  const generateBillingPDF = () => {
+  const generateBillingPDF = async () => {
+    if (!cycle || !clientData) return;
+
     const doc = new jsPDF();
-    const currentDate = new Date();
-    const monthYear = format(currentDate, "MMMM yyyy");
+    const clientName = clientData.company_name || `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim();
+    const monthYear = format(new Date(cycle.billing_month), "MMMM yyyy");
 
     // Add logo
-    doc.addImage(westfieldLogo, "JPEG", 20, 15, 40, 15);
+    const img = new Image();
+    img.src = westfieldLogo;
+    await new Promise((resolve) => { img.onload = resolve; });
+    
+    const logoWidth = 30;
+    const logoHeight = (img.height / img.width) * logoWidth;
+    doc.addImage(img, 'JPEG', (210 - logoWidth) / 2, 10, logoWidth, logoHeight);
 
-    // Company info
-    doc.setFontSize(10);
-    doc.text("Westfield Prep Center", 150, 20);
-    doc.text("5750 Smithway St Suite 100", 150, 25);
-    doc.text("Commerce, CA 90040", 150, 30);
-
-    // Title
-    doc.setFontSize(20);
+    // Header
+    const headerY = 10 + logoHeight + 5;
+    doc.setFontSize(16);
     doc.setFont(undefined, 'bold');
-    doc.text("Invoice", 20, 50);
+    doc.setTextColor(13, 33, 66);
+    doc.text("MONTHLY INVOICE", 105, headerY, { align: "center" });
+
+    // Business info
+    const infoStartY = headerY + 12;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text("Westfield Prep Center", 20, infoStartY);
+    doc.setFont(undefined, 'normal');
+    doc.text("info@westfieldprepcenter.com", 20, infoStartY + 5);
+    doc.text("818-935-5478", 20, infoStartY + 10);
 
     // Client info
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'normal');
-    doc.text(`Bill To:`, 20, 60);
+    const rightX = 140;
     doc.setFont(undefined, 'bold');
-    doc.text(clientData?.company_name || "", 20, 66);
+    doc.text(clientName, rightX, infoStartY);
     doc.setFont(undefined, 'normal');
-    doc.text(clientData?.contact_name || "", 20, 72);
-    doc.text(clientData?.email || "", 20, 78);
+    if (clientData.email) doc.text(clientData.email, rightX, infoStartY + 5);
 
-    // Invoice details
-    doc.text(`Invoice Date: ${format(currentDate, "MMM d, yyyy")}`, 150, 60);
-    doc.text(`Billing Period: ${monthYear}`, 150, 66);
-    doc.text(`Invoice #: ${format(currentDate, "yyyyMM")}-${clientData?.id?.substring(0, 8) || ""}`, 150, 72);
+    // Date
+    const dateY = infoStartY + 20;
+    doc.text(`Billing Period: ${monthYear}`, 20, dateY);
+    doc.text(`Invoice Date: ${format(new Date(), "MMM d, yyyy")}`, 20, dateY + 5);
 
-    // Table header
-    let y = 95;
-    doc.setFillColor(240, 240, 240);
-    doc.rect(20, y, 170, 8, 'F');
-    doc.setFont(undefined, 'bold');
-    doc.text("Service", 25, y + 5);
-    doc.text("Qty", 110, y + 5);
-    doc.text("Unit Price", 130, y + 5);
-    doc.text("Total", 165, y + 5);
+    let y = dateY + 15;
 
-    // Table rows
-    y += 12;
-    doc.setFont(undefined, 'normal');
-    charges.forEach((charge) => {
-      if (y > 270) {
+    // Group items by section
+    const sections: { [key: string]: any[] } = {};
+    items.filter(item => item.quantity > 0).forEach(item => {
+      const section = item.section_type || 'Other';
+      if (!sections[section]) sections[section] = [];
+      sections[section].push(item);
+    });
+
+    // Render each section
+    Object.entries(sections).forEach(([sectionName, sectionItems]) => {
+      if (y > 260) {
         doc.addPage();
         y = 20;
       }
 
-      doc.text(charge.service_name.substring(0, 45), 25, y);
-      if (charge.description) {
-        doc.setFontSize(9);
-        doc.setTextColor(100, 100, 100);
-        doc.text(charge.description.substring(0, 50), 25, y + 4);
-        doc.setFontSize(11);
-        doc.setTextColor(0, 0, 0);
-      }
-      doc.text(charge.quantity.toString(), 110, y);
-      doc.text(`$${Number(charge.unit_price).toFixed(2)}`, 130, y);
-      doc.text(`$${Number(charge.total_amount).toFixed(2)}`, 165, y);
-      
-      y += charge.description ? 10 : 8;
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text(sectionName, 20, y);
+      y += 7;
+
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+
+      sectionItems.forEach(item => {
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+
+        doc.text(item.service_name, 25, y);
+        doc.text(`Qty: ${item.quantity}`, 110, y);
+        doc.text(`$${Number(item.unit_price).toFixed(2)}`, 140, y);
+        doc.text(`$${Number(item.total_amount).toFixed(2)}`, 170, y, { align: "right" });
+        y += 6;
+      });
+
+      y += 5;
     });
 
     // Total
@@ -134,17 +165,14 @@ const ClientBillingTab = () => {
     y += 10;
     doc.setFont(undefined, 'bold');
     doc.setFontSize(14);
-    doc.text(`Total: $${totalAmount.toFixed(2)}`, 165, y, { align: 'right' });
+    doc.text(`Total: $${Number(cycle.total_amount).toFixed(2)}`, 170, y, { align: 'right' });
 
-    // Footer
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(128, 128, 128);
-    const footerY = 280;
-    doc.text("Thank you for your business!", 105, footerY, { align: 'center' });
-    doc.text("Questions? Contact us at info@westfieldprepcenter.com", 105, footerY + 5, { align: 'center' });
+    doc.save(`Invoice-${clientName.replace(/\s/g, '-')}-${monthYear.replace(' ', '-')}.pdf`);
 
-    doc.save(`Westfield-Invoice-${monthYear.replace(" ", "-")}.pdf`);
+    toast({
+      title: "PDF Generated",
+      description: "Invoice downloaded successfully",
+    });
   };
 
   if (loading) {
@@ -157,18 +185,32 @@ const ClientBillingTab = () => {
     );
   }
 
+  // Group items by section
+  const sections: { [key: string]: any[] } = {};
+  items.forEach(item => {
+    const section = item.section_type || 'Other';
+    if (!sections[section]) sections[section] = [];
+    sections[section].push(item);
+  });
+
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Current Month Billing</CardTitle>
-            <CardDescription>
-              {format(new Date(), "MMMM yyyy")} - Total: ${totalAmount.toFixed(2)}
+            <CardDescription className="flex items-center gap-2">
+              {format(new Date(), "MMMM yyyy")} - Total: ${cycle ? Number(cycle.total_amount).toFixed(2) : '0.00'}
+              {cycle?.status === 'locked' && (
+                <Badge variant="secondary">
+                  <Lock className="h-3 w-3 mr-1" />
+                  Locked
+                </Badge>
+              )}
             </CardDescription>
           </div>
-          {charges.length > 0 && (
-            <Button onClick={generateBillingPDF} variant="outline">
+          {cycle && items.length > 0 && (
+            <Button onClick={generateBillingPDF} variant="outline" disabled={cycle.status !== 'locked'}>
               <Download className="mr-2 h-4 w-4" />
               Download PDF
             </Button>
@@ -176,31 +218,36 @@ const ClientBillingTab = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {charges.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">No charges for this month.</p>
+        {!cycle || items.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">No billing data for this month yet.</p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Service</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Unit Price</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {charges.map((charge) => (
-                <TableRow key={charge.id}>
-                  <TableCell className="font-medium">{charge.service_name}</TableCell>
-                  <TableCell>{charge.quantity}</TableCell>
-                  <TableCell>${charge.unit_price}</TableCell>
-                  <TableCell className="font-medium">${charge.total_amount}</TableCell>
-                  <TableCell>{format(new Date(charge.charge_date), "MMM d, yyyy")}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="space-y-6">
+            {Object.entries(sections).map(([sectionName, sectionItems]) => (
+              <div key={sectionName} className="border rounded-lg p-4">
+                <h3 className="font-semibold text-lg mb-3">{sectionName}</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Service</TableHead>
+                      <TableHead className="text-right">Quantity</TableHead>
+                      <TableHead className="text-right">Unit Price</TableHead>
+                      <TableHead className="text-right">Total</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sectionItems.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell className="font-medium">{item.service_name}</TableCell>
+                        <TableCell className="text-right">{item.quantity}</TableCell>
+                        <TableCell className="text-right">${Number(item.unit_price).toFixed(2)}</TableCell>
+                        <TableCell className="text-right font-semibold">${Number(item.total_amount).toFixed(2)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ))}
+          </div>
         )}
       </CardContent>
     </Card>

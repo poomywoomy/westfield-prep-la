@@ -50,11 +50,7 @@ const Header = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {user && role ? (
-            <div className="flex items-center select-none">
-              <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" />
-            </div>
-          ) : (
+          {!user && !role && (
             <Link 
               to="/" 
               className="flex items-center cursor-pointer"

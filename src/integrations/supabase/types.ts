@@ -345,6 +345,101 @@ export type Database = {
         }
         Relationships: []
       }
+      monthly_billing_cycles: {
+        Row: {
+          billing_month: string
+          client_id: string
+          created_at: string
+          id: string
+          locked_at: string | null
+          quote_id: string
+          status: string
+          total_amount: number | null
+          updated_at: string
+        }
+        Insert: {
+          billing_month: string
+          client_id: string
+          created_at?: string
+          id?: string
+          locked_at?: string | null
+          quote_id: string
+          status?: string
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Update: {
+          billing_month?: string
+          client_id?: string
+          created_at?: string
+          id?: string
+          locked_at?: string | null
+          quote_id?: string
+          status?: string
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monthly_billing_cycles_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "monthly_billing_cycles_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      monthly_billing_items: {
+        Row: {
+          created_at: string
+          cycle_id: string
+          id: string
+          quantity: number
+          section_type: string | null
+          service_name: string
+          total_amount: number
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cycle_id: string
+          id?: string
+          quantity?: number
+          section_type?: string | null
+          service_name: string
+          total_amount: number
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cycle_id?: string
+          id?: string
+          quantity?: number
+          section_type?: string | null
+          service_name?: string
+          total_amount?: number
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monthly_billing_items_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "monthly_billing_cycles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_name: string | null
