@@ -38,13 +38,6 @@ export const useAutoLogout = (isAuthenticated: boolean) => {
     // Start initial timer
     resetTimer();
 
-    // Handle tab/window close
-    const handleBeforeUnload = () => {
-      logout();
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
     // Cleanup
     return () => {
       if (timeoutRef.current) {
@@ -53,7 +46,6 @@ export const useAutoLogout = (isAuthenticated: boolean) => {
       events.forEach(event => {
         document.removeEventListener(event, resetTimer);
       });
-      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [isAuthenticated]);
 };

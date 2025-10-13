@@ -53,8 +53,7 @@ const handler = async (req: Request): Promise<Response> => {
       console.error("Validation error:", validationResult.error);
       return new Response(
         JSON.stringify({ 
-          error: "Invalid input data provided",
-          details: validationResult.error.issues 
+          error: "Invalid input provided. Please check your information and try again."
         }),
         {
           status: 400,
@@ -71,8 +70,6 @@ const handler = async (req: Request): Promise<Response> => {
     const safePhone = escapeHtml(phone);
     const safeBusiness = escapeHtml(business);
     const safeVolume = escapeHtml(volume);
-
-    console.log("Sending contact form email to:", recipientEmail);
 
     // Send notification email to business
     const emailResponse = await fetch("https://api.resend.com/emails", {
@@ -103,11 +100,9 @@ const handler = async (req: Request): Promise<Response> => {
     const data = await emailResponse.json();
 
     if (!emailResponse.ok) {
-      console.error("Resend API error:", data);
-      throw new Error(data.message || "Failed to send email");
+      console.error("Email delivery failed");
+      throw new Error("Failed to send email");
     }
-
-    console.log("Business notification email sent successfully:", data);
 
     // Send confirmation email to the submitter
     const confirmationResponse = await fetch("https://api.resend.com/emails", {
@@ -216,11 +211,8 @@ const handler = async (req: Request): Promise<Response> => {
     const confirmationData = await confirmationResponse.json();
 
     if (!confirmationResponse.ok) {
-      console.error("Confirmation email error:", confirmationData);
+      console.error("Confirmation email delivery failed");
       // Don't throw here - business notification already sent
-      console.log("Business was notified but confirmation email failed");
-    } else {
-      console.log("Confirmation email sent successfully:", confirmationData);
     }
 
     return new Response(JSON.stringify(data), {

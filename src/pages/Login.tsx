@@ -44,18 +44,22 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Track failed login attempts for this email
-      const failedKey = `failedLogin_${email}`;
-      const failedAttempts = JSON.parse(localStorage.getItem(failedKey) || "[]");
-      const now = Date.now();
-      const thirtyMinutesAgo = now - 30 * 60 * 1000;
-      
-      const recentFailures = failedAttempts.filter((time: number) => time > thirtyMinutesAgo);
-      
-      if (recentFailures.length >= 5) {
+      // Check server-side rate limit for login attempts
+      const { data: rateLimitData, error: rateLimitError } = await supabase.functions.invoke(
+        'check-rate-limit',
+        {
+          body: {
+            key: `login_${email}`,
+            maxAttempts: 5,
+            windowMinutes: 30,
+          },
+        }
+      );
+
+      if (rateLimitError || !rateLimitData?.allowed) {
         toast({
-          title: "Account temporarily locked",
-          description: "Too many failed login attempts. Please try again in 30 minutes or reset your password.",
+          title: "Too many login attempts",
+          description: "Please wait 30 minutes before trying again or reset your password.",
           variant: "destructive",
         });
         setLoading(false);
@@ -68,14 +72,8 @@ const Login = () => {
       });
 
       if (error) {
-        // Track failed attempt
-        recentFailures.push(now);
-        localStorage.setItem(failedKey, JSON.stringify(recentFailures));
         throw error;
       }
-
-      // Clear failed attempts on successful login
-      localStorage.removeItem(failedKey);
 
       // Check user role
       const { data: roleData, error: roleError } = await supabase
@@ -118,14 +116,19 @@ const Login = () => {
     setResetLoading(true);
 
     try {
-      // Rate limiting for password reset
-      const attempts = JSON.parse(localStorage.getItem("resetAttempts") || "[]");
-      const now = Date.now();
-      const fifteenMinutesAgo = now - 15 * 60 * 1000;
-      
-      const recentAttempts = attempts.filter((time: number) => time > fifteenMinutesAgo);
-      
-      if (recentAttempts.length >= 3) {
+      // Check server-side rate limit for password reset
+      const { data: rateLimitData, error: rateLimitError } = await supabase.functions.invoke(
+        'check-rate-limit',
+        {
+          body: {
+            key: `password_reset_${resetEmail}`,
+            maxAttempts: 3,
+            windowMinutes: 15,
+          },
+        }
+      );
+
+      if (rateLimitError || !rateLimitData?.allowed) {
         toast({
           title: "Too many attempts",
           description: "Please wait 15 minutes before requesting another reset link.",
@@ -134,9 +137,6 @@ const Login = () => {
         setResetLoading(false);
         return;
       }
-      
-      recentAttempts.push(now);
-      localStorage.setItem("resetAttempts", JSON.stringify(recentAttempts));
 
       const redirectUrl = `${window.location.origin}/reset-password`;
       

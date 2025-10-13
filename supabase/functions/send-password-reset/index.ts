@@ -47,8 +47,6 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { email, redirectUrl }: PasswordResetRequest = validationResult.data;
 
-    console.log("Processing password reset request for:", email);
-
     // Create admin client
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -71,7 +69,6 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const resetLink = data.properties.action_link;
-    console.log("Generated reset link for:", email);
 
     const homeUrl = redirectUrl.split('/reset-password')[0];
 
@@ -163,11 +160,9 @@ const handler = async (req: Request): Promise<Response> => {
     const emailData = await emailResponse.json();
 
     if (!emailResponse.ok) {
-      console.error("Resend API error:", emailData);
+      console.error("Email delivery failed");
       throw new Error("Email service error");
     }
-
-    console.log("Password reset email sent successfully:", emailData);
 
     return new Response(
       JSON.stringify({ 

@@ -30,24 +30,6 @@ const ContactForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Rate limiting: track submission attempts
-  const checkRateLimit = () => {
-    const attempts = JSON.parse(localStorage.getItem("contactAttempts") || "[]");
-    const now = Date.now();
-    const fiveMinutesAgo = now - 5 * 60 * 1000;
-    
-    // Filter out attempts older than 5 minutes
-    const recentAttempts = attempts.filter((time: number) => time > fiveMinutesAgo);
-    
-    if (recentAttempts.length >= 3) {
-      return false;
-    }
-    
-    // Add current attempt
-    recentAttempts.push(now);
-    localStorage.setItem("contactAttempts", JSON.stringify(recentAttempts));
-    return true;
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -64,12 +46,26 @@ const ContactForm = () => {
     try {
       // Check honeypot field (should be empty)
       if (formData.honeypot) {
-        console.log("Bot detected via honeypot");
         return;
       }
 
-      // Check rate limit
-      if (!checkRateLimit()) {
+      // Validate form data
+      const { honeypot, ...submitData } = formData;
+      const validatedData = contactSchema.parse(submitData);
+
+      // Check server-side rate limit
+      const { data: rateLimitData, error: rateLimitError } = await supabase.functions.invoke(
+        'check-rate-limit',
+        {
+          body: {
+            key: `contact_${validatedData.email}`,
+            maxAttempts: 3,
+            windowMinutes: 5,
+          },
+        }
+      );
+
+      if (rateLimitError || !rateLimitData?.allowed) {
         toast({
           title: "Too many attempts",
           description: "Please wait a few minutes before submitting again.",
@@ -79,13 +75,7 @@ const ContactForm = () => {
         return;
       }
 
-      console.log("Starting form submission...");
-      const { honeypot, ...submitData } = formData;
-      const validatedData = contactSchema.parse(submitData);
-      console.log("Form data validated:", validatedData);
-
       // Send email via edge function
-      console.log("Calling edge function...");
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
         body: {
           ...validatedData,
@@ -93,19 +83,15 @@ const ContactForm = () => {
         },
       });
 
-      console.log("Edge function response:", { data, error });
-
       if (error) {
-        console.error("Error sending email:", error);
         toast({
           title: "Error",
-          description: `Failed to send your message: ${error.message}`,
+          description: "Failed to send your message. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
-      console.log("Email sent successfully:", data);
       toast({
         title: "Success!",
         description: "Your message has been sent. We'll get back to you soon!",
@@ -114,7 +100,6 @@ const ContactForm = () => {
       // Navigate to thank you page after a short delay
       setTimeout(() => navigate("/thank-you"), 1500);
     } catch (error) {
-      console.error("Form submission error:", error);
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
         error.errors.forEach((err) => {
