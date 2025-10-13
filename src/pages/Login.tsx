@@ -56,10 +56,21 @@ const Login = () => {
         }
       );
 
-      if (rateLimitError || !rateLimitData?.allowed) {
+      // Fail closed - block on any error or rate limit exceeded
+      if (rateLimitError) {
+        toast({
+          title: "Service unavailable",
+          description: "Please try again in a moment.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (!rateLimitData?.allowed) {
         toast({
           title: "Too many login attempts",
-          description: "Please wait 30 minutes before trying again or reset your password.",
+          description: `Please wait ${rateLimitData?.retryAfter || 1800} seconds before trying again or reset your password.`,
           variant: "destructive",
         });
         setLoading(false);

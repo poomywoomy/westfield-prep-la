@@ -65,10 +65,21 @@ const ContactForm = () => {
         }
       );
 
-      if (rateLimitError || !rateLimitData?.allowed) {
+      // Fail closed - block on any error or rate limit exceeded
+      if (rateLimitError) {
+        toast({
+          title: "Service unavailable",
+          description: "Please try again in a moment.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!rateLimitData?.allowed) {
         toast({
           title: "Too many attempts",
-          description: "Please wait a few minutes before submitting again.",
+          description: `Please wait ${rateLimitData?.retryAfter || 300} seconds before submitting again.`,
           variant: "destructive",
         });
         setIsSubmitting(false);

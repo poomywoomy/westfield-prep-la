@@ -56,10 +56,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (fetchError) {
       console.error("Error fetching rate limit:", fetchError);
-      // Fail open - allow request if we can't check rate limit
+      // Fail closed - deny request when rate limit service unavailable
       return new Response(
-        JSON.stringify({ allowed: true, remaining: maxAttempts }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ 
+          allowed: false, 
+          remaining: 0,
+          error: 'Rate limit service unavailable. Please try again later.',
+          retryAfter: 60
+        }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -110,10 +115,15 @@ const handler = async (req: Request): Promise<Response> => {
     );
   } catch (error: any) {
     console.error("Error in check-rate-limit function:", error);
-    // Fail open - allow request on error
+    // Fail closed - deny request on error
     return new Response(
-      JSON.stringify({ allowed: true, remaining: 0 }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ 
+        allowed: false, 
+        remaining: 0,
+        error: 'Rate limit service error. Please try again later.',
+        retryAfter: 60
+      }),
+      { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 };
