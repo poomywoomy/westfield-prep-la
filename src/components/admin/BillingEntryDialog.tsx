@@ -158,11 +158,12 @@ const BillingEntryDialog = ({
         initializeFromQuote();
       }
 
-      // Load payments
+      // Load payments (excluding soft-deleted)
       const { data: paymentsData, error: paymentsError } = await supabase
         .from("billing_payments")
         .select("*")
         .eq("cycle_id", cycle.id)
+        .is("deleted_at", null)
         .order("payment_date", { ascending: false });
 
       if (paymentsError) throw paymentsError;
@@ -457,6 +458,40 @@ const BillingEntryDialog = ({
       });
 
       loadBillingData();
+      onSuccess();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const removePayment = async (paymentId: string) => {
+    if (!currentCycle) return;
+
+    try {
+      // Soft delete the payment
+      const { error } = await supabase
+        .from("billing_payments")
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: (await supabase.auth.getUser()).data.user?.id,
+        } as any)
+        .eq("id", paymentId);
+
+      if (error) throw error;
+
+      // Remove from local state immediately for instant UI update
+      setPayments(payments.filter(p => p.id !== paymentId));
+
+      toast({
+        title: "Success",
+        description: "Payment removed successfully",
+      });
+
+      // Trigger parent refresh to update totals
       onSuccess();
     } catch (error: any) {
       toast({
@@ -886,7 +921,7 @@ const BillingEntryDialog = ({
                   {payments.map((payment) => (
                     <div
                       key={payment.id}
-                      className="grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 items-center p-3 border rounded bg-green-50"
+                      className="grid grid-cols-[2fr,1fr,1fr,1fr,auto] gap-4 items-center p-3 border rounded bg-green-50"
                     >
                       <div>
                         <p className="font-medium">{payment.payment_name}</p>
@@ -901,6 +936,15 @@ const BillingEntryDialog = ({
                       <div className="text-right font-semibold text-green-600">
                         {formatCurrency(Number(payment.amount))}
                       </div>
+                      {!isLocked && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removePayment(payment.id)}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>
