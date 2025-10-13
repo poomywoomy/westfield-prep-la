@@ -796,6 +796,139 @@ const BillingEntryDialog = ({
     // Draw box around totals
     doc.rect(boxX, yPos - 4, boxWidth, boxY - yPos + 8);
 
+    // PAGE 2 - SKU Billing Detail
+    doc.addPage();
+    yPos = 20;
+
+    // Header
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("SKU Billing Detail", 105, yPos, { align: "center" });
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    if (currentCycle.statement_start_date && currentCycle.statement_end_date) {
+      doc.text(`Period: ${formatMDY(currentCycle.statement_start_date)} - ${formatMDY(currentCycle.statement_end_date)}`, 105, yPos, { align: "center" });
+    } else {
+      const billingDate = new Date(currentCycle.billing_month);
+      const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
+      doc.text(`Period: ${monthYear}`, 105, yPos, { align: "center" });
+    }
+    yPos += 15;
+
+    // Load quote lines with invoice items
+    try {
+      const { data: quoteLines } = await supabase
+        .from("quote_lines")
+        .select("*, invoice_items!invoice_items_quote_line_id_fkey(*)")
+        .eq("quote_id", quote.id);
+
+      if (quoteLines && quoteLines.length > 0) {
+        // Table header
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text("SKU", leftX, yPos);
+        doc.text("Product", leftX + 25, yPos);
+        doc.text("Service", leftX + 70, yPos);
+        doc.text("Qty", 130, yPos, { align: "right" });
+        doc.text("Unit Price", 155, yPos, { align: "right" });
+        doc.text("Amount", 180, yPos, { align: "right" });
+        doc.line(leftX, yPos + 1, 190, yPos + 1);
+        yPos += 6;
+
+        doc.setFont("helvetica", "normal");
+
+        // Group by service type
+        const serviceGroups: Record<string, typeof quoteLines> = {};
+        quoteLines.forEach(line => {
+          const serviceType = line.service_type || "Other";
+          if (!serviceGroups[serviceType]) serviceGroups[serviceType] = [];
+          serviceGroups[serviceType].push(line);
+        });
+
+        let grandTotal = 0;
+
+        Object.entries(serviceGroups).forEach(([serviceType, lines]) => {
+          // Service type header
+          doc.setFont("helvetica", "bold");
+          doc.text(serviceType, leftX, yPos);
+          yPos += 5;
+          doc.setFont("helvetica", "normal");
+
+          let sectionTotal = 0;
+
+          lines.forEach(line => {
+            const qtyBilled = line.invoice_items?.reduce((sum: number, item: any) => sum + (item.qty || 0), 0) || 0;
+            const lineAmount = qtyBilled * Number(line.unit_price);
+            sectionTotal += lineAmount;
+            grandTotal += lineAmount;
+
+            // Determine paid/unpaid status
+            const isPaid = lineAmount > 0 && payments.some(p => Number(p.amount) >= lineAmount);
+            const paidStatus = isPaid ? "Paid" : "Unpaid";
+
+            doc.text(line.sku, leftX + 2, yPos);
+            const productName = doc.splitTextToSize(line.product_name || "-", 40);
+            doc.text(productName, leftX + 27, yPos);
+            doc.text(String(qtyBilled), 130, yPos, { align: "right" });
+            doc.text(formatCurrency(Number(line.unit_price)), 155, yPos, { align: "right" });
+            doc.text(formatCurrency(lineAmount), 180, yPos, { align: "right" });
+
+            yPos += 5 * productName.length;
+
+            // Add paid/unpaid indicator in smaller text
+            doc.setFontSize(7);
+            doc.setTextColor(isPaid ? 0 : 255, isPaid ? 128 : 0, 0);
+            doc.text(paidStatus, 185, yPos - 2);
+            doc.setTextColor(0);
+            doc.setFontSize(9);
+
+            if (yPos > 260) {
+              doc.addPage();
+              yPos = 20;
+            }
+          });
+
+          // Section subtotal
+          doc.setFont("helvetica", "bold");
+          doc.text(`${serviceType} Subtotal:`, 140, yPos);
+          doc.text(formatCurrency(sectionTotal), 180, yPos, { align: "right" });
+          yPos += 8;
+          doc.setFont("helvetica", "normal");
+
+          if (yPos > 260) {
+            doc.addPage();
+            yPos = 20;
+          }
+        });
+
+        // Page total
+        yPos += 5;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text("Page 2 Total:", 140, yPos);
+        doc.text(formatCurrency(grandTotal), 180, yPos, { align: "right" });
+        
+        // Note about reconciliation
+        yPos += 10;
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "italic");
+        doc.text("Note: Page 2 total reconciles with Page 1 services subtotal.", leftX, yPos);
+
+        // Footnote for unlinked items
+        yPos += 5;
+        doc.text("Items without quote line are matched by SKU and unit price.", leftX, yPos);
+      } else {
+        doc.setFont("helvetica", "italic");
+        doc.text("No SKU-level billing data available for this period.", leftX, yPos);
+      }
+    } catch (error) {
+      console.error("Error loading SKU data for PDF:", error);
+      doc.setFont("helvetica", "italic");
+      doc.text("Error loading SKU details.", leftX, yPos);
+    }
+
     // Generate filename based on statement dates or billing month
     let filenameDatePart;
     if (currentCycle.statement_start_date && currentCycle.statement_end_date) {

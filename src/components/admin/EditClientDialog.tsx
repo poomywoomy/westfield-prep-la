@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, FileText } from "lucide-react";
 import { validatePricingDocument } from "@/lib/fileValidation";
 import { sanitizeError } from "@/lib/errorHandler";
+import ClientSkuManagement from "./ClientSkuManagement";
 
 interface EditClientDialogProps {
   open: boolean;
@@ -223,7 +225,7 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Client</DialogTitle>
           <DialogDescription>
@@ -231,7 +233,14 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <Tabs defaultValue="general" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="skus">SKUs</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="general">
+            <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="company_name">Company Name *</Label>
@@ -522,15 +531,21 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
             </div>
           </div>
 
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Updating..." : "Update Client"}
+            <Button type="submit" disabled={loading || uploadingFile}>
+              {loading ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </form>
+          </TabsContent>
+
+          <TabsContent value="skus">
+            <ClientSkuManagement clientId={client.id} />
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

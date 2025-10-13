@@ -136,6 +136,50 @@ export type Database = {
         }
         Relationships: []
       }
+      client_skus: {
+        Row: {
+          client_id: string
+          created_at: string
+          default_service_type: string | null
+          default_unit_price: number | null
+          id: string
+          notes: string | null
+          product_name: string | null
+          sku: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          default_service_type?: string | null
+          default_unit_price?: number | null
+          id?: string
+          notes?: string | null
+          product_name?: string | null
+          sku: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          default_service_type?: string | null
+          default_unit_price?: number | null
+          id?: string
+          notes?: string | null
+          product_name?: string | null
+          sku?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_skus_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           admin_notes: string | null

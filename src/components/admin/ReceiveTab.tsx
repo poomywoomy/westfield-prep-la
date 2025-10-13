@@ -7,11 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Plus, Save, Trash2, Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type ReceivingItem = {
   tempId: string;
   sku: string;
+  product_name: string;
   expected_qty: number;
   received_qty: number;
   damaged_qty: number;
@@ -22,6 +26,7 @@ type ReceivingItem = {
 const ReceiveTab = () => {
   const [clients, setClients] = useState<any[]>([]);
   const [quotes, setQuotes] = useState<any[]>([]);
+  const [clientSkus, setClientSkus] = useState<any[]>([]);
   const [selectedClientId, setSelectedClientId] = useState("");
   const [selectedQuoteId, setSelectedQuoteId] = useState("");
   const [shipmentRef, setShipmentRef] = useState("");
@@ -37,8 +42,10 @@ const ReceiveTab = () => {
   useEffect(() => {
     if (selectedClientId) {
       fetchQuotes(selectedClientId);
+      fetchClientSkus(selectedClientId);
     } else {
       setQuotes([]);
+      setClientSkus([]);
       setSelectedQuoteId("");
     }
   }, [selectedClientId]);
@@ -70,12 +77,27 @@ const ReceiveTab = () => {
     }
   };
 
+  const fetchClientSkus = async (clientId: string) => {
+    const { data, error } = await supabase
+      .from("client_skus")
+      .select("*")
+      .eq("client_id", clientId)
+      .order("sku");
+
+    if (error) {
+      console.error("Error loading client SKUs:", error);
+    } else {
+      setClientSkus(data || []);
+    }
+  };
+
   const addItem = () => {
     setItems([
       ...items,
       {
         tempId: crypto.randomUUID(),
         sku: "",
+        product_name: "",
         expected_qty: 0,
         received_qty: 0,
         damaged_qty: 0,
@@ -83,6 +105,16 @@ const ReceiveTab = () => {
         notes: "",
       },
     ]);
+  };
+
+  const selectSku = (tempId: string, skuData: any) => {
+    setItems(items.map(item => 
+      item.tempId === tempId ? {
+        ...item,
+        sku: skuData.sku,
+        product_name: skuData.product_name || "",
+      } : item
+    ));
   };
 
   const updateItem = (tempId: string, field: keyof ReceivingItem, value: any) => {
@@ -135,9 +167,24 @@ const ReceiveTab = () => {
 
       if (itemsError) throw itemsError;
 
-      // Update quote lines if quote is selected
-      if (selectedQuoteId) {
-        for (const item of items) {
+      // Upsert client_skus and update quote lines if needed
+      for (const item of items) {
+        // Upsert client_skus
+        const { error: skuError } = await supabase
+          .from("client_skus")
+          .upsert({
+            client_id: selectedClientId,
+            sku: item.sku,
+            product_name: item.product_name || item.sku,
+          }, {
+            onConflict: "client_id,sku",
+            ignoreDuplicates: false,
+          });
+
+        if (skuError) console.error("Error upserting SKU:", skuError);
+
+        // Update quote lines if quote is selected
+        if (selectedQuoteId) {
           const { data: quoteLine } = await supabase
             .from("quote_lines")
             .select("id, qty_actual")
@@ -246,6 +293,7 @@ const ReceiveTab = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>SKU</TableHead>
+                    <TableHead>Product</TableHead>
                     <TableHead>Expected</TableHead>
                     <TableHead>Received</TableHead>
                     <TableHead>Damaged</TableHead>
@@ -258,10 +306,49 @@ const ReceiveTab = () => {
                   {items.map(item => (
                     <TableRow key={item.tempId}>
                       <TableCell>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between"
+                            >
+                              {item.sku || "Select SKU..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[300px] p-0">
+                            <Command>
+                              <CommandInput placeholder="Search SKU..." />
+                              <CommandList>
+                                <CommandEmpty>No SKU found. Type to add new.</CommandEmpty>
+                                <CommandGroup>
+                                  {clientSkus.map((sku) => (
+                                    <CommandItem
+                                      key={sku.id}
+                                      value={sku.sku}
+                                      onSelect={() => selectSku(item.tempId, sku)}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          item.sku === sku.sku ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {sku.sku} - {sku.product_name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </TableCell>
+                      <TableCell>
                         <Input
-                          value={item.sku}
-                          onChange={(e) => updateItem(item.tempId, "sku", e.target.value)}
-                          placeholder="SKU"
+                          value={item.product_name}
+                          onChange={(e) => updateItem(item.tempId, "product_name", e.target.value)}
+                          placeholder="Product name"
                         />
                       </TableCell>
                       <TableCell>
