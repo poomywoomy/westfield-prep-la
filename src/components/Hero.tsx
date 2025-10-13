@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-warehouse.jpg";
+import heroImage from "@/assets/hero-warehouse-optimized.webp";
 
 const Hero = () => {
   const navigate = useNavigate();
