@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Eye, Download, Trash2, Edit, ListOrdered } from "lucide-react";
+import { Plus, Eye, Download, Trash2, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 import {
@@ -16,9 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import CreateQuoteDialog from "./CreateQuoteDialog";
-import QuoteLineManagement from "./QuoteLineManagement";
 import jsPDF from "jspdf";
 
 const QuotesTab = () => {
@@ -28,7 +26,6 @@ const QuotesTab = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingQuote, setEditingQuote] = useState<any>(null);
   const [deleteQuoteId, setDeleteQuoteId] = useState<string | null>(null);
-  const [lineManagementQuote, setLineManagementQuote] = useState<any>(null);
 
   useEffect(() => {
     fetchClients();
@@ -459,14 +456,6 @@ const QuotesTab = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setLineManagementQuote(quote)}
-                        >
-                          <ListOrdered className="h-4 w-4 mr-1" />
-                          SKU Lines
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
                           onClick={() => generatePDFFromQuote(quote)}
                         >
                           <Download className="h-4 w-4 mr-1" />
@@ -515,21 +504,6 @@ const QuotesTab = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <Dialog open={!!lineManagementQuote} onOpenChange={(open) => !open && setLineManagementQuote(null)}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Manage SKU Lines - Quote {lineManagementQuote?.id.slice(0, 8)}</DialogTitle>
-          </DialogHeader>
-          {lineManagementQuote && (
-            <QuoteLineManagement
-              quoteId={lineManagementQuote.id}
-              clientId={lineManagementQuote.client_id}
-              isAdmin={true}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </>
   );
 };

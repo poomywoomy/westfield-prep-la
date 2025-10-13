@@ -6,18 +6,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Users, FileText, DollarSign, Image, LogOut, Settings, ChevronDown, FileSignature, TrendingUp, Package } from "lucide-react";
-import westfieldLogo from "@/assets/westfield-logo-original.jpg";
+import { Users, FileText, DollarSign, Image, LogOut, Settings, ChevronDown, FileSignature } from "lucide-react";
+import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientsTab from "@/components/admin/ClientsTab";
 import QuotesTab from "@/components/admin/QuotesTab";
 import BillingTab from "@/components/admin/BillingTab";
 import QCImagesTab from "@/components/admin/QCImagesTab";
 import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
-import { ServiceTrackingTab } from "@/components/admin/ServiceTrackingTab";
-import ReceiveTab from "@/components/admin/ReceiveTab";
 
 const AdminDashboard = () => {
-  const { user, role, loading, WarningDialog } = useAuth();
+  const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -89,31 +87,26 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 md:px-8 py-8">
-        <WarningDialog />
+      <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="inline-flex flex-row items-center gap-2 w-full overflow-x-auto border-b bg-transparent p-0 h-auto scrollbar-gutter-stable">
-            <TabsTrigger value="clients" className="flex-shrink-0">
+          <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+            <TabsTrigger value="clients">
               <Users className="mr-2 h-4 w-4" />
               Clients
             </TabsTrigger>
-            <TabsTrigger value="quotes" className="flex-shrink-0">
+            <TabsTrigger value="quotes">
               <FileText className="mr-2 h-4 w-4" />
               Quotes
             </TabsTrigger>
-            <TabsTrigger value="billing" className="flex-shrink-0">
+            <TabsTrigger value="billing">
               <DollarSign className="mr-2 h-4 w-4" />
               Billing
             </TabsTrigger>
-            <TabsTrigger value="tracking" className="flex-shrink-0">
-              <TrendingUp className="mr-2 h-4 w-4" />
-              Tracking
+            <TabsTrigger value="qc-images">
+              <Image className="mr-2 h-4 w-4" />
+              QC Images
             </TabsTrigger>
-            <TabsTrigger value="receive" className="flex-shrink-0">
-              <Package className="mr-2 h-4 w-4" />
-              Receive
-            </TabsTrigger>
-            <TabsTrigger value="documents" className="flex-shrink-0">
+            <TabsTrigger value="documents">
               <FileSignature className="mr-2 h-4 w-4" />
               Documents
             </TabsTrigger>
@@ -131,12 +124,8 @@ const AdminDashboard = () => {
             <BillingTab />
           </TabsContent>
 
-          <TabsContent value="tracking">
-            <ServiceTrackingTab />
-          </TabsContent>
-
-          <TabsContent value="receive">
-            <ReceiveTab />
+          <TabsContent value="qc-images">
+            <QCImagesTab />
           </TabsContent>
 
           <TabsContent value="documents">

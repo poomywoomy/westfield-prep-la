@@ -4,7 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import BillingClientsGrid from "./BillingClientsGrid";
 import BillingEntryDialog from "./BillingEntryDialog";
-import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 const BillingTab = () => {
   const [clients, setClients] = useState<any[]>([]);
@@ -57,12 +56,11 @@ const BillingTab = () => {
               return sum + Number(item.total_amount);
             }, 0) || 0;
 
-            // Get payments total (excluding soft-deleted payments)
+            // Get payments total (including auto-deposits from Monthly Deposit items)
             const { data: payments } = await supabase
               .from("billing_payments")
               .select("amount")
-              .eq("cycle_id", cycles.id)
-              .is("deleted_at", null);
+              .eq("cycle_id", cycles.id);
 
             mtdDeposits = payments?.reduce((sum, payment) => sum + Number(payment.amount), 0) || 0;
           }
@@ -89,44 +87,6 @@ const BillingTab = () => {
 
   useEffect(() => {
     fetchClients();
-
-    // Set up real-time subscriptions for billing updates
-    const paymentsChannel = supabase
-      .channel('billing-payments-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'billing_payments'
-        },
-        (payload: RealtimePostgresChangesPayload<any>) => {
-          console.log('Payment change detected:', payload);
-          fetchClients();
-        }
-      )
-      .subscribe();
-
-    const itemsChannel = supabase
-      .channel('billing-items-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'monthly_billing_items'
-        },
-        (payload: RealtimePostgresChangesPayload<any>) => {
-          console.log('Billing item change detected:', payload);
-          fetchClients();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(paymentsChannel);
-      supabase.removeChannel(itemsChannel);
-    };
   }, []);
 
   const handleClientClick = (client: any) => {

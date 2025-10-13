@@ -6,27 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, Unlock, Download, Plus, DollarSign, Trash2, MoreVertical } from "lucide-react";
+import { Lock, Unlock, Download, Plus, DollarSign, Trash2 } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 import AddCustomBillingItemDialog from "./AddCustomBillingItemDialog";
 import AddBillingPaymentDialog from "./AddBillingPaymentDialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface BillingEntryDialogProps {
   open: boolean;
@@ -70,8 +54,6 @@ const BillingEntryDialog = ({
   const [saving, setSaving] = useState(false);
   const [customDialogOpen, setCustomDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
-  const [paymentToRemove, setPaymentToRemove] = useState<Payment | null>(null);
-  const [removingPayment, setRemovingPayment] = useState(false);
   const { toast } = useToast();
 
   // Get current month in LA timezone
@@ -176,12 +158,11 @@ const BillingEntryDialog = ({
         initializeFromQuote();
       }
 
-      // Load payments (only non-deleted)
+      // Load payments
       const { data: paymentsData, error: paymentsError } = await supabase
         .from("billing_payments")
         .select("*")
         .eq("cycle_id", cycle.id)
-        .is("deleted_at", null)
         .order("payment_date", { ascending: false });
 
       if (paymentsError) throw paymentsError;
@@ -486,121 +467,6 @@ const BillingEntryDialog = ({
     }
   };
 
-  const removePayment = async () => {
-    if (!paymentToRemove || !currentCycle) return;
-
-    // Check if cycle is finalized
-    if (currentCycle.status === "locked") {
-      toast({
-        title: "Cannot Remove Payment",
-        description: "Payments can't be removed after invoicing. Create a credit memo instead.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setRemovingPayment(true);
-    try {
-      const { data: userData } = await supabase.auth.getUser();
-
-      // Soft delete the payment
-      const { error: deleteError } = await supabase
-        .from("billing_payments")
-        .update({
-          deleted_at: new Date().toISOString(),
-          deleted_by: userData.user?.id,
-        })
-        .eq("id", paymentToRemove.id);
-
-      if (deleteError) throw deleteError;
-
-      // Create payment event for audit
-      const { error: eventError } = await supabase
-        .from("payment_events")
-        .insert({
-          payment_id: paymentToRemove.id,
-          type: "delete",
-          amount: paymentToRemove.amount,
-          method: paymentToRemove.payment_method,
-          note: "Payment removed by admin",
-          actor_id: userData.user?.id,
-        });
-
-      if (eventError) throw eventError;
-
-      toast({
-        title: "Success",
-        description: "Payment removed successfully",
-        action: (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => restorePayment(paymentToRemove.id)}
-          >
-            Undo
-          </Button>
-        ),
-      });
-
-      setPaymentToRemove(null);
-      loadBillingData();
-      onSuccess();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setRemovingPayment(false);
-    }
-  };
-
-  const restorePayment = async (paymentId: string) => {
-    try {
-      const { data: userData } = await supabase.auth.getUser();
-
-      // Restore the payment
-      const { error: restoreError } = await supabase
-        .from("billing_payments")
-        .update({
-          deleted_at: null,
-          deleted_by: null,
-        })
-        .eq("id", paymentId);
-
-      if (restoreError) throw restoreError;
-
-      // Create payment event for audit
-      const { error: eventError } = await supabase
-        .from("payment_events")
-        .insert({
-          payment_id: paymentId,
-          type: "restore",
-          amount: 0,
-          method: "N/A",
-          note: "Payment restored by admin",
-          actor_id: userData.user?.id,
-        });
-
-      if (eventError) throw eventError;
-
-      toast({
-        title: "Success",
-        description: "Payment restored successfully",
-      });
-
-      loadBillingData();
-      onSuccess();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
   const generatePDF = async () => {
     const doc = new jsPDF();
     const clientName = client.company_name || `${client.first_name || ''} ${client.last_name || ''}`.trim();
@@ -795,139 +661,6 @@ const BillingEntryDialog = ({
     
     // Draw box around totals
     doc.rect(boxX, yPos - 4, boxWidth, boxY - yPos + 8);
-
-    // PAGE 2 - SKU Billing Detail
-    doc.addPage();
-    yPos = 20;
-
-    // Header
-    doc.setFontSize(20);
-    doc.setFont("helvetica", "bold");
-    doc.text("SKU Billing Detail", 105, yPos, { align: "center" });
-    yPos += 10;
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    if (currentCycle.statement_start_date && currentCycle.statement_end_date) {
-      doc.text(`Period: ${formatMDY(currentCycle.statement_start_date)} - ${formatMDY(currentCycle.statement_end_date)}`, 105, yPos, { align: "center" });
-    } else {
-      const billingDate = new Date(currentCycle.billing_month);
-      const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
-      doc.text(`Period: ${monthYear}`, 105, yPos, { align: "center" });
-    }
-    yPos += 15;
-
-    // Load quote lines with invoice items
-    try {
-      const { data: quoteLines } = await supabase
-        .from("quote_lines")
-        .select("*, invoice_items!invoice_items_quote_line_id_fkey(*)")
-        .eq("quote_id", quote.id);
-
-      if (quoteLines && quoteLines.length > 0) {
-        // Table header
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
-        doc.text("SKU", leftX, yPos);
-        doc.text("Product", leftX + 25, yPos);
-        doc.text("Service", leftX + 70, yPos);
-        doc.text("Qty", 130, yPos, { align: "right" });
-        doc.text("Unit Price", 155, yPos, { align: "right" });
-        doc.text("Amount", 180, yPos, { align: "right" });
-        doc.line(leftX, yPos + 1, 190, yPos + 1);
-        yPos += 6;
-
-        doc.setFont("helvetica", "normal");
-
-        // Group by service type
-        const serviceGroups: Record<string, typeof quoteLines> = {};
-        quoteLines.forEach(line => {
-          const serviceType = line.service_type || "Other";
-          if (!serviceGroups[serviceType]) serviceGroups[serviceType] = [];
-          serviceGroups[serviceType].push(line);
-        });
-
-        let grandTotal = 0;
-
-        Object.entries(serviceGroups).forEach(([serviceType, lines]) => {
-          // Service type header
-          doc.setFont("helvetica", "bold");
-          doc.text(serviceType, leftX, yPos);
-          yPos += 5;
-          doc.setFont("helvetica", "normal");
-
-          let sectionTotal = 0;
-
-          lines.forEach(line => {
-            const qtyBilled = line.invoice_items?.reduce((sum: number, item: any) => sum + (item.qty || 0), 0) || 0;
-            const lineAmount = qtyBilled * Number(line.unit_price);
-            sectionTotal += lineAmount;
-            grandTotal += lineAmount;
-
-            // Determine paid/unpaid status
-            const isPaid = lineAmount > 0 && payments.some(p => Number(p.amount) >= lineAmount);
-            const paidStatus = isPaid ? "Paid" : "Unpaid";
-
-            doc.text(line.sku, leftX + 2, yPos);
-            const productName = doc.splitTextToSize(line.product_name || "-", 40);
-            doc.text(productName, leftX + 27, yPos);
-            doc.text(String(qtyBilled), 130, yPos, { align: "right" });
-            doc.text(formatCurrency(Number(line.unit_price)), 155, yPos, { align: "right" });
-            doc.text(formatCurrency(lineAmount), 180, yPos, { align: "right" });
-
-            yPos += 5 * productName.length;
-
-            // Add paid/unpaid indicator in smaller text
-            doc.setFontSize(7);
-            doc.setTextColor(isPaid ? 0 : 255, isPaid ? 128 : 0, 0);
-            doc.text(paidStatus, 185, yPos - 2);
-            doc.setTextColor(0);
-            doc.setFontSize(9);
-
-            if (yPos > 260) {
-              doc.addPage();
-              yPos = 20;
-            }
-          });
-
-          // Section subtotal
-          doc.setFont("helvetica", "bold");
-          doc.text(`${serviceType} Subtotal:`, 140, yPos);
-          doc.text(formatCurrency(sectionTotal), 180, yPos, { align: "right" });
-          yPos += 8;
-          doc.setFont("helvetica", "normal");
-
-          if (yPos > 260) {
-            doc.addPage();
-            yPos = 20;
-          }
-        });
-
-        // Page total
-        yPos += 5;
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
-        doc.text("Page 2 Total:", 140, yPos);
-        doc.text(formatCurrency(grandTotal), 180, yPos, { align: "right" });
-        
-        // Note about reconciliation
-        yPos += 10;
-        doc.setFontSize(8);
-        doc.setFont("helvetica", "italic");
-        doc.text("Note: Page 2 total reconciles with Page 1 services subtotal.", leftX, yPos);
-
-        // Footnote for unlinked items
-        yPos += 5;
-        doc.text("Items without quote line are matched by SKU and unit price.", leftX, yPos);
-      } else {
-        doc.setFont("helvetica", "italic");
-        doc.text("No SKU-level billing data available for this period.", leftX, yPos);
-      }
-    } catch (error) {
-      console.error("Error loading SKU data for PDF:", error);
-      doc.setFont("helvetica", "italic");
-      doc.text("Error loading SKU details.", leftX, yPos);
-    }
 
     // Generate filename based on statement dates or billing month
     let filenameDatePart;
@@ -1153,7 +886,7 @@ const BillingEntryDialog = ({
                   {payments.map((payment) => (
                     <div
                       key={payment.id}
-                      className="grid grid-cols-[2fr,1fr,1fr,1fr,auto] gap-4 items-center p-3 border rounded bg-green-50"
+                      className="grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 items-center p-3 border rounded bg-green-50"
                     >
                       <div>
                         <p className="font-medium">{payment.payment_name}</p>
@@ -1168,24 +901,6 @@ const BillingEntryDialog = ({
                       <div className="text-right font-semibold text-green-600">
                         {formatCurrency(Number(payment.amount))}
                       </div>
-                      {!isLocked && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => setPaymentToRemove(payment)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Remove Payment
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -1243,27 +958,6 @@ const BillingEntryDialog = ({
           }}
         />
       )}
-
-      <AlertDialog open={!!paymentToRemove} onOpenChange={(open) => !open && setPaymentToRemove(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove Payment?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Remove this payment? A reversal entry will be kept in the audit log. You can undo this action within 10 minutes.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={removePayment}
-              disabled={removingPayment}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {removingPayment ? "Removing..." : "Remove Payment"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };

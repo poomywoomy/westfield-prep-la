@@ -10,7 +10,7 @@ export const useAuth = () => {
   const [role, setRole] = useState<"admin" | "client" | null>(null);
 
   // Auto-logout on tab close or 30 minutes inactivity
-  const { WarningDialog } = useAutoLogout(!!user);
+  useAutoLogout(!!user);
 
   useEffect(() => {
     // Set up auth state listener
@@ -63,5 +63,5 @@ export const useAuth = () => {
     }
   };
 
-  return { user, session, loading, role, WarningDialog };
+  return { user, session, loading, role };
 };

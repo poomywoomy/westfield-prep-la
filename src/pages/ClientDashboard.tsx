@@ -8,15 +8,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Image, LogOut, Settings, ChevronDown, Package, Warehouse, FileText, Download, Sparkles, BarChart3 } from "lucide-react";
-import westfieldLogo from "@/assets/westfield-logo-original.jpg";
+import { DollarSign, Image, LogOut, Settings, ChevronDown, Package, Warehouse, FileText, Download, Sparkles } from "lucide-react";
+import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientQCImagesTab from "@/components/client/ClientQCImagesTab";
-import { ClientInventoryTab } from "@/components/client/ClientInventoryTab";
 import { sanitizeError } from "@/lib/errorHandler";
 
 const ClientDashboard = () => {
-  const { user, role, loading, WarningDialog } = useAuth();
+  const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [clientName, setClientName] = useState<string>("");
@@ -127,7 +126,6 @@ const ClientDashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <WarningDialog />
         {clientName && (
           <div className="mb-8">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
@@ -241,14 +239,10 @@ const ClientDashboard = () => {
         )}
         
         <Tabs defaultValue="billing" className="space-y-6">
-          <TabsList className="grid grid-cols-3 w-full max-w-2xl">
+          <TabsList className="grid grid-cols-2 w-full max-w-md">
             <TabsTrigger value="billing">
               <DollarSign className="mr-2 h-4 w-4" />
               Billing
-            </TabsTrigger>
-            <TabsTrigger value="inventory">
-              <BarChart3 className="mr-2 h-4 w-4" />
-              Inventory
             </TabsTrigger>
             <TabsTrigger value="qc-images">
               <Image className="mr-2 h-4 w-4" />
@@ -258,10 +252,6 @@ const ClientDashboard = () => {
 
           <TabsContent value="billing">
             <ClientBillingTab />
-          </TabsContent>
-
-          <TabsContent value="inventory">
-            <ClientInventoryTab />
           </TabsContent>
 
           <TabsContent value="qc-images">
