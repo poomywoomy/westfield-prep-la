@@ -100,6 +100,8 @@ export type Database = {
           client_id: string
           created_at: string
           cycle_id: string
+          deleted_at: string | null
+          deleted_by: string | null
           id: string
           payment_date: string
           payment_method: string
@@ -111,6 +113,8 @@ export type Database = {
           client_id: string
           created_at?: string
           cycle_id: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           payment_date?: string
           payment_method: string
@@ -122,6 +126,8 @@ export type Database = {
           client_id?: string
           created_at?: string
           cycle_id?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           payment_date?: string
           payment_method?: string
@@ -394,6 +400,7 @@ export type Database = {
           id: string
           invoice_id: string
           qty: number
+          quote_line_id: string | null
           sku: string | null
           total: number
           unit_price: number
@@ -404,6 +411,7 @@ export type Database = {
           id?: string
           invoice_id: string
           qty?: number
+          quote_line_id?: string | null
           sku?: string | null
           total?: number
           unit_price?: number
@@ -414,6 +422,7 @@ export type Database = {
           id?: string
           invoice_id?: string
           qty?: number
+          quote_line_id?: string | null
           sku?: string | null
           total?: number
           unit_price?: number
@@ -424,6 +433,13 @@ export type Database = {
             columns: ["invoice_id"]
             isOneToOne: false
             referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_quote_line_id_fkey"
+            columns: ["quote_line_id"]
+            isOneToOne: false
+            referencedRelation: "quote_lines"
             referencedColumns: ["id"]
           },
         ]
@@ -576,6 +592,47 @@ export type Database = {
           },
         ]
       }
+      payment_events: {
+        Row: {
+          actor_id: string | null
+          amount: number
+          created_at: string
+          id: string
+          method: string
+          note: string | null
+          payment_id: string
+          type: string
+        }
+        Insert: {
+          actor_id?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          method: string
+          note?: string | null
+          payment_id: string
+          type: string
+        }
+        Update: {
+          actor_id?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          method?: string
+          note?: string | null
+          payment_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_events_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "billing_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prep_tasks: {
         Row: {
           created_at: string
@@ -607,6 +664,41 @@ export type Database = {
             columns: ["shipment_item_id"]
             isOneToOne: false
             referencedRelation: "shipment_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_changes: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          new_price: number
+          old_price: number
+          quote_line_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          new_price: number
+          old_price: number
+          quote_line_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          new_price?: number
+          old_price?: number
+          quote_line_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_changes_quote_line_id_fkey"
+            columns: ["quote_line_id"]
+            isOneToOne: false
+            referencedRelation: "quote_lines"
             referencedColumns: ["id"]
           },
         ]
@@ -694,6 +786,62 @@ export type Database = {
           },
         ]
       }
+      quote_lines: {
+        Row: {
+          created_at: string
+          id: string
+          line_status: Database["public"]["Enums"]["line_status"]
+          line_total: number
+          notes: string | null
+          product_name: string | null
+          qty_actual: number
+          qty_estimated: number
+          quote_id: string
+          service_type: string
+          sku: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          line_status?: Database["public"]["Enums"]["line_status"]
+          line_total?: number
+          notes?: string | null
+          product_name?: string | null
+          qty_actual?: number
+          qty_estimated?: number
+          quote_id: string
+          service_type: string
+          sku: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          line_status?: Database["public"]["Enums"]["line_status"]
+          line_total?: number
+          notes?: string | null
+          product_name?: string | null
+          qty_actual?: number
+          qty_estimated?: number
+          quote_id?: string
+          service_type?: string
+          sku?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_lines_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotes: {
         Row: {
           client_id: string | null
@@ -752,6 +900,95 @@ export type Database = {
           window_start?: string
         }
         Relationships: []
+      }
+      receiving_items: {
+        Row: {
+          created_at: string
+          damaged_qty: number
+          expected_qty: number
+          id: string
+          missing_qty: number
+          notes: string | null
+          received_qty: number
+          receiving_id: string
+          sku: string
+        }
+        Insert: {
+          created_at?: string
+          damaged_qty?: number
+          expected_qty?: number
+          id?: string
+          missing_qty?: number
+          notes?: string | null
+          received_qty?: number
+          receiving_id: string
+          sku: string
+        }
+        Update: {
+          created_at?: string
+          damaged_qty?: number
+          expected_qty?: number
+          id?: string
+          missing_qty?: number
+          notes?: string | null
+          received_qty?: number
+          receiving_id?: string
+          sku?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receiving_items_receiving_id_fkey"
+            columns: ["receiving_id"]
+            isOneToOne: false
+            referencedRelation: "receivings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      receivings: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          quote_id: string | null
+          received_at: string
+          received_by: string | null
+          shipment_ref: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          quote_id?: string | null
+          received_at?: string
+          received_by?: string | null
+          shipment_ref: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          quote_id?: string | null
+          received_at?: string
+          received_by?: string | null
+          shipment_ref?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receivings_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receivings_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       report_jobs: {
         Row: {
@@ -938,6 +1175,7 @@ export type Database = {
         | "self_fulfilled"
         | "shopify"
         | "returns_processing"
+      line_status: "awaiting" | "in_progress" | "ready" | "shipped"
       prep_status: "awaiting" | "in_progress" | "ready"
       receiving_format: "pallets" | "cartons" | "both"
     }
@@ -1079,6 +1317,7 @@ export const Constants = {
         "shopify",
         "returns_processing",
       ],
+      line_status: ["awaiting", "in_progress", "ready", "shipped"],
       prep_status: ["awaiting", "in_progress", "ready"],
       receiving_format: ["pallets", "cartons", "both"],
     },

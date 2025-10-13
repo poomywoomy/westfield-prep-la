@@ -6,11 +6,27 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, Unlock, Download, Plus, DollarSign, Trash2 } from "lucide-react";
+import { Lock, Unlock, Download, Plus, DollarSign, Trash2, MoreVertical } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 import AddCustomBillingItemDialog from "./AddCustomBillingItemDialog";
 import AddBillingPaymentDialog from "./AddBillingPaymentDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface BillingEntryDialogProps {
   open: boolean;
@@ -54,6 +70,8 @@ const BillingEntryDialog = ({
   const [saving, setSaving] = useState(false);
   const [customDialogOpen, setCustomDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [paymentToRemove, setPaymentToRemove] = useState<Payment | null>(null);
+  const [removingPayment, setRemovingPayment] = useState(false);
   const { toast } = useToast();
 
   // Get current month in LA timezone
@@ -158,11 +176,12 @@ const BillingEntryDialog = ({
         initializeFromQuote();
       }
 
-      // Load payments
+      // Load payments (only non-deleted)
       const { data: paymentsData, error: paymentsError } = await supabase
         .from("billing_payments")
         .select("*")
         .eq("cycle_id", cycle.id)
+        .is("deleted_at", null)
         .order("payment_date", { ascending: false });
 
       if (paymentsError) throw paymentsError;
@@ -454,6 +473,121 @@ const BillingEntryDialog = ({
       toast({
         title: "Success",
         description: "Billing cycle unlocked successfully",
+      });
+
+      loadBillingData();
+      onSuccess();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const removePayment = async () => {
+    if (!paymentToRemove || !currentCycle) return;
+
+    // Check if cycle is finalized
+    if (currentCycle.status === "locked") {
+      toast({
+        title: "Cannot Remove Payment",
+        description: "Payments can't be removed after invoicing. Create a credit memo instead.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setRemovingPayment(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+
+      // Soft delete the payment
+      const { error: deleteError } = await supabase
+        .from("billing_payments")
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: userData.user?.id,
+        })
+        .eq("id", paymentToRemove.id);
+
+      if (deleteError) throw deleteError;
+
+      // Create payment event for audit
+      const { error: eventError } = await supabase
+        .from("payment_events")
+        .insert({
+          payment_id: paymentToRemove.id,
+          type: "delete",
+          amount: paymentToRemove.amount,
+          method: paymentToRemove.payment_method,
+          note: "Payment removed by admin",
+          actor_id: userData.user?.id,
+        });
+
+      if (eventError) throw eventError;
+
+      toast({
+        title: "Success",
+        description: "Payment removed successfully",
+        action: (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => restorePayment(paymentToRemove.id)}
+          >
+            Undo
+          </Button>
+        ),
+      });
+
+      setPaymentToRemove(null);
+      loadBillingData();
+      onSuccess();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setRemovingPayment(false);
+    }
+  };
+
+  const restorePayment = async (paymentId: string) => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+
+      // Restore the payment
+      const { error: restoreError } = await supabase
+        .from("billing_payments")
+        .update({
+          deleted_at: null,
+          deleted_by: null,
+        })
+        .eq("id", paymentId);
+
+      if (restoreError) throw restoreError;
+
+      // Create payment event for audit
+      const { error: eventError } = await supabase
+        .from("payment_events")
+        .insert({
+          payment_id: paymentId,
+          type: "restore",
+          amount: 0,
+          method: "N/A",
+          note: "Payment restored by admin",
+          actor_id: userData.user?.id,
+        });
+
+      if (eventError) throw eventError;
+
+      toast({
+        title: "Success",
+        description: "Payment restored successfully",
       });
 
       loadBillingData();
@@ -886,7 +1020,7 @@ const BillingEntryDialog = ({
                   {payments.map((payment) => (
                     <div
                       key={payment.id}
-                      className="grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 items-center p-3 border rounded bg-green-50"
+                      className="grid grid-cols-[2fr,1fr,1fr,1fr,auto] gap-4 items-center p-3 border rounded bg-green-50"
                     >
                       <div>
                         <p className="font-medium">{payment.payment_name}</p>
@@ -901,6 +1035,24 @@ const BillingEntryDialog = ({
                       <div className="text-right font-semibold text-green-600">
                         {formatCurrency(Number(payment.amount))}
                       </div>
+                      {!isLocked && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => setPaymentToRemove(payment)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remove Payment
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -958,6 +1110,27 @@ const BillingEntryDialog = ({
           }}
         />
       )}
+
+      <AlertDialog open={!!paymentToRemove} onOpenChange={(open) => !open && setPaymentToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Payment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remove this payment? A reversal entry will be kept in the audit log. You can undo this action within 10 minutes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={removePayment}
+              disabled={removingPayment}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {removingPayment ? "Removing..." : "Remove Payment"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

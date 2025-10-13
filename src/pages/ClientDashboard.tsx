@@ -16,7 +16,7 @@ import { ClientInventoryTab } from "@/components/client/ClientInventoryTab";
 import { sanitizeError } from "@/lib/errorHandler";
 
 const ClientDashboard = () => {
-  const { user, role, loading } = useAuth();
+  const { user, role, loading, WarningDialog } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [clientName, setClientName] = useState<string>("");
@@ -127,6 +127,7 @@ const ClientDashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <WarningDialog />
         {clientName && (
           <div className="mb-8">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
