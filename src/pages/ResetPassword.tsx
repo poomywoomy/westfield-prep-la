@@ -46,10 +46,25 @@ const ResetPassword = () => {
       return;
     }
 
-    if (password.length < 8) {
+    if (password.length < 12) {
       toast({
         title: "Password too short",
-        description: "Password must be at least 8 characters long.",
+        description: "Password must be at least 12 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check password complexity
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+      toast({
+        title: "Weak password",
+        description: "Password must include uppercase, lowercase, number, and special character.",
         variant: "destructive",
       });
       return;
@@ -114,7 +129,7 @@ const ResetPassword = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
-                  minLength={8}
+                  minLength={12}
                 />
                 <button
                   type="button"
@@ -137,7 +152,7 @@ const ResetPassword = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   disabled={loading}
-                  minLength={8}
+                  minLength={12}
                 />
                 <button
                   type="button"

@@ -90,24 +90,9 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
       if (clientError) throw clientError;
       if (!clientData?.success) throw new Error(clientData?.error || "Failed to create client");
 
-      // Send account setup email if new user
-      if (clientData?.is_new_user) {
-        try {
-          await supabase.functions.invoke('send-client-credentials', {
-            body: {
-              email: formData.email,
-              company_name: formData.company_name,
-              contact_name: `${formData.first_name} ${formData.last_name}`,
-            },
-          });
-        } catch (emailError) {
-          // Email error doesn't prevent client creation
-        }
-      }
-
       toast({
         title: "Client created",
-        description: clientData?.is_new_user 
+        description: clientData?.is_new_user
           ? "Account setup instructions have been sent to the client's email."
           : "Client account updated successfully.",
       });

@@ -108,10 +108,25 @@ const ClientSettings = () => {
       return;
     }
 
-    if (newPassword.length < 8) {
+    if (newPassword.length < 12) {
       toast({
         title: "Error",
-        description: "Password must be at least 8 characters",
+        description: "Password must be at least 12 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check password complexity
+    const hasUppercase = /[A-Z]/.test(newPassword);
+    const hasLowercase = /[a-z]/.test(newPassword);
+    const hasNumber = /[0-9]/.test(newPassword);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+
+    if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+      toast({
+        title: "Error",
+        description: "Password must include uppercase, lowercase, number, and special character",
         variant: "destructive",
       });
       return;

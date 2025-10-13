@@ -98,8 +98,6 @@ const Login = () => {
         throw new Error("Authentication failed. Please check your credentials.");
       }
 
-      // Password expiration removed - now using secure password reset links instead
-
       toast({
         title: "Login successful",
         description: "Welcome back!",

@@ -174,7 +174,11 @@ serve(async (req) => {
       throw roleError;
     }
 
-    // Upsert client record
+    // Upsert client record with password expiration (48 hours for new accounts)
+    const passwordExpiresAt = isNewUser 
+      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() 
+      : null;
+
     const { error: clientError } = await supabaseAdmin
       .from("clients")
       .upsert({
@@ -193,6 +197,7 @@ serve(async (req) => {
         admin_notes: requestData.admin_notes,
         fulfillment_services: requestData.fulfillment_services,
         status: 'pending',
+        password_expires_at: passwordExpiresAt,
       }, {
         onConflict: 'user_id'
       });
@@ -201,10 +206,30 @@ serve(async (req) => {
       throw clientError;
     }
 
+    // For new users, send password reset link instead of plaintext password
+    if (isNewUser) {
+      try {
+        const origin = req.headers.get('origin') || Deno.env.get("SUPABASE_URL") || "";
+        
+        const { error: resetError } = await supabaseAdmin.functions.invoke('send-password-reset', {
+          body: {
+            email: requestData.email,
+            redirectUrl: `${origin}/reset-password`,
+          },
+        });
+
+        if (resetError) {
+          console.error("Failed to send password reset email:", resetError);
+        }
+      } catch (emailError) {
+        console.error("Error sending welcome email:", emailError);
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: existingUser ? "Client account updated successfully" : "Client account created successfully",
+        message: existingUser ? "Client account updated successfully" : "Client account created successfully. Password reset email sent.",
         user_id: userId,
         is_new_user: isNewUser
       }),
