@@ -89,35 +89,31 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-6 md:px-8 py-8">
         <WarningDialog />
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="grid grid-cols-7 w-full max-w-5xl">
-            <TabsTrigger value="clients">
+          <TabsList className="inline-flex flex-row items-center gap-2 w-full overflow-x-auto border-b bg-transparent p-0 h-auto scrollbar-gutter-stable">
+            <TabsTrigger value="clients" className="flex-shrink-0">
               <Users className="mr-2 h-4 w-4" />
               Clients
             </TabsTrigger>
-            <TabsTrigger value="quotes">
+            <TabsTrigger value="quotes" className="flex-shrink-0">
               <FileText className="mr-2 h-4 w-4" />
               Quotes
             </TabsTrigger>
-            <TabsTrigger value="billing">
+            <TabsTrigger value="billing" className="flex-shrink-0">
               <DollarSign className="mr-2 h-4 w-4" />
               Billing
             </TabsTrigger>
-            <TabsTrigger value="tracking">
+            <TabsTrigger value="tracking" className="flex-shrink-0">
               <TrendingUp className="mr-2 h-4 w-4" />
               Tracking
             </TabsTrigger>
-            <TabsTrigger value="receive">
+            <TabsTrigger value="receive" className="flex-shrink-0">
               <Package className="mr-2 h-4 w-4" />
               Receive
             </TabsTrigger>
-            <TabsTrigger value="qc-images">
-              <Image className="mr-2 h-4 w-4" />
-              QC Images
-            </TabsTrigger>
-            <TabsTrigger value="documents">
+            <TabsTrigger value="documents" className="flex-shrink-0">
               <FileSignature className="mr-2 h-4 w-4" />
               Documents
             </TabsTrigger>
@@ -141,10 +137,6 @@ const AdminDashboard = () => {
 
           <TabsContent value="receive">
             <ReceiveTab />
-          </TabsContent>
-
-          <TabsContent value="qc-images">
-            <QCImagesTab />
           </TabsContent>
 
           <TabsContent value="documents">
