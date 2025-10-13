@@ -673,7 +673,7 @@ export type Database = {
       }
       delete_own_client_account: {
         Args: Record<PropertyKey, never>
-        Returns: undefined
+        Returns: Json
       }
       has_role: {
         Args: {

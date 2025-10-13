@@ -55,7 +55,9 @@ const handler = async (req: Request): Promise<Response> => {
       .maybeSingle();
 
     if (fetchError) {
-      console.error("Error fetching rate limit:", fetchError);
+      if (Deno.env.get("ENVIRONMENT") === "development") {
+        console.error("Error fetching rate limit:", fetchError);
+      }
       // Fail closed - deny request when rate limit service unavailable
       return new Response(
         JSON.stringify({ 
@@ -114,7 +116,9 @@ const handler = async (req: Request): Promise<Response> => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("Error in check-rate-limit function:", error);
+    if (Deno.env.get("ENVIRONMENT") === "development") {
+      console.error("Error in check-rate-limit function:", error);
+    }
     // Fail closed - deny request on error
     return new Response(
       JSON.stringify({ 

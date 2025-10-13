@@ -69,8 +69,10 @@ const ClientDashboard = () => {
       toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
       window.location.replace('/');
     } catch (e) {
-      console.error('Logout error:', e);
-      toast({ 
+      if (import.meta.env.DEV) {
+        console.error('Logout error:', e);
+      }
+      toast({
         title: 'Logout error', 
         description: 'An error occurred during logout. Please try again.',
         variant: 'destructive'

@@ -55,7 +55,9 @@ export const useAuth = () => {
         setRole(data.role as "admin" | "client");
       }
     } catch (error) {
-      console.error("Error fetching user role:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error fetching user role:", error);
+      }
     } finally {
       setLoading(false);
     }
