@@ -68,15 +68,10 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
     setLoading(true);
 
     try {
-      const tempPassword = generatePassword();
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 24);
-
-      // Create client using edge function with service role
+      // Create client using edge function
       const { data: clientData, error: clientError } = await supabase.functions.invoke('create-client', {
         body: {
           email: formData.email,
-          tempPassword: tempPassword,
           company_name: formData.company_name,
           first_name: formData.first_name,
           last_name: formData.last_name,
@@ -89,32 +84,32 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
           storage_method: formData.storage_method || null,
           admin_notes: formData.admin_notes,
           fulfillment_services: formData.fulfillment_services,
-          password_expires_at: expiresAt.toISOString(),
         }
       });
 
       if (clientError) throw clientError;
       if (!clientData?.success) throw new Error(clientData?.error || "Failed to create client");
 
-      // Send credentials email
-      try {
-        await supabase.functions.invoke('send-client-credentials', {
-          body: {
-            email: formData.email,
-            companyName: formData.company_name,
-            contactName: `${formData.first_name} ${formData.last_name}`,
-            tempPassword: tempPassword,
-          },
-        });
-        console.log('Credentials email sent successfully');
-      } catch (emailError: any) {
-        console.error('Failed to send credentials email:', emailError);
-        // Don't throw - client was created successfully
+      // Send account setup email if new user
+      if (clientData?.is_new_user) {
+        try {
+          await supabase.functions.invoke('send-client-credentials', {
+            body: {
+              email: formData.email,
+              company_name: formData.company_name,
+              contact_name: `${formData.first_name} ${formData.last_name}`,
+            },
+          });
+        } catch (emailError) {
+          // Email error doesn't prevent client creation
+        }
       }
 
       toast({
         title: "Client created",
-        description: `An email with login credentials has been sent to ${formData.email}`,
+        description: clientData?.is_new_user 
+          ? "Account setup instructions have been sent to the client's email."
+          : "Client account updated successfully.",
       });
 
       onSuccess();

@@ -9,7 +9,6 @@ const corsHeaders = {
 
 const createClientSchema = z.object({
   email: z.string().email().max(255),
-  tempPassword: z.string().min(8).max(100),
   company_name: z.string().trim().min(1).max(200),
   first_name: z.string().trim().min(1).max(100),
   last_name: z.string().trim().min(1).max(100),
@@ -21,12 +20,10 @@ const createClientSchema = z.object({
   storage_units_per_month: z.number().int().positive().nullable(),
   admin_notes: z.string().max(2000),
   fulfillment_services: z.array(z.string()),
-  password_expires_at: z.string(),
 });
 
 interface CreateClientRequest {
   email: string;
-  tempPassword: string;
   company_name: string;
   first_name: string;
   last_name: string;
@@ -38,7 +35,6 @@ interface CreateClientRequest {
   storage_units_per_month: number | null;
   admin_notes: string;
   fulfillment_services: string[];
-  password_expires_at: string;
 }
 
 serve(async (req) => {
@@ -106,7 +102,6 @@ serve(async (req) => {
     // Validate input
     const validationResult = createClientSchema.safeParse(body);
     if (!validationResult.success) {
-      console.error("Validation error:", validationResult.error);
       return new Response(
         JSON.stringify({ 
           error: "Invalid input data provided"
@@ -119,44 +114,30 @@ serve(async (req) => {
     }
     
     const requestData: CreateClientRequest = validationResult.data;
-    console.log("Creating client for email:", requestData.email);
 
     // Check if user already exists
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
     const existingUser = existingUsers?.users.find(u => u.email === requestData.email);
 
     let userId: string;
+    let isNewUser = false;
 
     if (existingUser) {
-      console.log("User already exists, updating password for:", requestData.email);
       userId = existingUser.id;
-      
-      // Update password for existing user
-      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        userId,
-        { password: requestData.tempPassword }
-      );
-      
-      if (updateError) {
-        console.error("Error updating password:", updateError);
-        throw updateError;
-      }
     } else {
-      // Create new auth user
+      // Create new user with placeholder password (they'll set it via email link)
       const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: requestData.email,
-        password: requestData.tempPassword,
+        password: crypto.randomUUID() + crypto.randomUUID(), // Random password they'll never use
         email_confirm: true,
       });
 
-      if (authError) {
-        console.error("Auth error:", authError);
-        throw authError;
+      if (authError || !authData.user) {
+        throw authError || new Error("Failed to create user");
       }
-      if (!authData.user) throw new Error("Failed to create user");
 
       userId = authData.user.id;
-      console.log("User created with ID:", userId);
+      isNewUser = true;
     }
 
     // Upsert profile
@@ -175,11 +156,8 @@ serve(async (req) => {
       });
 
     if (profileError) {
-      console.error("Profile error:", profileError);
       throw profileError;
     }
-
-    console.log("Profile created");
 
     // Upsert client role
     const { error: roleError } = await supabaseAdmin
@@ -193,13 +171,10 @@ serve(async (req) => {
       });
 
     if (roleError) {
-      console.error("Role error:", roleError);
       throw roleError;
     }
 
-    console.log("Client role assigned");
-
-    // Upsert client record (NOT storing temp_password for security)
+    // Upsert client record
     const { error: clientError } = await supabaseAdmin
       .from("clients")
       .upsert({
@@ -217,24 +192,21 @@ serve(async (req) => {
         storage_units_per_month: requestData.storage_units_per_month,
         admin_notes: requestData.admin_notes,
         fulfillment_services: requestData.fulfillment_services,
-        password_expires_at: requestData.password_expires_at,
         status: 'pending',
       }, {
         onConflict: 'user_id'
       });
 
     if (clientError) {
-      console.error("Client record error:", clientError);
       throw clientError;
     }
-
-    console.log("Client record created successfully");
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: existingUser ? "Client account updated successfully" : "Client account created successfully",
-        user_id: userId 
+        user_id: userId,
+        is_new_user: isNewUser
       }),
       {
         status: 200,
@@ -242,7 +214,6 @@ serve(async (req) => {
       }
     );
   } catch (error: any) {
-    console.error("Error creating client:", error);
     return new Response(
       JSON.stringify({ 
         error: "Unable to create client account. Please try again or contact support."

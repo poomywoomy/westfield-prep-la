@@ -33,7 +33,7 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, storage_method, fulfillment_services, status, password_expires_at, pricing_document_url")
+        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, storage_method, fulfillment_services, status, pricing_document_url")
         .eq("user_id", user?.id)
         .single();
 
@@ -53,7 +53,7 @@ const ClientDashboard = () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching client name:", error);
+      // Error handled silently for better UX
     }
   };
 

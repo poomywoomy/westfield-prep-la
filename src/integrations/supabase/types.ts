@@ -149,7 +149,6 @@ export type Database = {
             | null
           id: string
           last_name: string | null
-          password_expires_at: string | null
           phone_number: string
           pricing_active: boolean | null
           pricing_document_url: string | null
@@ -181,7 +180,6 @@ export type Database = {
             | null
           id?: string
           last_name?: string | null
-          password_expires_at?: string | null
           phone_number: string
           pricing_active?: boolean | null
           pricing_document_url?: string | null
@@ -213,7 +211,6 @@ export type Database = {
             | null
           id?: string
           last_name?: string | null
-          password_expires_at?: string | null
           phone_number?: string
           pricing_active?: boolean | null
           pricing_document_url?: string | null
@@ -612,6 +609,30 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          created_at: string
+          id: string
+          rate_key: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rate_key: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rate_key?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -638,6 +659,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_rate_limits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       clear_password_expiration: {
         Args: Record<PropertyKey, never>
         Returns: undefined

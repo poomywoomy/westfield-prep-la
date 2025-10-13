@@ -41,7 +41,7 @@ const ClientSettings = () => {
   const fetchClientData = async () => {
     const { data, error } = await supabase
       .from("clients")
-      .select("id, first_name, last_name, company_name, email, phone_number, password_expires_at")
+      .select("id, first_name, last_name, company_name, email, phone_number")
       .eq("user_id", user?.id)
       .single();
 
@@ -51,9 +51,7 @@ const ClientSettings = () => {
       setLastName(data.last_name || "");
       setCompanyName(data.company_name || "");
       setPhoneNumber(data.phone_number || "");
-      
-      // Check if user has password expiration set (indicates temporary password)
-      setHasSetPassword(!data.password_expires_at);
+      setHasSetPassword(true);
     }
   };
 

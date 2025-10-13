@@ -89,22 +89,7 @@ const Login = () => {
         throw new Error("Authentication failed. Please check your credentials.");
       }
 
-      // Check for expired temp password (clients only)
-      if (roleData.role === "client") {
-        const { data: clientData, error: clientError } = await supabase
-          .from("clients")
-          .select("password_expires_at")
-          .eq("user_id", data.user.id)
-          .single();
-
-        if (!clientError && clientData.password_expires_at) {
-          const expiryDate = new Date(clientData.password_expires_at);
-          if (expiryDate < new Date()) {
-            await supabase.auth.signOut();
-            throw new Error("Authentication failed. Please check your credentials.");
-          }
-        }
-      }
+      // Password expiration removed - now using secure password reset links instead
 
       toast({
         title: "Login successful",
