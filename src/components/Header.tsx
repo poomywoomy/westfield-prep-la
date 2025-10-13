@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/westfield-logo.png";
+import logo from "@/assets/westfield-logo-optimized.webp";
 import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
@@ -57,7 +57,7 @@ const Header = () => {
             className="flex items-center cursor-pointer"
             onClick={handleLogoClick}
           >
-            <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" />
+            <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" width="147" height="48" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
