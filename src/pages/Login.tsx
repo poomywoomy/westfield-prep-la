@@ -110,6 +110,23 @@ const Login = () => {
         navigate("/client/dashboard");
       }
     } catch (error: any) {
+      // Log failed login attempt to audit_log for security monitoring
+      try {
+        await supabase.from('audit_log').insert({
+          action: 'FAILED_LOGIN',
+          table_name: 'auth.users',
+          new_data: {
+            email,
+            error_message: error.message,
+            timestamp: new Date().toISOString(),
+            user_agent: navigator.userAgent,
+          }
+        });
+      } catch (logError) {
+        // Silently fail - don't block user experience if audit logging fails
+        console.error('Failed to log security event:', logError);
+      }
+
       toast({
         title: "Login failed",
         description: error.message || "Authentication failed. Please check your credentials.",
