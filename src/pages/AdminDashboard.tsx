@@ -6,13 +6,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Users, FileText, DollarSign, Image, LogOut, Settings, ChevronDown, FileSignature } from "lucide-react";
-import westfieldLogo from "@/assets/westfield-logo.png";
+import { Users, FileText, DollarSign, Image, LogOut, Settings, ChevronDown, FileSignature, TrendingUp } from "lucide-react";
+import westfieldLogo from "@/assets/westfield-logo-original.jpg";
 import ClientsTab from "@/components/admin/ClientsTab";
 import QuotesTab from "@/components/admin/QuotesTab";
 import BillingTab from "@/components/admin/BillingTab";
 import QCImagesTab from "@/components/admin/QCImagesTab";
 import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
+import { ServiceTrackingTab } from "@/components/admin/ServiceTrackingTab";
 
 const AdminDashboard = () => {
   const { user, role, loading } = useAuth();
@@ -89,7 +90,7 @@ const AdminDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+          <TabsList className="grid grid-cols-6 w-full max-w-4xl">
             <TabsTrigger value="clients">
               <Users className="mr-2 h-4 w-4" />
               Clients
@@ -101,6 +102,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="billing">
               <DollarSign className="mr-2 h-4 w-4" />
               Billing
+            </TabsTrigger>
+            <TabsTrigger value="tracking">
+              <TrendingUp className="mr-2 h-4 w-4" />
+              Tracking
             </TabsTrigger>
             <TabsTrigger value="qc-images">
               <Image className="mr-2 h-4 w-4" />
@@ -122,6 +127,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="billing">
             <BillingTab />
+          </TabsContent>
+
+          <TabsContent value="tracking">
+            <ServiceTrackingTab />
           </TabsContent>
 
           <TabsContent value="qc-images">

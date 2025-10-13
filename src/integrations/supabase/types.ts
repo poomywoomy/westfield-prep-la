@@ -387,6 +387,91 @@ export type Database = {
         }
         Relationships: []
       }
+      invoice_items: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          invoice_id: string
+          qty: number
+          sku: string | null
+          total: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          invoice_id: string
+          qty?: number
+          sku?: string | null
+          total?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id?: string
+          qty?: number
+          sku?: string | null
+          total?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount_paid: number
+          amount_total: number
+          client_id: string
+          created_at: string
+          due_date: string | null
+          id: string
+          number: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_paid?: number
+          amount_total?: number
+          client_id: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          number: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_paid?: number
+          amount_total?: number
+          client_id?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          number?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       monthly_billing_cycles: {
         Row: {
           billing_month: string
@@ -487,6 +572,41 @@ export type Database = {
             columns: ["cycle_id"]
             isOneToOne: false
             referencedRelation: "monthly_billing_cycles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prep_tasks: {
+        Row: {
+          created_at: string
+          id: string
+          prepped_qty: number
+          shipment_item_id: string
+          status: Database["public"]["Enums"]["prep_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prepped_qty?: number
+          shipment_item_id: string
+          status?: Database["public"]["Enums"]["prep_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prepped_qty?: number
+          shipment_item_id?: string
+          status?: Database["public"]["Enums"]["prep_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prep_tasks_shipment_item_id_fkey"
+            columns: ["shipment_item_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_items"
             referencedColumns: ["id"]
           },
         ]
@@ -633,6 +753,129 @@ export type Database = {
         }
         Relationships: []
       }
+      report_jobs: {
+        Row: {
+          client_id: string
+          created_at: string
+          email_enabled: boolean
+          emailed: boolean
+          id: string
+          pdf_url: string | null
+          period_end: string
+          period_start: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          email_enabled?: boolean
+          emailed?: boolean
+          id?: string
+          pdf_url?: string | null
+          period_end: string
+          period_start: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          email_enabled?: boolean
+          emailed?: boolean
+          id?: string
+          pdf_url?: string | null
+          period_end?: string
+          period_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_jobs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipment_items: {
+        Row: {
+          created_at: string
+          damaged_qty: number
+          expected_qty: number
+          id: string
+          missing_qty: number
+          product_name: string | null
+          received_qty: number
+          shipment_id: string
+          sku: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          damaged_qty?: number
+          expected_qty?: number
+          id?: string
+          missing_qty?: number
+          product_name?: string | null
+          received_qty?: number
+          shipment_id: string
+          sku: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          damaged_qty?: number
+          expected_qty?: number
+          id?: string
+          missing_qty?: number
+          product_name?: string | null
+          received_qty?: number
+          shipment_id?: string
+          sku?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_items_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipments: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          received_at: string
+          shipment_ref: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          received_at?: string
+          shipment_ref: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          received_at?: string
+          shipment_ref?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -695,6 +938,7 @@ export type Database = {
         | "self_fulfilled"
         | "shopify"
         | "returns_processing"
+      prep_status: "awaiting" | "in_progress" | "ready"
       receiving_format: "pallets" | "cartons" | "both"
     }
     CompositeTypes: {
@@ -835,6 +1079,7 @@ export const Constants = {
         "shopify",
         "returns_processing",
       ],
+      prep_status: ["awaiting", "in_progress", "ready"],
       receiving_format: ["pallets", "cartons", "both"],
     },
   },
