@@ -60,7 +60,8 @@ const BillingTab = () => {
             const { data: payments } = await supabase
               .from("billing_payments")
               .select("amount")
-              .eq("cycle_id", cycles.id);
+              .eq("cycle_id", cycles.id)
+              .is("deleted_at", null);
 
             mtdDeposits = payments?.reduce((sum, payment) => sum + Number(payment.amount), 0) || 0;
           }
@@ -87,6 +88,19 @@ const BillingTab = () => {
 
   useEffect(() => {
     fetchClients();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('billing-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'billing_payments' }, () => fetchClients())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'monthly_billing_items' }, () => fetchClients())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'monthly_billing_cycles' }, () => fetchClients())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleClientClick = (client: any) => {
