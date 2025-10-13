@@ -208,33 +208,37 @@ const ClientSkuManagement = ({ clientId, readOnly = false }: ClientSkuManagement
                     placeholder="Product name"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Default Service Type</Label>
-                  <Select
-                    value={formData.default_service_type}
-                    onValueChange={(value) => setFormData({ ...formData, default_service_type: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Amazon FBA">Amazon FBA</SelectItem>
-                      <SelectItem value="Self Fulfillment">Self Fulfillment</SelectItem>
-                      <SelectItem value="WFS">WFS</SelectItem>
-                      <SelectItem value="TikTok Shop">TikTok Shop</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Default Unit Price</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={formData.default_unit_price}
-                    onChange={(e) => setFormData({ ...formData, default_unit_price: e.target.value })}
-                    placeholder="0.00"
-                  />
-                </div>
+                {!readOnly && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>Default Service Type</Label>
+                      <Select
+                        value={formData.default_service_type}
+                        onValueChange={(value) => setFormData({ ...formData, default_service_type: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Amazon FBA">Amazon FBA</SelectItem>
+                          <SelectItem value="Self Fulfillment">Self Fulfillment</SelectItem>
+                          <SelectItem value="WFS">WFS</SelectItem>
+                          <SelectItem value="TikTok Shop">TikTok Shop</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Default Unit Price</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.default_unit_price}
+                        onChange={(e) => setFormData({ ...formData, default_unit_price: e.target.value })}
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </>
+                )}
                 {quotes.length > 0 && (
                   <div className="space-y-2">
                     <Label>Attach to Quote (Optional)</Label>
@@ -287,8 +291,8 @@ const ClientSkuManagement = ({ clientId, readOnly = false }: ClientSkuManagement
               <TableRow>
                 <TableHead>SKU</TableHead>
                 <TableHead>Product Name</TableHead>
-                <TableHead>Service Type</TableHead>
-                <TableHead>Unit Price</TableHead>
+                {!readOnly && <TableHead>Service Type</TableHead>}
+                {!readOnly && <TableHead>Unit Price</TableHead>}
                 <TableHead>Notes</TableHead>
                 {!readOnly && <TableHead className="w-[100px]">Actions</TableHead>}
               </TableRow>
@@ -298,8 +302,8 @@ const ClientSkuManagement = ({ clientId, readOnly = false }: ClientSkuManagement
                 <TableRow key={sku.id}>
                   <TableCell className="font-medium">{sku.sku}</TableCell>
                   <TableCell>{sku.product_name || "-"}</TableCell>
-                  <TableCell>{sku.default_service_type || "-"}</TableCell>
-                  <TableCell>${Number(sku.default_unit_price).toFixed(2)}</TableCell>
+                  {!readOnly && <TableCell>{sku.default_service_type || "-"}</TableCell>}
+                  {!readOnly && <TableCell>${Number(sku.default_unit_price).toFixed(2)}</TableCell>}
                   <TableCell className="max-w-[200px] truncate">{sku.notes || "-"}</TableCell>
                   {!readOnly && (
                     <TableCell>
