@@ -36,6 +36,36 @@ const ClientBillingTab = () => {
     if (user) {
       fetchBillingData();
     }
+    
+    // Set up realtime subscription for billing updates
+    const channel = supabase
+      .channel('client-billing-realtime')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'billing_payments' 
+      }, () => {
+        if (user) fetchBillingData();
+      })
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'monthly_billing_items' 
+      }, () => {
+        if (user) fetchBillingData();
+      })
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'monthly_billing_cycles' 
+      }, () => {
+        if (user) fetchBillingData();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user, selectedMonth]);
 
   const fetchBillingData = async () => {
@@ -79,11 +109,12 @@ const ClientBillingTab = () => {
         if (itemsError) throw itemsError;
         setItems(itemsData || []);
 
-        // Fetch payments
+        // Fetch payments (exclude soft-deleted)
         const { data: paymentsData, error: paymentsError } = await supabase
           .from("billing_payments")
           .select("*")
           .eq("cycle_id", cycleData.id)
+          .is("deleted_at", null)
           .order("payment_date", { ascending: false });
 
         if (paymentsError) throw paymentsError;

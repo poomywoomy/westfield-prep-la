@@ -9,7 +9,12 @@ import { lazy, Suspense } from "react";
 const Index = lazy(() => import("./pages/Index"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Contact = lazy(() => import("./pages/Contact"));
-const ServiceBreakdown = lazy(() => import("./pages/ServiceBreakdown"));
+const ShopifyFulfillment = lazy(() => import("./pages/ShopifyFulfillment"));
+const AmazonFBAPrep = lazy(() => import("./pages/AmazonFBAPrep"));
+const TikTokShopFulfillment = lazy(() => import("./pages/TikTokShopFulfillment"));
+const KittingBundling = lazy(() => import("./pages/KittingBundling"));
+const LabelingCompliance = lazy(() => import("./pages/LabelingCompliance"));
+const StorageWarehousing = lazy(() => import("./pages/StorageWarehousing"));
 const TOS = lazy(() => import("./pages/TOS"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const ThankYou = lazy(() => import("./pages/ThankYou"));
@@ -35,7 +40,21 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/services" element={<ServiceBreakdown />} />
+              
+              {/* Service Pages */}
+              <Route path="/shopify-fulfillment" element={<ShopifyFulfillment />} />
+              <Route path="/amazon-fba-prep" element={<AmazonFBAPrep />} />
+              <Route path="/tiktok-shop-fulfillment" element={<TikTokShopFulfillment />} />
+              <Route path="/kitting-bundling" element={<KittingBundling />} />
+              <Route path="/labeling-fnsku" element={<LabelingCompliance />} />
+              <Route path="/storage-warehousing" element={<StorageWarehousing />} />
+              
+              {/* Legacy Redirects */}
+              <Route path="/services" element={<ShopifyFulfillment />} />
+              <Route path="/platforms" element={<ShopifyFulfillment />} />
+              <Route path="/platforms/*" element={<ShopifyFulfillment />} />
+              <Route path="/walmart-fulfillment" element={<AmazonFBAPrep />} />
+              
               <Route path="/terms" element={<TOS />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/thank-you" element={<ThankYou />} />

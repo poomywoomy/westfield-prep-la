@@ -33,7 +33,24 @@ const ClientQCImagesTab = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
+    // Refetch images when component mounts or dialog opens
     fetchImages();
+    
+    // Set up realtime subscription for QC images
+    const channel = supabase
+      .channel('qc-images-realtime')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'qc_images' 
+      }, () => {
+        fetchImages(); // Refresh images on any change
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchImages = async () => {
@@ -57,17 +74,19 @@ const ClientQCImagesTab = () => {
 
       if (error) throw error;
 
-      // Create signed URLs for all images
+      // Create signed URLs for all images with cache-busting
       const imagesWithSignedUrls = await Promise.all(
         (data || []).map(async (image) => {
           try {
+            // Add timestamp for cache-busting
+            const timestamp = new Date(image.upload_date).getTime();
             const { data: signedData } = await supabase.storage
               .from('qc-images')
               .createSignedUrl(image.image_url, 3600); // 1 hour expiry
             
             return {
               ...image,
-              signedUrl: signedData?.signedUrl || ''
+              signedUrl: signedData?.signedUrl ? `${signedData.signedUrl}&v=${timestamp}` : ''
             };
           } catch (err) {
             console.error('Failed to create signed URL:', err);
@@ -188,8 +207,26 @@ const ClientQCImagesTab = () => {
     return grouped;
   };
 
-  const handleImageClick = (image: QCImageWithSignedUrl) => {
-    setSelectedImage(image);
+  const handleImageClick = async (image: QCImageWithSignedUrl) => {
+    // Force refresh the signed URL when opening modal
+    try {
+      const timestamp = Date.now();
+      const { data: signedData } = await supabase.storage
+        .from('qc-images')
+        .createSignedUrl(image.image_url, 3600);
+      
+      if (signedData?.signedUrl) {
+        setSelectedImage({
+          ...image,
+          signedUrl: `${signedData.signedUrl}&v=${timestamp}`
+        });
+      } else {
+        setSelectedImage(image);
+      }
+    } catch (err) {
+      console.error('Failed to refresh signed URL:', err);
+      setSelectedImage(image);
+    }
     setDialogOpen(true);
   };
 

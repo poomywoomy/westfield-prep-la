@@ -60,66 +60,44 @@ const Header = () => {
             <img src={logo} alt="Westfield Prep Center Logo" className="h-12 w-auto" width="147" height="48" />
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
-            {isHomePage ? (
-              <>
-                <button
-                  onClick={() => scrollToSection("services")}
-                  className="text-foreground hover:text-primary transition-colors font-medium"
-                >
-                  Services
-                </button>
-                <button
-                  onClick={() => scrollToSection("pricing")}
-                  className="text-foreground hover:text-primary transition-colors font-medium"
-                >
-                  Pricing
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/"
-                  className="text-foreground hover:text-primary transition-colors font-medium"
-                >
-                  Home
-                </Link>
-                <button
-                  onClick={() => {
-                    navigate("/");
-                    setTimeout(() => {
-                      const element = document.getElementById("services");
-                      if (element) element.scrollIntoView({ behavior: "smooth" });
-                    }, 100);
-                  }}
-                  className="text-foreground hover:text-primary transition-colors font-medium"
-                >
-                  Services
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/");
-                    setTimeout(() => {
-                      const element = document.getElementById("pricing");
-                      if (element) element.scrollIntoView({ behavior: "smooth" });
-                    }, 100);
-                  }}
-                  className="text-foreground hover:text-primary transition-colors font-medium"
-                >
-                  Pricing
-                </button>
-              </>
-            )}
-            <Link
-              to="/services"
-              className="text-foreground hover:text-primary transition-colors font-medium"
-            >
-              Platforms
+          <nav className="hidden md:flex items-center gap-6">
+            <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium">
+              Home
             </Link>
-            <Link
-              to="/faq"
-              className="text-foreground hover:text-primary transition-colors font-medium"
-            >
+            <Link to="/shopify-fulfillment" className="text-foreground hover:text-primary transition-colors font-bold">
+              Shopify Fulfillment
+            </Link>
+            <Link to="/amazon-fba-prep" className="text-foreground hover:text-primary transition-colors font-medium">
+              Amazon FBA
+            </Link>
+            <Link to="/tiktok-shop-fulfillment" className="text-foreground hover:text-primary transition-colors font-medium">
+              TikTok Shop
+            </Link>
+            <Link to="/kitting-bundling" className="text-foreground hover:text-primary transition-colors font-medium">
+              Kitting
+            </Link>
+            {isHomePage ? (
+              <button
+                onClick={() => scrollToSection("pricing")}
+                className="text-foreground hover:text-primary transition-colors font-medium"
+              >
+                Pricing
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  navigate("/");
+                  setTimeout(() => {
+                    const element = document.getElementById("pricing");
+                    if (element) element.scrollIntoView({ behavior: "smooth" });
+                  }, 100);
+                }}
+                className="text-foreground hover:text-primary transition-colors font-medium"
+              >
+                Pricing
+              </button>
+            )}
+            <Link to="/faq" className="text-foreground hover:text-primary transition-colors font-medium">
               FAQ
             </Link>
             <Button

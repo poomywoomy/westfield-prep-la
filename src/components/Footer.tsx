@@ -39,10 +39,31 @@ const Footer = () => {
             </p>
             <div className="flex justify-center flex-wrap gap-4 mt-3 mb-2">
               <Link
-                to="/services"
+                to="/shopify-fulfillment"
                 className="text-xs text-white/80 hover:text-secondary transition-colors"
               >
-                Platforms
+                Shopify Fulfillment
+              </Link>
+              <span className="text-white/40">•</span>
+              <Link
+                to="/amazon-fba-prep"
+                className="text-xs text-white/80 hover:text-secondary transition-colors"
+              >
+                Amazon FBA
+              </Link>
+              <span className="text-white/40">•</span>
+              <Link
+                to="/tiktok-shop-fulfillment"
+                className="text-xs text-white/80 hover:text-secondary transition-colors"
+              >
+                TikTok Shop
+              </Link>
+              <span className="text-white/40">•</span>
+              <Link
+                to="/kitting-bundling"
+                className="text-xs text-white/80 hover:text-secondary transition-colors"
+              >
+                Kitting
               </Link>
               <span className="text-white/40">•</span>
               <Link
@@ -63,21 +84,21 @@ const Footer = () => {
                 to="/terms"
                 className="text-xs text-white/80 hover:text-secondary transition-colors"
               >
-                Terms of Service
+                Terms
               </Link>
               <span className="text-white/40">•</span>
               <Link
                 to="/privacy"
                 className="text-xs text-white/80 hover:text-secondary transition-colors"
               >
-                Privacy Policy
+                Privacy
               </Link>
               <span className="text-white/40">•</span>
               <Link
                 to="/login"
                 className="text-xs text-white/60 hover:text-white/80 transition-colors"
               >
-                Sign In
+                Client Portal
               </Link>
             </div>
             <p className="text-xs text-white/60 mt-2">

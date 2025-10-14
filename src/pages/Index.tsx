@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
@@ -14,16 +15,22 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <Hero />
-      <HowItWorks />
-      <WhyChooseUs />
-      <Services />
-      <Pricing />
-      <Compliance />
-      <Footer />
-    </div>
+    <>
+      <Helmet>
+        <title>Shopify & E-commerce Fulfillment in Los Angeles | Westfield Prep Center</title>
+        <meta name="description" content="Shopify-first fulfillment with photo-proof QC, branded packaging, and same-day cutoffs. Also supporting Amazon FBA and TikTok Shop. Scale your DTC brand with a premium LA partner." />
+      </Helmet>
+      <div className="min-h-screen">
+        <Header />
+        <Hero />
+        <HowItWorks />
+        <WhyChooseUs />
+        <Services />
+        <Pricing />
+        <Compliance />
+        <Footer />
+      </div>
+    </>
   );
 };
 

@@ -25,18 +25,28 @@ const Hero = () => {
       <div className="container mx-auto px-4 relative z-10 pt-16">
         <div className="max-w-4xl mx-auto text-center text-white">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-            Prep & Fulfillment for Amazon & Shopify Sellers—Simplified.
+            Shopify & E-commerce Fulfillment in Los Angeles
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-            Save hours and scale faster with done-for-you prep, bundling, and shipping for Amazon & Shopify sellers.
+            Shopify-first fulfillment with photo-proof QC, branded packaging, and same-day cutoffs. Also supporting Amazon FBA and TikTok Shop.
           </p>
-          <Button
-            onClick={goToContact}
-            size="lg"
-            className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-6 font-semibold"
-          >
-            Get a Free Quote
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={goToContact}
+              size="lg"
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-6 font-semibold"
+            >
+              Get a Quote
+            </Button>
+            <Button
+              onClick={() => navigate("/amazon-fba-prep")}
+              size="lg"
+              variant="outline"
+              className="text-lg px-8 py-6 bg-white/10 hover:bg-white/20 text-white border-white/30"
+            >
+              Explore Amazon FBA Prep
+            </Button>
+          </div>
         </div>
       </div>
     </section>
