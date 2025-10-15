@@ -1,14 +1,10 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /client/
+Disallow: /client/*
+Disallow: /login
+Disallow: /reset-password
+
+Sitemap: https://westfieldprepcenter.com/sitemap.xml

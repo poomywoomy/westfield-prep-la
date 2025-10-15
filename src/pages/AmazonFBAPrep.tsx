@@ -2,6 +2,9 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import Reviews from "@/components/Reviews";
+import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +12,13 @@ import { CheckCircle, Package, Tag, Shield } from "lucide-react";
 
 const AmazonFBAPrep = () => {
   const navigate = useNavigate();
+
+  const serviceData = {
+    serviceType: "FulfillmentService",
+    name: "Amazon FBA Prep Services",
+    description: "FNSKU labeling, polybagging, bubble wrap, carton prep, pallet forwarding with Amazon compliance.",
+    features: ["FNSKU Labeling", "Polybagging", "Bubble Wrap", "Carton Prep", "Pallet Forwarding", "Photo-Proof QC"]
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -19,10 +29,15 @@ const AmazonFBAPrep = () => {
       <Helmet>
         <title>Amazon FBA Prep in Los Angeles | Compliance & Photo-Proof QC</title>
         <meta name="description" content="Amazon-compliant prep with FNSKU labeling, polybagging, bubble wrap, carton prep, pallets, and photo-proof QC." />
+        <link rel="canonical" href="https://westfieldprepcenter.com/amazon-fba-prep/" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/amazon-fba-prep/" />
+        <meta property="og:type" content="article" />
       </Helmet>
+      <StructuredData type="service" data={serviceData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
+        <Breadcrumbs items={[{ label: "Amazon FBA Prep", path: "/amazon-fba-prep/" }]} />
         
         <main className="flex-1">
           {/* Hero Section */}
@@ -184,6 +199,8 @@ const AmazonFBAPrep = () => {
               </div>
             </div>
           </section>
+
+          <Reviews />
 
           {/* CTA */}
           <section className="py-16 bg-primary text-primary-foreground">

@@ -2,6 +2,9 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import Reviews from "@/components/Reviews";
+import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +13,21 @@ import { Zap, Package, Camera, Truck, Award, CheckCircle } from "lucide-react";
 
 const ShopifyFulfillment = () => {
   const navigate = useNavigate();
+
+  const faqData = [
+    { question: "Do you integrate directly with Shopify?", answer: "Yes, we integrate seamlessly with Shopify via API or third-party apps like ShipStation for automated order import and tracking sync." },
+    { question: "What are your same-day cutoff times?", answer: "Orders placed before 2 PM PST ship the same business day. Orders after 2 PM ship the next business day." },
+    { question: "Can you handle custom packaging and branded inserts?", answer: "Absolutely. We offer custom kitting, branded tissue paper, thank-you cards, promotional inserts, and gift wrapping services." },
+    { question: "Is there a minimum order quantity or monthly volume requirement?", answer: "We work with brands of all sizes. Contact us to discuss your specific volume and we'll create a custom pricing plan." },
+    { question: "How does your pricing model work?", answer: "We charge per-unit pricing based on your services: receiving, pick/pack, kitting, storage, and shipping. No hidden fees. Get a custom quote today." }
+  ];
+
+  const serviceData = {
+    serviceType: "FulfillmentService",
+    name: "Shopify Fulfillment Services",
+    description: "Fast, accurate pick-pack, branded unboxing, same-day cutoffs for Shopify stores.",
+    features: ["Photo-Proof QC", "Same-Day Shipping", "Custom Kitting", "Branded Packaging", "Inventory Management"]
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -20,10 +38,16 @@ const ShopifyFulfillment = () => {
       <Helmet>
         <title>Shopify Fulfillment in Los Angeles | Westfield Prep Center</title>
         <meta name="description" content="Shopify-first fulfillment with photo-proof QC, branded packaging, and same-day cutoffs. Scale DTC with a premium LA partner." />
+        <link rel="canonical" href="https://westfieldprepcenter.com/shopify-fulfillment/" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/shopify-fulfillment/" />
+        <meta property="og:type" content="article" />
       </Helmet>
+      <StructuredData type="service" data={serviceData} />
+      <StructuredData type="faq" data={faqData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
+        <Breadcrumbs items={[{ label: "Shopify Fulfillment", path: "/shopify-fulfillment/" }]} />
         
         <main className="flex-1">
           {/* Hero Section */}
@@ -178,6 +202,8 @@ const ShopifyFulfillment = () => {
               </div>
             </div>
           </section>
+
+          <Reviews />
 
           {/* FAQ */}
           <section className="py-16 bg-background">

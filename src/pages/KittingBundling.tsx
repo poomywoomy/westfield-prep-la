@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +11,13 @@ import { Package, Gift, Camera, CheckCircle } from "lucide-react";
 
 const KittingBundling = () => {
   const navigate = useNavigate();
+
+  const serviceData = {
+    serviceType: "Service",
+    name: "Kitting & Bundling Services",
+    description: "Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands.",
+    features: ["Multi-SKU Kits", "Gift Sets", "Promotional Bundles", "Photo-Proof QC"]
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -19,10 +28,15 @@ const KittingBundling = () => {
       <Helmet>
         <title>Kitting & Bundling Services | Westfield Prep Center</title>
         <meta name="description" content="Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands." />
+        <link rel="canonical" href="https://westfieldprepcenter.com/kitting-bundling/" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/kitting-bundling/" />
+        <meta property="og:type" content="article" />
       </Helmet>
+      <StructuredData type="service" data={serviceData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
+        <Breadcrumbs items={[{ label: "Kitting & Bundling", path: "/kitting-bundling/" }]} />
         
         <main className="flex-1">
           {/* Hero Section */}

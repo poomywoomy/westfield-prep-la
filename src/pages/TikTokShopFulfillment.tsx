@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +11,13 @@ import { Zap, Video, Package, Truck } from "lucide-react";
 
 const TikTokShopFulfillment = () => {
   const navigate = useNavigate();
+
+  const serviceData = {
+    serviceType: "FulfillmentService",
+    name: "TikTok Shop Fulfillment",
+    description: "Fast FBT workflows, creator-friendly packaging, and reliable shipping for TikTok Shop sellers.",
+    features: ["Rapid Turnaround", "Creator-Ready Packaging", "Flexible Kitting", "Fast Shipping"]
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -19,10 +28,15 @@ const TikTokShopFulfillment = () => {
       <Helmet>
         <title>TikTok Shop Fulfillment | Westfield Prep Center</title>
         <meta name="description" content="Fast FBT workflows, creator-friendly packaging, and reliable shipping for TikTok Shop sellers." />
+        <link rel="canonical" href="https://westfieldprepcenter.com/tiktok-shop-fulfillment/" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/tiktok-shop-fulfillment/" />
+        <meta property="og:type" content="article" />
       </Helmet>
+      <StructuredData type="service" data={serviceData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
+        <Breadcrumbs items={[{ label: "TikTok Shop Fulfillment", path: "/tiktok-shop-fulfillment/" }]} />
         
         <main className="flex-1">
           {/* Hero Section */}

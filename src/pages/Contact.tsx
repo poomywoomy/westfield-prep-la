@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import ContactForm from "@/components/ContactForm";
+import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 
 const Contact = () => {
@@ -12,15 +14,24 @@ const Contact = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <>
+      <Helmet>
+        <title>Contact Us - Westfield Prep Center | Get a Quote</title>
+        <meta name="description" content="Contact Westfield Prep Center for e-commerce fulfillment services. Call +1 (818) 935-5478 or email info@westfieldprepcenter.com. Open 7 days, 9am-8pm PST." />
+        <link rel="canonical" href="https://westfieldprepcenter.com/contact/" />
+      </Helmet>
+      <StructuredData type="organization" />
+      
+      <div className="min-h-screen bg-background">
+        <Header />
 
-      <main>
-        <ContactForm />
-      </main>
+        <main>
+          <ContactForm />
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 

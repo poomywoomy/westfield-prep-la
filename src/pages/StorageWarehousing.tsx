@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +11,13 @@ import { Warehouse, Shield, Package, CheckCircle } from "lucide-react";
 
 const StorageWarehousing = () => {
   const navigate = useNavigate();
+
+  const serviceData = {
+    serviceType: "WarehouseService",
+    name: "Storage & Warehousing Services",
+    description: "Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management.",
+    features: ["Secure Racking", "Pallet Storage", "Lot Control", "Cycle Counts"]
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -19,10 +28,15 @@ const StorageWarehousing = () => {
       <Helmet>
         <title>Storage & Warehousing | Westfield Prep Center</title>
         <meta name="description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
+        <link rel="canonical" href="https://westfieldprepcenter.com/storage-warehousing/" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/storage-warehousing/" />
+        <meta property="og:type" content="article" />
       </Helmet>
+      <StructuredData type="service" data={serviceData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
+        <Breadcrumbs items={[{ label: "Storage & Warehousing", path: "/storage-warehousing/" }]} />
         
         <main className="flex-1">
           {/* Hero Section */}

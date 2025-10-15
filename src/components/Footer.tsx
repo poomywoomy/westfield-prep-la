@@ -8,12 +8,13 @@ const Footer = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h3 className="text-2xl font-bold mb-6">Westfield Prep Center</h3>
 
-          <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-8">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-6">
             <div className="flex items-center gap-2">
               <Phone className="w-5 h-5 text-secondary" />
               <a
                 href="tel:+18189355478"
                 className="hover:text-secondary transition-colors"
+                aria-label="Call Westfield Prep Center"
               >
                 +1 (818) 935-5478
               </a>
@@ -23,6 +24,7 @@ const Footer = () => {
               <a
                 href="mailto:info@westfieldprepcenter.com"
                 className="hover:text-secondary transition-colors"
+                aria-label="Email Westfield Prep Center"
               >
                 info@westfieldprepcenter.com
               </a>
@@ -32,6 +34,10 @@ const Footer = () => {
               <span>Los Angeles, CA</span>
             </div>
           </div>
+
+          <p className="text-sm text-white/90 mb-8">
+            Open 7 Days | 9am-8pm PST | Serving Los Angeles & Southern California
+          </p>
 
           <div className="border-t border-white/20 pt-6">
             <p className="text-sm text-white/80">

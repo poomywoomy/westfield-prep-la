@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowLeft } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
+import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 
 const FAQ = () => {
@@ -82,8 +84,16 @@ const FAQ = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-background shadow-sm sticky top-0 z-50">
+    <>
+      <Helmet>
+        <title>FAQ - Westfield Prep Center | E-commerce Fulfillment Questions</title>
+        <meta name="description" content="Frequently asked questions about Westfield Prep Center's fulfillment services, turnaround times, pricing, and compliance standards." />
+        <link rel="canonical" href="https://westfieldprepcenter.com/faq/" />
+      </Helmet>
+      <StructuredData type="faq" data={faqs} />
+      
+      <div className="min-h-screen bg-background">
+        <header className="bg-background shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" onClick={handleLogoClick}>
@@ -143,8 +153,9 @@ const FAQ = () => {
         </div>
       </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 

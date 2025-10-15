@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +11,13 @@ import { Tag, Shield, FileCheck, CheckCircle } from "lucide-react";
 
 const LabelingCompliance = () => {
   const navigate = useNavigate();
+
+  const serviceData = {
+    serviceType: "Service",
+    name: "Labeling & Compliance Services",
+    description: "FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance.",
+    features: ["FNSKU Labels", "Warning Labels", "Carton Labeling", "Documentation", "Compliance Standards"]
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -19,10 +28,15 @@ const LabelingCompliance = () => {
       <Helmet>
         <title>Labeling & Compliance Services | Westfield Prep Center</title>
         <meta name="description" content="FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance." />
+        <link rel="canonical" href="https://westfieldprepcenter.com/labeling-fnsku/" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/labeling-fnsku/" />
+        <meta property="og:type" content="article" />
       </Helmet>
+      <StructuredData type="service" data={serviceData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
+        <Breadcrumbs items={[{ label: "Labeling & Compliance", path: "/labeling-fnsku/" }]} />
         
         <main className="flex-1">
           {/* Hero Section */}
