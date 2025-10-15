@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
@@ -13,7 +15,12 @@ const contactSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
   phone: z.string().trim().min(1, "Phone is required").max(20),
   business: z.string().trim().min(1, "Business name is required").max(100),
-  volume: z.string().trim().min(1, "Monthly volume is required").max(500),
+  unitsPerMonth: z.string().min(1, "Units per month is required"),
+  skuCount: z.string().min(1, "SKU count is required"),
+  marketplaces: z.array(z.string()).min(1, "Select at least one marketplace"),
+  packagingRequirements: z.string().min(1, "Packaging requirements is required"),
+  timeline: z.string().trim().min(1, "Timeline is required").max(200),
+  comments: z.string().trim().max(1000).optional(),
 });
 
 const ContactForm = () => {
@@ -24,7 +31,12 @@ const ContactForm = () => {
     email: "",
     phone: "",
     business: "",
-    volume: "",
+    unitsPerMonth: "",
+    skuCount: "",
+    marketplaces: [] as string[],
+    packagingRequirements: "",
+    timeline: "",
+    comments: "",
     honeypot: "", // Bot detection field
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -36,6 +48,25 @@ const ContactForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleMarketplaceToggle = (marketplace: string) => {
+    setFormData((prev) => {
+      const marketplaces = prev.marketplaces.includes(marketplace)
+        ? prev.marketplaces.filter((m) => m !== marketplace)
+        : [...prev.marketplaces, marketplace];
+      return { ...prev, marketplaces };
+    });
+    if (errors.marketplaces) {
+      setErrors((prev) => ({ ...prev, marketplaces: "" }));
     }
   };
 
@@ -141,76 +172,182 @@ const ContactForm = () => {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6 bg-card p-8 rounded-lg shadow-lg border border-border">
-            <div>
-              <Label htmlFor="name">Full Name *</Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={errors.name ? "border-destructive" : ""}
-                placeholder="John Doe"
-              />
-              {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
+            {/* Name and Email - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="name">Full Name *</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className={errors.name ? "border-destructive" : ""}
+                  placeholder="John Doe"
+                />
+                {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="email">Email Address *</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={errors.email ? "border-destructive" : ""}
+                  placeholder="john@example.com"
+                />
+                {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="email">Email Address *</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={errors.email ? "border-destructive" : ""}
-                placeholder="john@example.com"
-              />
-              {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
+            {/* Phone and Business - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="phone">Phone Number *</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className={errors.phone ? "border-destructive" : ""}
+                  placeholder="(555) 123-4567"
+                />
+                {errors.phone && <p className="text-sm text-destructive mt-1">{errors.phone}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="business">Business Name *</Label>
+                <Input
+                  id="business"
+                  name="business"
+                  value={formData.business}
+                  onChange={handleChange}
+                  className={errors.business ? "border-destructive" : ""}
+                  placeholder="Your Company LLC"
+                />
+                {errors.business && <p className="text-sm text-destructive mt-1">{errors.business}</p>}
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="phone">Phone Number *</Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleChange}
-                className={errors.phone ? "border-destructive" : ""}
-                placeholder="(555) 123-4567"
-              />
-              {errors.phone && <p className="text-sm text-destructive mt-1">{errors.phone}</p>}
+            {/* Units per Month and SKU Count - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="unitsPerMonth">Units per Month *</Label>
+                <Select
+                  value={formData.unitsPerMonth}
+                  onValueChange={(value) => handleSelectChange("unitsPerMonth", value)}
+                >
+                  <SelectTrigger className={errors.unitsPerMonth ? "border-destructive" : ""}>
+                    <SelectValue placeholder="Select monthly units" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border z-50">
+                    <SelectItem value="0-100">0 - 100</SelectItem>
+                    <SelectItem value="101-500">101 - 500</SelectItem>
+                    <SelectItem value="501-1000">501 - 1,000</SelectItem>
+                    <SelectItem value="1001-3000">1,001 - 3,000</SelectItem>
+                    <SelectItem value="3001-5000">3,001 - 5,000</SelectItem>
+                    <SelectItem value="5001-10000">5,001 - 10,000</SelectItem>
+                    <SelectItem value="10000+">10,000+</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.unitsPerMonth && <p className="text-sm text-destructive mt-1">{errors.unitsPerMonth}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="skuCount">SKU Count *</Label>
+                <Select
+                  value={formData.skuCount}
+                  onValueChange={(value) => handleSelectChange("skuCount", value)}
+                >
+                  <SelectTrigger className={errors.skuCount ? "border-destructive" : ""}>
+                    <SelectValue placeholder="Select SKU count" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border z-50">
+                    <SelectItem value="0-10">0 - 10</SelectItem>
+                    <SelectItem value="11-25">11 - 25</SelectItem>
+                    <SelectItem value="25-50">25 - 50</SelectItem>
+                    <SelectItem value="50+">50+</SelectItem>
+                    <SelectItem value="unsure">Unsure</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.skuCount && <p className="text-sm text-destructive mt-1">{errors.skuCount}</p>}
+              </div>
             </div>
 
+            {/* Marketplaces - Checkboxes */}
             <div>
-              <Label htmlFor="business">Business Name *</Label>
-              <Input
-                id="business"
-                name="business"
-                value={formData.business}
-                onChange={handleChange}
-                className={errors.business ? "border-destructive" : ""}
-                placeholder="Your Company LLC"
-              />
-              {errors.business && (
-                <p className="text-sm text-destructive mt-1">{errors.business}</p>
-              )}
+              <Label>Marketplaces *</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                {["Shopify", "Amazon", "Walmart", "TikTok Shop", "Other"].map((marketplace) => (
+                  <div key={marketplace} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`marketplace-${marketplace}`}
+                      checked={formData.marketplaces.includes(marketplace)}
+                      onCheckedChange={() => handleMarketplaceToggle(marketplace)}
+                    />
+                    <label
+                      htmlFor={`marketplace-${marketplace}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {marketplace}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              {errors.marketplaces && <p className="text-sm text-destructive mt-1">{errors.marketplaces}</p>}
             </div>
 
+            {/* Packaging Requirements and Timeline - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="packagingRequirements">Packaging Requirements *</Label>
+                <Select
+                  value={formData.packagingRequirements}
+                  onValueChange={(value) => handleSelectChange("packagingRequirements", value)}
+                >
+                  <SelectTrigger className={errors.packagingRequirements ? "border-destructive" : ""}>
+                    <SelectValue placeholder="Select packaging" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border z-50">
+                    <SelectItem value="standard">Standard</SelectItem>
+                    <SelectItem value="custom">Custom</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.packagingRequirements && <p className="text-sm text-destructive mt-1">{errors.packagingRequirements}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="timeline">When would you like to start? *</Label>
+                <Input
+                  id="timeline"
+                  name="timeline"
+                  value={formData.timeline}
+                  onChange={handleChange}
+                  className={errors.timeline ? "border-destructive" : ""}
+                  placeholder="e.g., ASAP, Next month, Q1 2026"
+                />
+                {errors.timeline && <p className="text-sm text-destructive mt-1">{errors.timeline}</p>}
+              </div>
+            </div>
+
+            {/* Comments */}
             <div>
-              <Label htmlFor="volume">Monthly Volume & Requirements *</Label>
+              <Label htmlFor="comments">Comments or Additional Requirements</Label>
               <Textarea
-                id="volume"
-                name="volume"
-                value={formData.volume}
+                id="comments"
+                name="comments"
+                value={formData.comments}
                 onChange={handleChange}
-                className={errors.volume ? "border-destructive" : ""}
-                placeholder="Describe your monthly shipment volume, product types, and any special requirements..."
+                className={errors.comments ? "border-destructive" : ""}
+                placeholder="Tell us about any special requirements, product types, or questions..."
                 rows={4}
               />
-              {errors.volume && <p className="text-sm text-destructive mt-1">{errors.volume}</p>}
+              {errors.comments && <p className="text-sm text-destructive mt-1">{errors.comments}</p>}
             </div>
 
             {/* Honeypot field - hidden from users */}

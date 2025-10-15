@@ -14,7 +14,12 @@ const contactEmailSchema = z.object({
   email: z.string().email().max(255),
   phone: z.string().trim().min(1).max(20),
   business: z.string().trim().min(1).max(200),
-  volume: z.string().trim().min(1).max(1000),
+  unitsPerMonth: z.string().min(1),
+  skuCount: z.string().min(1),
+  marketplaces: z.array(z.string()).min(1),
+  packagingRequirements: z.string().min(1),
+  timeline: z.string().trim().min(1).max(200),
+  comments: z.string().trim().max(1000).optional(),
   recipientEmail: z.string().email().max(255),
 });
 
@@ -35,7 +40,12 @@ interface ContactEmailRequest {
   email: string;
   phone: string;
   business: string;
-  volume: string;
+  unitsPerMonth: string;
+  skuCount: string;
+  marketplaces: string[];
+  packagingRequirements: string;
+  timeline: string;
+  comments?: string;
   recipientEmail: string;
 }
 
@@ -62,14 +72,19 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
     
-    const { name, email, phone, business, volume, recipientEmail }: ContactEmailRequest = validationResult.data;
+    const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data;
     
     // Escape HTML to prevent XSS
     const safeName = escapeHtml(name);
     const safeEmail = escapeHtml(email);
     const safePhone = escapeHtml(phone);
     const safeBusiness = escapeHtml(business);
-    const safeVolume = escapeHtml(volume);
+    const safeUnitsPerMonth = escapeHtml(unitsPerMonth);
+    const safeSkuCount = escapeHtml(skuCount);
+    const safeMarketplaces = marketplaces.map(m => escapeHtml(m)).join(", ");
+    const safePackaging = escapeHtml(packagingRequirements);
+    const safeTimeline = escapeHtml(timeline);
+    const safeComments = comments ? escapeHtml(comments) : "None provided";
 
     // Send notification email to business
     const emailResponse = await fetch("https://api.resend.com/emails", {
@@ -89,8 +104,16 @@ const handler = async (req: Request): Promise<Response> => {
           <p><strong>Email:</strong> ${safeEmail}</p>
           <p><strong>Phone:</strong> ${safePhone}</p>
           <p><strong>Business:</strong> ${safeBusiness}</p>
-          <p><strong>Monthly Volume & Requirements:</strong></p>
-          <p>${safeVolume}</p>
+          <hr>
+          <h3>Business Details</h3>
+          <p><strong>Units per Month:</strong> ${safeUnitsPerMonth}</p>
+          <p><strong>SKU Count:</strong> ${safeSkuCount}</p>
+          <p><strong>Marketplaces:</strong> ${safeMarketplaces}</p>
+          <p><strong>Packaging Requirements:</strong> ${safePackaging}</p>
+          <p><strong>Timeline:</strong> ${safeTimeline}</p>
+          <hr>
+          <h3>Additional Comments</h3>
+          <p>${safeComments}</p>
           <hr>
           <p style="color: #666; font-size: 12px;">You can reply directly to this email to respond to ${safeName}</p>
         `,
@@ -170,8 +193,28 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeBusiness}</td>
                               </tr>
                               <tr>
-                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0; vertical-align: top;">Requirements:</td>
-                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeVolume}</td>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Units/Month:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeUnitsPerMonth}</td>
+                              </tr>
+                              <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">SKU Count:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeSkuCount}</td>
+                              </tr>
+                              <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Marketplaces:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeMarketplaces}</td>
+                              </tr>
+                              <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Packaging:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safePackaging}</td>
+                              </tr>
+                              <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Timeline:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeTimeline}</td>
+                              </tr>
+                              <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0; vertical-align: top;">Comments:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeComments}</td>
                               </tr>
                             </table>
                           </div>
