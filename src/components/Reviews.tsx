@@ -4,28 +4,28 @@ import { Star } from "lucide-react";
 const Reviews = () => {
   const reviews = [
     {
-      name: "Drew",
+      name: "Brian Crocker",
       rating: 5,
-      text: "Excellent service and very professional. They handle our inventory with care and always meet our deadlines.",
+      text: "Outstanding service and reliability. Westfield Prep Center has been a game changer for my Amazon business. Their communication is fast, clear, and professional, and they consistently process and ship inventory on time. Every shipment has been perfectly prepped, labeled, and compliant with Amazon requirements with no delays or issues. What I appreciate most is their attention to detail and genuine care for my business. They treat my products as if they were their own.",
+      date: "January 2025"
+    },
+    {
+      name: "Adonass Kingsley",
+      rating: 5,
+      text: "Westfield Prep Center has been an absolute game-changer for my Amazon business! Their professionalism, efficiency, and attention to detail are unmatched. From the very first shipment, the team made the entire FBA prep process smooth and stress-free. They handle everything — from receiving and inspecting inventory to labeling, bundling, and shipping — with precision and care. I've never had to worry about compliance issues or delays.",
       date: "December 2024"
     },
     {
-      name: "Nima Baniasadi",
+      name: "Bryan Flores",
       rating: 5,
-      text: "Great communication and fast turnaround. Highly recommend for anyone looking for reliable fulfillment services.",
+      text: "I have nothing but good things to say about Westfield since I've started working with them. Quality and smooth process every time. They help process a good amount of units for my business and I'd definitely recommend them to anyone looking to trust them with their products!",
       date: "November 2024"
     },
     {
-      name: "Amir Kohan Far",
+      name: "Nuantip Diteesrivorakul",
       rating: 5,
-      text: "They've been handling our e-commerce fulfillment for months now and we couldn't be happier. Photo proof of every shipment is a game changer.",
+      text: "I have been working with Westfield for about 4-5 months now having them send in around 3k units per month. They have been on top of communicating, and have gotten fast turn around on all of shipments. I would 100% recommend them to anyone looking for a good, fast, and consistent prep center.",
       date: "October 2024"
-    },
-    {
-      name: "Joshua Meier",
-      rating: 5,
-      text: "Professional team that really cares about getting things right. Our Amazon FBA prep has never been smoother.",
-      date: "September 2024"
     }
   ];
 
@@ -42,7 +42,7 @@ const Reviews = () => {
             <span className="text-2xl font-bold">5.0</span>
           </div>
           <h2 className="text-3xl font-bold mb-2">What Our Clients Say</h2>
-          <p className="text-muted-foreground">Based on 4 Google reviews</p>
+          <p className="text-muted-foreground">based on our google reviews</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">

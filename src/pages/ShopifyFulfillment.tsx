@@ -167,42 +167,6 @@ const ShopifyFulfillment = () => {
             </div>
           </section>
 
-          {/* Social Proof */}
-          <section className="py-16 bg-muted/30">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Trusted by DTC Brands</h2>
-              <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                <Card>
-                  <CardContent className="pt-6">
-                    <Award className="h-8 w-8 text-primary mb-4" />
-                    <p className="italic text-muted-foreground mb-4">
-                      "Westfield transformed our fulfillment. Same-day shipping and photo QC give us peace of mind."
-                    </p>
-                    <p className="font-semibold">— Sarah M., Skincare Brand</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <Award className="h-8 w-8 text-primary mb-4" />
-                    <p className="italic text-muted-foreground mb-4">
-                      "Their custom kitting for our subscription boxes is flawless. Customers love the unboxing experience."
-                    </p>
-                    <p className="font-semibold">— Mike T., Subscription Box</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <Award className="h-8 w-8 text-primary mb-4" />
-                    <p className="italic text-muted-foreground mb-4">
-                      "We scaled from 500 to 5,000 orders per month seamlessly with Westfield. Highly recommend."
-                    </p>
-                    <p className="font-semibold">— Lisa K., Apparel Brand</p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </section>
-
           <Reviews />
 
           {/* FAQ */}
