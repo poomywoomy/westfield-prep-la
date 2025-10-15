@@ -6,26 +6,26 @@ const Reviews = () => {
     {
       name: "Brian Crocker",
       rating: 5,
-      text: "Outstanding service and reliability. Westfield Prep Center has been a game changer for my Amazon business. Their communication is fast, clear, and professional, and they consistently process and ship inventory on time. Every shipment has been perfectly prepped, labeled, and compliant with Amazon requirements with no delays or issues. What I appreciate most is their attention to detail and genuine care for my business. They treat my products as if they were their own.",
-      date: "January 2025"
+      text: "Outstanding service and reliability. Westfield Prep Center has been a game changer for my Amazon business. Their communication is fast, clear, and professional, and they consistently process and ship inventory on time...",
+      date: "July 2025"
     },
     {
       name: "Adonass Kingsley",
       rating: 5,
-      text: "Westfield Prep Center has been an absolute game-changer for my Amazon business! Their professionalism, efficiency, and attention to detail are unmatched. From the very first shipment, the team made the entire FBA prep process smooth and stress-free. They handle everything — from receiving and inspecting inventory to labeling, bundling, and shipping — with precision and care. I've never had to worry about compliance issues or delays.",
-      date: "December 2024"
+      text: "Westfield Prep Center has been an absolute game-changer for my Amazon business! Their professionalism, efficiency, and attention to detail are unmatched. From the very first shipment, the team made the entire FBA prep process smooth and stress-free...",
+      date: "June 2025"
     },
     {
       name: "Bryan Flores",
       rating: 5,
-      text: "I have nothing but good things to say about Westfield since I've started working with them. Quality and smooth process every time. They help process a good amount of units for my business and I'd definitely recommend them to anyone looking to trust them with their products!",
-      date: "November 2024"
+      text: "I have nothing but good things to say about Westfield since I've started working with them. Quality and smooth process every time. They help process a good amount of units for my business and I'd definitely recommend them...",
+      date: "March 2025"
     },
     {
       name: "Nuantip Diteesrivorakul",
       rating: 5,
-      text: "I have been working with Westfield for about 4-5 months now having them send in around 3k units per month. They have been on top of communicating, and have gotten fast turn around on all of shipments. I would 100% recommend them to anyone looking for a good, fast, and consistent prep center.",
-      date: "October 2024"
+      text: "I have been working with Westfield for about 4-5 months now having them send in around 3k units per month. They have been on top of communicating, and have gotten fast turn around on all of shipments...",
+      date: "December 2024"
     }
   ];
 
