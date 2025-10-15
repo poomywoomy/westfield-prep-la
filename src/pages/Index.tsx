@@ -17,7 +17,7 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Shopify & E-commerce Fulfillment in Los Angeles | Westfield Prep Center</title>
+        <title>Shopify, Amazon, & Ecom Fulfillment | Westfield Prep Center</title>
         <meta name="description" content="Shopify-first fulfillment with photo-proof QC, branded packaging, and same-day cutoffs. Also supporting Amazon FBA and TikTok Shop. Scale your DTC brand with a premium LA partner." />
       </Helmet>
       <div className="min-h-screen">
