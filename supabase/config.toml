@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.send-password-reset]
 verify_jwt = false
+
+[functions.change-password]
+verify_jwt = true
+
+[functions.check-rate-limit]
+verify_jwt = false

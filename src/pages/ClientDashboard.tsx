@@ -58,10 +58,24 @@ const ClientDashboard = () => {
   };
 
   useEffect(() => {
-    if (!loading && (!user || role !== "client")) {
-      navigate("/login");
+    // Defense-in-depth: Explicit role check before loading dashboard
+    if (!loading) {
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+      if (role !== "client") {
+        // Non-client user trying to access client dashboard
+        toast({
+          title: "Access Denied",
+          description: "You do not have permission to access this area.",
+          variant: "destructive",
+        });
+        navigate("/login");
+        return;
+      }
     }
-  }, [user, role, loading, navigate]);
+  }, [user, role, loading, navigate, toast]);
 
   const handleLogout = async () => {
     try {

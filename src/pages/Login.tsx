@@ -110,26 +110,35 @@ const Login = () => {
         navigate("/client/dashboard");
       }
     } catch (error: any) {
-      // Log failed login attempt to audit_log for security monitoring
+      // Log failed login attempt to audit_log for security monitoring (sanitized)
       try {
+        // Hash user agent to prevent information leakage
+        const userAgentHash = Array.from(
+          new Uint8Array(
+            await crypto.subtle.digest('SHA-256', new TextEncoder().encode(navigator.userAgent))
+          )
+        ).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+
         await supabase.from('audit_log').insert({
           action: 'FAILED_LOGIN',
           table_name: 'auth.users',
           new_data: {
             email,
-            error_message: error.message,
+            error_message: 'Authentication failed', // Generic message to prevent info leakage
             timestamp: new Date().toISOString(),
-            user_agent: navigator.userAgent,
+            user_agent_hash: userAgentHash, // Hashed instead of raw user agent
           }
         });
       } catch (logError) {
         // Silently fail - don't block user experience if audit logging fails
-        console.error('Failed to log security event:', logError);
+        if (import.meta.env.DEV) {
+          console.error('Failed to log security event:', logError);
+        }
       }
 
       toast({
         title: "Login failed",
-        description: error.message || "Authentication failed. Please check your credentials.",
+        description: "Authentication failed. Please check your credentials.",
         variant: "destructive",
       });
     } finally {

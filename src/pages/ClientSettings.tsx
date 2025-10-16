@@ -135,22 +135,16 @@ const ClientSettings = () => {
     setIsUpdating(true);
 
     try {
-      // First, verify current password by attempting to sign in
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: clientData.email,
-        password: currentPassword,
-      });
-
-      if (signInError) {
-        throw new Error("Current password is incorrect");
-      }
-
-      // If sign in successful, update to new password
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
+      // Use server-side password change with verification
+      const { data, error } = await supabase.functions.invoke('change-password', {
+        body: {
+          currentPassword,
+          newPassword,
+        }
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       toast({
         title: "Success",
@@ -164,7 +158,7 @@ const ClientSettings = () => {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to update password",
         variant: "destructive",
       });
     } finally {

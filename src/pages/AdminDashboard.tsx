@@ -20,10 +20,24 @@ const AdminDashboard = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!loading && (!user || role !== "admin")) {
-      navigate("/login");
+    // Defense-in-depth: Explicit role check before loading dashboard
+    if (!loading) {
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+      if (role !== "admin") {
+        // Non-admin user trying to access admin dashboard
+        toast({
+          title: "Access Denied",
+          description: "You do not have permission to access this area.",
+          variant: "destructive",
+        });
+        navigate("/login");
+        return;
+      }
     }
-  }, [user, role, loading, navigate]);
+  }, [user, role, loading, navigate, toast]);
 
   const handleLogout = async () => {
     try {
