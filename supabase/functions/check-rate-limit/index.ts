@@ -10,6 +10,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Allowlist of legitimate rate limit key prefixes to prevent probing
+const ALLOWED_KEY_PREFIXES = [
+  'login_',
+  'password_reset_',
+  'contact_form_',
+  'intake_form_',
+];
+
 const rateLimitSchema = z.object({
   key: z.string().max(100),
   maxAttempts: z.number().int().positive().max(100),
@@ -33,6 +41,15 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const { key, maxAttempts, windowMinutes } = validationResult.data;
+    
+    // Validate key prefix against allowlist to prevent probing
+    const hasValidPrefix = ALLOWED_KEY_PREFIXES.some(prefix => key.startsWith(prefix));
+    if (!hasValidPrefix) {
+      return new Response(
+        JSON.stringify({ error: "Invalid rate limit key" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
     
     // Get client IP for additional tracking
     const clientIp = req.headers.get("x-forwarded-for") || "unknown";

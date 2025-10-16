@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload, X, FileText } from "lucide-react";
 import { validatePricingDocument } from "@/lib/fileValidation";
 import { sanitizeError } from "@/lib/errorHandler";
+import { clientUpdateSchema } from "@/lib/clientValidation";
 
 interface EditClientDialogProps {
   open: boolean;
@@ -182,23 +183,42 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
         }
       }
 
+      // Prepare data for validation
+      const dataToValidate = {
+        company_name: formData.company_name,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        phone_number: formData.phone_number,
+        estimated_units_per_month: formData.estimated_units_per_month ? parseInt(formData.estimated_units_per_month) : null,
+        receiving_format: formData.receiving_format,
+        extra_prep: formData.extra_prep,
+        storage: formData.storage,
+        storage_units_per_month: formData.storage_units_per_month ? parseInt(formData.storage_units_per_month) : null,
+        storage_method: formData.storage_method || null,
+        admin_notes: formData.admin_notes,
+        fulfillment_services: formData.fulfillment_services,
+        pricing_document_url: documentUrl || null,
+      };
+
+      // Validate data with zod schema
+      const validationResult = clientUpdateSchema.safeParse(dataToValidate);
+      
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        toast({
+          title: "Validation error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase
         .from("clients")
         .update({
-          company_name: formData.company_name,
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          contact_name: `${formData.first_name} ${formData.last_name}`.trim(),
-          phone_number: formData.phone_number,
-          estimated_units_per_month: formData.estimated_units_per_month ? parseInt(formData.estimated_units_per_month) : null,
-          receiving_format: formData.receiving_format,
-          extra_prep: formData.extra_prep,
-          storage: formData.storage,
-          storage_units_per_month: formData.storage_units_per_month ? parseInt(formData.storage_units_per_month) : null,
-          storage_method: formData.storage_method || null,
-          admin_notes: formData.admin_notes,
-          fulfillment_services: formData.fulfillment_services,
-          pricing_document_url: documentUrl || null,
+          ...validationResult.data,
+          contact_name: `${validationResult.data.first_name} ${validationResult.data.last_name}`.trim(),
         })
         .eq("id", client.id);
 
