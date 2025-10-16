@@ -90,7 +90,7 @@ const Pricing = () => {
                         </TableRow>
                         {selfFulfilledExpanded && (
                           <>
-                            <TableRow className="bg-muted/20">
+                            <TableRow key={`${index}-standard`} className="bg-muted/20">
                               <TableCell className="pl-8 text-sm text-muted-foreground">
                                 Standard
                               </TableCell>
@@ -98,7 +98,7 @@ const Pricing = () => {
                                 $3.00/order
                               </TableCell>
                             </TableRow>
-                            <TableRow className="bg-muted/20">
+                            <TableRow key={`${index}-oversized`} className="bg-muted/20">
                               <TableCell className="pl-8 text-sm text-muted-foreground">
                                 Oversized
                               </TableCell>
