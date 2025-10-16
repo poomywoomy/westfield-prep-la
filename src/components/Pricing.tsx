@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import {
   Table,
   TableBody,
@@ -58,9 +58,8 @@ const Pricing = () => {
                 {pricingData.map((item, index) => {
                   if (item.service === "Self-Fulfilled Shipment") {
                     return (
-                      <>
+                      <Fragment key={index}>
                         <TableRow 
-                          key={index} 
                           className="hover:bg-muted/30 transition-colors cursor-pointer"
                           onClick={() => setSelfFulfilledExpanded(!selfFulfilledExpanded)}
                         >
@@ -108,7 +107,7 @@ const Pricing = () => {
                             </TableRow>
                           </>
                         )}
-                      </>
+                      </Fragment>
                     );
                   }
                   
