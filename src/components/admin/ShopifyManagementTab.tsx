@@ -1,36 +1,167 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, Store } from "lucide-react";
+import { Loader2, RefreshCw, Search, MoreHorizontal, Store, Activity, TrendingUp, AlertCircle } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ShopifySyncLogsDialog } from "./ShopifySyncLogsDialog";
+import { ShopifyProductsDialog } from "./ShopifyProductsDialog";
+import { ShopifyWebhooksDialog } from "./ShopifyWebhooksDialog";
+import { ShopifySyncScheduleDialog } from "./ShopifySyncScheduleDialog";
+import { format } from "date-fns";
 
-export default function ShopifyManagementTab() {
-  const { toast } = useToast();
+interface ShopifyStore {
+  id: string;
+  shop_domain: string;
+  is_active: boolean;
+  connected_at: string;
+  client_id: string;
+  clients: {
+    company_name: string;
+  };
+  shopify_sync_config?: {
+    auto_sync_enabled: boolean;
+    sync_frequency: string;
+    last_sync_at: string | null;
+  };
+  product_count?: number;
+}
+
+interface Stats {
+  totalStores: number;
+  activeAutoSyncs: number;
+  syncsLast24h: number;
+  failedSyncsLast24h: number;
+  totalProductsSynced: number;
+  pendingWebhooks: number;
+}
+
+export function ShopifyManagementTab() {
+  const [stores, setStores] = useState<ShopifyStore[]>([]);
+  const [stats, setStats] = useState<Stats>({
+    totalStores: 0,
+    activeAutoSyncs: 0,
+    syncsLast24h: 0,
+    failedSyncsLast24h: 0,
+    totalProductsSynced: 0,
+    pendingWebhooks: 0,
+  });
   const [loading, setLoading] = useState(true);
-  const [stores, setStores] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [syncing, setSyncing] = useState<string | null>(null);
+  const [testing, setTesting] = useState<string | null>(null);
+  
+  // Dialog states
+  const [logsDialog, setLogsDialog] = useState<{ open: boolean; clientId: string; clientName: string }>({
+    open: false,
+    clientId: "",
+    clientName: "",
+  });
+  const [productsDialog, setProductsDialog] = useState<{ open: boolean; clientId: string; clientName: string }>({
+    open: false,
+    clientId: "",
+    clientName: "",
+  });
+  const [webhooksDialog, setWebhooksDialog] = useState<{ open: boolean; clientId: string; clientName: string }>({
+    open: false,
+    clientId: "",
+    clientName: "",
+  });
+  const [scheduleDialog, setScheduleDialog] = useState<{ open: boolean; clientId: string; clientName: string }>({
+    open: false,
+    clientId: "",
+    clientName: "",
+  });
+
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchStores();
+    fetchStats();
+
+    // Real-time subscriptions
+    const storesChannel = supabase
+      .channel('shopify-stores-admin')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'shopify_stores'
+      }, () => {
+        fetchStores();
+        fetchStats();
+      })
+      .subscribe();
+
+    const syncLogsChannel = supabase
+      .channel('sync-logs-admin')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'sync_logs'
+      }, (payload) => {
+        if (payload.new.status === 'success') {
+          toast({
+            title: "Sync completed",
+            description: `${payload.new.products_synced} products synced`,
+          });
+        }
+        fetchStats();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(storesChannel);
+      supabase.removeChannel(syncLogsChannel);
+    };
   }, []);
 
   const fetchStores = async () => {
     try {
-      setLoading(true);
       const { data, error } = await supabase
-        .from('shopify_stores')
+        .from("shopify_stores")
         .select(`
           *,
           clients!inner(company_name)
         `)
-        .eq('is_active', true);
+        .order("connected_at", { ascending: false });
 
       if (error) throw error;
-      setStores(data || []);
+
+      // Fetch sync configs and product counts for each store
+      const storesWithDetails = await Promise.all(
+        (data || []).map(async (store) => {
+          const [syncConfigRes, productCountRes] = await Promise.all([
+            supabase
+              .from('shopify_sync_config')
+              .select('auto_sync_enabled, sync_frequency, last_sync_at')
+              .eq('client_id', store.client_id)
+              .single(),
+            supabase
+              .from('client_skus')
+              .select('id', { count: 'exact', head: true })
+              .eq('client_id', store.client_id)
+          ]);
+
+          return {
+            ...store,
+            shopify_sync_config: syncConfigRes.data || undefined,
+            product_count: productCountRes.count || 0,
+          };
+        })
+      );
+
+      setStores(storesWithDetails);
     } catch (error) {
-      console.error('Error fetching stores:', error);
+      console.error("Error fetching Shopify stores:", error);
       toast({
         title: "Error",
         description: "Failed to load Shopify stores",
@@ -41,80 +172,369 @@ export default function ShopifyManagementTab() {
     }
   };
 
-  const handleSync = async (clientId: string) => {
+  const fetchStats = async () => {
     try {
-      const { error } = await supabase.functions.invoke('shopify-sync-products', {
-        body: { client_id: clientId }
+      const [storesRes, autoSyncsRes, syncsRes, failedSyncsRes, productsRes] = await Promise.all([
+        supabase.from('shopify_stores').select('id', { count: 'exact', head: true }),
+        supabase.from('shopify_sync_config').select('id', { count: 'exact', head: true }).eq('auto_sync_enabled', true),
+        supabase.from('sync_logs').select('id', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+        supabase.from('sync_logs').select('id', { count: 'exact', head: true }).eq('status', 'failed').gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+        supabase.from('client_skus').select('id', { count: 'exact', head: true }),
+      ]);
+
+      setStats({
+        totalStores: storesRes.count || 0,
+        activeAutoSyncs: autoSyncsRes.count || 0,
+        syncsLast24h: syncsRes.count || 0,
+        failedSyncsLast24h: failedSyncsRes.count || 0,
+        totalProductsSynced: productsRes.count || 0,
+        pendingWebhooks: 0,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
+
+  const handleSyncProducts = async (clientId: string) => {
+    setSyncing(clientId);
+    try {
+      const { error } = await supabase.functions.invoke("shopify-sync-products", {
+        body: { client_id: clientId },
       });
 
       if (error) throw error;
 
       toast({
-        title: "Sync started",
-        description: "Product sync has been triggered",
+        title: "Success",
+        description: "Product sync initiated",
       });
+
+      fetchStores();
     } catch (error) {
+      console.error("Error syncing products:", error);
       toast({
-        title: "Sync failed",
-        description: error instanceof Error ? error.message : "Failed to sync",
+        title: "Error",
+        description: "Failed to sync products",
+        variant: "destructive",
+      });
+    } finally {
+      setSyncing(null);
+    }
+  };
+
+  const testConnection = async (clientId: string, storeDomain: string) => {
+    setTesting(clientId);
+    try {
+      const { data, error } = await supabase.functions.invoke("shopify-test-connection", {
+        body: { client_id: clientId },
+      });
+
+      if (error) throw error;
+
+      if (data?.connected) {
+        toast({
+          title: "Connection Active",
+          description: `Store: ${data.store_name || storeDomain}`,
+        });
+      } else {
+        throw new Error("Connection test failed");
+      }
+    } catch (error) {
+      console.error("Error testing connection:", error);
+      toast({
+        title: "Connection Failed",
+        description: error instanceof Error ? error.message : "Unable to connect to store",
+        variant: "destructive",
+      });
+    } finally {
+      setTesting(null);
+    }
+  };
+
+  const disconnectStore = async (clientId: string, storeDomain: string) => {
+    if (!confirm(`Disconnect Shopify store ${storeDomain}? This will deactivate auto-sync and remove webhooks.`)) {
+      return;
+    }
+
+    const deleteProducts = confirm("Also delete all synced products for this client?");
+
+    try {
+      const { error } = await supabase.functions.invoke("shopify-disconnect-store", {
+        body: { client_id: clientId, delete_products: deleteProducts },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Store disconnected successfully",
+      });
+
+      fetchStores();
+      fetchStats();
+    } catch (error) {
+      console.error("Error disconnecting store:", error);
+      toast({
+        title: "Error",
+        description: "Failed to disconnect store",
         variant: "destructive",
       });
     }
   };
 
+  const filteredStores = stores.filter(store =>
+    store.shop_domain.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    store.clients.company_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Stores</CardTitle>
+            <Store className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalStores}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Auto-Syncs</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.activeAutoSyncs}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Syncs (24h)</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.syncsLast24h}</div>
+            {stats.failedSyncsLast24h > 0 && (
+              <p className="text-xs text-destructive mt-1">
+                {stats.failedSyncsLast24h} failed
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Products Synced</CardTitle>
+            <Store className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalProductsSynced}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Failed Syncs (24h)</CardTitle>
+            <AlertCircle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.failedSyncsLast24h}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Stores Table */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Store className="h-5 w-5" />
-              <div>
-                <CardTitle>Shopify Store Connections</CardTitle>
-                <CardDescription>Manage all client Shopify integrations</CardDescription>
-              </div>
+          <CardTitle>Connected Stores</CardTitle>
+          <CardDescription>Manage Shopify integrations for all clients</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by store domain or client name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
             </div>
-            <Button onClick={fetchStores} variant="outline" size="sm">
-              <RefreshCw className="mr-2 h-4 w-4" />
+            <Button variant="outline" onClick={fetchStores}>
+              <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Client</TableHead>
-                <TableHead>Store Domain</TableHead>
-                <TableHead>Connected</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {stores.map((store) => (
-                <TableRow key={store.id}>
-                  <TableCell className="font-medium">{store.clients?.company_name}</TableCell>
-                  <TableCell>{store.shop_domain}</TableCell>
-                  <TableCell>{new Date(store.connected_at).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Badge variant="default">Active</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleSync(store.client_id)}
-                    >
-                      Sync Now
-                    </Button>
-                  </TableCell>
+
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Store Domain</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Auto-Sync</TableHead>
+                  <TableHead>Products</TableHead>
+                  <TableHead>Last Sync</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredStores.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                      No stores connected
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredStores.map((store) => (
+                    <TableRow key={store.id}>
+                      <TableCell className="font-medium">{store.clients.company_name}</TableCell>
+                      <TableCell className="font-mono text-sm">{store.shop_domain}</TableCell>
+                      <TableCell>
+                        <Badge variant={store.is_active ? "default" : "secondary"}>
+                          {store.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {store.shopify_sync_config?.auto_sync_enabled ? (
+                          <Badge variant="outline">
+                            {store.shopify_sync_config.sync_frequency}
+                          </Badge>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">Disabled</span>
+                        )}
+                      </TableCell>
+                      <TableCell>{store.product_count || 0}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {store.shopify_sync_config?.last_sync_at
+                          ? format(new Date(store.shopify_sync_config.last_sync_at), 'MMM dd, HH:mm')
+                          : 'Never'}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => handleSyncProducts(store.client_id)}
+                              disabled={syncing === store.client_id}
+                            >
+                              {syncing === store.client_id ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  Syncing...
+                                </>
+                              ) : (
+                                'Sync Now'
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setLogsDialog({
+                                open: true,
+                                clientId: store.client_id,
+                                clientName: store.clients.company_name,
+                              })}
+                            >
+                              View Sync Logs
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setProductsDialog({
+                                open: true,
+                                clientId: store.client_id,
+                                clientName: store.clients.company_name,
+                              })}
+                            >
+                              View Products
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setWebhooksDialog({
+                                open: true,
+                                clientId: store.client_id,
+                                clientName: store.clients.company_name,
+                              })}
+                            >
+                              Manage Webhooks
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setScheduleDialog({
+                                open: true,
+                                clientId: store.client_id,
+                                clientName: store.clients.company_name,
+                              })}
+                            >
+                              Sync Schedule
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => testConnection(store.client_id, store.shop_domain)}
+                              disabled={testing === store.client_id}
+                            >
+                              {testing === store.client_id ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  Testing...
+                                </>
+                              ) : (
+                                'Test Connection'
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => disconnectStore(store.client_id, store.shop_domain)}
+                              className="text-destructive"
+                            >
+                              Disconnect Store
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
+
+      {/* Dialogs */}
+      <ShopifySyncLogsDialog
+        open={logsDialog.open}
+        onOpenChange={(open) => setLogsDialog({ ...logsDialog, open })}
+        clientId={logsDialog.clientId}
+        clientName={logsDialog.clientName}
+      />
+
+      <ShopifyProductsDialog
+        open={productsDialog.open}
+        onOpenChange={(open) => setProductsDialog({ ...productsDialog, open })}
+        clientId={productsDialog.clientId}
+        clientName={productsDialog.clientName}
+      />
+
+      <ShopifyWebhooksDialog
+        open={webhooksDialog.open}
+        onOpenChange={(open) => setWebhooksDialog({ ...webhooksDialog, open })}
+        clientId={webhooksDialog.clientId}
+        clientName={webhooksDialog.clientName}
+      />
+
+      <ShopifySyncScheduleDialog
+        open={scheduleDialog.open}
+        onOpenChange={(open) => setScheduleDialog({ ...scheduleDialog, open })}
+        clientId={scheduleDialog.clientId}
+        clientName={scheduleDialog.clientName}
+      />
     </div>
   );
 }

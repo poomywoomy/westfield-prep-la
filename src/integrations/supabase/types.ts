@@ -1354,6 +1354,47 @@ export type Database = {
           },
         ]
       }
+      shopify_webhooks: {
+        Row: {
+          address: string
+          client_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          topic: string
+          updated_at: string
+          webhook_id: string
+        }
+        Insert: {
+          address: string
+          client_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          topic: string
+          updated_at?: string
+          webhook_id: string
+        }
+        Update: {
+          address?: string
+          client_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          topic?: string
+          updated_at?: string
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_webhooks_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sync_logs: {
         Row: {
           client_id: string
@@ -1458,6 +1499,10 @@ export type Database = {
     }
     Functions: {
       cleanup_old_rate_limits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      cleanup_old_sync_logs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }

@@ -13,7 +13,7 @@ import QuotesTab from "@/components/admin/QuotesTab";
 import BillingTab from "@/components/admin/BillingTab";
 import QCImagesTab from "@/components/admin/QCImagesTab";
 import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
-import ShopifyManagementTab from "@/components/admin/ShopifyManagementTab";
+import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
 
 const AdminDashboard = () => {
   const { user, role, loading } = useAuth();
