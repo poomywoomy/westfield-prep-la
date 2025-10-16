@@ -74,9 +74,6 @@ const Header = () => {
             <Link to="/tiktok-shop-fulfillment" className="text-foreground hover:text-primary transition-colors font-medium">
               TikTok Shop
             </Link>
-            <Link to="/kitting-bundling" className="text-foreground hover:text-primary transition-colors font-medium">
-              Kitting
-            </Link>
             {isHomePage ? (
               <button
                 onClick={() => scrollToSection("pricing")}
@@ -113,7 +110,7 @@ const Header = () => {
                 <span className="font-bold text-sm">1.818.935.5478</span>
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  Mon-Fri | 9am-8pm PST
+                  Mon-Sun | 9am-8pm PST
                 </span>
               </div>
             </a>

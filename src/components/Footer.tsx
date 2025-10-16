@@ -66,10 +66,10 @@ const Footer = () => {
               </Link>
               <span className="text-white/40">•</span>
               <Link
-                to="/kitting-bundling"
+                to="/testimonials"
                 className="text-xs text-white/80 hover:text-secondary transition-colors"
               >
-                Kitting
+                Testimonials
               </Link>
               <span className="text-white/40">•</span>
               <Link

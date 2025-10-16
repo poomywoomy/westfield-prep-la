@@ -25,6 +25,7 @@ const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
 const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const ClientSettings = lazy(() => import("./pages/ClientSettings"));
+const Testimonials = lazy(() => import("./pages/Testimonials"));
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/testimonials" element={<Testimonials />} />
               
               {/* Service Pages */}
               <Route path="/shopify-fulfillment" element={<ShopifyFulfillment />} />
