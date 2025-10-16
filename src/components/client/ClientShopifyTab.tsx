@@ -105,33 +105,62 @@ export default function ClientShopifyTab() {
     }
   };
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
     const shopDomain = prompt('Enter your Shopify store domain (e.g., mystore.myshopify.com):');
     if (!shopDomain) return;
 
-    // Open OAuth window
-    const width = 600;
-    const height = 700;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
+    try {
+      // Call edge function to get OAuth URL
+      const { data, error } = await supabase.functions.invoke('shopify-oauth-start', {
+        body: { shop: shopDomain }
+      });
 
-    const popup = window.open(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-oauth-start?shop=${shopDomain}`,
-      'Shopify OAuth',
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
+      if (error) throw error;
 
-    // Poll for popup close
-    const pollTimer = setInterval(() => {
-      if (popup?.closed) {
-        clearInterval(pollTimer);
-        fetchStoreData();
-        toast({
-          title: "Connection successful",
-          description: "Your Shopify store has been connected.",
-        });
+      if (!data?.authUrl) {
+        throw new Error('Failed to get OAuth URL');
       }
-    }, 500);
+
+      // Open OAuth URL in popup
+      const width = 600;
+      const height = 700;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
+
+      const popup = window.open(
+        data.authUrl,
+        'Shopify OAuth',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      if (!popup) {
+        toast({
+          title: "Popup blocked",
+          description: "Please allow popups for this site and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Poll for popup close
+      const pollTimer = setInterval(() => {
+        if (popup?.closed) {
+          clearInterval(pollTimer);
+          fetchStoreData();
+          toast({
+            title: "Connection successful",
+            description: "Your Shopify store has been connected.",
+          });
+        }
+      }, 500);
+    } catch (error) {
+      console.error('OAuth error:', error);
+      toast({
+        title: "Connection failed",
+        description: error instanceof Error ? error.message : "Failed to start OAuth flow",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSync = async () => {

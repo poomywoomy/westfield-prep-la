@@ -16,13 +16,18 @@ Deno.serve(async (req) => {
     const shop = url.searchParams.get('shop');
     const state = url.searchParams.get('state');
 
+    console.log('OAuth callback received - Shop:', shop, 'Code:', code ? 'present' : 'missing');
+
     if (!code || !shop) {
+      console.error('Missing OAuth parameters - code:', !!code, 'shop:', shop);
       throw new Error('Missing required OAuth parameters');
     }
 
     const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
     const clientSecret = Deno.env.get('SHOPIFY_CLIENT_SECRET');
     const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
+
+    console.log('Exchanging code for access token...');
 
     // Exchange code for access token
     const tokenResponse = await fetch(`https://${shop}/admin/oauth/access_token`, {
@@ -36,15 +41,20 @@ Deno.serve(async (req) => {
     });
 
     if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text();
+      console.error('Token exchange failed:', tokenResponse.status, errorText);
       throw new Error('Failed to exchange OAuth code for access token');
     }
 
     const tokenData = await tokenResponse.json();
     const { access_token, scope } = tokenData;
+    
+    console.log('Access token received, scope:', scope);
 
     // Get auth header from request
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error('No authorization header in callback request');
       throw new Error('No authorization header');
     }
 
@@ -54,11 +64,16 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
+    console.log('Getting authenticated user...');
+
     // Get user's client_id
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+      console.error('No authenticated user found');
       throw new Error('User not authenticated');
     }
+
+    console.log('User authenticated:', user.id);
 
     const { data: client } = await supabase
       .from('clients')
@@ -67,8 +82,11 @@ Deno.serve(async (req) => {
       .single();
 
     if (!client) {
+      console.error('No client profile found for user:', user.id);
       throw new Error('Client profile not found');
     }
+
+    console.log('Storing Shopify connection for client:', client.id);
 
     // Store Shopify connection
     const { error: storeError } = await supabase
@@ -84,8 +102,11 @@ Deno.serve(async (req) => {
       });
 
     if (storeError) {
+      console.error('Failed to store Shopify connection:', storeError);
       throw storeError;
     }
+
+    console.log('Shopify store connected successfully!');
 
     // Redirect back to client dashboard
     const redirectUrl = `${url.origin}/client-dashboard?shopify_connected=true`;

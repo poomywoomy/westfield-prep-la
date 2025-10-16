@@ -13,7 +13,10 @@ Deno.serve(async (req) => {
   try {
     const { shop } = await req.json();
 
+    console.log('Starting OAuth flow for shop:', shop);
+
     if (!shop) {
+      console.error('No shop domain provided');
       return new Response(
         JSON.stringify({ error: 'Shop domain is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -24,11 +27,15 @@ Deno.serve(async (req) => {
     const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
     const redirectUri = `${Deno.env.get('SUPABASE_URL')}/functions/v1/shopify-oauth-callback`;
     
+    console.log('Client ID:', clientId);
+    console.log('Redirect URI:', redirectUri);
+    
     const scopes = 'read_products,write_products,read_orders,write_orders,read_inventory,write_inventory';
     const nonce = crypto.randomUUID();
 
-    // Store nonce in session for verification
     const authUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${scopes}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${nonce}`;
+    
+    console.log('Generated OAuth URL:', authUrl);
 
     return new Response(
       JSON.stringify({ authUrl, nonce }),
