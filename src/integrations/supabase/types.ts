@@ -437,6 +437,53 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_sync: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          last_synced_at: string | null
+          shopify_inventory_item_id: string | null
+          shopify_quantity: number | null
+          sku: string
+          sync_enabled: boolean
+          updated_at: string
+          westfield_quantity: number
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          shopify_inventory_item_id?: string | null
+          shopify_quantity?: number | null
+          sku: string
+          sync_enabled?: boolean
+          updated_at?: string
+          westfield_quantity?: number
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          shopify_inventory_item_id?: string | null
+          shopify_quantity?: number | null
+          sku?: string
+          sync_enabled?: boolean
+          updated_at?: string
+          westfield_quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_sync_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_items: {
         Row: {
           created_at: string
@@ -1157,6 +1204,68 @@ export type Database = {
           },
         ]
       }
+      shopify_orders: {
+        Row: {
+          client_id: string
+          created_at_shopify: string | null
+          currency: string | null
+          customer_email: string | null
+          customer_name: string | null
+          financial_status: string | null
+          fulfillment_status: string | null
+          id: string
+          line_items: Json | null
+          order_number: string | null
+          shipping_address: Json | null
+          shopify_order_id: string
+          synced_at: string
+          total_price: number | null
+          updated_at_shopify: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at_shopify?: string | null
+          currency?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          financial_status?: string | null
+          fulfillment_status?: string | null
+          id?: string
+          line_items?: Json | null
+          order_number?: string | null
+          shipping_address?: Json | null
+          shopify_order_id: string
+          synced_at?: string
+          total_price?: number | null
+          updated_at_shopify?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at_shopify?: string | null
+          currency?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          financial_status?: string | null
+          fulfillment_status?: string | null
+          id?: string
+          line_items?: Json | null
+          order_number?: string | null
+          shipping_address?: Json | null
+          shopify_order_id?: string
+          synced_at?: string
+          total_price?: number | null
+          updated_at_shopify?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_orders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shopify_stores: {
         Row: {
           access_token: string
@@ -1198,6 +1307,97 @@ export type Database = {
           },
         ]
       }
+      shopify_sync_config: {
+        Row: {
+          auto_sync_enabled: boolean
+          client_id: string
+          created_at: string
+          id: string
+          last_sync_at: string | null
+          last_sync_product_count: number | null
+          last_sync_status: string | null
+          next_sync_at: string | null
+          sync_frequency: string
+          updated_at: string
+        }
+        Insert: {
+          auto_sync_enabled?: boolean
+          client_id: string
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          last_sync_product_count?: number | null
+          last_sync_status?: string | null
+          next_sync_at?: string | null
+          sync_frequency?: string
+          updated_at?: string
+        }
+        Update: {
+          auto_sync_enabled?: boolean
+          client_id?: string
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          last_sync_product_count?: number | null
+          last_sync_status?: string | null
+          next_sync_at?: string | null
+          sync_frequency?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_sync_config_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sync_logs: {
+        Row: {
+          client_id: string
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          products_synced: number | null
+          status: string
+          sync_type: string
+          triggered_by: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          products_synced?: number | null
+          status?: string
+          sync_type: string
+          triggered_by?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          products_synced?: number | null
+          status?: string
+          sync_type?: string
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_logs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1216,6 +1416,39 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      webhook_delivery_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          payload: Json | null
+          shop_domain: string
+          status: string
+          topic: string
+          webhook_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          payload?: Json | null
+          shop_domain: string
+          status: string
+          topic: string
+          webhook_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          payload?: Json | null
+          shop_domain?: string
+          status?: string
+          topic?: string
+          webhook_id?: string | null
         }
         Relationships: []
       }
