@@ -19,6 +19,53 @@ interface ShopifyStore {
   access_token: string;
 }
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 5000;
+
+const isRetryableError = (error: any): boolean => {
+  if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') return true;
+  if (error.status === 429 || error.status === 503 || error.status === 502) return true;
+  return false;
+};
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function fetchShopifyProductsWithRetry(
+  shopDomain: string,
+  accessToken: string,
+  attempt = 1
+): Promise<any> {
+  try {
+    const response = await fetch(
+      `https://${shopDomain}/admin/api/2024-01/products.json?limit=250`,
+      {
+        headers: {
+          'X-Shopify-Access-Token': accessToken,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw { status: response.status, message: errorText };
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`Shopify API error (attempt ${attempt}):`, error);
+    
+    if (attempt < MAX_RETRIES && isRetryableError(error)) {
+      const delay = RETRY_DELAY_MS * attempt;
+      console.log(`Retrying after ${delay}ms...`);
+      await sleep(delay);
+      return fetchShopifyProductsWithRetry(shopDomain, accessToken, attempt + 1);
+    }
+    
+    throw error;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -77,22 +124,11 @@ Deno.serve(async (req) => {
           throw new Error('Store not found or inactive');
         }
 
-        // Fetch products from Shopify
-        const shopifyResponse = await fetch(
-          `https://${store.shop_domain}/admin/api/2024-01/products.json?limit=250`,
-          {
-            headers: {
-              'X-Shopify-Access-Token': store.access_token,
-              'Content-Type': 'application/json',
-            },
-          }
+        // Fetch products from Shopify with retry logic
+        const { products } = await fetchShopifyProductsWithRetry(
+          store.shop_domain,
+          store.access_token
         );
-
-        if (!shopifyResponse.ok) {
-          throw new Error(`Shopify API error: ${shopifyResponse.statusText}`);
-        }
-
-        const { products } = await shopifyResponse.json();
 
         // Process and upsert products
         const productData = products.flatMap((product: any) =>

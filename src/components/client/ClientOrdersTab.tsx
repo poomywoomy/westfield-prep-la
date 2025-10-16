@@ -6,7 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, ShoppingCart, ExternalLink } from "lucide-react";
+import { RefreshCw, ShoppingCart, Package, ChevronDown, ChevronUp } from "lucide-react";
+import { OrderFulfillmentDialog } from "./OrderFulfillmentDialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export default function ClientOrdersTab() {
   const { user } = useAuth();
@@ -14,6 +16,11 @@ export default function ClientOrdersTab() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [fulfillmentDialog, setFulfillmentDialog] = useState<{
+    open: boolean;
+    order: any | null;
+  }>({ open: false, order: null });
 
   useEffect(() => {
     if (user) {
@@ -142,55 +149,136 @@ export default function ClientOrdersTab() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12"></TableHead>
                   <TableHead>Order #</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead className="text-right">Total</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Payment</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {orders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                       No orders found. Click "Sync Orders" to import from Shopify.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  orders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-mono text-sm">
-                        {order.order_number}
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{order.customer_name || 'Guest'}</div>
-                          <div className="text-sm text-muted-foreground">{order.customer_email}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(order.shopify_created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {order.currency} ${Number(order.total_price || 0).toFixed(2)}
-                      </TableCell>
-                      <TableCell>
-                        {getStatusBadge(order.fulfillment_status || 'unfulfilled')}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={order.financial_status === 'paid' ? 'default' : 'outline'}>
-                          {order.financial_status}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  orders.map((order) => {
+                    const isExpanded = expandedOrder === order.id;
+                    const lineItems = order.line_items || [];
+                    
+                    return (
+                      <>
+                        <TableRow key={order.id}>
+                          <TableCell>
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
+                              >
+                                {isExpanded ? (
+                                  <ChevronUp className="h-4 w-4" />
+                                ) : (
+                                  <ChevronDown className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </CollapsibleTrigger>
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">
+                            {order.order_number}
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{order.customer_name || 'Guest'}</div>
+                              <div className="text-sm text-muted-foreground">{order.customer_email}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {new Date(order.created_at_shopify).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {order.currency} ${Number(order.total_price || 0).toFixed(2)}
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(order.fulfillment_status || 'unfulfilled')}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={order.financial_status === 'paid' ? 'default' : 'outline'}>
+                              {order.financial_status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {order.fulfillment_status !== 'fulfilled' && (
+                              <Button
+                                size="sm"
+                                onClick={() => setFulfillmentDialog({ open: true, order })}
+                              >
+                                <Package className="mr-2 h-4 w-4" />
+                                Fulfill
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                        {isExpanded && (
+                          <TableRow>
+                            <TableCell colSpan={8} className="bg-muted/50">
+                              <div className="p-4 space-y-4">
+                                <div>
+                                  <h4 className="font-semibold mb-2">Order Items</h4>
+                                  <div className="space-y-2">
+                                    {lineItems.map((item: any, idx: number) => (
+                                      <div key={idx} className="flex justify-between text-sm">
+                                        <span>
+                                          {item.name} × {item.quantity}
+                                        </span>
+                                        <span className="font-medium">
+                                          ${Number(item.price).toFixed(2)}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                {order.shipping_address && (
+                                  <div>
+                                    <h4 className="font-semibold mb-2">Shipping Address</h4>
+                                    <div className="text-sm text-muted-foreground">
+                                      <p>{order.shipping_address.address1}</p>
+                                      {order.shipping_address.address2 && (
+                                        <p>{order.shipping_address.address2}</p>
+                                      )}
+                                      <p>
+                                        {order.shipping_address.city}, {order.shipping_address.province}{' '}
+                                        {order.shipping_address.zip}
+                                      </p>
+                                      <p>{order.shipping_address.country}</p>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
           </div>
         </CardContent>
       </Card>
+
+      <OrderFulfillmentDialog
+        open={fulfillmentDialog.open}
+        onOpenChange={(open) => setFulfillmentDialog({ open, order: null })}
+        order={fulfillmentDialog.order}
+        onSuccess={fetchOrders}
+      />
     </div>
   );
 }

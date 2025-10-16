@@ -89,6 +89,18 @@ export function ShopifyWebhooksDialog({ open, onOpenChange, clientId, clientName
 
       if (error) throw error;
 
+      // Audit log
+      await supabase.from('audit_log').insert({
+        action: 'shopify_webhook_register',
+        table_name: 'shopify_webhooks',
+        record_id: clientId,
+        new_data: { 
+          action: 'register_webhook',
+          topic: selectedTopic,
+          timestamp: new Date().toISOString() 
+        }
+      });
+
       toast({
         title: "Success",
         description: `Webhook registered for ${selectedTopic}`,
@@ -118,6 +130,19 @@ export function ShopifyWebhooksDialog({ open, onOpenChange, clientId, clientName
         .eq('id', webhookId);
 
       if (error) throw error;
+
+      // Audit log
+      await supabase.from('audit_log').insert({
+        action: 'shopify_webhook_delete',
+        table_name: 'shopify_webhooks',
+        record_id: webhookId,
+        old_data: { 
+          action: 'delete_webhook',
+          topic: topic,
+          client_id: clientId,
+          timestamp: new Date().toISOString() 
+        }
+      });
 
       toast({
         title: "Success",
