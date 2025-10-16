@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Phone, Clock } from "lucide-react";
 import logo from "@/assets/westfield-logo-original.jpg";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -100,21 +101,46 @@ const Header = () => {
             <Link to="/faq" className="text-foreground hover:text-primary transition-colors font-medium">
               FAQ
             </Link>
+          </nav>
+
+          <div className="hidden lg:flex items-center gap-4">
+            <a 
+              href="tel:+18189355478" 
+              className="flex items-center gap-2 text-primary hover:text-secondary transition-colors group"
+            >
+              <Phone className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              <div className="flex flex-col items-start">
+                <span className="font-bold text-sm">1.818.935.5478</span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  Mon-Fri | 9am-8pm PST
+                </span>
+              </div>
+            </a>
             <Button
               onClick={() => navigate("/contact")}
               className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
             >
               Get a Free Quote
             </Button>
-          </nav>
+          </div>
 
-          <Button
-            onClick={() => navigate("/contact")}
-            className="md:hidden bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-            size="sm"
-          >
-            Get a Free Quote
-          </Button>
+          <div className="flex lg:hidden items-center gap-2">
+            <a 
+              href="tel:+18189355478" 
+              className="flex items-center gap-1 text-primary hover:text-secondary transition-colors"
+            >
+              <Phone className="h-4 w-4" />
+              <span className="font-semibold text-sm hidden md:inline">1.818.935.5478</span>
+            </a>
+            <Button
+              onClick={() => navigate("/contact")}
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+              size="sm"
+            >
+              Get a Free Quote
+            </Button>
+          </div>
         </div>
       </div>
     </header>
