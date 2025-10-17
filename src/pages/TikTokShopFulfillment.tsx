@@ -26,8 +26,8 @@ const TikTokShopFulfillment = () => {
   return (
     <>
       <Helmet>
-        <title>TikTok Shop Fulfillment | Westfield Prep Center</title>
-        <meta name="description" content="Fast FBT workflows, creator-friendly packaging, and reliable shipping for TikTok Shop sellers." />
+        <title>TikTok Shop Fulfillment in Los Angeles | TikTok 3PL LA | Westfield Prep Center</title>
+        <meta name="description" content="Scale your TikTok Shop with professional fulfillment from WestfieldPrepCenter.com. Based in Los Angeles, we handle order processing, packing, and shipping for sellers across Southern California." />
         <link rel="canonical" href="https://westfieldprepcenter.com/tiktok-shop-fulfillment/" />
         <meta property="og:url" content="https://westfieldprepcenter.com/tiktok-shop-fulfillment/" />
         <meta property="og:type" content="article" />

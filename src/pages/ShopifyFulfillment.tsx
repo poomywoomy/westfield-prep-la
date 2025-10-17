@@ -36,8 +36,8 @@ const ShopifyFulfillment = () => {
   return (
     <>
       <Helmet>
-        <title>Shopify Fulfillment in Los Angeles | Westfield Prep Center</title>
-        <meta name="description" content="Shopify-first fulfillment with photo-proof QC, branded packaging, and same-day cutoffs. Scale DTC with a premium LA partner." />
+        <title>Shopify Fulfillment Services in Los Angeles & Southern California | Westfield Prep Center</title>
+        <meta name="description" content="Streamline your Shopify store with fulfillment services from Westfield Prep Center in Los Angeles & Southern California. We manage storage, packing, and shipping for Shopify sellers. Request a Quote." />
         <link rel="canonical" href="https://westfieldprepcenter.com/shopify-fulfillment/" />
         <meta property="og:url" content="https://westfieldprepcenter.com/shopify-fulfillment/" />
         <meta property="og:type" content="article" />

@@ -27,8 +27,8 @@ const AmazonFBAPrep = () => {
   return (
     <>
       <Helmet>
-        <title>Amazon FBA Prep in Los Angeles | Compliance & Photo-Proof QC</title>
-        <meta name="description" content="Amazon-compliant prep with FNSKU labeling, polybagging, bubble wrap, carton prep, pallets, and photo-proof QC." />
+        <title>Amazon FBA Prep Center in Los Angeles & Southern California | Westfield Prep Center</title>
+        <meta name="description" content="Westfield Prep Center specializes in Amazon FBA prep for sellers in Los Angeles and Southern California. Inspection, labeling, bundling, and compliant shipping — all handled with care." />
         <link rel="canonical" href="https://westfieldprepcenter.com/amazon-fba-prep/" />
         <meta property="og:url" content="https://westfieldprepcenter.com/amazon-fba-prep/" />
         <meta property="og:type" content="article" />
