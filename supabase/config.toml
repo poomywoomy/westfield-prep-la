@@ -22,7 +22,7 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.shopify-auto-sync]
-verify_jwt = false
+verify_jwt = true
 
 [functions.shopify-webhook-handler]
 verify_jwt = false
