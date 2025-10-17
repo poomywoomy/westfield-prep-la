@@ -1,9 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
-import { createHmac } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-shopify-hmac-sha256, x-shopify-shop-domain, x-shopify-topic',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-shopify-hmac-sha256, x-shopify-shop-domain, x-shopify-topic, x-shopify-webhook-id',
 };
 
 Deno.serve(async (req) => {
@@ -21,18 +21,40 @@ Deno.serve(async (req) => {
     const hmac = req.headers.get('x-shopify-hmac-sha256');
     const shopDomain = req.headers.get('x-shopify-shop-domain');
     const topic = req.headers.get('x-shopify-topic');
+    const webhookId = req.headers.get('x-shopify-webhook-id');
 
-    if (!hmac || !shopDomain || !topic) {
+    if (!hmac || !shopDomain || !topic || !webhookId) {
       throw new Error('Missing required webhook headers');
     }
 
-    // Read and verify webhook payload
+    // Check for replay attacks - verify webhook hasn't been processed before
+    const { data: existingWebhook } = await supabase
+      .from('processed_webhooks')
+      .select('id')
+      .eq('webhook_id', webhookId)
+      .single();
+
+    if (existingWebhook) {
+      console.log('Webhook already processed:', webhookId);
+      return new Response(
+        JSON.stringify({ success: true, message: 'Webhook already processed' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
+
+    // Read and verify webhook payload with timing-safe comparison
     const body = await req.text();
     const generatedHmac = createHmac('sha256', shopifySecret)
       .update(body)
-      .digest('base64');
+      .digest();
 
-    if (generatedHmac !== hmac) {
+    // Decode received HMAC from base64
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    const hmacDecoded = Uint8Array.from(atob(hmac), c => c.charCodeAt(0));
+
+    // Use timing-safe comparison
+    if (generatedHmac.length !== hmacDecoded.length || !timingSafeEqual(generatedHmac, hmacDecoded)) {
       console.error('HMAC verification failed');
       throw new Error('Invalid webhook signature');
     }
@@ -52,12 +74,21 @@ Deno.serve(async (req) => {
       throw new Error('Store not found');
     }
 
+    // Mark webhook as processed to prevent replay attacks
+    await supabase
+      .from('processed_webhooks')
+      .insert({
+        webhook_id: webhookId,
+        shop_domain: shopDomain,
+        topic
+      });
+
     // Log webhook delivery
     const { data: logEntry } = await supabase
       .from('webhook_delivery_logs')
       .insert({
-        webhook_id: null, // Will be set if we have webhook registration
-        client_id: store.client_id,
+        webhook_id: webhookId,
+        shop_domain: shopDomain,
         topic,
         payload,
         status: 'pending',
@@ -110,8 +141,9 @@ Deno.serve(async (req) => {
     }
   } catch (error) {
     console.error('Webhook handler error:', error);
+    // Return generic error message to prevent information leakage
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: 'Webhook processing failed' }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,

@@ -23,6 +23,31 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Get authenticated user for state validation
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    
+    if (userError || !user) {
+      console.error('Failed to authenticate user:', userError);
+      return new Response(
+        JSON.stringify({ error: 'Authentication failed' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
     const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
     const redirectUri = `${Deno.env.get('SUPABASE_URL')}/functions/v1/shopify-oauth-callback`;
@@ -31,14 +56,33 @@ Deno.serve(async (req) => {
     console.log('Redirect URI:', redirectUri);
     
     const scopes = 'read_products,write_products,read_orders,write_orders,read_inventory,write_inventory';
-    const nonce = crypto.randomUUID();
-
-    const authUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${scopes}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${nonce}`;
     
-    console.log('Generated OAuth URL:', authUrl);
+    // Generate secure state parameter and store it
+    const state = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    
+    const { error: stateError } = await supabase
+      .from('oauth_states')
+      .insert({
+        state,
+        user_id: user.id,
+        expires_at: expiresAt.toISOString()
+      });
+    
+    if (stateError) {
+      console.error('Failed to store OAuth state:', stateError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to initialize OAuth flow' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const authUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${scopes}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+    
+    console.log('Generated OAuth URL with state:', state);
 
     return new Response(
-      JSON.stringify({ authUrl, nonce }),
+      JSON.stringify({ authUrl, state }),
       { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -46,9 +90,8 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Error starting OAuth:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'Failed to start OAuth flow' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

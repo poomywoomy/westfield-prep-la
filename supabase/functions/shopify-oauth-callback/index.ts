@@ -16,12 +16,44 @@ Deno.serve(async (req) => {
     const shop = url.searchParams.get('shop');
     const state = url.searchParams.get('state');
 
-    console.log('OAuth callback received - Shop:', shop, 'Code:', code ? 'present' : 'missing');
+    console.log('OAuth callback received - Shop:', shop, 'State:', state ? 'present' : 'missing');
 
-    if (!code || !shop) {
-      console.error('Missing OAuth parameters - code:', !!code, 'shop:', shop);
+    if (!code || !shop || !state) {
+      console.error('Missing OAuth parameters');
       throw new Error('Missing required OAuth parameters');
     }
+
+    // Validate state parameter to prevent session hijacking
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
+    const { data: stateRecord, error: stateError } = await supabase
+      .from('oauth_states')
+      .select('user_id, expires_at')
+      .eq('state', state)
+      .single();
+
+    if (stateError || !stateRecord) {
+      console.error('Invalid or missing state:', stateError);
+      throw new Error('Invalid OAuth state');
+    }
+
+    // Check if state has expired
+    if (new Date() > new Date(stateRecord.expires_at)) {
+      console.error('Expired OAuth state');
+      // Clean up expired state
+      await supabase.from('oauth_states').delete().eq('state', state);
+      throw new Error('OAuth state expired');
+    }
+
+    const userId = stateRecord.user_id;
+
+    // Clean up used state
+    await supabase.from('oauth_states').delete().eq('state', state);
+
+    console.log('State validated for user:', userId);
 
     const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
     const clientSecret = Deno.env.get('SHOPIFY_CLIENT_SECRET');
@@ -51,38 +83,14 @@ Deno.serve(async (req) => {
     
     console.log('Access token received, scope:', scope);
 
-    // Get auth header from request
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      console.error('No authorization header in callback request');
-      throw new Error('No authorization header');
-    }
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    console.log('Getting authenticated user...');
-
-    // Get user's client_id
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.error('No authenticated user found');
-      throw new Error('User not authenticated');
-    }
-
-    console.log('User authenticated:', user.id);
-
     const { data: client } = await supabase
       .from('clients')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (!client) {
-      console.error('No client profile found for user:', user.id);
+      console.error('No client profile found for user:', userId);
       throw new Error('Client profile not found');
     }
 
@@ -121,10 +129,9 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('OAuth callback error:', error);
     
-    // Redirect to error page
+    // Redirect to error page with generic message
     const url = new URL(req.url);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    const errorUrl = `${url.origin}/client-dashboard?shopify_error=${encodeURIComponent(errorMessage)}`;
+    const errorUrl = `${url.origin}/client-dashboard?shopify_error=${encodeURIComponent('Failed to connect Shopify store. Please try again.')}`;
     
     return new Response(null, {
       status: 302,

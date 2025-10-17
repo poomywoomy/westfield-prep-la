@@ -683,6 +683,30 @@ export type Database = {
           },
         ]
       }
+      oauth_states: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          state: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          state: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          state?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_events: {
         Row: {
           actor_id: string | null
@@ -793,6 +817,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      processed_webhooks: {
+        Row: {
+          created_at: string
+          id: string
+          processed_at: string
+          shop_domain: string
+          topic: string
+          webhook_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          processed_at?: string
+          shop_domain: string
+          topic: string
+          webhook_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          processed_at?: string
+          shop_domain?: string
+          topic?: string
+          webhook_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1498,6 +1549,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_oauth_states: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       cleanup_old_rate_limits: {
         Args: Record<PropertyKey, never>
         Returns: undefined
