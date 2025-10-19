@@ -430,12 +430,17 @@ const BillingEntryDialog = ({
 
       if (error) throw error;
 
+      // Reload data to get updated cycle info
+      await loadBillingData();
+
+      // Automatically download PDF after locking
+      await generatePDF();
+
       toast({
         title: "Success",
-        description: "Billing cycle locked successfully",
+        description: "Billing cycle locked and PDF downloaded successfully",
       });
 
-      loadBillingData();
       onSuccess();
     } catch (error: any) {
       toast({
