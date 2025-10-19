@@ -14,6 +14,7 @@ import BillingTab from "@/components/admin/BillingTab";
 import QCImagesTab from "@/components/admin/QCImagesTab";
 import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
 import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
+import { InventoryTab } from "@/components/admin/InventoryTab";
 
 const AdminDashboard = () => {
   const { user, role, loading } = useAuth();
@@ -104,7 +105,7 @@ const AdminDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="grid grid-cols-6 w-full max-w-5xl">
+          <TabsList className="grid grid-cols-7 w-full max-w-6xl">
             <TabsTrigger value="clients">
               <Users className="mr-2 h-4 w-4" />
               Clients
@@ -116,6 +117,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="billing">
               <DollarSign className="mr-2 h-4 w-4" />
               Billing
+            </TabsTrigger>
+            <TabsTrigger value="inventory">
+              <Package className="mr-2 h-4 w-4" />
+              Inventory
             </TabsTrigger>
             <TabsTrigger value="shopify">
               <Store className="mr-2 h-4 w-4" />
@@ -141,6 +146,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="billing">
             <BillingTab />
+          </TabsContent>
+
+          <TabsContent value="inventory">
+            <InventoryTab />
           </TabsContent>
 
           <TabsContent value="shopify">
