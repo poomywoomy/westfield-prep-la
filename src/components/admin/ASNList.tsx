@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Package } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { ASNFormDialog } from "./ASNFormDialog";
+import { ReceivingDialog } from "./ReceivingDialog";
 
 type ASN = Database["public"]["Tables"]["asn_headers"]["Row"];
 type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -18,6 +20,9 @@ export const ASNList = () => {
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [receivingDialogOpen, setReceivingDialogOpen] = useState(false);
+  const [selectedASN, setSelectedASN] = useState<ASN | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -100,11 +105,24 @@ export const ASNList = () => {
             />
           </div>
         </div>
-        <Button>
+        <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Create ASN
         </Button>
       </div>
+
+      <ASNFormDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={fetchASNs}
+      />
+
+      <ReceivingDialog
+        asn={selectedASN}
+        open={receivingDialogOpen}
+        onOpenChange={setReceivingDialogOpen}
+        onSuccess={fetchASNs}
+      />
 
       <div className="border rounded-lg">
         <Table>
@@ -148,9 +166,23 @@ export const ASNList = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
+                    {asn.status === "draft" || asn.status === "in_progress" ? (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedASN(asn);
+                          setReceivingDialogOpen(true);
+                        }}
+                      >
+                        <Package className="mr-2 h-4 w-4" />
+                        Receive
+                      </Button>
+                    ) : (
+                      <Button variant="ghost" size="sm">
+                        View
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
