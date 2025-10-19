@@ -8,9 +8,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, LogOut, Settings, ChevronDown, Package, Warehouse, FileText, Download, Sparkles } from "lucide-react";
+import { DollarSign, Image, LogOut, Settings, ChevronDown, Package, Warehouse, FileText, Download, Sparkles } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
+import ClientQCImagesTab from "@/components/client/ClientQCImagesTab";
 import ClientProductsTab from "@/components/client/ClientProductsTab";
 import ClientOrdersTab from "@/components/client/ClientOrdersTab";
 import ClientShopifyTab from "@/components/client/ClientShopifyTab";
@@ -260,7 +261,7 @@ const ClientDashboard = () => {
         )}
         
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full">
+          <TabsList className="grid grid-cols-5 w-full">
             <TabsTrigger value="products">
               <Package className="mr-2 h-4 w-4" />
               Products
@@ -276,6 +277,10 @@ const ClientDashboard = () => {
             <TabsTrigger value="billing">
               <DollarSign className="mr-2 h-4 w-4" />
               Billing
+            </TabsTrigger>
+            <TabsTrigger value="qc-images">
+              <Image className="mr-2 h-4 w-4" />
+              QC Images
             </TabsTrigger>
           </TabsList>
 
@@ -293,6 +298,10 @@ const ClientDashboard = () => {
 
           <TabsContent value="billing">
             <ClientBillingTab />
+          </TabsContent>
+
+          <TabsContent value="qc-images">
+            <ClientQCImagesTab />
           </TabsContent>
         </Tabs>
       </main>

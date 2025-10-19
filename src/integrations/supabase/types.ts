@@ -223,65 +223,6 @@ export type Database = {
         }
         Relationships: []
       }
-      bill_items: {
-        Row: {
-          bill_id: string
-          created_at: string
-          created_by: string | null
-          discount_cents: number
-          id: string
-          line_date: string
-          note: string | null
-          qty_decimal: number
-          service_code: string | null
-          service_name: string
-          sku_ref: string | null
-          source: string
-          unit_price_cents: number
-          updated_at: string
-        }
-        Insert: {
-          bill_id: string
-          created_at?: string
-          created_by?: string | null
-          discount_cents?: number
-          id?: string
-          line_date?: string
-          note?: string | null
-          qty_decimal?: number
-          service_code?: string | null
-          service_name: string
-          sku_ref?: string | null
-          source?: string
-          unit_price_cents: number
-          updated_at?: string
-        }
-        Update: {
-          bill_id?: string
-          created_at?: string
-          created_by?: string | null
-          discount_cents?: number
-          id?: string
-          line_date?: string
-          note?: string | null
-          qty_decimal?: number
-          service_code?: string | null
-          service_name?: string
-          sku_ref?: string | null
-          source?: string
-          unit_price_cents?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bill_items_bill_id_fkey"
-            columns: ["bill_id"]
-            isOneToOne: false
-            referencedRelation: "bills"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       billing_charges: {
         Row: {
           billing_month: string
@@ -371,69 +312,9 @@ export type Database = {
         }
         Relationships: []
       }
-      bills: {
-        Row: {
-          amount_due_cents: number
-          billing_month: string
-          client_id: string
-          closed_at: string | null
-          created_at: string
-          discount_cents: number
-          emailed_at: string | null
-          id: string
-          memo: string | null
-          opened_at: string
-          pdf_url: string | null
-          status: string
-          subtotal_cents: number
-          updated_at: string
-        }
-        Insert: {
-          amount_due_cents?: number
-          billing_month: string
-          client_id: string
-          closed_at?: string | null
-          created_at?: string
-          discount_cents?: number
-          emailed_at?: string | null
-          id?: string
-          memo?: string | null
-          opened_at?: string
-          pdf_url?: string | null
-          status?: string
-          subtotal_cents?: number
-          updated_at?: string
-        }
-        Update: {
-          amount_due_cents?: number
-          billing_month?: string
-          client_id?: string
-          closed_at?: string | null
-          created_at?: string
-          discount_cents?: number
-          emailed_at?: string | null
-          id?: string
-          memo?: string | null
-          opened_at?: string
-          pdf_url?: string | null
-          status?: string
-          subtotal_cents?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bills_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       clients: {
         Row: {
           admin_notes: string | null
-          billing_emails: string[] | null
           billing_frequency:
             | Database["public"]["Enums"]["billing_frequency"]
             | null
@@ -441,7 +322,6 @@ export type Database = {
           company_name: string
           contact_name: string
           created_at: string
-          deposit_balance_cents: number
           email: string
           estimated_units_per_month: number | null
           extra_prep: boolean | null
@@ -461,13 +341,11 @@ export type Database = {
           storage: boolean | null
           storage_method: string | null
           storage_units_per_month: number | null
-          timezone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           admin_notes?: string | null
-          billing_emails?: string[] | null
           billing_frequency?:
             | Database["public"]["Enums"]["billing_frequency"]
             | null
@@ -475,7 +353,6 @@ export type Database = {
           company_name: string
           contact_name: string
           created_at?: string
-          deposit_balance_cents?: number
           email: string
           estimated_units_per_month?: number | null
           extra_prep?: boolean | null
@@ -495,13 +372,11 @@ export type Database = {
           storage?: boolean | null
           storage_method?: string | null
           storage_units_per_month?: number | null
-          timezone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           admin_notes?: string | null
-          billing_emails?: string[] | null
           billing_frequency?:
             | Database["public"]["Enums"]["billing_frequency"]
             | null
@@ -509,7 +384,6 @@ export type Database = {
           company_name?: string
           contact_name?: string
           created_at?: string
-          deposit_balance_cents?: number
           email?: string
           estimated_units_per_month?: number | null
           extra_prep?: boolean | null
@@ -529,59 +403,10 @@ export type Database = {
           storage?: boolean | null
           storage_method?: string | null
           storage_units_per_month?: number | null
-          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
-      }
-      credits: {
-        Row: {
-          amount_cents: number
-          bill_id: string | null
-          client_id: string
-          created_at: string
-          created_by: string | null
-          id: string
-          memo: string | null
-          reason: string
-        }
-        Insert: {
-          amount_cents: number
-          bill_id?: string | null
-          client_id: string
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          memo?: string | null
-          reason: string
-        }
-        Update: {
-          amount_cents?: number
-          bill_id?: string | null
-          client_id?: string
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          memo?: string | null
-          reason?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "credits_bill_id_fkey"
-            columns: ["bill_id"]
-            isOneToOne: false
-            referencedRelation: "bills"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "credits_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       custom_pricing: {
         Row: {
@@ -1108,60 +933,6 @@ export type Database = {
           },
         ]
       }
-      payments: {
-        Row: {
-          amount_cents: number
-          bill_id: string | null
-          client_id: string
-          created_at: string
-          created_by: string | null
-          external_ref: string | null
-          id: string
-          memo: string | null
-          method: string
-          received_at: string
-        }
-        Insert: {
-          amount_cents: number
-          bill_id?: string | null
-          client_id: string
-          created_at?: string
-          created_by?: string | null
-          external_ref?: string | null
-          id?: string
-          memo?: string | null
-          method: string
-          received_at?: string
-        }
-        Update: {
-          amount_cents?: number
-          bill_id?: string | null
-          client_id?: string
-          created_at?: string
-          created_by?: string | null
-          external_ref?: string | null
-          id?: string
-          memo?: string | null
-          method?: string
-          received_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payments_bill_id_fkey"
-            columns: ["bill_id"]
-            isOneToOne: false
-            referencedRelation: "bills"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payments_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       prep_tasks: {
         Row: {
           created_at: string
@@ -1295,6 +1066,53 @@ export type Database = {
         }
         Relationships: []
       }
+      qc_images: {
+        Row: {
+          client_id: string
+          damage_quantity: number | null
+          expires_at: string
+          id: string
+          image_url: string
+          is_damaged: boolean | null
+          is_missing: boolean | null
+          missing_quantity: number | null
+          notes: string | null
+          upload_date: string
+        }
+        Insert: {
+          client_id: string
+          damage_quantity?: number | null
+          expires_at?: string
+          id?: string
+          image_url: string
+          is_damaged?: boolean | null
+          is_missing?: boolean | null
+          missing_quantity?: number | null
+          notes?: string | null
+          upload_date?: string
+        }
+        Update: {
+          client_id?: string
+          damage_quantity?: number | null
+          expires_at?: string
+          id?: string
+          image_url?: string
+          is_damaged?: boolean | null
+          is_missing?: boolean | null
+          missing_quantity?: number | null
+          notes?: string | null
+          upload_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qc_images_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_lines: {
         Row: {
           created_at: string
@@ -1353,36 +1171,27 @@ export type Database = {
       }
       quotes: {
         Row: {
-          activated_at: string | null
           client_id: string | null
           created_at: string
-          created_by: string | null
           id: string
-          memo: string | null
           quote_data: Json
-          status: Database["public"]["Enums"]["quote_status"]
+          status: string
           updated_at: string
         }
         Insert: {
-          activated_at?: string | null
           client_id?: string | null
           created_at?: string
-          created_by?: string | null
           id?: string
-          memo?: string | null
           quote_data: Json
-          status?: Database["public"]["Enums"]["quote_status"]
+          status?: string
           updated_at?: string
         }
         Update: {
-          activated_at?: string | null
           client_id?: string | null
           created_at?: string
-          created_by?: string | null
           id?: string
-          memo?: string | null
           quote_data?: Json
-          status?: Database["public"]["Enums"]["quote_status"]
+          status?: string
           updated_at?: string
         }
         Relationships: [
@@ -2096,6 +1905,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      delete_expired_qc_images: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       delete_own_client_account: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -2133,7 +1946,6 @@ export type Database = {
         | "RELEASE"
       line_status: "awaiting" | "in_progress" | "ready" | "shipped"
       prep_status: "awaiting" | "in_progress" | "ready"
-      quote_status: "draft" | "active" | "replaced" | "archived"
       receiving_format: "pallets" | "cartons" | "both"
     }
     CompositeTypes: {
@@ -2288,7 +2100,6 @@ export const Constants = {
       ],
       line_status: ["awaiting", "in_progress", "ready", "shipped"],
       prep_status: ["awaiting", "in_progress", "ready"],
-      quote_status: ["draft", "active", "replaced", "archived"],
       receiving_format: ["pallets", "cartons", "both"],
     },
   },
