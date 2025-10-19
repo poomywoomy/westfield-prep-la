@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,11 +54,11 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
   const [lines, setLines] = useState<ASNLine[]>([]);
   const { toast } = useToast();
 
-  useState(() => {
+  useEffect(() => {
     if (open) {
       fetchClients();
     }
-  });
+  }, [open]);
 
   const fetchClients = async () => {
     const { data } = await supabase
