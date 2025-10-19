@@ -1,4 +1,4 @@
-import { Package, Camera, Shield, Tag, Box, Truck, ShoppingCart, Video, Store, ShoppingBag } from "lucide-react";
+import { Package, Camera, Shield, Tag, Box, Truck, ShoppingCart, Video, Store, ShoppingBag, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const services = [
@@ -16,6 +16,11 @@ const services = [
     icon: Video,
     title: "TikTok Shop Fulfillment",
     description: "Fast-turnaround fulfillment solutions optimized for TikTok Shop orders.",
+  },
+  {
+    icon: Users,
+    title: "DTC Fulfillment",
+    description: "Direct-to-consumer fulfillment with branded packaging and personalized unboxing experiences.",
   },
   {
     icon: Package,

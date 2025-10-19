@@ -15,7 +15,6 @@ const ShopifyFulfillment = () => {
   const navigate = useNavigate();
 
   const faqData = [
-    { question: "Do you integrate directly with Shopify?", answer: "Yes, we integrate seamlessly with Shopify via API or third-party apps like ShipStation for automated order import and tracking sync." },
     { question: "What are your same-day cutoff times?", answer: "Orders placed before 2 PM PST ship the same business day. Orders after 2 PM ship the next business day." },
     { question: "Can you handle custom packaging and branded inserts?", answer: "Absolutely. We offer custom kitting, branded tissue paper, thank-you cards, promotional inserts, and gift wrapping services." },
     { question: "Is there a minimum order quantity or monthly volume requirement?", answer: "We work with brands of all sizes. Contact us to discuss your specific volume and we'll create a custom pricing plan." },
@@ -240,30 +239,24 @@ const ShopifyFulfillment = () => {
               <div className="max-w-3xl mx-auto">
                 <Accordion type="single" collapsible>
                   <AccordionItem value="item-1">
-                    <AccordionTrigger>Do you integrate directly with Shopify?</AccordionTrigger>
-                    <AccordionContent>
-                      Yes, we integrate seamlessly with Shopify via API or third-party apps like ShipStation for automated order import and tracking sync.
-                    </AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="item-2">
                     <AccordionTrigger>What are your same-day cutoff times?</AccordionTrigger>
                     <AccordionContent>
                       Orders placed before 2 PM PST ship the same business day. Orders after 2 PM ship the next business day.
                     </AccordionContent>
                   </AccordionItem>
-                  <AccordionItem value="item-3">
+                  <AccordionItem value="item-2">
                     <AccordionTrigger>Can you handle custom packaging and branded inserts?</AccordionTrigger>
                     <AccordionContent>
                       Absolutely. We offer custom kitting, branded tissue paper, thank-you cards, promotional inserts, and gift wrapping services.
                     </AccordionContent>
                   </AccordionItem>
-                  <AccordionItem value="item-4">
+                  <AccordionItem value="item-3">
                     <AccordionTrigger>Is there a minimum order quantity or monthly volume requirement?</AccordionTrigger>
                     <AccordionContent>
                       We work with brands of all sizes. Contact us to discuss your specific volume and we'll create a custom pricing plan.
                     </AccordionContent>
                   </AccordionItem>
-                  <AccordionItem value="item-5">
+                  <AccordionItem value="item-4">
                     <AccordionTrigger>How does your pricing model work?</AccordionTrigger>
                     <AccordionContent>
                       We charge per-unit pricing based on your services: receiving, pick/pack, kitting, storage, and shipping. No hidden fees. Get a custom quote today.
@@ -282,20 +275,11 @@ const ShopifyFulfillment = () => {
               <div className="absolute bottom-10 left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
             </div>
             <div className="container mx-auto px-4 text-center relative">
-              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-6">
-                <Heart className="h-4 w-4 text-white" />
-                <span className="text-sm font-medium text-white">Loved by 1000+ DTC Brands</span>
-              </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Ready to Scale Your Shopify Store?</h2>
               <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">Get a custom fulfillment quote in 24 hours and delight your customers.</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-white text-purple-600 hover:bg-white/90" onClick={() => navigate("/contact")}>
-                  Get a Quote
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" onClick={() => navigate("/contact")}>
-                  See Integration
-                </Button>
-              </div>
+              <Button size="lg" className="bg-white text-purple-600 hover:bg-white/90" onClick={() => navigate("/contact")}>
+                Get a Quote
+              </Button>
             </div>
           </section>
         </main>

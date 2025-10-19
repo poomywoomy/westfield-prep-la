@@ -238,20 +238,11 @@ const AmazonFBAPrep = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-orange-600" />
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:32px_32px]" />
             <div className="container mx-auto px-4 text-center relative">
-              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-6">
-                <TrendingUp className="h-4 w-4 text-white" />
-                <span className="text-sm font-medium text-white">Trusted by 500+ Amazon Sellers</span>
-              </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Ready to Streamline Your FBA Prep?</h2>
               <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">Get a custom prep quote in 24 hours and start scaling your Amazon business.</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-white text-blue-600 hover:bg-white/90" onClick={() => navigate("/contact")}>
-                  Get a Quote
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" onClick={() => navigate("/contact")}>
-                  Schedule Consultation
-                </Button>
-              </div>
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-white/90" onClick={() => navigate("/contact")}>
+                Get a Quote
+              </Button>
             </div>
           </section>
         </main>

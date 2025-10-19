@@ -15,7 +15,6 @@ const TikTokShopFulfillment = () => {
   const navigate = useNavigate();
 
   const faqData = [
-    { question: "Do you integrate with TikTok Shop?", answer: "Yes, we can integrate with TikTok Shop through API connections or third-party fulfillment platforms for automated order processing." },
     { question: "Can you handle viral spikes in orders?", answer: "Absolutely. We're built for TikTok's rapid pace and can scale quickly to handle sudden surges from viral content." },
     { question: "What about creator-friendly unboxing?", answer: "We specialize in packaging that looks amazing on camera with custom branding, tissue paper, stickers, and thank-you notes." },
     { question: "How fast can you fulfill trending products?", answer: "Orders placed before 2 PM PST ship same-day. We prioritize speed to capitalize on viral moments." },
@@ -259,30 +258,24 @@ const TikTokShopFulfillment = () => {
               <div className="max-w-3xl mx-auto">
                 <Accordion type="single" collapsible>
                   <AccordionItem value="item-1">
-                    <AccordionTrigger>Do you integrate with TikTok Shop?</AccordionTrigger>
-                    <AccordionContent>
-                      Yes, we can integrate with TikTok Shop through API connections or third-party fulfillment platforms for automated order processing.
-                    </AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="item-2">
                     <AccordionTrigger>Can you handle viral spikes in orders?</AccordionTrigger>
                     <AccordionContent>
                       Absolutely. We're built for TikTok's rapid pace and can scale quickly to handle sudden surges from viral content.
                     </AccordionContent>
                   </AccordionItem>
-                  <AccordionItem value="item-3">
+                  <AccordionItem value="item-2">
                     <AccordionTrigger>What about creator-friendly unboxing?</AccordionTrigger>
                     <AccordionContent>
                       We specialize in packaging that looks amazing on camera with custom branding, tissue paper, stickers, and thank-you notes.
                     </AccordionContent>
                   </AccordionItem>
-                  <AccordionItem value="item-4">
+                  <AccordionItem value="item-3">
                     <AccordionTrigger>How fast can you fulfill trending products?</AccordionTrigger>
                     <AccordionContent>
                       Orders placed before 2 PM PST ship same-day. We prioritize speed to capitalize on viral moments.
                     </AccordionContent>
                   </AccordionItem>
-                  <AccordionItem value="item-5">
+                  <AccordionItem value="item-4">
                     <AccordionTrigger>Do you offer photo documentation?</AccordionTrigger>
                     <AccordionContent>
                       Yes, every order includes photo-proof QC documentation so you can verify quality before shipping.
@@ -304,25 +297,16 @@ const TikTokShopFulfillment = () => {
               </div>
             </div>
             <div className="container mx-auto px-4 text-center relative">
-              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-6 animate-pulse">
-                <Sparkles className="h-4 w-4 text-white" />
-                <span className="text-sm font-medium text-white">Join 200+ Viral TikTok Sellers</span>
-              </div>
               <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white drop-shadow-lg">
                 Ready to Go Viral?
               </h2>
               <p className="text-xl mb-8 text-white/95 max-w-2xl mx-auto drop-shadow">
                 Get fulfillment that scales with your TikTok success. Quote in 24 hours.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-white text-pink-600 hover:bg-white/90 shadow-2xl hover:shadow-white/50 transition-all" onClick={() => navigate("/contact")}>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Get a Quote
-                </Button>
-                <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 shadow-lg" onClick={() => navigate("/contact")}>
-                  See Success Stories
-                </Button>
-              </div>
+              <Button size="lg" className="bg-white text-pink-600 hover:bg-white/90 shadow-2xl hover:shadow-white/50 transition-all" onClick={() => navigate("/contact")}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Get a Quote
+              </Button>
             </div>
           </section>
         </main>

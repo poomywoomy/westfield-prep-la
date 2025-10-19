@@ -35,11 +35,11 @@ const FAQ = () => {
     },
     {
       question: "What services does Westfield Prep Center offer?",
-      answer: "We offer comprehensive ecommerce fulfillment services including Amazon FBA prep, Walmart fulfillment, TikTok Shop fulfillment, Shopify order fulfillment, receiving & inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack & carton prep, self-fulfilled/dropship orders, LTL & SPD shipping, and photo proof of every step. We also provide storage solutions."
+      answer: "We offer comprehensive ecommerce fulfillment services including Amazon FBA prep, Walmart fulfillment, TikTok Shop fulfillment, Shopify order fulfillment, DTC (Direct-to-Consumer) fulfillment, receiving & inspection, polybagging, bubble wrap, bundling, product labeling (including FNSKU), case pack & carton prep, branded packaging, custom kitting, LTL & SPD shipping, and photo proof of every step. We also provide storage solutions."
     },
     {
       question: "What are your turnaround times?",
-      answer: "As a boutique operation, we pride ourselves on same-day turnaround for most orders. Our small team allows us to process and ship significantly faster than larger prep centers. Rush services are available for urgent shipments, with an additional 30-60% fee."
+      answer: "As a boutique operation, we pride ourselves on same-day turnaround for orders placed before 2 PM PST. Our small team allows us to process and ship significantly faster than larger prep centers. Rush services are available for urgent shipments, with an additional 30-60% fee."
     },
     {
       question: "What are the payment terms for new clients?",
@@ -47,39 +47,59 @@ const FAQ = () => {
     },
     {
       question: "How do you ensure marketplace compliance?",
-      answer: "We stay up-to-date with all major marketplace requirements including Amazon FBA, Walmart, TikTok Shop, Shopify, and other e-commerce platforms. This includes polybag suffocation warnings, weight limits, and accurate case labels. We're fully insured with General Liability and Warehouse Legal Liability coverage."
+      answer: "We stay up-to-date with all major marketplace requirements including Amazon FBA, Walmart, TikTok Shop, Shopify, and other e-commerce platforms. This includes polybag suffocation warnings, weight limits, accurate case labels, fire & theft prevention, data security & confidentiality, and sustainable practices. We're fully insured with General Liability and Warehouse Legal Liability coverage."
     },
     {
       question: "Do you provide photo proof of your work?",
-      answer: "Yes! We provide photo verification and quality control documentation for every step of the prep process. This ensures transparency and peace of mind for our clients."
+      answer: "Yes! We provide photo verification and quality control documentation for every step of the prep process. Every shipment is documented with timestamped photos, ensuring transparency and peace of mind for our clients."
     },
     {
       question: "Where is Westfield Prep Center located?",
-      answer: "As a boutique fulfillment company, we provide our warehouse address only to active clients. We're based in Los Angeles, CA, with easy access to major carriers for efficient shipping to fulfillment centers nationwide."
+      answer: "As a boutique fulfillment company, we provide our warehouse address only to active clients. We're based in Los Angeles, CA, with easy access to major carriers for efficient shipping to fulfillment centers nationwide. Our strategic West Coast location ensures fast shipping times."
     },
     {
       question: "How do I get started?",
-      answer: "Simply fill out our contact form with your business details and monthly volume. We'll respond with an onboarding packet and pricing sheet tailored to your needs."
+      answer: "Simply fill out our contact form with your business details and monthly volume. We'll respond with an onboarding packet and pricing sheet tailored to your needs within 24 hours."
     },
     {
       question: "Are you insured?",
-      answer: "Yes, we are fully insured with both General Liability and Warehouse Legal Liability insurance to protect your inventory."
+      answer: "Yes, we are fully insured with both General Liability and Warehouse Legal Liability insurance to protect your inventory. We also maintain fire & theft prevention measures and data security protocols."
     },
     {
       question: "Can you handle large volumes?",
-      answer: "Absolutely! We work with sellers of all sizes and can scale our services to meet your growing business needs. Contact us to discuss volume discounts."
+      answer: "Absolutely! We work with sellers of all sizes, from startups to established brands. We can scale our services to meet your growing business needs. Contact us to discuss volume discounts."
     },
     {
       question: "What carriers do you work with?",
-      answer: "We work with all major carriers and have established relationships to ensure competitive shipping rates and reliable delivery to fulfillment centers for all ecommerce platforms."
+      answer: "We work with all major carriers including UPS, FedEx, USPS, and freight carriers for LTL shipments. We have established relationships to ensure competitive shipping rates and reliable delivery to fulfillment centers for all ecommerce platforms."
     },
     {
       question: "Do you offer storage services?",
-      answer: "Yes, we offer secure storage at $0.80/unit/month for inventory awaiting prep or shipment to your fulfillment destination."
+      answer: "Yes, we offer secure storage at $0.80/unit/month for inventory awaiting prep or shipment to your fulfillment destination. Our facility includes climate control and 24/7 security monitoring."
     },
     {
-      question: "Do you handle self-fulfilled and dropship orders?",
-      answer: "Yes! We provide fulfillment services for self-fulfilled orders and direct-to-consumer shipping. Standard orders are $2.50 per order, and oversized items are $8.00 per order. This is perfect for dropshipping or shipping directly to your customers."
+      question: "Do you handle DTC (Direct-to-Consumer) fulfillment?",
+      answer: "Yes! We provide comprehensive DTC fulfillment services with branded packaging, custom inserts, and personalized unboxing experiences. Standard orders are $2.50 per order, and oversized items are $8.00 per order. Perfect for Shopify stores and direct customer shipping."
+    },
+    {
+      question: "Can you handle custom packaging and branded inserts?",
+      answer: "Absolutely! We specialize in custom kitting, branded tissue paper, thank-you cards, promotional inserts, and gift wrapping services. We help you create memorable unboxing experiences for your customers."
+    },
+    {
+      question: "What is your same-day cutoff time?",
+      answer: "Orders placed before 2 PM PST ship the same business day. Orders placed after 2 PM PST will ship the next business day. This applies to all our fulfillment services including Shopify, Amazon FBA, TikTok Shop, and DTC orders."
+    },
+    {
+      question: "Do you provide inventory reports and tracking?",
+      answer: "Yes, we provide real-time inventory updates, photo documentation, and tracking numbers for all shipments. You'll have complete visibility into your inventory and order status at all times."
+    },
+    {
+      question: "What is your minimum order requirement?",
+      answer: "We work with brands of all sizes and don't have strict minimum order requirements. Whether you're just starting out or scaling rapidly, we'll create a custom pricing plan that fits your volume and needs."
+    },
+    {
+      question: "Are your practices environmentally sustainable?",
+      answer: "Yes! We implement sustainable practices including eco-friendly packaging options, recycling programs, and energy-efficient warehouse operations. We're committed to reducing our environmental impact while delivering exceptional service."
     }
   ];
 
