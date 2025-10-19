@@ -34,63 +34,25 @@ export function BulkProductActionsDialog({
       setLoading(true);
 
       if (action === 'update-price') {
-        const adjustment = parseFloat(priceAdjustment);
-        if (isNaN(adjustment)) {
-          toast({
-            title: "Invalid input",
-            description: "Please enter a valid number",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Update each product individually
-        for (const product of selectedProducts) {
-          const currentPrice = Number(product.default_unit_price || 0);
-          const newPrice = adjustmentType === 'percentage'
-            ? currentPrice * (1 + adjustment / 100)
-            : currentPrice + adjustment;
-          
-          const { error } = await supabase
-            .from('client_skus')
-            .update({ default_unit_price: Math.max(0, newPrice) })
-            .eq('id', product.id);
-
-          if (error) throw error;
-        }
-
         toast({
-          title: "Prices updated",
-          description: `Updated ${selectedProducts.length} products`,
+          title: "Not supported",
+          description: "Price updates are not available for the new inventory system",
+          variant: "destructive",
         });
+        onOpenChange(false);
+        return;
       } else if (action === 'update-service') {
-        if (!newServiceType) {
-          toast({
-            title: "Invalid input",
-            description: "Please select a service type",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Update each product individually
-        for (const product of selectedProducts) {
-          const { error } = await supabase
-            .from('client_skus')
-            .update({ default_service_type: newServiceType })
-            .eq('id', product.id);
-
-          if (error) throw error;
-        }
-
         toast({
-          title: "Service types updated",
-          description: `Updated ${selectedProducts.length} products`,
+          title: "Not supported",
+          description: "Service type updates are not available for the new inventory system",
+          variant: "destructive",
         });
+        onOpenChange(false);
+        return;
       } else if (action === 'delete') {
         const ids = selectedProducts.map(p => p.id);
         const { error } = await supabase
-          .from('client_skus')
+          .from('skus')
           .delete()
           .in('id', ids);
 

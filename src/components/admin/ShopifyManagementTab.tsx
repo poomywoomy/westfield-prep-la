@@ -146,7 +146,7 @@ export function ShopifyManagementTab() {
               .eq('client_id', store.client_id)
               .single(),
             supabase
-              .from('client_skus')
+              .from('skus')
               .select('id', { count: 'exact', head: true })
               .eq('client_id', store.client_id)
           ]);
@@ -179,7 +179,7 @@ export function ShopifyManagementTab() {
         supabase.from('shopify_sync_config').select('id', { count: 'exact', head: true }).eq('auto_sync_enabled', true),
         supabase.from('sync_logs').select('id', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
         supabase.from('sync_logs').select('id', { count: 'exact', head: true }).eq('status', 'failed').gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
-        supabase.from('client_skus').select('id', { count: 'exact', head: true }),
+        supabase.from('skus').select('id', { count: 'exact', head: true }),
       ]);
 
       setStats({

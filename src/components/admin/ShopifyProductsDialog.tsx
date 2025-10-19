@@ -17,10 +17,8 @@ import {
 
 interface Product {
   id: string;
-  sku: string;
-  product_name: string | null;
-  default_service_type: string | null;
-  default_unit_price: number | null;
+  client_sku: string;
+  title: string | null;
   updated_at: string;
 }
 
@@ -47,8 +45,8 @@ export function ShopifyProductsDialog({ open, onOpenChange, clientId, clientName
 
   useEffect(() => {
     const filtered = products.filter(p => 
-      p.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (p.product_name && p.product_name.toLowerCase().includes(searchTerm.toLowerCase()))
+      p.client_sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (p.title && p.title.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredProducts(filtered);
   }, [searchTerm, products]);
@@ -57,7 +55,7 @@ export function ShopifyProductsDialog({ open, onOpenChange, clientId, clientName
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('client_skus')
+        .from('skus')
         .select('*')
         .eq('client_id', clientId)
         .order('updated_at', { ascending: false });
@@ -100,7 +98,7 @@ export function ShopifyProductsDialog({ open, onOpenChange, clientId, clientName
 
     try {
       const { error } = await supabase
-        .from('client_skus')
+        .from('skus')
         .delete()
         .in('id', Array.from(selectedProducts));
 
@@ -124,15 +122,13 @@ export function ShopifyProductsDialog({ open, onOpenChange, clientId, clientName
   };
 
   const exportToCSV = () => {
-    const headers = ['SKU', 'Product Name', 'Service Type', 'Unit Price', 'Last Updated'];
+    const headers = ['SKU', 'Product Name', 'Last Updated'];
     const rows = (selectedProducts.size > 0 
       ? filteredProducts.filter(p => selectedProducts.has(p.id))
       : filteredProducts
     ).map(p => [
-      p.sku,
-      p.product_name || '',
-      p.default_service_type || '',
-      p.default_unit_price || '0',
+      p.client_sku,
+      p.title || '',
       p.updated_at,
     ]);
 
@@ -195,18 +191,16 @@ export function ShopifyProductsDialog({ open, onOpenChange, clientId, clientName
                     checked={selectedProducts.size === filteredProducts.length && filteredProducts.length > 0}
                     onCheckedChange={toggleSelectAll}
                   />
-                </TableHead>
+                 </TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Product Name</TableHead>
-                <TableHead>Service Type</TableHead>
-                <TableHead>Unit Price</TableHead>
                 <TableHead>Last Updated</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredProducts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={4} className="text-center text-muted-foreground">
                     No products found
                   </TableCell>
                 </TableRow>
@@ -219,10 +213,8 @@ export function ShopifyProductsDialog({ open, onOpenChange, clientId, clientName
                         onCheckedChange={() => toggleSelection(product.id)}
                       />
                     </TableCell>
-                    <TableCell className="font-mono">{product.sku}</TableCell>
-                    <TableCell>{product.product_name || '-'}</TableCell>
-                    <TableCell>{product.default_service_type || '-'}</TableCell>
-                    <TableCell>${product.default_unit_price?.toFixed(2) || '0.00'}</TableCell>
+                    <TableCell className="font-mono">{product.client_sku}</TableCell>
+                    <TableCell>{product.title || '-'}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {new Date(product.updated_at).toLocaleDateString()}
                     </TableCell>
