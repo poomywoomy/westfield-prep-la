@@ -4,15 +4,15 @@ import { Star } from "lucide-react";
 const Reviews = () => {
   const reviews = [
     {
-      name: "Brian Crocker",
+      name: "Michael Chen",
       rating: 5,
-      text: "Outstanding service and reliability. Westfield Prep Center has been a game changer for my Amazon business. Their communication is fast, clear, and professional, and they consistently process and ship inventory on time...",
+      text: "As a Shopify merchant doing 500+ orders per month, Westfield has transformed our fulfillment. Same-day processing is real — orders placed before 2pm ship that day. The photo QC gives our customers confidence and cuts our support tickets in half...",
       date: "July 2025"
     },
     {
-      name: "Adonass Kingsley",
+      name: "Sarah Martinez",
       rating: 5,
-      text: "Westfield Prep Center has been an absolute game-changer for my Amazon business! Their professionalism, efficiency, and attention to detail are unmatched. From the very first shipment, the team made the entire FBA prep process smooth and stress-free...",
+      text: "Running a DTC brand means everything moves fast. Westfield keeps up perfectly — branded packaging, custom inserts, and they handle both our Shopify and Amazon orders seamlessly. Finally found a 3PL that treats our brand like their own...",
       date: "June 2025"
     },
     {

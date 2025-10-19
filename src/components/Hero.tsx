@@ -48,11 +48,11 @@ const Hero = () => {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                Shopify, Amazon, & E-commerce Fulfillment in Los Angeles
+                Fulfillment That Moves as Fast as Your Brand
               </h1>
               
               <p className="text-xl md:text-2xl mb-8 text-white/90 font-light leading-relaxed">
-                Boutique fulfillment with photo-proof QC, branded packaging, and same-day cutoffs. Supporting Shopify, Amazon FBA, and TikTok Shop.
+                Westfield Prep Center helps high-volume Shopify and Amazon sellers deliver faster — with same-day processing, full insurance, and photo-proof QC on every shipment. <span className="font-bold text-secondary">(Every order documented, every brand protected.)</span>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-10">
