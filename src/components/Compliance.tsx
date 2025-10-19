@@ -1,4 +1,4 @@
-import { Shield, FileCheck, Award } from "lucide-react";
+import { Shield, FileCheck, Award, Flame, Lock, Leaf } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const complianceFeatures = [
@@ -10,14 +10,29 @@ const complianceFeatures = [
   },
   {
     icon: FileCheck,
-    title: "Amazon FBA Compliant",
+    title: "Multi-Platform Compliant",
     description:
-      "All prep meets Amazon requirements: polybag suffocation warnings, 50-lb box rule, accurate case labels.",
+      "All prep meets Amazon, Walmart, and Shopify requirements: polybag suffocation warnings, 50-lb box rule, accurate case labels.",
   },
   {
     icon: Award,
     title: "Quality Assurance",
     description: "Rigorous inspection processes and photo documentation for every order.",
+  },
+  {
+    icon: Flame,
+    title: "Fire & Theft Prevention",
+    description: "Advanced security systems with 24/7 monitoring, fire suppression, and comprehensive theft prevention protocols.",
+  },
+  {
+    icon: Lock,
+    title: "Data Security & Confidentiality",
+    description: "Enterprise-grade data protection with encrypted systems and strict confidentiality agreements to safeguard your business information.",
+  },
+  {
+    icon: Leaf,
+    title: "Sustainable Practices",
+    description: "Eco-friendly operations with recycling programs, energy-efficient facilities, and sustainable packaging materials.",
   },
 ];
 

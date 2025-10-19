@@ -18,6 +18,7 @@ import { ChevronDown, ChevronUp, Info } from "lucide-react";
 const pricingData = [
   { service: "Receiving", price: "$3/carton" },
   { service: "Pallet Receiving", price: "$50/pallet" },
+  { service: "Direct to Consumer Fulfillment", price: "$1.50/shipment" },
   { service: "FNSKU Label", price: "$0.70/unit" },
   { service: "Polybag + Label", price: "$1.40/unit" },
   { service: "Bubble Wrap", price: "+$0.50/unit" },
@@ -25,7 +26,6 @@ const pricingData = [
   { service: "Additional Label", price: "+$0.20/unit" },
   { service: "Special Prep", price: "Contact for pricing" },
   { service: "Amazon/Walmart Shipment Box", price: "$3/box" },
-  { service: "Self-Fulfilled Shipment", price: "$1.50/shipment" },
   { service: "Storage", price: "Contact for pricing" },
   { service: "Deposit", price: "$300" },
 ];
@@ -56,7 +56,7 @@ const Pricing = () => {
               </TableHeader>
               <TableBody>
                 {pricingData.map((item, index) => {
-                  if (item.service === "Self-Fulfilled Shipment") {
+                  if (item.service === "Direct to Consumer Fulfillment") {
                     return (
                       <Fragment key={index}>
                         <TableRow 
@@ -65,7 +65,7 @@ const Pricing = () => {
                         >
                           <TableCell className="font-medium text-foreground">
                             <div className="flex items-center gap-2">
-                              <span>Self-Fulfilled</span>
+                              <span>Direct to Consumer Fulfillment</span>
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>

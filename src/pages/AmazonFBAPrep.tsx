@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import HowItWorks from "@/components/HowItWorks";
 import Reviews from "@/components/Reviews";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
@@ -56,6 +57,8 @@ const AmazonFBAPrep = () => {
               </div>
             </div>
           </section>
+
+          <HowItWorks />
 
           {/* Services Grid */}
           <section className="py-16 bg-background">

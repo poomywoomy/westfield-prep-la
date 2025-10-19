@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import HowItWorks from "@/components/HowItWorks";
 import Services from "@/components/Services";
 import Pricing from "@/components/Pricing";
 import Compliance from "@/components/Compliance";
@@ -30,7 +29,6 @@ const Index = () => {
         <Header />
         <Hero />
         <TrustBadges />
-        <HowItWorks />
         <WhyChooseUs />
         <Services />
         <Reviews />
