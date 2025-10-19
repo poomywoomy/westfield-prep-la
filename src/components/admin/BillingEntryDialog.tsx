@@ -56,12 +56,12 @@ const BillingEntryDialog = ({
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  // Get current month in LA timezone
-  const getCurrentMonthLA = () => {
+  // Get current month in PST/PDT timezone
+  const getCurrentMonthPST = () => {
     const now = new Date();
-    const laDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-    const year = laDate.getFullYear();
-    const month = String(laDate.getMonth() + 1).padStart(2, '0');
+    const pstDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    const year = pstDate.getFullYear();
+    const month = String(pstDate.getMonth() + 1).padStart(2, '0');
     return `${year}-${month}-01`;
   };
 
@@ -77,8 +77,8 @@ const BillingEntryDialog = ({
 
   useEffect(() => {
     if (open) {
-      // Reset selected month when dialog opens - use LA timezone
-      const currentMonth = getCurrentMonthLA();
+      // Reset selected month when dialog opens - use PST timezone
+      const currentMonth = getCurrentMonthPST();
       setSelectedMonth(currentMonth);
       loadBillingData();
     }
@@ -105,12 +105,12 @@ const BillingEntryDialog = ({
       setAvailableCycles(allCycles || []);
 
       // Get or create the selected month's billing cycle
-      const monthToLoad = selectedMonth || getCurrentMonthLA();
+      const monthToLoad = selectedMonth || getCurrentMonthPST();
       let cycle = allCycles?.find(c => c.billing_month === monthToLoad);
 
       if (!cycle) {
         // Only create a new cycle if we're looking at the current month
-        const currentMonth = getCurrentMonthLA();
+        const currentMonth = getCurrentMonthPST();
         if (monthToLoad === currentMonth) {
           const { data: newCycle, error: createError } = await supabase
             .from("monthly_billing_cycles")
@@ -371,11 +371,17 @@ const BillingEntryDialog = ({
 
       if (insertError) throw insertError;
 
-      // Update cycle total
+      // Update cycle total and statement dates
       const total = calculateSubtotal();
+      const updateData: any = { total_amount: total };
+      
+      // Save statement dates if they're set
+      if (statementStart) updateData.statement_start_date = statementStart;
+      if (statementEnd) updateData.statement_end_date = statementEnd;
+      
       const { error: updateError } = await supabase
         .from("monthly_billing_cycles")
-        .update({ total_amount: total })
+        .update(updateData)
         .eq("id", currentCycle.id);
 
       if (updateError) throw updateError;
@@ -385,6 +391,8 @@ const BillingEntryDialog = ({
         description: "Billing saved successfully",
       });
 
+      // Reload to update the cycle data and dropdown display
+      await loadBillingData();
       onSuccess();
     } catch (error: any) {
       toast({

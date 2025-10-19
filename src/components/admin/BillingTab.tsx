@@ -23,11 +23,11 @@ const BillingTab = () => {
 
       if (clientsError) throw clientsError;
 
-      // Get current month in LA timezone
+      // Get current month in PST timezone
       const now = new Date();
-      const laDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-      const year = laDate.getFullYear();
-      const month = String(laDate.getMonth() + 1).padStart(2, '0');
+      const pstDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+      const year = pstDate.getFullYear();
+      const month = String(pstDate.getMonth() + 1).padStart(2, '0');
       const currentMonth = `${year}-${month}-01`;
       
       const clientsWithTotals = await Promise.all(
