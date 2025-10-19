@@ -143,6 +143,7 @@ export type Database = {
           default_service_type: string | null
           default_unit_price: number | null
           id: string
+          image_url: string | null
           notes: string | null
           product_name: string | null
           sku: string
@@ -154,6 +155,7 @@ export type Database = {
           default_service_type?: string | null
           default_unit_price?: number | null
           id?: string
+          image_url?: string | null
           notes?: string | null
           product_name?: string | null
           sku: string
@@ -165,6 +167,7 @@ export type Database = {
           default_service_type?: string | null
           default_unit_price?: number | null
           id?: string
+          image_url?: string | null
           notes?: string | null
           product_name?: string | null
           sku?: string

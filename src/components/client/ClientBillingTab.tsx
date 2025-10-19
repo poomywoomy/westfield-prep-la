@@ -23,12 +23,12 @@ const ClientBillingTab = () => {
   const [clientData, setClientData] = useState<any>(null);
   const { toast } = useToast();
 
-  // Get current month in LA timezone
-  const getCurrentMonthLA = () => {
+  // Get current month in PST/PDT timezone
+  const getCurrentMonthPST = () => {
     const now = new Date();
-    const laDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-    const year = laDate.getFullYear();
-    const month = String(laDate.getMonth() + 1).padStart(2, '0');
+    const pstDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    const year = pstDate.getFullYear();
+    const month = String(pstDate.getMonth() + 1).padStart(2, '0');
     return `${year}-${month}-01`;
   };
 
@@ -89,8 +89,8 @@ const ClientBillingTab = () => {
       if (cyclesError) throw cyclesError;
       setAvailableCycles(allCycles || []);
 
-      // Set current month as default if no selection - use LA timezone
-      const currentMonth = getCurrentMonthLA();
+      // Set current month as default if no selection - use PST timezone
+      const currentMonth = getCurrentMonthPST();
       const monthToLoad = selectedMonth || currentMonth;
       setSelectedMonth(monthToLoad);
       
