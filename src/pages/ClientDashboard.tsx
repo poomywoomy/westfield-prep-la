@@ -214,19 +214,24 @@ const ClientDashboard = () => {
                     className="w-full mt-2"
                     onClick={async () => {
                       try {
+                        if (!pricingDocUrl) throw new Error('No pricing document on file');
+
+                        // Support both legacy full URLs and new storage paths
+                        if (pricingDocUrl.startsWith('http')) {
+                          window.open(pricingDocUrl, '_blank');
+                          return;
+                        }
+
                         const { data, error } = await supabase.storage
                           .from('qc-images')
-                          .createSignedUrl(pricingDocUrl, 3600); // 1 hour expiry
-                        
-                        if (error) throw error;
-                        if (data?.signedUrl) {
-                          window.open(data.signedUrl, '_blank');
-                        }
+                          .createSignedUrl(pricingDocUrl, 60 * 60); // 1 hour expiry
+                        if (error || !data?.signedUrl) throw error || new Error('Unable to sign pricing URL');
+                        window.open(data.signedUrl, '_blank');
                       } catch (error: any) {
                         toast({
-                          title: "Error",
+                          title: 'Unable to load pricing document',
                           description: sanitizeError(error, 'storage'),
-                          variant: "destructive",
+                          variant: 'destructive',
                         });
                       }
                     }}

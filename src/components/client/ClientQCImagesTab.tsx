@@ -74,16 +74,18 @@ const ClientQCImagesTab = () => {
 
       if (error) throw error;
 
-      // Create signed URLs for all images with cache-busting
+      // Create signed URLs for all images with cache-busting and legacy URL support
       const imagesWithSignedUrls = await Promise.all(
         (data || []).map(async (image) => {
           try {
-            // Add timestamp for cache-busting
             const timestamp = new Date(image.upload_date).getTime();
+            // If legacy records store a full public URL, use it directly
+            if (image.image_url.startsWith('http')) {
+              return { ...image, signedUrl: `${image.image_url}${image.image_url.includes('?') ? '&' : '?'}v=${timestamp}` };
+            }
             const { data: signedData } = await supabase.storage
               .from('qc-images')
-              .createSignedUrl(image.image_url, 3600); // 1 hour expiry
-            
+              .createSignedUrl(image.image_url, 3600);
             return {
               ...image,
               signedUrl: signedData?.signedUrl ? `${signedData.signedUrl}&v=${timestamp}` : ''
@@ -109,6 +111,22 @@ const ClientQCImagesTab = () => {
 
   const downloadImage = async (imagePath: string, fileName: string) => {
     try {
+      // If legacy URL, download directly
+      if (imagePath.startsWith('http')) {
+        const response = await fetch(imagePath);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        toast({ title: "Success", description: "Image downloaded" });
+        return;
+      }
+
       // Create a fresh signed URL for download
       const { data, error } = await supabase.storage
         .from('qc-images')
@@ -150,17 +168,21 @@ const ClientQCImagesTab = () => {
     for (let i = 0; i < dateImages.length; i++) {
       const image = dateImages[i];
       try {
-        // Create a fresh signed URL for each download
-        const { data, error } = await supabase.storage
-          .from('qc-images')
-          .createSignedUrl(image.image_url, 60);
-        
-        if (error || !data?.signedUrl) {
-          console.error(`Failed to get signed URL for image ${i + 1}`, error);
-          continue;
+        let urlToFetch = '';
+        if (image.image_url.startsWith('http')) {
+          urlToFetch = image.image_url;
+        } else {
+          const { data, error } = await supabase.storage
+            .from('qc-images')
+            .createSignedUrl(image.image_url, 60);
+          if (error || !data?.signedUrl) {
+            console.error(`Failed to get signed URL for image ${i + 1}`, error);
+            continue;
+          }
+          urlToFetch = data.signedUrl;
         }
 
-        const response = await fetch(data.signedUrl);
+        const response = await fetch(urlToFetch);
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -170,8 +192,6 @@ const ClientQCImagesTab = () => {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        
-        // Small delay between downloads
         await new Promise(resolve => setTimeout(resolve, 500));
       } catch (error) {
         console.error(`Failed to download image ${i + 1}`, error);
@@ -314,6 +334,7 @@ const ClientQCImagesTab = () => {
                                 <img
                                   src={image.signedUrl || ''}
                                   alt="QC Image"
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.svg'; }}
                                   className="w-40 h-40 object-cover rounded"
                                 />
                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded">
@@ -387,6 +408,7 @@ const ClientQCImagesTab = () => {
                 <img
                   src={selectedImage.signedUrl || ''}
                   alt="QC Image Enlarged"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.svg'; }}
                   className="max-h-[60vh] w-auto object-contain rounded"
                 />
               </div>

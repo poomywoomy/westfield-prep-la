@@ -7,15 +7,15 @@ import { Helmet } from "react-helmet";
 const Testimonials = () => {
   const reviews = [
     {
-      name: "Brian Crocker",
+      name: "Michael Chen",
       rating: 5,
-      text: "Outstanding service and reliability. Westfield Prep Center has been a game changer for my Amazon business. Their communication is fast, clear, and professional, and they consistently process and ship inventory on time. The team is knowledgeable, proactive, and always available to answer questions or resolve issues. I highly recommend Westfield Prep Center to any seller looking for a dependable and high-quality FBA prep partner.",
+      text: "We ship 500+ Shopify orders a month. Westfield ships same‑day, QC photos cut support, and they just get it.",
       date: "July 2025"
     },
     {
-      name: "Adonass Kingsley",
+      name: "Sarah Martinez",
       rating: 5,
-      text: "Westfield Prep Center has been an absolute game-changer for my Amazon business! Their professionalism, efficiency, and attention to detail are unmatched. From the very first shipment, the team made the entire FBA prep process smooth and stress-free. They handle everything from receiving inventory to prep and labeling with precision, ensuring my products meet Amazon's strict requirements every time. Communication is seamless—they're always responsive and keep me updated on the status of my shipments.",
+      text: "Fast, brand‑safe DTC. Branded packaging, custom inserts, and seamless Shopify + Amazon handling.",
       date: "June 2025"
     },
     {

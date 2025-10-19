@@ -6,13 +6,13 @@ const Reviews = () => {
     {
       name: "Michael Chen",
       rating: 5,
-      text: "As a Shopify merchant doing 500+ orders per month, Westfield has transformed our fulfillment. Same-day processing is real — orders placed before 2pm ship that day. The photo QC gives our customers confidence and cuts our support tickets in half...",
+      text: "We ship 500+ Shopify orders a month. Westfield ships same‑day, QC photos cut support, and they just get it.",
       date: "July 2025"
     },
     {
       name: "Sarah Martinez",
       rating: 5,
-      text: "Running a DTC brand means everything moves fast. Westfield keeps up perfectly — branded packaging, custom inserts, and they handle both our Shopify and Amazon orders seamlessly. Finally found a 3PL that treats our brand like their own...",
+      text: "Fast, brand‑safe DTC. Branded packaging, custom inserts, and seamless Shopify + Amazon handling.",
       date: "June 2025"
     },
     {
