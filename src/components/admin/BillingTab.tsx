@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import AddBillItemDialog from "./AddBillItemDialog";
 import AddBillPaymentDialog from "./AddBillPaymentDialog";
 import AddBillCreditDialog from "./AddBillCreditDialog";
+import { CreateBillDialog } from "./CreateBillDialog";
 
 const NewBillingTab = () => {
   const { toast } = useToast();
@@ -25,6 +26,7 @@ const NewBillingTab = () => {
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
+  const [createBillDialogOpen, setCreateBillDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchClients();
@@ -248,6 +250,13 @@ const NewBillingTab = () => {
                   ))}
                 </SelectContent>
               </Select>
+
+              {selectedClientId && (
+                <Button onClick={() => setCreateBillDialogOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Bill
+                </Button>
+              )}
 
               {selectedClientId && bills.length > 0 && (
                 <Select 
@@ -481,6 +490,19 @@ const NewBillingTab = () => {
           />
         </>
       )}
+
+      <CreateBillDialog
+        open={createBillDialogOpen}
+        onOpenChange={setCreateBillDialogOpen}
+        clients={clients}
+        preSelectedClientId={selectedClientId}
+        onSuccess={(billId, clientId) => {
+          setSelectedClientId(clientId);
+          fetchBills();
+          // Small delay to ensure bills list is updated before selecting
+          setTimeout(() => setSelectedBill(bills.find(b => b.id === billId)), 100);
+        }}
+      />
     </>
   );
 };
