@@ -12,6 +12,9 @@ import { DollarSign, Image, LogOut, Settings, ChevronDown, Package, Warehouse, F
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientQCImagesTab from "@/components/client/ClientQCImagesTab";
+import ClientProductsTab from "@/components/client/ClientProductsTab";
+import ClientOrdersTab from "@/components/client/ClientOrdersTab";
+import ClientShopifyTab from "@/components/client/ClientShopifyTab";
 import { sanitizeError } from "@/lib/errorHandler";
 
 const ClientDashboard = () => {
@@ -257,8 +260,20 @@ const ClientDashboard = () => {
           </div>
         )}
         
-        <Tabs defaultValue="billing" className="space-y-6">
-          <TabsList className="grid grid-cols-2 w-full max-w-xl">
+        <Tabs defaultValue="products" className="space-y-6">
+          <TabsList className="grid grid-cols-5 w-full">
+            <TabsTrigger value="products">
+              <Package className="mr-2 h-4 w-4" />
+              Products
+            </TabsTrigger>
+            <TabsTrigger value="orders">
+              <Package className="mr-2 h-4 w-4" />
+              Orders
+            </TabsTrigger>
+            <TabsTrigger value="shopify">
+              <Warehouse className="mr-2 h-4 w-4" />
+              Shopify
+            </TabsTrigger>
             <TabsTrigger value="billing">
               <DollarSign className="mr-2 h-4 w-4" />
               Billing
@@ -268,6 +283,18 @@ const ClientDashboard = () => {
               QC Images
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="products">
+            <ClientProductsTab />
+          </TabsContent>
+
+          <TabsContent value="orders">
+            <ClientOrdersTab />
+          </TabsContent>
+
+          <TabsContent value="shopify">
+            <ClientShopifyTab />
+          </TabsContent>
 
           <TabsContent value="billing">
             <ClientBillingTab />

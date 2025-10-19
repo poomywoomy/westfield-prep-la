@@ -71,16 +71,34 @@ export default function ClientProductsTab() {
 
       if (!client) return;
 
-      const { data, error } = await supabase
+      // Fetch SKUs with inventory summary
+      const { data: skuData, error: skuError } = await supabase
         .from('skus')
         .select('*')
         .eq('client_id', client.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (skuError) throw skuError;
 
-      setProducts(data || []);
-      setFilteredProducts(data || []);
+      // Fetch inventory summary for each SKU
+      const { data: inventoryData } = await supabase
+        .from('inventory_summary')
+        .select('*')
+        .eq('client_id', client.id);
+
+      // Merge inventory data with SKU data
+      const productsWithInventory = (skuData || []).map(sku => {
+        const inventory = (inventoryData || []).find(inv => inv.sku_id === sku.id);
+        return {
+          ...sku,
+          on_hand: inventory?.on_hand || 0,
+          available: inventory?.available || 0,
+          reserved: inventory?.reserved || 0,
+        };
+      });
+
+      setProducts(productsWithInventory);
+      setFilteredProducts(productsWithInventory);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast({
@@ -120,11 +138,14 @@ export default function ClientProductsTab() {
   };
 
   const exportToCSV = () => {
-    const headers = ['SKU', 'Product Name', 'Brand', 'Notes'];
+    const headers = ['SKU', 'Product Name', 'Brand', 'On Hand', 'Available', 'Reserved', 'Notes'];
     const rows = filteredProducts.map(p => [
       p.client_sku,
       p.title || '',
       p.brand || '',
+      p.on_hand || 0,
+      p.available || 0,
+      p.reserved || 0,
       p.notes || '',
     ]);
 
@@ -160,9 +181,9 @@ export default function ClientProductsTab() {
             <div className="flex items-center gap-3">
               <Package className="h-5 w-5 text-muted-foreground" />
               <div>
-                <CardTitle>Synced Products</CardTitle>
+                <CardTitle>Your Products</CardTitle>
                 <CardDescription>
-                  {filteredProducts.length} products from Shopify
+                  {filteredProducts.length} products with inventory tracking
                 </CardDescription>
               </div>
             </div>
@@ -232,12 +253,15 @@ export default function ClientProductsTab() {
                   <TableHead>SKU</TableHead>
                   <TableHead>Product Name</TableHead>
                   <TableHead>Brand</TableHead>
+                  <TableHead className="text-right">On Hand</TableHead>
+                  <TableHead className="text-right">Available</TableHead>
+                  <TableHead className="text-right">Reserved</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredProducts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                       No products found
                     </TableCell>
                   </TableRow>
@@ -253,6 +277,9 @@ export default function ClientProductsTab() {
                       <TableCell className="font-mono text-sm">{product.client_sku}</TableCell>
                       <TableCell>{product.title || '-'}</TableCell>
                       <TableCell>{product.brand || '-'}</TableCell>
+                      <TableCell className="text-right font-medium">{product.on_hand}</TableCell>
+                      <TableCell className="text-right font-medium text-green-600">{product.available}</TableCell>
+                      <TableCell className="text-right font-medium text-amber-600">{product.reserved}</TableCell>
                     </TableRow>
                   ))
                 )}

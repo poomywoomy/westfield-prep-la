@@ -4,6 +4,7 @@ import { Package, ClipboardList, BarChart3, Settings as SettingsIcon } from "luc
 import { SKUList } from "./SKUList";
 import { ASNList } from "./ASNList";
 import { InventorySummary } from "./InventorySummary";
+import { InventoryAdjustmentsList } from "./InventoryAdjustmentsList";
 
 export const InventoryTab = () => {
   const [activeSubTab, setActiveSubTab] = useState("skus");
@@ -43,7 +44,7 @@ export const InventoryTab = () => {
         </TabsContent>
 
         <TabsContent value="adjustments">
-          <div className="text-muted-foreground">Adjustments coming soon...</div>
+          <InventoryAdjustmentsList />
         </TabsContent>
       </Tabs>
     </div>
