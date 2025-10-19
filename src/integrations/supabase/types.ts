@@ -1885,6 +1885,10 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_expired_attachments: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       cleanup_old_oauth_states: {
         Args: Record<PropertyKey, never>
         Returns: undefined

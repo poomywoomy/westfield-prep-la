@@ -93,11 +93,23 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
     try {
       setLoading(true);
 
+      // Parse and validate qty_delta
+      const qtyDelta = parseInt(formData.qty_delta, 10);
+      if (isNaN(qtyDelta)) {
+        toast({
+          title: "Invalid Quantity",
+          description: "Please enter a valid quantity adjustment.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       const validated = adjustmentSchema.parse({
         client_id: formData.client_id,
         sku_id: formData.sku_id,
         location_id: formData.location_id,
-        qty_delta: parseInt(formData.qty_delta),
+        qty_delta: qtyDelta,
         reason_code: formData.reason_code,
         notes: formData.notes,
         lot_number: formData.lot_number || null,

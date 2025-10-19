@@ -331,7 +331,11 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
                       min="1"
                       max="1000000"
                       value={line.expected_units}
-                      onChange={e => updateLine(index, "expected_units", parseInt(e.target.value) || 1)}
+                      onChange={e => {
+                        const value = e.target.value;
+                        const parsed = parseInt(value, 10);
+                        updateLine(index, "expected_units", !isNaN(parsed) && parsed > 0 ? parsed : 1);
+                      }}
                       placeholder="Qty"
                     />
                   </div>

@@ -286,7 +286,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                 min="0"
                 max="1000000"
                 value={currentLine.received_units}
-                onChange={e => updateLine(currentLineIndex, "received_units", parseInt(e.target.value) || 0)}
+                onChange={e => {
+                  const value = e.target.value;
+                  const parsed = parseInt(value, 10);
+                  updateLine(currentLineIndex, "received_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
+                }}
                 className="text-lg font-semibold"
               />
             </div>
@@ -301,7 +305,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                     type="number"
                     min="0"
                     value={currentLine.normal_units}
-                    onChange={e => updateLine(currentLineIndex, "normal_units", parseInt(e.target.value) || 0)}
+                    onChange={e => {
+                      const value = e.target.value;
+                      const parsed = parseInt(value, 10);
+                      updateLine(currentLineIndex, "normal_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
@@ -311,7 +319,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                     type="number"
                     min="0"
                     value={currentLine.damaged_units}
-                    onChange={e => updateLine(currentLineIndex, "damaged_units", parseInt(e.target.value) || 0)}
+                    onChange={e => {
+                      const value = e.target.value;
+                      const parsed = parseInt(value, 10);
+                      updateLine(currentLineIndex, "damaged_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
@@ -321,7 +333,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                     type="number"
                     min="0"
                     value={currentLine.quarantined_units}
-                    onChange={e => updateLine(currentLineIndex, "quarantined_units", parseInt(e.target.value) || 0)}
+                    onChange={e => {
+                      const value = e.target.value;
+                      const parsed = parseInt(value, 10);
+                      updateLine(currentLineIndex, "quarantined_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
@@ -331,7 +347,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                     type="number"
                     min="0"
                     value={currentLine.rework_units}
-                    onChange={e => updateLine(currentLineIndex, "rework_units", parseInt(e.target.value) || 0)}
+                    onChange={e => {
+                      const value = e.target.value;
+                      const parsed = parseInt(value, 10);
+                      updateLine(currentLineIndex, "rework_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
+                    }}
                   />
                 </div>
               </div>
@@ -345,7 +365,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                 min="0"
                 max={currentLine.normal_units}
                 value={currentLine.reserved_units}
-                onChange={e => updateLine(currentLineIndex, "reserved_units", parseInt(e.target.value) || 0)}
+                onChange={e => {
+                  const value = e.target.value;
+                  const parsed = parseInt(value, 10);
+                  updateLine(currentLineIndex, "reserved_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
+                }}
               />
             </div>
 
