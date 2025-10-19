@@ -14,6 +14,182 @@ export type Database = {
   }
   public: {
     Tables: {
+      asn_headers: {
+        Row: {
+          asn_number: string
+          carrier: string | null
+          client_id: string
+          closed_at: string | null
+          created_at: string
+          created_by: string | null
+          eta: string | null
+          id: string
+          notes: string | null
+          received_at: string | null
+          received_by: string | null
+          ship_from: string | null
+          status: Database["public"]["Enums"]["asn_status"]
+          tracking_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          asn_number: string
+          carrier?: string | null
+          client_id: string
+          closed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          eta?: string | null
+          id?: string
+          notes?: string | null
+          received_at?: string | null
+          received_by?: string | null
+          ship_from?: string | null
+          status?: Database["public"]["Enums"]["asn_status"]
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          asn_number?: string
+          carrier?: string | null
+          client_id?: string
+          closed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          eta?: string | null
+          id?: string
+          notes?: string | null
+          received_at?: string | null
+          received_by?: string | null
+          ship_from?: string | null
+          status?: Database["public"]["Enums"]["asn_status"]
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asn_headers_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      asn_lines: {
+        Row: {
+          asn_id: string
+          created_at: string
+          damaged_units: number
+          expected_units: number
+          expiry_date: string | null
+          id: string
+          lot_number: string | null
+          normal_units: number
+          notes: string | null
+          quarantined_units: number
+          received_units: number
+          reserved_units: number
+          rework_units: number
+          service_ticks: Json | null
+          sku_id: string
+          updated_at: string
+        }
+        Insert: {
+          asn_id: string
+          created_at?: string
+          damaged_units?: number
+          expected_units?: number
+          expiry_date?: string | null
+          id?: string
+          lot_number?: string | null
+          normal_units?: number
+          notes?: string | null
+          quarantined_units?: number
+          received_units?: number
+          reserved_units?: number
+          rework_units?: number
+          service_ticks?: Json | null
+          sku_id: string
+          updated_at?: string
+        }
+        Update: {
+          asn_id?: string
+          created_at?: string
+          damaged_units?: number
+          expected_units?: number
+          expiry_date?: string | null
+          id?: string
+          lot_number?: string | null
+          normal_units?: number
+          notes?: string | null
+          quarantined_units?: number
+          received_units?: number
+          reserved_units?: number
+          rework_units?: number
+          service_ticks?: Json | null
+          sku_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asn_lines_asn_id_fkey"
+            columns: ["asn_id"]
+            isOneToOne: false
+            referencedRelation: "asn_headers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asn_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attachments: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          file_size: number | null
+          file_url: string
+          filename: string
+          id: string
+          mime_type: string | null
+          owner_id: string
+          owner_type: string
+          retention_days: number | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          file_size?: number | null
+          file_url: string
+          filename: string
+          id?: string
+          mime_type?: string | null
+          owner_id: string
+          owner_type: string
+          retention_days?: number | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          file_size?: number | null
+          file_url?: string
+          filename?: string
+          id?: string
+          mime_type?: string | null
+          owner_id?: string
+          owner_type?: string
+          retention_days?: number | null
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action: string
@@ -135,53 +311,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
-      }
-      client_skus: {
-        Row: {
-          client_id: string
-          created_at: string
-          default_service_type: string | null
-          default_unit_price: number | null
-          id: string
-          image_url: string | null
-          notes: string | null
-          product_name: string | null
-          sku: string
-          updated_at: string
-        }
-        Insert: {
-          client_id: string
-          created_at?: string
-          default_service_type?: string | null
-          default_unit_price?: number | null
-          id?: string
-          image_url?: string | null
-          notes?: string | null
-          product_name?: string | null
-          sku: string
-          updated_at?: string
-        }
-        Update: {
-          client_id?: string
-          created_at?: string
-          default_service_type?: string | null
-          default_unit_price?: number | null
-          id?: string
-          image_url?: string | null
-          notes?: string | null
-          product_name?: string | null
-          sku?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "client_skus_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       clients: {
         Row: {
@@ -440,49 +569,78 @@ export type Database = {
         }
         Relationships: []
       }
-      inventory_sync: {
+      inventory_ledger: {
         Row: {
           client_id: string
           created_at: string
+          expiry_date: string | null
           id: string
-          last_synced_at: string | null
-          shopify_inventory_item_id: string | null
-          shopify_quantity: number | null
-          sku: string
-          sync_enabled: boolean
-          updated_at: string
-          westfield_quantity: number
+          location_id: string
+          lot_number: string | null
+          notes: string | null
+          qty_delta: number
+          reason_code: string | null
+          sku_id: string
+          source_ref: string | null
+          source_type: string | null
+          transaction_type: Database["public"]["Enums"]["ledger_type"]
+          ts: string
+          user_id: string | null
         }
         Insert: {
           client_id: string
           created_at?: string
+          expiry_date?: string | null
           id?: string
-          last_synced_at?: string | null
-          shopify_inventory_item_id?: string | null
-          shopify_quantity?: number | null
-          sku: string
-          sync_enabled?: boolean
-          updated_at?: string
-          westfield_quantity?: number
+          location_id: string
+          lot_number?: string | null
+          notes?: string | null
+          qty_delta: number
+          reason_code?: string | null
+          sku_id: string
+          source_ref?: string | null
+          source_type?: string | null
+          transaction_type: Database["public"]["Enums"]["ledger_type"]
+          ts?: string
+          user_id?: string | null
         }
         Update: {
           client_id?: string
           created_at?: string
+          expiry_date?: string | null
           id?: string
-          last_synced_at?: string | null
-          shopify_inventory_item_id?: string | null
-          shopify_quantity?: number | null
-          sku?: string
-          sync_enabled?: boolean
-          updated_at?: string
-          westfield_quantity?: number
+          location_id?: string
+          lot_number?: string | null
+          notes?: string | null
+          qty_delta?: number
+          reason_code?: string | null
+          sku_id?: string
+          source_ref?: string | null
+          source_type?: string | null
+          transaction_type?: Database["public"]["Enums"]["ledger_type"]
+          ts?: string
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "inventory_sync_client_id_fkey"
+            foreignKeyName: "inventory_ledger_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_ledger_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_ledger_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
             referencedColumns: ["id"]
           },
         ]
@@ -581,6 +739,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      locations: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
       }
       monthly_billing_cycles: {
         Row: {
@@ -1449,6 +1631,121 @@ export type Database = {
           },
         ]
       }
+      sku_aliases: {
+        Row: {
+          alias_type: string
+          alias_value: string
+          created_at: string
+          id: string
+          sku_id: string
+        }
+        Insert: {
+          alias_type: string
+          alias_value: string
+          created_at?: string
+          id?: string
+          sku_id: string
+        }
+        Update: {
+          alias_type?: string
+          alias_value?: string
+          created_at?: string
+          id?: string
+          sku_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sku_aliases_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      skus: {
+        Row: {
+          asin: string | null
+          brand: string | null
+          client_id: string
+          client_sku: string
+          created_at: string
+          ean: string | null
+          fnsku: string | null
+          has_expiration: boolean
+          has_lot_tracking: boolean
+          height: number | null
+          id: string
+          image_url: string | null
+          length: number | null
+          notes: string | null
+          prep_requirements: Json | null
+          status: string
+          title: string
+          unit_cost: number | null
+          upc: string | null
+          updated_at: string
+          weight: number | null
+          width: number | null
+        }
+        Insert: {
+          asin?: string | null
+          brand?: string | null
+          client_id: string
+          client_sku: string
+          created_at?: string
+          ean?: string | null
+          fnsku?: string | null
+          has_expiration?: boolean
+          has_lot_tracking?: boolean
+          height?: number | null
+          id?: string
+          image_url?: string | null
+          length?: number | null
+          notes?: string | null
+          prep_requirements?: Json | null
+          status?: string
+          title: string
+          unit_cost?: number | null
+          upc?: string | null
+          updated_at?: string
+          weight?: number | null
+          width?: number | null
+        }
+        Update: {
+          asin?: string | null
+          brand?: string | null
+          client_id?: string
+          client_sku?: string
+          created_at?: string
+          ean?: string | null
+          fnsku?: string | null
+          has_expiration?: boolean
+          has_lot_tracking?: boolean
+          height?: number | null
+          id?: string
+          image_url?: string | null
+          length?: number | null
+          notes?: string | null
+          prep_requirements?: Json | null
+          status?: string
+          title?: string
+          unit_cost?: number | null
+          upc?: string | null
+          updated_at?: string
+          weight?: number | null
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skus_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sync_logs: {
         Row: {
           client_id: string
@@ -1549,7 +1846,43 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      inventory_summary: {
+        Row: {
+          available: number | null
+          client_id: string | null
+          client_sku: string | null
+          fnsku: string | null
+          location_id: string | null
+          location_name: string | null
+          on_hand: number | null
+          reserved: number | null
+          sku_id: string | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_ledger_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_ledger_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_ledger_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       cleanup_old_oauth_states: {
@@ -1586,9 +1919,11 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "client"
+      asn_status: "draft" | "in_progress" | "received" | "closed"
       billing_frequency: "pay_as_go" | "end_of_month"
       channel_type: "amazon" | "walmart" | "shopify" | "ebay" | "other"
       client_status: "pending" | "active" | "inactive"
+      condition_type: "normal" | "damaged" | "quarantined" | "rework"
       fulfillment_service:
         | "fba_prep"
         | "wfs_prep"
@@ -1596,6 +1931,15 @@ export type Database = {
         | "self_fulfilled"
         | "shopify"
         | "returns_processing"
+      ledger_type:
+        | "RECEIPT"
+        | "ADJUSTMENT_PLUS"
+        | "ADJUSTMENT_MINUS"
+        | "SALE_DECREMENT"
+        | "RETURN"
+        | "TRANSFER"
+        | "RESERVE"
+        | "RELEASE"
       line_status: "awaiting" | "in_progress" | "ready" | "shipped"
       prep_status: "awaiting" | "in_progress" | "ready"
       receiving_format: "pallets" | "cartons" | "both"
@@ -1727,9 +2071,11 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "client"],
+      asn_status: ["draft", "in_progress", "received", "closed"],
       billing_frequency: ["pay_as_go", "end_of_month"],
       channel_type: ["amazon", "walmart", "shopify", "ebay", "other"],
       client_status: ["pending", "active", "inactive"],
+      condition_type: ["normal", "damaged", "quarantined", "rework"],
       fulfillment_service: [
         "fba_prep",
         "wfs_prep",
@@ -1737,6 +2083,16 @@ export const Constants = {
         "self_fulfilled",
         "shopify",
         "returns_processing",
+      ],
+      ledger_type: [
+        "RECEIPT",
+        "ADJUSTMENT_PLUS",
+        "ADJUSTMENT_MINUS",
+        "SALE_DECREMENT",
+        "RETURN",
+        "TRANSFER",
+        "RESERVE",
+        "RELEASE",
       ],
       line_status: ["awaiting", "in_progress", "ready", "shipped"],
       prep_status: ["awaiting", "in_progress", "ready"],
