@@ -52,7 +52,7 @@ const Hero = () => {
               </h1>
               
               <p className="text-xl md:text-2xl mb-8 text-white/90 font-light leading-relaxed">
-                Westfield Prep Center helps high-volume Shopify and Amazon sellers deliver faster — with same-day processing, full insurance, and photo-proof QC on every shipment. <span className="font-bold text-secondary">Every order documented, every brand protected.</span>
+                Westfield Prep Center helps sellers deliver and scale faster. Every order is documented, every brand is protected. <span className="block mt-3 text-2xl md:text-3xl font-bold text-secondary animate-pulse">Let us help you reach the next level of your growth.</span>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-10">
