@@ -7,7 +7,6 @@ import Pricing from "@/components/Pricing";
 import Compliance from "@/components/Compliance";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import Reviews from "@/components/Reviews";
-import TrustBadges from "@/components/TrustBadges";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 
@@ -28,7 +27,6 @@ const Index = () => {
       <div className="min-h-screen">
         <Header />
         <Hero />
-        <TrustBadges />
         <WhyChooseUs />
         <Services />
         <Reviews />
