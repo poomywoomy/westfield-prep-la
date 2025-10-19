@@ -9,7 +9,7 @@ import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Package, Tag, Shield } from "lucide-react";
+import { CheckCircle, Package, Tag, Shield, Boxes, TrendingUp } from "lucide-react";
 
 const AmazonFBAPrep = () => {
   const navigate = useNavigate();
@@ -41,87 +41,115 @@ const AmazonFBAPrep = () => {
         <Breadcrumbs items={[{ label: "Amazon FBA Prep", path: "/amazon-fba-prep/" }]} />
         
         <main className="flex-1">
-          {/* Hero Section */}
-          <section className="bg-gradient-to-br from-primary/10 to-primary/5 py-20 mt-16">
-            <div className="container mx-auto px-4">
+          {/* Hero Section - Amazon Professional Theme */}
+          <section className="relative py-24 mt-16 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-blue-500/5 to-orange-500/10" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+            <div className="container mx-auto px-4 relative">
               <div className="max-w-4xl mx-auto text-center">
-                <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
+                  <Boxes className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-600">Amazon FBA Certified</span>
+                </div>
+                <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent">
                   Amazon FBA Prep & Compliance
                 </h1>
-                <p className="text-xl text-muted-foreground mb-8">
-                  FNSKU labeling, polybagging, bubble wrap, carton prep, pallet forwarding.
+                <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                  FNSKU labeling, polybagging, bubble wrap, carton prep, pallet forwarding with full Amazon compliance.
                 </p>
-                <Button size="lg" onClick={() => navigate("/contact")}>
-                  Get a Quote
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => navigate("/contact")}>
+                    Get a Quote
+                  </Button>
+                  <Button size="lg" variant="outline" onClick={() => navigate("/contact")}>
+                    View Pricing
+                  </Button>
+                </div>
               </div>
             </div>
           </section>
 
           <HowItWorks />
 
-          {/* Services Grid */}
-          <section className="py-16 bg-background">
+          {/* Services Grid - Professional Card Design */}
+          <section className="py-20 bg-gradient-to-b from-background to-blue-50/30">
             <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Amazon FBA Services</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                <Card>
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold mb-4">Amazon FBA Services</h2>
+                <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                  Comprehensive prep services designed for Amazon seller success
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <Card className="border-blue-200/50 hover:border-blue-400/50 hover:shadow-lg transition-all duration-300 group">
                   <CardHeader>
-                    <Tag className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>FNSKU Labeling</CardTitle>
+                    <div className="h-14 w-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Tag className="h-7 w-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl">FNSKU Labeling</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground">Amazon-compliant FNSKU labels printed and applied to every unit.</p>
+                    <p className="text-muted-foreground leading-relaxed">Amazon-compliant FNSKU labels printed and applied to every unit with precision.</p>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-orange-200/50 hover:border-orange-400/50 hover:shadow-lg transition-all duration-300 group">
                   <CardHeader>
-                    <Package className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Polybagging</CardTitle>
+                    <div className="h-14 w-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Package className="h-7 w-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl">Polybagging</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground">Suffocation warning labels and transparent poly bags per Amazon standards.</p>
+                    <p className="text-muted-foreground leading-relaxed">Suffocation warning labels and transparent poly bags per Amazon standards.</p>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-blue-200/50 hover:border-blue-400/50 hover:shadow-lg transition-all duration-300 group">
                   <CardHeader>
-                    <Shield className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Bubble Wrap</CardTitle>
+                    <div className="h-14 w-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Shield className="h-7 w-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl">Bubble Wrap</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground">Fragile item protection with bubble wrap and reinforced packaging.</p>
+                    <p className="text-muted-foreground leading-relaxed">Fragile item protection with bubble wrap and reinforced packaging.</p>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-orange-200/50 hover:border-orange-400/50 hover:shadow-lg transition-all duration-300 group">
                   <CardHeader>
-                    <Package className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Carton Prep</CardTitle>
+                    <div className="h-14 w-14 bg-gradient-to-br from-orange-600 to-orange-700 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Package className="h-7 w-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl">Carton Prep</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground">Case packing with FBA box labels and shipment plan adherence.</p>
+                    <p className="text-muted-foreground leading-relaxed">Case packing with FBA box labels and shipment plan adherence.</p>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-blue-200/50 hover:border-blue-400/50 hover:shadow-lg transition-all duration-300 group">
                   <CardHeader>
-                    <Shield className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Pallet Forwarding</CardTitle>
+                    <div className="h-14 w-14 bg-gradient-to-br from-blue-700 to-blue-800 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Shield className="h-7 w-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl">Pallet Forwarding</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground">LTL shipments palletized and forwarded directly to Amazon FCs.</p>
+                    <p className="text-muted-foreground leading-relaxed">LTL shipments palletized and forwarded directly to Amazon FCs.</p>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-orange-200/50 hover:border-orange-400/50 hover:shadow-lg transition-all duration-300 group">
                   <CardHeader>
-                    <CheckCircle className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Photo-Proof QC</CardTitle>
+                    <div className="h-14 w-14 bg-gradient-to-br from-orange-700 to-orange-800 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <CheckCircle className="h-7 w-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl">Photo-Proof QC</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground">Every prep step documented with photos for compliance verification.</p>
+                    <p className="text-muted-foreground leading-relaxed">Every prep step documented with photos for compliance verification.</p>
                   </CardContent>
                 </Card>
               </div>
@@ -205,14 +233,25 @@ const AmazonFBAPrep = () => {
 
           <Reviews />
 
-          {/* CTA */}
-          <section className="py-16 bg-primary text-primary-foreground">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold mb-4">Ready to Streamline Your FBA Prep?</h2>
-              <p className="text-xl mb-8 opacity-90">Get a custom prep quote in 24 hours.</p>
-              <Button size="lg" variant="secondary" onClick={() => navigate("/contact")}>
-                Get a Quote
-              </Button>
+          {/* CTA - Amazon Professional Theme */}
+          <section className="relative py-20 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-orange-600" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:32px_32px]" />
+            <div className="container mx-auto px-4 text-center relative">
+              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-6">
+                <TrendingUp className="h-4 w-4 text-white" />
+                <span className="text-sm font-medium text-white">Trusted by 500+ Amazon Sellers</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Ready to Streamline Your FBA Prep?</h2>
+              <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">Get a custom prep quote in 24 hours and start scaling your Amazon business.</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" className="bg-white text-blue-600 hover:bg-white/90" onClick={() => navigate("/contact")}>
+                  Get a Quote
+                </Button>
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" onClick={() => navigate("/contact")}>
+                  Schedule Consultation
+                </Button>
+              </div>
             </div>
           </section>
         </main>
