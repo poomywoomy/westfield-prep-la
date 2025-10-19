@@ -6,12 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Users, FileText, DollarSign, Image, LogOut, Settings, ChevronDown, FileSignature, Store, Package } from "lucide-react";
+import { Users, FileText, DollarSign, LogOut, Settings, ChevronDown, FileSignature, Store, Package } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientsTab from "@/components/admin/ClientsTab";
 import QuotesTab from "@/components/admin/QuotesTab";
 import BillingTab from "@/components/admin/BillingTab";
-import QCImagesTab from "@/components/admin/QCImagesTab";
 import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
 import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
 import { InventoryTab } from "@/components/admin/InventoryTab";
@@ -105,7 +104,7 @@ const AdminDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="grid grid-cols-7 w-full max-w-6xl">
+          <TabsList className="grid grid-cols-6 w-full max-w-6xl">
             <TabsTrigger value="clients">
               <Users className="mr-2 h-4 w-4" />
               Clients
@@ -125,10 +124,6 @@ const AdminDashboard = () => {
             <TabsTrigger value="shopify">
               <Store className="mr-2 h-4 w-4" />
               Shopify
-            </TabsTrigger>
-            <TabsTrigger value="qc-images">
-              <Image className="mr-2 h-4 w-4" />
-              QC Images
             </TabsTrigger>
             <TabsTrigger value="documents">
               <FileSignature className="mr-2 h-4 w-4" />
@@ -154,10 +149,6 @@ const AdminDashboard = () => {
 
           <TabsContent value="shopify">
             <ShopifyManagementTab />
-          </TabsContent>
-
-          <TabsContent value="qc-images">
-            <QCImagesTab />
           </TabsContent>
 
           <TabsContent value="documents">

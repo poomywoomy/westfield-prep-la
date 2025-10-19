@@ -532,7 +532,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
           .insert([{
             client_id: useManualEntry ? null : (selectedClientId || null),
             quote_data: quoteData as any,
-            status: 'saved'
+            status: 'draft'
           }]);
 
         if (error) throw error;
@@ -664,7 +664,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
 
         const { error: insertQuoteError } = await supabase
           .from("quotes")
-          .insert([{ client_id: selectedClientId, quote_data: quoteData as any, status: 'saved' }]);
+          .insert([{ client_id: selectedClientId, quote_data: quoteData as any, status: 'draft' }]);
 
         if (insertQuoteError) throw insertQuoteError;
       }
