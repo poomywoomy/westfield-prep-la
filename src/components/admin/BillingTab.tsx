@@ -183,9 +183,11 @@ const BillingTab = () => {
                         <div className="text-sm text-muted-foreground">
                           {bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Updated: {new Date(bill.updated_at).toLocaleDateString()}
-                        </div>
+                        {bill.statement_start_date && bill.statement_end_date && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {new Date(bill.statement_start_date).toLocaleDateString()} - {new Date(bill.statement_end_date).toLocaleDateString()}
+                          </div>
+                        )}
                       </div>
                       <div className="text-right space-y-1">
                         <Badge className={getStatusColor(bill.status)}>{bill.status}</Badge>

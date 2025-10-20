@@ -31,7 +31,8 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [clientQuotes, setClientQuotes] = useState<Quote[]>([]);
-  const [statementDate, setStatementDate] = useState<string>(bill.statement_date || "");
+  const [statementStartDate, setStatementStartDate] = useState<string>(bill.statement_start_date || "");
+  const [statementEndDate, setStatementEndDate] = useState<string>(bill.statement_end_date || "");
   const [addPaymentOpen, setAddPaymentOpen] = useState(false);
   const [addCustomItemOpen, setAddCustomItemOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,8 +43,9 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   }, [bill.id]);
 
   useEffect(() => {
-    setStatementDate(bill.statement_date || "");
-  }, [bill.statement_date]);
+    setStatementStartDate(bill.statement_start_date || "");
+    setStatementEndDate(bill.statement_end_date || "");
+  }, [bill.statement_start_date, bill.statement_end_date]);
 
   const fetchBillData = async () => {
     try {
@@ -131,8 +133,34 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   };
 
   const addServiceFromQuote = async (serviceName: string, unitPrice: number) => {
+    if (!bill?.id) {
+      toast({
+        title: "Error",
+        description: "Bill ID is missing. Please refresh and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
+      
+      // Verify bill exists first
+      const { data: billCheck, error: checkError } = await supabase
+        .from("bills")
+        .select("id")
+        .eq("id", bill.id)
+        .single();
+
+      if (checkError || !billCheck) {
+        toast({
+          title: "Error",
+          description: "Bill not found. Please refresh the page.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase.from("bill_items").insert({
         bill_id: bill.id,
         service_name: serviceName,
@@ -241,11 +269,20 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     }
   };
 
-  const saveStatementDate = async () => {
-    if (!statementDate) {
+  const saveStatementDates = async () => {
+    if (!statementStartDate || !statementEndDate) {
       toast({
         title: "Validation Error",
-        description: "Please select a statement date",
+        description: "Please select both start and end dates",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (new Date(statementStartDate) > new Date(statementEndDate)) {
+      toast({
+        title: "Validation Error",
+        description: "Start date must be before end date",
         variant: "destructive",
       });
       return;
@@ -254,14 +291,17 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     try {
       const { error } = await supabase
         .from("bills")
-        .update({ statement_date: statementDate })
+        .update({ 
+          statement_start_date: statementStartDate,
+          statement_end_date: statementEndDate,
+        })
         .eq("id", bill.id);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Statement date saved and will show on client side",
+        description: "Statement dates saved and will show on client side",
       });
 
       onRefresh();
@@ -303,7 +343,10 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     doc.setFont("helvetica", "bold");
     doc.text("Statement Date:", 120, yPos);
     doc.setFont("helvetica", "normal");
-    doc.text(statementDate || new Date().toLocaleDateString(), 165, yPos);
+    const dateRange = statementStartDate && statementEndDate 
+      ? `${new Date(statementStartDate).toLocaleDateString()} - ${new Date(statementEndDate).toLocaleDateString()}`
+      : new Date().toLocaleDateString();
+    doc.text(dateRange, 165, yPos);
     yPos += 15;
 
     // Line items table
@@ -374,10 +417,10 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   };
 
   const closeBill = async () => {
-    if (!statementDate) {
+    if (!statementStartDate || !statementEndDate) {
       toast({
         title: "Validation Error",
-        description: "Please set a statement date before closing",
+        description: "Please set statement date range before closing",
         variant: "destructive",
       });
       return;
@@ -420,7 +463,32 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   };
 
   const populateFromQuote = async (q: Quote) => {
+    if (!bill?.id) {
+      toast({
+        title: "Error",
+        description: "Bill ID is missing. Please refresh and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      // Verify bill exists first
+      const { data: billCheck, error: checkError } = await supabase
+        .from("bills")
+        .select("id")
+        .eq("id", bill.id)
+        .single();
+
+      if (checkError || !billCheck) {
+        toast({
+          title: "Error",
+          description: "Bill not found. Please refresh the page.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const data = q.quote_data as any;
       const now = new Date();
       const lineItems: any[] = [];
@@ -572,31 +640,44 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Statement Date */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Statement Date Range */}
+          <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="statement-date">Statement Date *</Label>
-              <div className="flex gap-2 mt-1">
-                <Input
-                  id="statement-date"
-                  type="date"
-                  value={statementDate}
-                  onChange={(e) => setStatementDate(e.target.value)}
-                  disabled={isClosed}
-                />
-                <Button onClick={saveStatementDate} disabled={isClosed || !statementDate} size="sm">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Save
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Will display on client side automatically
-              </p>
+              <Label htmlFor="statement-start">Statement Start Date *</Label>
+              <Input
+                id="statement-start"
+                type="date"
+                value={statementStartDate}
+                onChange={(e) => setStatementStartDate(e.target.value)}
+                disabled={isClosed}
+                className="mt-1"
+              />
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold">${balance.toFixed(2)}</div>
-              <div className="text-sm text-muted-foreground">Balance Due</div>
+            <div>
+              <Label htmlFor="statement-end">Statement End Date *</Label>
+              <Input
+                id="statement-end"
+                type="date"
+                value={statementEndDate}
+                onChange={(e) => setStatementEndDate(e.target.value)}
+                disabled={isClosed}
+                className="mt-1"
+              />
             </div>
+            <div className="flex items-end">
+              <Button onClick={saveStatementDates} disabled={isClosed || !statementStartDate || !statementEndDate} className="w-full">
+                <Calendar className="mr-2 h-4 w-4" />
+                Save Dates
+              </Button>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Date range will display on client side automatically
+          </p>
+
+          <div className="text-right">
+            <div className="text-2xl font-bold">${balance.toFixed(2)}</div>
+            <div className="text-sm text-muted-foreground">Balance Due</div>
           </div>
 
           {/* Pricing Quote */}
@@ -640,7 +721,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
             </Button>
             {!isClosed && (
               <>
-                <Button onClick={closeBill} disabled={loading || !statementDate}>
+                <Button onClick={closeBill} disabled={loading || !statementStartDate || !statementEndDate}>
                   <Lock className="mr-2 h-4 w-4" />
                   Close Bill
                 </Button>
