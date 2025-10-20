@@ -13,8 +13,15 @@ import type { Database } from "@/integrations/supabase/types";
 type SKU = Database["public"]["Tables"]["skus"]["Row"];
 type Client = Database["public"]["Tables"]["clients"]["Row"];
 
+interface SKUWithMetrics extends SKU {
+  available: number;
+  received_this_month: number;
+  expected: number;
+  discrepancies: number;
+}
+
 export const SKUList = () => {
-  const [skus, setSKUs] = useState<SKU[]>([]);
+  const [skus, setSKUs] = useState<SKUWithMetrics[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState<string>("all");
@@ -49,13 +56,76 @@ export const SKUList = () => {
       query = query.eq("client_id", selectedClient);
     }
     
-    const { data, error } = await query.order("created_at", { ascending: false });
+    const { data: skuData, error } = await query.order("created_at", { ascending: false });
     
     if (error) {
       toast({ title: "Error", description: "Failed to load SKUs", variant: "destructive" });
-    } else {
-      setSKUs(data || []);
+      setLoading(false);
+      return;
     }
+
+    if (!skuData) {
+      setSKUs([]);
+      setLoading(false);
+      return;
+    }
+
+    // Fetch inventory metrics for each SKU
+    const skusWithMetrics = await Promise.all(
+      skuData.map(async (sku) => {
+        // Get available inventory from inventory_summary
+        const { data: summaryData } = await supabase
+          .from("inventory_summary")
+          .select("available")
+          .eq("sku_id", sku.id)
+          .maybeSingle();
+
+        // Get received this month from inventory_ledger
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const { data: receivedData } = await supabase
+          .from("inventory_ledger")
+          .select("qty_delta")
+          .eq("sku_id", sku.id)
+          .eq("transaction_type", "RECEIPT")
+          .gte("ts", startOfMonth.toISOString());
+
+        const receivedThisMonth = receivedData?.reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0;
+
+        // Get expected from ASN lines
+        const { data: asnData } = await supabase
+          .from("asn_lines")
+          .select("expected_units, received_units, asn_headers!inner(status)")
+          .eq("sku_id", sku.id)
+          .in("asn_headers.status", ["draft", "in_progress"]);
+
+        const expected = asnData?.reduce((sum, line) => sum + (line.expected_units || 0), 0) || 0;
+
+        // Calculate discrepancies from received ASNs
+        const { data: discrepancyData } = await supabase
+          .from("asn_lines")
+          .select("expected_units, received_units, asn_headers!inner(status)")
+          .eq("sku_id", sku.id)
+          .eq("asn_headers.status", "received");
+
+        const discrepancies = discrepancyData?.reduce(
+          (sum, line) => sum + Math.abs((line.expected_units || 0) - (line.received_units || 0)),
+          0
+        ) || 0;
+
+        return {
+          ...sku,
+          available: summaryData?.available || 0,
+          received_this_month: receivedThisMonth,
+          expected,
+          discrepancies,
+        };
+      })
+    );
+
+    setSKUs(skusWithMetrics);
     setLoading(false);
   };
 
@@ -123,9 +193,11 @@ export const SKUList = () => {
               <TableHead>Client SKU</TableHead>
               <TableHead>Title</TableHead>
               <TableHead>FNSKU</TableHead>
-              <TableHead>Brand</TableHead>
+              <TableHead className="text-right">Available</TableHead>
+              <TableHead className="text-right">Received (Month)</TableHead>
+              <TableHead className="text-right">Expected</TableHead>
+              <TableHead className="text-right">Discrepancies</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Dimensions</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -138,7 +210,7 @@ export const SKUList = () => {
               </TableRow>
             ) : filteredSKUs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground">
+                <TableCell colSpan={9} className="text-center text-muted-foreground">
                   No SKUs found
                 </TableCell>
               </TableRow>
@@ -148,17 +220,20 @@ export const SKUList = () => {
                   <TableCell className="font-medium">{sku.client_sku}</TableCell>
                   <TableCell>{sku.title}</TableCell>
                   <TableCell>{sku.fnsku || "-"}</TableCell>
-                  <TableCell>{sku.brand || "-"}</TableCell>
+                  <TableCell className="text-right">{sku.available}</TableCell>
+                  <TableCell className="text-right">{sku.received_this_month}</TableCell>
+                  <TableCell className="text-right">{sku.expected}</TableCell>
+                  <TableCell className="text-right">
+                    {sku.discrepancies > 0 ? (
+                      <Badge variant="destructive">{sku.discrepancies}</Badge>
+                    ) : (
+                      <span className="text-muted-foreground">0</span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={sku.status === "active" ? "default" : "secondary"}>
                       {sku.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {sku.length && sku.width && sku.height 
-                      ? `${sku.length} × ${sku.width} × ${sku.height}`
-                      : "-"
-                    }
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm" onClick={() => handleEdit(sku)}>

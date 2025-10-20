@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Package } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { ASNFormDialog } from "./ASNFormDialog";
 import { ReceivingDialog } from "./ReceivingDialog";
@@ -23,6 +24,9 @@ export const ASNList = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [receivingDialogOpen, setReceivingDialogOpen] = useState(false);
   const [selectedASN, setSelectedASN] = useState<ASN | null>(null);
+  const [editingASNId, setEditingASNId] = useState<string | undefined>(undefined);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [asnToDelete, setAsnToDelete] = useState<ASN | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -78,6 +82,57 @@ export const ASNList = () => {
     }
   };
 
+  const handleEdit = (asn: ASN) => {
+    setEditingASNId(asn.id);
+    setCreateDialogOpen(true);
+  };
+
+  const handleDelete = (asn: ASN) => {
+    setAsnToDelete(asn);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!asnToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from("asn_headers")
+        .delete()
+        .eq("id", asnToDelete.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "ASN deleted successfully",
+      });
+
+      fetchASNs();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete ASN",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setAsnToDelete(null);
+    }
+  };
+
+  const handleFormSuccess = () => {
+    setEditingASNId(undefined);
+    fetchASNs();
+  };
+
+  const handleFormClose = (open: boolean) => {
+    setCreateDialogOpen(open);
+    if (!open) {
+      setEditingASNId(undefined);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -113,9 +168,25 @@ export const ASNList = () => {
 
       <ASNFormDialog
         open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        onSuccess={fetchASNs}
+        onOpenChange={handleFormClose}
+        onSuccess={handleFormSuccess}
+        asnId={editingASNId}
       />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete ASN</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete ASN {asnToDelete?.asn_number}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <ReceivingDialog
         asn={selectedASN}
@@ -134,7 +205,7 @@ export const ASNList = () => {
               <TableHead>Tracking</TableHead>
               <TableHead>ETA</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right w-[200px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -166,23 +237,48 @@ export const ASNList = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    {asn.status === "draft" || asn.status === "in_progress" ? (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedASN(asn);
-                          setReceivingDialogOpen(true);
-                        }}
-                      >
-                        <Package className="mr-2 h-4 w-4" />
-                        Receive
-                      </Button>
-                    ) : (
-                      <Button variant="ghost" size="sm">
-                        View
-                      </Button>
-                    )}
+                    <div className="flex items-center justify-end gap-2">
+                      {asn.status === "draft" && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(asn)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(asn)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                      {asn.status === "draft" || asn.status === "in_progress" ? (
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedASN(asn);
+                            setReceivingDialogOpen(true);
+                          }}
+                        >
+                          Receive
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedASN(asn);
+                            setReceivingDialogOpen(true);
+                          }}
+                        >
+                          View
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

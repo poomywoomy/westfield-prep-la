@@ -34,6 +34,7 @@ interface ASNFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  asnId?: string;
 }
 
 interface ASNLine {
@@ -48,7 +49,7 @@ interface ASNAttachment {
   forLine?: number;
 }
 
-export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogProps) => {
+export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId }: ASNFormDialogProps) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [skus, setSKUs] = useState<SKU[]>([]);
   const [loading, setLoading] = useState(false);
@@ -69,8 +70,58 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
   useEffect(() => {
     if (open) {
       fetchClients();
+      if (asnId) {
+        loadASN(asnId);
+      } else {
+        resetForm();
+      }
     }
-  }, [open]);
+  }, [open, asnId]);
+
+  const loadASN = async (id: string) => {
+    setLoading(true);
+    try {
+      const { data: header, error: headerError } = await supabase
+        .from("asn_headers")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (headerError) throw headerError;
+
+      const { data: lines, error: linesError } = await supabase
+        .from("asn_lines")
+        .select("*")
+        .eq("asn_id", id);
+
+      if (linesError) throw linesError;
+
+      setFormData({
+        client_id: header.client_id,
+        asn_number: header.asn_number,
+        carrier: header.carrier || "",
+        tracking_number: header.tracking_number || "",
+        eta: header.eta || "",
+        ship_from: header.ship_from || "",
+        notes: header.notes || "",
+      });
+
+      await fetchSKUs(header.client_id);
+
+      setLines(lines.map(line => ({
+        sku_id: line.sku_id,
+        expected_units: line.expected_units,
+      })));
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load ASN",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchClients = async () => {
     const { data } = await supabase
@@ -211,39 +262,76 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
         throw new Error("Duplicate SKUs are not allowed");
       }
 
-      // Insert ASN header
-      const { data: header, error: headerError } = await supabase
-        .from("asn_headers")
-        .insert({
-          asn_number: validatedHeader.asn_number,
-          client_id: validatedHeader.client_id,
-          carrier: validatedHeader.carrier,
-          tracking_number: validatedHeader.tracking_number,
-          eta: validatedHeader.eta,
-          ship_from: validatedHeader.ship_from,
-          notes: validatedHeader.notes,
-          status: "draft",
-        })
-        .select()
-        .single();
+      if (asnId) {
+        // Update existing ASN
+        const { error: headerError } = await supabase
+          .from("asn_headers")
+          .update({
+            asn_number: validatedHeader.asn_number,
+            carrier: validatedHeader.carrier,
+            tracking_number: validatedHeader.tracking_number,
+            eta: validatedHeader.eta,
+            ship_from: validatedHeader.ship_from,
+            notes: validatedHeader.notes,
+          })
+          .eq("id", asnId);
 
-      if (headerError) throw headerError;
+        if (headerError) throw headerError;
 
-      // Insert ASN lines
-      const { data: insertedLines, error: linesError } = await supabase
-        .from("asn_lines")
-        .insert(
-          lines.map(line => ({
-            asn_id: header.id,
-            sku_id: line.sku_id,
-            expected_units: line.expected_units,
-          }))
-        )
-        .select();
+        // Delete existing lines
+        await supabase.from("asn_lines").delete().eq("asn_id", asnId);
 
-      if (linesError) throw linesError;
+        // Insert new lines
+        const { error: linesError } = await supabase
+          .from("asn_lines")
+          .insert(
+            lines.map(line => ({
+              asn_id: asnId,
+              sku_id: line.sku_id,
+              expected_units: line.expected_units,
+            }))
+          );
 
-      // Upload attachments
+        if (linesError) throw linesError;
+
+        toast({
+          title: "Success",
+          description: `ASN ${validatedHeader.asn_number} updated successfully`,
+        });
+      } else {
+        // Insert ASN header
+        const { data: header, error: headerError } = await supabase
+          .from("asn_headers")
+          .insert({
+            asn_number: validatedHeader.asn_number,
+            client_id: validatedHeader.client_id,
+            carrier: validatedHeader.carrier,
+            tracking_number: validatedHeader.tracking_number,
+            eta: validatedHeader.eta,
+            ship_from: validatedHeader.ship_from,
+            notes: validatedHeader.notes,
+            status: "draft",
+          })
+          .select()
+          .single();
+
+        if (headerError) throw headerError;
+
+        // Insert ASN lines
+        const { data: insertedLines, error: linesError } = await supabase
+          .from("asn_lines")
+          .insert(
+            lines.map(line => ({
+              asn_id: header.id,
+              sku_id: line.sku_id,
+              expected_units: line.expected_units,
+            }))
+          )
+          .select();
+
+        if (linesError) throw linesError;
+
+        // Upload attachments (only for new ASNs)
       for (const attachment of attachments) {
         const filePath = `${header.id}/${Date.now()}-${attachment.file.name}`;
         
@@ -271,13 +359,14 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
         });
       }
 
-      // Clean up preview URLs
-      attachments.forEach(att => URL.revokeObjectURL(att.preview));
+        // Clean up preview URLs
+        attachments.forEach(att => URL.revokeObjectURL(att.preview));
 
-      toast({
-        title: "Success",
-        description: `ASN ${validatedHeader.asn_number} created successfully`,
-      });
+        toast({
+          title: "Success",
+          description: `ASN ${validatedHeader.asn_number} created successfully`,
+        });
+      }
 
       onSuccess();
       onOpenChange(false);
@@ -314,7 +403,7 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create ASN</DialogTitle>
+          <DialogTitle>{asnId ? "Edit ASN" : "Create ASN"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
