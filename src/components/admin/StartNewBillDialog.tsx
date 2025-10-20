@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,8 +19,6 @@ interface StartNewBillDialogProps {
 export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: StartNewBillDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [clientId, setClientId] = useState("");
-  const [label, setLabel] = useState("");
-  const [memo, setMemo] = useState("");
   const { toast } = useToast();
 
   const handleSubmit = async () => {
@@ -38,32 +34,86 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
     setLoading(true);
 
     try {
+      // Get client's active quote
+      const { data: quotes } = await supabase
+        .from("quotes")
+        .select("*")
+        .eq("client_id", clientId)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      const activeQuote = quotes?.[0];
+
       // Generate billing month from current date
       const now = new Date();
       const billingMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
 
-      const { data, error } = await supabase
+      const { data: bill, error: billError } = await supabase
         .from("bills")
         .insert({
           client_id: clientId,
           billing_month: billingMonth,
-          label: label || null,
-          memo: memo || null,
           status: "open",
+          pricing_quote_id: activeQuote?.id || null,
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (billError) throw billError;
+
+      // Auto-populate line items from quote with quantity 0
+      if (activeQuote) {
+        const quoteData = activeQuote.quote_data as any;
+        const lineItems: any[] = [];
+
+        if (quoteData.standard_operations && Array.isArray(quoteData.standard_operations)) {
+          quoteData.standard_operations.forEach((op: any) => {
+            lineItems.push({
+              bill_id: bill.id,
+              service_name: op.service_name,
+              qty_decimal: 0,
+              unit_price_cents: Math.round(op.service_price * 100),
+              line_date: now.toISOString().split("T")[0],
+              source: "quote",
+            });
+          });
+        }
+
+        if (quoteData.fulfillment_sections && Array.isArray(quoteData.fulfillment_sections)) {
+          quoteData.fulfillment_sections.forEach((section: any) => {
+            if (section.items && Array.isArray(section.items)) {
+              section.items.forEach((item: any) => {
+                lineItems.push({
+                  bill_id: bill.id,
+                  service_name: item.service_name,
+                  qty_decimal: 0,
+                  unit_price_cents: Math.round(item.service_price * 100),
+                  line_date: now.toISOString().split("T")[0],
+                  source: "quote",
+                });
+              });
+            }
+          });
+        }
+
+        if (lineItems.length > 0) {
+          const { error: itemsError } = await supabase
+            .from("bill_items")
+            .insert(lineItems);
+
+          if (itemsError) throw itemsError;
+        }
+      }
 
       toast({
         title: "Success",
-        description: "New bill created successfully",
+        description: "New bill created with services from quote",
       });
 
-      onSuccess(data.id);
+      onSuccess(bill.id);
       onOpenChange(false);
-      resetForm();
+      setClientId("");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -75,25 +125,19 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
     }
   };
 
-  const resetForm = () => {
-    setClientId("");
-    setLabel("");
-    setMemo("");
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Start New Bill</DialogTitle>
+          <DialogTitle>Create New Bill</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
-            <Label htmlFor="client">Client *</Label>
+            <Label htmlFor="client">Select Client *</Label>
             <Select value={clientId} onValueChange={setClientId}>
               <SelectTrigger id="client">
-                <SelectValue placeholder="Select client" />
+                <SelectValue placeholder="Choose a client" />
               </SelectTrigger>
               <SelectContent>
                 {clients.map((client) => (
@@ -103,29 +147,9 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="label">Label (Optional)</Label>
-            <Input
-              id="label"
-              placeholder="e.g., 2025-10 or Project X"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              maxLength={100}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="memo">Notes (Optional)</Label>
-            <Textarea
-              id="memo"
-              placeholder="Internal notes about this bill..."
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-              maxLength={1000}
-              rows={3}
-            />
+            <p className="text-xs text-muted-foreground mt-1">
+              All services from client's active quote will be auto-populated with quantity 0
+            </p>
           </div>
         </div>
 

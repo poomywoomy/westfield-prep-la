@@ -437,6 +437,7 @@ export type Database = {
           opened_at: string
           pdf_url: string | null
           pricing_quote_id: string | null
+          statement_date: string | null
           status: string
           subtotal_cents: number
           updated_at: string
@@ -455,6 +456,7 @@ export type Database = {
           opened_at?: string
           pdf_url?: string | null
           pricing_quote_id?: string | null
+          statement_date?: string | null
           status?: string
           subtotal_cents?: number
           updated_at?: string
@@ -473,6 +475,7 @@ export type Database = {
           opened_at?: string
           pdf_url?: string | null
           pricing_quote_id?: string | null
+          statement_date?: string | null
           status?: string
           subtotal_cents?: number
           updated_at?: string

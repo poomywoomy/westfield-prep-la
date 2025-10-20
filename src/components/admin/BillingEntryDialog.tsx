@@ -9,8 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Lock, Unlock, Download, Plus, DollarSign, Trash2 } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
-import AddCustomBillingItemDialog from "./AddCustomBillingItemDialog";
-import AddBillingPaymentDialog from "./AddBillingPaymentDialog";
+import { AddCustomBillingItemDialog } from "./AddCustomBillingItemDialog";
+import { AddBillingPaymentDialog } from "./AddBillingPaymentDialog";
 
 interface BillingEntryDialogProps {
   open: boolean;

@@ -11,21 +11,21 @@ interface AddBillingPaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   clientId: string;
-  cycleId: string;
+  billId: string;
   onSuccess: () => void;
 }
 
-const AddBillingPaymentDialog = ({
+export const AddBillingPaymentDialog = ({
   open,
   onOpenChange,
   clientId,
-  cycleId,
+  billId,
   onSuccess,
 }: AddBillingPaymentDialogProps) => {
-  const [paymentName, setPaymentName] = useState("Deposit");
   const [amount, setAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Cash");
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [paymentMethod, setPaymentMethod] = useState("check");
+  const [receivedAt, setReceivedAt] = useState(new Date().toISOString().split('T')[0]);
+  const [memo, setMemo] = useState("");
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
@@ -41,13 +41,15 @@ const AddBillingPaymentDialog = ({
 
     setSaving(true);
     try {
-      const { error } = await supabase.from("billing_payments").insert({
+      const amountCents = Math.round(Number(amount) * 100);
+      
+      const { error } = await supabase.from("payments").insert({
         client_id: clientId,
-        cycle_id: cycleId,
-        payment_name: paymentName,
-        amount: Number(amount),
-        payment_method: paymentMethod,
-        payment_date: paymentDate,
+        bill_id: billId,
+        amount_cents: amountCents,
+        received_at: receivedAt,
+        method: paymentMethod,
+        memo: memo || null,
       });
 
       if (error) throw error;
@@ -61,10 +63,10 @@ const AddBillingPaymentDialog = ({
       onOpenChange(false);
       
       // Reset form
-      setPaymentName("Deposit");
       setAmount("");
-      setPaymentMethod("Cash");
-      setPaymentDate(new Date().toISOString().split('T')[0]);
+      setPaymentMethod("check");
+      setReceivedAt(new Date().toISOString().split('T')[0]);
+      setMemo("");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -80,19 +82,10 @@ const AddBillingPaymentDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Record Deposit / Payment</DialogTitle>
+          <DialogTitle>Record Payment</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="payment-name">Payment Name</Label>
-            <Input
-              id="payment-name"
-              value={paymentName}
-              onChange={(e) => setPaymentName(e.target.value)}
-            />
-          </div>
-
           <div>
             <Label htmlFor="amount">Amount ($)</Label>
             <Input
@@ -113,23 +106,34 @@ const AddBillingPaymentDialog = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Cash">Cash</SelectItem>
-                <SelectItem value="Zelle">Zelle</SelectItem>
-                <SelectItem value="Wire">Wire</SelectItem>
-                <SelectItem value="Check">Check</SelectItem>
-                <SelectItem value="Credit Card">Credit Card</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="check">Check</SelectItem>
+                <SelectItem value="wire">Wire Transfer</SelectItem>
+                <SelectItem value="ach">ACH</SelectItem>
+                <SelectItem value="cash">Cash</SelectItem>
+                <SelectItem value="credit_card">Credit Card</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <Label htmlFor="payment-date">Payment Date</Label>
+            <Label htmlFor="received-at">Received Date</Label>
             <Input
-              id="payment-date"
+              id="received-at"
               type="date"
-              value={paymentDate}
-              onChange={(e) => setPaymentDate(e.target.value)}
+              value={receivedAt}
+              onChange={(e) => setReceivedAt(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="memo">Memo (Optional)</Label>
+            <Input
+              id="memo"
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+              placeholder="Payment reference..."
+              maxLength={200}
             />
           </div>
 
@@ -146,5 +150,3 @@ const AddBillingPaymentDialog = ({
     </Dialog>
   );
 };
-
-export default AddBillingPaymentDialog;
