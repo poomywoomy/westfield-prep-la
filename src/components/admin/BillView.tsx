@@ -26,6 +26,8 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [repriceDialogOpen, setRepriceDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isCustomLine, setIsCustomLine] = useState(false);
+  const [selectedService, setSelectedService] = useState("");
   const [newItem, setNewItem] = useState({
     service_name: "",
     qty_decimal: "1",
@@ -186,6 +188,40 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
 
   const selectedQuote = quotes.find((q) => q.id === bill.pricing_quote_id);
 
+  // Extract all services from the selected quote
+  const quoteServices = selectedQuote
+    ? Object.entries(selectedQuote.quote_data as any)
+        .filter(([key]) => key !== "meta")
+        .flatMap(([sectionName, section]: [string, any]) =>
+          section.services?.map((service: any) => ({
+            sectionName,
+            serviceName: service.service_name,
+            unitPrice: service.price_per_unit,
+          })) || []
+        )
+    : [];
+
+  const handleServiceSelect = (serviceKey: string) => {
+    setSelectedService(serviceKey);
+    if (serviceKey === "custom") {
+      setIsCustomLine(true);
+      setNewItem({ service_name: "", qty_decimal: "1", unit_price_cents: "0" });
+    } else {
+      setIsCustomLine(false);
+      const [sectionName, serviceName] = serviceKey.split("|||");
+      const service = quoteServices.find(
+        (s) => s.sectionName === sectionName && s.serviceName === serviceName
+      );
+      if (service) {
+        setNewItem({
+          service_name: service.serviceName,
+          qty_decimal: "1",
+          unit_price_cents: service.unitPrice.toString(),
+        });
+      }
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card>
@@ -264,28 +300,95 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
             <CardTitle>Add Line Item</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-4 gap-2">
-              <Input
-                placeholder="Service name"
-                value={newItem.service_name}
-                onChange={(e) => setNewItem({ ...newItem, service_name: e.target.value })}
-              />
-              <Input
-                type="number"
-                placeholder="Quantity"
-                value={newItem.qty_decimal}
-                onChange={(e) => setNewItem({ ...newItem, qty_decimal: e.target.value })}
-              />
-              <Input
-                type="number"
-                placeholder="Unit price ($)"
-                value={newItem.unit_price_cents}
-                onChange={(e) => setNewItem({ ...newItem, unit_price_cents: e.target.value })}
-              />
-              <Button onClick={addLineItem} disabled={loading}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add
-              </Button>
+            <div className="space-y-3">
+              {selectedQuote && quoteServices.length > 0 && !isCustomLine ? (
+                <>
+                  <div>
+                    <Label>Select Service from Quote</Label>
+                    <Select value={selectedService} onValueChange={handleServiceSelect}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a service from quote" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {quoteServices.map((service) => {
+                          const serviceKey = `${service.sectionName}|||${service.serviceName}`;
+                          return (
+                            <SelectItem key={serviceKey} value={serviceKey}>
+                              {service.serviceName} - ${service.unitPrice.toFixed(2)}
+                            </SelectItem>
+                          );
+                        })}
+                        <SelectItem value="custom">+ Add Custom Line</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label>Service</Label>
+                      <Input value={newItem.service_name} disabled />
+                    </div>
+                    <div>
+                      <Label>Quantity</Label>
+                      <Input
+                        type="number"
+                        value={newItem.qty_decimal}
+                        onChange={(e) => setNewItem({ ...newItem, qty_decimal: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label>Unit Price ($)</Label>
+                      <Input
+                        type="number"
+                        value={newItem.unit_price_cents}
+                        onChange={(e) => setNewItem({ ...newItem, unit_price_cents: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <Button onClick={addLineItem} disabled={loading || !newItem.service_name}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Line Item
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {selectedQuote && quoteServices.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setIsCustomLine(false);
+                        setSelectedService("");
+                        setNewItem({ service_name: "", qty_decimal: "1", unit_price_cents: "0" });
+                      }}
+                    >
+                      ← Back to Quote Services
+                    </Button>
+                  )}
+                  <div className="grid grid-cols-4 gap-2">
+                    <Input
+                      placeholder="Service name"
+                      value={newItem.service_name}
+                      onChange={(e) => setNewItem({ ...newItem, service_name: e.target.value })}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Quantity"
+                      value={newItem.qty_decimal}
+                      onChange={(e) => setNewItem({ ...newItem, qty_decimal: e.target.value })}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Unit price ($)"
+                      value={newItem.unit_price_cents}
+                      onChange={(e) => setNewItem({ ...newItem, unit_price_cents: e.target.value })}
+                    />
+                    <Button onClick={addLineItem} disabled={loading}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
