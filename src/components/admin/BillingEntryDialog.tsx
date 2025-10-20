@@ -9,8 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Lock, Unlock, Download, Plus, DollarSign, Trash2 } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
-import { AddCustomBillingItemDialog } from "./AddCustomBillingItemDialog";
-import { AddBillingPaymentDialog } from "./AddBillingPaymentDialog";
+import AddMonthlyBillingItemDialog from "./AddMonthlyBillingItemDialog";
+import AddMonthlyBillingPaymentDialog from "./AddMonthlyBillingPaymentDialog";
 
 interface BillingEntryDialogProps {
   open: boolean;
@@ -997,14 +997,14 @@ const BillingEntryDialog = ({
         </DialogContent>
       </Dialog>
 
-      <AddCustomBillingItemDialog
+      <AddMonthlyBillingItemDialog
         open={customDialogOpen}
         onOpenChange={setCustomDialogOpen}
         onAdd={addCustomItem}
       />
 
       {currentCycle && (
-        <AddBillingPaymentDialog
+        <AddMonthlyBillingPaymentDialog
           open={paymentDialogOpen}
           onOpenChange={setPaymentDialogOpen}
           clientId={client.id}
