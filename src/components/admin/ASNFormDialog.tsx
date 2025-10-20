@@ -7,8 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, X, Upload } from "lucide-react";
+import { Plus, X, Upload, RefreshCw, Paperclip } from "lucide-react";
 import { z } from "zod";
+import { validateImageFile } from "@/lib/fileValidation";
 import type { Database } from "@/integrations/supabase/types";
 
 type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -16,6 +17,7 @@ type SKU = Database["public"]["Tables"]["skus"]["Row"];
 
 const asnHeaderSchema = z.object({
   client_id: z.string().uuid({ message: "Please select a client" }),
+  asn_number: z.string().min(1, { message: "ASN number is required" }),
   carrier: z.string().trim().max(100).nullable().optional(),
   tracking_number: z.string().trim().max(100).nullable().optional(),
   eta: z.string().nullable().optional(),
@@ -37,6 +39,13 @@ interface ASNFormDialogProps {
 interface ASNLine {
   sku_id: string;
   expected_units: number;
+  attachments?: File[];
+}
+
+interface ASNAttachment {
+  file: File;
+  preview: string;
+  forLine?: number;
 }
 
 export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogProps) => {
@@ -45,6 +54,7 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     client_id: "",
+    asn_number: "",
     carrier: "",
     tracking_number: "",
     eta: "",
@@ -52,6 +62,8 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
     notes: "",
   });
   const [lines, setLines] = useState<ASNLine[]>([]);
+  const [attachments, setAttachments] = useState<ASNAttachment[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -78,17 +90,35 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
     if (data) setSKUs(data);
   };
 
-  const handleClientChange = (clientId: string) => {
-    setFormData({ ...formData, client_id: clientId });
+  const handleClientChange = async (clientId: string) => {
+    setFormData({ ...formData, client_id: clientId, asn_number: "" });
     fetchSKUs(clientId);
     setLines([]);
+    
+    // Generate ASN number using database function
+    const { data, error } = await supabase.rpc("generate_asn_number", { p_client_id: clientId });
+    if (data && !error) {
+      setFormData(prev => ({ ...prev, asn_number: data }));
+    }
+  };
+
+  const regenerateASNNumber = async () => {
+    if (!formData.client_id) return;
+    
+    const { data, error } = await supabase.rpc("generate_asn_number", { p_client_id: formData.client_id });
+    if (data && !error) {
+      setFormData(prev => ({ ...prev, asn_number: data }));
+      toast({ title: "ASN number regenerated" });
+    }
   };
 
   const addLine = () => {
-    setLines([...lines, { sku_id: "", expected_units: 1 }]);
+    setLines([...lines, { sku_id: "", expected_units: 1, attachments: [] }]);
   };
 
   const removeLine = (index: number) => {
+    // Remove attachments associated with this line
+    setAttachments(attachments.filter(att => att.forLine !== index));
     setLines(lines.filter((_, i) => i !== index));
   };
 
@@ -98,10 +128,54 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
     setLines(updated);
   };
 
-  const generateASNNumber = () => {
-    const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
-    return `ASN-${date}-${random}`;
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent, lineIndex?: number) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    addFiles(files, lineIndex);
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>, lineIndex?: number) => {
+    const files = Array.from(e.target.files || []);
+    addFiles(files, lineIndex);
+  };
+
+  const addFiles = (files: File[], lineIndex?: number) => {
+    const validFiles: ASNAttachment[] = [];
+
+    for (const file of files) {
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        toast({
+          title: "Invalid File",
+          description: `${file.name}: ${validation.error}`,
+          variant: "destructive",
+        });
+        continue;
+      }
+
+      const preview = URL.createObjectURL(file);
+      validFiles.push({ file, preview, forLine: lineIndex });
+    }
+
+    setAttachments([...attachments, ...validFiles]);
+  };
+
+  const removeAttachment = (index: number) => {
+    const attachment = attachments[index];
+    URL.revokeObjectURL(attachment.preview);
+    setAttachments(attachments.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async () => {
@@ -125,7 +199,7 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
 
       for (let i = 0; i < lines.length; i++) {
         try {
-          asnLineSchema.parse(lines[i]);
+          asnLineSchema.parse({ sku_id: lines[i].sku_id, expected_units: lines[i].expected_units });
         } catch (err) {
           throw new Error(`Line ${i + 1}: ${(err as z.ZodError).errors[0].message}`);
         }
@@ -137,13 +211,11 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
         throw new Error("Duplicate SKUs are not allowed");
       }
 
-      const asnNumber = generateASNNumber();
-
       // Insert ASN header
       const { data: header, error: headerError } = await supabase
         .from("asn_headers")
         .insert({
-          asn_number: asnNumber,
+          asn_number: validatedHeader.asn_number,
           client_id: validatedHeader.client_id,
           carrier: validatedHeader.carrier,
           tracking_number: validatedHeader.tracking_number,
@@ -158,7 +230,7 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
       if (headerError) throw headerError;
 
       // Insert ASN lines
-      const { error: linesError } = await supabase
+      const { data: insertedLines, error: linesError } = await supabase
         .from("asn_lines")
         .insert(
           lines.map(line => ({
@@ -166,13 +238,45 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
             sku_id: line.sku_id,
             expected_units: line.expected_units,
           }))
-        );
+        )
+        .select();
 
       if (linesError) throw linesError;
 
+      // Upload attachments
+      for (const attachment of attachments) {
+        const filePath = `${header.id}/${Date.now()}-${attachment.file.name}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from("asn-attachments")
+          .upload(filePath, attachment.file);
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          continue;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("asn-attachments")
+          .getPublicUrl(filePath);
+
+        // Insert attachment record
+        await supabase.from("asn_attachments").insert({
+          asn_id: header.id,
+          asn_line_id: attachment.forLine !== undefined ? insertedLines?.[attachment.forLine]?.id : null,
+          file_url: publicUrl,
+          filename: attachment.file.name,
+          file_size: attachment.file.size,
+          mime_type: attachment.file.type,
+        });
+      }
+
+      // Clean up preview URLs
+      attachments.forEach(att => URL.revokeObjectURL(att.preview));
+
       toast({
         title: "Success",
-        description: `ASN ${asnNumber} created successfully`,
+        description: `ASN ${validatedHeader.asn_number} created successfully`,
       });
 
       onSuccess();
@@ -192,6 +296,7 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
   const resetForm = () => {
     setFormData({
       client_id: "",
+      asn_number: "",
       carrier: "",
       tracking_number: "",
       eta: "",
@@ -200,11 +305,14 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
     });
     setLines([]);
     setSKUs([]);
+    setAttachments([]);
   };
+
+  const globalAttachments = attachments.filter(att => att.forLine === undefined);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create ASN</DialogTitle>
         </DialogHeader>
@@ -228,6 +336,31 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="asn_number">ASN Number *</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="asn_number"
+                  value={formData.asn_number}
+                  onChange={e => setFormData({ ...formData, asn_number: e.target.value })}
+                  placeholder="Auto-generated"
+                  maxLength={50}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={regenerateASNNumber}
+                  disabled={!formData.client_id}
+                  title="Regenerate ASN number"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
               <Label htmlFor="carrier">Carrier</Label>
               <Input
                 id="carrier"
@@ -237,9 +370,7 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
                 maxLength={100}
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="tracking">Tracking Number</Label>
               <Input
@@ -249,7 +380,9 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
                 maxLength={100}
               />
             </div>
+          </div>
 
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="eta">ETA</Label>
               <Input
@@ -259,17 +392,17 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
                 onChange={e => setFormData({ ...formData, eta: e.target.value })}
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="ship_from">Ship From</Label>
-            <Input
-              id="ship_from"
-              value={formData.ship_from}
-              onChange={e => setFormData({ ...formData, ship_from: e.target.value })}
-              placeholder="Origin address"
-              maxLength={500}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="ship_from">Ship From</Label>
+              <Input
+                id="ship_from"
+                value={formData.ship_from}
+                onChange={e => setFormData({ ...formData, ship_from: e.target.value })}
+                placeholder="Origin address"
+                maxLength={500}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -307,7 +440,7 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
 
             <div className="space-y-2">
               {lines.map((line, index) => (
-                <div key={index} className="flex items-end gap-2">
+                <div key={index} className="flex items-end gap-2 p-2 border rounded-lg">
                   <div className="flex-1">
                     <Select
                       value={line.sku_id}
@@ -341,8 +474,25 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
                   </div>
                   <Button
                     type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => document.getElementById(`line-file-${index}`)?.click()}
+                    title="Attach images to this line"
+                  >
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
+                  <input
+                    id={`line-file-${index}`}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                    multiple
+                    className="hidden"
+                    onChange={e => handleFileInput(e, index)}
+                  />
+                  <Button
+                    type="button"
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={() => removeLine(index)}
                   >
                     <X className="h-4 w-4" />
@@ -350,6 +500,69 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess }: ASNFormDialogPr
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <Label>QC / Receiving Photos</Label>
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e)}
+              className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                isDragging ? "border-primary bg-primary/5" : "border-border"
+              }`}
+            >
+              <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">
+                Drag and drop images here, or click to select
+              </p>
+              <p className="text-xs text-muted-foreground mb-4">
+                JPG, PNG, WebP, GIF, PDF (max 20MB each)
+              </p>
+              <input
+                id="global-file-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                multiple
+                className="hidden"
+                onChange={(e) => handleFileInput(e)}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => document.getElementById("global-file-input")?.click()}
+              >
+                Select Files
+              </Button>
+            </div>
+
+            {globalAttachments.length > 0 && (
+              <div className="mt-4 grid grid-cols-4 gap-2">
+                {globalAttachments.map((att, index) => {
+                  const globalIndex = attachments.findIndex(a => a === att);
+                  return (
+                    <div key={globalIndex} className="relative group">
+                      <img
+                        src={att.preview}
+                        alt={att.file.name}
+                        className="w-full h-24 object-cover rounded border"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => removeAttachment(globalIndex)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                      <p className="text-xs truncate mt-1">{att.file.name}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
