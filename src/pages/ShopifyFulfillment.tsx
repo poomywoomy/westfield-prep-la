@@ -173,20 +173,23 @@ const ShopifyFulfillment = () => {
             </div>
           </section>
 
-          {/* Integration Benefits */}
+          {/* Core Capabilities */}
           <section className="py-20 bg-background">
             <div className="container mx-auto px-4">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4">Seamless Shopify Integration</h2>
+                <h2 className="text-4xl font-bold mb-4">Complete Fulfillment Solutions</h2>
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  Automated workflows that sync perfectly with your store
+                  Everything you need to deliver exceptional customer experiences
                 </p>
               </div>
               <div className="max-w-5xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
-                  { icon: BarChart, title: "Inventory Updates", desc: "Real-time inventory sync across all channels" },
-                  { icon: Heart, title: "Custom Branding", desc: "Custom kitting and bundle assembly for your brand" },
-                  { icon: CheckCircle, title: "Quality Reports", desc: "Photo-documented quality reports for every order" },
+                  { icon: Package, title: "Order Fulfillment", desc: "Fast, accurate pick and pack services with same-day shipping cutoffs" },
+                  { icon: BarChart, title: "Inventory Management", desc: "Real-time tracking and updates across all your sales channels" },
+                  { icon: Heart, title: "Custom Branding", desc: "Custom kitting and bundle assembly that reflects your brand identity" },
+                  { icon: CheckCircle, title: "Quality Control", desc: "Photo-documented inspections and quality reports for every order" },
+                  { icon: Truck, title: "Fast Shipping", desc: "Strategic location ensures quick delivery to all US markets" },
+                  { icon: Award, title: "Premium Packaging", desc: "Branded inserts, gift wrapping, and premium unboxing experiences" },
                 ].map((item, idx) => (
                   <Card key={idx} className="border-[hsl(var(--shopify-border))] hover:border-[hsl(var(--shopify-blue))]/40 hover:shadow-lg transition-all bg-white">
                     <CardHeader>
