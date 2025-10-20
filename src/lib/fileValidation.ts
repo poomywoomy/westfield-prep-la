@@ -41,14 +41,14 @@ export const validatePricingDocument = (file: File): FileValidationResult => {
 
 export const validateImageFile = (file: File): FileValidationResult => {
   const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20MB for images
-  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
   
   if (file.size > MAX_IMAGE_SIZE) {
-    return { valid: false, error: 'Image size exceeds 20MB limit' };
+    return { valid: false, error: 'File size exceeds 20MB limit' };
   }
   
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    return { valid: false, error: 'Invalid image type. Only JPEG, PNG, WEBP, and GIF allowed' };
+    return { valid: false, error: 'Invalid file type. Only JPEG, PNG, WEBP, GIF, and PDF allowed' };
   }
   
   if (file.name.includes('..') || file.name.includes('/') || file.name.includes('\\')) {
