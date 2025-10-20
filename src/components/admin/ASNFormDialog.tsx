@@ -310,7 +310,7 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId }: ASNFormD
             eta: validatedHeader.eta,
             ship_from: validatedHeader.ship_from,
             notes: validatedHeader.notes,
-            status: "draft",
+            status: "not_received",
           })
           .select()
           .single();

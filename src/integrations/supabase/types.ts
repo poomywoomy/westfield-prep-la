@@ -79,7 +79,7 @@ export type Database = {
           received_at: string | null
           received_by: string | null
           ship_from: string | null
-          status: Database["public"]["Enums"]["asn_status"]
+          status: Database["public"]["Enums"]["asn_status"] | null
           tracking_number: string | null
           updated_at: string
         }
@@ -96,7 +96,7 @@ export type Database = {
           received_at?: string | null
           received_by?: string | null
           ship_from?: string | null
-          status?: Database["public"]["Enums"]["asn_status"]
+          status?: Database["public"]["Enums"]["asn_status"] | null
           tracking_number?: string | null
           updated_at?: string
         }
@@ -113,7 +113,7 @@ export type Database = {
           received_at?: string | null
           received_by?: string | null
           ship_from?: string | null
-          status?: Database["public"]["Enums"]["asn_status"]
+          status?: Database["public"]["Enums"]["asn_status"] | null
           tracking_number?: string | null
           updated_at?: string
         }
@@ -136,6 +136,7 @@ export type Database = {
           expiry_date: string | null
           id: string
           lot_number: string | null
+          missing_units: number
           normal_units: number
           notes: string | null
           quarantined_units: number
@@ -154,6 +155,7 @@ export type Database = {
           expiry_date?: string | null
           id?: string
           lot_number?: string | null
+          missing_units?: number
           normal_units?: number
           notes?: string | null
           quarantined_units?: number
@@ -172,6 +174,7 @@ export type Database = {
           expiry_date?: string | null
           id?: string
           lot_number?: string | null
+          missing_units?: number
           normal_units?: number
           notes?: string | null
           quarantined_units?: number
@@ -2187,7 +2190,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "client"
-      asn_status: "draft" | "in_progress" | "received" | "closed"
+      asn_status: "not_received" | "receiving" | "closed"
       billing_frequency: "pay_as_go" | "end_of_month"
       channel_type: "amazon" | "walmart" | "shopify" | "ebay" | "other"
       client_status: "pending" | "active" | "inactive"
@@ -2340,7 +2343,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "client"],
-      asn_status: ["draft", "in_progress", "received", "closed"],
+      asn_status: ["not_received", "receiving", "closed"],
       billing_frequency: ["pay_as_go", "end_of_month"],
       channel_type: ["amazon", "walmart", "shopify", "ebay", "other"],
       client_status: ["pending", "active", "inactive"],

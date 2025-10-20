@@ -99,7 +99,7 @@ export const SKUList = () => {
           .from("asn_lines")
           .select("expected_units, received_units, asn_headers!inner(status)")
           .eq("sku_id", sku.id)
-          .in("asn_headers.status", ["draft", "in_progress"]);
+          .in("asn_headers.status", ["not_received", "receiving"]);
 
         const expected = asnData?.reduce((sum, line) => sum + (line.expected_units || 0), 0) || 0;
 
@@ -108,7 +108,7 @@ export const SKUList = () => {
           .from("asn_lines")
           .select("expected_units, received_units, asn_headers!inner(status)")
           .eq("sku_id", sku.id)
-          .eq("asn_headers.status", "received");
+          .eq("asn_headers.status", "closed");
 
         const discrepancies = discrepancyData?.reduce(
           (sum, line) => sum + Math.abs((line.expected_units || 0) - (line.received_units || 0)),

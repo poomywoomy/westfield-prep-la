@@ -73,12 +73,19 @@ export const ASNList = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "draft": return "secondary";
-      case "submitted": return "default";
-      case "in_progress": return "default";
-      case "received": return "default";
-      case "closed": return "secondary";
+      case "not_received": return "secondary";
+      case "receiving": return "default";
+      case "closed": return "default";
       default: return "secondary";
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "not_received": return "Not Received";
+      case "receiving": return "Receiving";
+      case "closed": return "Closed";
+      default: return status;
     }
   };
 
@@ -118,6 +125,30 @@ export const ASNList = () => {
     } finally {
       setDeleteDialogOpen(false);
       setAsnToDelete(null);
+    }
+  };
+
+  const handleMarkAsClosed = async (asn: ASN) => {
+    try {
+      const { error } = await supabase
+        .from("asn_headers")
+        .update({ status: "closed" })
+        .eq("id", asn.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `ASN ${asn.asn_number} marked as closed`,
+      });
+
+      fetchASNs();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update ASN status",
+        variant: "destructive",
+      });
     }
   };
 
@@ -233,12 +264,12 @@ export const ASNList = () => {
                   <TableCell>{asn.eta ? new Date(asn.eta).toLocaleDateString() : "-"}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusColor(asn.status)}>
-                      {asn.status}
+                      {getStatusLabel(asn.status)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {asn.status === "draft" && (
+                      {asn.status === "not_received" && (
                         <>
                           <Button
                             variant="ghost"
@@ -256,7 +287,16 @@ export const ASNList = () => {
                           </Button>
                         </>
                       )}
-                      {asn.status === "draft" || asn.status === "in_progress" ? (
+                      {asn.status === "receiving" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleMarkAsClosed(asn)}
+                        >
+                          Mark as Closed
+                        </Button>
+                      )}
+                      {asn.status !== "closed" ? (
                         <Button
                           size="sm"
                           onClick={() => {

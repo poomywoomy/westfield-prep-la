@@ -20,15 +20,11 @@ const receivingLineSchema = z.object({
   normal_units: z.number().int().min(0).max(1000000),
   damaged_units: z.number().int().min(0).max(1000000),
   quarantined_units: z.number().int().min(0).max(1000000),
-  rework_units: z.number().int().min(0).max(1000000),
-  reserved_units: z.number().int().min(0).max(1000000),
+  missing_units: z.number().int().min(0).max(1000000),
   lot_number: z.string().trim().max(100).nullable().optional(),
   expiry_date: z.string().nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),
-}).refine(
-  (data) => data.received_units === data.normal_units + data.damaged_units + data.quarantined_units + data.rework_units,
-  { message: "Condition breakdown must equal received units" }
-);
+});
 
 interface ReceivingDialogProps {
   asn: ASNHeader | null;
@@ -45,8 +41,7 @@ interface LineReceiving {
   normal_units: number;
   damaged_units: number;
   quarantined_units: number;
-  rework_units: number;
-  reserved_units: number;
+  missing_units: number;
   lot_number: string;
   expiry_date: string;
   notes: string;
@@ -93,8 +88,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
         normal_units: line.normal_units,
         damaged_units: line.damaged_units,
         quarantined_units: line.quarantined_units,
-        rework_units: line.rework_units,
-        reserved_units: line.reserved_units,
+        missing_units: line.missing_units,
         lot_number: line.lot_number || "",
         expiry_date: line.expiry_date || "",
         notes: line.notes || "",
@@ -144,8 +138,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
             normal_units: lines[i].normal_units,
             damaged_units: lines[i].damaged_units,
             quarantined_units: lines[i].quarantined_units,
-            rework_units: lines[i].rework_units,
-            reserved_units: lines[i].reserved_units,
+            missing_units: lines[i].missing_units,
             lot_number: lines[i].lot_number || null,
             expiry_date: lines[i].expiry_date || null,
             notes: lines[i].notes || null,
@@ -154,6 +147,10 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
           throw new Error(`Line ${i + 1} (${lines[i].sku.client_sku}): ${(err as z.ZodError).errors[0].message}`);
         }
       }
+
+      // Determine if any receiving has started
+      const hasReceivedAny = lines.some(line => line.received_units > 0);
+      const newStatus = hasReceivedAny ? 'receiving' : 'not_received';
 
       // Update ASN lines
       for (const line of lines) {
@@ -164,8 +161,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
             normal_units: line.normal_units,
             damaged_units: line.damaged_units,
             quarantined_units: line.quarantined_units,
-            rework_units: line.rework_units,
-            reserved_units: line.reserved_units,
+            missing_units: line.missing_units,
             lot_number: line.lot_number || null,
             expiry_date: line.expiry_date || null,
             notes: line.notes || null,
@@ -195,12 +191,12 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
         }
       }
 
-      // Update ASN status to received
+      // Update ASN status
       const { error: asnError } = await supabase
         .from("asn_headers")
         .update({
-          status: "received",
-          received_at: new Date().toISOString(),
+          status: newStatus,
+          received_at: hasReceivedAny ? new Date().toISOString() : null,
         })
         .eq("id", asn!.id);
 
@@ -296,7 +292,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
             </div>
 
             <div className="border-t pt-4">
-              <Label className="mb-3 block">Condition Breakdown *</Label>
+              <Label className="mb-3 block">Condition Breakdown</Label>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="normal" className="text-sm">Normal</Label>
@@ -341,36 +337,20 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="rework" className="text-sm">Rework</Label>
+                  <Label htmlFor="missing" className="text-sm">Missing</Label>
                   <Input
-                    id="rework"
+                    id="missing"
                     type="number"
                     min="0"
-                    value={currentLine.rework_units}
+                    value={currentLine.missing_units}
                     onChange={e => {
                       const value = e.target.value;
                       const parsed = parseInt(value, 10);
-                      updateLine(currentLineIndex, "rework_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
+                      updateLine(currentLineIndex, "missing_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
                     }}
                   />
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="reserved">Reserved Units</Label>
-              <Input
-                id="reserved"
-                type="number"
-                min="0"
-                max={currentLine.normal_units}
-                value={currentLine.reserved_units}
-                onChange={e => {
-                  const value = e.target.value;
-                  const parsed = parseInt(value, 10);
-                  updateLine(currentLineIndex, "reserved_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
-                }}
-              />
             </div>
 
             {currentLine.sku.has_lot_tracking && (
