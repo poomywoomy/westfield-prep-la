@@ -190,15 +190,38 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
 
   // Extract all services from the selected quote
   const quoteServices = selectedQuote
-    ? Object.entries(selectedQuote.quote_data as any)
-        .filter(([key]) => key !== "meta")
-        .flatMap(([sectionName, section]: [string, any]) =>
-          section.services?.map((service: any) => ({
-            sectionName,
-            serviceName: service.service_name,
-            unitPrice: service.price_per_unit,
-          })) || []
-        )
+    ? (() => {
+        const data = selectedQuote.quote_data as any;
+        const services: Array<{ sectionName: string; serviceName: string; unitPrice: number }> = [];
+        
+        // Add standard operations
+        if (data.standard_operations && Array.isArray(data.standard_operations)) {
+          data.standard_operations.forEach((op: any) => {
+            services.push({
+              sectionName: "Standard Operations",
+              serviceName: op.service_name,
+              unitPrice: op.service_price,
+            });
+          });
+        }
+        
+        // Add fulfillment sections
+        if (data.fulfillment_sections && Array.isArray(data.fulfillment_sections)) {
+          data.fulfillment_sections.forEach((section: any) => {
+            if (section.items && Array.isArray(section.items)) {
+              section.items.forEach((item: any) => {
+                services.push({
+                  sectionName: section.type,
+                  serviceName: item.service_name,
+                  unitPrice: item.service_price,
+                });
+              });
+            }
+          });
+        }
+        
+        return services;
+      })()
     : [];
 
   const handleServiceSelect = (serviceKey: string) => {
