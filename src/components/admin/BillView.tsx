@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2, Plus, Download, Lock, Calendar, DollarSign } from "lucide-react";
 import { AddBillingPaymentDialog } from "./AddBillingPaymentDialog";
@@ -29,6 +30,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   const [billItems, setBillItems] = useState<BillItem[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [quote, setQuote] = useState<Quote | null>(null);
+  const [clientQuotes, setClientQuotes] = useState<Quote[]>([]);
   const [statementDate, setStatementDate] = useState<string>(bill.statement_date || "");
   const [addPaymentOpen, setAddPaymentOpen] = useState(false);
   const [addCustomItemOpen, setAddCustomItemOpen] = useState(false);
@@ -65,16 +67,31 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       if (paymentsError) throw paymentsError;
       setPayments(paymentsData || []);
 
-      // Fetch quote if bill has one
-      if (bill.pricing_quote_id) {
-        const { data: quoteData, error: quoteError } = await supabase
-          .from("quotes")
-          .select("*")
-          .eq("id", bill.pricing_quote_id)
-          .single();
+      // Fetch quotes for this client
+      const { data: quotesData, error: quotesListError } = await supabase
+        .from("quotes")
+        .select("*")
+        .eq("client_id", client.id)
+        .order("created_at", { ascending: false });
 
-        if (quoteError) throw quoteError;
-        setQuote(quoteData);
+      if (quotesListError) throw quotesListError;
+      setClientQuotes(quotesData || []);
+
+      // Fetch assigned quote if any
+      if (bill.pricing_quote_id) {
+        const assigned = quotesData?.find((q) => q.id === bill.pricing_quote_id) || null;
+        if (assigned) {
+          setQuote(assigned);
+        } else {
+          const { data: quoteData, error: quoteError } = await supabase
+            .from("quotes")
+            .select("*")
+            .eq("id", bill.pricing_quote_id)
+            .single();
+
+          if (quoteError) throw quoteError;
+          setQuote(quoteData);
+        }
       }
     } catch (error: any) {
       toast({
@@ -402,6 +419,92 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     }
   };
 
+  const populateFromQuote = async (q: Quote) => {
+    try {
+      const data = q.quote_data as any;
+      const now = new Date();
+      const lineItems: any[] = [];
+      const existingNames = new Set(billItems.map((i) => i.service_name));
+
+      const pushItem = (name: string, price: number) => {
+        if (!existingNames.has(name)) {
+          lineItems.push({
+            bill_id: bill.id,
+            service_name: name,
+            qty_decimal: 0,
+            unit_price_cents: Math.round(Number(price) * 100),
+            line_date: now.toISOString().split("T")[0],
+            source: "quote",
+          });
+        }
+      };
+
+      if (data?.standard_operations && Array.isArray(data.standard_operations)) {
+        data.standard_operations.forEach((op: any) => pushItem(op.service_name, op.service_price));
+      }
+      if (data?.fulfillment_sections && Array.isArray(data.fulfillment_sections)) {
+        data.fulfillment_sections.forEach((section: any) => {
+          if (section.items && Array.isArray(section.items)) {
+            section.items.forEach((item: any) => pushItem(item.service_name, item.service_price));
+          }
+        });
+      }
+
+      if (lineItems.length === 0) {
+        toast({ title: "Nothing to add", description: "All services already exist on this bill." });
+        return;
+      }
+
+      const { error } = await supabase.from("bill_items").insert(lineItems);
+      if (error) throw error;
+
+      toast({ title: "Added from quote", description: `${lineItems.length} services added` });
+      await fetchBillData();
+      await recalculateBillTotals();
+      onRefresh();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  };
+
+  const updatePricingQuote = async (quoteId: string) => {
+    try {
+      const { error } = await supabase
+        .from("bills")
+        .update({ pricing_quote_id: quoteId })
+        .eq("id", bill.id);
+      if (error) throw error;
+
+      const selected = clientQuotes.find((q) => q.id === quoteId) || null;
+      setQuote(selected);
+
+      toast({ title: "Quote assigned", description: "Pricing will follow this quote" });
+
+      if (billItems.length === 0 && selected) {
+        await populateFromQuote(selected);
+      }
+      onRefresh();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  };
+
+  const deleteBill = async () => {
+    if (!confirm("Delete this bill and all its items and payments?")) return;
+    try {
+      setLoading(true);
+      await supabase.from("bill_items").delete().eq("bill_id", bill.id);
+      await supabase.from("payments").delete().eq("bill_id", bill.id);
+      const { error } = await supabase.from("bills").delete().eq("id", bill.id);
+      if (error) throw error;
+      toast({ title: "Bill deleted" });
+      onRefresh();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
   // Extract services from quote
   const quoteServices: Array<{ serviceName: string; unitPrice: number }> = quote
     ? (() => {
@@ -496,6 +599,39 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
             </div>
           </div>
 
+          {/* Pricing Quote */}
+          {!isClosed && (
+            <div>
+              <Label>Pricing Quote</Label>
+              <div className="flex gap-2 mt-1">
+                <Select value={quote?.id || ""} onValueChange={updatePricingQuote}>
+                  <SelectTrigger className="w-[280px]">
+                    <SelectValue placeholder="Select a quote" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientQuotes.map((q) => (
+                      <SelectItem key={q.id} value={q.id}>
+                        {(q.memo || `Quote ${q.id.slice(0,8)}`)} - {q.status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  disabled={!quote}
+                  onClick={async () => {
+                    if (quote) await populateFromQuote(quote);
+                  }}
+                >
+                  Add All Services
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Adds services from the selected quote with quantity 0.
+              </p>
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex gap-2">
             <Button onClick={generatePDF} variant="outline">
@@ -503,10 +639,16 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
               Download PDF
             </Button>
             {!isClosed && (
-              <Button onClick={closeBill} disabled={loading || !statementDate}>
-                <Lock className="mr-2 h-4 w-4" />
-                Close Bill
-              </Button>
+              <>
+                <Button onClick={closeBill} disabled={loading || !statementDate}>
+                  <Lock className="mr-2 h-4 w-4" />
+                  Close Bill
+                </Button>
+                <Button onClick={deleteBill} variant="destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Bill
+                </Button>
+              </>
             )}
           </div>
         </CardContent>
