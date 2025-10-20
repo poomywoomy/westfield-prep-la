@@ -72,9 +72,6 @@ const ShopifyFulfillment = () => {
                   <Button size="lg" className="bg-gradient-to-r from-[hsl(var(--shopify-blue))] to-[hsl(var(--shopify-teal))] hover:opacity-90 text-white shadow-lg" onClick={() => navigate("/contact")}>
                     Get a Quote
                   </Button>
-                  <Button size="lg" variant="outline" className="border-[hsl(var(--shopify-border))] text-[hsl(var(--shopify-blue))] hover:bg-[hsl(var(--shopify-accent))] shadow-sm" onClick={() => navigate("/contact")}>
-                    View Integration
-                  </Button>
                 </div>
               </div>
             </div>
@@ -187,11 +184,8 @@ const ShopifyFulfillment = () => {
               </div>
               <div className="max-w-5xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
-                  { icon: Store, title: "Auto Order Sync", desc: "Orders automatically imported from your Shopify store in real-time" },
-                  { icon: Clock, title: "Live Tracking", desc: "Tracking numbers synced back to Shopify instantly" },
                   { icon: BarChart, title: "Inventory Updates", desc: "Real-time inventory sync across all channels" },
                   { icon: Heart, title: "Custom Branding", desc: "Custom kitting and bundle assembly for your brand" },
-                  { icon: Award, title: "Returns Portal", desc: "Returns processing and inspection with customer portal" },
                   { icon: CheckCircle, title: "Quality Reports", desc: "Photo-documented quality reports for every order" },
                 ].map((item, idx) => (
                   <Card key={idx} className="border-[hsl(var(--shopify-border))] hover:border-[hsl(var(--shopify-blue))]/40 hover:shadow-lg transition-all bg-white">
