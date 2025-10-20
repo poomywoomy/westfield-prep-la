@@ -41,6 +41,14 @@ All colors MUST be HSL.
 
     --radius: 0.375rem;
 
+    /* Professional Shopify-inspired colors */
+    --shopify-blue: 215 85% 50%;
+    --shopify-blue-dark: 215 85% 40%;
+    --shopify-teal: 175 75% 45%;
+    --shopify-teal-dark: 175 75% 35%;
+    --shopify-accent: 220 90% 96%;
+    --shopify-border: 220 25% 88%;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;

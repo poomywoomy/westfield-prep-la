@@ -51,28 +51,28 @@ const ShopifyFulfillment = () => {
         <main className="flex-1">
           {/* Hero Section - Shopify Brand-Focused Theme */}
           <section className="relative py-24 mt-16 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-green-500/5 to-purple-500/10" />
+            <div className="absolute inset-0 bg-[hsl(var(--shopify-accent))]" />
             <div className="absolute inset-0">
-              <div className="absolute top-20 left-10 w-72 h-72 bg-purple-400/20 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-20 right-10 w-96 h-96 bg-green-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="absolute top-20 left-10 w-72 h-72 bg-[hsl(var(--shopify-blue))]/15 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-20 right-10 w-96 h-96 bg-[hsl(var(--shopify-teal))]/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
             <div className="container mx-auto px-4 relative">
               <div className="max-w-4xl mx-auto text-center">
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500/10 to-green-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-6">
-                  <Store className="h-4 w-4 text-purple-600" />
-                  <span className="text-sm font-medium text-purple-600">Shopify Fulfillment Partner</span>
+                <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-[hsl(var(--shopify-border))] rounded-full px-4 py-2 mb-6 shadow-sm">
+                  <Store className="h-4 w-4 text-[hsl(var(--shopify-blue))]" />
+                  <span className="text-sm font-medium text-[hsl(var(--shopify-blue-dark))]">Shopify Fulfillment Partner</span>
                 </div>
-                <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-green-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-[hsl(var(--shopify-blue))] via-[hsl(var(--shopify-teal))] to-[hsl(var(--shopify-blue-dark))] bg-clip-text text-transparent">
                   Shopify Fulfillment for Modern DTC Brands
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
                   Fast, accurate pick-pack, branded unboxing experiences, and same-day cutoffs that delight your customers.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button size="lg" className="bg-gradient-to-r from-purple-600 to-green-600 hover:opacity-90" onClick={() => navigate("/contact")}>
+                  <Button size="lg" className="bg-gradient-to-r from-[hsl(var(--shopify-blue))] to-[hsl(var(--shopify-teal))] hover:opacity-90 text-white shadow-lg" onClick={() => navigate("/contact")}>
                     Get a Quote
                   </Button>
-                  <Button size="lg" variant="outline" className="border-purple-300 text-purple-600 hover:bg-purple-50" onClick={() => navigate("/contact")}>
+                  <Button size="lg" variant="outline" className="border-[hsl(var(--shopify-border))] text-[hsl(var(--shopify-blue))] hover:bg-[hsl(var(--shopify-accent))] shadow-sm" onClick={() => navigate("/contact")}>
                     View Integration
                   </Button>
                 </div>
@@ -80,8 +80,8 @@ const ShopifyFulfillment = () => {
             </div>
           </section>
 
-          {/* Value Props - Vibrant Brand Cards */}
-          <section className="py-20 bg-gradient-to-b from-background via-purple-50/20 to-green-50/20">
+          {/* Value Props - Professional Brand Cards */}
+          <section className="py-20 bg-gradient-to-b from-background via-[hsl(var(--shopify-accent))]/50 to-background">
             <div className="container mx-auto px-4">
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold mb-4">Why DTC Brands Choose Us</h2>
@@ -90,10 +90,10 @@ const ShopifyFulfillment = () => {
                 </p>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <Card className="border-purple-200/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-transparent rounded-bl-full" />
+                <Card className="border-[hsl(var(--shopify-border))] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group bg-white">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[hsl(var(--shopify-blue))]/10 to-transparent rounded-bl-full" />
                   <CardHeader className="relative">
-                    <div className="h-16 w-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
+                    <div className="h-16 w-16 bg-gradient-to-br from-[hsl(var(--shopify-blue))] to-[hsl(var(--shopify-blue-dark))] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
                       <Zap className="h-8 w-8 text-white" />
                     </div>
                     <CardTitle className="text-xl">Lightning Speed</CardTitle>
@@ -103,10 +103,10 @@ const ShopifyFulfillment = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-green-200/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-transparent rounded-bl-full" />
+                <Card className="border-[hsl(var(--shopify-border))] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group bg-white">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[hsl(var(--shopify-teal))]/10 to-transparent rounded-bl-full" />
                   <CardHeader className="relative">
-                    <div className="h-16 w-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
+                    <div className="h-16 w-16 bg-gradient-to-br from-[hsl(var(--shopify-teal))] to-[hsl(var(--shopify-teal-dark))] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
                       <Package className="h-8 w-8 text-white" />
                     </div>
                     <CardTitle className="text-xl">Brand Excellence</CardTitle>
@@ -116,10 +116,10 @@ const ShopifyFulfillment = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-purple-200/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-transparent rounded-bl-full" />
+                <Card className="border-[hsl(var(--shopify-border))] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group bg-white">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[hsl(var(--shopify-blue))]/10 to-transparent rounded-bl-full" />
                   <CardHeader className="relative">
-                    <div className="h-16 w-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
+                    <div className="h-16 w-16 bg-gradient-to-br from-[hsl(var(--shopify-blue-dark))] to-[hsl(var(--shopify-blue))] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
                       <Camera className="h-8 w-8 text-white" />
                     </div>
                     <CardTitle className="text-xl">Quality Proof</CardTitle>
@@ -129,10 +129,10 @@ const ShopifyFulfillment = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-green-200/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-transparent rounded-bl-full" />
+                <Card className="border-[hsl(var(--shopify-border))] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group bg-white">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[hsl(var(--shopify-teal))]/10 to-transparent rounded-bl-full" />
                   <CardHeader className="relative">
-                    <div className="h-16 w-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
+                    <div className="h-16 w-16 bg-gradient-to-br from-[hsl(var(--shopify-teal-dark))] to-[hsl(var(--shopify-teal))] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
                       <Truck className="h-8 w-8 text-white" />
                     </div>
                     <CardTitle className="text-xl">Fast Shipping</CardTitle>
@@ -194,9 +194,9 @@ const ShopifyFulfillment = () => {
                   { icon: Award, title: "Returns Portal", desc: "Returns processing and inspection with customer portal" },
                   { icon: CheckCircle, title: "Quality Reports", desc: "Photo-documented quality reports for every order" },
                 ].map((item, idx) => (
-                  <Card key={idx} className="border-purple-100 hover:border-purple-300 hover:shadow-lg transition-all">
+                  <Card key={idx} className="border-[hsl(var(--shopify-border))] hover:border-[hsl(var(--shopify-blue))]/40 hover:shadow-lg transition-all bg-white">
                     <CardHeader>
-                      <item.icon className="h-10 w-10 text-purple-600 mb-2" />
+                      <item.icon className="h-10 w-10 text-[hsl(var(--shopify-blue))] mb-2" />
                       <CardTitle className="text-lg">{item.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -209,7 +209,7 @@ const ShopifyFulfillment = () => {
           </section>
 
           {/* Capabilities */}
-          <section className="py-20 bg-gradient-to-b from-purple-50/30 to-green-50/30">
+          <section className="py-20 bg-gradient-to-b from-[hsl(var(--shopify-accent))]/40 to-background">
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-bold text-center mb-12">Additional Capabilities</h2>
               <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
@@ -221,8 +221,8 @@ const ShopifyFulfillment = () => {
                   "Multi-channel inventory management",
                   "Custom SKU configuration",
                 ].map((capability, idx) => (
-                  <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-white/60 backdrop-blur-sm border border-purple-100/50 hover:border-purple-300/50 transition-all">
-                    <CheckCircle className="h-6 w-6 text-green-600 mt-1 flex-shrink-0" />
+                  <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-white backdrop-blur-sm border border-[hsl(var(--shopify-border))] hover:border-[hsl(var(--shopify-blue))]/40 hover:shadow-md transition-all">
+                    <CheckCircle className="h-6 w-6 text-[hsl(var(--shopify-teal))] mt-1 flex-shrink-0" />
                     <p className="text-lg">{capability}</p>
                   </div>
                 ))}
@@ -267,9 +267,9 @@ const ShopifyFulfillment = () => {
             </div>
           </section>
 
-          {/* CTA - Shopify Brand Theme */}
+          {/* CTA - Professional Theme */}
           <section className="relative py-20 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-green-600 to-purple-600" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--shopify-blue))] via-[hsl(var(--shopify-teal))] to-[hsl(var(--shopify-blue-dark))]" />
             <div className="absolute inset-0">
               <div className="absolute top-10 right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
               <div className="absolute bottom-10 left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
@@ -277,7 +277,7 @@ const ShopifyFulfillment = () => {
             <div className="container mx-auto px-4 text-center relative">
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Ready to Scale Your Shopify Store?</h2>
               <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">Get a custom fulfillment quote in 24 hours and delight your customers.</p>
-              <Button size="lg" className="bg-white text-purple-600 hover:bg-white/90" onClick={() => navigate("/contact")}>
+              <Button size="lg" className="bg-white text-[hsl(var(--shopify-blue-dark))] hover:bg-white/90 shadow-xl" onClick={() => navigate("/contact")}>
                 Get a Quote
               </Button>
             </div>
