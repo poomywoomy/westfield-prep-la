@@ -3,113 +3,139 @@ import { Mail, MapPin, Phone } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-primary text-white py-12">
+    <footer className="bg-primary text-white py-16">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h3 className="text-2xl font-bold mb-6">Westfield Prep Center</h3>
+        <div className="max-w-6xl mx-auto">
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            {/* Company Info */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
+              <p className="text-sm text-white/80 leading-relaxed">
+                Professional e-commerce fulfillment services in Los Angeles & Southern California
+              </p>
+              <div className="pt-2">
+                <p className="text-sm text-secondary font-semibold">Open Every Day</p>
+                <p className="text-sm text-white/90">8am - 5pm PST</p>
+              </div>
+            </div>
 
-          <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-6">
-            <div className="flex items-center gap-2">
-              <Phone className="w-5 h-5 text-secondary" />
-              <a
-                href="tel:+18189355478"
-                className="hover:text-secondary transition-colors"
-                aria-label="Call Westfield Prep Center"
-              >
-                +1 (818) 935-5478
-              </a>
+            {/* Contact Info */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+              <div className="space-y-3">
+                <a
+                  href="tel:+18189355478"
+                  className="flex items-start gap-3 hover:text-secondary transition-colors group"
+                  aria-label="Call Westfield Prep Center"
+                >
+                  <Phone className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">+1 (818) 935-5478</span>
+                </a>
+                <a
+                  href="mailto:info@westfieldprepcenter.com"
+                  className="flex items-start gap-3 hover:text-secondary transition-colors group"
+                  aria-label="Email Westfield Prep Center"
+                >
+                  <Mail className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">info@westfieldprepcenter.com</span>
+                </a>
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">1801 Flower Ave Office 2<br />Duarte, CA 91010</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Mail className="w-5 h-5 text-secondary" />
-              <a
-                href="mailto:info@westfieldprepcenter.com"
-                className="hover:text-secondary transition-colors"
-                aria-label="Email Westfield Prep Center"
-              >
-                info@westfieldprepcenter.com
-              </a>
+
+            {/* Services */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold mb-4">Services</h4>
+              <div className="space-y-2">
+                <Link
+                  to="/shopify-fulfillment"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors"
+                >
+                  Shopify Fulfillment
+                </Link>
+                <Link
+                  to="/amazon-fba-prep"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors"
+                >
+                  Amazon FBA Prep
+                </Link>
+                <Link
+                  to="/tiktok-shop-fulfillment"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors"
+                >
+                  TikTok Shop Fulfillment
+                </Link>
+                <Link
+                  to="/storage-warehousing"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors"
+                >
+                  Storage & Warehousing
+                </Link>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-secondary" />
-              <span>1801 Flower Ave Office 2, Duarte, CA 91010</span>
+
+            {/* Quick Links */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <div className="space-y-2">
+                <Link
+                  to="/testimonials"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors"
+                >
+                  Testimonials
+                </Link>
+                <Link
+                  to="/faq"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors"
+                >
+                  FAQ
+                </Link>
+                <Link
+                  to="/contact"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors"
+                >
+                  Contact
+                </Link>
+                <Link
+                  to="/login"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors"
+                >
+                  Client Portal
+                </Link>
+              </div>
             </div>
           </div>
 
-          <p className="text-sm text-white/90 mb-8">
-            Open 7 Days | 9am-8pm PST | Serving Los Angeles & Southern California
-          </p>
-
-          <div className="border-t border-white/20 pt-6">
-            <p className="text-sm text-white/80">
-              Westfield Prep Center — a DBA of Sathatham LLC
-            </p>
-            <div className="flex justify-center flex-wrap gap-4 mt-3 mb-2">
-              <Link
-                to="/shopify-fulfillment"
-                className="text-xs text-white/80 hover:text-secondary transition-colors"
-              >
-                Shopify Fulfillment
-              </Link>
-              <span className="text-white/40">•</span>
-              <Link
-                to="/amazon-fba-prep"
-                className="text-xs text-white/80 hover:text-secondary transition-colors"
-              >
-                Amazon FBA
-              </Link>
-              <span className="text-white/40">•</span>
-              <Link
-                to="/tiktok-shop-fulfillment"
-                className="text-xs text-white/80 hover:text-secondary transition-colors"
-              >
-                TikTok Shop
-              </Link>
-              <span className="text-white/40">•</span>
-              <Link
-                to="/testimonials"
-                className="text-xs text-white/80 hover:text-secondary transition-colors"
-              >
-                Testimonials
-              </Link>
-              <span className="text-white/40">•</span>
-              <Link
-                to="/faq"
-                className="text-xs text-white/80 hover:text-secondary transition-colors"
-              >
-                FAQ
-              </Link>
-              <span className="text-white/40">•</span>
-              <Link
-                to="/contact"
-                className="text-xs text-white/80 hover:text-secondary transition-colors"
-              >
-                Contact
-              </Link>
-              <span className="text-white/40">•</span>
-              <Link
-                to="/terms"
-                className="text-xs text-white/80 hover:text-secondary transition-colors"
-              >
-                Terms
-              </Link>
-              <span className="text-white/40">•</span>
-              <Link
-                to="/privacy"
-                className="text-xs text-white/80 hover:text-secondary transition-colors"
-              >
-                Privacy
-              </Link>
-              <span className="text-white/40">•</span>
-              <Link
-                to="/login"
-                className="text-xs text-white/60 hover:text-white/80 transition-colors"
-              >
-                Client Portal
-              </Link>
+          {/* Bottom Bar */}
+          <div className="border-t border-white/20 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-sm text-white/70">
+                Westfield Prep Center — a DBA of Sathatham LLC
+              </p>
+              <div className="flex items-center gap-4">
+                <Link
+                  to="/terms"
+                  className="text-sm text-white/70 hover:text-secondary transition-colors"
+                >
+                  Terms
+                </Link>
+                <span className="text-white/40">•</span>
+                <Link
+                  to="/privacy"
+                  className="text-sm text-white/70 hover:text-secondary transition-colors"
+                >
+                  Privacy
+                </Link>
+                <span className="text-white/40">•</span>
+                <p className="text-sm text-white/60">
+                  © {new Date().getFullYear()} All rights reserved.
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-white/60 mt-2">
-              © {new Date().getFullYear()} Westfield Prep Center. All rights reserved.
-            </p>
           </div>
         </div>
       </div>
