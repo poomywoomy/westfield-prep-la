@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +14,16 @@ interface AddCustomBillingItemDialogProps {
   billId: string;
   onSuccess: () => void;
 }
+
+const SECTION_TYPES = [
+  "Standard Operations",
+  "Amazon FBA",
+  "Walmart WFS",
+  "TikTok Shop",
+  "Self Fulfillment",
+  "Shopify",
+  "Other"
+];
 
 export const AddCustomBillingItemDialog = ({
   open,
@@ -24,6 +35,7 @@ export const AddCustomBillingItemDialog = ({
   const [unitPrice, setUnitPrice] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [note, setNote] = useState("");
+  const [sectionType, setSectionType] = useState("Standard Operations");
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
@@ -59,6 +71,7 @@ export const AddCustomBillingItemDialog = ({
         line_date: new Date().toISOString().split("T")[0],
         source: "manual",
         note: note || null,
+        section_type: sectionType,
       });
 
       if (error) throw error;
@@ -76,6 +89,7 @@ export const AddCustomBillingItemDialog = ({
       setUnitPrice("");
       setQuantity("1");
       setNote("");
+      setSectionType("Standard Operations");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -104,6 +118,22 @@ export const AddCustomBillingItemDialog = ({
               placeholder="e.g., Special Handling"
               maxLength={200}
             />
+          </div>
+
+          <div>
+            <Label htmlFor="section-type">Section Type</Label>
+            <Select value={sectionType} onValueChange={setSectionType}>
+              <SelectTrigger id="section-type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SECTION_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

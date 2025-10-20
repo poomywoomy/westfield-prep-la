@@ -132,7 +132,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     }
   };
 
-  const addServiceFromQuote = async (serviceName: string, unitPrice: number) => {
+  const addServiceFromQuote = async (serviceName: string, unitPrice: number, sectionType: string) => {
     if (!bill?.id) {
       toast({
         title: "Error",
@@ -168,6 +168,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
         unit_price_cents: Math.round(unitPrice * 100),
         line_date: new Date().toISOString().split("T")[0],
         source: "manual",
+        section_type: sectionType,
       });
 
       if (error) throw error;
@@ -349,31 +350,46 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     doc.text(dateRange, 165, yPos);
     yPos += 15;
 
-    // Line items table
-    doc.setFont("helvetica", "bold");
-    doc.text("Service", 20, yPos);
-    doc.text("Qty", 120, yPos, { align: "right" });
-    doc.text("Unit Price", 150, yPos, { align: "right" });
-    doc.text("Total", 185, yPos, { align: "right" });
-    doc.line(20, yPos + 1, 190, yPos + 1);
-    yPos += 6;
-
-    doc.setFont("helvetica", "normal");
-    billItems.forEach(item => {
-      const lineTotal = Number(item.qty_decimal) * item.unit_price_cents / 100;
-      doc.text(item.service_name, 20, yPos);
-      doc.text(String(item.qty_decimal), 120, yPos, { align: "right" });
-      doc.text(`$${(item.unit_price_cents / 100).toFixed(2)}`, 150, yPos, { align: "right" });
-      doc.text(`$${lineTotal.toFixed(2)}`, 185, yPos, { align: "right" });
-      yPos += 5;
-
-      if (yPos > 260) {
+    // Line items grouped by section
+    Object.entries(billItemsBySection).forEach(([sectionType, items]) => {
+      if (yPos > 250) {
         doc.addPage();
         yPos = 20;
       }
-    });
 
-    yPos += 5;
+      // Section header
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text(sectionType, 20, yPos);
+      yPos += 6;
+
+      // Table header
+      doc.setFontSize(10);
+      doc.text("Service", 20, yPos);
+      doc.text("Qty", 120, yPos, { align: "right" });
+      doc.text("Unit Price", 150, yPos, { align: "right" });
+      doc.text("Total", 185, yPos, { align: "right" });
+      doc.line(20, yPos + 1, 190, yPos + 1);
+      yPos += 6;
+
+      // Items
+      doc.setFont("helvetica", "normal");
+      items.forEach(item => {
+        const lineTotal = Number(item.qty_decimal) * item.unit_price_cents / 100;
+        doc.text(item.service_name, 20, yPos);
+        doc.text(String(item.qty_decimal), 120, yPos, { align: "right" });
+        doc.text(`$${(item.unit_price_cents / 100).toFixed(2)}`, 150, yPos, { align: "right" });
+        doc.text(`$${lineTotal.toFixed(2)}`, 185, yPos, { align: "right" });
+        yPos += 5;
+
+        if (yPos > 260) {
+          doc.addPage();
+          yPos = 20;
+        }
+      });
+
+      yPos += 8;
+    });
 
     // Payments
     if (payments.length > 0) {
@@ -494,7 +510,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       const lineItems: any[] = [];
       const existingNames = new Set(billItems.map((i) => i.service_name));
 
-      const pushItem = (name: string, price: number) => {
+      const pushItem = (name: string, price: number, sectionType: string) => {
         if (!existingNames.has(name)) {
           lineItems.push({
             bill_id: bill.id,
@@ -503,17 +519,18 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
             unit_price_cents: Math.round(Number(price) * 100),
             line_date: now.toISOString().split("T")[0],
             source: "quote",
+            section_type: sectionType,
           });
         }
       };
 
       if (data?.standard_operations && Array.isArray(data.standard_operations)) {
-        data.standard_operations.forEach((op: any) => pushItem(op.service_name, op.service_price));
+        data.standard_operations.forEach((op: any) => pushItem(op.service_name, op.service_price, "Standard Operations"));
       }
       if (data?.fulfillment_sections && Array.isArray(data.fulfillment_sections)) {
         data.fulfillment_sections.forEach((section: any) => {
           if (section.items && Array.isArray(section.items)) {
-            section.items.forEach((item: any) => pushItem(item.service_name, item.service_price));
+            section.items.forEach((item: any) => pushItem(item.service_name, item.service_price, section.type));
           }
         });
       }
@@ -573,37 +590,49 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       setLoading(false);
     }
   };
-  // Extract services from quote
-  const quoteServices: Array<{ serviceName: string; unitPrice: number }> = quote
+  // Extract services from quote grouped by section
+  const quoteServicesBySection: Array<{ sectionType: string; services: Array<{ serviceName: string; unitPrice: number }> }> = quote
     ? (() => {
         const data = quote.quote_data as any;
-        const services: Array<{ serviceName: string; unitPrice: number }> = [];
+        const sections: Array<{ sectionType: string; services: Array<{ serviceName: string; unitPrice: number }> }> = [];
         
-        if (data.standard_operations && Array.isArray(data.standard_operations)) {
-          data.standard_operations.forEach((op: any) => {
-            services.push({
+        if (data.standard_operations && Array.isArray(data.standard_operations) && data.standard_operations.length > 0) {
+          sections.push({
+            sectionType: "Standard Operations",
+            services: data.standard_operations.map((op: any) => ({
               serviceName: op.service_name,
               unitPrice: op.service_price,
-            });
+            })),
           });
         }
         
         if (data.fulfillment_sections && Array.isArray(data.fulfillment_sections)) {
           data.fulfillment_sections.forEach((section: any) => {
-            if (section.items && Array.isArray(section.items)) {
-              section.items.forEach((item: any) => {
-                services.push({
+            if (section.items && Array.isArray(section.items) && section.items.length > 0) {
+              sections.push({
+                sectionType: section.type,
+                services: section.items.map((item: any) => ({
                   serviceName: item.service_name,
                   unitPrice: item.service_price,
-                });
+                })),
               });
             }
           });
         }
         
-        return services;
+        return sections;
       })()
     : [];
+
+  // Group bill items by section type
+  const billItemsBySection = billItems.reduce((acc, item) => {
+    const sectionType = item.section_type || "Standard Operations";
+    if (!acc[sectionType]) {
+      acc[sectionType] = [];
+    }
+    acc[sectionType].push(item);
+    return acc;
+  }, {} as Record<string, BillItem[]>);
 
   const subtotal = billItems.reduce(
     (sum, item) => sum + (Number(item.qty_decimal) * item.unit_price_cents / 100),
@@ -749,78 +778,89 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Service</TableHead>
-                <TableHead className="text-right">Quantity</TableHead>
-                <TableHead className="text-right">Unit Price</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                {!isClosed && <TableHead className="w-[50px]"></TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {billItems.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.service_name}</TableCell>
-                  <TableCell className="text-right">
-                    {!isClosed ? (
-                      <Input
-                        type="number"
-                        value={item.qty_decimal}
-                        onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
-                        className="w-20 text-right"
-                        step="0.01"
-                      />
-                    ) : (
-                      item.qty_decimal
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    ${(item.unit_price_cents / 100).toFixed(2)}
-                  </TableCell>
-                  <TableCell className="text-right font-semibold">
-                    ${(Number(item.qty_decimal) * item.unit_price_cents / 100).toFixed(2)}
-                  </TableCell>
-                  {!isClosed && (
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteLineItem(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-              {billItems.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={isClosed ? 4 : 5} className="text-center text-muted-foreground">
-                    No line items yet
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-
-          {!isClosed && quote && quoteServices.length > 0 && (
-            <div className="mt-4 p-4 border rounded-lg bg-accent/50">
-              <div className="font-semibold mb-2">Add from Quote:</div>
-              <div className="flex flex-wrap gap-2">
-                {quoteServices.map((service, idx) => (
-                  <Button
-                    key={idx}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => addServiceFromQuote(service.serviceName, service.unitPrice)}
-                    disabled={loading}
-                  >
-                    {service.serviceName} - ${service.unitPrice.toFixed(2)}
-                  </Button>
-                ))}
+          {Object.keys(billItemsBySection).length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">
+              No line items yet
+            </div>
+          ) : (
+            Object.entries(billItemsBySection).map(([sectionType, items]) => (
+              <div key={sectionType} className="mb-6 last:mb-0">
+                <div className="font-semibold text-sm text-muted-foreground mb-2 px-1">
+                  {sectionType}
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Service</TableHead>
+                      <TableHead className="text-right">Quantity</TableHead>
+                      <TableHead className="text-right">Unit Price</TableHead>
+                      <TableHead className="text-right">Total</TableHead>
+                      {!isClosed && <TableHead className="w-[50px]"></TableHead>}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {items.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell className="font-medium">{item.service_name}</TableCell>
+                        <TableCell className="text-right">
+                          {!isClosed ? (
+                            <Input
+                              type="number"
+                              value={item.qty_decimal}
+                              onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
+                              className="w-20 text-right"
+                              step="0.01"
+                            />
+                          ) : (
+                            item.qty_decimal
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          ${(item.unit_price_cents / 100).toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold">
+                          ${(Number(item.qty_decimal) * item.unit_price_cents / 100).toFixed(2)}
+                        </TableCell>
+                        {!isClosed && (
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteLineItem(item.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
+            ))
+          )}
+
+          {!isClosed && quote && quoteServicesBySection.length > 0 && (
+            <div className="mt-4 p-4 border rounded-lg bg-accent/50 space-y-4">
+              <div className="font-semibold">Add from Quote:</div>
+              {quoteServicesBySection.map((section, sectionIdx) => (
+                <div key={sectionIdx} className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground">{section.sectionType}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {section.services.map((service, idx) => (
+                      <Button
+                        key={idx}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addServiceFromQuote(service.serviceName, service.unitPrice, section.sectionType)}
+                        disabled={loading}
+                      >
+                        {service.serviceName} - ${service.unitPrice.toFixed(2)}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 

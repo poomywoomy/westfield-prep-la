@@ -284,6 +284,7 @@ export type Database = {
           line_date: string
           note: string | null
           qty_decimal: number
+          section_type: string | null
           service_code: string | null
           service_name: string
           sku_ref: string | null
@@ -300,6 +301,7 @@ export type Database = {
           line_date?: string
           note?: string | null
           qty_decimal?: number
+          section_type?: string | null
           service_code?: string | null
           service_name: string
           sku_ref?: string | null
@@ -316,6 +318,7 @@ export type Database = {
           line_date?: string
           note?: string | null
           qty_decimal?: number
+          section_type?: string | null
           service_code?: string | null
           service_name?: string
           sku_ref?: string | null
