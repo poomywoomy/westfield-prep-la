@@ -55,7 +55,7 @@ const FAQ = () => {
     },
     {
       question: "Where is Westfield Prep Center located?",
-      answer: "As a boutique fulfillment company, we provide our warehouse address only to active clients. We're based in Los Angeles, CA, with easy access to major carriers for efficient shipping to fulfillment centers nationwide. Our strategic West Coast location ensures fast shipping times."
+      answer: "We're located at 1801 Flower Ave Office 2, Duarte, CA 91010, with easy access to major carriers for efficient shipping to fulfillment centers nationwide. Our strategic West Coast location ensures fast shipping times."
     },
     {
       question: "How do I get started?",
