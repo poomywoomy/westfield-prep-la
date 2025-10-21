@@ -251,7 +251,7 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
         sku_id: item.sku_id,
         location_id: item.location_id,
         qty_delta: item.qty_delta,
-        transaction_type: item.qty_delta > 0 ? "ADJUSTMENT_PLUS" : "ADJUSTMENT_MINUS",
+        transaction_type: (item.qty_delta > 0 ? "ADJUSTMENT_PLUS" : "ADJUSTMENT_MINUS") as "ADJUSTMENT_PLUS" | "ADJUSTMENT_MINUS",
         reason_code: formData.reason_code,
         notes: item.notes,
         lot_number: formData.lot_number || null,

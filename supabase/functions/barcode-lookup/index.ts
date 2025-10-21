@@ -115,36 +115,49 @@ Deno.serve(async (req) => {
 
     // Special handling for receiving context with asn_id
     if (context === 'receiving' && asn_id && detectedType.startsWith('product_')) {
-      // Search within specific ASN's line items
-      const { data: asnLines, error: asnError } = await supabase
-        .from('asn_lines')
-        .select(`
-          id,
-          expected_units,
-          received_units,
-          normal_units,
-          damaged_units,
-          quarantined_units,
-          missing_units,
-          lot_number,
-          expiry_date,
-          notes,
-          skus!inner (
+      // First find matching SKU
+      let skuQuery = supabase
+        .from('skus')
+        .select('id')
+        .or(`upc.eq.${normalizedBarcode},ean.eq.${normalizedBarcode},fnsku.eq.${normalizedBarcode},asin.eq.${normalizedBarcode},client_sku.ilike.${normalizedBarcode}`);
+      
+      if (client_id) {
+        skuQuery = skuQuery.eq('client_id', client_id);
+      }
+      
+      const { data: matchedSkus } = await skuQuery;
+      
+      if (matchedSkus && matchedSkus.length > 0) {
+        // Search for ASN lines with this SKU
+        const { data: asnLines, error: asnError } = await supabase
+          .from('asn_lines')
+          .select(`
             id,
-            client_sku,
-            title,
-            brand,
-            upc,
-            ean,
-            fnsku,
-            asin,
-            has_lot_tracking,
-            has_expiration,
-            status
-          )
-        `)
-        .eq('asn_id', asn_id)
-        .or(`skus.upc.eq.${normalizedBarcode},skus.ean.eq.${normalizedBarcode},skus.fnsku.eq.${normalizedBarcode},skus.asin.eq.${normalizedBarcode},skus.client_sku.ilike.${normalizedBarcode}`);
+            expected_units,
+            received_units,
+            normal_units,
+            damaged_units,
+            quarantined_units,
+            missing_units,
+            lot_number,
+            expiry_date,
+            notes,
+            skus (
+              id,
+              client_sku,
+              title,
+              brand,
+              upc,
+              ean,
+              fnsku,
+              asin,
+              has_lot_tracking,
+              has_expiration,
+              status
+            )
+          `)
+          .eq('asn_id', asn_id)
+          .in('sku_id', matchedSkus.map(s => s.id));
 
       if (asnLines && asnLines.length > 0 && !asnError) {
         const matchedLine = asnLines[0];
@@ -176,6 +189,7 @@ Deno.serve(async (req) => {
             sku: sku
           }
         };
+      }
       }
     }
     // Adjustment context: return current inventory levels
