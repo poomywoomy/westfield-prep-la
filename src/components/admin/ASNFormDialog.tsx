@@ -12,6 +12,7 @@ import { z } from "zod";
 import { validateImageFile } from "@/lib/fileValidation";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { ShipmentTemplateDialog } from "./ShipmentTemplateDialog";
+import { QuickAddSKUModal } from "./QuickAddSKUModal";
 import type { Database } from "@/integrations/supabase/types";
 
 type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -81,6 +82,8 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
   const [scannerMode, setScannerMode] = useState<'manual' | 'scanner'>('manual');
   const [activeScanLine, setActiveScanLine] = useState<number | null>(null);
+  const [showQuickAddSKU, setShowQuickAddSKU] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -195,6 +198,37 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
     if (data && !error) {
       setFormData(prev => ({ ...prev, asn_number: data }));
       toast({ title: "ASN number regenerated" });
+    }
+  };
+
+  const handleQuickSKUSuccess = async (skuId: string) => {
+    // Refresh SKU list
+    if (formData.client_id) {
+      await fetchSKUs(formData.client_id);
+      
+      // Add a new line if none exist, or update current line
+      if (lines.length === 0) {
+        addLine();
+        setTimeout(() => {
+          updateLine(0, 'sku_id', skuId);
+        }, 100);
+      } else {
+        // Find first empty line or add new one
+        const emptyLineIndex = lines.findIndex(l => !l.sku_id);
+        if (emptyLineIndex >= 0) {
+          updateLine(emptyLineIndex, 'sku_id', skuId);
+        } else {
+          addLine();
+          setTimeout(() => {
+            updateLine(lines.length, 'sku_id', skuId);
+          }, 100);
+        }
+      }
+      
+      toast({
+        title: "SKU Created",
+        description: "SKU has been added to the form"
+      });
     }
   };
 
@@ -800,6 +834,13 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
         onSuccess={() => {
           toast({ title: "Template saved successfully" });
         }}
+      />
+
+      <QuickAddSKUModal
+        open={showQuickAddSKU}
+        onOpenChange={setShowQuickAddSKU}
+        clientId={formData.client_id}
+        onSuccess={handleQuickSKUSuccess}
       />
     </Dialog>
   );

@@ -76,18 +76,38 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
 
       if (data?.found) {
         if (data.matched_table === 'asn_headers') {
-          // Found existing ASN
+          // Found existing ASN - Auto-open it
+          const asnData = data.data;
+          
           toast({ 
-            title: `ASN Found: ${data.data.asn_number}`,
-            description: `Status: ${data.data.status}`
+            title: `✓ ASN Found: ${asnData.asn_number}`,
+            description: `Opening ASN... (${asnData.status})`,
+            duration: 2000
           });
+          
+          // Auto-open ASN form in view/edit mode
+          setASNPrefillData({
+            client_id: asnData.client_id,
+            asn_number: asnData.asn_number,
+            tracking_number: asnData.tracking_number,
+            carrier: asnData.carrier,
+            eta: asnData.eta,
+            ship_from: asnData.ship_from,
+            notes: asnData.notes,
+            lines: asnData.asn_lines?.map((line: any) => ({
+              sku_id: line.sku_id,
+              expected_units: line.expected_units
+            })) || []
+          });
+          setShowASNForm(true);
+          onOpenChange(false);
           
           setScanHistory([{
             barcode,
             type: format,
             timestamp: new Date(),
             result: 'found',
-            details: `ASN: ${data.data.asn_number}`
+            details: `ASN: ${asnData.asn_number} (Opened)`
           }, ...scanHistory.slice(0, 9)]);
         } else if (data.matched_table === 'skus') {
           // Found SKU
@@ -107,19 +127,31 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
       } else {
         // Not found - check if tracking number
         if (data?.type === 'tracking') {
-          // Offer to create new ASN
-          setTrackingData({ 
-            number: barcode, 
-            carrier: data.carrier || 'Unknown' 
+          // Auto-create new ASN with detected tracking
+          const detectedCarrier = data.carrier || 'Unknown';
+          
+          toast({ 
+            title: "🆕 New Tracking Number",
+            description: `Creating ASN for ${detectedCarrier} tracking...`,
+            duration: 2000
           });
-          setShowTrackingIntelligence(true);
+          
+          // Auto-open ASN creation form with tracking pre-filled
+          setASNPrefillData({
+            client_id: selectedClient,
+            tracking_number: barcode,
+            carrier: detectedCarrier,
+            asn_number: `ASN-${Date.now()}` // Temporary, will be generated on save
+          });
+          setShowASNForm(true);
+          onOpenChange(false);
           
           setScanHistory([{
             barcode,
             type: format,
             timestamp: new Date(),
-            result: 'not_found',
-            details: `Tracking: ${data.carrier || 'Unknown'}`
+            result: 'created',
+            details: `New ASN (${detectedCarrier})`
           }, ...scanHistory.slice(0, 9)]);
         } else {
           toast({ 

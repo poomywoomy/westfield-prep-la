@@ -126,6 +126,14 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
     }
   };
 
+  const handleQuickSKUSuccess = () => {
+    toast({
+      title: "SKU Created",
+      description: "Please add this SKU to the ASN before receiving.",
+      variant: "default"
+    });
+  };
+
   const handleCompleteReceiving = async () => {
     try {
       setLoading(true);

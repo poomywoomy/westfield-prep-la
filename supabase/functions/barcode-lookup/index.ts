@@ -16,6 +16,7 @@ interface LookupResponse {
   type: 'tracking' | 'product_upc' | 'product_ean' | 'product_fnsku' | 'product_client_sku' | 'unknown';
   matched_table?: 'asn_headers' | 'skus';
   matched_id?: string;
+  carrier?: string;
   data?: any;
   suggestions?: any[];
 }
@@ -113,10 +114,37 @@ Deno.serve(async (req) => {
 
     // Search based on detected type
     if (detectedType === 'tracking') {
-      // Search ASN headers
+      // Search ASN headers with full details including lines
       let query = supabase
         .from('asn_headers')
-        .select('id, asn_number, tracking_number, carrier, eta, status, client_id, clients!inner(company_name)')
+        .select(`
+          id, 
+          asn_number, 
+          tracking_number, 
+          carrier, 
+          eta, 
+          status, 
+          client_id,
+          ship_from,
+          notes,
+          created_at,
+          clients!inner(company_name),
+          asn_lines (
+            id,
+            expected_units,
+            received_units,
+            sku_id,
+            skus (
+              id,
+              client_sku,
+              title,
+              fnsku,
+              asin,
+              upc,
+              ean
+            )
+          )
+        `)
         .eq('tracking_number', normalizedBarcode);
 
       if (client_id) {
@@ -201,6 +229,21 @@ Deno.serve(async (req) => {
 
         response.suggestions = suggestions || [];
       }
+    }
+
+    // Enhanced carrier detection for not found tracking numbers
+    if (!response.found && detectedType === 'tracking') {
+      let detectedCarrier = 'Unknown';
+      if (normalizedBarcode.startsWith('1Z')) detectedCarrier = 'UPS';
+      else if (/^94\d{20}$/.test(normalizedBarcode)) detectedCarrier = 'USPS';
+      else if (/^92\d{20}$/.test(normalizedBarcode)) detectedCarrier = 'USPS';
+      else if (/^\d{12}$/.test(normalizedBarcode)) detectedCarrier = 'FedEx';
+      else if (/^\d{14}$/.test(normalizedBarcode)) detectedCarrier = 'FedEx';
+      else if (/^\d{15}$/.test(normalizedBarcode)) detectedCarrier = 'FedEx';
+      else if (/^\d{20}$/.test(normalizedBarcode)) detectedCarrier = 'FedEx';
+      else if (/^\d{10,11}$/.test(normalizedBarcode)) detectedCarrier = 'DHL';
+      
+      response.carrier = detectedCarrier;
     }
 
     const scanDuration = Date.now() - startTime;
