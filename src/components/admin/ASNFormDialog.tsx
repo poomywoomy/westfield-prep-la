@@ -7,9 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, X, Upload, RefreshCw, Paperclip } from "lucide-react";
+import { Plus, X, Upload, RefreshCw, Paperclip, Scan, Save } from "lucide-react";
 import { z } from "zod";
 import { validateImageFile } from "@/lib/fileValidation";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { ShipmentTemplateDialog } from "./ShipmentTemplateDialog";
 import type { Database } from "@/integrations/supabase/types";
 
 type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -35,6 +37,17 @@ interface ASNFormDialogProps {
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
   asnId?: string;
+  prefillData?: {
+    client_id?: string;
+    asn_number?: string;
+    carrier?: string;
+    tracking_number?: string;
+    eta?: string;
+    ship_from?: string;
+    notes?: string;
+    template_id?: string;
+    lines?: { sku_id: string; expected_units: number }[];
+  };
 }
 
 interface ASNLine {
@@ -49,7 +62,7 @@ interface ASNAttachment {
   forLine?: number;
 }
 
-export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId }: ASNFormDialogProps) => {
+export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillData }: ASNFormDialogProps) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [skus, setSKUs] = useState<SKU[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,6 +78,9 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId }: ASNFormD
   const [lines, setLines] = useState<ASNLine[]>([]);
   const [attachments, setAttachments] = useState<ASNAttachment[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [scannerMode, setScannerMode] = useState<'manual' | 'scanner'>('manual');
+  const [activeScanLine, setActiveScanLine] = useState<number | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -72,11 +88,30 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId }: ASNFormD
       fetchClients();
       if (asnId) {
         loadASN(asnId);
+      } else if (prefillData) {
+        // Load from prefill (template or tracking intelligence)
+        setFormData({
+          client_id: prefillData.client_id || "",
+          asn_number: prefillData.asn_number || "",
+          carrier: prefillData.carrier || "",
+          tracking_number: prefillData.tracking_number || "",
+          eta: prefillData.eta || "",
+          ship_from: prefillData.ship_from || "",
+          notes: prefillData.notes || "",
+        });
+        
+        if (prefillData.client_id) {
+          fetchSKUs(prefillData.client_id);
+        }
+        
+        if (prefillData.lines) {
+          setLines(prefillData.lines);
+        }
       } else {
         resetForm();
       }
     }
-  }, [open, asnId]);
+  }, [open, asnId, prefillData]);
 
   const loadASN = async (id: string) => {
     setLoading(true);
@@ -462,12 +497,40 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId }: ASNFormD
 
             <div className="space-y-2">
               <Label htmlFor="tracking">Tracking Number</Label>
-              <Input
-                id="tracking"
-                value={formData.tracking_number}
-                onChange={e => setFormData({ ...formData, tracking_number: e.target.value })}
-                maxLength={100}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="tracking"
+                  value={formData.tracking_number}
+                  onChange={e => setFormData({ ...formData, tracking_number: e.target.value })}
+                  maxLength={100}
+                  disabled={scannerMode === 'scanner'}
+                />
+                <Button
+                  type="button"
+                  variant={scannerMode === 'scanner' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setScannerMode(scannerMode === 'scanner' ? 'manual' : 'scanner');
+                  }}
+                  title="Scan tracking barcode"
+                >
+                  <Scan className="h-4 w-4" />
+                </Button>
+              </div>
+              {scannerMode === 'scanner' && (
+                <BarcodeScanner
+                  mode="keyboard"
+                  onScan={(barcode) => {
+                    setFormData({ ...formData, tracking_number: barcode });
+                    setScannerMode('manual');
+                    toast({ title: "Tracking number scanned" });
+                  }}
+                  onError={(error) => {
+                    toast({ title: "Scan error", description: error, variant: "destructive" });
+                  }}
+                  placeholder="Scan tracking barcode..."
+                  continuous={false}
+                />
+              )}
             </div>
           </div>
 
@@ -529,63 +592,110 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId }: ASNFormD
 
             <div className="space-y-2">
               {lines.map((line, index) => (
-                <div key={index} className="flex items-end gap-2 p-2 border rounded-lg">
-                  <div className="flex-1">
-                    <Select
-                      value={line.sku_id}
-                      onValueChange={value => updateLine(index, "sku_id", value)}
+                <div key={index} className="space-y-2">
+                  <div className="flex items-end gap-2 p-2 border rounded-lg">
+                    <div className="flex-1">
+                      <Select
+                        value={line.sku_id}
+                        onValueChange={value => updateLine(index, "sku_id", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select SKU" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {skus.map(sku => (
+                            <SelectItem key={sku.id} value={sku.id}>
+                              {sku.client_sku} - {sku.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="w-32">
+                      <Input
+                        type="number"
+                        min="1"
+                        max="1000000"
+                        value={line.expected_units}
+                        onChange={e => {
+                          const value = e.target.value;
+                          const parsed = parseInt(value, 10);
+                          updateLine(index, "expected_units", !isNaN(parsed) && parsed > 0 ? parsed : 1);
+                        }}
+                        placeholder="Qty"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setActiveScanLine(activeScanLine === index ? null : index)}
+                      title="Scan product barcode"
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select SKU" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {skus.map(sku => (
-                          <SelectItem key={sku.id} value={sku.id}>
-                            {sku.client_sku} - {sku.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="w-32">
-                    <Input
-                      type="number"
-                      min="1"
-                      max="1000000"
-                      value={line.expected_units}
-                      onChange={e => {
-                        const value = e.target.value;
-                        const parsed = parseInt(value, 10);
-                        updateLine(index, "expected_units", !isNaN(parsed) && parsed > 0 ? parsed : 1);
-                      }}
-                      placeholder="Qty"
+                      <Scan className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => document.getElementById(`line-file-${index}`)?.click()}
+                      title="Attach images to this line"
+                    >
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+                    <input
+                      id={`line-file-${index}`}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                      multiple
+                      className="hidden"
+                      onChange={e => handleFileInput(e, index)}
                     />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeLine(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => document.getElementById(`line-file-${index}`)?.click()}
-                    title="Attach images to this line"
-                  >
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
-                  <input
-                    id={`line-file-${index}`}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
-                    multiple
-                    className="hidden"
-                    onChange={e => handleFileInput(e, index)}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeLine(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                  
+                  {activeScanLine === index && (
+                    <div className="ml-2 p-3 border-2 border-dashed rounded-md bg-muted/30">
+                      <BarcodeScanner
+                        mode="keyboard"
+                        onScan={async (barcode) => {
+                          if (!formData.client_id) return;
+                          
+                          const { data } = await supabase.functions.invoke('barcode-lookup', {
+                            body: { 
+                              barcode, 
+                              client_id: formData.client_id,
+                              context: 'asn_line_selection'
+                            }
+                          });
+                          
+                          if (data?.found && data.matched_table === 'skus') {
+                            updateLine(index, "sku_id", data.matched_id);
+                            toast({ title: `Added: ${data.data.title}` });
+                            setActiveScanLine(null);
+                          } else {
+                            toast({ 
+                              title: "SKU not found", 
+                              description: `No SKU found for barcode: ${barcode}`,
+                              variant: "destructive" 
+                            });
+                          }
+                        }}
+                        onError={(error) => {
+                          toast({ title: "Scan error", description: error, variant: "destructive" });
+                        }}
+                        placeholder="Scan product barcode..."
+                        continuous={false}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -656,14 +766,41 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId }: ASNFormD
         </div>
 
         <DialogFooter>
+          {!asnId && formData.client_id && lines.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowSaveTemplate(true)}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save as Template
+            </Button>
+          )}
+          
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Creating..." : "Create ASN"}
+            {loading ? "Saving..." : asnId ? "Update" : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <ShipmentTemplateDialog
+        open={showSaveTemplate}
+        onOpenChange={setShowSaveTemplate}
+        clientId={formData.client_id}
+        asnData={{
+          carrier: formData.carrier,
+          ship_from: formData.ship_from,
+          notes: formData.notes,
+          lines: lines
+        }}
+        skus={skus}
+        onSuccess={() => {
+          toast({ title: "Template saved successfully" });
+        }}
+      />
     </Dialog>
   );
 };

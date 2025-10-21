@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Users, FileText, DollarSign, LogOut, Settings, ChevronDown, FileSignature, Store, Package } from "lucide-react";
+import { Users, FileText, DollarSign, LogOut, Settings, ChevronDown, FileSignature, Store, Package, Scan } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientsTab from "@/components/admin/ClientsTab";
 import QuotesTab from "@/components/admin/QuotesTab";
@@ -14,11 +14,25 @@ import BillingTab from "@/components/admin/BillingTab";
 import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
 import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
 import { InventoryTab } from "@/components/admin/InventoryTab";
+import { QuickScanModal } from "@/components/admin/QuickScanModal";
 
 const AdminDashboard = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showQuickScan, setShowQuickScan] = useState(false);
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowQuickScan(true);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
 
   useEffect(() => {
@@ -156,6 +170,21 @@ const AdminDashboard = () => {
             <DocumentGeneratorTab />
           </TabsContent>
         </Tabs>
+
+        {/* Floating Action Button */}
+        <Button
+          size="lg"
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
+          onClick={() => setShowQuickScan(true)}
+          title="Quick Scan (Ctrl+K)"
+        >
+          <Scan className="h-6 w-6" />
+        </Button>
+
+        <QuickScanModal 
+          open={showQuickScan} 
+          onOpenChange={setShowQuickScan} 
+        />
       </main>
     </div>
   );
