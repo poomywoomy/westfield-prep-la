@@ -20,6 +20,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+
   useEffect(() => {
     // Defense-in-depth: Explicit role check before loading dashboard
     if (!loading) {
