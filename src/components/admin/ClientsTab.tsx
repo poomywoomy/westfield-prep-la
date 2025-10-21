@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import CreateClientDialog from "./CreateClientDialog";
 import ClientsList from "./ClientsList";
 
@@ -35,6 +35,27 @@ const ClientsTab = () => {
 
   useEffect(() => {
     fetchClients();
+    
+    // Subscribe to realtime changes on clients table
+    const channel = supabase
+      .channel('clients-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'clients'
+        },
+        (payload) => {
+          // Refetch clients list on any change
+          fetchClients();
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
@@ -45,10 +66,20 @@ const ClientsTab = () => {
             <CardTitle>Clients Management</CardTitle>
             <CardDescription>Create and manage client accounts</CardDescription>
           </div>
-          <Button onClick={() => setShowCreateDialog(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Client
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={fetchClients}
+              disabled={loading}
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Button onClick={() => setShowCreateDialog(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Client
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>

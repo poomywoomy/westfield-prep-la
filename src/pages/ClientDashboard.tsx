@@ -23,7 +23,6 @@ const ClientDashboard = () => {
   const [clientName, setClientName] = useState<string>("");
   const [clientStats, setClientStats] = useState<any>(null);
   const [pricingDocUrl, setPricingDocUrl] = useState<string>("");
-  const [hasCheckedStatus, setHasCheckedStatus] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -44,14 +43,19 @@ const ClientDashboard = () => {
         setClientStats(data);
         setPricingDocUrl(data.pricing_document_url || "");
         
-        // Check if this is first login and status should be changed
-        if (!hasCheckedStatus && data.status === 'pending') {
-          // User has logged in, update status to active
-          await supabase
+        // Only update status once on first login using localStorage flag
+        const statusUpdateKey = `client_status_updated_${user?.id}`;
+        const hasUpdatedStatus = localStorage.getItem(statusUpdateKey);
+        
+        if (!hasUpdatedStatus && data.status === 'pending') {
+          const { error: updateError } = await supabase
             .from("clients")
             .update({ status: 'active' })
             .eq("user_id", user?.id);
-          setHasCheckedStatus(true);
+          
+          if (!updateError) {
+            localStorage.setItem(statusUpdateKey, 'true');
+          }
         }
       }
     } catch (error) {
