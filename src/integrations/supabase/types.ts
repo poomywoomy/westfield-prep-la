@@ -80,6 +80,7 @@ export type Database = {
           received_by: string | null
           ship_from: string | null
           status: Database["public"]["Enums"]["asn_status"] | null
+          template_id: string | null
           tracking_number: string | null
           updated_at: string
         }
@@ -97,6 +98,7 @@ export type Database = {
           received_by?: string | null
           ship_from?: string | null
           status?: Database["public"]["Enums"]["asn_status"] | null
+          template_id?: string | null
           tracking_number?: string | null
           updated_at?: string
         }
@@ -114,6 +116,7 @@ export type Database = {
           received_by?: string | null
           ship_from?: string | null
           status?: Database["public"]["Enums"]["asn_status"] | null
+          template_id?: string | null
           tracking_number?: string | null
           updated_at?: string
         }
@@ -123,6 +126,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asn_headers_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -276,6 +286,62 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      barcode_scans: {
+        Row: {
+          barcode_value: string
+          client_id: string | null
+          context_id: string | null
+          context_type: string | null
+          detected_type: string
+          device_type: string | null
+          id: string
+          matched_id: string | null
+          matched_table: string | null
+          scan_duration_ms: number | null
+          scan_result: string
+          scanned_at: string
+          user_id: string | null
+        }
+        Insert: {
+          barcode_value: string
+          client_id?: string | null
+          context_id?: string | null
+          context_type?: string | null
+          detected_type: string
+          device_type?: string | null
+          id?: string
+          matched_id?: string | null
+          matched_table?: string | null
+          scan_duration_ms?: number | null
+          scan_result: string
+          scanned_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          barcode_value?: string
+          client_id?: string | null
+          context_id?: string | null
+          context_type?: string | null
+          detected_type?: string
+          device_type?: string | null
+          id?: string
+          matched_id?: string | null
+          matched_table?: string | null
+          scan_duration_ms?: number | null
+          scan_result?: string
+          scanned_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barcode_scans_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bill_items: {
         Row: {
@@ -1668,6 +1734,95 @@ export type Database = {
             columns: ["shipment_id"]
             isOneToOne: false
             referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipment_template_lines: {
+        Row: {
+          created_at: string
+          expected_units: number
+          id: string
+          sku_id: string
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          expected_units: number
+          id?: string
+          sku_id: string
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          expected_units?: number
+          id?: string
+          sku_id?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_template_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipment_template_lines_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipment_templates: {
+        Row: {
+          carrier: string | null
+          client_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          last_used_at: string | null
+          notes: string | null
+          ship_from: string | null
+          template_name: string
+          updated_at: string
+          use_count: number
+        }
+        Insert: {
+          carrier?: string | null
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_used_at?: string | null
+          notes?: string | null
+          ship_from?: string | null
+          template_name: string
+          updated_at?: string
+          use_count?: number
+        }
+        Update: {
+          carrier?: string | null
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_used_at?: string | null
+          notes?: string | null
+          ship_from?: string | null
+          template_name?: string
+          updated_at?: string
+          use_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_templates_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]
