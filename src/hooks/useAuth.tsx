@@ -20,7 +20,14 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          fetchUserRole(session.user.id);
+          // Activate client on login and fetch role (deferred to avoid blocking)
+          setTimeout(async () => {
+            const { error } = await supabase.rpc('activate_client_on_login');
+            if (error && import.meta.env.DEV) {
+              console.error('Error activating client:', error);
+            }
+            fetchUserRole(session.user.id);
+          }, 0);
         } else {
           setRole(null);
           setLoading(false);
@@ -34,7 +41,14 @@ export const useAuth = () => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserRole(session.user.id);
+        // Activate client on initial load and fetch role (deferred to avoid blocking)
+        setTimeout(async () => {
+          const { error } = await supabase.rpc('activate_client_on_login');
+          if (error && import.meta.env.DEV) {
+            console.error('Error activating client:', error);
+          }
+          fetchUserRole(session.user.id);
+        }, 0);
       } else {
         setLoading(false);
       }

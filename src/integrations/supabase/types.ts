@@ -2307,6 +2307,10 @@ export type Database = {
       }
     }
     Functions: {
+      activate_client_on_login: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       cleanup_expired_attachments: {
         Args: Record<PropertyKey, never>
         Returns: number

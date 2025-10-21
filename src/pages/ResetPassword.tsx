@@ -79,6 +79,12 @@ const ResetPassword = () => {
 
       if (error) throw error;
 
+      // Activate client after successful password reset
+      const { error: activateError } = await supabase.rpc('activate_client_on_login');
+      if (activateError && import.meta.env.DEV) {
+        console.error('Error activating client:', activateError);
+      }
+
       toast({
         title: "Password updated successfully",
         description: "You can now log in with your new password.",
