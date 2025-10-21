@@ -384,8 +384,8 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
           </div>
           <BarcodeScanner
             onScan={handleBarcodeScan}
-            scanDelay={500}
-            defaultMode="keyboard"
+            mode="keyboard"
+            continuous={true}
           />
           {lastScanned && (
             <p className="text-sm mt-2 text-muted-foreground">{lastScanned}</p>

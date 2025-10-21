@@ -15,7 +15,7 @@ interface LookupRequest {
 interface LookupResponse {
   found: boolean;
   type: 'tracking' | 'product_upc' | 'product_ean' | 'product_fnsku' | 'product_client_sku' | 'unknown';
-  matched_table?: 'asn_headers' | 'skus';
+  matched_table?: 'asn_headers' | 'asn_lines' | 'skus';
   matched_id?: string;
   carrier?: string;
   data?: any;

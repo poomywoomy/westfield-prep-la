@@ -1304,41 +1304,6 @@ export type Database = {
           },
         ]
       }
-      prep_tasks: {
-        Row: {
-          created_at: string
-          id: string
-          prepped_qty: number
-          shipment_item_id: string
-          status: Database["public"]["Enums"]["prep_status"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          prepped_qty?: number
-          shipment_item_id: string
-          status?: Database["public"]["Enums"]["prep_status"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          prepped_qty?: number
-          shipment_item_id?: string
-          status?: Database["public"]["Enums"]["prep_status"]
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "prep_tasks_shipment_item_id_fkey"
-            columns: ["shipment_item_id"]
-            isOneToOne: false
-            referencedRelation: "shipment_items"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       price_changes: {
         Row: {
           actor_id: string | null
@@ -1561,95 +1526,6 @@ export type Database = {
         }
         Relationships: []
       }
-      receiving_items: {
-        Row: {
-          created_at: string
-          damaged_qty: number
-          expected_qty: number
-          id: string
-          missing_qty: number
-          notes: string | null
-          received_qty: number
-          receiving_id: string
-          sku: string
-        }
-        Insert: {
-          created_at?: string
-          damaged_qty?: number
-          expected_qty?: number
-          id?: string
-          missing_qty?: number
-          notes?: string | null
-          received_qty?: number
-          receiving_id: string
-          sku: string
-        }
-        Update: {
-          created_at?: string
-          damaged_qty?: number
-          expected_qty?: number
-          id?: string
-          missing_qty?: number
-          notes?: string | null
-          received_qty?: number
-          receiving_id?: string
-          sku?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "receiving_items_receiving_id_fkey"
-            columns: ["receiving_id"]
-            isOneToOne: false
-            referencedRelation: "receivings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      receivings: {
-        Row: {
-          client_id: string
-          created_at: string
-          id: string
-          quote_id: string | null
-          received_at: string
-          received_by: string | null
-          shipment_ref: string
-        }
-        Insert: {
-          client_id: string
-          created_at?: string
-          id?: string
-          quote_id?: string | null
-          received_at?: string
-          received_by?: string | null
-          shipment_ref: string
-        }
-        Update: {
-          client_id?: string
-          created_at?: string
-          id?: string
-          quote_id?: string | null
-          received_at?: string
-          received_by?: string | null
-          shipment_ref?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "receivings_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "receivings_quote_id_fkey"
-            columns: ["quote_id"]
-            isOneToOne: false
-            referencedRelation: "quotes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       report_jobs: {
         Row: {
           client_id: string
@@ -1687,53 +1563,6 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      shipment_items: {
-        Row: {
-          created_at: string
-          damaged_qty: number
-          expected_qty: number
-          id: string
-          missing_qty: number
-          product_name: string | null
-          received_qty: number
-          shipment_id: string
-          sku: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          damaged_qty?: number
-          expected_qty?: number
-          id?: string
-          missing_qty?: number
-          product_name?: string | null
-          received_qty?: number
-          shipment_id: string
-          sku: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          damaged_qty?: number
-          expected_qty?: number
-          id?: string
-          missing_qty?: number
-          product_name?: string | null
-          received_qty?: number
-          shipment_id?: string
-          sku?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shipment_items_shipment_id_fkey"
-            columns: ["shipment_id"]
-            isOneToOne: false
-            referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
         ]
@@ -1820,41 +1649,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "shipment_templates_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      shipments: {
-        Row: {
-          client_id: string
-          created_at: string
-          id: string
-          received_at: string
-          shipment_ref: string
-          updated_at: string
-        }
-        Insert: {
-          client_id: string
-          created_at?: string
-          id?: string
-          received_at?: string
-          shipment_ref: string
-          updated_at?: string
-        }
-        Update: {
-          client_id?: string
-          created_at?: string
-          id?: string
-          received_at?: string
-          shipment_ref?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shipments_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
