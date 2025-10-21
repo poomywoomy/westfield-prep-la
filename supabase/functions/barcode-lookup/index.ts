@@ -8,6 +8,7 @@ interface LookupRequest {
   barcode: string;
   client_id?: string;
   context?: 'receiving' | 'adjustment' | 'lookup' | 'asn_creation';
+  asn_id?: string;
   user_id?: string;
 }
 
@@ -88,7 +89,7 @@ Deno.serve(async (req) => {
 
     // Parse request body
     const body: LookupRequest = await req.json();
-    const { barcode, client_id, context = 'lookup' } = body;
+    const { barcode, client_id, context = 'lookup', asn_id } = body;
 
     if (!barcode || barcode.trim().length === 0) {
       return new Response(
@@ -112,8 +113,73 @@ Deno.serve(async (req) => {
 
     const startTime = Date.now();
 
+    // Special handling for receiving context with asn_id
+    if (context === 'receiving' && asn_id && detectedType.startsWith('product_')) {
+      // Search within specific ASN's line items
+      const { data: asnLines, error: asnError } = await supabase
+        .from('asn_lines')
+        .select(`
+          id,
+          expected_units,
+          received_units,
+          normal_units,
+          damaged_units,
+          quarantined_units,
+          missing_units,
+          lot_number,
+          expiry_date,
+          notes,
+          skus!inner (
+            id,
+            client_sku,
+            title,
+            brand,
+            upc,
+            ean,
+            fnsku,
+            asin,
+            has_lot_tracking,
+            has_expiration,
+            status
+          )
+        `)
+        .eq('asn_id', asn_id)
+        .or(`skus.upc.eq.${normalizedBarcode},skus.ean.eq.${normalizedBarcode},skus.fnsku.eq.${normalizedBarcode},skus.asin.eq.${normalizedBarcode},skus.client_sku.ilike.${normalizedBarcode}`);
+
+      if (asnLines && asnLines.length > 0 && !asnError) {
+        const matchedLine = asnLines[0];
+        const sku = matchedLine.skus as any;
+        
+        // Determine specific match type
+        let specificType: any = 'product_upc';
+        if (sku.upc === normalizedBarcode) specificType = 'product_upc';
+        else if (sku.ean === normalizedBarcode) specificType = 'product_ean';
+        else if (sku.fnsku === normalizedBarcode) specificType = 'product_fnsku';
+        else if (sku.client_sku?.toUpperCase() === normalizedBarcode) specificType = 'product_client_sku';
+
+        response = {
+          found: true,
+          type: specificType,
+          matched_table: 'asn_lines',
+          matched_id: matchedLine.id,
+          data: {
+            line_id: matchedLine.id,
+            expected_units: matchedLine.expected_units,
+            received_units: matchedLine.received_units,
+            remaining_units: matchedLine.expected_units - matchedLine.received_units,
+            normal_units: matchedLine.normal_units,
+            damaged_units: matchedLine.damaged_units,
+            quarantined_units: matchedLine.quarantined_units,
+            missing_units: matchedLine.missing_units,
+            lot_number: matchedLine.lot_number,
+            expiry_date: matchedLine.expiry_date,
+            sku: sku
+          }
+        };
+      }
+    }
     // Search based on detected type
-    if (detectedType === 'tracking') {
+    else if (detectedType === 'tracking') {
       // Search ASN headers with full details including lines
       let query = supabase
         .from('asn_headers')

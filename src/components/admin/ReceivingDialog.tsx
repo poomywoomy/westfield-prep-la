@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Plus } from "lucide-react";
+import { Camera, Pause, Play, Scan } from "lucide-react";
 import { z } from "zod";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { playSuccessSound, playErrorSound } from "@/lib/soundEffects";
+import { Progress } from "@/components/ui/progress";
 import type { Database } from "@/integrations/supabase/types";
 
 type ASNHeader = Database["public"]["Tables"]["asn_headers"]["Row"];
@@ -51,7 +54,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
   const [lines, setLines] = useState<LineReceiving[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [scannerActive, setScannerActive] = useState(true);
+  const [highlightedLine, setHighlightedLine] = useState<number | null>(null);
+  const [lastScanned, setLastScanned] = useState<string>("");
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open && asn) {
@@ -111,6 +118,125 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
     if (variance > 0) return "secondary";
     return "destructive";
   };
+
+  const handleBarcodeScan = async (barcode: string, format: string) => {
+    if (!scannerActive || !asn) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('barcode-lookup', {
+        body: {
+          barcode,
+          client_id: asn.client_id,
+          context: 'receiving',
+          asn_id: asn.id
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.found && data.matched_table === 'asn_lines') {
+        const lineIndex = lines.findIndex(l => l.line_id === data.matched_id);
+        
+        if (lineIndex >= 0) {
+          const currentLine = lines[lineIndex];
+          
+          updateLine(lineIndex, 'received_units', currentLine.received_units + 1);
+          updateLine(lineIndex, 'normal_units', currentLine.normal_units + 1);
+          
+          playSuccessSound();
+          setLastScanned(`✓ ${currentLine.sku.client_sku} - Qty: ${currentLine.received_units + 1}`);
+          setCurrentLineIndex(lineIndex);
+          
+          toast({
+            title: "✓ Scanned",
+            description: `${currentLine.sku.client_sku} - Qty: ${currentLine.received_units + 1}`,
+            duration: 2000
+          });
+          
+          setHighlightedLine(lineIndex);
+          setTimeout(() => setHighlightedLine(null), 1500);
+        }
+      } else {
+        playErrorSound();
+        setLastScanned(`❌ ${barcode} not found in ASN`);
+        
+        toast({
+          title: "❌ Not Found",
+          description: `Barcode ${barcode} is not in this ASN`,
+          variant: "destructive",
+          duration: 3000
+        });
+      }
+    } catch (error: any) {
+      playErrorSound();
+      toast({
+        title: "Scan Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !asn) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${asn.id}_${currentLine.line_id}_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('asn-attachments')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('asn-attachments')
+        .getPublicUrl(filePath);
+
+      await supabase
+        .from('attachments')
+        .insert({
+          owner_type: 'asn_line',
+          owner_id: currentLine.line_id,
+          filename: file.name,
+          file_url: publicUrl,
+          mime_type: file.type,
+          file_size: file.size
+        });
+
+      toast({
+        title: "Photo Captured",
+        description: "QC photo saved successfully"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Upload Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleQuickCompleteAll = () => {
+    const updated = lines.map(line => ({
+      ...line,
+      received_units: line.expected,
+      normal_units: line.expected
+    }));
+    setLines(updated);
+    
+    toast({
+      title: "All Items Completed",
+      description: "All quantities set to expected"
+    });
+  };
+
+  const totalExpected = lines.reduce((sum, l) => sum + l.expected, 0);
+  const totalReceived = lines.reduce((sum, l) => sum + l.received_units, 0);
+  const progressPercent = totalExpected > 0 ? (totalReceived / totalExpected) * 100 : 0;
 
   const currentLine = lines[currentLineIndex];
 
@@ -232,46 +358,91 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            Receiving: {asn?.asn_number}
-            <span className="ml-4 text-sm font-normal text-muted-foreground">
-              Line {currentLineIndex + 1} of {lines.length}
-            </span>
+          <DialogTitle className="flex items-center justify-between">
+            <span>Receiving: {asn?.asn_number}</span>
+            <Badge variant={scannerActive ? "default" : "secondary"}>
+              {scannerActive ? "🟢 Scanner Active" : "⚫ Scanner Paused"}
+            </Badge>
           </DialogTitle>
         </DialogHeader>
+
+        {/* Barcode Scanner Section */}
+        <div className="border rounded-lg p-4 bg-muted/50">
+          <div className="flex items-center gap-4 mb-2">
+            <Scan className="h-5 w-5" />
+            <Label className="font-semibold">Barcode Scanner</Label>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setScannerActive(!scannerActive)}
+            >
+              {scannerActive ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+              {scannerActive ? "Pause" : "Resume"}
+            </Button>
+          </div>
+          <BarcodeScanner
+            onScan={handleBarcodeScan}
+            scanDelay={500}
+            defaultMode="keyboard"
+          />
+          {lastScanned && (
+            <p className="text-sm mt-2 text-muted-foreground">{lastScanned}</p>
+          )}
+        </div>
+
+        {/* Progress Bar */}
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>Progress: {totalReceived} / {totalExpected} units</span>
+            <span>{progressPercent.toFixed(0)}%</span>
+          </div>
+          <Progress value={progressPercent} />
+        </div>
 
         <div className="grid grid-cols-2 gap-6">
           {/* Expected Items (Left) */}
           <div className="space-y-4">
             <h3 className="font-semibold">Expected Items</h3>
-            <div className="border rounded-lg divide-y">
-              {lines.map((line, index) => (
-                <div
-                  key={line.line_id}
-                  className={`p-3 cursor-pointer transition-colors ${
-                    index === currentLineIndex ? "bg-accent" : "hover:bg-muted"
-                  }`}
-                  onClick={() => setCurrentLineIndex(index)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{line.sku.client_sku}</p>
-                      <p className="text-sm text-muted-foreground truncate">{line.sku.title}</p>
-                    </div>
-                    <div className="ml-2 text-right">
-                      <p className="text-sm font-medium">Expected: {line.expected}</p>
-                      {line.received_units > 0 && (
-                        <Badge variant={getVarianceColor(getVariance(line))} className="mt-1">
-                          {getVariance(line) > 0 && "+"}
-                          {getVariance(line)}
-                        </Badge>
-                      )}
+            <div className="border rounded-lg divide-y max-h-[400px] overflow-y-auto">
+              {lines.map((line, index) => {
+                const isComplete = line.received_units >= line.expected;
+                const isHighlighted = highlightedLine === index;
+                
+                return (
+                  <div
+                    key={line.line_id}
+                    className={`p-3 cursor-pointer transition-all duration-300 ${
+                      isHighlighted ? "bg-green-500/20 animate-pulse" :
+                      index === currentLineIndex ? "bg-accent" :
+                      isComplete ? "bg-green-500/10" :
+                      "hover:bg-muted"
+                    }`}
+                    onClick={() => setCurrentLineIndex(index)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate flex items-center gap-2">
+                          {isComplete && "✓"} {line.sku.client_sku}
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">{line.sku.title}</p>
+                      </div>
+                      <div className="ml-2 text-right">
+                        <p className="text-sm font-medium">
+                          {line.received_units}/{line.expected}
+                        </p>
+                        {line.received_units > 0 && (
+                          <Badge variant={getVarianceColor(getVariance(line))} className="mt-1">
+                            {getVariance(line) > 0 && "+"}
+                            {getVariance(line)}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -391,10 +562,32 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                 id="notes"
                 value={currentLine.notes}
                 onChange={e => updateLine(currentLineIndex, "notes", e.target.value)}
-                rows={3}
+                rows={2}
                 maxLength={2000}
                 className="resize-none"
               />
+            </div>
+
+            {/* QC Photo Capture */}
+            <div className="space-y-2">
+              <Label>QC Photos</Label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handlePhotoCapture}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Camera className="h-4 w-4 mr-2" />
+                Capture Photo
+              </Button>
             </div>
           </div>
         </div>
@@ -406,6 +599,9 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
             </Button>
             <Button variant="outline" onClick={handleNext} disabled={currentLineIndex === lines.length - 1}>
               Next
+            </Button>
+            <Button variant="secondary" onClick={handleQuickCompleteAll}>
+              Quick Complete All
             </Button>
           </div>
           <div className="flex gap-2">
