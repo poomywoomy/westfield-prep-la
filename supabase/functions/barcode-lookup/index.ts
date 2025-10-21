@@ -178,6 +178,45 @@ Deno.serve(async (req) => {
         };
       }
     }
+    // Adjustment context: return current inventory levels
+    else if (context === 'adjustment' && client_id && detectedType.startsWith('product_')) {
+      const { data: skuMatch } = await supabase
+        .from('skus')
+        .select('*')
+        .eq('client_id', client_id)
+        .eq('status', 'active')
+        .or(`upc.eq.${normalizedBarcode},ean.eq.${normalizedBarcode},fnsku.eq.${normalizedBarcode},asin.eq.${normalizedBarcode},client_sku.ilike.${normalizedBarcode}`)
+        .maybeSingle();
+
+      if (skuMatch) {
+        // Get current inventory level from most recent ledger entry
+        const { data: inventory } = await supabase
+          .from('inventory_ledger')
+          .select('qty_after, location_id')
+          .eq('sku_id', skuMatch.id)
+          .order('ts', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        let specificType: any = 'product_upc';
+        if (skuMatch.upc === normalizedBarcode) specificType = 'product_upc';
+        else if (skuMatch.ean === normalizedBarcode) specificType = 'product_ean';
+        else if (skuMatch.fnsku === normalizedBarcode) specificType = 'product_fnsku';
+        else if (skuMatch.client_sku?.toUpperCase() === normalizedBarcode) specificType = 'product_client_sku';
+
+        response = {
+          found: true,
+          type: specificType,
+          matched_table: 'skus',
+          matched_id: skuMatch.id,
+          data: {
+            sku: skuMatch,
+            current_qty: inventory?.qty_after || 0,
+            location_id: inventory?.location_id || null
+          }
+        };
+      }
+    }
     // Search based on detected type
     else if (detectedType === 'tracking') {
       // Search ASN headers with full details including lines

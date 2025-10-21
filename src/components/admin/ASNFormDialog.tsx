@@ -13,6 +13,7 @@ import { validateImageFile } from "@/lib/fileValidation";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { ShipmentTemplateDialog } from "./ShipmentTemplateDialog";
 import { QuickAddSKUModal } from "./QuickAddSKUModal";
+import { TemplateSelector } from "./TemplateSelector";
 import type { Database } from "@/integrations/supabase/types";
 
 type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -516,6 +517,50 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
               </div>
             </div>
           </div>
+
+          {/* Template Loader */}
+          {formData.client_id && !asnId && (
+            <div className="space-y-2 p-4 bg-muted/30 rounded-lg">
+              <Label>Load from Template (optional)</Label>
+              <TemplateSelector
+                clientId={formData.client_id}
+                onSelect={async (template) => {
+                  // Update last_used_at and use_count
+                  await supabase
+                    .from('shipment_templates')
+                    .update({
+                      last_used_at: new Date().toISOString(),
+                      use_count: (template.use_count || 0) + 1
+                    })
+                    .eq('id', template.id);
+
+                  // Populate form with template data
+                  setFormData({
+                    ...formData,
+                    carrier: template.carrier || '',
+                    ship_from: template.ship_from || '',
+                    notes: template.notes || ''
+                  });
+
+                  // Populate line items
+                  if (template.shipment_template_lines) {
+                    setLines(template.shipment_template_lines.map((line: any) => ({
+                      sku_id: line.sku_id,
+                      expected_units: line.expected_units
+                    })));
+                  }
+
+                  toast({
+                    title: "Template loaded",
+                    description: `"${template.template_name}" applied successfully`
+                  });
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Quickly create ASN from previously saved template
+              </p>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

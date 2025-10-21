@@ -10,8 +10,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Camera, X, Scan, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { playSuccessSound, playErrorSound } from "@/lib/soundEffects";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 
 const adjustmentSchema = z.object({
   client_id: z.string().uuid(),
@@ -30,11 +34,26 @@ interface InventoryAdjustmentDialogProps {
   onSuccess: () => void;
 }
 
+interface BatchItem {
+  sku_id: string;
+  sku_code: string;
+  title: string;
+  qty_delta: number;
+  location_id: string;
+  notes: string;
+}
+
 export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: InventoryAdjustmentDialogProps) => {
   const [clients, setClients] = useState<any[]>([]);
   const [skus, setSKUs] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [scannerActive, setScannerActive] = useState(false);
+  const [batchMode, setBatchMode] = useState(false);
+  const [batchItems, setBatchItems] = useState<BatchItem[]>([]);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [currentInventory, setCurrentInventory] = useState<{ qty: number; location: string } | null>(null);
   const [formData, setFormData] = useState({
     client_id: "",
     sku_id: "",
@@ -153,6 +172,116 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
     }
   };
 
+  const handleBarcodeScan = async (barcode: string) => {
+    if (!formData.client_id) {
+      toast({ title: "Please select a client first", variant: "destructive" });
+      return;
+    }
+
+    const { data } = await supabase.functions.invoke('barcode-lookup', {
+      body: {
+        barcode,
+        client_id: formData.client_id,
+        context: 'adjustment'
+      }
+    });
+
+    if (data?.found && data.type.startsWith('product_')) {
+      const sku = data.data.sku || data.data;
+      setFormData({ ...formData, sku_id: sku.id, location_id: data.data.location_id || formData.location_id });
+      setCurrentInventory({ qty: data.data.current_qty || 0, location: data.data.location_id || '' });
+      playSuccessSound();
+      toast({ title: "SKU Found", description: `${sku.client_sku} - ${sku.title}` });
+    } else {
+      playErrorSound();
+      toast({ title: "Not Found", description: "Barcode not recognized", variant: "destructive" });
+    }
+  };
+
+  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setPhotos([...photos, ...files]);
+    
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos(photos.filter((_, i) => i !== index));
+    setPhotoPreviews(photoPreviews.filter((_, i) => i !== index));
+  };
+
+  const addToBatch = () => {
+    if (!formData.sku_id) return;
+    
+    const sku = skus.find(s => s.id === formData.sku_id);
+    if (!sku) return;
+
+    setBatchItems([...batchItems, {
+      sku_id: formData.sku_id,
+      sku_code: sku.client_sku,
+      title: sku.title,
+      qty_delta: parseInt(formData.qty_delta) || 0,
+      location_id: formData.location_id,
+      notes: formData.notes
+    }]);
+
+    // Reset for next scan
+    setFormData({ ...formData, sku_id: "", qty_delta: "", notes: "" });
+    setCurrentInventory(null);
+    toast({ title: "Added to batch", description: `${sku.client_sku} queued` });
+  };
+
+  const removeBatchItem = (index: number) => {
+    setBatchItems(batchItems.filter((_, i) => i !== index));
+  };
+
+  const submitBatchAdjustments = async () => {
+    if (batchItems.length === 0) return;
+    
+    setLoading(true);
+    try {
+      const entries = batchItems.map(item => ({
+        client_id: formData.client_id,
+        sku_id: item.sku_id,
+        location_id: item.location_id,
+        qty_delta: item.qty_delta,
+        transaction_type: item.qty_delta > 0 ? "ADJUSTMENT_PLUS" : "ADJUSTMENT_MINUS",
+        reason_code: formData.reason_code,
+        notes: item.notes,
+        lot_number: formData.lot_number || null,
+        expiry_date: formData.expiry_date ? format(formData.expiry_date, "yyyy-MM-dd") : null,
+      }));
+
+      const { error } = await supabase.from("inventory_ledger").insert(entries);
+      if (error) throw error;
+
+      toast({ title: "Batch complete", description: `${batchItems.length} adjustments recorded` });
+      setBatchItems([]);
+      onSuccess();
+      onOpenChange(false);
+      resetForm();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const applyPreset = (preset: 'cycle_count' | 'damage' | 'shrink') => {
+    setFormData({ ...formData, reason_code: preset });
+    if (preset === 'cycle_count') {
+      setBatchMode(true);
+      setScannerActive(true);
+    }
+    toast({ title: `${preset.replace('_', ' ')} mode activated` });
+  };
+
   const resetForm = () => {
     setFormData({
       client_id: "",
@@ -164,16 +293,74 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
       lot_number: "",
       expiry_date: null,
     });
+    setBatchMode(false);
+    setBatchItems([]);
+    setPhotos([]);
+    setPhotoPreviews([]);
+    setCurrentInventory(null);
+    setScannerActive(false);
   };
+
+  const showPhotoCapture = formData.reason_code === 'damage' || formData.reason_code === 'shrink';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Record Inventory Adjustment</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Quick Presets */}
+          <div className="flex gap-2 p-3 bg-muted/30 rounded-lg">
+            <Button variant="outline" size="sm" onClick={() => applyPreset('cycle_count')}>
+              📊 Cycle Count
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => applyPreset('damage')}>
+              📸 Damage Report
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => applyPreset('shrink')}>
+              ⚠️ Shrinkage
+            </Button>
+          </div>
+
+          {/* Batch Mode Toggle */}
+          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+            <div className="flex items-center gap-2">
+              <Switch checked={batchMode} onCheckedChange={setBatchMode} />
+              <Label>Batch Mode (scan multiple items)</Label>
+            </div>
+            {batchMode && <Badge variant="secondary">{batchItems.length} items queued</Badge>}
+          </div>
+
+          {/* Scanner Section */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>Barcode Scanner</Label>
+              <Button
+                variant={scannerActive ? "default" : "outline"}
+                size="sm"
+                onClick={() => setScannerActive(!scannerActive)}
+              >
+                <Scan className="mr-2 h-4 w-4" />
+                {scannerActive ? "Pause Scanner" : "Start Scanner"}
+              </Button>
+            </div>
+            {scannerActive && (
+              <BarcodeScanner
+                mode="keyboard"
+                onScan={handleBarcodeScan}
+                onError={(error) => toast({ title: "Scan error", description: error, variant: "destructive" })}
+                placeholder="Scan product barcode..."
+                continuous={batchMode}
+              />
+            )}
+            {currentInventory && (
+              <div className="p-2 bg-primary/10 rounded text-sm">
+                Current inventory: <strong>{currentInventory.qty} units</strong>
+              </div>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="client">Client *</Label>
@@ -316,15 +503,101 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
               </Popover>
             </div>
           </div>
+
+          {/* Photo Evidence for Damage/Shrink */}
+          {showPhotoCapture && (
+            <div className="space-y-2 p-3 border-2 border-dashed rounded-lg">
+              <Label>Photo Evidence</Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById('photo-input')?.click()}
+                >
+                  <Camera className="mr-2 h-4 w-4" />
+                  Add Photos
+                </Button>
+                <input
+                  id="photo-input"
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  multiple
+                  className="hidden"
+                  onChange={handlePhotoCapture}
+                />
+                <span className="text-xs text-muted-foreground">{photos.length} photos attached</span>
+              </div>
+              {photoPreviews.length > 0 && (
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                  {photoPreviews.map((preview, idx) => (
+                    <div key={idx} className="relative group">
+                      <img src={preview} alt={`Photo ${idx + 1}`} className="w-full h-20 object-cover rounded" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100"
+                        onClick={() => removePhoto(idx)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Batch Items Queue */}
+          {batchMode && batchItems.length > 0 && (
+            <div className="space-y-2 p-3 border rounded-lg bg-muted/20">
+              <Label>Batch Queue ({batchItems.length} items)</Label>
+              <div className="space-y-1 max-h-40 overflow-y-auto">
+                {batchItems.map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2 bg-background rounded text-sm">
+                    <span>{item.sku_code} - {item.title}</span>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={item.qty_delta > 0 ? "default" : "destructive"}>
+                        {item.qty_delta > 0 ? '+' : ''}{item.qty_delta}
+                      </Badge>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => removeBatchItem(idx)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Recording..." : "Record Adjustment"}
-          </Button>
+          {batchMode && batchItems.length > 0 ? (
+            <>
+              <Button variant="secondary" onClick={addToBatch} disabled={loading || !formData.sku_id}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add to Batch
+              </Button>
+              <Button onClick={submitBatchAdjustments} disabled={loading}>
+                {loading ? "Submitting..." : `Submit All (${batchItems.length})`}
+              </Button>
+            </>
+          ) : (
+            <Button onClick={handleSubmit} disabled={loading}>
+              {loading ? "Recording..." : "Record Adjustment"}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
