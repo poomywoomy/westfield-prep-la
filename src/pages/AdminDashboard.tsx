@@ -75,7 +75,7 @@ const AdminDashboard = () => {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link to="/">
+            <Link to="/admin/dashboard">
               <img src={westfieldLogo} alt="Westfield Logo" className="h-10 cursor-pointer" />
             </Link>
             <h1 className="text-2xl font-bold">Admin Dashboard</h1>
