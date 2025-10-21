@@ -190,7 +190,6 @@ Deno.serve(async (req) => {
           }
         };
       }
-      }
     }
     // Adjustment context: return current inventory levels
     else if (context === 'adjustment' && client_id && detectedType.startsWith('product_')) {

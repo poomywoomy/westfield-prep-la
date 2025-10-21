@@ -42,6 +42,28 @@ export default function ClientProductsTab() {
   useEffect(() => {
     if (user) {
       fetchProducts();
+      
+      // Subscribe to real-time inventory updates
+      const channel = supabase
+        .channel('inventory_updates')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'inventory_ledger'
+          },
+          (payload) => {
+            console.log('Inventory update received:', payload);
+            // Refetch products when inventory changes
+            fetchProducts();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
 

@@ -7,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Settings, Package } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { ASNFormDialog } from "./ASNFormDialog";
 import { ReceivingDialog } from "./ReceivingDialog";
+import { TemplateManagementDialog } from "./TemplateManagementDialog";
 
 type ASN = Database["public"]["Tables"]["asn_headers"]["Row"];
 type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -27,6 +28,7 @@ export const ASNList = () => {
   const [editingASNId, setEditingASNId] = useState<string | undefined>(undefined);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [asnToDelete, setAsnToDelete] = useState<ASN | null>(null);
+  const [showTemplates, setShowTemplates] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -191,10 +193,20 @@ export const ASNList = () => {
             />
           </div>
         </div>
-        <Button onClick={() => setCreateDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create ASN
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowTemplates(true)}
+            disabled={!selectedClient || selectedClient === 'all'}
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            Manage Templates
+          </Button>
+          <Button onClick={() => setCreateDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create ASN
+          </Button>
+        </div>
       </div>
 
       <ASNFormDialog
@@ -326,6 +338,12 @@ export const ASNList = () => {
           </TableBody>
         </Table>
       </div>
+
+      <TemplateManagementDialog 
+        open={showTemplates} 
+        onOpenChange={setShowTemplates}
+        clientId={selectedClient === 'all' ? '' : selectedClient}
+      />
     </div>
   );
 };

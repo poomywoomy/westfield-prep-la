@@ -18,9 +18,11 @@ interface SKUFormDialogProps {
   onClose: () => void;
   sku: SKU | null;
   clients: Client[];
+  isClientView?: boolean;
+  presetClientId?: string;
 }
 
-export const SKUFormDialog = ({ open, onClose, sku, clients }: SKUFormDialogProps) => {
+export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = false, presetClientId }: SKUFormDialogProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   
@@ -67,7 +69,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients }: SKUFormDialogProp
       });
     } else {
       setFormData({
-        client_id: "",
+        client_id: presetClientId || "",
         client_sku: "",
         fnsku: "",
         asin: "",
@@ -141,25 +143,27 @@ export const SKUFormDialog = ({ open, onClose, sku, clients }: SKUFormDialogProp
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="client_id">Client *</Label>
-              <Select
-                value={formData.client_id}
-                onValueChange={(value) => setFormData({ ...formData, client_id: value })}
-                disabled={!!sku}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select client" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map(client => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.company_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {!isClientView && (
+              <div className="space-y-2">
+                <Label htmlFor="client_id">Client *</Label>
+                <Select
+                  value={formData.client_id}
+                  onValueChange={(value) => setFormData({ ...formData, client_id: value })}
+                  disabled={!!sku || !!presetClientId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clients.map(client => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.company_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="client_sku">Client SKU *</Label>
@@ -228,16 +232,18 @@ export const SKUFormDialog = ({ open, onClose, sku, clients }: SKUFormDialogProp
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="unit_cost">Unit Cost</Label>
-              <Input
-                id="unit_cost"
-                type="number"
-                step="0.01"
-                value={formData.unit_cost}
-                onChange={(e) => setFormData({ ...formData, unit_cost: e.target.value })}
-              />
-            </div>
+            {!isClientView && (
+              <div className="space-y-2">
+                <Label htmlFor="unit_cost">Unit Cost</Label>
+                <Input
+                  id="unit_cost"
+                  type="number"
+                  step="0.01"
+                  value={formData.unit_cost}
+                  onChange={(e) => setFormData({ ...formData, unit_cost: e.target.value })}
+                />
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-4 gap-4">

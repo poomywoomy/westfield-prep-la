@@ -15,6 +15,8 @@ import ClientProductsTab from "@/components/client/ClientProductsTab";
 import ClientOrdersTab from "@/components/client/ClientOrdersTab";
 import ClientShopifyTab from "@/components/client/ClientShopifyTab";
 import { sanitizeError } from "@/lib/errorHandler";
+import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
+import type { Database } from "@/integrations/supabase/types";
 
 const ClientDashboard = () => {
   const { user, role, loading } = useAuth();
@@ -23,6 +25,8 @@ const ClientDashboard = () => {
   const [clientName, setClientName] = useState<string>("");
   const [clientStats, setClientStats] = useState<any>(null);
   const [pricingDocUrl, setPricingDocUrl] = useState<string>("");
+  const [clientId, setClientId] = useState<string>("");
+  const [showSKUDialog, setShowSKUDialog] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -34,11 +38,12 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, storage_method, fulfillment_services, status, pricing_document_url")
+        .select("id, contact_name, estimated_units_per_month, receiving_format, extra_prep, storage, storage_units_per_month, storage_method, fulfillment_services, status, pricing_document_url")
         .eq("user_id", user?.id)
         .single();
 
       if (!error && data) {
+        setClientId(data.id);
         setClientName(data.contact_name);
         setClientStats(data);
         setPricingDocUrl(data.pricing_document_url || "");
@@ -284,7 +289,15 @@ const ClientDashboard = () => {
           </TabsList>
 
           <TabsContent value="products">
-            <ClientProductsTab />
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <Button onClick={() => setShowSKUDialog(true)}>
+                  <Package className="mr-2 h-4 w-4" />
+                  Create SKU
+                </Button>
+              </div>
+              <ClientProductsTab />
+            </div>
           </TabsContent>
 
           <TabsContent value="orders">
@@ -300,6 +313,15 @@ const ClientDashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      <SKUFormDialog 
+        open={showSKUDialog}
+        onClose={() => setShowSKUDialog(false)}
+        sku={null}
+        clients={[]}
+        isClientView={true}
+        presetClientId={clientId}
+      />
     </div>
   );
 };

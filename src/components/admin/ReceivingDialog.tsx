@@ -7,11 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Pause, Play, Scan } from "lucide-react";
+import { Camera, Pause, Play, Scan, X } from "lucide-react";
 import { z } from "zod";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { playSuccessSound, playErrorSound } from "@/lib/soundEffects";
 import { Progress } from "@/components/ui/progress";
+import { ScannerStatus } from "@/components/ScannerStatus";
+import { ScannerHelpDialog } from "@/components/admin/ScannerHelpDialog";
 import type { Database } from "@/integrations/supabase/types";
 
 type ASNHeader = Database["public"]["Tables"]["asn_headers"]["Row"];
@@ -57,6 +59,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
   const [scannerActive, setScannerActive] = useState(true);
   const [highlightedLine, setHighlightedLine] = useState<number | null>(null);
   const [lastScanned, setLastScanned] = useState<string>("");
+  const [showHelp, setShowHelp] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -360,12 +363,24 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>Receiving: {asn?.asn_number}</span>
-            <Badge variant={scannerActive ? "default" : "secondary"}>
-              {scannerActive ? "🟢 Scanner Active" : "⚫ Scanner Paused"}
-            </Badge>
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>Receiving: {asn?.asn_number}</DialogTitle>
+            <div className="flex items-center gap-2">
+              <ScannerStatus 
+                isActive={scannerActive} 
+                mode="keyboard" 
+                onHelpClick={() => setShowHelp(true)} 
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setScannerActive(!scannerActive)}
+              >
+                {scannerActive ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+                {scannerActive ? "Pause" : "Resume"}
+              </Button>
+            </div>
+          </div>
         </DialogHeader>
 
         {/* Barcode Scanner Section */}
@@ -614,6 +629,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
           </div>
         </DialogFooter>
       </DialogContent>
+      <ScannerHelpDialog open={showHelp} onOpenChange={setShowHelp} />
     </Dialog>
   );
 };

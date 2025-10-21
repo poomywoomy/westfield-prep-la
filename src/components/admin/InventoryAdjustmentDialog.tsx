@@ -16,6 +16,8 @@ import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { playSuccessSound, playErrorSound } from "@/lib/soundEffects";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { ScannerStatus } from "@/components/ScannerStatus";
+import { ScannerHelpDialog } from "@/components/admin/ScannerHelpDialog";
 
 const adjustmentSchema = z.object({
   client_id: z.string().uuid(),
@@ -54,6 +56,7 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [currentInventory, setCurrentInventory] = useState<{ qty: number; location: string } | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
   const [formData, setFormData] = useState({
     client_id: "",
     sku_id: "",
@@ -336,15 +339,25 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
           {/* Scanner Section */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>Barcode Scanner</Label>
-              <Button
-                variant={scannerActive ? "default" : "outline"}
-                size="sm"
-                onClick={() => setScannerActive(!scannerActive)}
-              >
-                <Scan className="mr-2 h-4 w-4" />
-                {scannerActive ? "Pause Scanner" : "Start Scanner"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Scan className="h-5 w-5" />
+                <Label>Barcode Scanner</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <ScannerStatus 
+                  isActive={scannerActive} 
+                  mode="keyboard" 
+                  onHelpClick={() => setShowHelp(true)} 
+                />
+                <Button
+                  variant={scannerActive ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setScannerActive(!scannerActive)}
+                >
+                  <Scan className="mr-2 h-4 w-4" />
+                  {scannerActive ? "Pause Scanner" : "Start Scanner"}
+                </Button>
+              </div>
             </div>
             {scannerActive && (
               <BarcodeScanner
@@ -600,6 +613,7 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
           )}
         </DialogFooter>
       </DialogContent>
+      <ScannerHelpDialog open={showHelp} onOpenChange={setShowHelp} />
     </Dialog>
   );
 };
