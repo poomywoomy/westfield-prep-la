@@ -6,7 +6,6 @@ import { SKUList } from "./SKUList";
 import { ASNList } from "./ASNList";
 import { InventorySummary } from "./InventorySummary";
 import { InventoryAdjustmentsList } from "./InventoryAdjustmentsList";
-import { InventoryAdjustmentDialog } from "./InventoryAdjustmentDialog";
 import { QuickScanModal } from "./QuickScanModal";
 import { useToast } from "@/hooks/use-toast";
 

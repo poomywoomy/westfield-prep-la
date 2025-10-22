@@ -21,9 +21,9 @@ const ThankYou = lazy(() => import("./pages/ThankYou"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Login = lazy(() => import("@/pages/Login"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
-const AdminSettings = lazy(() => import("./pages/AdminSettings"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const ClientDashboard = lazy(() => import("@/pages/ClientDashboard"));
+const AdminSettings = lazy(() => import("@/pages/AdminSettings"));
 const ClientSettings = lazy(() => import("./pages/ClientSettings"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
 
