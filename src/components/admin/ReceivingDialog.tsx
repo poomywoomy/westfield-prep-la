@@ -71,16 +71,6 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
   useEffect(() => {
     if (open && asn) {
-      // Check if ASN has already been fully received
-      if (asn.received_at && asn.status !== 'receiving') {
-        toast({
-          title: "ASN Already Received",
-          description: "This ASN has already been completed. Please refresh to see updated status.",
-          variant: "destructive",
-        });
-        onOpenChange(false);
-        return;
-      }
       fetchMainLocation();
       fetchLines();
       setIsSubmitting(false);
@@ -288,16 +278,24 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
   const totalExpected = lines.reduce((sum, l) => sum + l.expected, 0);
   const totalReceived = lines.reduce((sum, l) => sum + l.received_units, 0);
+  const totalBreakdown = lines.reduce((sum, l) => sum + l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units, 0);
   const totalNormal = lines.reduce((sum, l) => sum + l.normal_units, 0);
   const totalDamaged = lines.reduce((sum, l) => sum + l.damaged_units, 0);
   const totalMissing = lines.reduce((sum, l) => sum + l.missing_units, 0);
   const totalQuarantined = lines.reduce((sum, l) => sum + l.quarantined_units, 0);
-  const progressPercent = totalExpected > 0 ? (totalReceived / totalExpected) * 100 : 0;
+  
+  // Progress shows breakdown completion vs received (not received vs expected)
+  const progressPercent = totalReceived > 0 ? (totalBreakdown / totalReceived) * 100 : 0;
 
-  // Can complete if all lines with received_units > 0 have complete breakdown
-  const canComplete = lines
+  // Can complete only if:
+  // 1. All received units are accounted for in breakdown
+  // 2. Total received equals total expected
+  const allBreakdownComplete = lines
     .filter(l => l.received_units > 0)
     .every((l) => l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units === l.received_units);
+  
+  const allUnitsReceived = totalReceived === totalExpected;
+  const canComplete = allBreakdownComplete && allUnitsReceived;
 
   const currentLine = lines[currentLineIndex];
 
@@ -456,9 +454,12 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
         (l) => l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units === l.received_units
       );
       const allNormal = lines.every((l) => l.normal_units === l.received_units && l.received_units > 0);
+      const receivedMatchesExpected = totalReceived === totalExpected;
 
       let newStatus: "receiving" | "closed" | "issue";
-      if (!allAccountedFor) {
+      
+      // Cannot mark as complete until all expected units are received
+      if (!receivedMatchesExpected || !allAccountedFor) {
         newStatus = "receiving";
       } else if (allNormal) {
         newStatus = "closed";
@@ -557,15 +558,19 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
         {/* Progress Bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span>Progress: {lines.reduce((sum, l) => sum + (l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units), 0)} / {totalExpected} units accounted</span>
-            <span>{((lines.reduce((sum, l) => sum + (l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units), 0) / totalExpected) * 100).toFixed(0)}%</span>
+            <span className="font-medium">Breakdown Progress</span>
+            <span>{progressPercent.toFixed(0)}% accounted</span>
           </div>
-          <Progress value={(lines.reduce((sum, l) => sum + (l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units), 0) / totalExpected) * 100} />
+          <Progress value={progressPercent} />
           <div className="flex gap-4 text-xs text-muted-foreground">
-            <span>Normal: {lines.reduce((sum, l) => sum + l.normal_units, 0)}</span>
-            <span>Damaged: {lines.reduce((sum, l) => sum + l.damaged_units, 0)}</span>
-            <span>Missing: {lines.reduce((sum, l) => sum + l.missing_units, 0)}</span>
-            <span>Quarantined: {lines.reduce((sum, l) => sum + l.quarantined_units, 0)}</span>
+            <span>Received: {totalReceived}/{totalExpected}</span>
+            <span>Breakdown: {totalBreakdown}/{totalReceived}</span>
+          </div>
+          <div className="flex gap-4 text-xs">
+            <span className="text-green-600">Normal: {totalNormal}</span>
+            <span className="text-yellow-600">Damaged: {totalDamaged}</span>
+            <span className="text-red-600">Missing: {totalMissing}</span>
+            <span className="text-purple-600">Quarantined: {totalQuarantined}</span>
           </div>
         </div>
 

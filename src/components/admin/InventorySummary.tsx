@@ -15,6 +15,7 @@ import { InventoryAdjustmentDialog } from "./InventoryAdjustmentDialog";
 import { InventoryHistoryDialog } from "./InventoryHistoryDialog";
 import { QuickScanModal } from "./QuickScanModal";
 import { DiscrepancyActionsDialog } from "./DiscrepancyActionsDialog";
+import { DiscrepancyStatusBadge } from "./DiscrepancyStatusBadge";
 import { format } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 

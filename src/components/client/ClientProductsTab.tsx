@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ClientDiscrepancyStatusBadge } from "./ClientDiscrepancyStatusBadge";
 import { format } from "date-fns";
 
 export default function ClientProductsTab() {
@@ -429,9 +430,9 @@ export default function ClientProductsTab() {
                       <TableHead>SKU / Product</TableHead>
                       <TableHead className="text-right">Damaged</TableHead>
                       <TableHead className="text-right">Missing</TableHead>
-                      <TableHead className="text-right">Quarantined</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Quarantined</TableHead>
+                  <TableHead>Client Status</TableHead>
+                  <TableHead>Date</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>

@@ -40,8 +40,11 @@ const Header = () => {
     }
   };
 
-  // Don't render header at all when logged in
-  if (user && role) {
+  // Only hide header on dashboard/settings routes
+  const dashboardRoutes = ['/admin/dashboard', '/client/dashboard', '/admin/settings', '/client/settings'];
+  const isDashboardRoute = dashboardRoutes.includes(location.pathname);
+  
+  if (user && role && isDashboardRoute) {
     return null;
   }
 
@@ -114,12 +117,21 @@ const Header = () => {
                 </span>
               </div>
             </a>
-            <Button
-              onClick={() => navigate("/contact")}
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
-            >
-              Get a Free Quote
-            </Button>
+            {user && role ? (
+              <Button
+                onClick={() => navigate(role === 'admin' ? '/admin/dashboard' : '/client/dashboard')}
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+              >
+                Dashboard
+              </Button>
+            ) : (
+              <Button
+                onClick={() => navigate("/contact")}
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+              >
+                Get a Free Quote
+              </Button>
+            )}
           </div>
 
           <div className="flex lg:hidden items-center gap-2">
@@ -130,13 +142,23 @@ const Header = () => {
               <Phone className="h-4 w-4" />
               <span className="font-semibold text-sm hidden md:inline">1.818.935.5478</span>
             </a>
-            <Button
-              onClick={() => navigate("/contact")}
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-              size="sm"
-            >
-              Get a Free Quote
-            </Button>
+            {user && role ? (
+              <Button
+                onClick={() => navigate(role === 'admin' ? '/admin/dashboard' : '/client/dashboard')}
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                size="sm"
+              >
+                Dashboard
+              </Button>
+            ) : (
+              <Button
+                onClick={() => navigate("/contact")}
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                size="sm"
+              >
+                Get a Free Quote
+              </Button>
+            )}
           </div>
         </div>
       </div>
