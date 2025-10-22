@@ -48,6 +48,7 @@ export const InventorySummary = () => {
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [quickScanOpen, setQuickScanOpen] = useState(false);
   const [selectedSku, setSelectedSku] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<"available" | "discrepancies">("available");
   const [realtimeEnabled, setRealtimeEnabled] = useState(true);
   const { toast } = useToast();
 

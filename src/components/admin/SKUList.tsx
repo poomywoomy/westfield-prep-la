@@ -113,12 +113,12 @@ export const SKUList = () => {
 
         const soldThisMonth = Math.abs(soldData?.reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0);
 
-        // Get expected from ASN lines
+        // Get expected from ASN lines (only truly pending ASNs)
         const { data: asnData } = await supabase
           .from("asn_lines")
           .select("expected_units, received_units, asn_headers!inner(status)")
           .eq("sku_id", sku.id)
-          .in("asn_headers.status", ["not_received", "receiving"]);
+          .eq("asn_headers.status", "not_received");
 
         const expected = asnData?.reduce((sum, line) => sum + (line.expected_units || 0), 0) || 0;
 

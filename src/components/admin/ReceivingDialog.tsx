@@ -63,13 +63,25 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
   const [showHelp, setShowHelp] = useState(false);
   const [mainLocationId, setMainLocationId] = useState<string | null>(null);
   const [qcPhotos, setQCPhotos] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open && asn) {
+      // Check if ASN has already been fully received
+      if (asn.received_at && asn.status !== 'receiving') {
+        toast({
+          title: "ASN Already Received",
+          description: "This ASN has already been completed. Please refresh to see updated status.",
+          variant: "destructive",
+        });
+        onOpenChange(false);
+        return;
+      }
       fetchMainLocation();
       fetchLines();
+      setIsSubmitting(false);
     }
   }, [open, asn]);
 
@@ -255,6 +267,10 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
   const totalExpected = lines.reduce((sum, l) => sum + l.expected, 0);
   const totalReceived = lines.reduce((sum, l) => sum + l.received_units, 0);
+  const totalNormal = lines.reduce((sum, l) => sum + l.normal_units, 0);
+  const totalDamaged = lines.reduce((sum, l) => sum + l.damaged_units, 0);
+  const totalMissing = lines.reduce((sum, l) => sum + l.missing_units, 0);
+  const totalQuarantined = lines.reduce((sum, l) => sum + l.quarantined_units, 0);
   const progressPercent = totalExpected > 0 ? (totalReceived / totalExpected) * 100 : 0;
 
   const currentLine = lines[currentLineIndex];
@@ -288,6 +304,10 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
       });
       return;
     }
+
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
 
     try {
       setLoading(true);
@@ -481,6 +501,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
       });
     } finally {
       setLoading(false);
+      setIsSubmitting(false);
     }
   };
 

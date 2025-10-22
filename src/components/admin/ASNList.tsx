@@ -110,20 +110,58 @@ export const ASNList = () => {
     if (!asnToDelete) return;
 
     try {
-      const { error } = await supabase
+      // Delete in proper order to handle foreign key constraints
+      
+      // 1. Delete ASN lines first
+      const { error: linesError } = await supabase
+        .from("asn_lines")
+        .delete()
+        .eq("asn_id", asnToDelete.id);
+
+      if (linesError) throw linesError;
+
+      // 2. Delete attachments
+      const { error: attachmentsError } = await supabase
+        .from("attachments")
+        .delete()
+        .eq("owner_id", asnToDelete.id)
+        .eq("owner_type", "asn");
+
+      if (attachmentsError) throw attachmentsError;
+
+      // 3. Delete inventory ledger entries
+      const { error: ledgerError } = await supabase
+        .from("inventory_ledger")
+        .delete()
+        .eq("source_ref", asnToDelete.id)
+        .eq("source_type", "asn");
+
+      if (ledgerError) throw ledgerError;
+
+      // 4. Delete damaged item decisions
+      const { error: decisionsError } = await supabase
+        .from("damaged_item_decisions")
+        .delete()
+        .eq("asn_id", asnToDelete.id);
+
+      if (decisionsError) throw decisionsError;
+
+      // 5. Finally delete ASN header
+      const { error: headerError } = await supabase
         .from("asn_headers")
         .delete()
         .eq("id", asnToDelete.id);
 
-      if (error) throw error;
+      if (headerError) throw headerError;
 
       toast({
         title: "Success",
-        description: "ASN deleted successfully",
+        description: "ASN and all related data deleted successfully",
       });
 
       fetchASNs();
     } catch (error: any) {
+      console.error("Error deleting ASN:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to delete ASN",

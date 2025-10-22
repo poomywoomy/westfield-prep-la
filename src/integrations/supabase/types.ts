@@ -57,6 +57,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "asn_attachments_asn_id_fkey"
+            columns: ["asn_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_discrepancies_summary"
+            referencedColumns: ["asn_id"]
+          },
+          {
             foreignKeyName: "asn_attachments_asn_line_id_fkey"
             columns: ["asn_line_id"]
             isOneToOne: false
@@ -208,6 +215,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "asn_headers"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asn_lines_asn_id_fkey"
+            columns: ["asn_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_discrepancies_summary"
+            referencedColumns: ["asn_id"]
           },
           {
             foreignKeyName: "asn_lines_sku_id_fkey"
@@ -768,6 +782,92 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      damaged_item_decisions: {
+        Row: {
+          admin_notes: string | null
+          asn_id: string
+          client_id: string
+          client_notes: string | null
+          created_at: string | null
+          decision: string | null
+          discrepancy_type: string
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          qc_photo_urls: string[] | null
+          quantity: number
+          sku_id: string
+          status: string
+          submitted_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          asn_id: string
+          client_id: string
+          client_notes?: string | null
+          created_at?: string | null
+          decision?: string | null
+          discrepancy_type: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          qc_photo_urls?: string[] | null
+          quantity: number
+          sku_id: string
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          asn_id?: string
+          client_id?: string
+          client_notes?: string | null
+          created_at?: string | null
+          decision?: string | null
+          discrepancy_type?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          qc_photo_urls?: string[] | null
+          quantity?: number
+          sku_id?: string
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "damaged_item_decisions_asn_id_fkey"
+            columns: ["asn_id"]
+            isOneToOne: false
+            referencedRelation: "asn_headers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "damaged_item_decisions_asn_id_fkey"
+            columns: ["asn_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_discrepancies_summary"
+            referencedColumns: ["asn_id"]
+          },
+          {
+            foreignKeyName: "damaged_item_decisions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "damaged_item_decisions_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
             referencedColumns: ["id"]
           },
         ]
@@ -2068,6 +2168,39 @@ export type Database = {
       }
     }
     Views: {
+      inventory_discrepancies_summary: {
+        Row: {
+          asn_id: string | null
+          asn_number: string | null
+          client_id: string | null
+          client_sku: string | null
+          created_at: string | null
+          damaged_qty: number | null
+          image_url: string | null
+          missing_qty: number | null
+          quarantined_qty: number | null
+          received_at: string | null
+          sku_id: string | null
+          status: Database["public"]["Enums"]["asn_status"] | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asn_headers_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asn_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_summary: {
         Row: {
           available: number | null
