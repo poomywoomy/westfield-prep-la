@@ -4,9 +4,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { PackagePlus, ShoppingCart, Package2 } from "lucide-react";
+import { PackagePlus, ShoppingCart, Package2, Trash2 } from "lucide-react";
 
 interface SKUDetailedHistoryDialogProps {
   open: boolean;
@@ -35,6 +38,9 @@ export function SKUDetailedHistoryDialog({
   const [history, setHistory] = useState<any[]>([]);
   const [metrics, setMetrics] = useState<Metrics>({ received: 0, sold: 0, returns: 0 });
   const [loading, setLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (open && skuId) {
@@ -143,9 +149,44 @@ export function SKUDetailedHistoryDialog({
     return 'outline';
   };
 
+  const handleDeleteEntry = (entryId: string) => {
+    setEntryToDelete(entryId);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!entryToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('inventory_ledger')
+        .delete()
+        .eq('id', entryToDelete);
+
+      if (error) throw error;
+
+      toast({
+        title: "Entry deleted",
+        description: "Inventory history entry has been removed",
+      });
+
+      // Refresh history
+      fetchHistory();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete entry",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setEntryToDelete(null);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pr-8">
           <DialogTitle>SKU History: {clientSku}</DialogTitle>
           <div className="flex items-center gap-4 mt-2 flex-wrap">
@@ -206,28 +247,29 @@ export function SKUDetailedHistoryDialog({
         </div>
 
         {/* Transaction History Table */}
-        <div className="border rounded-lg">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
+                <TableHead className="whitespace-nowrap">Date</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Location</TableHead>
-                <TableHead className="text-right">Qty Change</TableHead>
+                <TableHead className="text-right whitespace-nowrap">Qty Change</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Notes</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : history.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
                     No transactions found for this period
                   </TableCell>
                 </TableRow>
@@ -256,12 +298,42 @@ export function SKUDetailedHistoryDialog({
                     <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
                       {entry.notes || "-"}
                     </TableCell>
+                    <TableCell className="text-right">
+                      {(entry.transaction_type === 'ADJUSTMENT_PLUS' || entry.transaction_type === 'ADJUSTMENT_MINUS') && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleDeleteEntry(entry.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))
               )}
             </TableBody>
           </Table>
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Adjustment Entry</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this adjustment entry? This action cannot be undone and will affect inventory calculations.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   );

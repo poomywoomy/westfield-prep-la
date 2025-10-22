@@ -24,10 +24,11 @@ const adjustmentSchema = z.object({
   sku_id: z.string().uuid(),
   location_id: z.string().uuid(),
   qty_delta: z.number().int().min(-1000000).max(1000000).refine(val => val !== 0, "Adjustment quantity cannot be zero"),
-  reason_code: z.enum(['cycle_count', 'damage', 'rework', 'correction', 'return', 'sold', 'sent_to_amazon', 'sent_to_walmart', 'sent_to_tiktok', 'other']),
+  reason_code: z.enum(['damage', 'rework', 'correction', 'return', 'sold', 'sent_to_amazon', 'sent_to_walmart', 'sent_to_tiktok', 'other']),
   notes: z.string().trim().min(1, "Notes are required").max(1000),
   lot_number: z.string().trim().max(100).nullable().optional(),
   expiry_date: z.date().nullable().optional(),
+  mark_as_damaged: z.boolean().optional(),
 });
 
 interface InventoryAdjustmentDialogProps {
@@ -63,10 +64,11 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
     sku_id: "",
     location_id: "",
     qty_delta: "",
-    reason_code: "cycle_count",
+    reason_code: "damage",
     notes: "",
     lot_number: "",
     expiry_date: null as Date | null,
+    mark_as_damaged: false,
   });
   const { toast } = useToast();
 
@@ -114,6 +116,12 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
       .eq("is_active", true)
       .order("name");
     setLocations(data || []);
+    
+    // Auto-select Main Warehouse if available
+    const mainWarehouse = data?.find(loc => loc.code === 'MAIN' || loc.name.toLowerCase().includes('main'));
+    if (mainWarehouse && !formData.location_id) {
+      setFormData(prev => ({ ...prev, location_id: mainWarehouse.id }));
+    }
   };
 
   const handleSubmit = async () => {
@@ -141,19 +149,13 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
         notes: formData.notes,
         lot_number: formData.lot_number || null,
         expiry_date: formData.expiry_date || null,
+        mark_as_damaged: formData.mark_as_damaged,
       });
 
-      // Determine transaction type based on qty_delta sign and reason code
-      let transactionType: string;
-      if (validated.reason_code === 'sold') {
-        transactionType = "SALE_DECREMENT";
-      } else if (['sent_to_amazon', 'sent_to_walmart', 'sent_to_tiktok'].includes(validated.reason_code)) {
-        transactionType = "TRANSFER";
-      } else {
-        transactionType = validated.qty_delta > 0 ? "ADJUSTMENT_PLUS" : "ADJUSTMENT_MINUS";
-      }
+      // All adjustments now use standard ADJUSTMENT_PLUS/ADJUSTMENT_MINUS
+      const transactionType = validated.qty_delta > 0 ? "ADJUSTMENT_PLUS" : "ADJUSTMENT_MINUS";
       
-      const { error } = await supabase.from("inventory_ledger").insert({
+      const { data: ledgerData, error } = await supabase.from("inventory_ledger").insert({
         client_id: validated.client_id,
         sku_id: validated.sku_id,
         location_id: validated.location_id,
@@ -163,9 +165,68 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
         notes: validated.notes,
         lot_number: validated.lot_number,
         expiry_date: validated.expiry_date ? format(validated.expiry_date, "yyyy-MM-dd") : null,
-      } as any);
+      } as any).select();
 
       if (error) throw error;
+
+      // Handle damaged return workflow
+      if (validated.reason_code === 'return' && validated.mark_as_damaged && ledgerData) {
+        // Get client info for ASN number
+        const { data: clientData } = await supabase
+          .from("clients")
+          .select("company_name")
+          .eq("id", validated.client_id)
+          .single();
+
+        // Generate ASN number
+        const dateStr = format(new Date(), "yyyyMMdd");
+        const clientCode = clientData?.company_name.substring(0, 3).toUpperCase() || "CLT";
+        const asnNumber = `RTN-${clientCode}-${dateStr}-${Math.floor(Math.random() * 1000)}`;
+
+        // Create ASN header
+        const { data: asnData, error: asnError } = await supabase
+          .from("asn_headers")
+          .insert({
+            client_id: validated.client_id,
+            asn_number: asnNumber,
+            status: 'issue',
+            received_at: new Date().toISOString(),
+            notes: `Auto-created from damaged return adjustment. Linked to adjustment: ${ledgerData[0].id}`,
+          })
+          .select()
+          .single();
+
+        if (asnError) throw asnError;
+
+        // Create ASN line
+        const { error: lineError } = await supabase
+          .from("asn_lines")
+          .insert({
+            asn_id: asnData.id,
+            sku_id: validated.sku_id,
+            expected_units: Math.abs(validated.qty_delta),
+            received_units: Math.abs(validated.qty_delta),
+            damaged_units: Math.abs(validated.qty_delta),
+            notes: validated.notes,
+          });
+
+        if (lineError) throw lineError;
+
+        // Create damaged item decision for client review
+        const { error: decisionError } = await supabase
+          .from("damaged_item_decisions")
+          .insert({
+            client_id: validated.client_id,
+            asn_id: asnData.id,
+            sku_id: validated.sku_id,
+            quantity: Math.abs(validated.qty_delta),
+            discrepancy_type: 'damaged',
+            status: 'pending',
+            admin_notes: 'Damaged return marked during inventory adjustment',
+          });
+
+        if (decisionError) throw decisionError;
+      }
 
       toast({
         title: "Adjustment recorded",
@@ -288,12 +349,8 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
     }
   };
 
-  const applyPreset = (preset: 'cycle_count' | 'damage' | 'sold') => {
+  const applyPreset = (preset: 'damage' | 'sold' | 'return' | 'sent_to_amazon') => {
     setFormData({ ...formData, reason_code: preset });
-    if (preset === 'cycle_count') {
-      setBatchMode(true);
-      setScannerActive(true);
-    }
     toast({ title: `${preset.replace('_', ' ')} mode activated` });
   };
 
@@ -303,10 +360,11 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
       sku_id: "",
       location_id: "",
       qty_delta: "",
-      reason_code: "cycle_count",
+      reason_code: "damage",
       notes: "",
       lot_number: "",
       expiry_date: null,
+      mark_as_damaged: false,
     });
     setBatchMode(false);
     setBatchItems([]);
@@ -327,15 +385,18 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
 
         <div className="space-y-4">
           {/* Quick Presets */}
-          <div className="flex gap-2 p-3 bg-muted/30 rounded-lg">
-            <Button variant="outline" size="sm" onClick={() => applyPreset('cycle_count')}>
-              📊 Cycle Count
-            </Button>
+          <div className="flex gap-2 p-3 bg-muted/30 rounded-lg flex-wrap">
             <Button variant="outline" size="sm" onClick={() => applyPreset('damage')}>
               📸 Damage Report
             </Button>
             <Button variant="outline" size="sm" onClick={() => applyPreset('sold')}>
               💰 Sale
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => applyPreset('return')}>
+              ↩️ Return
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => applyPreset('sent_to_amazon')}>
+              📦 Sent to Amazon
             </Button>
           </div>
 
@@ -429,39 +490,18 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="location">Location *</Label>
-              <Select
-                value={formData.location_id}
-                onValueChange={(value) => setFormData({ ...formData, location_id: value })}
-              >
-                <SelectTrigger id="location">
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locations.map((loc) => (
-                    <SelectItem key={loc.id} value={loc.id}>
-                      {loc.name} ({loc.code})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="qty_delta">Adjustment Quantity *</Label>
-              <Input
-                id="qty_delta"
-                type="number"
-                placeholder="e.g., +50 or -25"
-                value={formData.qty_delta}
-                onChange={(e) => setFormData({ ...formData, qty_delta: e.target.value })}
-              />
-              <p className="text-xs text-muted-foreground">
-                Use + for additions, - for reductions
-              </p>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="qty_delta">Adjustment Quantity *</Label>
+            <Input
+              id="qty_delta"
+              type="number"
+              placeholder="e.g., +50 or -25"
+              value={formData.qty_delta}
+              onChange={(e) => setFormData({ ...formData, qty_delta: e.target.value })}
+            />
+            <p className="text-xs text-muted-foreground">
+              Use + for additions, - for reductions
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -474,7 +514,6 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cycle_count">Cycle Count</SelectItem>
                 <SelectItem value="damage">Damage</SelectItem>
                 <SelectItem value="rework">Rework</SelectItem>
                 <SelectItem value="correction">Correction</SelectItem>
@@ -575,6 +614,25 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Mark as Damaged checkbox for returns */}
+          {formData.reason_code === 'return' && (
+            <div className="flex items-center space-x-2 p-3 border rounded-lg bg-amber-50 dark:bg-amber-950/20">
+              <Switch
+                id="mark-damaged"
+                checked={formData.mark_as_damaged}
+                onCheckedChange={(checked) => setFormData({ ...formData, mark_as_damaged: checked })}
+              />
+              <div className="space-y-1">
+                <Label htmlFor="mark-damaged" className="cursor-pointer font-medium">
+                  Mark as Damaged Return
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Will create ASN and send for client review
+                </p>
+              </div>
             </div>
           )}
 
