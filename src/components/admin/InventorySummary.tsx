@@ -540,39 +540,64 @@ export const InventorySummary = () => {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        {item.damaged_qty > 0 && (
+                        {item.damaged_qty > 0 ? (
                           <Badge variant="destructive">{item.damaged_qty}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {item.missing_qty > 0 && (
+                        {item.missing_qty > 0 ? (
                           <Badge variant="destructive">{item.missing_qty}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {item.quarantined_qty > 0 && (
+                        {item.quarantined_qty > 0 ? (
                           <Badge variant="outline" className="border-amber-500 text-amber-500">
                             {item.quarantined_qty}
                           </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={item.status === 'pending' ? 'secondary' : 'default'}>
+                        <Badge variant={item.status === "issue" ? "destructive" : "default"}>
                           {item.status}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {item.received_at
-                          ? format(new Date(item.received_at), "MMM d, HH:mm")
-                          : "N/A"}
+                        {item.received_at ? format(new Date(item.received_at), "MMM d, yyyy") : "-"}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
-                          variant="outline"
                           size="sm"
-                          onClick={() => {
-                            setSelectedDiscrepancy(item);
-                            setDiscrepancyDialogOpen(true);
+                          variant="outline"
+                          onClick={async () => {
+                            // Fetch the decision record for this discrepancy
+                            const { data: decisions } = await supabase
+                              .from("damaged_item_decisions")
+                              .select("*")
+                              .eq("asn_id", item.asn_id)
+                              .eq("sku_id", item.sku_id)
+                              .order("created_at", { ascending: false })
+                              .limit(1);
+
+                            if (decisions && decisions.length > 0) {
+                              setSelectedDiscrepancy({
+                                ...decisions[0],
+                                client_sku: item.client_sku,
+                                title: item.title,
+                                asn_number: item.asn_number,
+                              });
+                              setDiscrepancyDialogOpen(true);
+                            } else {
+                              toast({
+                                title: "No Decision Yet",
+                                description: "Client has not submitted a decision for this discrepancy",
+                              });
+                            }
                           }}
                         >
                           Review
@@ -610,22 +635,7 @@ export const InventorySummary = () => {
         <DiscrepancyActionsDialog
           open={discrepancyDialogOpen}
           onOpenChange={setDiscrepancyDialogOpen}
-          decision={{
-            id: selectedDiscrepancy.sku_id,
-            client_id: selectedDiscrepancy.client_id,
-            asn_id: selectedDiscrepancy.asn_id,
-            sku_id: selectedDiscrepancy.sku_id,
-            quantity: (selectedDiscrepancy.damaged_qty || 0) + (selectedDiscrepancy.missing_qty || 0) + (selectedDiscrepancy.quarantined_qty || 0),
-            discrepancy_type: selectedDiscrepancy.damaged_qty > 0 ? 'damaged' : selectedDiscrepancy.missing_qty > 0 ? 'missing' : 'quarantined',
-            decision: selectedDiscrepancy.decision || 'pending',
-            client_notes: selectedDiscrepancy.client_notes || '',
-            submitted_at: selectedDiscrepancy.created_at || new Date().toISOString(),
-            status: selectedDiscrepancy.status || 'pending',
-            client_sku: selectedDiscrepancy.client_sku,
-            title: selectedDiscrepancy.title,
-            asn_number: selectedDiscrepancy.asn_number,
-            qc_photo_urls: null,
-          }}
+          decision={selectedDiscrepancy}
           onSuccess={() => {
             fetchDiscrepancies();
             toast({ title: "Success", description: "Discrepancy processed" });

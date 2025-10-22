@@ -51,6 +51,7 @@ interface LineReceiving {
   lot_number: string;
   expiry_date: string;
   notes: string;
+  qc_photo_urls?: string[];
 }
 
 export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: ReceivingDialogProps) => {
@@ -142,12 +143,19 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
     const updated = [...lines];
     updated[index] = { ...updated[index], [field]: value };
     
-    // Auto-compute received_units as sum of breakdown
-    if (['normal_units', 'damaged_units', 'quarantined_units'].includes(field)) {
+    // Validate breakdown does not exceed received_units when editing breakdown fields
+    if (['normal_units', 'damaged_units', 'quarantined_units', 'missing_units'].includes(field)) {
       const line = updated[index];
-      line.received_units = line.normal_units + line.damaged_units + line.quarantined_units;
-      // Auto-compute missing_units
-      line.missing_units = Math.max(0, line.expected - line.received_units);
+      const breakdown = line.normal_units + line.damaged_units + line.quarantined_units + line.missing_units;
+      
+      if (breakdown > line.received_units) {
+        toast({
+          title: "Invalid Breakdown",
+          description: `Total breakdown (${breakdown}) cannot exceed received quantity (${line.received_units})`,
+          variant: "destructive",
+        });
+        return; // Don't update if invalid
+      }
     }
     
     setLines(updated);
@@ -286,6 +294,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
   const totalQuarantined = lines.reduce((sum, l) => sum + l.quarantined_units, 0);
   const progressPercent = totalExpected > 0 ? (totalReceived / totalExpected) * 100 : 0;
 
+  // Can complete if all lines with received_units > 0 have complete breakdown
+  const canComplete = lines
+    .filter(l => l.received_units > 0)
+    .every((l) => l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units === l.received_units);
+
   const currentLine = lines[currentLineIndex];
 
   const handleNext = () => {
@@ -325,47 +338,24 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
     try {
       setLoading(true);
 
-      const totalExpected = lines.reduce((sum, l) => sum + l.expected, 0);
-      const totalAccounted = lines.reduce((sum, l) => sum + (l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units), 0);
-      const totalNormal = lines.reduce((sum, l) => sum + l.normal_units, 0);
-      const hasDiscrepancies = lines.some(l => 
-        l.damaged_units > 0 || l.quarantined_units > 0 || l.missing_units > 0
+      // Validation: All lines with received_units > 0 must have breakdown === received_units
+      const invalidLines = lines.filter(
+        (l) => l.received_units > 0 && 
+        (l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units !== l.received_units)
       );
 
-      // Validate all lines with received units
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].received_units > 0) {
-          try {
-            receivingLineSchema.parse({
-              received_units: lines[i].received_units,
-              normal_units: lines[i].normal_units,
-              damaged_units: lines[i].damaged_units,
-              quarantined_units: lines[i].quarantined_units,
-              missing_units: lines[i].missing_units,
-              lot_number: lines[i].lot_number || null,
-              expiry_date: lines[i].expiry_date || null,
-              notes: lines[i].notes || null,
-            });
-          } catch (err) {
-            throw new Error(`Line ${i + 1} (${lines[i].sku.client_sku}): ${(err as z.ZodError).errors[0].message}`);
-          }
-        }
+      if (invalidLines.length > 0) {
+        toast({
+          title: "Validation Error",
+          description: "All received units must be accounted for in the breakdown (Normal + Damaged + Quarantined + Missing = Received)",
+          variant: "destructive",
+        });
+        setLoading(false);
+        setIsSubmitting(false);
+        return;
       }
 
-      // Determine status
-      let newStatus: 'receiving' | 'closed' | 'issue' = 'receiving';
-      if (totalAccounted === totalExpected) {
-        // All units accounted for
-        if (totalNormal === totalExpected) {
-          newStatus = 'closed';
-        } else {
-          newStatus = 'issue';
-        }
-      } else {
-        newStatus = 'receiving';
-      }
-
-      // Update ASN lines and create ledger entries using DELTAS
+      // Update ASN lines and create ledger entries
       const { data: { user } } = await supabase.auth.getUser();
       
       for (const line of lines) {
@@ -386,62 +376,102 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
         if (lineError) throw lineError;
 
-        // Get initial state to compute delta
-        const initialLine = initialLines.get(line.line_id);
-        if (!initialLine) continue;
-
-        // Compute delta for normal units only
-        const normalDelta = line.normal_units - initialLine.normal_units;
-        
-        if (normalDelta > 0) {
-          // Add to inventory (positive delta)
-          const { error: ledgerError } = await supabase
+        // Post only normal_units to inventory_ledger (idempotent)
+        if (line.normal_units > 0 || line.received_units > 0) {
+          // Get already posted RECEIPT for this ASN + SKU
+          const { data: existingReceipts } = await supabase
             .from("inventory_ledger")
-            .insert({
-              client_id: asn!.client_id,
-              sku_id: line.sku.id,
-              location_id: mainLocationId,
-              user_id: user?.id || null,
-              qty_delta: normalDelta,
-              transaction_type: "RECEIPT" as const,
-              source_type: "asn",
-              source_ref: asn!.id,
-              lot_number: line.lot_number || null,
-              expiry_date: line.expiry_date || null,
-              notes: `Received ${normalDelta} units via ASN ${asn!.asn_number}`,
-            } as any);
+            .select("qty_delta")
+            .eq("source_type", "asn")
+            .eq("source_ref", asn!.id)
+            .eq("sku_id", line.sku.id)
+            .eq("transaction_type", "RECEIPT");
 
-          if (ledgerError) throw ledgerError;
-        } else if (normalDelta < 0) {
-          // Correction (negative delta)
-          const { error: ledgerError } = await supabase
-            .from("inventory_ledger")
-            .insert({
-              client_id: asn!.client_id,
-              sku_id: line.sku.id,
-              location_id: mainLocationId,
-              user_id: user?.id || null,
-              qty_delta: normalDelta,
-              transaction_type: "ADJUSTMENT_MINUS" as const,
-              source_type: "asn",
-              source_ref: asn!.id,
-              reason_code: "correction",
-              notes: `Corrected -${Math.abs(normalDelta)} units from ASN ${asn!.asn_number}`,
-            } as any);
+          const alreadyPosted = existingReceipts?.reduce((sum, r) => sum + (r.qty_delta || 0), 0) || 0;
+          const normalDelta = line.normal_units - alreadyPosted;
 
-          if (ledgerError) throw ledgerError;
+          if (normalDelta !== 0) {
+            const { error: ledgerError } = await supabase
+              .from("inventory_ledger")
+              .insert({
+                client_id: asn!.client_id,
+                sku_id: line.sku.id,
+                location_id: mainLocationId,
+                user_id: user?.id || null,
+                qty_delta: normalDelta,
+                transaction_type: normalDelta > 0 ? "RECEIPT" : "ADJUSTMENT_MINUS",
+                reason_code: normalDelta < 0 ? "correction" : undefined,
+                source_type: "asn",
+                source_ref: asn!.id,
+                lot_number: line.lot_number || null,
+                expiry_date: line.expiry_date || null,
+                notes: normalDelta < 0 
+                  ? `Correction for ASN ${asn!.asn_number}` 
+                  : `Received from ASN ${asn!.asn_number}`,
+              } as any);
+
+            if (ledgerError) throw ledgerError;
+          }
+        }
+
+        // Create damaged_item_decisions for discrepancies
+        if (line.damaged_units > 0) {
+          await supabase.from("damaged_item_decisions").insert({
+            client_id: asn!.client_id,
+            asn_id: asn!.id,
+            sku_id: line.sku.id,
+            quantity: line.damaged_units,
+            discrepancy_type: "damaged",
+            status: "pending",
+            qc_photo_urls: line.qc_photo_urls || [],
+          });
+        }
+
+        if (line.missing_units > 0) {
+          await supabase.from("damaged_item_decisions").insert({
+            client_id: asn!.client_id,
+            asn_id: asn!.id,
+            sku_id: line.sku.id,
+            quantity: line.missing_units,
+            discrepancy_type: "missing",
+            status: "pending",
+          });
+        }
+
+        if (line.quarantined_units > 0) {
+          await supabase.from("damaged_item_decisions").insert({
+            client_id: asn!.client_id,
+            asn_id: asn!.id,
+            sku_id: line.sku.id,
+            quantity: line.quarantined_units,
+            discrepancy_type: "quarantined",
+            status: "pending",
+            qc_photo_urls: line.qc_photo_urls || [],
+          });
         }
       }
 
-      // Update ASN status
-      const updateData: any = {
-        status: newStatus,
-      };
+      // Determine ASN status
+      const allAccountedFor = lines.every(
+        (l) => l.normal_units + l.damaged_units + l.quarantined_units + l.missing_units === l.received_units
+      );
+      const allNormal = lines.every((l) => l.normal_units === l.received_units && l.received_units > 0);
 
-      // Only set timestamps for completed statuses
-      if (newStatus === 'closed' || newStatus === 'issue') {
+      let newStatus: "receiving" | "closed" | "issue";
+      if (!allAccountedFor) {
+        newStatus = "receiving";
+      } else if (allNormal) {
+        newStatus = "closed";
+      } else {
+        newStatus = "issue";
+      }
+
+      const updateData: any = { status: newStatus };
+      if (newStatus === "closed" || newStatus === "issue") {
         updateData.received_at = new Date().toISOString();
-        updateData.closed_at = new Date().toISOString();
+        if (newStatus === "closed") {
+          updateData.closed_at = new Date().toISOString();
+        }
       }
 
       const { error: asnError } = await supabase
@@ -451,15 +481,13 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
       if (asnError) throw asnError;
 
-      const statusMessage = totalAccounted < totalExpected
-        ? `${totalAccounted} of ${totalExpected} units accounted for. Receiving paused.`
-        : hasDiscrepancies
-        ? `ASN ${asn!.asn_number} completed with discrepancies - ${totalNormal} normal, ${totalAccounted - totalNormal} with issues`
-        : `ASN ${asn!.asn_number} receiving completed successfully - all ${totalExpected} units received normally`;
-
       toast({
-        title: "Success",
-        description: statusMessage,
+        title: "Receiving Complete",
+        description: newStatus === "issue" 
+          ? "ASN marked as issue - discrepancies require client review"
+          : newStatus === "receiving"
+          ? "Receiving paused - complete breakdown to finish"
+          : "ASN successfully received",
       });
 
       onSuccess();
@@ -607,7 +635,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                   updateLine(currentLineIndex, "received_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
                 }}
                 className="text-lg font-semibold"
+                placeholder="Enter actual count"
               />
+              <p className="text-xs text-muted-foreground">
+                Expected: {currentLine.expected} units | Remaining to account: {Math.max(0, currentLine.received_units - (currentLine.normal_units + currentLine.damaged_units + currentLine.quarantined_units + currentLine.missing_units))} units
+              </p>
             </div>
 
             <div className="border-t pt-4">
@@ -656,7 +688,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="missing" className="text-sm">Missing</Label>
+                  <Label htmlFor="missing" className="text-sm">Missing (Manually Mark)</Label>
                   <Input
                     id="missing"
                     type="number"
@@ -667,6 +699,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                       const parsed = parseInt(value, 10);
                       updateLine(currentLineIndex, "missing_units", !isNaN(parsed) && parsed >= 0 ? parsed : 0);
                     }}
+                    placeholder="0"
                   />
                 </div>
               </div>
@@ -737,10 +770,13 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
               Cancel
             </Button>
-            <Button onClick={handleCompleteReceiving} disabled={loading || totalReceived === 0}>
+            <Button 
+              onClick={handleCompleteReceiving} 
+              disabled={loading || totalReceived === 0}
+            >
               {loading ? "Processing..." : 
                totalReceived === 0 ? "No Items Received" :
-               totalReceived > 0 && totalReceived < totalExpected ? "Pause Receiving" : 
+               !canComplete ? "Pause Receiving" :
                "Complete Receiving"}
             </Button>
           </div>
