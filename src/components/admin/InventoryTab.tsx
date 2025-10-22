@@ -21,10 +21,6 @@ export const InventoryTab = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Inventory Management</h2>
         <div className="flex gap-2">
-          <Button onClick={() => setQuickAdjustOpen(true)} variant="outline" size="sm">
-            <SettingsIcon className="mr-2 h-4 w-4" />
-            Quick Adjust
-          </Button>
           <Button onClick={() => setQuickScanOpen(true)} variant="secondary" size="sm">
             <ScanBarcode className="mr-2 h-4 w-4" />
             Quick Scan
@@ -69,13 +65,6 @@ export const InventoryTab = () => {
         </TabsContent>
       </Tabs>
 
-      <InventoryAdjustmentDialog 
-        open={quickAdjustOpen} 
-        onOpenChange={setQuickAdjustOpen}
-        onSuccess={() => {
-          toast({ title: "Success", description: "Inventory adjusted" });
-        }}
-      />
       <QuickScanModal open={quickScanOpen} onOpenChange={setQuickScanOpen} />
     </div>
   );

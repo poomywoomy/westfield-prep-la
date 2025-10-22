@@ -91,7 +91,7 @@ export const ASNList = () => {
       case "not_received": return "Not Received";
       case "receiving": return "Receiving";
       case "closed": return "Completed";
-      case "issue": return "Issue";
+      case "issue": return "Discrepancies";
       default: return status;
     }
   };
@@ -285,6 +285,7 @@ export const ASNList = () => {
                       className={
                         asn.status === 'receiving' ? 'bg-yellow-600 hover:bg-yellow-700 text-white' :
                         asn.status === 'closed' ? 'bg-green-600 hover:bg-green-700 text-white' :
+                        asn.status === 'issue' ? 'bg-red-600 hover:bg-red-700 text-white' :
                         ''
                       }
                     >
@@ -310,15 +311,6 @@ export const ASNList = () => {
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </>
-                      )}
-                      {asn.status === "receiving" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleMarkAsClosed(asn)}
-                        >
-                          Mark as Closed
-                        </Button>
                       )}
                       {asn.status === "issue" && (
                         <Button

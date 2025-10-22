@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, FileDown, Edit, Trash } from "lucide-react";
+import { Plus, Search, FileDown, Edit, Trash, Settings as SettingsIcon } from "lucide-react";
 import { SKUFormDialog } from "./SKUFormDialog";
 import { DeleteSKUDialog } from "./DeleteSKUDialog";
 import { SKUDetailedHistoryDialog } from "./SKUDetailedHistoryDialog";
+import { InventoryAdjustmentDialog } from "./InventoryAdjustmentDialog";
 import type { Database } from "@/integrations/supabase/types";
 
 type SKU = Database["public"]["Tables"]["skus"]["Row"];
@@ -35,6 +36,7 @@ export const SKUList = () => {
   const [deletingSKU, setDeletingSKU] = useState<SKU | null>(null);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [selectedSKU, setSelectedSKU] = useState<SKU | null>(null);
+  const [adjustmentDialogOpen, setAdjustmentDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -193,6 +195,15 @@ export const SKUList = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setAdjustmentDialogOpen(true)}
+            disabled={selectedClient === "all"}
+          >
+            <SettingsIcon className="mr-2 h-4 w-4" />
+            Adjust Inventory
+          </Button>
           <Button variant="outline" size="sm">
             <FileDown className="mr-2 h-4 w-4" />
             Export
@@ -260,7 +271,7 @@ export const SKUList = () => {
                       variant={sku.status === "active" ? "default" : "secondary"}
                       className={sku.status === "active" ? "bg-green-600 hover:bg-green-700 text-white" : ""}
                     >
-                      {sku.status === "active" ? "Active" : sku.status}
+                      {sku.status === "active" ? "Active" : sku.status.charAt(0).toUpperCase() + sku.status.slice(1)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -311,6 +322,18 @@ export const SKUList = () => {
         skuId={selectedSKU?.id || ""}
         clientSku={selectedSKU?.client_sku || ""}
         title={selectedSKU?.title || ""}
+      />
+
+      <InventoryAdjustmentDialog 
+        open={adjustmentDialogOpen} 
+        onOpenChange={(open) => {
+          setAdjustmentDialogOpen(open);
+        }}
+        prefilledClientId={selectedClient !== "all" ? selectedClient : undefined}
+        onSuccess={() => {
+          toast({ title: "Success", description: "Inventory adjusted" });
+          fetchSKUs();
+        }}
       />
     </div>
   );

@@ -34,6 +34,7 @@ interface InventoryAdjustmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  prefilledClientId?: string;
 }
 
 interface BatchItem {
@@ -45,7 +46,7 @@ interface BatchItem {
   notes: string;
 }
 
-export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: InventoryAdjustmentDialogProps) => {
+export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefilledClientId }: InventoryAdjustmentDialogProps) => {
   const [clients, setClients] = useState<any[]>([]);
   const [skus, setSKUs] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
@@ -73,8 +74,12 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
     if (open) {
       fetchClients();
       fetchLocations();
+      // Set prefilled client ID if provided
+      if (prefilledClientId) {
+        setFormData(prev => ({ ...prev, client_id: prefilledClientId }));
+      }
     }
-  }, [open]);
+  }, [open, prefilledClientId]);
 
   useEffect(() => {
     if (formData.client_id) {
