@@ -55,6 +55,7 @@ interface LineReceiving {
 
 export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: ReceivingDialogProps) => {
   const [lines, setLines] = useState<LineReceiving[]>([]);
+  const [initialLines, setInitialLines] = useState<Map<string, LineReceiving>>(new Map());
   const [loading, setLoading] = useState(false);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [scannerActive, setScannerActive] = useState(true);
@@ -117,26 +118,38 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
     const skuMap = new Map(skus.map(s => [s.id, s]));
 
-    setLines(
-      asnLines.map(line => ({
-        line_id: line.id,
-        sku: skuMap.get(line.sku_id)!,
-        expected: line.expected_units,
-        received_units: line.received_units,
-        normal_units: line.normal_units,
-        damaged_units: line.damaged_units,
-        quarantined_units: line.quarantined_units,
-        missing_units: line.missing_units,
-        lot_number: line.lot_number || "",
-        expiry_date: line.expiry_date || "",
-        notes: line.notes || "",
-      }))
-    );
+    const lineData = asnLines.map(line => ({
+      line_id: line.id,
+      sku: skuMap.get(line.sku_id)!,
+      expected: line.expected_units,
+      received_units: line.received_units,
+      normal_units: line.normal_units,
+      damaged_units: line.damaged_units,
+      quarantined_units: line.quarantined_units,
+      missing_units: line.missing_units,
+      lot_number: line.lot_number || "",
+      expiry_date: line.expiry_date || "",
+      notes: line.notes || "",
+    }));
+
+    // Store initial state for delta computation
+    const initialMap = new Map(lineData.map(line => [line.line_id, { ...line }]));
+    setInitialLines(initialMap);
+    setLines(lineData);
   };
 
   const updateLine = (index: number, field: keyof LineReceiving, value: any) => {
     const updated = [...lines];
     updated[index] = { ...updated[index], [field]: value };
+    
+    // Auto-compute received_units as sum of breakdown
+    if (['normal_units', 'damaged_units', 'quarantined_units'].includes(field)) {
+      const line = updated[index];
+      line.received_units = line.normal_units + line.damaged_units + line.quarantined_units;
+      // Auto-compute missing_units
+      line.missing_units = Math.max(0, line.expected - line.received_units);
+    }
+    
     setLines(updated);
   };
 
@@ -318,7 +331,6 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
       const hasDiscrepancies = lines.some(l => 
         l.damaged_units > 0 || l.quarantined_units > 0 || l.missing_units > 0
       );
-      const isPausing = totalAccounted < totalExpected;
 
       // Validate all lines with received units
       for (let i = 0; i < lines.length; i++) {
@@ -340,26 +352,24 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
         }
       }
 
-      // Determine status based on new logic
+      // Determine status
       let newStatus: 'receiving' | 'closed' | 'issue' = 'receiving';
-      if (isPausing) {
-        // Not all units accounted for - stay in receiving
-        newStatus = 'receiving';
-      } else if (totalAccounted === totalExpected) {
+      if (totalAccounted === totalExpected) {
         // All units accounted for
         if (totalNormal === totalExpected) {
-          // 100% normal - completed
           newStatus = 'closed';
         } else {
-          // Has discrepancies (damaged/missing/quarantined)
           newStatus = 'issue';
         }
       } else {
         newStatus = 'receiving';
       }
 
-      // Update ASN lines
+      // Update ASN lines and create ledger entries using DELTAS
+      const { data: { user } } = await supabase.auth.getUser();
+      
       for (const line of lines) {
+        // Update ASN line
         const { error: lineError } = await supabase
           .from("asn_lines")
           .update({
@@ -376,10 +386,15 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
         if (lineError) throw lineError;
 
-        // Create inventory ledger entries for different unit types
-        // Only normal units go to available inventory
-        if (line.normal_units > 0) {
-          const { data: { user } } = await supabase.auth.getUser();
+        // Get initial state to compute delta
+        const initialLine = initialLines.get(line.line_id);
+        if (!initialLine) continue;
+
+        // Compute delta for normal units only
+        const normalDelta = line.normal_units - initialLine.normal_units;
+        
+        if (normalDelta > 0) {
+          // Add to inventory (positive delta)
           const { error: ledgerError } = await supabase
             .from("inventory_ledger")
             .insert({
@@ -387,21 +402,18 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
               sku_id: line.sku.id,
               location_id: mainLocationId,
               user_id: user?.id || null,
-              qty_delta: line.normal_units,
+              qty_delta: normalDelta,
               transaction_type: "RECEIPT" as const,
               source_type: "asn",
               source_ref: asn!.id,
               lot_number: line.lot_number || null,
               expiry_date: line.expiry_date || null,
-              notes: `Received via ASN ${asn!.asn_number} - Normal units`,
+              notes: `Received ${normalDelta} units via ASN ${asn!.asn_number}`,
             } as any);
 
           if (ledgerError) throw ledgerError;
-        }
-
-        // Log damaged units separately (not added to available inventory)
-        if (line.damaged_units > 0) {
-          const { data: { user } } = await supabase.auth.getUser();
+        } else if (normalDelta < 0) {
+          // Correction (negative delta)
           const { error: ledgerError } = await supabase
             .from("inventory_ledger")
             .insert({
@@ -409,54 +421,12 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
               sku_id: line.sku.id,
               location_id: mainLocationId,
               user_id: user?.id || null,
-              qty_delta: 0,
+              qty_delta: normalDelta,
               transaction_type: "ADJUSTMENT_MINUS" as const,
               source_type: "asn",
               source_ref: asn!.id,
-              reason_code: "damage",
-              notes: `${line.damaged_units} units marked as damaged from ASN ${asn!.asn_number}`,
-            } as any);
-
-          if (ledgerError) throw ledgerError;
-        }
-
-        // Log missing units separately
-        if (line.missing_units > 0) {
-          const { data: { user } } = await supabase.auth.getUser();
-          const { error: ledgerError } = await supabase
-            .from("inventory_ledger")
-            .insert({
-              client_id: asn!.client_id,
-              sku_id: line.sku.id,
-              location_id: mainLocationId,
-              user_id: user?.id || null,
-              qty_delta: 0,
-              transaction_type: "ADJUSTMENT_MINUS" as const,
-              source_type: "asn",
-              source_ref: asn!.id,
-              reason_code: "other",
-              notes: `${line.missing_units} units marked as missing from ASN ${asn!.asn_number}`,
-            } as any);
-
-          if (ledgerError) throw ledgerError;
-        }
-
-        // Log quarantined units separately
-        if (line.quarantined_units > 0) {
-          const { data: { user } } = await supabase.auth.getUser();
-          const { error: ledgerError } = await supabase
-            .from("inventory_ledger")
-            .insert({
-              client_id: asn!.client_id,
-              sku_id: line.sku.id,
-              location_id: mainLocationId,
-              user_id: user?.id || null,
-              qty_delta: 0,
-              transaction_type: "ADJUSTMENT_MINUS" as const,
-              source_type: "asn",
-              source_ref: asn!.id,
-              reason_code: "other",
-              notes: `${line.quarantined_units} units marked as quarantined from ASN ${asn!.asn_number}`,
+              reason_code: "correction",
+              notes: `Corrected -${Math.abs(normalDelta)} units from ASN ${asn!.asn_number}`,
             } as any);
 
           if (ledgerError) throw ledgerError;
@@ -466,10 +436,11 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
       // Update ASN status
       const updateData: any = {
         status: newStatus,
-        received_at: new Date().toISOString(),
       };
 
+      // Only set timestamps for completed statuses
       if (newStatus === 'closed' || newStatus === 'issue') {
+        updateData.received_at = new Date().toISOString();
         updateData.closed_at = new Date().toISOString();
       }
 
@@ -480,7 +451,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
       if (asnError) throw asnError;
 
-      const statusMessage = isPausing 
+      const statusMessage = totalAccounted < totalExpected
         ? `${totalAccounted} of ${totalExpected} units accounted for. Receiving paused.`
         : hasDiscrepancies
         ? `ASN ${asn!.asn_number} completed with discrepancies - ${totalNormal} normal, ${totalAccounted - totalNormal} with issues`

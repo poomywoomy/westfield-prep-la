@@ -333,22 +333,22 @@ export const ASNList = () => {
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       {asn.status === "not_received" && (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(asn)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(asn)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(asn)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {asn.status !== "closed" && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(asn)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       )}
                       {asn.status === "issue" && (
                         <Button

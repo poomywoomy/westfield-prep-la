@@ -146,12 +146,12 @@ export function SKUDetailedHistoryDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+        <DialogHeader className="pr-8">
           <DialogTitle>SKU History: {clientSku}</DialogTitle>
-          <div className="flex items-center gap-4 mt-2">
-            <p className="text-sm text-muted-foreground flex-1">{title}</p>
+          <div className="flex items-center gap-4 mt-2 flex-wrap">
+            <p className="text-sm text-muted-foreground flex-1 min-w-0">{title}</p>
             <Select value={timePeriod} onValueChange={(value: TimePeriod) => setTimePeriod(value)}>
-              <SelectTrigger className="w-[160px]">
+              <SelectTrigger className="w-[200px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

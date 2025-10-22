@@ -122,15 +122,15 @@ export const SKUList = () => {
 
         const expected = asnData?.reduce((sum, line) => sum + (line.expected_units || 0), 0) || 0;
 
-        // Calculate discrepancies from received ASNs
+        // Calculate discrepancies from ASNs with issues
         const { data: discrepancyData } = await supabase
           .from("asn_lines")
-          .select("expected_units, received_units, asn_headers!inner(status)")
+          .select("damaged_units, missing_units, quarantined_units, asn_headers!inner(status)")
           .eq("sku_id", sku.id)
-          .eq("asn_headers.status", "closed");
+          .eq("asn_headers.status", "issue");
 
         const discrepancies = discrepancyData?.reduce(
-          (sum, line) => sum + Math.abs((line.expected_units || 0) - (line.received_units || 0)),
+          (sum, line) => sum + (line.damaged_units || 0) + (line.missing_units || 0) + (line.quarantined_units || 0),
           0
         ) || 0;
 
