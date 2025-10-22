@@ -78,6 +78,8 @@ export type Database = {
           notes: string | null
           received_at: string | null
           received_by: string | null
+          resolved_at: string | null
+          resolved_by: string | null
           ship_from: string | null
           status: Database["public"]["Enums"]["asn_status"] | null
           template_id: string | null
@@ -96,6 +98,8 @@ export type Database = {
           notes?: string | null
           received_at?: string | null
           received_by?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           ship_from?: string | null
           status?: Database["public"]["Enums"]["asn_status"] | null
           template_id?: string | null
@@ -114,6 +118,8 @@ export type Database = {
           notes?: string | null
           received_at?: string | null
           received_by?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           ship_from?: string | null
           status?: Database["public"]["Enums"]["asn_status"] | null
           template_id?: string | null
@@ -2143,7 +2149,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "client"
-      asn_status: "not_received" | "receiving" | "closed"
+      asn_status: "not_received" | "receiving" | "closed" | "issue"
       billing_frequency: "pay_as_go" | "end_of_month"
       channel_type: "amazon" | "walmart" | "shopify" | "ebay" | "other"
       client_status: "pending" | "active" | "inactive"
@@ -2296,7 +2302,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "client"],
-      asn_status: ["not_received", "receiving", "closed"],
+      asn_status: ["not_received", "receiving", "closed", "issue"],
       billing_frequency: ["pay_as_go", "end_of_month"],
       channel_type: ["amazon", "walmart", "shopify", "ebay", "other"],
       client_status: ["pending", "active", "inactive"],

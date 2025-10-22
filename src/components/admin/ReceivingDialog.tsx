@@ -14,6 +14,7 @@ import { playSuccessSound, playErrorSound } from "@/lib/soundEffects";
 import { Progress } from "@/components/ui/progress";
 import { ScannerStatus } from "@/components/ScannerStatus";
 import { ScannerHelpDialog } from "@/components/admin/ScannerHelpDialog";
+import { QCPhotoUpload } from "@/components/admin/QCPhotoUpload";
 import type { Database } from "@/integrations/supabase/types";
 
 type ASNHeader = Database["public"]["Tables"]["asn_headers"]["Row"];
@@ -60,14 +61,29 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
   const [highlightedLine, setHighlightedLine] = useState<number | null>(null);
   const [lastScanned, setLastScanned] = useState<string>("");
   const [showHelp, setShowHelp] = useState(false);
+  const [mainLocationId, setMainLocationId] = useState<string | null>(null);
+  const [qcPhotos, setQCPhotos] = useState<string[]>([]);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open && asn) {
+      fetchMainLocation();
       fetchLines();
     }
   }, [open, asn]);
+
+  const fetchMainLocation = async () => {
+    const { data } = await supabase
+      .from('locations')
+      .select('id')
+      .eq('code', 'MAIN')
+      .single();
+    
+    if (data) {
+      setMainLocationId(data.id);
+    }
+  };
 
   const fetchLines = async () => {
     if (!asn) return;
@@ -264,30 +280,54 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
   };
 
   const handleCompleteReceiving = async () => {
+    if (!mainLocationId) {
+      toast({
+        title: "Error",
+        description: "MAIN location not found. Please contact support.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
 
-      // Validate all lines
+      const totalExpected = lines.reduce((sum, l) => sum + l.expected, 0);
+      const totalReceived = lines.reduce((sum, l) => sum + l.received_units, 0);
+      const isPausing = totalReceived > 0 && totalReceived < totalExpected;
+      const hasDiscrepancies = lines.some(l => 
+        l.damaged_units > 0 || l.quarantined_units > 0 || l.missing_units > 0
+      );
+
+      // Validate all lines with received units
       for (let i = 0; i < lines.length; i++) {
-        try {
-          receivingLineSchema.parse({
-            received_units: lines[i].received_units,
-            normal_units: lines[i].normal_units,
-            damaged_units: lines[i].damaged_units,
-            quarantined_units: lines[i].quarantined_units,
-            missing_units: lines[i].missing_units,
-            lot_number: lines[i].lot_number || null,
-            expiry_date: lines[i].expiry_date || null,
-            notes: lines[i].notes || null,
-          });
-        } catch (err) {
-          throw new Error(`Line ${i + 1} (${lines[i].sku.client_sku}): ${(err as z.ZodError).errors[0].message}`);
+        if (lines[i].received_units > 0) {
+          try {
+            receivingLineSchema.parse({
+              received_units: lines[i].received_units,
+              normal_units: lines[i].normal_units,
+              damaged_units: lines[i].damaged_units,
+              quarantined_units: lines[i].quarantined_units,
+              missing_units: lines[i].missing_units,
+              lot_number: lines[i].lot_number || null,
+              expiry_date: lines[i].expiry_date || null,
+              notes: lines[i].notes || null,
+            });
+          } catch (err) {
+            throw new Error(`Line ${i + 1} (${lines[i].sku.client_sku}): ${(err as z.ZodError).errors[0].message}`);
+          }
         }
       }
 
-      // Determine if any receiving has started
-      const hasReceivedAny = lines.some(line => line.received_units > 0);
-      const newStatus = hasReceivedAny ? 'receiving' : 'not_received';
+      // Determine status
+      let newStatus: 'receiving' | 'closed' | 'issue' = 'receiving';
+      if (isPausing) {
+        newStatus = 'receiving';
+      } else if (hasDiscrepancies) {
+        newStatus = 'issue';
+      } else {
+        newStatus = 'closed';
+      }
 
       // Update ASN lines
       for (const line of lines) {
@@ -307,14 +347,14 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
         if (lineError) throw lineError;
 
-        // Create inventory ledger entry
+        // Create inventory ledger entry for received units
         if (line.received_units > 0) {
           const { error: ledgerError } = await supabase
             .from("inventory_ledger")
             .insert({
               client_id: asn!.client_id,
               sku_id: line.sku.id,
-              location_id: "00000000-0000-0000-0000-000000000001", // MAIN location
+              location_id: mainLocationId,
               qty_delta: line.received_units,
               transaction_type: "RECEIPT",
               source_type: "asn",
@@ -329,19 +369,31 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
       }
 
       // Update ASN status
+      const updateData: any = {
+        status: newStatus,
+        received_at: new Date().toISOString(),
+      };
+
+      if (newStatus === 'closed' || newStatus === 'issue') {
+        updateData.closed_at = new Date().toISOString();
+      }
+
       const { error: asnError } = await supabase
         .from("asn_headers")
-        .update({
-          status: newStatus,
-          received_at: hasReceivedAny ? new Date().toISOString() : null,
-        })
+        .update(updateData)
         .eq("id", asn!.id);
 
       if (asnError) throw asnError;
 
+      const statusMessage = isPausing 
+        ? `${totalReceived} units received and added to inventory. Receiving paused.`
+        : hasDiscrepancies
+        ? `ASN ${asn!.asn_number} completed with discrepancies - marked as issue`
+        : `ASN ${asn!.asn_number} receiving completed successfully`;
+
       toast({
         title: "Success",
-        description: `ASN ${asn!.asn_number} receiving completed`,
+        description: statusMessage,
       });
 
       onSuccess();
@@ -586,29 +638,18 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
             {/* QC Photo Capture */}
             <div className="space-y-2">
               <Label>QC Photos</Label>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handlePhotoCapture}
-                className="hidden"
+              <QCPhotoUpload
+                lineId={currentLine.line_id}
+                asnNumber={asn?.asn_number || ""}
+                onPhotosUploaded={(urls) => setQCPhotos(urls)}
+                existingPhotos={qcPhotos}
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Camera className="h-4 w-4 mr-2" />
-                Capture Photo
-              </Button>
             </div>
           </div>
         </div>
 
-        <DialogFooter className="flex items-center justify-between">
-          <div className="flex gap-2">
+        <DialogFooter className="flex items-center justify-between gap-4">
+          <div className="flex gap-3">
             <Button variant="outline" onClick={handlePrevious} disabled={currentLineIndex === 0}>
               Previous
             </Button>
@@ -619,12 +660,15 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
               Quick Complete All
             </Button>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
               Cancel
             </Button>
-            <Button onClick={handleCompleteReceiving} disabled={loading}>
-              {loading ? "Processing..." : "Complete Receiving"}
+            <Button onClick={handleCompleteReceiving} disabled={loading || totalReceived === 0}>
+              {loading ? "Processing..." : 
+               totalReceived === 0 ? "No Items Received" :
+               totalReceived > 0 && totalReceived < totalExpected ? "Pause Receiving" : 
+               "Complete Receiving"}
             </Button>
           </div>
         </DialogFooter>

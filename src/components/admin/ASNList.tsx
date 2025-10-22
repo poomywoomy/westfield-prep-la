@@ -7,11 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Search, Edit, Trash2, Settings, Package } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Settings, Package, CheckCircle2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { ASNFormDialog } from "./ASNFormDialog";
 import { ReceivingDialog } from "./ReceivingDialog";
 import { TemplateManagementDialog } from "./TemplateManagementDialog";
+import { ResolveIssueDialog } from "./ResolveIssueDialog";
 
 type ASN = Database["public"]["Tables"]["asn_headers"]["Row"];
 type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -29,6 +30,8 @@ export const ASNList = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [asnToDelete, setAsnToDelete] = useState<ASN | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [resolveDialogOpen, setResolveDialogOpen] = useState(false);
+  const [asnToResolve, setAsnToResolve] = useState<ASN | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -78,6 +81,7 @@ export const ASNList = () => {
       case "not_received": return "secondary";
       case "receiving": return "default";
       case "closed": return "default";
+      case "issue": return "destructive";
       default: return "secondary";
     }
   };
@@ -86,7 +90,8 @@ export const ASNList = () => {
     switch (status) {
       case "not_received": return "Not Received";
       case "receiving": return "Receiving";
-      case "closed": return "Closed";
+      case "closed": return "Completed";
+      case "issue": return "Issue";
       default: return status;
     }
   };
@@ -275,7 +280,14 @@ export const ASNList = () => {
                   <TableCell>{asn.tracking_number || "-"}</TableCell>
                   <TableCell>{asn.eta ? new Date(asn.eta).toLocaleDateString() : "-"}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusColor(asn.status)}>
+                    <Badge 
+                      variant={getStatusColor(asn.status)}
+                      className={
+                        asn.status === 'receiving' ? 'bg-yellow-600 hover:bg-yellow-700 text-white' :
+                        asn.status === 'closed' ? 'bg-green-600 hover:bg-green-700 text-white' :
+                        ''
+                      }
+                    >
                       {getStatusLabel(asn.status)}
                     </Badge>
                   </TableCell>
@@ -306,6 +318,19 @@ export const ASNList = () => {
                           onClick={() => handleMarkAsClosed(asn)}
                         >
                           Mark as Closed
+                        </Button>
+                      )}
+                      {asn.status === "issue" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setAsnToResolve(asn);
+                            setResolveDialogOpen(true);
+                          }}
+                        >
+                          <CheckCircle2 className="h-4 w-4 mr-2" />
+                          Mark as Resolved
                         </Button>
                       )}
                       {asn.status !== "closed" ? (
@@ -343,6 +368,14 @@ export const ASNList = () => {
         open={showTemplates} 
         onOpenChange={setShowTemplates}
         clientId={selectedClient === 'all' ? '' : selectedClient}
+      />
+
+      <ResolveIssueDialog
+        asnId={asnToResolve?.id || null}
+        asnNumber={asnToResolve?.asn_number || ""}
+        open={resolveDialogOpen}
+        onOpenChange={setResolveDialogOpen}
+        onSuccess={fetchASNs}
       />
     </div>
   );

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Download, Package, Edit, Trash, DollarSign, Filter } from "lucide-react";
 import { BulkProductActionsDialog } from "./BulkProductActionsDialog";
+import { DeleteSKUDialog } from "@/components/admin/DeleteSKUDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +39,8 @@ export default function ClientProductsTab() {
     open: boolean;
     action: 'update-price' | 'update-service' | 'delete';
   }>({ open: false, action: 'update-price' });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingSKU, setDeletingSKU] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -318,6 +321,17 @@ export default function ClientProductsTab() {
         selectedProducts={getSelectedProductsData()}
         onSuccess={() => {
           setSelectedProducts(new Set());
+          fetchProducts();
+        }}
+      />
+
+      <DeleteSKUDialog
+        sku={deletingSKU}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onSuccess={() => {
+          setDeleteDialogOpen(false);
+          setDeletingSKU(null);
           fetchProducts();
         }}
       />

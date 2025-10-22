@@ -8,12 +8,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, LogOut, Settings, ChevronDown, Package, Warehouse, FileText, Download, Sparkles } from "lucide-react";
+import { DollarSign, LogOut, Settings, ChevronDown, Package, Warehouse, FileText, Download, Sparkles, Activity } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientProductsTab from "@/components/client/ClientProductsTab";
 import ClientOrdersTab from "@/components/client/ClientOrdersTab";
 import ClientShopifyTab from "@/components/client/ClientShopifyTab";
+import { ClientInventoryActivityLog } from "@/components/client/ClientInventoryActivityLog";
 import { sanitizeError } from "@/lib/errorHandler";
 import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
 import type { Database } from "@/integrations/supabase/types";
@@ -269,7 +270,7 @@ const ClientDashboard = () => {
         )}
         
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full">
+          <TabsList className="grid grid-cols-5 w-full">
             <TabsTrigger value="products">
               <Package className="mr-2 h-4 w-4" />
               Products
@@ -277,6 +278,10 @@ const ClientDashboard = () => {
             <TabsTrigger value="orders">
               <Package className="mr-2 h-4 w-4" />
               Orders
+            </TabsTrigger>
+            <TabsTrigger value="activity">
+              <Activity className="mr-2 h-4 w-4" />
+              Activity Log
             </TabsTrigger>
             <TabsTrigger value="shopify">
               <Warehouse className="mr-2 h-4 w-4" />
@@ -302,6 +307,10 @@ const ClientDashboard = () => {
 
           <TabsContent value="orders">
             <ClientOrdersTab />
+          </TabsContent>
+
+          <TabsContent value="activity">
+            <ClientInventoryActivityLog clientId={clientId} />
           </TabsContent>
 
           <TabsContent value="shopify">

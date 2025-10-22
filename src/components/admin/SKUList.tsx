@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, FileDown, Edit } from "lucide-react";
+import { Plus, Search, FileDown, Edit, Trash } from "lucide-react";
 import { SKUFormDialog } from "./SKUFormDialog";
+import { DeleteSKUDialog } from "./DeleteSKUDialog";
 import type { Database } from "@/integrations/supabase/types";
 
 type SKU = Database["public"]["Tables"]["skus"]["Row"];
@@ -28,6 +29,8 @@ export const SKUList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSKU, setEditingSKU] = useState<SKU | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingSKU, setDeletingSKU] = useState<SKU | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -236,9 +239,21 @@ export const SKUList = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(sku)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => handleEdit(sku)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => {
+                          setDeletingSKU(sku);
+                          setDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -252,6 +267,17 @@ export const SKUList = () => {
         onClose={handleDialogClose}
         sku={editingSKU}
         clients={clients}
+      />
+
+      <DeleteSKUDialog
+        sku={deletingSKU}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onSuccess={() => {
+          setDeleteDialogOpen(false);
+          setDeletingSKU(null);
+          fetchSKUs();
+        }}
       />
     </div>
   );

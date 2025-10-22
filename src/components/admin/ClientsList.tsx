@@ -52,6 +52,7 @@ const ClientsList = ({ clients, loading, onRefresh }: ClientsListProps) => {
                     client.status === 'inactive' ? 'destructive' : 
                     'secondary'
                   }
+                  className={client.status === 'active' ? 'bg-green-600 hover:bg-green-700 text-white' : ''}
                 >
                   {client.status ? client.status.charAt(0).toUpperCase() + client.status.slice(1) : 'Pending'}
                 </Badge>
