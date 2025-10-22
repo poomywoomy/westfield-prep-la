@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Search, FileDown, Edit, Trash } from "lucide-react";
 import { SKUFormDialog } from "./SKUFormDialog";
 import { DeleteSKUDialog } from "./DeleteSKUDialog";
+import { SKUDetailedHistoryDialog } from "./SKUDetailedHistoryDialog";
 import type { Database } from "@/integrations/supabase/types";
 
 type SKU = Database["public"]["Tables"]["skus"]["Row"];
@@ -17,6 +18,7 @@ type Client = Database["public"]["Tables"]["clients"]["Row"];
 interface SKUWithMetrics extends SKU {
   available: number;
   received_this_month: number;
+  sold_this_month: number;
   expected: number;
   discrepancies: number;
 }
@@ -31,6 +33,8 @@ export const SKUList = () => {
   const [editingSKU, setEditingSKU] = useState<SKU | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingSKU, setDeletingSKU] = useState<SKU | null>(null);
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [selectedSKU, setSelectedSKU] = useState<SKU | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -97,6 +101,16 @@ export const SKUList = () => {
 
         const receivedThisMonth = receivedData?.reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0;
 
+        // Get sold this month from inventory_ledger
+        const { data: soldData } = await supabase
+          .from("inventory_ledger")
+          .select("qty_delta")
+          .eq("sku_id", sku.id)
+          .in("transaction_type", ["SALE_DECREMENT"])
+          .gte("ts", startOfMonth.toISOString());
+
+        const soldThisMonth = Math.abs(soldData?.reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0);
+
         // Get expected from ASN lines
         const { data: asnData } = await supabase
           .from("asn_lines")
@@ -122,6 +136,7 @@ export const SKUList = () => {
           ...sku,
           available: summaryData?.available || 0,
           received_this_month: receivedThisMonth,
+          sold_this_month: soldThisMonth,
           expected,
           discrepancies,
         };
@@ -195,9 +210,9 @@ export const SKUList = () => {
             <TableRow>
               <TableHead>Client SKU</TableHead>
               <TableHead>Title</TableHead>
-              <TableHead>FNSKU</TableHead>
               <TableHead className="text-right">Available</TableHead>
               <TableHead className="text-right">Received (Month)</TableHead>
+              <TableHead className="text-right">Sold (Month)</TableHead>
               <TableHead className="text-right">Expected</TableHead>
               <TableHead className="text-right">Discrepancies</TableHead>
               <TableHead>Status</TableHead>
@@ -219,12 +234,19 @@ export const SKUList = () => {
               </TableRow>
             ) : (
               filteredSKUs.map(sku => (
-                <TableRow key={sku.id}>
+                <TableRow 
+                  key={sku.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    setSelectedSKU(sku);
+                    setHistoryDialogOpen(true);
+                  }}
+                >
                   <TableCell className="font-medium">{sku.client_sku}</TableCell>
                   <TableCell>{sku.title}</TableCell>
-                  <TableCell>{sku.fnsku || "-"}</TableCell>
                   <TableCell className="text-right">{sku.available}</TableCell>
                   <TableCell className="text-right">{sku.received_this_month}</TableCell>
+                  <TableCell className="text-right">{sku.sold_this_month}</TableCell>
                   <TableCell className="text-right">{sku.expected}</TableCell>
                   <TableCell className="text-right">
                     {sku.discrepancies > 0 ? (
@@ -234,12 +256,15 @@ export const SKUList = () => {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={sku.status === "active" ? "default" : "secondary"}>
-                      {sku.status}
+                    <Badge 
+                      variant={sku.status === "active" ? "default" : "secondary"}
+                      className={sku.status === "active" ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+                    >
+                      {sku.status === "active" ? "Active" : sku.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                       <Button variant="ghost" size="sm" onClick={() => handleEdit(sku)}>
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -278,6 +303,14 @@ export const SKUList = () => {
           setDeletingSKU(null);
           fetchSKUs();
         }}
+      />
+
+      <SKUDetailedHistoryDialog
+        open={historyDialogOpen}
+        onOpenChange={setHistoryDialogOpen}
+        skuId={selectedSKU?.id || ""}
+        clientSku={selectedSKU?.client_sku || ""}
+        title={selectedSKU?.title || ""}
       />
     </div>
   );

@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Search, Download, Package, Edit, Trash, DollarSign, Filter } from "lucide-react";
 import { BulkProductActionsDialog } from "./BulkProductActionsDialog";
 import { DeleteSKUDialog } from "@/components/admin/DeleteSKUDialog";
+import { SKUDetailedHistoryDialog } from "@/components/admin/SKUDetailedHistoryDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +42,8 @@ export default function ClientProductsTab() {
   }>({ open: false, action: 'update-price' });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingSKU, setDeletingSKU] = useState<any>(null);
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -111,19 +114,35 @@ export default function ClientProductsTab() {
         .select('*')
         .eq('client_id', client.id);
 
-      // Merge inventory data with SKU data
-      const productsWithInventory = (skuData || []).map(sku => {
+      // Get sold this month for each SKU
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      const productsWithMetrics = await Promise.all((skuData || []).map(async (sku) => {
         const inventory = (inventoryData || []).find(inv => inv.sku_id === sku.id);
+        
+        // Get sold this month
+        const { data: soldData } = await supabase
+          .from("inventory_ledger")
+          .select("qty_delta")
+          .eq("sku_id", sku.id)
+          .in("transaction_type", ["SALE_DECREMENT"])
+          .gte("ts", startOfMonth.toISOString());
+
+        const soldThisMonth = Math.abs(soldData?.reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0);
+
         return {
           ...sku,
           on_hand: inventory?.on_hand || 0,
           available: inventory?.available || 0,
           reserved: inventory?.reserved || 0,
+          sold_this_month: soldThisMonth,
         };
-      });
+      }));
 
-      setProducts(productsWithInventory);
-      setFilteredProducts(productsWithInventory);
+      setProducts(productsWithMetrics);
+      setFilteredProducts(productsWithMetrics);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast({
@@ -281,6 +300,8 @@ export default function ClientProductsTab() {
                   <TableHead className="text-right">On Hand</TableHead>
                   <TableHead className="text-right">Available</TableHead>
                   <TableHead className="text-right">Reserved</TableHead>
+                  <TableHead className="text-right">Sold (Month)</TableHead>
+                  <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -292,8 +313,15 @@ export default function ClientProductsTab() {
                   </TableRow>
                 ) : (
                   filteredProducts.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell>
+                    <TableRow 
+                      key={product.id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => {
+                        setSelectedProduct(product);
+                        setHistoryDialogOpen(true);
+                      }}
+                    >
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <Checkbox
                           checked={selectedProducts.has(product.id)}
                           onCheckedChange={() => toggleSelectProduct(product.id)}
@@ -305,6 +333,15 @@ export default function ClientProductsTab() {
                       <TableCell className="text-right font-medium">{product.on_hand}</TableCell>
                       <TableCell className="text-right font-medium text-green-600">{product.available}</TableCell>
                       <TableCell className="text-right font-medium text-amber-600">{product.reserved}</TableCell>
+                      <TableCell className="text-right font-medium text-blue-600">{product.sold_this_month}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={product.status === "active" ? "default" : "secondary"}
+                          className={product.status === "active" ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+                        >
+                          {product.status === "active" ? "Active" : product.status}
+                        </Badge>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -334,6 +371,14 @@ export default function ClientProductsTab() {
           setDeletingSKU(null);
           fetchProducts();
         }}
+      />
+
+      <SKUDetailedHistoryDialog
+        open={historyDialogOpen}
+        onOpenChange={setHistoryDialogOpen}
+        skuId={selectedProduct?.id || ""}
+        clientSku={selectedProduct?.client_sku || ""}
+        title={selectedProduct?.title || ""}
       />
     </div>
   );

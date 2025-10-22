@@ -24,7 +24,7 @@ const adjustmentSchema = z.object({
   sku_id: z.string().uuid(),
   location_id: z.string().uuid(),
   qty_delta: z.number().int().min(-1000000).max(1000000).refine(val => val !== 0, "Adjustment quantity cannot be zero"),
-  reason_code: z.enum(['cycle_count', 'damage', 'shrink', 'rework', 'correction', 'return', 'other']),
+  reason_code: z.enum(['cycle_count', 'damage', 'rework', 'correction', 'return', 'sold', 'sent_to_amazon', 'sent_to_walmart', 'sent_to_tiktok', 'other']),
   notes: z.string().trim().min(1, "Notes are required").max(1000),
   lot_number: z.string().trim().max(100).nullable().optional(),
   expiry_date: z.date().nullable().optional(),
@@ -138,8 +138,15 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
         expiry_date: formData.expiry_date || null,
       });
 
-      // Determine transaction type based on qty_delta sign
-      const transactionType = validated.qty_delta > 0 ? "ADJUSTMENT_PLUS" : "ADJUSTMENT_MINUS";
+      // Determine transaction type based on qty_delta sign and reason code
+      let transactionType: string;
+      if (validated.reason_code === 'sold') {
+        transactionType = "SALE_DECREMENT";
+      } else if (['sent_to_amazon', 'sent_to_walmart', 'sent_to_tiktok'].includes(validated.reason_code)) {
+        transactionType = "TRANSFER";
+      } else {
+        transactionType = validated.qty_delta > 0 ? "ADJUSTMENT_PLUS" : "ADJUSTMENT_MINUS";
+      }
       
       const { error } = await supabase.from("inventory_ledger").insert({
         client_id: validated.client_id,
@@ -276,7 +283,7 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
     }
   };
 
-  const applyPreset = (preset: 'cycle_count' | 'damage' | 'shrink') => {
+  const applyPreset = (preset: 'cycle_count' | 'damage' | 'sold') => {
     setFormData({ ...formData, reason_code: preset });
     if (preset === 'cycle_count') {
       setBatchMode(true);
@@ -304,7 +311,7 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
     setScannerActive(false);
   };
 
-  const showPhotoCapture = formData.reason_code === 'damage' || formData.reason_code === 'shrink';
+  const showPhotoCapture = formData.reason_code === 'damage';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -322,8 +329,8 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
             <Button variant="outline" size="sm" onClick={() => applyPreset('damage')}>
               📸 Damage Report
             </Button>
-            <Button variant="outline" size="sm" onClick={() => applyPreset('shrink')}>
-              ⚠️ Shrinkage
+            <Button variant="outline" size="sm" onClick={() => applyPreset('sold')}>
+              💰 Sale
             </Button>
           </div>
 
@@ -464,10 +471,13 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess }: Inv
               <SelectContent>
                 <SelectItem value="cycle_count">Cycle Count</SelectItem>
                 <SelectItem value="damage">Damage</SelectItem>
-                <SelectItem value="shrink">Shrinkage</SelectItem>
                 <SelectItem value="rework">Rework</SelectItem>
                 <SelectItem value="correction">Correction</SelectItem>
                 <SelectItem value="return">Return</SelectItem>
+                <SelectItem value="sold">Sold</SelectItem>
+                <SelectItem value="sent_to_amazon">Sent to Amazon</SelectItem>
+                <SelectItem value="sent_to_walmart">Sent to Walmart</SelectItem>
+                <SelectItem value="sent_to_tiktok">Sent to TikTok</SelectItem>
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
