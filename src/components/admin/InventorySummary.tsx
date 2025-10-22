@@ -4,7 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, FileDown, PackagePlus, Settings as SettingsIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, FileDown, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -13,6 +14,7 @@ import { InventoryRowActions } from "./InventoryRowActions";
 import { InventoryAdjustmentDialog } from "./InventoryAdjustmentDialog";
 import { InventoryHistoryDialog } from "./InventoryHistoryDialog";
 import { QuickScanModal } from "./QuickScanModal";
+import { DiscrepancyActionsDialog } from "./DiscrepancyActionsDialog";
 import { format } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -49,14 +51,21 @@ export const InventorySummary = () => {
   const [quickScanOpen, setQuickScanOpen] = useState(false);
   const [selectedSku, setSelectedSku] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"available" | "discrepancies">("available");
+  const [discrepancies, setDiscrepancies] = useState<any[]>([]);
+  const [selectedDiscrepancy, setSelectedDiscrepancy] = useState<any>(null);
+  const [discrepancyDialogOpen, setDiscrepancyDialogOpen] = useState(false);
   const [realtimeEnabled, setRealtimeEnabled] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchClients();
     fetchLocations();
-    fetchInventory();
-  }, [selectedClient, selectedLocation, stockStatus]);
+    if (activeTab === "available") {
+      fetchInventory();
+    } else {
+      fetchDiscrepancies();
+    }
+  }, [selectedClient, selectedLocation, stockStatus, activeTab]);
 
   // Real-time subscription
   useEffect(() => {
@@ -165,6 +174,28 @@ export const InventorySummary = () => {
     setLoading(false);
   };
 
+  const fetchDiscrepancies = async () => {
+    setLoading(true);
+    
+    let query = supabase
+      .from("inventory_discrepancies_summary")
+      .select("*");
+    
+    if (selectedClient !== "all") {
+      query = query.eq("client_id", selectedClient);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      toast({ title: "Error", description: "Failed to load discrepancies", variant: "destructive" });
+      setDiscrepancies([]);
+    } else {
+      setDiscrepancies(data || []);
+    }
+    setLoading(false);
+  };
+
   const filteredInventory = inventory.filter(item => {
     // Stock status filter
     if (stockStatus === "low" && item.available >= 10) return false;
@@ -256,11 +287,21 @@ export const InventorySummary = () => {
 
   return (
     <div className="space-y-6">
-      <InventoryMetricsCards 
-        metrics={metrics}
-        onMetricClick={(filter) => setStockStatus(filter)}
-        onQuickScan={() => setQuickScanOpen(true)}
-      />
+      <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)} className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="available">Available Inventory</TabsTrigger>
+          <TabsTrigger value="discrepancies">
+            <AlertTriangle className="mr-2 h-4 w-4" />
+            Discrepancies
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="available" className="space-y-6">
+          <InventoryMetricsCards 
+            metrics={metrics}
+            onMetricClick={(filter) => setStockStatus(filter)}
+            onQuickScan={() => setQuickScanOpen(true)}
+          />
 
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4 flex-wrap">
@@ -437,6 +478,158 @@ export const InventorySummary = () => {
           skuId={selectedSku.sku_id}
           clientSku={selectedSku.client_sku}
           title={selectedSku.title}
+        />
+      )}
+
+        </TabsContent>
+
+        <TabsContent value="discrepancies" className="space-y-6">
+          <div className="flex items-center gap-4 flex-wrap">
+            <Select value={selectedClient} onValueChange={setSelectedClient}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Select client" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Clients</SelectItem>
+                {clients.map(client => (
+                  <SelectItem key={client.id} value={client.id}>
+                    {client.company_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ASN</TableHead>
+                  <TableHead>SKU / Product</TableHead>
+                  <TableHead className="text-right">Damaged</TableHead>
+                  <TableHead className="text-right">Missing</TableHead>
+                  <TableHead className="text-right">Quarantined</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                      Loading discrepancies...
+                    </TableCell>
+                  </TableRow>
+                ) : discrepancies.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                      No discrepancies found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  discrepancies.map((item) => (
+                    <TableRow key={item.sku_id + item.asn_id}>
+                      <TableCell>
+                        <Badge variant="outline">{item.asn_number}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{item.client_sku}</span>
+                          <span className="text-xs text-muted-foreground">{item.title}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {item.damaged_qty > 0 && (
+                          <Badge variant="destructive">{item.damaged_qty}</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {item.missing_qty > 0 && (
+                          <Badge variant="destructive">{item.missing_qty}</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {item.quarantined_qty > 0 && (
+                          <Badge variant="outline" className="border-amber-500 text-amber-500">
+                            {item.quarantined_qty}
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={item.status === 'pending' ? 'secondary' : 'default'}>
+                          {item.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {item.received_at
+                          ? format(new Date(item.received_at), "MMM d, HH:mm")
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedDiscrepancy(item);
+                            setDiscrepancyDialogOpen(true);
+                          }}
+                        >
+                          Review
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <InventoryAdjustmentDialog
+        open={adjustDialogOpen}
+        onOpenChange={setAdjustDialogOpen}
+        onSuccess={() => {
+          fetchInventory();
+          toast({ title: "Success", description: "Inventory adjusted" });
+        }}
+      />
+
+      {selectedSku && (
+        <InventoryHistoryDialog
+          open={historyDialogOpen}
+          onOpenChange={setHistoryDialogOpen}
+          skuId={selectedSku.sku_id}
+          clientSku={selectedSku.client_sku}
+          title={selectedSku.title}
+        />
+      )}
+
+      {selectedDiscrepancy && (
+        <DiscrepancyActionsDialog
+          open={discrepancyDialogOpen}
+          onOpenChange={setDiscrepancyDialogOpen}
+          decision={{
+            id: selectedDiscrepancy.sku_id,
+            client_id: selectedDiscrepancy.client_id,
+            asn_id: selectedDiscrepancy.asn_id,
+            sku_id: selectedDiscrepancy.sku_id,
+            quantity: (selectedDiscrepancy.damaged_qty || 0) + (selectedDiscrepancy.missing_qty || 0) + (selectedDiscrepancy.quarantined_qty || 0),
+            discrepancy_type: selectedDiscrepancy.damaged_qty > 0 ? 'damaged' : selectedDiscrepancy.missing_qty > 0 ? 'missing' : 'quarantined',
+            decision: selectedDiscrepancy.decision || 'pending',
+            client_notes: selectedDiscrepancy.client_notes || '',
+            submitted_at: selectedDiscrepancy.created_at || new Date().toISOString(),
+            status: selectedDiscrepancy.status || 'pending',
+            client_sku: selectedDiscrepancy.client_sku,
+            title: selectedDiscrepancy.title,
+            asn_number: selectedDiscrepancy.asn_number,
+            qc_photo_urls: null,
+          }}
+          onSuccess={() => {
+            fetchDiscrepancies();
+            toast({ title: "Success", description: "Discrepancy processed" });
+          }}
         />
       )}
 

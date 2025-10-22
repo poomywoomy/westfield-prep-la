@@ -409,8 +409,8 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
               sku_id: line.sku.id,
               location_id: mainLocationId,
               user_id: user?.id || null,
-              qty_delta: 0, // Don't add to inventory
-              transaction_type: "ADJUSTMENT" as const,
+              qty_delta: 0,
+              transaction_type: "ADJUSTMENT_MINUS" as const,
               source_type: "asn",
               source_ref: asn!.id,
               reason_code: "damage",
@@ -430,8 +430,8 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
               sku_id: line.sku.id,
               location_id: mainLocationId,
               user_id: user?.id || null,
-              qty_delta: 0, // Don't add to inventory
-              transaction_type: "ADJUSTMENT" as const,
+              qty_delta: 0,
+              transaction_type: "ADJUSTMENT_MINUS" as const,
               source_type: "asn",
               source_ref: asn!.id,
               reason_code: "other",
@@ -451,8 +451,8 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
               sku_id: line.sku.id,
               location_id: mainLocationId,
               user_id: user?.id || null,
-              qty_delta: 0, // Don't add to inventory
-              transaction_type: "ADJUSTMENT" as const,
+              qty_delta: 0,
+              transaction_type: "ADJUSTMENT_MINUS" as const,
               source_type: "asn",
               source_ref: asn!.id,
               reason_code: "other",

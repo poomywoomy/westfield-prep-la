@@ -147,10 +147,11 @@ export function SKUDetailedHistoryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex justify-between items-center">
-            <DialogTitle>SKU History: {clientSku}</DialogTitle>
+          <DialogTitle>SKU History: {clientSku}</DialogTitle>
+          <div className="flex items-center gap-4 mt-2">
+            <p className="text-sm text-muted-foreground flex-1">{title}</p>
             <Select value={timePeriod} onValueChange={(value: TimePeriod) => setTimePeriod(value)}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[160px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -165,7 +166,6 @@ export function SKUDetailedHistoryDialog({
               </SelectContent>
             </Select>
           </div>
-          <p className="text-sm text-muted-foreground">{title}</p>
         </DialogHeader>
         
         {/* Metrics Cards */}
