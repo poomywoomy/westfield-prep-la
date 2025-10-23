@@ -2240,38 +2240,14 @@ export type Database = {
       }
     }
     Functions: {
-      activate_client_on_login: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_expired_attachments: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      cleanup_old_oauth_states: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_old_rate_limits: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_old_sync_logs: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      clear_password_expiration: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      delete_own_client_account: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      generate_asn_number: {
-        Args: { p_client_id: string }
-        Returns: string
-      }
+      activate_client_on_login: { Args: never; Returns: undefined }
+      cleanup_expired_attachments: { Args: never; Returns: number }
+      cleanup_old_oauth_states: { Args: never; Returns: undefined }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
+      cleanup_old_sync_logs: { Args: never; Returns: undefined }
+      clear_password_expiration: { Args: never; Returns: undefined }
+      delete_own_client_account: { Args: never; Returns: Json }
+      generate_asn_number: { Args: { p_client_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

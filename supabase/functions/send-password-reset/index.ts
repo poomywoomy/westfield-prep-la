@@ -57,7 +57,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { data: existingAttempts } = await supabaseAdmin
       .from('rate_limits')
-      .select('request_count')
+      .select('request_count, window_start')
       .eq('key', rateLimitKey)
       .gte('window_start', windowStart.toISOString())
       .maybeSingle();
