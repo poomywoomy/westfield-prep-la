@@ -49,6 +49,42 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Create admin client
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Rate limiting check (5 attempts per hour per email) - prevent spam and email enumeration
+    const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimitKey = `password_reset:${email}:${clientIp}`;
+    const windowStart = new Date(Date.now() - 3600000); // 1 hour ago
+    
+    const { data: existingAttempts } = await supabaseAdmin
+      .from('rate_limits')
+      .select('request_count')
+      .eq('key', rateLimitKey)
+      .gte('window_start', windowStart.toISOString())
+      .maybeSingle();
+    
+    if (existingAttempts && existingAttempts.request_count >= 5) {
+      console.warn(`Rate limit exceeded for password reset: ${email}`);
+      // Return success message to prevent email enumeration
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          message: "If an account exists with this email, you will receive a password reset link."
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+    
+    // Update rate limit counter
+    await supabaseAdmin
+      .from('rate_limits')
+      .upsert({
+        key: rateLimitKey,
+        request_count: (existingAttempts?.request_count || 0) + 1,
+        window_start: existingAttempts ? existingAttempts.window_start : new Date().toISOString()
+      });
 
     // Generate password reset link using Supabase
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
@@ -164,10 +200,11 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Email service error");
     }
 
+    // Always return the same message to prevent email enumeration
     return new Response(
       JSON.stringify({ 
         success: true,
-        message: "Password reset email sent successfully" 
+        message: "If an account exists with this email, you will receive a password reset link."
       }),
       {
         status: 200,
@@ -179,13 +216,14 @@ const handler = async (req: Request): Promise<Response> => {
     );
   } catch (error: any) {
     console.error("Error in send-password-reset function:", error);
+    // Always return the same message to prevent email enumeration even on errors
     return new Response(
       JSON.stringify({ 
-        error: "Unable to send password reset email. Please try again or contact support.",
-        success: false 
+        success: true,
+        message: "If an account exists with this email, you will receive a password reset link."
       }),
       {
-        status: 500,
+        status: 200,
         headers: { 
           "Content-Type": "application/json", 
           ...corsHeaders 

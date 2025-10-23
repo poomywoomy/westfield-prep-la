@@ -1,7 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -73,6 +76,41 @@ const handler = async (req: Request): Promise<Response> => {
     }
     
     const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data;
+    
+    // Rate limiting check (5 submissions per hour per email)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimitKey = `contact_form:${email}:${clientIp}`;
+    const windowStart = new Date(Date.now() - 3600000); // 1 hour ago
+    
+    const { data: existingAttempts } = await supabase
+      .from('rate_limits')
+      .select('request_count')
+      .eq('key', rateLimitKey)
+      .gte('window_start', windowStart.toISOString())
+      .maybeSingle();
+    
+    if (existingAttempts && existingAttempts.request_count >= 5) {
+      console.warn(`Rate limit exceeded for ${email}`);
+      return new Response(
+        JSON.stringify({ 
+          error: "Too many requests. Please try again later."
+        }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+    
+    // Update rate limit counter
+    await supabase
+      .from('rate_limits')
+      .upsert({
+        key: rateLimitKey,
+        request_count: (existingAttempts?.request_count || 0) + 1,
+        window_start: existingAttempts ? existingAttempts.window_start : new Date().toISOString()
+      });
     
     // Escape HTML to prevent XSS
     const safeName = escapeHtml(name);

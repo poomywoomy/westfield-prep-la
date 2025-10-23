@@ -1,8 +1,22 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
+
+// Input validation schema
+const lookupRequestSchema = z.object({
+  barcode: z.string()
+    .trim()
+    .min(1, 'Barcode cannot be empty')
+    .max(50, 'Barcode too long')
+    .regex(/^[A-Za-z0-9\-\s]+$/, 'Invalid barcode format - only alphanumeric characters, hyphens, and spaces allowed'),
+  client_id: z.string().uuid().optional(),
+  context: z.enum(['receiving', 'adjustment', 'lookup', 'asn_creation']).optional(),
+  asn_id: z.string().uuid().optional(),
+  user_id: z.string().uuid().optional()
+});
 
 interface LookupRequest {
   barcode: string;
@@ -87,16 +101,22 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Parse request body
-    const body: LookupRequest = await req.json();
-    const { barcode, client_id, context = 'lookup', asn_id } = body;
-
-    if (!barcode || barcode.trim().length === 0) {
+    // Parse and validate request body
+    const bodyData = await req.json();
+    const validationResult = lookupRequestSchema.safeParse(bodyData);
+    
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error);
       return new Response(
-        JSON.stringify({ error: 'Barcode is required' }),
+        JSON.stringify({ 
+          error: 'Invalid barcode format or parameters',
+          details: validationResult.error.errors[0]?.message 
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    const { barcode, client_id, context = 'lookup', asn_id }: LookupRequest = validationResult.data;
 
     // Normalize barcode
     const normalizedBarcode = barcode.trim().toUpperCase().replace(/\s+/g, '');
