@@ -44,7 +44,7 @@ export const BarcodeScanner = ({
   useEffect(() => {
     if (!keyboardMode) return;
 
-    const handleKeyPress = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if user is typing in an input field (except our scanner input)
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' && target !== inputRef.current) return;
@@ -76,8 +76,8 @@ export const BarcodeScanner = ({
       lastKeyTimeRef.current = currentTime;
     };
 
-    window.addEventListener('keypress', handleKeyPress);
-    return () => window.removeEventListener('keypress', handleKeyPress);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [keyboardMode, continuous]);
 
   // Camera scanner

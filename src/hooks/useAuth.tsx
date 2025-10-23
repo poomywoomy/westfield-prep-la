@@ -44,23 +44,38 @@ export const useAuth = () => {
 
     // Check for existing session only if not logging out
     if (!isLoggingOut) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Activate client on initial load and fetch role (deferred to avoid blocking)
-          setTimeout(async () => {
-            const { error } = await supabase.rpc('activate_client_on_login');
-            if (error && import.meta.env.DEV) {
-              console.error('Error activating client:', error);
-            }
-            fetchUserRole(session.user.id);
-          }, 0);
-        } else {
-          setLoading(false);
-        }
-      });
+      // Check if we just logged out - delay session check to prevent race
+      const justLoggedOut = localStorage.getItem('auth:justLoggedOut');
+      
+      if (justLoggedOut) {
+        // Wait a bit before checking session, then remove flag
+        setTimeout(() => {
+          localStorage.removeItem('auth:justLoggedOut');
+          supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setUser(session?.user ?? null);
+            setLoading(false);
+          });
+        }, 1000);
+      } else {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          if (session?.user) {
+            // Activate client on initial load and fetch role (deferred to avoid blocking)
+            setTimeout(async () => {
+              const { error } = await supabase.rpc('activate_client_on_login');
+              if (error && import.meta.env.DEV) {
+                console.error('Error activating client:', error);
+              }
+              fetchUserRole(session.user.id);
+            }, 0);
+          } else {
+            setLoading(false);
+          }
+        });
+      }
     }
 
     return () => subscription.unsubscribe();
@@ -92,10 +107,18 @@ export const useAuth = () => {
     setUser(null);
     setRole(null);
     
-    // Clear localStorage before signOut to prevent auto-login
-    localStorage.removeItem('sb-gqnvkecmxjijrxhggcro-auth-token');
+    // Global sign out to invalidate all sessions
+    await supabase.auth.signOut({ scope: 'global' });
     
-    await supabase.auth.signOut({ scope: 'local' });
+    // Clear all Supabase auth tokens from localStorage
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    // Set flag to prevent immediate rehydration race
+    localStorage.setItem('auth:justLoggedOut', '1');
   }, []);
 
   return { user, session, loading, role, logout };

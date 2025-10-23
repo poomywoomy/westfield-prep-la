@@ -124,19 +124,24 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
   useEffect(() => {
     if (!open) return;
 
-    const handleKeyPress = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if user is typing in an input/textarea
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
       }
 
-      // Clear timeout on each keypress
+      // Clear timeout on each keydown
       if (keyboardTimeout.current) {
         clearTimeout(keyboardTimeout.current);
       }
 
+      // Prevent default for Enter to avoid form submission
+      if (e.key === 'Enter' && keyboardBuffer.current.length > 5) {
+        e.preventDefault();
+      }
+
       // Add character to buffer (ignore special keys)
-      if (e.key.length === 1) {
+      if (e.key.length === 1 && e.key !== 'Enter') {
         keyboardBuffer.current += e.key;
       }
 
@@ -164,10 +169,10 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
       }, 100);
     };
 
-    window.addEventListener('keypress', handleKeyPress);
+    window.addEventListener('keydown', handleKeyDown);
     
     return () => {
-      window.removeEventListener('keypress', handleKeyPress);
+      window.removeEventListener('keydown', handleKeyDown);
       if (keyboardTimeout.current) {
         clearTimeout(keyboardTimeout.current);
       }

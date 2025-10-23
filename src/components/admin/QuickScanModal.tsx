@@ -64,13 +64,18 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
 
     try {
       // Call barcode-lookup edge function
-      const { data, error } = await supabase.functions.invoke('barcode-lookup', {
-        body: { 
-          barcode, 
-          client_id: selectedClient,
-          context: 'quick_scan'
-        }
-      });
+    const { data, error } = await supabase.functions.invoke('barcode-lookup', {
+      body: {
+        barcode,
+        client_id: selectedClient,
+        context: 'lookup'
+      }
+    });
+    
+    if (error) {
+      console.error('Barcode lookup error:', error);
+      throw new Error(error.message || 'Failed to lookup barcode');
+    }
 
       if (error) throw error;
 

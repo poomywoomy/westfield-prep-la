@@ -98,6 +98,9 @@ const Header = () => {
                 Pricing
               </button>
             )}
+            <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium">
+              Blog
+            </Link>
             <Link to="/faq" className="text-foreground hover:text-primary transition-colors font-medium">
               FAQ
             </Link>
