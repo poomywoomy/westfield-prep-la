@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
@@ -6,11 +6,11 @@ const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
 export const useAutoLogout = (isAuthenticated: boolean) => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await supabase.auth.signOut();
-  };
+  }, []);
 
-  const resetTimer = () => {
+  const resetTimer = useCallback(() => {
     // Clear existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -22,7 +22,7 @@ export const useAutoLogout = (isAuthenticated: boolean) => {
         logout();
       }, INACTIVITY_TIMEOUT);
     }
-  };
+  }, [isAuthenticated, logout]);
 
   useEffect(() => {
     if (!isAuthenticated) return;

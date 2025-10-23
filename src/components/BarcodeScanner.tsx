@@ -16,6 +16,7 @@ interface BarcodeScannerProps {
   autoStart?: boolean;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export const BarcodeScanner = ({
@@ -25,7 +26,8 @@ export const BarcodeScanner = ({
   continuous = false,
   autoStart = false,
   placeholder = "Scan or type barcode...",
-  className
+  className,
+  disabled = false
 }: BarcodeScannerProps) => {
   const [cameraActive, setCameraActive] = useState(false);
   const [keyboardMode, setKeyboardMode] = useState(mode === 'keyboard' || mode === 'both');
@@ -256,11 +258,13 @@ export const BarcodeScanner = ({
             onKeyPress={(e) => e.key === 'Enter' && handleManualSubmit()}
             placeholder={placeholder}
             className="flex-1"
+            disabled={disabled}
+            autoFocus
           />
           <Button 
             type="button"
             onClick={handleManualSubmit}
-            disabled={!manualInput.trim()}
+            disabled={!manualInput.trim() || disabled}
           >
             Submit
           </Button>
@@ -270,6 +274,7 @@ export const BarcodeScanner = ({
               variant="ghost"
               size="icon"
               onClick={() => setManualInput('')}
+              disabled={disabled}
             >
               <X className="h-4 w-4" />
             </Button>

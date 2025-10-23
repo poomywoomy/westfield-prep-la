@@ -204,7 +204,11 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Select Client *</label>
-              <Select value={selectedClient} onValueChange={setSelectedClient}>
+              <Select 
+                value={selectedClient} 
+                onValueChange={setSelectedClient}
+                disabled={scanning}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Choose a client to start scanning" />
                 </SelectTrigger>
@@ -232,6 +236,7 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
                   }}
                   placeholder="Ready to scan..."
                   continuous={true}
+                  disabled={scanning}
                 />
               </div>
             )}
