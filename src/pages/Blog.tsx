@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { CategoryFilter } from "@/components/blog/CategoryFilter";
 import { SearchBar } from "@/components/blog/SearchBar";
 import { NewsletterSignup } from "@/components/blog/NewsletterSignup";
@@ -126,7 +126,19 @@ const Blog = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredPosts.map((post, i) => (
-                <BlogCard key={post.id} {...post} isFeatured={i === 0} />
+                <BlogCard 
+                  key={post.id} 
+                  id={post.id}
+                  title={post.title}
+                  slug={post.slug}
+                  excerpt={post.excerpt}
+                  coverImageUrl={post.cover_image_url}
+                  publishedAt={post.published_at}
+                  category={post.category}
+                  authorName={post.author_name}
+                  readTimeMinutes={post.read_time_minutes}
+                  isFeatured={i === 0} 
+                />
               ))}
             </div>
           )}
