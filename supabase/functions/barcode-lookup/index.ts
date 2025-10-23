@@ -284,43 +284,47 @@ Deno.serve(async (req) => {
     } else if (detectedType.startsWith('product_')) {
       console.log('Searching for SKU matches...');
       
-      // Step 1: Search sku_aliases first for alternate barcodes
-      let aliasQuery = supabase
-        .from('sku_aliases')
+      // Search SKUs by multiple fields
+      let query = supabase
+        .from('skus')
         .select(`
-          sku_id,
-          alias_type,
-          alias_value,
-          skus!inner (
-            id,
-            client_id,
-            client_sku,
-            title,
-            brand,
-            upc,
-            ean,
-            fnsku,
-            asin,
-            status,
-            clients!inner(company_name)
-          )
+          id, 
+          client_id, 
+          client_sku, 
+          title, 
+          brand,
+          upc, 
+          ean, 
+          fnsku, 
+          asin,
+          status,
+          clients!inner(company_name)
         `)
-        .eq('alias_value', normalizedBarcode)
-        .eq('skus.status', 'active');
+        .eq('status', 'active');
 
       // Add client filter if provided
       if (client_id) {
-        aliasQuery = aliasQuery.eq('skus.client_id', client_id);
+        query = query.eq('client_id', client_id);
       }
 
-      const { data: aliasMatches, error: aliasError } = await aliasQuery;
+      // Search across multiple barcode fields - Supabase handles NULL properly
+      query = query.or(`upc.eq.${normalizedBarcode},ean.eq.${normalizedBarcode},fnsku.eq.${normalizedBarcode},asin.eq.${normalizedBarcode},client_sku.ilike.${normalizedBarcode}`);
 
-      if (!aliasError && aliasMatches && aliasMatches.length > 0) {
-        const matchedAlias = aliasMatches[0];
-        const matchedSku = matchedAlias.skus as any;
-        console.log('Found SKU via alias:', matchedSku.id);
+      const { data: skuData, error: skuError } = await query;
 
-        // Get inventory data
+      if (skuData && skuData.length > 0 && !skuError) {
+        const matchedSku = skuData[0];
+        console.log('Found SKU match:', matchedSku.id);
+
+        // Determine specific match type
+        let specificType: any = 'product_upc';
+        if (matchedSku.upc === normalizedBarcode) specificType = 'product_upc';
+        else if (matchedSku.ean === normalizedBarcode) specificType = 'product_ean';
+        else if (matchedSku.fnsku === normalizedBarcode) specificType = 'product_fnsku';
+        else if (matchedSku.asin === normalizedBarcode) specificType = 'product_asin';
+        else if (matchedSku.client_sku?.toUpperCase() === normalizedBarcode) specificType = 'product_client_sku';
+
+        // Fetch current inventory
         const { data: inventoryData } = await supabase
           .from('inventory_summary')
           .select('on_hand, available, reserved')
@@ -329,9 +333,7 @@ Deno.serve(async (req) => {
 
         response = {
           found: true,
-          type: matchedAlias.alias_type === 'upc' ? 'product_upc' : 
-                matchedAlias.alias_type === 'ean' ? 'product_ean' :
-                matchedAlias.alias_type === 'fnsku' ? 'product_fnsku' : 'product_code',
+          type: specificType,
           matched_table: 'skus',
           matched_id: matchedSku.id,
           data: {
@@ -340,73 +342,15 @@ Deno.serve(async (req) => {
           }
         };
       } else {
-        // Step 2: Direct SKU field search if no alias match
-        let query = supabase
+        // Provide fuzzy search suggestions
+        const { data: suggestions } = await supabase
           .from('skus')
-          .select(`
-            id, 
-            client_id, 
-            client_sku, 
-            title, 
-            brand,
-            upc, 
-            ean, 
-            fnsku, 
-            asin,
-            status,
-            clients!inner(company_name)
-          `)
-          .eq('status', 'active');
+          .select('id, client_sku, title, upc, ean, fnsku')
+          .eq('status', 'active')
+          .or(`client_sku.ilike.%${normalizedBarcode}%,title.ilike.%${normalizedBarcode}%`)
+          .limit(5);
 
-        // Add client filter if provided
-        if (client_id) {
-          query = query.eq('client_id', client_id);
-        }
-
-        // Search across multiple barcode fields
-        query = query.or(`upc.eq.${normalizedBarcode},ean.eq.${normalizedBarcode},fnsku.eq.${normalizedBarcode},asin.eq.${normalizedBarcode},client_sku.ilike.${normalizedBarcode}`);
-
-        const { data: skuData, error: skuError } = await query;
-
-        if (skuData && skuData.length > 0 && !skuError) {
-          const matchedSku = skuData[0];
-          console.log('Found SKU match:', matchedSku.id);
-
-          // Determine specific match type
-          let specificType: any = 'product_upc';
-          if (matchedSku.upc === normalizedBarcode) specificType = 'product_upc';
-          else if (matchedSku.ean === normalizedBarcode) specificType = 'product_ean';
-          else if (matchedSku.fnsku === normalizedBarcode) specificType = 'product_fnsku';
-          else if (matchedSku.client_sku?.toUpperCase() === normalizedBarcode) specificType = 'product_client_sku';
-
-          // Fetch current inventory
-          const { data: inventoryData } = await supabase
-            .from('inventory_summary')
-            .select('on_hand, available, reserved')
-            .eq('sku_id', matchedSku.id)
-            .maybeSingle();
-
-          response = {
-            found: true,
-            type: specificType,
-            matched_table: 'skus',
-            matched_id: matchedSku.id,
-            data: {
-              ...matchedSku,
-              inventory: inventoryData || { on_hand: 0, available: 0, reserved: 0 }
-            }
-          };
-        } else {
-          // Provide fuzzy search suggestions
-          const { data: suggestions } = await supabase
-            .from('skus')
-            .select('id, client_sku, title, upc, ean, fnsku')
-            .eq('status', 'active')
-            .or(`client_sku.ilike.%${normalizedBarcode}%,title.ilike.%${normalizedBarcode}%`)
-            .limit(5);
-
-          response.suggestions = suggestions || [];
-        }
+        response.suggestions = suggestions || [];
       }
     }
 
