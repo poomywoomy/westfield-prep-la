@@ -100,7 +100,9 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Test connection error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ 
+        error: 'Unable to test Shopify connection. Please try again or contact support.' 
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,

@@ -133,7 +133,9 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Disconnect store error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ 
+        error: 'Unable to disconnect Shopify store. Please try again or contact support.' 
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,

@@ -127,7 +127,9 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Inventory sync error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ 
+        error: 'Unable to sync inventory with Shopify. Please try again or contact support.' 
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
