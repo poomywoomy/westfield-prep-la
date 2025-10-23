@@ -9,7 +9,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { PackagePlus, ShoppingCart, Package2, Trash2 } from "lucide-react";
+import { PackagePlus, ShoppingCart, Package2, Trash2, Edit, AlertCircle } from "lucide-react";
+import { SKUFormDialog } from "./SKUFormDialog";
+import { SKUDiscrepanciesDialog } from "./SKUDiscrepanciesDialog";
 
 interface SKUDetailedHistoryDialogProps {
   open: boolean;
@@ -40,13 +42,46 @@ export function SKUDetailedHistoryDialog({
   const [loading, setLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
+  const [showSKUEdit, setShowSKUEdit] = useState(false);
+  const [skuData, setSkuData] = useState<any>(null);
+  const [clients, setClients] = useState<any[]>([]);
+  const [discrepancyCount, setDiscrepancyCount] = useState(0);
+  const [showDiscrepancies, setShowDiscrepancies] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (open && skuId) {
       fetchHistory();
+      fetchSKU();
+      fetchClients();
+      fetchDiscrepancies();
     }
   }, [open, skuId, timePeriod]);
+
+  const fetchSKU = async () => {
+    const { data } = await supabase
+      .from('skus')
+      .select('*')
+      .eq('id', skuId)
+      .single();
+    setSkuData(data);
+  };
+
+  const fetchClients = async () => {
+    const { data } = await supabase
+      .from('clients')
+      .select('*')
+      .order('company_name');
+    setClients(data || []);
+  };
+
+  const fetchDiscrepancies = async () => {
+    const { count } = await supabase
+      .from('damaged_item_decisions')
+      .select('*', { count: 'exact', head: true })
+      .eq('sku_id', skuId);
+    setDiscrepancyCount(count || 0);
+  };
 
   const getDateRange = (period: TimePeriod) => {
     const now = new Date();
@@ -157,6 +192,8 @@ export function SKUDetailedHistoryDialog({
   const confirmDelete = async () => {
     if (!entryToDelete) return;
 
+    const entryData = history.find(e => e.id === entryToDelete);
+
     try {
       const { error } = await supabase
         .from('inventory_ledger')
@@ -166,16 +203,15 @@ export function SKUDetailedHistoryDialog({
       if (error) throw error;
 
       toast({
-        title: "Entry deleted",
-        description: "Inventory history entry has been removed",
+        title: "Deleted",
+        description: `${getTransactionTypeLabel(entryData?.transaction_type || '')} removed`,
       });
 
-      // Refresh history
       fetchHistory();
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to delete entry",
+        description: error.message || "Delete failed",
         variant: "destructive",
       });
     } finally {
@@ -191,6 +227,15 @@ export function SKUDetailedHistoryDialog({
           <DialogTitle>SKU History: {clientSku}</DialogTitle>
           <div className="flex items-center gap-4 mt-2 flex-wrap">
             <p className="text-sm text-muted-foreground flex-1 min-w-0">{title}</p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowSKUEdit(true)}
+              className="gap-2"
+            >
+              <Edit className="h-4 w-4" />
+              Edit SKU
+            </Button>
             <Select value={timePeriod} onValueChange={(value: TimePeriod) => setTimePeriod(value)}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue />
@@ -242,6 +287,21 @@ export function SKUDetailedHistoryDialog({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-amber-600">+{metrics.returns}</div>
+            </CardContent>
+          </Card>
+          <Card 
+            className="cursor-pointer hover:bg-accent/50 transition-colors" 
+            onClick={() => setShowDiscrepancies(true)}
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+                Discrepancies
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">{discrepancyCount}</div>
+              <p className="text-xs text-muted-foreground mt-1">Click to review</p>
             </CardContent>
           </Card>
         </div>
@@ -299,7 +359,7 @@ export function SKUDetailedHistoryDialog({
                       {entry.notes || "-"}
                     </TableCell>
                     <TableCell className="text-right">
-                      {(entry.transaction_type === 'ADJUSTMENT_PLUS' || entry.transaction_type === 'ADJUSTMENT_MINUS') && (
+                      {(entry.transaction_type !== 'RECEIPT') && (
                         <Button
                           variant="ghost"
                           size="icon"
@@ -321,9 +381,9 @@ export function SKUDetailedHistoryDialog({
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete Adjustment Entry</AlertDialogTitle>
+              <AlertDialogTitle>Delete Entry?</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete this adjustment entry? This action cannot be undone and will affect inventory calculations.
+                Are you sure you want to delete this entry? This will affect inventory calculations and cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -334,6 +394,26 @@ export function SKUDetailedHistoryDialog({
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        <SKUFormDialog
+          open={showSKUEdit}
+          onClose={() => {
+            setShowSKUEdit(false);
+            fetchHistory();
+            fetchSKU();
+          }}
+          sku={skuData}
+          clients={clients}
+          isClientView={false}
+        />
+
+        <SKUDiscrepanciesDialog
+          open={showDiscrepancies}
+          onOpenChange={setShowDiscrepancies}
+          skuId={skuId}
+          clientSku={clientSku}
+          onResolved={fetchDiscrepancies}
+        />
       </DialogContent>
     </Dialog>
   );

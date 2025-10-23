@@ -80,9 +80,8 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
           const asnData = data.data;
           
           toast({ 
-            title: `✓ ASN Found: ${asnData.asn_number}`,
-            description: `Opening ASN... (${asnData.status})`,
-            duration: 2000
+            title: "ASN Found",
+            description: `#${asnData.asn_number}`,
           });
           
           // Auto-open ASN form in view/edit mode
@@ -112,9 +111,8 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
         } else if (data.matched_table === 'skus') {
           // Found SKU - Auto-open edit dialog
           toast({ 
-            title: `✓ SKU Found: ${data.data.client_sku}`,
-            description: `Opening SKU for editing...`,
-            duration: 2000
+            title: "SKU Found",
+            description: data.data.client_sku,
           });
           
           setSelectedSKU(data.data);
@@ -136,9 +134,8 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
           const detectedCarrier = data.carrier || 'Unknown';
           
           toast({ 
-            title: "🆕 New Tracking Number",
-            description: `Creating ASN for ${detectedCarrier} tracking...`,
-            duration: 2000
+            title: "New Tracking",
+            description: `${detectedCarrier}`,
           });
           
           // Auto-open ASN creation form with tracking pre-filled

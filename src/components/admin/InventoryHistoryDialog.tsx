@@ -84,15 +84,15 @@ export const InventoryHistoryDialog = ({
       if (error) throw error;
 
       toast({
-        title: "Entry deleted",
-        description: "Inventory history entry has been removed",
+        title: "Deleted",
+        description: "Entry removed",
       });
 
       fetchHistory();
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to delete entry",
+        description: error.message || "Delete failed",
         variant: "destructive",
       });
     } finally {
@@ -145,7 +145,7 @@ export const InventoryHistoryDialog = ({
                       {entry.notes || "-"}
                     </TableCell>
                     <TableCell className="text-right">
-                      {(entry.transaction_type === 'ADJUSTMENT_PLUS' || entry.transaction_type === 'ADJUSTMENT_MINUS') && (
+                      {(entry.transaction_type !== 'RECEIPT') && (
                         <Button
                           variant="ghost"
                           size="icon"
@@ -167,9 +167,9 @@ export const InventoryHistoryDialog = ({
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete Adjustment Entry</AlertDialogTitle>
+              <AlertDialogTitle>Delete Entry?</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete this adjustment entry? This action cannot be undone and will affect inventory calculations.
+                Are you sure you want to delete this entry? This will affect inventory calculations and cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

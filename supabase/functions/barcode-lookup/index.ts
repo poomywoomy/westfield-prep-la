@@ -282,45 +282,45 @@ Deno.serve(async (req) => {
         };
       }
     } else if (detectedType.startsWith('product_')) {
-      // Search SKUs by multiple fields
-      let query = supabase
-        .from('skus')
+      console.log('Searching for SKU matches...');
+      
+      // Step 1: Search sku_aliases first for alternate barcodes
+      let aliasQuery = supabase
+        .from('sku_aliases')
         .select(`
-          id, 
-          client_id, 
-          client_sku, 
-          title, 
-          brand,
-          upc, 
-          ean, 
-          fnsku, 
-          asin,
-          status,
-          clients!inner(company_name)
+          sku_id,
+          alias_type,
+          alias_value,
+          skus!inner (
+            id,
+            client_id,
+            client_sku,
+            title,
+            brand,
+            upc,
+            ean,
+            fnsku,
+            asin,
+            status,
+            clients!inner(company_name)
+          )
         `)
-        .eq('status', 'active');
+        .eq('alias_value', normalizedBarcode)
+        .eq('skus.status', 'active');
 
       // Add client filter if provided
       if (client_id) {
-        query = query.eq('client_id', client_id);
+        aliasQuery = aliasQuery.eq('skus.client_id', client_id);
       }
 
-      // Search across multiple barcode fields
-      query = query.or(`upc.eq.${normalizedBarcode},ean.eq.${normalizedBarcode},fnsku.eq.${normalizedBarcode},asin.eq.${normalizedBarcode},client_sku.ilike.${normalizedBarcode}`);
+      const { data: aliasMatches, error: aliasError } = await aliasQuery;
 
-      const { data: skuData, error: skuError } = await query;
+      if (!aliasError && aliasMatches && aliasMatches.length > 0) {
+        const matchedAlias = aliasMatches[0];
+        const matchedSku = matchedAlias.skus as any;
+        console.log('Found SKU via alias:', matchedSku.id);
 
-      if (skuData && skuData.length > 0 && !skuError) {
-        const matchedSku = skuData[0];
-
-        // Determine specific match type
-        let specificType: any = 'product_upc';
-        if (matchedSku.upc === normalizedBarcode) specificType = 'product_upc';
-        else if (matchedSku.ean === normalizedBarcode) specificType = 'product_ean';
-        else if (matchedSku.fnsku === normalizedBarcode) specificType = 'product_fnsku';
-        else if (matchedSku.client_sku?.toUpperCase() === normalizedBarcode) specificType = 'product_client_sku';
-
-        // Fetch current inventory
+        // Get inventory data
         const { data: inventoryData } = await supabase
           .from('inventory_summary')
           .select('on_hand, available, reserved')
@@ -329,7 +329,9 @@ Deno.serve(async (req) => {
 
         response = {
           found: true,
-          type: specificType,
+          type: matchedAlias.alias_type === 'upc' ? 'product_upc' : 
+                matchedAlias.alias_type === 'ean' ? 'product_ean' :
+                matchedAlias.alias_type === 'fnsku' ? 'product_fnsku' : 'product_code',
           matched_table: 'skus',
           matched_id: matchedSku.id,
           data: {
@@ -338,15 +340,73 @@ Deno.serve(async (req) => {
           }
         };
       } else {
-        // Provide fuzzy search suggestions
-        const { data: suggestions } = await supabase
+        // Step 2: Direct SKU field search if no alias match
+        let query = supabase
           .from('skus')
-          .select('id, client_sku, title, upc, ean, fnsku')
-          .eq('status', 'active')
-          .or(`client_sku.ilike.%${normalizedBarcode}%,title.ilike.%${normalizedBarcode}%`)
-          .limit(5);
+          .select(`
+            id, 
+            client_id, 
+            client_sku, 
+            title, 
+            brand,
+            upc, 
+            ean, 
+            fnsku, 
+            asin,
+            status,
+            clients!inner(company_name)
+          `)
+          .eq('status', 'active');
 
-        response.suggestions = suggestions || [];
+        // Add client filter if provided
+        if (client_id) {
+          query = query.eq('client_id', client_id);
+        }
+
+        // Search across multiple barcode fields
+        query = query.or(`upc.eq.${normalizedBarcode},ean.eq.${normalizedBarcode},fnsku.eq.${normalizedBarcode},asin.eq.${normalizedBarcode},client_sku.ilike.${normalizedBarcode}`);
+
+        const { data: skuData, error: skuError } = await query;
+
+        if (skuData && skuData.length > 0 && !skuError) {
+          const matchedSku = skuData[0];
+          console.log('Found SKU match:', matchedSku.id);
+
+          // Determine specific match type
+          let specificType: any = 'product_upc';
+          if (matchedSku.upc === normalizedBarcode) specificType = 'product_upc';
+          else if (matchedSku.ean === normalizedBarcode) specificType = 'product_ean';
+          else if (matchedSku.fnsku === normalizedBarcode) specificType = 'product_fnsku';
+          else if (matchedSku.client_sku?.toUpperCase() === normalizedBarcode) specificType = 'product_client_sku';
+
+          // Fetch current inventory
+          const { data: inventoryData } = await supabase
+            .from('inventory_summary')
+            .select('on_hand, available, reserved')
+            .eq('sku_id', matchedSku.id)
+            .maybeSingle();
+
+          response = {
+            found: true,
+            type: specificType,
+            matched_table: 'skus',
+            matched_id: matchedSku.id,
+            data: {
+              ...matchedSku,
+              inventory: inventoryData || { on_hand: 0, available: 0, reserved: 0 }
+            }
+          };
+        } else {
+          // Provide fuzzy search suggestions
+          const { data: suggestions } = await supabase
+            .from('skus')
+            .select('id, client_sku, title, upc, ean, fnsku')
+            .eq('status', 'active')
+            .or(`client_sku.ilike.%${normalizedBarcode}%,title.ilike.%${normalizedBarcode}%`)
+            .limit(5);
+
+          response.suggestions = suggestions || [];
+        }
       }
     }
 
