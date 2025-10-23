@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { ShipmentTemplateDialog } from "./ShipmentTemplateDialog";
 import { QuickAddSKUModal } from "./QuickAddSKUModal";
 import { TemplateSelector } from "./TemplateSelector";
+import { detectCarrier, isTrackingNumber, normalizeBarcode } from "@/lib/barcodeDetection";
 import type { Database } from "@/integrations/supabase/types";
 
 type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -85,6 +86,8 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
   const [activeScanLine, setActiveScanLine] = useState<number | null>(null);
   const [showQuickAddSKU, setShowQuickAddSKU] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const keyboardBuffer = useRef<string>("");
+  const keyboardTimeout = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -116,6 +119,60 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
       }
     }
   }, [open, asnId, prefillData]);
+
+  // Global keyboard listener for automatic tracking number detection
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input/textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Clear timeout on each keypress
+      if (keyboardTimeout.current) {
+        clearTimeout(keyboardTimeout.current);
+      }
+
+      // Add character to buffer (ignore special keys)
+      if (e.key.length === 1) {
+        keyboardBuffer.current += e.key;
+      }
+
+      // Set timeout to process buffer after 100ms of no input
+      keyboardTimeout.current = setTimeout(() => {
+        const scannedBarcode = normalizeBarcode(keyboardBuffer.current);
+        
+        if (scannedBarcode && isTrackingNumber(scannedBarcode)) {
+          const carrier = detectCarrier(scannedBarcode);
+          
+          setFormData(prev => ({
+            ...prev,
+            tracking_number: scannedBarcode,
+            carrier: carrier
+          }));
+          
+          toast({ 
+            title: `✓ Tracking Scanned`,
+            description: `${carrier} tracking number auto-detected`,
+            duration: 2000
+          });
+        }
+        
+        keyboardBuffer.current = "";
+      }, 100);
+    };
+
+    window.addEventListener('keypress', handleKeyPress);
+    
+    return () => {
+      window.removeEventListener('keypress', handleKeyPress);
+      if (keyboardTimeout.current) {
+        clearTimeout(keyboardTimeout.current);
+      }
+    };
+  }, [open, toast]);
 
   const loadASN = async (id: string) => {
     setLoading(true);

@@ -26,8 +26,8 @@ export const isTrackingNumber = (barcode: string): boolean => {
 /**
  * Auto-detect carrier from tracking number format
  */
-export const detectCarrier = (trackingNumber: string): string | null => {
-  if (!trackingNumber) return null;
+export const detectCarrier = (trackingNumber: string): string => {
+  if (!trackingNumber) return 'Unknown';
   
   // UPS: Starts with 1Z
   if (/^1Z/i.test(trackingNumber)) return 'UPS';
@@ -44,7 +44,7 @@ export const detectCarrier = (trackingNumber: string): string | null => {
   // DHL patterns
   if (/^\d{10,11}$/.test(trackingNumber)) return 'DHL';
   
-  return null;
+  return 'Unknown';
 };
 
 /**

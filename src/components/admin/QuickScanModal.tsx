@@ -6,8 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Package, Clock, AlertCircle } from "lucide-react";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
-import { TrackingIntelligenceDialog } from "./TrackingIntelligenceDialog";
 import { ASNFormDialog } from "./ASNFormDialog";
+import { SKUFormDialog } from "./SKUFormDialog";
 import type { Database } from "@/integrations/supabase/types";
 
 type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -30,10 +30,10 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [scanning, setScanning] = useState(false);
   const [scanHistory, setScanHistory] = useState<ScanHistoryItem[]>([]);
-  const [showTrackingIntelligence, setShowTrackingIntelligence] = useState(false);
-  const [trackingData, setTrackingData] = useState({ number: "", carrier: "" });
   const [showASNForm, setShowASNForm] = useState(false);
   const [asnPrefillData, setASNPrefillData] = useState<any>(null);
+  const [showSKUEdit, setShowSKUEdit] = useState(false);
+  const [selectedSKU, setSelectedSKU] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -110,18 +110,23 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
             details: `ASN: ${asnData.asn_number} (Opened)`
           }, ...scanHistory.slice(0, 9)]);
         } else if (data.matched_table === 'skus') {
-          // Found SKU
+          // Found SKU - Auto-open edit dialog
           toast({ 
-            title: `SKU Found: ${data.data.client_sku}`,
-            description: data.data.title
+            title: `✓ SKU Found: ${data.data.client_sku}`,
+            description: `Opening SKU for editing...`,
+            duration: 2000
           });
+          
+          setSelectedSKU(data.data);
+          setShowSKUEdit(true);
+          onOpenChange(false);
           
           setScanHistory([{
             barcode,
             type: format,
             timestamp: new Date(),
             result: 'found',
-            details: `SKU: ${data.data.client_sku}`
+            details: `SKU: ${data.data.client_sku} (Opened)`
           }, ...scanHistory.slice(0, 9)]);
         }
       } else {
@@ -179,12 +184,6 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
     }
   };
 
-  const handleCreateASN = (asnData: any) => {
-    setASNPrefillData(asnData);
-    setShowASNForm(true);
-    setShowTrackingIntelligence(false);
-    onOpenChange(false);
-  };
 
   const getResultIcon = (result: string) => {
     switch (result) {
@@ -295,15 +294,6 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
         </DialogContent>
       </Dialog>
 
-      <TrackingIntelligenceDialog
-        open={showTrackingIntelligence}
-        onOpenChange={setShowTrackingIntelligence}
-        trackingNumber={trackingData.number}
-        carrier={trackingData.carrier}
-        clientId={selectedClient}
-        onCreateASN={handleCreateASN}
-      />
-
       <ASNFormDialog
         open={showASNForm}
         onOpenChange={setShowASNForm}
@@ -319,6 +309,17 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
             details: `ASN: ${asnPrefillData?.asn_number || 'New'}`
           }, ...scanHistory.slice(0, 9)]);
         }}
+      />
+
+      <SKUFormDialog
+        open={showSKUEdit}
+        onClose={() => {
+          setShowSKUEdit(false);
+          setSelectedSKU(null);
+        }}
+        sku={selectedSKU}
+        clients={clients}
+        isClientView={false}
       />
     </>
   );
