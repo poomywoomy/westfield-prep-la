@@ -36,11 +36,11 @@ const processSteps = [
     icon: ClipboardCheck,
     description: "100% inspection rate. Not random sampling, not spot checks—we examine every unit that comes through our doors. Because one damaged item reaching your customer is one too many.",
     details: [
-      { title: "Visual Inspection", description: "Check for damage, defects, or compliance issues" },
-      { title: "Photo Documentation", description: "Multiple angles, close-ups of any concerns" },
-      { title: "FBA Compliance Check", description: "Verify labeling requirements, packaging standards" },
-      { title: "Prop 65 Verification", description: "California compliance for relevant products" },
-      { title: "QC Report Generation", description: "Detailed report with timestamped photos" }
+      { title: "Visual Inspection", description: "Check for damage, defects, functionality issues, and presentation quality" },
+      { title: "Photo Documentation", description: "Multiple angles, close-ups of any concerns, before/after comparisons" },
+      { title: "Multi-Channel Compliance", description: "Verify requirements for Amazon FBA, Shopify stores, DTC orders, and TikTok Shop" },
+      { title: "Product Safety & Labeling", description: "California Prop 65, choking hazards, material compliance across all channels" },
+      { title: "QC Report Generation", description: "Detailed report with timestamped photos sent to your dashboard" }
     ],
     timeline: "24-48 hours depending on volume",
     clientVisibility: "Timestamped QC report + hi-res photos"
@@ -81,11 +81,11 @@ const processSteps = [
     icon: Package,
     description: "Hit our 2 PM PST cutoff and your orders ship today—not tomorrow, not 'we'll try.' Today. That's how we keep your customers happy and your reviews glowing.",
     details: [
-      { title: "Order Picking", description: "99.8% accuracy rate on picks" },
-      { title: "Custom Packaging", description: "Your branded boxes, inserts, thank you cards" },
-      { title: "Final QC Check", description: "Double-check before sealing the box" },
-      { title: "Carrier Selection", description: "Best rates via our negotiated shipping accounts" },
-      { title: "Tracking Upload", description: "Tracking numbers to Amazon/Shopify automatically" }
+      { title: "Order Picking", description: "99.8% accuracy rate across Shopify, Amazon, TikTok Shop, and direct orders" },
+      { title: "Custom Packaging", description: "Your branded boxes, tissue paper, inserts, thank you cards—the full experience" },
+      { title: "Final QC Check", description: "Double-check item, quantity, address, and presentation before sealing" },
+      { title: "Smart Carrier Selection", description: "Best rates and delivery speed via our negotiated USPS, UPS, FedEx accounts" },
+      { title: "Automatic Tracking Updates", description: "Tracking syncs to your sales channels automatically—Shopify, Amazon, TikTok Shop, or custom integrations" }
     ],
     timeline: "Same-day shipping (2 PM PST cutoff)",
     clientVisibility: "Real-time order status + tracking"
@@ -176,7 +176,7 @@ const WhyChooseUs = () => {
                   </span>
                 </h1>
                 <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in delay-200">
-                  Where your brand gets treated like the VIP it is ✨
+                  Whether you're selling on Amazon, Shopify, or direct—your brand gets VIP treatment ✨
                 </p>
                 <Button 
                   size="lg" 
@@ -185,6 +185,59 @@ const WhyChooseUs = () => {
                 >
                   Let's Talk →
                 </Button>
+              </div>
+            </div>
+          </section>
+
+          {/* Channels We Support */}
+          <section className="py-16 bg-gradient-to-br from-primary/5 to-secondary/5">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold mb-3">We Fulfill for Every Channel You Sell On</h2>
+                <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                  One prep center. All your sales channels. Seamless multi-channel fulfillment.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
+                      <Package className="h-6 w-6 text-white" />
+                    </div>
+                    <p className="font-semibold">Amazon FBA</p>
+                    <p className="text-xs text-muted-foreground mt-1">Full prep & compliance</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className="h-12 w-12 bg-gradient-to-br from-secondary to-secondary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
+                      <Package className="h-6 w-6 text-white" />
+                    </div>
+                    <p className="font-semibold">Shopify Stores</p>
+                    <p className="text-xs text-muted-foreground mt-1">Direct fulfillment</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
+                      <Package className="h-6 w-6 text-white" />
+                    </div>
+                    <p className="font-semibold">TikTok Shop</p>
+                    <p className="text-xs text-muted-foreground mt-1">Fast turnaround</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className="h-12 w-12 bg-gradient-to-br from-secondary to-secondary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
+                      <Package className="h-6 w-6 text-white" />
+                    </div>
+                    <p className="font-semibold">Direct to Customer</p>
+                    <p className="text-xs text-muted-foreground mt-1">Branded packaging</p>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </section>
@@ -334,7 +387,7 @@ const WhyChooseUs = () => {
                       <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
                         <p className="text-sm font-semibold text-secondary mb-1">⚡ Quality Promise</p>
                         <p className="text-sm text-muted-foreground">
-                          We catch defects before they reach your customers. Our 100% inspection rate means fewer returns and higher customer satisfaction.
+                          Whether you're shipping to Amazon FBA, fulfilling Shopify orders, or sending gifts directly—we catch defects before they reach your customers. Fewer returns, higher satisfaction.
                         </p>
                       </div>
                     )}
@@ -405,15 +458,16 @@ const WhyChooseUs = () => {
                       <CardTitle className="text-2xl text-primary">Westfield Prep Center</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      {[
-                        "🎯 Direct access to team",
-                        "⚡ Same-day processing",
-                        "📸 Photo-proof QC on every order",
-                        "🎨 Custom solutions for your brand",
-                        "💬 Personalized support",
-                        "💰 Flexible pricing",
-                        "✅ Fast decision-making",
-                      ].map((item, idx) => (
+              {[
+                "🎯 Direct access to team",
+                "⚡ Same-day processing",
+                "📸 Photo-proof QC on every order",
+                "🛒 Multi-channel fulfillment (Amazon, Shopify, TikTok)",
+                "🎨 Custom branded packaging for DTC",
+                "💬 Personalized support",
+                "💰 Flexible pricing",
+                "✅ Fast decision-making",
+              ].map((item, idx) => (
                         <div key={idx} className="flex items-start gap-2">
                           <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                           <p className="text-sm">{item}</p>
@@ -494,11 +548,11 @@ const WhyChooseUs = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Shield className="h-5 w-5 text-primary" />
-                        California Compliance
+                        E-Commerce Compliance Experts
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">Expert in California-specific regulations, Prop 65 labeling, and compliance requirements for e-commerce sellers.</p>
+                      <p className="text-muted-foreground">Expert in multi-channel regulations: California Prop 65, product safety labeling, customs documentation, and compliance requirements for Amazon, Shopify, and DTC brands.</p>
                     </CardContent>
                   </Card>
                 </div>
