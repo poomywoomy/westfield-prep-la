@@ -22,6 +22,11 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         description: "Leading Los Angeles prep center for Amazon FBA, Shopify fulfillment, and e-commerce services. Same-day turnaround, photo-proof QC, and branded packaging.",
         telephone: "+18189355478",
         email: "info@westfieldprepcenter.com",
+        sameAs: [
+          "https://www.facebook.com/westfieldprepcenter",
+          "https://www.linkedin.com/company/westfield-prep-center",
+          "https://g.page/westfield-prep-center"
+        ],
         address: {
           "@type": "PostalAddress",
           streetAddress: "1801 Flower Ave Office 2",
@@ -70,7 +75,8 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
             "@type": "OpeningHoursSpecification",
             dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
             opens: "09:00",
-            closes: "20:00"
+            closes: "20:00",
+            timezone: "America/Los_Angeles"
           }
         },
         aggregateRating: {
@@ -234,6 +240,20 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         url: baseUrl,
         telephone: "+18189355478",
         email: "info@westfieldprepcenter.com",
+        image: `${baseUrl}/westfield-logo.png`,
+        priceRange: "$$",
+        sameAs: [
+          "https://www.facebook.com/westfieldprepcenter",
+          "https://www.linkedin.com/company/westfield-prep-center",
+          "https://g.page/westfield-prep-center"
+        ],
+        openingHoursSpecification: {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          opens: "09:00",
+          closes: "20:00",
+          timezone: "America/Los_Angeles"
+        },
         address: {
           "@type": "PostalAddress",
           streetAddress: "1801 Flower Ave Office 2",

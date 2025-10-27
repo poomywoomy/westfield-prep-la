@@ -27,6 +27,30 @@ const Contact = () => {
 
         <main>
           <ContactForm />
+          
+          {/* Google Maps Embed */}
+          <section className="py-12 bg-muted/30">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto">
+                <h2 className="text-2xl font-bold text-center mb-6">Visit Our Duarte Location</h2>
+                <div className="rounded-xl overflow-hidden shadow-lg border border-border">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3299.8!2d-117.9773!3d34.1395!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzTCsDA4JzIyLjIiTiAxMTfCsDU4JzM4LjMiVw!5e0!3m2!1sen!2sus!4v1234567890"
+                    width="100%"
+                    height="450"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Westfield Prep Center Location - 1801 Flower Ave, Duarte, CA 91010"
+                  />
+                </div>
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                  1801 Flower Ave Office 2, Duarte, CA 91010 • San Gabriel Valley, Los Angeles County
+                </p>
+              </div>
+            </div>
+          </section>
         </main>
 
         <Footer />

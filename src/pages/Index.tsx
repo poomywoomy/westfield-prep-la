@@ -18,24 +18,24 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment - Westfield</title>
-        <meta name="description" content="Los Angeles prep center serving all 50 states. Amazon FBA prep, Shopify fulfillment with same-day turnaround, photo-proof QC. 2-day shipping to major markets from Duarte, CA." />
+        <title>Duarte Prep Center | Los Angeles County FBA & Shopify Fulfillment - Westfield</title>
+        <meta name="description" content="Duarte prep center serving Los Angeles County, San Gabriel Valley & all 50 states. Amazon FBA prep, Shopify fulfillment with same-day turnaround. 2-day shipping from LA." />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.placename" content="Duarte, Los Angeles County" />
         <meta name="geo.position" content="34.1395;-117.9773" />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content="Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment - Westfield" />
-        <meta property="og:description" content="Los Angeles prep center serving all 50 states. Amazon FBA prep, Shopify fulfillment with same-day turnaround, photo-proof QC. 2-day shipping to major markets from Duarte, CA." />
+        <meta property="og:title" content="Duarte Prep Center | Los Angeles County FBA & Shopify Fulfillment - Westfield" />
+        <meta property="og:description" content="Duarte prep center serving Los Angeles County, San Gabriel Valley & all 50 states. Amazon FBA prep, Shopify fulfillment with same-day turnaround. 2-day shipping from LA." />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
         <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
         <meta property="og:type" content="website" />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment - Westfield" />
-        <meta name="twitter:description" content="Los Angeles prep center serving all 50 states. Amazon FBA prep, Shopify fulfillment with same-day turnaround. 2-day shipping to major US markets." />
+        <meta name="twitter:title" content="Duarte Prep Center | Los Angeles County FBA & Shopify Fulfillment - Westfield" />
+        <meta name="twitter:description" content="Duarte prep center serving Los Angeles County, San Gabriel Valley & all 50 states. Amazon FBA prep, Shopify fulfillment with same-day turnaround." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="organization" />
@@ -52,9 +52,9 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-10">
-                <h2 className="text-3xl md:text-4xl font-bold mb-3">Los Angeles Prep Center: Nationwide Amazon FBA & Shopify Fulfillment</h2>
+                <h2 className="text-3xl md:text-4xl font-bold mb-3">Duarte Prep Center: Serving Los Angeles County, San Gabriel Valley & Nationwide</h2>
                 <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-5">
-                  Based in Duarte, Los Angeles County, we serve all 50 states with 2-day shipping to major markets including California, New York, Texas, and Florida
+                  Professional Amazon FBA prep and Shopify fulfillment from Duarte, CA. Serving Monrovia, Arcadia, Pasadena, Greater LA & all 50 states with 2-day shipping to major markets
                 </p>
                 <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary/5 rounded-full border border-secondary/10">
                   <span className="text-xl" aria-label="United States nationwide coverage">🇺🇸</span>

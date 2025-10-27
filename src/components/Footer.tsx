@@ -19,11 +19,17 @@ const Footer = () => {
     "telephone": "+18189355478",
     "email": "info@westfieldprepcenter.com",
     "url": "https://westfieldprepcenter.com",
+    "sameAs": [
+      "https://www.facebook.com/westfieldprepcenter",
+      "https://www.linkedin.com/company/westfield-prep-center",
+      "https://g.page/westfield-prep-center"
+    ],
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
       "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      "opens": "08:00",
-      "closes": "17:00"
+      "opens": "09:00",
+      "closes": "20:00",
+      "timezone": "America/Los_Angeles"
     },
     "areaServed": [
       {
@@ -54,11 +60,11 @@ const Footer = () => {
             <div className="space-y-4">
               <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
               <p className="text-sm text-white/80 leading-relaxed">
-                Professional e-commerce fulfillment services in Los Angeles & Southern California
+                Duarte prep center serving Los Angeles County, San Gabriel Valley & all 50 states
               </p>
               <div className="pt-2">
-                <p className="text-sm text-secondary font-semibold">Open Every Day</p>
-                <p className="text-sm text-white/90">8am - 5pm PST</p>
+                <p className="text-sm text-secondary font-semibold">Open 7 Days a Week</p>
+                <p className="text-sm text-white/90">9am - 8pm PST</p>
               </div>
             </div>
 
