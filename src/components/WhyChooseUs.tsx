@@ -15,8 +15,8 @@ const reasons = [
   },
   {
     icon: MapPin,
-    title: "Los Angeles Prep Center Location",
-    description: "Strategic Los Angeles prep center for efficient nationwide shipping. Serving LA County, Orange County, and all of Southern California.",
+    title: "Nationwide Coverage",
+    description: "Strategic Los Angeles hub powering fast, reliable shipping to all 50 states—no geographic restrictions.",
   },
 ];
 
