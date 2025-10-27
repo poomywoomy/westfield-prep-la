@@ -12,14 +12,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Shield, Camera, Clock, Heart, MapPin, Award, TrendingUp, CheckCircle, Package, ClipboardCheck, Tag, Warehouse, Headphones, Truck } from "lucide-react";
+import { Shield, Camera, Clock, Heart, MapPin, Award, TrendingUp, CheckCircle, Package, ClipboardCheck, Tag, Warehouse, Headphones, Truck, X } from "lucide-react";
 
 const processSteps = [
   {
     number: 1,
     title: "Receiving & Check-In",
     icon: Truck,
-    description: "Your shipment arrives at our facility and we spring into action. Every box, every item, every detail gets documented.",
+    description: "Your shipment arrives and our team springs into action—scanning, photographing, and updating your portal in real-time. You'll know exactly what came in before we even finish unpacking.",
     details: [
       { title: "ASN Verification", description: "Cross-check your Advanced Ship Notice with actual shipment contents" },
       { title: "Barcode Scanning", description: "Scan every item into our system for real-time tracking" },
@@ -34,7 +34,7 @@ const processSteps = [
     number: 2,
     title: "Quality Control & Inspection",
     icon: ClipboardCheck,
-    description: "We inspect every single unit. Not a random sample. Every. Single. One.",
+    description: "100% inspection rate. Not random sampling, not spot checks—we examine every unit that comes through our doors. Because one damaged item reaching your customer is one too many.",
     details: [
       { title: "Visual Inspection", description: "Check for damage, defects, or compliance issues" },
       { title: "Photo Documentation", description: "Multiple angles, close-ups of any concerns" },
@@ -47,24 +47,24 @@ const processSteps = [
   },
   {
     number: 3,
-    title: "Labeling & Prep Work",
+    title: "Custom Prep & Branding",
     icon: Tag,
-    description: "Amazon-ready labels applied by humans who actually care. No rushed, crooked labels here.",
+    description: "From Amazon barcodes to branded unboxing experiences—we prep for every channel you sell on.",
     details: [
-      { title: "FNSKU Label Application", description: "Amazon barcodes applied correctly, every time" },
-      { title: "Poly Bagging", description: "Suffocation warning labels where required" },
-      { title: "Bubble Wrapping", description: "Extra protection for fragile items" },
-      { title: "Box Content Labels", description: "Clear labeling for multi-item boxes" },
-      { title: "Compliance Documentation", description: "Paper trail for every prep task" }
+      { title: "Multi-Channel Labeling", description: "Amazon FNSKU barcodes, Shopify SKU labels, and custom brand tags" },
+      { title: "Branded Packaging Setup", description: "Insert thank you cards, promotional flyers, tissue paper, and stickers" },
+      { title: "FBA Compliance Prep", description: "Poly bagging with suffocation warnings, bubble wrapping, box content labels" },
+      { title: "DTC-Ready Enhancements", description: "Gift wrapping, personalized notes, bundle assembly, and tamper-evident sealing" },
+      { title: "Documentation & Tracking", description: "Photo proof of every prep task with SKU-level tracking" }
     ],
     timeline: "Same day or next business day",
-    clientVisibility: "SKU-level prep tracking in portal"
+    clientVisibility: "Real-time prep status + before/after photos"
   },
   {
     number: 4,
     title: "Storage & Inventory Management",
     icon: Warehouse,
-    description: "Your inventory stored in climate-controlled space. Organized, tracked, and ready to ship.",
+    description: "Your inventory lives in climate-controlled comfort with 24/7 security. Organized by SKU, tracked in real-time, and always ready to ship at a moment's notice.",
     details: [
       { title: "Climate Control", description: "Temperature and humidity regulated storage" },
       { title: "SKU Organization", description: "Logical bin locations for fast picking" },
@@ -79,7 +79,7 @@ const processSteps = [
     number: 5,
     title: "Pick, Pack & Ship",
     icon: Package,
-    description: "Orders placed before 2 PM PST ship the same day. No backlog, no excuses.",
+    description: "Hit our 2 PM PST cutoff and your orders ship today—not tomorrow, not 'we'll try.' Today. That's how we keep your customers happy and your reviews glowing.",
     details: [
       { title: "Order Picking", description: "99.8% accuracy rate on picks" },
       { title: "Custom Packaging", description: "Your branded boxes, inserts, thank you cards" },
@@ -94,7 +94,7 @@ const processSteps = [
     number: 6,
     title: "Post-Ship Support & Analytics",
     icon: Headphones,
-    description: "We don't disappear after your order ships. We're here to handle issues and optimize your fulfillment.",
+    description: "The relationship doesn't end at the dock door. We're monitoring tracking, processing returns, and analyzing your fulfillment data to help you scale smarter.",
     details: [
       { title: "Tracking Monitoring", description: "We watch for delivery issues" },
       { title: "Return Processing", description: "Handle returns and restocking" },
@@ -175,8 +175,8 @@ const WhyChooseUs = () => {
                     Prep Center
                   </span>
                 </h1>
-                <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  We actually care about your success 🚀
+                <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in delay-200">
+                  Where your brand gets treated like the VIP it is ✨
                 </p>
                 <Button 
                   size="lg" 
@@ -270,9 +270,9 @@ const WhyChooseUs = () => {
                 <h2 className="text-4xl md:text-5xl font-bold mb-4">
                   How We Make It Happen
                 </h2>
-                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                  Every step documented. Every detail handled. Here's exactly what happens when you work with us.
-                </p>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Ever wonder what actually happens between 'order placed' and 'delivered'? We document every step. Here's the full behind-the-scenes.
+          </p>
               </div>
 
               <div className="max-w-6xl mx-auto space-y-12">
@@ -317,11 +317,61 @@ const WhyChooseUs = () => {
                                         <p className="font-medium text-foreground">{detail.title}</p>
                                         <p className="text-sm text-muted-foreground mt-1">{detail.description}</p>
                                       </div>
-                                    </li>
-                                  ))}
-                                </ul>
-                                
-                                {/* Additional info boxes */}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Pro Tip callout */}
+                    {step.number === 1 && (
+                      <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r-lg mt-4">
+                        <p className="text-sm font-semibold text-primary mb-1">💡 Pro Tip</p>
+                        <p className="text-sm text-muted-foreground">
+                          Send us an ASN (Advanced Ship Notice) before your shipment arrives and we'll prioritize your check-in for same-day processing.
+                        </p>
+                      </div>
+                    )}
+                    {step.number === 2 && (
+                      <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
+                        <p className="text-sm font-semibold text-secondary mb-1">⚡ Quality Promise</p>
+                        <p className="text-sm text-muted-foreground">
+                          We catch defects before they reach your customers. Our 100% inspection rate means fewer returns and higher customer satisfaction.
+                        </p>
+                      </div>
+                    )}
+                    {step.number === 3 && (
+                      <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r-lg mt-4">
+                        <p className="text-sm font-semibold text-primary mb-1">🎨 Brand Boost</p>
+                        <p className="text-sm text-muted-foreground">
+                          Branded unboxing experiences increase repeat purchases by 32%. Let us handle your inserts, thank you cards, and custom packaging.
+                        </p>
+                      </div>
+                    )}
+                    {step.number === 4 && (
+                      <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
+                        <p className="text-sm font-semibold text-secondary mb-1">🔒 Security First</p>
+                        <p className="text-sm text-muted-foreground">
+                          24/7 surveillance, restricted access zones, and comprehensive insurance. Your inventory is as safe as it would be in a bank vault.
+                        </p>
+                      </div>
+                    )}
+                    {step.number === 5 && (
+                      <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r-lg mt-4">
+                        <p className="text-sm font-semibold text-primary mb-1">📦 Speed Matters</p>
+                        <p className="text-sm text-muted-foreground">
+                          Our 2 PM cutoff means your orders get to customers faster. Faster delivery = happier customers = better reviews = more sales.
+                        </p>
+                      </div>
+                    )}
+                    {step.number === 6 && (
+                      <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
+                        <p className="text-sm font-semibold text-secondary mb-1">📊 Data-Driven</p>
+                        <p className="text-sm text-muted-foreground">
+                          We track every metric—speed, accuracy, cost per order. Monthly reports help you identify trends and optimize your operations.
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Additional info boxes */}
                                 <div className="grid md:grid-cols-2 gap-4 mt-6 pt-6 border-t">
                                   <div className="bg-primary/5 p-4 rounded-lg">
                                     <p className="text-xs uppercase tracking-wide text-primary font-semibold mb-1">Timeline</p>
@@ -356,13 +406,13 @@ const WhyChooseUs = () => {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {[
-                        "Direct access to team",
-                        "Same-day processing",
-                        "Photo-proof QC on every order",
-                        "Custom solutions for your brand",
-                        "Personalized support",
-                        "Flexible pricing",
-                        "Fast decision-making",
+                        "🎯 Direct access to team",
+                        "⚡ Same-day processing",
+                        "📸 Photo-proof QC on every order",
+                        "🎨 Custom solutions for your brand",
+                        "💬 Personalized support",
+                        "💰 Flexible pricing",
+                        "✅ Fast decision-making",
                       ].map((item, idx) => (
                         <div key={idx} className="flex items-start gap-2">
                           <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
@@ -387,8 +437,8 @@ const WhyChooseUs = () => {
                         "Slow approval processes",
                       ].map((item, idx) => (
                         <div key={idx} className="flex items-start gap-2">
-                          <div className="h-5 w-5 rounded-full border-2 border-muted mt-0.5 flex-shrink-0" />
-                          <p className="text-sm text-muted-foreground">{item}</p>
+                          <X className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-muted-foreground line-through">{item}</p>
                         </div>
                       ))}
                     </CardContent>
