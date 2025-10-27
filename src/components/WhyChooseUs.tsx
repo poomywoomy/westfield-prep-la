@@ -15,8 +15,8 @@ const reasons = [
   },
   {
     icon: MapPin,
-    title: "Local LA warehouse",
-    description: "Strategic Los Angeles location for efficient nationwide shipping.",
+    title: "Los Angeles Prep Center Location",
+    description: "Strategic Los Angeles prep center for efficient nationwide shipping. Serving LA County, Orange County, and all of Southern California.",
   },
 ];
 
@@ -27,9 +27,9 @@ const WhyChooseUs = () => {
     <section className="py-20 bg-primary text-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Sellers Choose Us</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Sellers Choose Our LA Prep Center</h2>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            Experience the boutique advantage—personalized service with faster turnaround times
+            Experience the boutique prep center advantage—personalized service with faster turnaround times
           </p>
         </div>
 

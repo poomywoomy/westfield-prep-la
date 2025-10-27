@@ -19,9 +19,23 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         alternateName: "Westfield Prep",
         url: baseUrl,
         logo: `${baseUrl}/westfield-logo.png`,
-        description: "Shopify, Amazon, and e-commerce fulfillment services in Los Angeles. Same-day turnaround, photo-proof QC, and branded packaging.",
+        description: "Leading Los Angeles prep center for Amazon FBA, Shopify fulfillment, and e-commerce services. Same-day turnaround, photo-proof QC, and branded packaging.",
         telephone: "+18189355478",
         email: "info@westfieldprepcenter.com",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "7451 Valjean Ave",
+          addressLocality: "Los Angeles",
+          addressRegion: "CA",
+          postalCode: "91406",
+          addressCountry: "US"
+        },
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: "34.2068",
+          longitude: "-118.4524"
+        },
+        priceRange: "$$",
         areaServed: {
           "@type": "GeoCircle",
           geoMidpoint: {

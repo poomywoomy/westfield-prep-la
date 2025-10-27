@@ -35,8 +35,8 @@ const ShopifyFulfillment = () => {
   return (
     <>
       <Helmet>
-        <title>Shopify Fulfillment Services in Los Angeles & Southern California | Westfield Prep Center</title>
-        <meta name="description" content="Streamline your Shopify store with fulfillment services from Westfield Prep Center in Los Angeles & Southern California. We manage storage, packing, and shipping for Shopify sellers. Request a Quote." />
+        <title>Shopify Prep Center in Los Angeles | DTC Fulfillment & Order Processing - Westfield</title>
+        <meta name="description" content="Los Angeles Shopify prep center offering same-day order fulfillment, branded packaging, and inventory management. Trusted Shopify prep center serving LA and Southern California sellers." />
         <link rel="canonical" href="https://westfieldprepcenter.com/shopify-fulfillment/" />
         <meta property="og:url" content="https://westfieldprepcenter.com/shopify-fulfillment/" />
         <meta property="og:type" content="article" />
@@ -63,10 +63,10 @@ const ShopifyFulfillment = () => {
                   <span className="text-sm font-medium text-[hsl(var(--shopify-blue-dark))]">Shopify Fulfillment Partner</span>
                 </div>
                 <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-[hsl(var(--shopify-blue))] via-[hsl(var(--shopify-teal))] to-[hsl(var(--shopify-blue-dark))] bg-clip-text text-transparent">
-                  Shopify Fulfillment for Modern DTC Brands
+                  Los Angeles Shopify Prep Center for DTC Brands
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  Fast, accurate pick-pack, branded unboxing experiences, and same-day cutoffs that delight your customers.
+                  Our Los Angeles Shopify prep center specializes in fast, accurate pick-pack, branded unboxing experiences, and same-day cutoffs. As a dedicated Shopify prep center, we help DTC brands scale with confidence.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button size="lg" className="bg-gradient-to-r from-[hsl(var(--shopify-blue))] to-[hsl(var(--shopify-teal))] hover:opacity-90 text-white shadow-lg" onClick={() => navigate("/contact")}>
@@ -81,9 +81,9 @@ const ShopifyFulfillment = () => {
           <section className="py-20 bg-gradient-to-b from-background via-[hsl(var(--shopify-accent))]/50 to-background">
             <div className="container mx-auto px-4">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4">Why DTC Brands Choose Us</h2>
+                <h2 className="text-4xl font-bold mb-4">Why DTC Brands Choose Our Shopify Prep Center in Los Angeles</h2>
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  Elevate your brand with fulfillment that matches your vision
+                  Elevate your brand with prep center capabilities that match your vision
                 </p>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
