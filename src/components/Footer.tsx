@@ -49,7 +49,7 @@ const Footer = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             {/* Main Footer Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {/* Company Info */}
             <div className="space-y-4">
               <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
@@ -157,19 +157,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Service Areas */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold mb-4">Service Areas</h4>
-              <div className="text-sm text-white/80 space-y-2">
-                <p className="font-semibold text-secondary">Based in Duarte, California</p>
-                <p>• Serving e-commerce sellers across all 50 states</p>
-                <p>• Specializing in Southern California logistics</p>
-                <p>• Same-day shipping throughout the US</p>
-                <p className="text-xs text-white/60 mt-3">
-                  Strategic location near LA/Long Beach ports
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* Bottom Bar */}
