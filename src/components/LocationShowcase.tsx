@@ -10,14 +10,14 @@ const LocationShowcase = () => {
           {/* Header */}
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
-              Duarte Prep Center: Serving Los Angeles County, San Gabriel Valley & Nationwide
+              Los Angeles Prep Center: Serving LA County & All 50 States from Duarte
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-5">
-              Professional Amazon FBA prep and Shopify fulfillment from Duarte, CA. Serving Monrovia, Arcadia, Pasadena, Greater LA & all 50 states with 2-day shipping to major markets
+              Professional Amazon FBA prep and Shopify fulfillment from our Los Angeles area location in Duarte, CA. Serving Monrovia, Arcadia, Pasadena, Greater LA & all 50 states with 2-day shipping to major markets
             </p>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-border/50">
               <MapPin className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Based in Duarte, CA</span>
+              <span className="text-sm font-medium">Los Angeles Area • Duarte, CA</span>
               <span className="text-xs text-muted-foreground">• Nationwide E-Commerce Fulfillment</span>
             </div>
           </div>
@@ -151,7 +151,7 @@ const LocationShowcase = () => {
           {/* Footer */}
           <div className="text-center mt-8">
             <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Serving businesses nationwide from our</strong> <a href="/contact" className="text-primary hover:underline">Duarte, California location</a> • 1801 Flower Ave Office 2, CA 91010 • Greater Los Angeles Area
+              <strong className="text-foreground">Serving businesses nationwide from our</strong> <a href="/contact" className="text-primary hover:underline">Los Angeles prep center in Duarte, CA</a> • 1801 Flower Ave Office 2, CA 91010 • Greater Los Angeles Area
             </p>
           </div>
         </div>
