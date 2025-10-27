@@ -19,24 +19,24 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Duarte Prep Center | Amazon FBA & Shopify Fulfillment Los Angeles County</title>
-        <meta name="description" content="Professional prep center in Duarte serving Los Angeles County & San Gabriel Valley. Amazon FBA prep, Shopify fulfillment, multi-channel services. Fast 24-48hr turnaround. Serving Monrovia, Arcadia, Pasadena & all 50 states." />
+        <title>Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment in Duarte, CA</title>
+        <meta name="description" content="Professional Los Angeles prep center in Duarte serving LA County & San Gabriel Valley. Amazon FBA prep, Shopify fulfillment, multi-channel services. Fast 24-48hr turnaround. Serving Monrovia, Arcadia, Pasadena & all 50 states." />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.placename" content="Duarte, Los Angeles County" />
         <meta name="geo.position" content="34.1395;-117.9773" />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content="Duarte Prep Center | Amazon FBA & Shopify Fulfillment Los Angeles County" />
-        <meta property="og:description" content="Professional prep center in Duarte serving Los Angeles County & San Gabriel Valley. Amazon FBA prep, Shopify fulfillment, multi-channel services. Fast 24-48hr turnaround nationwide." />
+        <meta property="og:title" content="Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment in Duarte, CA" />
+        <meta property="og:description" content="Professional Los Angeles prep center in Duarte serving LA County & San Gabriel Valley. Amazon FBA prep, Shopify fulfillment, multi-channel services. Fast 24-48hr turnaround nationwide." />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
         <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
         <meta property="og:type" content="website" />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Duarte Prep Center | Amazon FBA & Shopify Fulfillment Los Angeles" />
-        <meta name="twitter:description" content="Professional prep center in Duarte serving Los Angeles County. Amazon FBA prep, Shopify fulfillment, multi-channel services. Fast turnaround nationwide." />
+        <meta name="twitter:title" content="Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment in Duarte, CA" />
+        <meta name="twitter:description" content="Professional Los Angeles prep center in Duarte serving LA County. Amazon FBA prep, Shopify fulfillment, multi-channel services. Fast turnaround nationwide." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="organization" />

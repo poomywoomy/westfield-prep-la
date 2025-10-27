@@ -178,7 +178,7 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
           },
           {
             "@type": "Place",
-            name: "Southern California"
+            name: "Los Angeles County, CA"
           }
         ],
         offers: {
