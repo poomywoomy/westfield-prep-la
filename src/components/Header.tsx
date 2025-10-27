@@ -5,13 +5,10 @@ import { Phone, Clock, ChevronDown } from "lucide-react";
 import logo from "@/assets/westfield-logo-original.jpg";
 import { useAuth } from "@/hooks/useAuth";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -76,15 +73,6 @@ const Header = () => {
             <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium">
               Home
             </Link>
-            <Link to="/shopify-fulfillment" className="text-foreground hover:text-primary transition-colors font-bold">
-              Shopify Fulfillment
-            </Link>
-            <Link to="/amazon-fba-prep" className="text-foreground hover:text-primary transition-colors font-medium">
-              Amazon FBA
-            </Link>
-            <Link to="/tiktok-shop-fulfillment" className="text-foreground hover:text-primary transition-colors font-medium">
-              TikTok Shop
-            </Link>
             {isHomePage ? (
               <button
                 onClick={() => scrollToSection("pricing")}
@@ -106,48 +94,40 @@ const Header = () => {
                 Pricing
               </button>
             )}
+            <HoverCard openDelay={100} closeDelay={200}>
+              <HoverCardTrigger className="text-foreground hover:text-primary transition-colors font-medium cursor-pointer flex items-center gap-1">
+                About Us
+                <ChevronDown className="h-4 w-4" />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-48 p-2 bg-background border shadow-lg z-[100]">
+                <div className="flex flex-col gap-1">
+                  <Link
+                    to="/why-choose-us"
+                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                  >
+                    Why Choose Us
+                  </Link>
+                  <Link
+                    to="/faq"
+                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                  >
+                    FAQ
+                  </Link>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+            <Link to="/shopify-fulfillment" className="text-foreground hover:text-primary transition-colors font-bold">
+              Shopify Fulfillment
+            </Link>
+            <Link to="/amazon-fba-prep" className="text-foreground hover:text-primary transition-colors font-medium">
+              Amazon FBA
+            </Link>
+            <Link to="/tiktok-shop-fulfillment" className="text-foreground hover:text-primary transition-colors font-medium">
+              TikTok Shop
+            </Link>
             <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium">
               Blog
             </Link>
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-foreground hover:text-primary transition-colors font-medium bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">
-                    About Us
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[200px] gap-3 p-4">
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/why-choose-us"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Why Choose Us</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              What makes us different
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/faq"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">FAQ</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Common questions
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
           </nav>
 
           <div className="hidden lg:flex items-center gap-4">
