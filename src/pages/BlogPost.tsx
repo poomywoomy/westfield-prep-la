@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import StructuredData from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowLeft, Clock, Share2 } from "lucide-react";
 import { format } from "date-fns";
@@ -77,12 +78,27 @@ const BlogPost = () => {
       <Helmet>
         <title>{post.title} | Westfield Prep Center Blog</title>
         <meta name="description" content={post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
+        <link rel="canonical" href={`https://westfieldprepcenter.com/blog/${post.slug}`} />
+        
+        {/* Open Graph tags */}
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.excerpt || ""} />
+        <meta property="og:url" content={`https://westfieldprepcenter.com/blog/${post.slug}`} />
         {post.cover_image_url && <meta property="og:image" content={post.cover_image_url} />}
         <meta property="og:type" content="article" />
         {post.published_at && <meta property="article:published_time" content={post.published_at} />}
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
+        {post.cover_image_url && <meta name="twitter:image" content={post.cover_image_url} />}
       </Helmet>
+      <StructuredData type="breadcrumb" data={[
+        { name: "Home", url: "https://westfieldprepcenter.com/" },
+        { name: "Blog", url: "https://westfieldprepcenter.com/blog/" },
+        { name: post.title, url: `https://westfieldprepcenter.com/blog/${post.slug}` }
+      ]} />
 
       <div className="min-h-screen flex flex-col">
         <Header />

@@ -21,6 +21,19 @@ const Index = () => {
         <title>Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment - Westfield</title>
         <meta name="description" content="LA prep center with same-day Amazon FBA & Shopify fulfillment. Every order documented, every brand protected. Trusted by e-commerce sellers in Southern California." />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content="Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment - Westfield" />
+        <meta property="og:description" content="LA prep center with same-day Amazon FBA & Shopify fulfillment. Every order documented, every brand protected. Trusted by e-commerce sellers in Southern California." />
+        <meta property="og:url" content="https://westfieldprepcenter.com/" />
+        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+        <meta property="og:type" content="website" />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment - Westfield" />
+        <meta name="twitter:description" content="LA prep center with same-day Amazon FBA & Shopify fulfillment. Every order documented, every brand protected." />
+        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="organization" />
       <StructuredData type="reviews" />

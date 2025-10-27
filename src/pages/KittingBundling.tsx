@@ -29,8 +29,19 @@ const KittingBundling = () => {
         <title>Kitting & Bundling Services | Westfield Prep Center</title>
         <meta name="description" content="Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands." />
         <link rel="canonical" href="https://westfieldprepcenter.com/kitting-bundling/" />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content="Kitting & Bundling Services | Westfield Prep Center" />
+        <meta property="og:description" content="Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands." />
         <meta property="og:url" content="https://westfieldprepcenter.com/kitting-bundling/" />
-        <meta property="og:type" content="article" />
+        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+        <meta property="og:type" content="website" />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Kitting & Bundling Services | Westfield Prep Center" />
+        <meta name="twitter:description" content="Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands." />
+        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
       

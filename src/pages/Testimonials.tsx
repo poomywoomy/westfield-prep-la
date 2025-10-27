@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
 import { Helmet } from "react-helmet";
+import StructuredData from "@/components/StructuredData";
 
 const Testimonials = () => {
   const reviews = [
@@ -52,7 +53,26 @@ const Testimonials = () => {
           name="description" 
           content="Read real reviews from satisfied customers of Westfield Prep Center. See why businesses trust us for Amazon FBA prep, Shopify fulfillment, and TikTok Shop services." 
         />
+        <link rel="canonical" href="https://westfieldprepcenter.com/testimonials/" />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content="Customer Testimonials | Westfield Prep Center Reviews" />
+        <meta property="og:description" content="Read real reviews from satisfied customers. See why businesses trust Westfield Prep Center for Amazon FBA prep, Shopify fulfillment, and TikTok Shop services." />
+        <meta property="og:url" content="https://westfieldprepcenter.com/testimonials/" />
+        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+        <meta property="og:type" content="website" />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Customer Testimonials | Westfield Prep Center Reviews" />
+        <meta name="twitter:description" content="Read real reviews from satisfied customers. See why businesses trust Westfield Prep Center for fulfillment services." />
+        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
+      <StructuredData type="reviews" />
+      <StructuredData type="breadcrumb" data={[
+        { name: "Home", url: "https://westfieldprepcenter.com/" },
+        { name: "Testimonials", url: "https://westfieldprepcenter.com/testimonials/" }
+      ]} />
       
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-muted/20 to-background">
         <Header />

@@ -29,8 +29,19 @@ const StorageWarehousing = () => {
         <title>Storage & Warehousing | Westfield Prep Center</title>
         <meta name="description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
         <link rel="canonical" href="https://westfieldprepcenter.com/storage-warehousing/" />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content="Storage & Warehousing | Westfield Prep Center" />
+        <meta property="og:description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
         <meta property="og:url" content="https://westfieldprepcenter.com/storage-warehousing/" />
-        <meta property="og:type" content="article" />
+        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+        <meta property="og:type" content="website" />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Storage & Warehousing | Westfield Prep Center" />
+        <meta name="twitter:description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
+        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
       

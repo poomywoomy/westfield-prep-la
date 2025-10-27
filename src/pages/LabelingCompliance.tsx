@@ -29,8 +29,19 @@ const LabelingCompliance = () => {
         <title>Labeling & Compliance Services | Westfield Prep Center</title>
         <meta name="description" content="FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance." />
         <link rel="canonical" href="https://westfieldprepcenter.com/labeling-fnsku/" />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content="Labeling & Compliance Services | Westfield Prep Center" />
+        <meta property="og:description" content="FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance." />
         <meta property="og:url" content="https://westfieldprepcenter.com/labeling-fnsku/" />
-        <meta property="og:type" content="article" />
+        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+        <meta property="og:type" content="website" />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Labeling & Compliance Services | Westfield Prep Center" />
+        <meta name="twitter:description" content="FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance." />
+        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
       
