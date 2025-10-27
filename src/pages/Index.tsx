@@ -18,8 +18,8 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Los Angeles Prep Center | Amazon FBA, Shopify & E-Commerce Fulfillment - Westfield</title>
-        <meta name="description" content="Leading Los Angeles prep center specializing in Amazon FBA, Shopify fulfillment, and e-commerce services. Same-day prep center processing, photo-proof QC, and fast shipping in Southern California." />
+        <title>Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment - Westfield</title>
+        <meta name="description" content="LA prep center with same-day Amazon FBA & Shopify fulfillment. Every order documented, every brand protected. Trusted by e-commerce sellers in Southern California." />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
       </Helmet>
       <StructuredData type="organization" />

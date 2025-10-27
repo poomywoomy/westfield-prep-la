@@ -48,15 +48,15 @@ const Hero = () => {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                Los Angeles's Premier Prep Center for E-Commerce Sellers
+                LA's Prep Center That Moves as Fast as Your Brand
               </h1>
               
               <h2 className="text-2xl md:text-3xl mb-4 text-white/95 font-semibold">
-                Same-Day Amazon FBA, Shopify & DTC Prep Services in Southern California
+                Same-Day Amazon FBA & Shopify Fulfillment
               </h2>
               
               <p className="text-xl md:text-2xl mb-8 text-white/90 font-light leading-relaxed">
-                As a boutique Los Angeles prep center, we provide fast, reliable fulfillment services for Amazon FBA sellers, Shopify stores, and e-commerce brands. Our prep center specializes in same-day processing with dedicated support. <span className="block mt-3 text-2xl md:text-3xl font-bold text-secondary animate-pulse">Let us help you reach the next level of your growth.</span>
+                Westfield Prep Center helps sellers deliver and scale faster in Los Angeles and Southern California. Every order is documented, every brand is protected. Same-day processing with dedicated support.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-10">
