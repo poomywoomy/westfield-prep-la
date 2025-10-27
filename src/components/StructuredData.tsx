@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 
 interface StructuredDataProps {
-  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website";
+  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService";
   data?: any;
 }
 
@@ -220,6 +220,87 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
           },
           "query-input": "required name=search_term_string"
         }
+      };
+    }
+
+    // LocalBusiness with Service schema for nationwide coverage
+    if (type === "localBusinessWithService") {
+      return {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "@id": `${baseUrl}/#localbusiness-service`,
+        name: "Westfield Prep Center",
+        description: "Los Angeles prep center providing nationwide Amazon FBA prep and Shopify fulfillment services to all 50 states",
+        url: baseUrl,
+        telephone: "+18189355478",
+        email: "info@westfieldprepcenter.com",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "1801 Flower Ave Office 2",
+          addressLocality: "Duarte",
+          addressRegion: "CA",
+          postalCode: "91010",
+          addressCountry: "US"
+        },
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: "34.1395",
+          longitude: "-117.9773"
+        },
+        areaServed: [
+          { "@type": "Country", name: "United States" },
+          { "@type": "State", name: "California" },
+          { "@type": "State", name: "New York" },
+          { "@type": "State", name: "Texas" },
+          { "@type": "State", name: "Florida" },
+          { "@type": "State", name: "Illinois" },
+          { "@type": "State", name: "Pennsylvania" },
+          { "@type": "State", name: "Ohio" },
+          { "@type": "State", name: "Georgia" },
+          { "@type": "State", name: "North Carolina" },
+          { "@type": "State", name: "Michigan" }
+        ],
+        makesOffer: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Amazon FBA Prep Services",
+              description: "Professional Amazon FBA preparation including inspection, labeling, poly-bagging, and shipping to Amazon fulfillment centers",
+              provider: {
+                "@type": "LocalBusiness",
+                name: "Westfield Prep Center"
+              },
+              areaServed: { "@type": "Country", name: "United States" }
+            }
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Shopify Fulfillment Services",
+              description: "Complete Shopify order fulfillment with same-day processing, photo-proof QC, and branded packaging",
+              provider: {
+                "@type": "LocalBusiness",
+                name: "Westfield Prep Center"
+              },
+              areaServed: { "@type": "Country", name: "United States" }
+            }
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Nationwide E-commerce Fulfillment",
+              description: "Full-service e-commerce fulfillment with 2-day shipping to major US markets from our Los Angeles location",
+              provider: {
+                "@type": "LocalBusiness",
+                name: "Westfield Prep Center"
+              },
+              areaServed: { "@type": "Country", name: "United States" }
+            }
+          }
+        ]
       };
     }
 
