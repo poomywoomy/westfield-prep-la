@@ -55,7 +55,7 @@ const AmazonFBAPrep = () => {
                   Amazon FBA Prep & Compliance
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  FNSKU labeling, polybagging, bubble wrap, carton prep, pallet forwarding with full Amazon compliance.
+                  FNSKU labeling, polybagging, bubble wrap, carton prep, pallet forwarding with full Amazon compliance. <a href="/why-choose-us" className="text-primary hover:underline">Learn why sellers choose our LA prep center</a> and review our <a href="/faq" className="text-primary hover:underline">Amazon FBA prep questions</a>.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => navigate("/contact")}>

@@ -29,6 +29,7 @@ const ClientSettings = lazy(() => import("./pages/ClientSettings"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const WhyChooseUs = lazy(() => import("./pages/WhyChooseUs"));
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => {
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/testimonials" element={<Testimonials />} />
+              <Route path="/why-choose-us" element={<WhyChooseUs />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               

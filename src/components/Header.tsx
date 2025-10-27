@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Phone, Clock } from "lucide-react";
+import { Phone, Clock, ChevronDown } from "lucide-react";
 import logo from "@/assets/westfield-logo-original.jpg";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -101,9 +109,45 @@ const Header = () => {
             <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium">
               Blog
             </Link>
-            <Link to="/faq" className="text-foreground hover:text-primary transition-colors font-medium">
-              FAQ
-            </Link>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-foreground hover:text-primary transition-colors font-medium bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">
+                    About Us
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[200px] gap-3 p-4">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/why-choose-us"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">Why Choose Us</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              What makes us different
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/faq"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">FAQ</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Common questions
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </nav>
 
           <div className="hidden lg:flex items-center gap-4">

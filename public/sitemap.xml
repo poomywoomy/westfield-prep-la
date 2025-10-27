@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://westfieldprepcenter.com/</loc>
-    <lastmod>2025-10-15</lastmod>
+    <lastmod>2025-10-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -68,8 +68,20 @@
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/terms/</loc>
-    <lastmod>2025-10-15</lastmod>
+    <lastmod>2025-10-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/why-choose-us/</loc>
+    <lastmod>2025-10-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/blog/</loc>
+    <lastmod>2025-10-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

@@ -66,7 +66,7 @@ const ShopifyFulfillment = () => {
                   Los Angeles Shopify Prep Center for DTC Brands
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  Our Los Angeles Shopify prep center specializes in fast, accurate pick-pack, branded unboxing experiences, and same-day cutoffs. As a dedicated Shopify prep center, we help DTC brands scale with confidence.
+                  Our <a href="/why-choose-us" className="text-primary hover:underline">Los Angeles Shopify prep center</a> specializes in fast, accurate pick-pack, branded unboxing experiences, and same-day cutoffs. As a dedicated Shopify prep center, we help DTC brands scale with confidence. <a href="/faq" className="text-primary hover:underline">See our prep center services FAQ</a>.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button size="lg" className="bg-gradient-to-r from-[hsl(var(--shopify-blue))] to-[hsl(var(--shopify-teal))] hover:opacity-90 text-white shadow-lg" onClick={() => navigate("/contact")}>

@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 
 interface StructuredDataProps {
-  type: "organization" | "service" | "faq" | "reviews";
+  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website";
   data?: any;
 }
 
@@ -24,17 +24,18 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         email: "info@westfieldprepcenter.com",
         address: {
           "@type": "PostalAddress",
-          streetAddress: "7451 Valjean Ave",
-          addressLocality: "Los Angeles",
+          streetAddress: "1801 Flower Ave Office 2",
+          addressLocality: "Duarte",
           addressRegion: "CA",
-          postalCode: "91406",
+          postalCode: "91010",
           addressCountry: "US"
         },
         geo: {
           "@type": "GeoCoordinates",
-          latitude: "34.2068",
-          longitude: "-118.4524"
+          latitude: "34.1395",
+          longitude: "-117.9773"
         },
+        hasMap: "https://www.google.com/maps/place/1801+Flower+Ave,+Duarte,+CA+91010",
         priceRange: "$$",
         areaServed: {
           "@type": "GeoCircle",
@@ -89,14 +90,30 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         serviceType: data.serviceType,
         name: data.name,
         description: data.description,
+        category: "Prep Center Services",
         provider: {
           "@type": "Organization",
           name: "Westfield Prep Center",
           telephone: "+18189355478"
         },
-        areaServed: {
-          "@type": "Place",
-          name: "Los Angeles, California, United States"
+        areaServed: [
+          {
+            "@type": "Place",
+            name: "Los Angeles County, CA"
+          },
+          {
+            "@type": "Place",
+            name: "Duarte, CA"
+          },
+          {
+            "@type": "Place",
+            name: "Southern California"
+          }
+        ],
+        offers: {
+          "@type": "AggregateOffer",
+          priceCurrency: "USD",
+          description: "Custom pricing based on volume and services"
         },
         hasOfferCatalog: {
           "@type": "OfferCatalog",
@@ -170,6 +187,39 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
             reviewBody: "Professional team that really cares about getting things right. Our Amazon FBA prep has never been smoother."
           }
         ]
+      };
+    }
+
+    // Breadcrumb schema
+    if (type === "breadcrumb" && data) {
+      return {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: data.items?.map((item: { label: string; path: string }, index: number) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.label,
+          item: `${baseUrl}${item.path}`
+        }))
+      };
+    }
+
+    // Website schema with search action
+    if (type === "website") {
+      return {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": `${baseUrl}/#website`,
+        name: "Westfield Prep Center",
+        url: baseUrl,
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${baseUrl}/blog?search={search_term_string}`
+          },
+          "query-input": "required name=search_term_string"
+        }
       };
     }
 

@@ -74,8 +74,9 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>Blog - Westfield 3PL Fulfillment</title>
-        <meta name="description" content="Stay updated with the latest fulfillment strategies, warehouse optimization tips, and industry insights from Westfield 3PL." />
+        <title>Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield</title>
+        <meta name="description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
+        <link rel="canonical" href="https://westfieldprepcenter.com/blog/" />
       </Helmet>
 
       <Header />

@@ -56,7 +56,7 @@ const Hero = () => {
               </h2>
               
               <p className="text-xl md:text-2xl mb-8 text-white/90 font-light leading-relaxed">
-                Westfield Prep Center helps sellers deliver and scale faster in Los Angeles and Southern California. Every order is documented, every brand is protected. Same-day processing with dedicated support.
+                Westfield Prep Center helps sellers deliver and scale faster. Every order is documented, every brand is protected.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-10">

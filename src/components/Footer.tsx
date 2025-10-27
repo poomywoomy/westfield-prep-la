@@ -89,6 +89,12 @@ const Footer = () => {
                   Testimonials
                 </Link>
                 <Link
+                  to="/why-choose-us"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors"
+                >
+                  Why Choose Us
+                </Link>
+                <Link
                   to="/faq"
                   className="block text-sm text-white/80 hover:text-secondary transition-colors"
                 >
