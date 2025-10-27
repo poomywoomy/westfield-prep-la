@@ -1,13 +1,64 @@
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { Helmet } from "react-helmet";
 
 const Footer = () => {
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": "https://westfieldprepcenter.com/#organization",
+    "name": "Westfield Prep Center",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "1801 Flower Ave Office 2",
+      "addressLocality": "Duarte",
+      "addressRegion": "CA",
+      "postalCode": "91010",
+      "addressCountry": "US"
+    },
+    "telephone": "+18189355478",
+    "email": "info@westfieldprepcenter.com",
+    "url": "https://westfieldprepcenter.com",
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      "opens": "08:00",
+      "closes": "17:00"
+    },
+    "areaServed": [
+      {
+        "@type": "City",
+        "name": "Los Angeles"
+      },
+      {
+        "@type": "State",
+        "name": "California"
+      },
+      {
+        "@type": "GeoCircle",
+        "geoMidpoint": {
+          "@type": "GeoCoordinates",
+          "latitude": "34.1394",
+          "longitude": "-118.0092"
+        },
+        "geoRadius": "100"
+      }
+    ],
+    "priceRange": "$$"
+  };
+
   return (
-    <footer className="bg-primary text-white py-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Main Footer Content */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+    <>
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(localBusinessSchema)}
+        </script>
+      </Helmet>
+      <footer className="bg-primary text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            {/* Main Footer Content */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
             {/* Company Info */}
             <div className="space-y-4">
               <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
@@ -114,6 +165,21 @@ const Footer = () => {
                 </Link>
               </div>
             </div>
+
+            {/* Service Areas */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold mb-4">Service Areas</h4>
+              <p className="text-sm text-white/80 mb-3">
+                Proudly serving e-commerce businesses across:
+              </p>
+              <div className="text-sm text-white/70 space-y-1">
+                <p>• Los Angeles County</p>
+                <p>• Orange County</p>
+                <p>• San Bernardino County</p>
+                <p>• Riverside County</p>
+                <p>• All of Southern California</p>
+              </div>
+            </div>
           </div>
 
           {/* Bottom Bar */}
@@ -143,9 +209,10 @@ const Footer = () => {
               </div>
             </div>
           </div>
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 };
 
