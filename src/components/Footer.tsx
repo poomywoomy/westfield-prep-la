@@ -1,57 +1,9 @@
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
-import { Helmet } from "react-helmet";
 
 const Footer = () => {
-  const localBusinessSchema = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "@id": "https://westfieldprepcenter.com/#organization",
-    "name": "Westfield Prep Center",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "1801 Flower Ave Office 2",
-      "addressLocality": "Duarte",
-      "addressRegion": "CA",
-      "postalCode": "91010",
-      "addressCountry": "US"
-    },
-    "telephone": "+18189355478",
-    "email": "info@westfieldprepcenter.com",
-    "url": "https://westfieldprepcenter.com",
-    "sameAs": [
-      "https://www.facebook.com/westfieldprepcenter",
-      "https://www.linkedin.com/company/westfield-prep-center",
-      "https://g.page/westfield-prep-center"
-    ],
-    "openingHoursSpecification": {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      "opens": "09:00",
-      "closes": "20:00",
-      "timezone": "America/Los_Angeles"
-    },
-    "areaServed": [
-      {
-        "@type": "State",
-        "name": "California"
-      },
-      {
-        "@type": "Country",
-        "name": "United States"
-      }
-    ],
-    "priceRange": "$$"
-  };
-
   return (
-    <>
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(localBusinessSchema)}
-        </script>
-      </Helmet>
-      <footer className="bg-primary text-white py-16">
+    <footer className="bg-primary text-white py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             {/* Main Footer Content */}
@@ -195,7 +147,6 @@ const Footer = () => {
           </div>
         </div>
       </footer>
-    </>
   );
 };
 
