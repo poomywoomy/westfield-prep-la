@@ -594,6 +594,7 @@ export type Database = {
       }
       blog_posts: {
         Row: {
+          author_bio: string | null
           author_id: string | null
           author_name: string | null
           category: string | null
@@ -610,8 +611,10 @@ export type Database = {
           tags: string[] | null
           title: string
           updated_at: string
+          view_count: number | null
         }
         Insert: {
+          author_bio?: string | null
           author_id?: string | null
           author_name?: string | null
           category?: string | null
@@ -628,8 +631,10 @@ export type Database = {
           tags?: string[] | null
           title: string
           updated_at?: string
+          view_count?: number | null
         }
         Update: {
+          author_bio?: string | null
           author_id?: string | null
           author_name?: string | null
           category?: string | null
@@ -646,6 +651,7 @@ export type Database = {
           tags?: string[] | null
           title?: string
           updated_at?: string
+          view_count?: number | null
         }
         Relationships: []
       }

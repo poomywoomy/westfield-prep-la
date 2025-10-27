@@ -27,21 +27,12 @@ const Footer = () => {
     },
     "areaServed": [
       {
-        "@type": "City",
-        "name": "Los Angeles"
-      },
-      {
         "@type": "State",
         "name": "California"
       },
       {
-        "@type": "GeoCircle",
-        "geoMidpoint": {
-          "@type": "GeoCoordinates",
-          "latitude": "34.1394",
-          "longitude": "-118.0092"
-        },
-        "geoRadius": "100"
+        "@type": "Country",
+        "name": "United States"
       }
     ],
     "priceRange": "$$"
@@ -169,15 +160,14 @@ const Footer = () => {
             {/* Service Areas */}
             <div className="space-y-4">
               <h4 className="text-lg font-semibold mb-4">Service Areas</h4>
-              <p className="text-sm text-white/80 mb-3">
-                Proudly serving e-commerce businesses across:
-              </p>
-              <div className="text-sm text-white/70 space-y-1">
-                <p>• Los Angeles County</p>
-                <p>• Orange County</p>
-                <p>• San Bernardino County</p>
-                <p>• Riverside County</p>
-                <p>• All of Southern California</p>
+              <div className="text-sm text-white/80 space-y-2">
+                <p className="font-semibold text-secondary">Based in Duarte, California</p>
+                <p>• Serving e-commerce sellers across all 50 states</p>
+                <p>• Specializing in Southern California logistics</p>
+                <p>• Same-day shipping throughout the US</p>
+                <p className="text-xs text-white/60 mt-3">
+                  Strategic location near LA/Long Beach ports
+                </p>
               </div>
             </div>
           </div>

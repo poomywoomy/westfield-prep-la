@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, Loader2 } from "lucide-react";
 import { z } from "zod";
+import { RichTextEditor } from "@/components/blog/RichTextEditor";
 
 const blogPostSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
@@ -35,6 +37,10 @@ export const BlogPostDialog = ({ open, onOpenChange, postId, onSuccess }: BlogPo
     content: "",
     published: false,
     cover_image_url: "",
+    category: "General" as string,
+    tags: [] as string[],
+    meta_description: "",
+    author_bio: "",
   });
   const { toast } = useToast();
 
@@ -63,6 +69,10 @@ export const BlogPostDialog = ({ open, onOpenChange, postId, onSuccess }: BlogPo
         content: data.content || "",
         published: data.published,
         cover_image_url: data.cover_image_url || "",
+        category: data.category || "General",
+        tags: data.tags || [],
+        meta_description: data.meta_description || "",
+        author_bio: data.author_bio || "",
       });
     } catch (error: any) {
       toast({
@@ -81,6 +91,10 @@ export const BlogPostDialog = ({ open, onOpenChange, postId, onSuccess }: BlogPo
       content: "",
       published: false,
       cover_image_url: "",
+      category: "General",
+      tags: [],
+      meta_description: "",
+      author_bio: "",
     });
   };
 
@@ -162,6 +176,10 @@ export const BlogPostDialog = ({ open, onOpenChange, postId, onSuccess }: BlogPo
 
       const validated = blogPostSchema.parse(formData);
 
+      // Calculate read time
+      const wordCount = formData.content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+      const readTime = Math.max(1, Math.ceil(wordCount / 200));
+
       if (postId) {
         const { error } = await supabase
           .from("blog_posts")
@@ -169,6 +187,11 @@ export const BlogPostDialog = ({ open, onOpenChange, postId, onSuccess }: BlogPo
             ...validated,
             cover_image_url: formData.cover_image_url || null,
             published_at: validated.published ? new Date().toISOString() : null,
+            category: formData.category,
+            tags: formData.tags,
+            meta_description: formData.meta_description || null,
+            author_bio: formData.author_bio || null,
+            read_time_minutes: readTime,
           })
           .eq("id", postId);
 
@@ -190,6 +213,11 @@ export const BlogPostDialog = ({ open, onOpenChange, postId, onSuccess }: BlogPo
             cover_image_url: formData.cover_image_url || null,
             published_at: validated.published ? new Date().toISOString() : null,
             author_id: (await supabase.auth.getUser()).data.user?.id,
+            category: formData.category,
+            tags: formData.tags,
+            meta_description: formData.meta_description || null,
+            author_bio: formData.author_bio || null,
+            read_time_minutes: readTime,
           }]);
 
         if (error) throw error;
@@ -286,14 +314,73 @@ export const BlogPostDialog = ({ open, onOpenChange, postId, onSuccess }: BlogPo
           </div>
 
           <div>
-            <Label htmlFor="content">Content</Label>
-            <Textarea
-              id="content"
-              value={formData.content}
-              onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-              placeholder="Write your blog post content here..."
-              rows={12}
+            <Label htmlFor="category">Category</Label>
+            <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="General">General</SelectItem>
+                <SelectItem value="FBA Prep">FBA Prep</SelectItem>
+                <SelectItem value="Shopify">Shopify</SelectItem>
+                <SelectItem value="Multi-Channel">Multi-Channel</SelectItem>
+                <SelectItem value="Industry News">Industry News</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Input
+              id="tags"
+              value={formData.tags.join(", ")}
+              onChange={(e) => setFormData(prev => ({ 
+                ...prev, 
+                tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean)
+              }))}
+              placeholder="amazon fba, prep center, logistics"
             />
+          </div>
+
+          <div>
+            <Label htmlFor="meta_description">
+              Meta Description 
+              <span className="text-xs text-muted-foreground ml-2">
+                ({formData.meta_description.length}/155)
+              </span>
+            </Label>
+            <Textarea
+              id="meta_description"
+              value={formData.meta_description}
+              onChange={(e) => {
+                if (e.target.value.length <= 155) {
+                  setFormData(prev => ({ ...prev, meta_description: e.target.value }));
+                }
+              }}
+              placeholder="Brief SEO description (max 155 characters)"
+              rows={2}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="author_bio">Author Bio (optional)</Label>
+            <Textarea
+              id="author_bio"
+              value={formData.author_bio}
+              onChange={(e) => setFormData(prev => ({ ...prev, author_bio: e.target.value }))}
+              placeholder="Custom author bio for this post"
+              rows={2}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="content">Content *</Label>
+            <div className="border rounded-lg overflow-hidden">
+              <RichTextEditor
+                content={formData.content}
+                onChange={(html) => setFormData(prev => ({ ...prev, content: html }))}
+              />
+            </div>
           </div>
 
           <div className="flex items-center space-x-2">
