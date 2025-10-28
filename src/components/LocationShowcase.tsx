@@ -10,14 +10,14 @@ const LocationShowcase = () => {
           {/* Header */}
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
-              Los Angeles Prep Center: Serving LA County & All 50 States from Duarte
+              Los Angeles Prep Center: Professional Fulfillment Nationwide
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-5">
-              Professional Amazon FBA prep and Shopify fulfillment from our Los Angeles area location in Duarte, CA. Serving Monrovia, Arcadia, Pasadena, Greater LA & all 50 states with 2-day shipping to major markets
+              Professional Amazon FBA prep and Shopify fulfillment from Los Angeles, California. Serving all 50 states with fast 2-day shipping to major markets
             </p>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-border/50">
               <MapPin className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Los Angeles Area • Duarte, CA</span>
+              <span className="text-sm font-medium">Los Angeles, California</span>
               <span className="text-xs text-muted-foreground">• Nationwide E-Commerce Fulfillment</span>
             </div>
           </div>
@@ -47,7 +47,7 @@ const LocationShowcase = () => {
                     <TrendingUp className="h-5 w-5 text-primary mb-3" />
                     <h3 className="font-bold text-sm mb-2">West Coast Hub</h3>
                     <p className="text-xs text-muted-foreground">
-                      2-day delivery across Pacific region from San Gabriel Valley
+                      2-day delivery across Pacific region and West Coast
                     </p>
                   </CardContent>
                 </Card>
@@ -87,7 +87,7 @@ const LocationShowcase = () => {
                     <Handshake className="h-5 w-5 text-primary mb-3" />
                     <h3 className="font-bold text-sm mb-2">Local Partnership</h3>
                     <p className="text-xs text-muted-foreground">
-                      Serving Monrovia, Arcadia, Pasadena & Greater LA
+                      Serving Los Angeles & Southern California
                     </p>
                   </CardContent>
                 </Card>
@@ -151,7 +151,7 @@ const LocationShowcase = () => {
           {/* Footer */}
           <div className="text-center mt-8">
             <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Serving businesses nationwide from our</strong> <a href="/contact" className="text-primary hover:underline">Los Angeles prep center in Duarte, CA</a> • 1801 Flower Ave Office 2, CA 91010 • Greater Los Angeles Area
+              <strong className="text-foreground">Serving businesses nationwide from our</strong> <a href="/contact" className="text-primary hover:underline">Los Angeles prep center</a> • Professional fulfillment for e-commerce sellers coast to coast
             </p>
           </div>
         </div>
