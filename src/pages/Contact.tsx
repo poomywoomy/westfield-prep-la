@@ -16,8 +16,8 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Duarte Prep Center | Los Angeles FBA Fulfillment Quote</title>
-        <meta name="description" content="Contact Westfield Prep Center in Duarte for e-commerce fulfillment. Call +1 (818) 935-5478 or email info@westfieldprepcenter.com. Serving Los Angeles County & nationwide. Open 7 days, 9am-8pm PST." />
+        <title>Contact Los Angeles Shopify Prep Center | DTC Fulfillment & FBA Quote</title>
+        <meta name="description" content="Contact Westfield Prep Center in Los Angeles for Shopify fulfillment and e-commerce services. Call +1 (818) 935-5478 or email info@westfieldprepcenter.com. Serving businesses nationwide. Open 7 days, 9am-8pm PST." />
         <link rel="canonical" href="https://westfieldprepcenter.com/contact/" />
       </Helmet>
       <StructuredData type="organization" />

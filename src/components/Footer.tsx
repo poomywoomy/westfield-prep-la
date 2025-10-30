@@ -12,7 +12,7 @@ const Footer = () => {
             <div className="space-y-4">
               <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
               <p className="text-sm text-white/80 leading-relaxed">
-                Duarte prep center serving Los Angeles County, San Gabriel Valley & all 50 states
+                Los Angeles Shopify prep center serving e-commerce businesses nationwide
               </p>
               <div className="pt-2">
                 <p className="text-sm text-secondary font-semibold">Open 7 Days a Week</p>

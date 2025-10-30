@@ -17,7 +17,7 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         name: "Westfield Prep Center",
         legalName: "Sathatham LLC",
         alternateName: "Westfield Prep",
-        description: "Professional e-commerce fulfillment center in Duarte specializing in Amazon FBA prep, Shopify fulfillment, and multi-channel order processing. Serving Los Angeles County and all 50 states.",
+        description: "Professional Los Angeles Shopify prep center specializing in DTC fulfillment, custom branding, Amazon FBA prep, and multi-channel order processing. Serving e-commerce businesses nationwide.",
         additionalType: "https://www.productontology.org/id/Fulfillment_center",
         url: baseUrl,
         logo: `${baseUrl}/westfield-logo.png`,
@@ -35,8 +35,8 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         },
         geo: {
           "@type": "GeoCoordinates",
-          latitude: "34.1395",
-          longitude: "-117.9773"
+          latitude: "34.0522",
+          longitude: "-118.2437"
         },
         hasMap: "https://www.google.com/maps/place/1801+Flower+Ave,+Duarte,+CA+91010",
         openingHoursSpecification: [
@@ -50,29 +50,34 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         ],
         areaServed: [
           {
-            "@type": "City",
-            name: "Duarte",
-            containedIn: "Los Angeles County, California"
-          },
-          {
-            "@type": "City",
-            name: "Los Angeles"
-          },
-          {
             "@type": "State",
-            name: "California"
+            name: "California",
+            containedIn: "United States"
           },
           {
-            "@type": "State",
-            name: "New York"
+            "@type": "AdministrativeArea",
+            name: "Los Angeles County",
+            containedIn: "California"
           },
           {
-            "@type": "State",
-            name: "Texas"
+            "@type": "AdministrativeArea",
+            name: "Orange County",
+            containedIn: "California"
           },
           {
-            "@type": "State",
-            name: "Florida"
+            "@type": "AdministrativeArea",
+            name: "San Diego County",
+            containedIn: "California"
+          },
+          {
+            "@type": "AdministrativeArea",
+            name: "San Francisco Bay Area",
+            containedIn: "California"
+          },
+          {
+            "@type": "AdministrativeArea",
+            name: "Sacramento County",
+            containedIn: "California"
           },
           {
             "@type": "Country",
@@ -170,15 +175,11 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         areaServed: [
           {
             "@type": "Place",
-            name: "Los Angeles County, CA"
+            name: "California"
           },
           {
             "@type": "Place",
-            name: "Duarte, CA"
-          },
-          {
-            "@type": "Place",
-            name: "Los Angeles County, CA"
+            name: "United States"
           }
         ],
         offers: {

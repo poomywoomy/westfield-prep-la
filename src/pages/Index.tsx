@@ -19,24 +19,24 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment in Duarte, CA</title>
-        <meta name="description" content="Professional Los Angeles prep center in Duarte serving LA County & San Gabriel Valley. Amazon FBA prep, Shopify fulfillment, multi-channel services. Fast 24-48hr turnaround. Serving Monrovia, Arcadia, Pasadena & all 50 states." />
+        <title>Los Angeles Shopify Prep Center | DTC Fulfillment & Amazon FBA Services</title>
+        <meta name="description" content="Professional Los Angeles Shopify prep center specializing in DTC fulfillment, custom branding, and Amazon FBA prep. Fast 24-48hr turnaround. Serving e-commerce businesses nationwide." />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
         <meta name="geo.region" content="US-CA" />
-        <meta name="geo.placename" content="Duarte, Los Angeles County" />
-        <meta name="geo.position" content="34.1395;-117.9773" />
+        <meta name="geo.placename" content="Los Angeles, California" />
+        <meta name="geo.position" content="34.0522;-118.2437" />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content="Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment in Duarte, CA" />
-        <meta property="og:description" content="Professional Los Angeles prep center in Duarte serving LA County & San Gabriel Valley. Amazon FBA prep, Shopify fulfillment, multi-channel services. Fast 24-48hr turnaround nationwide." />
+        <meta property="og:title" content="Los Angeles Shopify Prep Center | DTC Fulfillment & Amazon FBA Services" />
+        <meta property="og:description" content="Professional Los Angeles Shopify prep center specializing in DTC fulfillment, custom branding, and Amazon FBA prep. Fast 24-48hr turnaround. Serving e-commerce businesses nationwide." />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
         <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
         <meta property="og:type" content="website" />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Los Angeles Prep Center | Amazon FBA & Shopify Fulfillment in Duarte, CA" />
-        <meta name="twitter:description" content="Professional Los Angeles prep center in Duarte serving LA County. Amazon FBA prep, Shopify fulfillment, multi-channel services. Fast turnaround nationwide." />
+        <meta name="twitter:title" content="Los Angeles Shopify Prep Center | DTC Fulfillment & Amazon FBA Services" />
+        <meta name="twitter:description" content="Professional Los Angeles Shopify prep center specializing in DTC fulfillment, custom branding, and Amazon FBA prep. Fast turnaround nationwide." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="organization" />
@@ -46,20 +46,20 @@ const Index = () => {
         data={{
           questions: [
             {
-              question: "Do you serve the San Gabriel Valley?",
-              answer: "Yes! Our prep center is located in Duarte, in the heart of the San Gabriel Valley. We serve Monrovia, Arcadia, Pasadena, and all surrounding cities in Los Angeles County."
+              question: "Do you offer Shopify fulfillment services?",
+              answer: "Yes! We specialize in Shopify fulfillment with custom branding, same-day processing, and direct integration with your Shopify store. We handle everything from receiving to shipping with full photo documentation."
             },
             {
-              question: "Where is your prep center located?",
-              answer: "We're located at 1801 Flower Ave Office 2, Duarte, CA 91010, in Los Angeles County. We're centrally positioned to serve the entire San Gabriel Valley and greater Los Angeles area."
+              question: "What areas do you serve?",
+              answer: "We're based in Los Angeles and provide fulfillment services to e-commerce businesses in all 50 states. We handle shipments to Amazon FBA warehouses, direct-to-consumer orders, and multi-channel fulfillment nationwide."
             },
             {
-              question: "Do you ship nationwide?",
-              answer: "Yes! While we're based in Duarte, California, we provide fulfillment services to businesses in all 50 states. We ship directly to Amazon FBA warehouses and customers nationwide."
+              question: "Do you offer same-day processing?",
+              answer: "Yes! Orders received before our daily cutoff are processed and shipped the same business day. We pride ourselves on fast turnaround times for both Shopify orders and Amazon FBA prep."
             },
             {
-              question: "What areas do you cover in Los Angeles?",
-              answer: "We serve all of Los Angeles County, with a focus on the San Gabriel Valley including Duarte, Monrovia, Arcadia, Pasadena, and surrounding communities. However, we handle shipments for clients across the United States."
+              question: "What makes your prep center different?",
+              answer: "As a boutique Los Angeles prep center, we offer personalized service, same-day processing, custom branding for Shopify stores, and full photo documentation. You get dedicated support instead of ticket-based systems."
             }
           ]
         }}
