@@ -47,7 +47,7 @@ const BlogPost = () => {
     if (post?.id) {
       const incrementViewCount = async () => {
         try {
-          await supabase.rpc('increment_blog_view_count', { post_id: post.id });
+          await supabase.rpc('increment_blog_view_count' as any, { post_id: post.id });
         } catch (error) {
           console.error('Error incrementing view count:', error);
         }
