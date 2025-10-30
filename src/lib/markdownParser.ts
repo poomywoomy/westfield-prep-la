@@ -2,12 +2,34 @@ import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css';
 
-// Custom renderer for code blocks with syntax highlighting
+// Custom renderer for code blocks and tables
 const renderer = new marked.Renderer();
+
+// Custom code block renderer with syntax highlighting
 renderer.code = (code, language) => {
   const validLanguage = hljs.getLanguage(language || '') ? language : 'plaintext';
   const highlighted = hljs.highlight(code, { language: validLanguage || 'plaintext' }).value;
   return `<pre><code class="hljs language-${validLanguage}">${highlighted}</code></pre>`;
+};
+
+// Custom table renderer to ensure proper structure
+renderer.table = (header, body) => {
+  return `<table>
+    <thead>${header}</thead>
+    <tbody>${body}</tbody>
+  </table>`;
+};
+
+// Custom table header renderer
+renderer.tablerow = (content) => {
+  return `<tr>${content}</tr>`;
+};
+
+// Custom table cell renderer
+renderer.tablecell = (content, flags) => {
+  const type = flags.header ? 'th' : 'td';
+  const align = flags.align ? ` style="text-align:${flags.align}"` : '';
+  return `<${type}${align}>${content}</${type}>`;
 };
 
 // Configure marked with GitHub Flavored Markdown

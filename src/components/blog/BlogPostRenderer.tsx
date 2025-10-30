@@ -36,11 +36,13 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
         [&>pre>code]:text-white [&>pre>code]:bg-transparent
         [&>code]:bg-[hsl(var(--blog-navy))] [&>code]:text-[hsl(var(--blog-orange))] [&>code]:px-2 [&>code]:py-1 [&>code]:rounded
         [&>table]:w-full [&>table]:border-collapse [&>table]:my-6 [&>table]:shadow-md [&>table]:rounded-lg [&>table]:overflow-hidden
-        [&>table>thead]:bg-[hsl(var(--blog-navy))] [&>table>thead]:text-white
-        [&>table>thead>tr>th]:p-3 [&>table>thead>tr>th]:text-left [&>table>thead>tr>th]:border [&>table>thead>tr>th]:border-[hsl(var(--blog-orange))] [&>table>thead>tr>th]:font-semibold
-        [&>table>tbody>tr>td]:p-3 [&>table>tbody>tr>td]:border [&>table>tbody>tr>td]:border-gray-300 [&>table>tbody>tr>td]:text-[hsl(var(--blog-gray-blue))]
-        [&>table>tbody>tr:nth-child(even)]:bg-[hsl(var(--blog-light-blue))]
-        [&>table>tbody>tr]:transition-colors [&>table>tbody>tr:hover]:bg-[hsl(var(--blog-light-blue))]/60
+        [&>table_thead]:bg-[hsl(var(--blog-navy))] [&>table_thead]:text-white
+        [&>table_thead_tr]:bg-[hsl(var(--blog-navy))]
+        [&>table_thead_tr_th]:p-3 [&>table_thead_tr_th]:text-left [&>table_thead_tr_th]:border [&>table_thead_tr_th]:border-[hsl(var(--blog-orange))] [&>table_thead_tr_th]:font-semibold [&>table_thead_tr_th]:text-white [&>table_thead_tr_th]:bg-[hsl(var(--blog-navy))]
+        [&>table_tbody_tr_th]:p-3 [&>table_tbody_tr_th]:text-left [&>table_tbody_tr_th]:border [&>table_tbody_tr_th]:border-[hsl(var(--blog-orange))] [&>table_tbody_tr_th]:font-semibold [&>table_tbody_tr_th]:text-white [&>table_tbody_tr_th]:bg-[hsl(var(--blog-navy))]
+        [&>table_tbody_tr_td]:p-3 [&>table_tbody_tr_td]:border [&>table_tbody_tr_td]:border-gray-300 [&>table_tbody_tr_td]:text-[hsl(var(--blog-gray-blue))]
+        [&>table_tbody_tr:nth-child(even)]:bg-[hsl(var(--blog-light-blue))]
+        [&>table_tbody_tr]:transition-colors [&>table_tbody_tr:hover]:bg-[hsl(var(--blog-light-blue))]/60
         [&>details]:my-6 [&>details]:border [&>details]:border-[hsl(var(--blog-orange))]/30 [&>details]:rounded-lg [&>details]:overflow-hidden [&>details]:bg-white [&>details]:shadow-sm [&>details]:hover:shadow-md [&>details]:transition-shadow
         [&>details>summary]:bg-[hsl(var(--blog-light-blue))] [&>details>summary]:p-4 [&>details>summary]:cursor-pointer [&>details>summary]:font-semibold [&>details>summary]:text-[hsl(var(--blog-navy))] [&>details>summary]:flex [&>details>summary]:items-center [&>details>summary]:gap-2 [&>details>summary]:hover:bg-[hsl(var(--blog-orange))]/10 [&>details>summary]:transition-colors
         [&>details>summary::marker]:content-[''] [&>details>summary::-webkit-details-marker]:hidden
