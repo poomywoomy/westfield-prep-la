@@ -14,7 +14,6 @@ renderer.code = (code, language) => {
 marked.setOptions({
   gfm: true,           // GitHub Flavored Markdown
   breaks: true,        // Convert \n to <br>
-  mangle: false,       // Don't escape autolinked email addresses
   renderer: renderer,
 });
 

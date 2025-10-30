@@ -63,10 +63,16 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           <Link 
             to="/" 
-            className="flex items-center cursor-pointer"
+            className="flex items-center cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
             onClick={handleLogoClick}
           >
-            <img src={logo} alt="Los Angeles Prep Center | Westfield Fulfillment Logo" className="h-12 w-auto" width="147" height="48" />
+            <img 
+              src={logo} 
+              alt="Los Angeles Prep Center | Westfield Fulfillment Logo" 
+              className="h-14 w-auto object-contain" 
+              width="147" 
+              height="56"
+            />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
