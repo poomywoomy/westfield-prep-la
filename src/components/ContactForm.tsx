@@ -89,7 +89,7 @@ const ContactForm = () => {
         'check-rate-limit',
         {
           body: {
-            key: `contact_${validatedData.email}`,
+            key: `contact_form_${validatedData.email}`,
             maxAttempts: 3,
             windowMinutes: 5,
           },

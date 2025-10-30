@@ -91,7 +91,7 @@ Use the comparison checklist in this guide (below).
 **Ideal Location:**
 - Within 50 miles of LA/Long Beach ports
 - Easy freeway access (10, 60, 710, 91)
-- Central to Southern California (San Gabriel Valley, Duarte, Pomona area)
+- Central to Southern California (Los Angeles County, Orange County, Inland Empire)
 
 ---
 

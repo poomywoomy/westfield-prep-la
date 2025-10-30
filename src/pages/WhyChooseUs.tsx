@@ -540,7 +540,7 @@ const WhyChooseUs = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">Based in Duarte, CA (San Gabriel Valley). Local team that understands LA e-commerce sellers and their unique needs.</p>
+                      <p className="text-muted-foreground">Based in Los Angeles with a local team that understands e-commerce sellers and their unique needs.</p>
                     </CardContent>
                   </Card>
 

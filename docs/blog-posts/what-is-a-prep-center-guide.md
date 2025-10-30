@@ -204,7 +204,6 @@
 
 ### Service Area
 - Los Angeles County
-- San Gabriel Valley
 - Orange County
 - Inland Empire
 - Ventura County

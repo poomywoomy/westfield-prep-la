@@ -133,7 +133,7 @@
 - Networking with other e-commerce sellers
 
 ### Duarte, CA Advantages
-- San Gabriel Valley location
+- Strategic Los Angeles location
 - Easy freeway access
 - Close to major shipping hubs
 - Lower costs than downtown LA
