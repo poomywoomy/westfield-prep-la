@@ -121,7 +121,7 @@ const AdminDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="grid grid-cols-8 w-full max-w-6xl".
+          <TabsList className="grid grid-cols-8 w-full max-w-6xl">
             <TabsTrigger value="clients">
               <Users className="mr-2 h-4 w-4" />
               Clients
