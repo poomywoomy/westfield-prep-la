@@ -1,10 +1,21 @@
+import { parseMarkdown } from "@/lib/markdownParser";
+
 interface BlogPostRendererProps {
   content: string;
 }
 
 export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
+  // Convert markdown to HTML before rendering
+  const htmlContent = parseMarkdown(content);
+  
+  // Add lazy loading to all images
+  const enhancedHtml = htmlContent.replace(
+    /<img /g,
+    '<img loading="lazy" '
+  );
+  
   return (
-    <div 
+    <div
       className="prose prose-lg max-w-none
         [&>h1]:text-[hsl(var(--blog-navy))] [&>h1]:font-bold [&>h1]:text-4xl [&>h1]:mb-6 [&>h1]:border-l-4 [&>h1]:border-[hsl(var(--blog-orange))] [&>h1]:pl-4
         [&>h2]:text-[hsl(var(--blog-navy))] [&>h2]:font-bold [&>h2]:text-3xl [&>h2]:mb-4 [&>h2]:mt-8 [&>h2]:border-l-4 [&>h2]:border-[hsl(var(--blog-orange))] [&>h2]:pl-4
@@ -38,7 +49,7 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
         [&>details>summary~*]:p-4 [&>details>summary~*]:text-[hsl(var(--blog-gray-blue))]
         [&_hr]:border-[hsl(var(--blog-orange))]/20 [&_hr]:my-8
       "
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: enhancedHtml }}
     />
   );
 };

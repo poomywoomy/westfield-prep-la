@@ -138,7 +138,7 @@ const Blog = () => {
                   category={post.category}
                   authorName={post.author_name}
                   readTimeMinutes={post.read_time_minutes}
-                  isFeatured={i === 0} 
+                  isFeatured={false}
                 />
               ))}
             </div>

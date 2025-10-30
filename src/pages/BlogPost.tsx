@@ -42,6 +42,20 @@ const BlogPost = () => {
     }
   }, [slug]);
 
+  // Track view count
+  useEffect(() => {
+    if (post?.id) {
+      const incrementViewCount = async () => {
+        try {
+          await supabase.rpc('increment_blog_view_count', { post_id: post.id });
+        } catch (error) {
+          console.error('Error incrementing view count:', error);
+        }
+      };
+      incrementViewCount();
+    }
+  }, [post?.id]);
+
   const fetchPost = async () => {
     try {
       const { data, error } = await supabase

@@ -16,6 +16,7 @@ import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
 import { InventoryTab } from "@/components/admin/InventoryTab";
 import { QuickScanModal } from "@/components/admin/QuickScanModal";
 import { BlogTab } from "@/components/admin/BlogTab";
+import { BlogEditorTab } from "@/components/admin/BlogEditorTab";
 
 const AdminDashboard = () => {
   const { user, role, loading } = useAuth();
@@ -120,7 +121,7 @@ const AdminDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="grid grid-cols-7 w-full max-w-6xl">
+          <TabsList className="grid grid-cols-8 w-full max-w-6xl".
             <TabsTrigger value="clients">
               <Users className="mr-2 h-4 w-4" />
               Clients
@@ -144,6 +145,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="blog">
               <PenSquare className="mr-2 h-4 w-4" />
               Blog
+            </TabsTrigger>
+            <TabsTrigger value="blog-editor">
+              <PenSquare className="mr-2 h-4 w-4" />
+              Editor
             </TabsTrigger>
             <TabsTrigger value="documents">
               <FileSignature className="mr-2 h-4 w-4" />
@@ -173,6 +178,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="blog">
             <BlogTab />
+          </TabsContent>
+
+          <TabsContent value="blog-editor">
+            <BlogEditorTab />
           </TabsContent>
 
           <TabsContent value="documents">
