@@ -24,11 +24,19 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
         [&>pre]:bg-[hsl(var(--blog-navy))] [&>pre]:text-white [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:overflow-x-auto [&>pre]:my-6
         [&>pre>code]:text-white [&>pre>code]:bg-transparent
         [&>code]:bg-[hsl(var(--blog-navy))] [&>code]:text-[hsl(var(--blog-orange))] [&>code]:px-2 [&>code]:py-1 [&>code]:rounded
-        [&>table]:w-full [&>table]:border-collapse [&>table]:my-6
+        [&>table]:w-full [&>table]:border-collapse [&>table]:my-6 [&>table]:shadow-md [&>table]:rounded-lg [&>table]:overflow-hidden
         [&>table>thead]:bg-[hsl(var(--blog-navy))] [&>table>thead]:text-white
-        [&>table>thead>tr>th]:p-3 [&>table>thead>tr>th]:text-left [&>table>thead>tr>th]:border [&>table>thead>tr>th]:border-[hsl(var(--blog-orange))]
-        [&>table>tbody>tr>td]:p-3 [&>table>tbody>tr>td]:border [&>table>tbody>tr>td]:border-gray-300
+        [&>table>thead>tr>th]:p-3 [&>table>thead>tr>th]:text-left [&>table>thead>tr>th]:border [&>table>thead>tr>th]:border-[hsl(var(--blog-orange))] [&>table>thead>tr>th]:font-semibold
+        [&>table>tbody>tr>td]:p-3 [&>table>tbody>tr>td]:border [&>table>tbody>tr>td]:border-gray-300 [&>table>tbody>tr>td]:text-[hsl(var(--blog-gray-blue))]
         [&>table>tbody>tr:nth-child(even)]:bg-[hsl(var(--blog-light-blue))]
+        [&>table>tbody>tr]:transition-colors [&>table>tbody>tr:hover]:bg-[hsl(var(--blog-light-blue))]/60
+        [&>details]:my-6 [&>details]:border [&>details]:border-[hsl(var(--blog-orange))]/30 [&>details]:rounded-lg [&>details]:overflow-hidden [&>details]:bg-white [&>details]:shadow-sm [&>details]:hover:shadow-md [&>details]:transition-shadow
+        [&>details>summary]:bg-[hsl(var(--blog-light-blue))] [&>details>summary]:p-4 [&>details>summary]:cursor-pointer [&>details>summary]:font-semibold [&>details>summary]:text-[hsl(var(--blog-navy))] [&>details>summary]:flex [&>details>summary]:items-center [&>details>summary]:gap-2 [&>details>summary]:hover:bg-[hsl(var(--blog-orange))]/10 [&>details>summary]:transition-colors
+        [&>details>summary::marker]:content-[''] [&>details>summary::-webkit-details-marker]:hidden
+        [&>details>summary::before]:content-['▶'] [&>details>summary::before]:text-[hsl(var(--blog-orange))] [&>details>summary::before]:text-sm [&>details>summary::before]:transition-transform [&>details>summary::before]:inline-block
+        [&>details[open]>summary::before]:rotate-90
+        [&>details>summary~*]:p-4 [&>details>summary~*]:text-[hsl(var(--blog-gray-blue))]
+        [&_hr]:border-[hsl(var(--blog-orange))]/20 [&_hr]:my-8
       "
       dangerouslySetInnerHTML={{ __html: content }}
     />
