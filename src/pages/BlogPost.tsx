@@ -7,12 +7,13 @@ import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import StructuredData from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
-import { Calendar, ArrowLeft, Clock, Share2 } from "lucide-react";
+import { Calendar, ArrowLeft, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { BlogPostRenderer } from "@/components/blog/BlogPostRenderer";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { AuthorBio } from "@/components/blog/AuthorBio";
+import { ShareButtons } from "@/components/blog/ShareButtons";
 
 interface BlogPost {
   id: string;
@@ -193,17 +194,11 @@ const BlogPost = () => {
                         <Clock className="h-4 w-4" />
                         <span className="text-sm">{estimatedReadTime} min read</span>
                       </div>
-                      <button 
-                        onClick={() => {
-                          if (navigator.share) {
-                            navigator.share({ title: post.title, url: window.location.href });
-                          }
-                        }}
-                        className="flex items-center gap-2 hover:text-white transition-colors"
-                      >
-                        <Share2 className="h-4 w-4" />
-                        <span className="text-sm">Share</span>
-                      </button>
+                      <ShareButtons 
+                        title={post.title}
+                        variant="ghost"
+                        size="sm"
+                      />
                     </div>
                   </div>
                 </div>
@@ -277,21 +272,11 @@ const BlogPost = () => {
                             Back to All Posts
                           </Button>
                         </Link>
-                        <Button 
+                        <ShareButtons 
+                          title={post.title}
                           variant="default"
                           size="lg"
-                          onClick={() => {
-                            if (navigator.share) {
-                              navigator.share({ title: post.title, url: window.location.href });
-                            } else {
-                              navigator.clipboard.writeText(window.location.href);
-                            }
-                          }}
-                          className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-                        >
-                          <Share2 className="mr-2 h-4 w-4" />
-                          Share Article
-                        </Button>
+                        />
                       </div>
                     </div>
                   </div>
