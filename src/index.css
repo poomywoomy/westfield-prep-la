@@ -64,6 +64,14 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Blog-specific colors */
+    --blog-navy: 215 30% 15%;
+    --blog-orange: 28 100% 50%;
+    --blog-light-blue: 213 100% 97%;
+    --blog-gray-blue: 215 15% 30%;
+    --blog-muted-bg: 210 20% 96%;
+    --blog-shadow-glow: 0 12px 24px hsla(28, 100%, 50%, 0.25);
   }
 
   .dark {
@@ -94,6 +102,14 @@ All colors MUST be HSL.
     --border: 210 30% 20%;
     --input: 210 30% 20%;
     --ring: 28 100% 50%;
+
+    /* Blog-specific colors (dark mode) */
+    --blog-navy: 215 25% 90%;
+    --blog-orange: 28 100% 50%;
+    --blog-light-blue: 215 25% 18%;
+    --blog-gray-blue: 215 10% 80%;
+    --blog-muted-bg: 215 15% 14%;
+    --blog-shadow-glow: 0 12px 28px hsla(28, 100%, 50%, 0.35);
   }
 }
 

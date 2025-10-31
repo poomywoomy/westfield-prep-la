@@ -20,11 +20,6 @@ renderer.table = (header, body) => {
   </table>`;
 };
 
-// Custom table header renderer
-renderer.tablerow = (content) => {
-  return `<tr>${content}</tr>`;
-};
-
 // Custom table cell renderer
 renderer.tablecell = (content, flags) => {
   const type = flags.header ? 'th' : 'td';
