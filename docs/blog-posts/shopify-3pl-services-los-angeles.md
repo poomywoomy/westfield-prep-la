@@ -50,13 +50,13 @@ The math is simple: port proximity saves you **thousands of dollars per containe
 
 The table below shows the total cost breakdown for moving a 40-foot container from the Port of Los Angeles to various 3PL fulfillment centers across the United States, including drayage (port pickup), inland freight, and estimated transit times:
 
-| Route | Drayage Cost | Inland Freight | Total Transport | Transit Days |
-|-------|--------------|----------------|-----------------|--------------|
-| LA Port to LA 3PL | $200-400 | $0 | $200-400 | 1-2 |
-| LA Port to Phoenix 3PL | $200-400 | $800-1,200 | $1,000-1,600 | 3-4 |
-| LA Port to Dallas 3PL | $200-400 | $1,500-2,000 | $1,700-2,400 | 5-7 |
-| LA Port to Atlanta 3PL | $200-400 | $2,500-3,500 | $2,700-3,900 | 7-10 |
-| LA Port to NYC 3PL | $200-400 | $3,000-4,500 | $3,200-4,900 | 10-14 |
+| Shipping Route | Port Pickup Cost | Long-Distance Shipping | Total Cost | Delivery Time |
+|----------------|------------------|------------------------|------------|---------------|
+| LA Port → LA Warehouse | $200-400 | $0 | $200-400 | 1-2 days |
+| LA Port → Phoenix | $200-400 | $800-1,200 | $1,000-1,600 | 3-4 days |
+| LA Port → Dallas | $200-400 | $1,500-2,000 | $1,700-2,400 | 5-7 days |
+| LA Port → Atlanta | $200-400 | $2,500-3,500 | $2,700-3,900 | 7-10 days |
+| LA Port → New York | $200-400 | $3,000-4,500 | $3,200-4,900 | 10-14 days |
 
 The savings are obvious - but the speed advantage is equally important. In eCommerce, time is literally money. Every day your products sit in transit is a day they're not generating revenue.
 
@@ -195,22 +195,20 @@ Let's look at a practical comparison. Imagine you're running a Shopify store sel
 
 **Total 3PL Cost**: **$3,200-5,400/month**
 
-### Annual Cost Comparison: Managing Your Own Warehouse vs. Partnering with an LA 3PL
+### Annual Cost Comparison: Managing Your Own Fulfillment vs. Using an LA 3PL
 
-The table below illustrates the yearly cost difference between handling fulfillment yourself (DIY) versus outsourcing to a Los Angeles-based 3PL for a growing Shopify store (starting at 500 orders/month, scaling to 2,000 orders/month):
+The table below shows real cost comparisons at different order volumes, comparing DIY fulfillment (managing it yourself with part-time help) versus outsourcing to a Los Angeles-based 3PL:
 
-| Cost Category | DIY Fulfillment (Annual) | LA 3PL (Annual) | Savings with 3PL |
-|---------------|---------------------------|-----------------|------------------|
-| Labor | $48,000-72,000 | $0 | $48,000-72,000 |
-| Warehouse Rent | $36,000-60,000 | $4,800-9,600 | $31,200-50,400 |
-| Fulfillment Operations | $6,000-12,000 | $30,000-48,000 | -$24,000 to -$36,000 |
-| Overhead (Insurance, Utilities, Software) | $8,400-18,000 | $3,600-7,200 | $4,800-10,800 |
-| Your Time (Opportunity Cost) | $48,000 | $0 | $48,000 |
-| **Total Annual Cost** | **$146,400-210,000** | **$38,400-64,800** | **$81,600-145,200** |
+| Monthly Order Volume | Managing It Yourself (Annual) | Using LA 3PL (Annual) | Your Annual Savings |
+|----------------------|-------------------------------|----------------------|---------------------|
+| 250 orders/month | $73,000-105,000 | $19,000-32,000 | $54,000-73,000 |
+| 500 orders/month | $98,000-140,000 | $38,000-64,000 | $60,000-76,000 |
+| 1,000 orders/month | $135,000-195,000 | $76,000-128,000 | $59,000-67,000 |
+| 2,500 orders/month | $195,000-285,000 | $190,000-320,000 | Save time, not money* |
 
-**Annual Savings**: **$81,600-145,200**
+*At higher volumes, 3PL costs approach DIY costs, but you save 15-20+ hours per week managing operations - time better spent growing your business.
 
-That's right - by using an LA 3PL, you could save anywhere from $81,000 to $145,000 per year, depending on your volume and specific needs. Even more importantly, you free up your time to focus on growth instead of packing boxes.
+**The Bottom Line**: For most growing Shopify stores, an LA 3PL saves $50,000-75,000 annually while freeing up your time to focus on marketing, product development, and customer service.
 
 ---
 
