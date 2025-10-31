@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Calendar } from "lucide-react";
 import { StartNewBillDialog } from "./StartNewBillDialog";
 import { BillView } from "./BillView";
+import { BillingSummaryDashboard } from "./BillingSummaryDashboard";
 import type { Database } from "@/integrations/supabase/types";
 
 type Bill = Database["public"]["Tables"]["bills"]["Row"];
@@ -23,6 +24,7 @@ const BillingTab = () => {
   const [newBillDialogOpen, setNewBillDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [dateFilter, setDateFilter] = useState<string>("all");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -86,7 +88,22 @@ const BillingTab = () => {
 
     const matchesStatus = statusFilter === "all" || bill.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    let matchesDate = true;
+    if (dateFilter !== "all") {
+      const billDate = new Date(bill.billing_month);
+      const now = new Date();
+      
+      if (dateFilter === "this_month") {
+        matchesDate = billDate.getMonth() === now.getMonth() && billDate.getFullYear() === now.getFullYear();
+      } else if (dateFilter === "last_month") {
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
+        matchesDate = billDate.getMonth() === lastMonth.getMonth() && billDate.getFullYear() === lastMonth.getFullYear();
+      } else if (dateFilter === "this_year") {
+        matchesDate = billDate.getFullYear() === now.getFullYear();
+      }
+    }
+
+    return matchesSearch && matchesStatus && matchesDate;
   });
 
   const getStatusColor = (status: string) => {
@@ -119,47 +136,64 @@ const BillingTab = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Left Panel - Bill History */}
-      <Card className="h-[calc(100vh-12rem)] flex flex-col">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Bill History</CardTitle>
-              <CardDescription>Search and manage all bills</CardDescription>
+    <div className="space-y-6">
+      {/* Dashboard Summary */}
+      <BillingSummaryDashboard />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Panel - Bill History */}
+        <Card className="h-[calc(100vh-20rem)] flex flex-col">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Bill History</CardTitle>
+                <CardDescription>Search and manage all bills</CardDescription>
+              </div>
+              <Button onClick={() => setNewBillDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Start New Bill
+              </Button>
             </div>
-            <Button onClick={() => setNewBillDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Start New Bill
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="flex-1 flex flex-col space-y-4 overflow-hidden">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by client or label..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
-              />
+          </CardHeader>
+          <CardContent className="flex-1 flex flex-col space-y-4 overflow-hidden">
+            {/* Enhanced Filters */}
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by client or label..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="open">Open</SelectItem>
+                    <SelectItem value="closed">Closed</SelectItem>
+                    <SelectItem value="sent">Sent</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Select value={dateFilter} onValueChange={setDateFilter}>
+                <SelectTrigger>
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Time</SelectItem>
+                  <SelectItem value="this_month">This Month</SelectItem>
+                  <SelectItem value="last_month">Last Month</SelectItem>
+                  <SelectItem value="this_year">This Year</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
-                <SelectItem value="sent">Sent</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="partial">Partial</SelectItem>
-                <SelectItem value="voided">Voided</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
           <div className="flex-1 overflow-y-auto space-y-2">
             {filteredBills.length === 0 ? (
@@ -200,19 +234,20 @@ const BillingTab = () => {
             )}
           </div>
         </CardContent>
-      </Card>
+        </Card>
 
-      {/* Right Panel - Selected Bill View */}
-      <div className="h-[calc(100vh-12rem)] overflow-y-auto">
-        {selectedBill && selectedClient ? (
-          <BillView bill={selectedBill} client={selectedClient} onRefresh={fetchData} />
-        ) : (
-          <Card className="h-full flex items-center justify-center">
-            <CardContent>
-              <p className="text-muted-foreground text-center">Select a bill to view details</p>
-            </CardContent>
-          </Card>
-        )}
+        {/* Right Panel - Selected Bill View */}
+        <div className="h-[calc(100vh-20rem)] overflow-y-auto">
+          {selectedBill && selectedClient ? (
+            <BillView bill={selectedBill} client={selectedClient} onRefresh={fetchData} />
+          ) : (
+            <Card className="h-full flex items-center justify-center">
+              <CardContent>
+                <p className="text-muted-foreground text-center">Select a bill to view details</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
 
       <StartNewBillDialog

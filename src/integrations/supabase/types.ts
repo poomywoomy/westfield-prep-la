@@ -1430,6 +1430,7 @@ export type Database = {
           id: string
           memo: string | null
           method: string
+          payment_type: string | null
           received_at: string
         }
         Insert: {
@@ -1442,6 +1443,7 @@ export type Database = {
           id?: string
           memo?: string | null
           method: string
+          payment_type?: string | null
           received_at?: string
         }
         Update: {
@@ -1454,6 +1456,7 @@ export type Database = {
           id?: string
           memo?: string | null
           method?: string
+          payment_type?: string | null
           received_at?: string
         }
         Relationships: [

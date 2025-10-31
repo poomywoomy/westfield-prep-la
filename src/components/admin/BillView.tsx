@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Plus, Download, Lock, Calendar, DollarSign } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Trash2, Plus, Download, Lock, Calendar, DollarSign, Wallet, ArrowLeft, ArrowRight, Copy, Mail, RefreshCw } from "lucide-react";
 import { AddBillingPaymentDialog } from "./AddBillingPaymentDialog";
 import { AddCustomBillingItemDialog } from "./AddCustomBillingItemDialog";
+import { CollapsibleBillSection } from "./CollapsibleBillSection";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 import type { Database } from "@/integrations/supabase/types";
@@ -36,6 +39,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   const [addPaymentOpen, setAddPaymentOpen] = useState(false);
   const [addCustomItemOpen, setAddCustomItemOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [depositBalance, setDepositBalance] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -49,6 +53,16 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
 
   const fetchBillData = async () => {
     try {
+      // Fetch client deposit balance
+      const { data: clientData, error: clientError } = await supabase
+        .from("clients")
+        .select("deposit_balance_cents")
+        .eq("id", client.id)
+        .single();
+
+      if (clientError) throw clientError;
+      setDepositBalance((clientData?.deposit_balance_cents || 0) / 100);
+
       // Fetch bill items
       const { data: itemsData, error: itemsError } = await supabase
         .from("bill_items")
@@ -648,25 +662,107 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
 
   const isClosed = bill.status === "closed";
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "open": return "bg-blue-500/10 text-blue-600 dark:text-blue-400";
+      case "closed": return "bg-gray-500/10 text-gray-600 dark:text-gray-400";
+      case "sent": return "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400";
+      case "paid": return "bg-green-500/10 text-green-600 dark:text-green-400";
+      default: return "bg-gray-500/10 text-gray-600";
+    }
+  };
+
+  const paymentProgress = subtotal > 0 ? (totalPayments / subtotal) * 100 : 0;
+
+  const quickApplyDeposit = async () => {
+    if (depositBalance <= 0 || balance <= 0) return;
+    
+    const applyAmount = Math.min(depositBalance, balance);
+    
+    if (!confirm(`Apply $${applyAmount.toFixed(2)} from deposit balance to this bill?`)) return;
+
+    try {
+      setLoading(true);
+      const amountCents = Math.round(applyAmount * 100);
+
+      await supabase.from("payments").insert({
+        client_id: client.id,
+        bill_id: bill.id,
+        amount_cents: amountCents,
+        received_at: new Date().toISOString().split('T')[0],
+        method: "deposit_application",
+        payment_type: "deposit_application",
+      });
+
+      await supabase.from("clients").update({
+        deposit_balance_cents: Math.round((depositBalance - applyAmount) * 100),
+      }).eq("id", client.id);
+
+      toast({ title: "Deposit Applied", description: `$${applyAmount.toFixed(2)} applied from deposit` });
+      
+      fetchBillData();
+      await recalculateBillTotals();
+      onRefresh();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Bill Header */}
+      {/* Enhanced Bill Header */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Bill Details</CardTitle>
-              <CardDescription>
-                {client.company_name} - {bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-              </CardDescription>
-            </div>
-            {isClosed && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Lock className="h-4 w-4" />
-                <span>Closed</span>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1 flex-1">
+              <div className="flex items-center gap-2">
+                <CardTitle>{client.company_name}</CardTitle>
+                <Badge className={getStatusColor(bill.status)}>{bill.status}</Badge>
               </div>
-            )}
+              <CardDescription>
+                {bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+              </CardDescription>
+              {statementStartDate && statementEndDate && (
+                <p className="text-xs text-muted-foreground">
+                  {new Date(statementStartDate).toLocaleDateString()} - {new Date(statementEndDate).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+            
+            {/* Financial Summary */}
+            <div className="text-right space-y-1">
+              <div className="text-3xl font-bold">${balance.toFixed(2)}</div>
+              <div className="text-xs text-muted-foreground">Balance Due</div>
+              <Progress value={paymentProgress} className="h-2 w-32" />
+              <div className="text-xs text-muted-foreground">
+                ${totalPayments.toFixed(2)} / ${subtotal.toFixed(2)}
+              </div>
+            </div>
           </div>
+
+          {/* Deposit Balance Banner */}
+          {depositBalance > 0 && !isClosed && (
+            <div className="flex items-center justify-between p-3 mt-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Wallet className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm font-medium">Deposit Balance Available</span>
+                <Badge variant="secondary" className="text-base font-bold">
+                  ${depositBalance.toFixed(2)}
+                </Badge>
+              </div>
+              <Button
+                size="sm"
+                onClick={quickApplyDeposit}
+                disabled={loading || balance <= 0}
+                variant="outline"
+              >
+                <Wallet className="mr-2 h-4 w-4" />
+                Quick Apply to Bill
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Statement Date Range */}
@@ -764,7 +860,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
         </CardContent>
       </Card>
 
-      {/* Line Items */}
+      {/* Line Items with Collapsible Sections */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -780,101 +876,49 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
         <CardContent>
           {Object.keys(billItemsBySection).length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
-              No line items yet
+              No line items yet. {quote && "Add services from the quote below."}
             </div>
           ) : (
-            Object.entries(billItemsBySection).map(([sectionType, items]) => (
-              <div key={sectionType} className="mb-6 last:mb-0">
-                <div className="font-semibold text-sm text-muted-foreground mb-2 px-1">
-                  {sectionType}
-                </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Service</TableHead>
-                      <TableHead className="text-right">Quantity</TableHead>
-                      <TableHead className="text-right">Unit Price</TableHead>
-                      <TableHead className="text-right">Total</TableHead>
-                      {!isClosed && <TableHead className="w-[50px]"></TableHead>}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {items.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.service_name}</TableCell>
-                        <TableCell className="text-right">
-                          {!isClosed ? (
-                            <Input
-                              type="number"
-                              value={item.qty_decimal}
-                              onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
-                              className="w-20 text-right"
-                              step="0.01"
-                            />
-                          ) : (
-                            item.qty_decimal
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          ${(item.unit_price_cents / 100).toFixed(2)}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          ${(Number(item.qty_decimal) * item.unit_price_cents / 100).toFixed(2)}
-                        </TableCell>
-                        {!isClosed && (
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deleteLineItem(item.id)}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ))
-          )}
-
-          {!isClosed && quote && quoteServicesBySection.length > 0 && (
-            <div className="mt-4 p-4 border rounded-lg bg-accent/50 space-y-4">
-              <div className="font-semibold">Add from Quote:</div>
-              {quoteServicesBySection.map((section, sectionIdx) => (
-                <div key={sectionIdx} className="space-y-2">
-                  <div className="text-sm font-medium text-muted-foreground">{section.sectionType}</div>
-                  <div className="flex flex-wrap gap-2">
-                    {section.services.map((service, idx) => (
-                      <Button
-                        key={idx}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addServiceFromQuote(service.serviceName, service.unitPrice, section.sectionType)}
-                        disabled={loading}
-                      >
-                        {service.serviceName} - ${service.unitPrice.toFixed(2)}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-2">
+              {Object.entries(billItemsBySection).map(([sectionType, items]) => {
+                const quoteSectionServices = quoteServicesBySection.find(
+                  (s) => s.sectionType === sectionType
+                )?.services || [];
+                
+                return (
+                  <CollapsibleBillSection
+                    key={sectionType}
+                    sectionType={sectionType}
+                    items={items}
+                    isClosed={isClosed}
+                    onUpdateQuantity={updateQuantity}
+                    onDeleteItem={deleteLineItem}
+                    quoteServices={quoteSectionServices}
+                    onAddService={(name, price) => addServiceFromQuote(name, price, sectionType)}
+                    loading={loading}
+                  />
+                );
+              })}
             </div>
           )}
 
-          <div className="mt-4 text-right">
-            <div className="text-lg font-semibold">Subtotal: ${subtotal.toFixed(2)}</div>
+          <div className="mt-6 pt-4 border-t">
+            <div className="flex justify-end items-center gap-4">
+              <span className="text-muted-foreground">Subtotal:</span>
+              <span className="text-2xl font-bold">${subtotal.toFixed(2)}</span>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Payments */}
+      {/* Enhanced Payments Section */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Payments</CardTitle>
+            <div>
+              <CardTitle>Payments & Deposits</CardTitle>
+              <CardDescription>Payment history and deposit applications</CardDescription>
+            </div>
             {!isClosed && (
               <Button onClick={() => setAddPaymentOpen(true)} size="sm">
                 <DollarSign className="mr-2 h-4 w-4" />
@@ -887,36 +931,61 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Type</TableHead>
                 <TableHead>Method</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Running Balance</TableHead>
                 {!isClosed && <TableHead className="w-[50px]"></TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {payments.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell className="font-medium">{payment.method}</TableCell>
-                  <TableCell>{new Date(payment.received_at).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right font-semibold">
-                    ${(payment.amount_cents / 100).toFixed(2)}
-                  </TableCell>
-                  {!isClosed && (
+              {payments.map((payment, idx) => {
+                const isDeposit = payment.method === "deposit_application" || payment.payment_type === "deposit_application";
+                let runningBalance = subtotal;
+                for (let i = payments.length - 1; i >= idx; i--) {
+                  runningBalance -= payments[i].amount_cents / 100;
+                }
+                
+                return (
+                  <TableRow key={payment.id}>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deletePayment(payment.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      {isDeposit ? (
+                        <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400">
+                          <Wallet className="mr-1 h-3 w-3" />
+                          Deposit
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">Payment</Badge>
+                      )}
                     </TableCell>
-                  )}
-                </TableRow>
-              ))}
+                    <TableCell className="font-medium">
+                      {isDeposit ? "Deposit Application" : payment.method}
+                    </TableCell>
+                    <TableCell>{new Date(payment.received_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">
+                      -${(payment.amount_cents / 100).toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">
+                      ${runningBalance.toFixed(2)}
+                    </TableCell>
+                    {!isClosed && (
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deletePayment(payment.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })}
               {payments.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={isClosed ? 3 : 4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={isClosed ? 5 : 6} className="text-center text-muted-foreground py-6">
                     No payments yet
                   </TableCell>
                 </TableRow>
@@ -924,8 +993,21 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
             </TableBody>
           </Table>
 
-          <div className="mt-4 text-right">
-            <div className="text-lg font-semibold">Total Payments: ${totalPayments.toFixed(2)}</div>
+          <div className="mt-6 pt-4 border-t">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Subtotal:</span>
+                <span className="font-medium">${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                <span>Total Payments:</span>
+                <span className="font-medium">-${totalPayments.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-lg font-bold border-t pt-2">
+                <span>Balance Due:</span>
+                <span>${balance.toFixed(2)}</span>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
