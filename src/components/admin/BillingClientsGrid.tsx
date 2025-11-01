@@ -16,16 +16,28 @@ const BillingClientsGrid = ({ clients, onClientClick }: BillingClientsGridProps)
     }).format(amount);
   };
 
+  const formatDateRange = (startDate: string | null, endDate: string | null) => {
+    if (!startDate || !endDate) return null;
+    const start = new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const end = new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return `${start} - ${end}`;
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {clients.map((client) => {
         const displayName = client.company_name || `${client.first_name || ''} ${client.last_name || ''}`.trim() || client.contact_name;
         const hasQuote = client.quotes && client.quotes.length > 0;
+        const hasBill = !!client.current_bill;
 
-        // Calculate MTD totals
-        const mtdBilled = client.mtd_subtotal || 0;
-        const mtdDeposits = client.mtd_deposits || 0;
-        const outstanding = mtdBilled - mtdDeposits;
+        // Use computed amounts from BillingTab
+        const subtotal = client.subtotal || 0;
+        const totalPaid = client.total_paid || 0;
+        const outstanding = client.outstanding || 0;
+
+        const statementPeriod = hasBill
+          ? formatDateRange(client.current_bill.statement_start_date, client.current_bill.statement_end_date)
+          : null;
 
         return (
           <Card
@@ -46,25 +58,33 @@ const BillingClientsGrid = ({ clients, onClientClick }: BillingClientsGridProps)
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-base truncate">{displayName}</h3>
+                  {statementPeriod && (
+                    <p className="text-xs text-muted-foreground">{statementPeriod}</p>
+                  )}
                 </div>
               </div>
               
               {!hasQuote ? (
                 <p className="text-xs text-muted-foreground">No quote assigned</p>
+              ) : !hasBill ? (
+                <div className="text-sm text-muted-foreground text-center py-2">
+                  <p>No active bill</p>
+                  <p className="text-xs">Click to start billing cycle</p>
+                </div>
               ) : (
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">MTD Billed:</span>
-                    <span className="font-semibold">{formatCurrency(mtdBilled)}</span>
+                    <span className="text-muted-foreground">Amount Owed:</span>
+                    <span className="font-semibold">{formatCurrency(subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Deposits:</span>
-                    <span className="font-semibold text-green-600">{formatCurrency(mtdDeposits)}</span>
+                    <span className="text-muted-foreground">Amount Paid:</span>
+                    <span className="font-semibold text-green-600">{formatCurrency(totalPaid)}</span>
                   </div>
                   <div className="flex justify-between pt-1 border-t">
                     <span className="text-muted-foreground">Outstanding:</span>
-                    <span className={`font-bold ${outstanding < 0 ? 'text-green-600' : 'text-foreground'}`}>
-                      {outstanding < 0 ? `Credit ${formatCurrency(Math.abs(outstanding))}` : formatCurrency(outstanding)}
+                    <span className={`font-bold ${outstanding <= 0 ? 'text-green-600' : 'text-foreground'}`}>
+                      {outstanding <= 0 ? `Paid` : formatCurrency(outstanding)}
                     </span>
                   </div>
                 </div>

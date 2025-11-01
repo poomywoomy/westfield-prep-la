@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Trash2, Plus, Download, Lock, Calendar, DollarSign, Wallet, ArrowLeft, ArrowRight, Copy, Mail, RefreshCw } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AddBillingPaymentDialog } from "./AddBillingPaymentDialog";
 import { AddCustomBillingItemDialog } from "./AddCustomBillingItemDialog";
 import { CollapsibleBillSection } from "./CollapsibleBillSection";
@@ -33,13 +34,13 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   const [billItems, setBillItems] = useState<BillItem[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [quote, setQuote] = useState<Quote | null>(null);
-  const [clientQuotes, setClientQuotes] = useState<Quote[]>([]);
   const [statementStartDate, setStatementStartDate] = useState<string>(bill.statement_start_date || "");
   const [statementEndDate, setStatementEndDate] = useState<string>(bill.statement_end_date || "");
   const [addPaymentOpen, setAddPaymentOpen] = useState(false);
   const [addCustomItemOpen, setAddCustomItemOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [depositBalance, setDepositBalance] = useState(0);
+  const [cycleDialogOpen, setCycleDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -83,21 +84,16 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       if (paymentsError) throw paymentsError;
       setPayments(paymentsData || []);
 
-      // Fetch quotes for this client
-      const { data: quotesData, error: quotesListError } = await supabase
-        .from("quotes")
-        .select("*")
-        .eq("client_id", client.id)
-        .order("created_at", { ascending: false });
-
-      if (quotesListError) throw quotesListError;
-      setClientQuotes(quotesData || []);
-
       // Fetch assigned quote if any
       if (bill.pricing_quote_id) {
-        const assigned = quotesData?.find((q) => q.id === bill.pricing_quote_id) || null;
-        if (assigned) {
-          setQuote(assigned);
+        const { data: quoteData, error: quoteError } = await supabase
+          .from("quotes")
+          .select("*")
+          .eq("id", bill.pricing_quote_id)
+          .single();
+
+        if (!quoteError && quoteData) {
+          setQuote(quoteData);
         } else {
           const { data: quoteData, error: quoteError } = await supabase
             .from("quotes")
@@ -636,44 +632,84 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     }
   };
 
-  const updatePricingQuote = async (quoteId: string) => {
+  const resetBill = async () => {
+    if (!confirm("Reset this bill? This will delete all line items and payments, then re-populate from the quote with qty=0. Statement dates will be preserved.")) return;
+
+    setLoading(true);
     try {
-      const { error } = await supabase
-        .from("bills")
-        .update({ pricing_quote_id: quoteId })
-        .eq("id", bill.id);
-      if (error) throw error;
-
-      const selected = clientQuotes.find((q) => q.id === quoteId) || null;
-      setQuote(selected);
-
-      toast({ title: "Quote assigned", description: "Pricing will follow this quote" });
-
-      if (billItems.length === 0 && selected) {
-        await populateFromQuote(selected);
-      }
-      onRefresh();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    }
-  };
-
-  const deleteBill = async () => {
-    if (!confirm("Delete this bill and all its items and payments?")) return;
-    try {
-      setLoading(true);
+      // Delete all line items
       await supabase.from("bill_items").delete().eq("bill_id", bill.id);
+
+      // Delete all payments
       await supabase.from("payments").delete().eq("bill_id", bill.id);
-      const { error } = await supabase.from("bills").delete().eq("id", bill.id);
-      if (error) throw error;
-      toast({ title: "Bill deleted" });
-      onRefresh();
+
+      // Re-populate from quote
+      if (quote) {
+        const quoteData = quote.quote_data as any;
+        const itemsToInsert: any[] = [];
+
+        // Add Standard Operations
+        if (quoteData.standard_operations) {
+          quoteData.standard_operations.forEach((service: any) => {
+            itemsToInsert.push({
+              bill_id: bill.id,
+              service_name: service.service_name,
+              service_code: service.service_code || null,
+              unit_price_cents: Math.round(service.price_per_unit * 100),
+              qty_decimal: 0,
+              section_type: "Standard Operations",
+              source: "quote",
+            });
+          });
+        }
+
+        // Add fulfillment sections
+        if (quoteData.fulfillment_sections) {
+          quoteData.fulfillment_sections.forEach((section: any) => {
+            section.items?.forEach((service: any) => {
+              itemsToInsert.push({
+                bill_id: bill.id,
+                service_name: service.service_name,
+                service_code: service.service_code || null,
+                unit_price_cents: Math.round(service.price_per_unit * 100),
+                qty_decimal: 0,
+                section_type: section.type,
+                source: "quote",
+              });
+            });
+          });
+        }
+
+        if (itemsToInsert.length > 0) {
+          await supabase.from("bill_items").insert(itemsToInsert);
+        }
+      }
+
+      // Recalculate totals
+      await recalculateBillTotals();
+
+      toast({
+        title: "Bill Reset",
+        description: "All items and payments cleared, services re-populated from quote.",
+      });
+
+      await fetchBillData();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      console.error("Error resetting bill:", error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
+
+  const startNewBillCycle = () => {
+    setCycleDialogOpen(true);
+  };
+
   // Extract services from quote grouped by section
   const quoteServicesBySection: Array<{ sectionType: string; services: Array<{ serviceName: string; unitPrice: number }> }> = quote
     ? (() => {
@@ -708,7 +744,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       })()
     : [];
 
-  // Group bill items by section type
+  // Group bill items by section type with Standard Operations first
   const billItemsBySection = billItems.reduce((acc, item) => {
     const sectionType = item.section_type || "Standard Operations";
     if (!acc[sectionType]) {
@@ -717,6 +753,13 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     acc[sectionType].push(item);
     return acc;
   }, {} as Record<string, BillItem[]>);
+
+  // Sort sections with Standard Operations always first
+  const sortedSections = Object.keys(billItemsBySection).sort((a, b) => {
+    if (a === "Standard Operations") return -1;
+    if (b === "Standard Operations") return 1;
+    return a.localeCompare(b);
+  });
 
   const subtotal = billItems.reduce(
     (sum, item) => sum + (Number(item.qty_decimal) * item.unit_price_cents / 100),
@@ -875,36 +918,10 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
             <div className="text-sm text-muted-foreground">Balance Due</div>
           </div>
 
-          {/* Pricing Quote */}
-          {!isClosed && (
-            <div>
-              <Label>Pricing Quote</Label>
-              <div className="flex gap-2 mt-1">
-                <Select value={quote?.id || ""} onValueChange={updatePricingQuote}>
-                  <SelectTrigger className="w-[280px]">
-                    <SelectValue placeholder="Select a quote" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clientQuotes.map((q) => (
-                      <SelectItem key={q.id} value={q.id}>
-                        {(q.memo || `Quote ${q.id.slice(0,8)}`)} - {q.status}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button
-                  variant="outline"
-                  disabled={!quote}
-                  onClick={async () => {
-                    if (quote) await populateFromQuote(quote);
-                  }}
-                >
-                  Add All Services
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Adds services from the selected quote with quantity 0.
-              </p>
+          {/* Quote Warning */}
+          {!quote && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-700 dark:text-yellow-300">
+              No active quote assigned to this client. Services will not auto-populate.
             </div>
           )}
 
@@ -915,19 +932,25 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
               Download PDF
             </Button>
             {isClosed ? (
-              <Button onClick={reopenBill} variant="secondary" disabled={loading}>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Reopen Bill
-              </Button>
+              <>
+                <Button onClick={reopenBill} variant="outline" disabled={loading}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Reopen Bill
+                </Button>
+                <Button onClick={startNewBillCycle} variant="default" disabled={loading}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Start New Bill
+                </Button>
+              </>
             ) : (
               <>
                 <Button onClick={closeBill} disabled={loading || !statementStartDate || !statementEndDate} variant="default">
                   <Lock className="mr-2 h-4 w-4" />
                   Close Billing Cycle
                 </Button>
-                <Button onClick={deleteBill} variant="destructive" disabled={loading}>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Bill
+                <Button onClick={resetBill} variant="outline" disabled={loading}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Reset Bill
                 </Button>
               </>
             )}
@@ -952,13 +975,14 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           </div>
         </CardHeader>
         <CardContent>
-          {Object.keys(billItemsBySection).length === 0 ? (
+          {sortedSections.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
-              No line items yet. {quote && "Add services from the quote below."}
+              No line items yet. Services should have been auto-populated from the quote.
             </div>
           ) : (
             <div className="space-y-2">
-              {Object.entries(billItemsBySection).map(([sectionType, items]) => {
+              {sortedSections.map((sectionType) => {
+                const sectionItems = billItemsBySection[sectionType];
                 const quoteSectionServices = quoteServicesBySection.find(
                   (s) => s.sectionType === sectionType
                 )?.services || [];
@@ -967,7 +991,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
                   <CollapsibleBillSection
                     key={sectionType}
                     sectionType={sectionType}
-                    items={items}
+                    items={sectionItems}
                     isClosed={isClosed}
                     onUpdateQuantity={updateQuantity}
                     onDeleteItem={deleteLineItem}
@@ -1090,12 +1114,12 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
         </CardContent>
       </Card>
 
-      {/* Dialogs */}
       <AddBillingPaymentDialog
         open={addPaymentOpen}
         onOpenChange={setAddPaymentOpen}
         billId={bill.id}
         clientId={client.id}
+        depositBalance={depositBalance}
         onSuccess={() => {
           fetchBillData();
           recalculateBillTotals();
@@ -1113,6 +1137,20 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           onRefresh();
         }}
       />
+
+      <Dialog open={cycleDialogOpen} onOpenChange={setCycleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Start New Billing Cycle</DialogTitle>
+            <DialogDescription>
+              Please close this modal and click the client card again to start a new billing cycle.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setCycleDialogOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

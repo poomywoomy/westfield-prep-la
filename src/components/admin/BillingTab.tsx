@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Plus, Search } from "lucide-react";
-import { StartNewBillDialog } from "./StartNewBillDialog";
+import { StartBillingCycleDialog } from "./StartBillingCycleDialog";
 import { BillView } from "./BillView";
 import { BillingSummaryDashboard } from "./BillingSummaryDashboard";
 import BillingClientsGrid from "./BillingClientsGrid";
@@ -20,7 +20,7 @@ const BillingTab = () => {
   const [selectedClient, setSelectedClient] = useState<any | null>(null);
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [loading, setLoading] = useState(true);
-  const [newBillDialogOpen, setNewBillDialogOpen] = useState(false);
+  const [cycleDialogOpen, setCycleDialogOpen] = useState(false);
   const [billModalOpen, setBillModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("open");
@@ -57,7 +57,7 @@ const BillingTab = () => {
 
       if (clientsError) throw clientsError;
 
-      // For each client, fetch their current open bill and MTD info
+      // For each client, fetch their current open bill and compute real totals
       const clientsWithBilling = await Promise.all(
         (clientsData || []).map(async (client) => {
           // Get current open bill
@@ -71,26 +71,36 @@ const BillingTab = () => {
 
           const currentBill = openBills?.[0] || null;
 
-          // Calculate MTD totals for current bill
-          let mtdSubtotal = 0;
-          let mtdDeposits = 0;
+          // Calculate accurate totals from line items and payments
+          let subtotal = 0;
+          let totalPaid = 0;
 
           if (currentBill) {
-            mtdSubtotal = currentBill.subtotal_cents / 100;
+            // Get actual line items
+            const { data: itemsData } = await supabase
+              .from("bill_items")
+              .select("qty_decimal, unit_price_cents")
+              .eq("bill_id", currentBill.id);
 
+            subtotal = (itemsData || []).reduce((sum, item) => {
+              return sum + (parseFloat(item.qty_decimal.toString()) * item.unit_price_cents);
+            }, 0) / 100;
+
+            // Get actual payments
             const { data: paymentsData } = await supabase
               .from("payments")
               .select("amount_cents")
               .eq("bill_id", currentBill.id);
 
-            mtdDeposits = (paymentsData || []).reduce((sum, p) => sum + p.amount_cents, 0) / 100;
+            totalPaid = (paymentsData || []).reduce((sum, p) => sum + p.amount_cents, 0) / 100;
           }
 
           return {
             ...client,
             current_bill: currentBill,
-            mtd_subtotal: mtdSubtotal,
-            mtd_deposits: mtdDeposits,
+            subtotal,
+            total_paid: totalPaid,
+            outstanding: subtotal - totalPaid,
           };
         })
       );
@@ -108,33 +118,36 @@ const BillingTab = () => {
   };
 
   const handleClientClick = (client: any) => {
+    setSelectedClient(client);
     if (client.current_bill) {
+      // Has open bill - show bill view
       setSelectedBill(client.current_bill);
-      setSelectedClient(client);
+      setBillModalOpen(true);
+    } else {
+      // No open bill - start new billing cycle
+      setCycleDialogOpen(true);
+    }
+  };
+
+  const handleCycleSuccess = async (billId: string) => {
+    setCycleDialogOpen(false);
+    await fetchData();
+    // Find the bill and open it
+    const { data: newBill } = await supabase
+      .from("bills")
+      .select("*")
+      .eq("id", billId)
+      .single();
+
+    if (newBill) {
+      setSelectedBill(newBill);
       setBillModalOpen(true);
     }
   };
 
-  const handleNewBillSuccess = (billId: string) => {
-    fetchData();
-    // Find the bill and open it
-    setTimeout(async () => {
-      const { data: newBill } = await supabase
-        .from("bills")
-        .select("*, clients(*)")
-        .eq("id", billId)
-        .single();
-
-      if (newBill) {
-        setSelectedBill(newBill);
-        setSelectedClient(newBill.clients);
-        setBillModalOpen(true);
-      }
-    }, 500);
-  };
-
   const handleModalClose = () => {
     setBillModalOpen(false);
+    setCycleDialogOpen(false);
     setSelectedBill(null);
     setSelectedClient(null);
     fetchData();
@@ -164,10 +177,7 @@ const BillingTab = () => {
 
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Active Clients</h2>
-        <Button onClick={() => setNewBillDialogOpen(true)} size="lg">
-          <Plus className="mr-2 h-4 w-4" />
-          Start New Bill
-        </Button>
+        <p className="text-sm text-muted-foreground">Click a client to view/start their billing cycle</p>
       </div>
 
       <div className="flex gap-3">
@@ -194,11 +204,11 @@ const BillingTab = () => {
 
       <BillingClientsGrid clients={filteredClients} onClientClick={handleClientClick} />
 
-      <StartNewBillDialog
-        open={newBillDialogOpen}
-        onOpenChange={setNewBillDialogOpen}
-        clients={clients}
-        onSuccess={handleNewBillSuccess}
+      <StartBillingCycleDialog
+        open={cycleDialogOpen}
+        onOpenChange={setCycleDialogOpen}
+        client={selectedClient}
+        onSuccess={handleCycleSuccess}
       />
 
       <Dialog open={billModalOpen} onOpenChange={handleModalClose}>
