@@ -6,59 +6,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { format } from "date-fns";
-import { Download, Lock } from "lucide-react";
+import { Download, Lock, DollarSign, Wallet } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 
 const ClientBillingTab = () => {
   const { user } = useAuth();
-  const [items, setItems] = useState<any[]>([]);
+  const [bill, setBill] = useState<any>(null);
+  const [billItems, setBillItems] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
-  const [cycle, setCycle] = useState<any>(null);
-  const [availableCycles, setAvailableCycles] = useState<any[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [clientData, setClientData] = useState<any>(null);
   const { toast } = useToast();
-
-  // Get current month in PST/PDT timezone
-  const getCurrentMonthPST = () => {
-    const now = new Date();
-    const pstDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-    const year = pstDate.getFullYear();
-    const month = String(pstDate.getMonth() + 1).padStart(2, '0');
-    return `${year}-${month}-01`;
-  };
 
   useEffect(() => {
     if (user) {
       fetchBillingData();
     }
-    
-    // Set up realtime subscription for billing updates
+
+    // Real-time updates
     const channel = supabase
-      .channel('client-billing-realtime')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'billing_payments' 
-      }, () => {
+      .channel('client-bill-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bills' }, () => {
         if (user) fetchBillingData();
       })
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'monthly_billing_items' 
-      }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bill_items' }, () => {
         if (user) fetchBillingData();
       })
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'monthly_billing_cycles' 
-      }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
         if (user) fetchBillingData();
       })
       .subscribe();
@@ -66,7 +41,7 @@ const ClientBillingTab = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, selectedMonth]);
+  }, [user]);
 
   const fetchBillingData = async () => {
     try {
@@ -79,46 +54,43 @@ const ClientBillingTab = () => {
       if (clientError) throw clientError;
       setClientData(client);
 
-      // Fetch all available billing cycles for this client
-      const { data: allCycles, error: cyclesError } = await supabase
-        .from("monthly_billing_cycles")
+      // Fetch current open bill only
+      const { data: openBills, error: billsError } = await supabase
+        .from("bills")
         .select("*")
         .eq("client_id", client.id)
-        .order("billing_month", { ascending: false });
+        .eq("status", "open")
+        .order("created_at", { ascending: false })
+        .limit(1);
 
-      if (cyclesError) throw cyclesError;
-      setAvailableCycles(allCycles || []);
+      if (billsError) throw billsError;
 
-      // Set current month as default if no selection - use PST timezone
-      const currentMonth = getCurrentMonthPST();
-      const monthToLoad = selectedMonth || currentMonth;
-      setSelectedMonth(monthToLoad);
-      
-      // Fetch specific billing cycle
-      const cycleData = allCycles?.find(c => c.billing_month === monthToLoad);
-      setCycle(cycleData || null);
+      const currentBill = openBills?.[0] || null;
+      setBill(currentBill);
 
-      if (cycleData) {
-        // Fetch billing items
+      if (currentBill) {
+        // Fetch bill items
         const { data: itemsData, error: itemsError } = await supabase
-          .from("monthly_billing_items")
+          .from("bill_items")
           .select("*")
-          .eq("cycle_id", cycleData.id)
+          .eq("bill_id", currentBill.id)
           .order("section_type");
 
         if (itemsError) throw itemsError;
-        setItems(itemsData || []);
+        setBillItems(itemsData || []);
 
-        // Fetch payments (exclude soft-deleted)
+        // Fetch payments
         const { data: paymentsData, error: paymentsError } = await supabase
-          .from("billing_payments")
+          .from("payments")
           .select("*")
-          .eq("cycle_id", cycleData.id)
-          .is("deleted_at", null)
-          .order("payment_date", { ascending: false });
+          .eq("bill_id", currentBill.id)
+          .order("received_at", { ascending: false });
 
         if (paymentsError) throw paymentsError;
         setPayments(paymentsData || []);
+      } else {
+        setBillItems([]);
+        setPayments([]);
       }
     } catch (error: any) {
       toast({
@@ -141,15 +113,13 @@ const ClientBillingTab = () => {
   };
 
   const calculateSubtotal = () => {
-    return items.reduce((sum, item) => {
-      // Exclude "Monthly Deposit" from charges as it's a payment
-      if (item.service_name === "Monthly Deposit") return sum;
-      return sum + Number(item.total_amount);
+    return billItems.reduce((sum, item) => {
+      return sum + (Number(item.qty_decimal) * item.unit_price_cents / 100);
     }, 0);
   };
 
   const calculateTotalPayments = () => {
-    return payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
+    return payments.reduce((sum, payment) => sum + (payment.amount_cents / 100), 0);
   };
 
   const calculateOutstanding = () => {
@@ -157,16 +127,16 @@ const ClientBillingTab = () => {
   };
 
   const generateBillingPDF = async () => {
-    if (!cycle || !clientData) return;
+    if (!bill || !clientData) return;
 
     const doc = new jsPDF();
     const clientName = clientData.company_name || `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim();
-    
+
     // Add logo
     const img = new Image();
     img.src = westfieldLogo;
     await new Promise((resolve) => { img.onload = resolve; });
-    
+
     const logoWidth = 30;
     const logoHeight = (img.height / img.width) * logoWidth;
     doc.addImage(img, 'JPEG', (210 - logoWidth) / 2, 10, logoWidth, logoHeight);
@@ -176,111 +146,71 @@ const ClientBillingTab = () => {
     // Header
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
-    doc.text("Monthly Billing Statement", 105, yPos, { align: "center" });
+    doc.text("Bill Statement", 105, yPos, { align: "center" });
     yPos += 15;
 
-    // Two columns: Westfield on left, Client on right
-    const leftX = 20;
-    const rightX = 120;
-    
-    // Westfield Prep Center info (left)
+    // Client info
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.text("Westfield Prep Center", leftX, yPos);
+    doc.text("BILL TO:", 20, yPos);
+    yPos += 5;
     doc.setFont("helvetica", "normal");
-    doc.text("Navapoom Sathatham", leftX, yPos + 5);
-    doc.text("info@westfieldprepcenter.com", leftX, yPos + 10);
-    doc.text("818-935-5478", leftX, yPos + 15);
+    doc.text(clientData.contact_name || clientName, 20, yPos);
+    yPos += 4;
+    doc.text(clientName, 20, yPos);
+    yPos += 4;
+    doc.text(`Phone: ${clientData.phone_number || 'N/A'}`, 20, yPos);
+    yPos += 4;
+    doc.text(`Email: ${clientData.email || 'N/A'}`, 20, yPos);
+    yPos += 8;
 
-    // Client info (right)
-    doc.setFont("helvetica", "bold");
-    doc.text("Bill To:", rightX, yPos);
-    doc.setFont("helvetica", "normal");
-    doc.text(clientName, rightX, yPos + 5);
-    doc.text(clientData.email, rightX, yPos + 10);
-    if (clientData.phone_number) {
-      doc.text(clientData.phone_number, rightX, yPos + 15);
+    // Statement dates
+    if (bill.statement_start_date && bill.statement_end_date) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Statement Period:", 20, yPos);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${new Date(bill.statement_start_date).toLocaleDateString()} - ${new Date(bill.statement_end_date).toLocaleDateString()}`, 70, yPos);
+      yPos += 10;
     }
 
-    yPos += 25;
-
-    // Billing date range - show the manually set statement dates
-    const formatMDYLocal = (dateStr: string) => {
-      if (!dateStr) return '';
-      // Parse as local date to avoid timezone shifts
-      const [year, month, day] = dateStr.split('-').map(Number);
-      const mm = String(month).padStart(2, '0');
-      const dd = String(day).padStart(2, '0');
-      const yyyy = year;
-      return `${mm}/${dd}/${yyyy}`;
-    };
-
-    doc.setFontSize(10);
-    if (cycle.statement_start_date && cycle.statement_end_date) {
-      doc.text(`Billing Date: ${formatMDYLocal(cycle.statement_start_date)} - ${formatMDYLocal(cycle.statement_end_date)}`, leftX, yPos);
-    } else {
-      const billingDate = new Date(cycle.billing_month);
-      const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
-      doc.text(`Billing Period: ${monthYear}`, leftX, yPos);
-    }
-    const todayDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' });
-    doc.text(`Statement Date: ${todayDate}`, rightX, yPos);
-    yPos += 15;
-
-    // Group items by section and filter out 0 quantity
+    // Group items by section
     const groupedItems: { [key: string]: any[] } = {};
-    items.forEach(item => {
-      // Skip items with 0 quantity and Monthly Deposit
-      if (item.quantity === 0 || item.service_name === "Monthly Deposit") return;
-      
+    billItems.forEach(item => {
+      if (item.qty_decimal === 0) return; // Skip 0 quantity items
       const section = item.section_type || 'Other';
       if (!groupedItems[section]) groupedItems[section] = [];
       groupedItems[section].push(item);
     });
 
-    // Services section header
+    // Services section
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text("Itemized Services", leftX, yPos);
+    doc.text("Itemized Services", 20, yPos);
     yPos += 8;
 
     // Table header
     doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text("Service", leftX, yPos);
+    doc.text("Service", 20, yPos);
     doc.text("Qty", 120, yPos, { align: "right" });
     doc.text("Unit Price", 150, yPos, { align: "right" });
     doc.text("Total", 185, yPos, { align: "right" });
-    
-    // Draw line under header
-    doc.line(leftX, yPos + 1, 190, yPos + 1);
+    doc.line(20, yPos + 1, 190, yPos + 1);
     yPos += 6;
-
     doc.setFont("helvetica", "normal");
 
     Object.entries(groupedItems).forEach(([section, sectionItems]) => {
-      // Section header
       doc.setFont("helvetica", "bold");
-      doc.text(section, leftX, yPos);
+      doc.text(section, 20, yPos);
       yPos += 5;
       doc.setFont("helvetica", "normal");
 
       sectionItems.forEach(item => {
-        const lineTotal = Number(item.total_amount);
-        const itemType = item.item_type === "adjustment" ? " (Adj)" : item.item_type === "custom" ? " (Custom)" : "";
-        
-        // Service name (with wrapping if too long)
-        const serviceName = `${item.service_name}${itemType}`;
-        const maxWidth = 100;
-        const lines = doc.splitTextToSize(serviceName, maxWidth);
-        doc.text(lines, leftX + 2, yPos);
-        
-        // Qty, Unit Price, Total
-        doc.text(String(item.quantity), 120, yPos, { align: "right" });
-        doc.text(formatCurrency(Number(item.unit_price)), 150, yPos, { align: "right" });
+        const lineTotal = Number(item.qty_decimal) * item.unit_price_cents / 100;
+        doc.text(item.service_name, 22, yPos);
+        doc.text(String(item.qty_decimal), 120, yPos, { align: "right" });
+        doc.text(formatCurrency(item.unit_price_cents / 100), 150, yPos, { align: "right" });
         doc.text(formatCurrency(lineTotal), 185, yPos, { align: "right" });
-        
-        yPos += 5 * lines.length;
+        yPos += 5;
 
         if (yPos > 260) {
           doc.addPage();
@@ -296,24 +226,22 @@ const ClientBillingTab = () => {
       yPos += 8;
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
-      doc.text("Payments/Deposits", leftX, yPos);
+      doc.text("Payments", 20, yPos);
       yPos += 8;
 
       doc.setFontSize(9);
-      doc.setFont("helvetica", "bold");
-      doc.text("Payment", leftX, yPos);
-      doc.text("Method", 90, yPos);
-      doc.text("Date", 130, yPos);
+      doc.text("Method", 20, yPos);
+      doc.text("Date", 90, yPos);
       doc.text("Amount", 185, yPos, { align: "right" });
-      doc.line(leftX, yPos + 1, 190, yPos + 1);
+      doc.line(20, yPos + 1, 190, yPos + 1);
       yPos += 6;
 
       doc.setFont("helvetica", "normal");
       payments.forEach((payment) => {
-        doc.text(payment.payment_name, leftX + 2, yPos);
-        doc.text(payment.payment_method, 90, yPos);
-        doc.text(new Date(payment.payment_date).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' }), 130, yPos);
-        doc.text(formatCurrency(Number(payment.amount)), 185, yPos, { align: "right" });
+        const isDeposit = payment.method === "deposit_application" || payment.payment_type === "deposit_application";
+        doc.text(isDeposit ? "Deposit Application" : payment.method, 20, yPos);
+        doc.text(new Date(payment.received_at).toLocaleDateString(), 90, yPos);
+        doc.text(formatCurrency(payment.amount_cents / 100), 185, yPos, { align: "right" });
         yPos += 5;
 
         if (yPos > 260) {
@@ -323,58 +251,34 @@ const ClientBillingTab = () => {
       });
     }
 
-    // Totals section (in a box at bottom right)
+    // Totals
     yPos += 10;
-    if (yPos > 240) {
-      doc.addPage();
-      yPos = 20;
-    }
-
     const boxX = 135;
     const boxWidth = 55;
     let boxY = yPos;
-    
+
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    
-    // Subtotal
+
     doc.text("Subtotal:", boxX + 2, boxY);
     doc.text(formatCurrency(calculateSubtotal()), boxX + boxWidth - 2, boxY, { align: "right" });
     boxY += 6;
-    
-    // Total Payments
+
     doc.text("Total Payments:", boxX + 2, boxY);
     doc.text(formatCurrency(calculateTotalPayments()), boxX + boxWidth - 2, boxY, { align: "right" });
     boxY += 6;
-    
-    // Draw line
+
     doc.line(boxX + 2, boxY, boxX + boxWidth - 2, boxY);
     boxY += 5;
-    
-    // Outstanding Balance
+
     const outstanding = calculateOutstanding();
     doc.setFontSize(11);
-    if (outstanding < 0) {
-      doc.text("Credit Balance:", boxX + 2, boxY);
-      doc.text(formatCurrency(Math.abs(outstanding)), boxX + boxWidth - 2, boxY, { align: "right" });
-    } else {
-      doc.text("Balance Due:", boxX + 2, boxY);
-      doc.text(formatCurrency(outstanding), boxX + boxWidth - 2, boxY, { align: "right" });
-    }
-    
-    // Draw box around totals
+    doc.text(outstanding < 0 ? "Credit Balance:" : "Balance Due:", boxX + 2, boxY);
+    doc.text(formatCurrency(Math.abs(outstanding)), boxX + boxWidth - 2, boxY, { align: "right" });
+
     doc.rect(boxX, yPos - 4, boxWidth, boxY - yPos + 8);
 
-    // Generate filename based on statement dates or billing month
-    let filenameDatePart;
-    if (cycle.statement_start_date && cycle.statement_end_date) {
-      filenameDatePart = `${formatMDYLocal(cycle.statement_start_date).replace(/\//g, '-')}_to_${formatMDYLocal(cycle.statement_end_date).replace(/\//g, '-')}`;
-    } else {
-      const billingDate = new Date(cycle.billing_month);
-      const monthYear = billingDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'America/Los_Angeles' });
-      filenameDatePart = monthYear.replace(/\s+/g, "_");
-    }
-    const fileName = `${clientName.replace(/\s+/g, "_")}_Billing_${filenameDatePart}.pdf`;
+    const fileName = `${clientName.replace(/\s+/g, "_")}_Billing_${new Date(bill.billing_month).toLocaleDateString().replace(/\//g, '-')}.pdf`;
     doc.save(fileName);
 
     toast({
@@ -393,9 +297,27 @@ const ClientBillingTab = () => {
     );
   }
 
+  if (!bill) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Billing Statement</CardTitle>
+          <CardDescription>Your current billing information</CardDescription>
+        </CardHeader>
+        <CardContent className="py-12">
+          <div className="text-center text-muted-foreground">
+            <Lock className="h-12 w-12 mx-auto mb-4 opacity-30" />
+            <p className="text-lg">No Active Billing Statement</p>
+            <p className="text-sm mt-2">Your next billing statement will appear here when available.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   // Group items by section
   const sections: { [key: string]: any[] } = {};
-  items.forEach(item => {
+  billItems.forEach(item => {
     const section = item.section_type || 'Other';
     if (!sections[section]) sections[section] = [];
     sections[section].push(item);
@@ -410,33 +332,22 @@ const ClientBillingTab = () => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <CardTitle>Billing Statement</CardTitle>
+            <CardTitle>Current Billing Statement</CardTitle>
             <CardDescription className="flex items-center gap-2 mt-1">
-              {cycle && format(new Date(cycle.billing_month), "MMMM yyyy")}
-              {cycle?.status === 'locked' && (
-                <Badge variant="secondary">
-                  <Lock className="h-3 w-3 mr-1" />
-                  Locked
-                </Badge>
+              {bill.statement_start_date && bill.statement_end_date ? (
+                <>
+                  {new Date(bill.statement_start_date).toLocaleDateString()} - {new Date(bill.statement_end_date).toLocaleDateString()}
+                </>
+              ) : (
+                new Date(bill.billing_month).toLocaleDateString("en-US", { month: "long", year: "numeric" })
               )}
+              <Badge variant="secondary" className="bg-blue-500/10 text-blue-600">
+                Open
+              </Badge>
             </CardDescription>
           </div>
           <div className="flex items-center gap-3">
-            {availableCycles.length > 0 && (
-              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select month" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableCycles.map((c) => (
-                    <SelectItem key={c.id} value={c.billing_month}>
-                      {format(new Date(c.billing_month), "MMMM yyyy")}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            {cycle && items.length > 0 && (
+            {billItems.length > 0 && (
               <Button onClick={generateBillingPDF} variant="outline">
                 <Download className="mr-2 h-4 w-4" />
                 Download PDF
@@ -444,10 +355,28 @@ const ClientBillingTab = () => {
             )}
           </div>
         </div>
+
+        {/* Financial Summary */}
+        <div className="grid grid-cols-3 gap-4 mt-4 p-4 bg-muted rounded-lg">
+          <div>
+            <div className="text-sm text-muted-foreground">Subtotal</div>
+            <div className="text-2xl font-bold">{formatCurrency(subtotal)}</div>
+          </div>
+          <div>
+            <div className="text-sm text-muted-foreground">Paid</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(totalPayments)}</div>
+          </div>
+          <div>
+            <div className="text-sm text-muted-foreground">Balance Due</div>
+            <div className={`text-2xl font-bold ${outstanding < 0 ? 'text-green-600 dark:text-green-400' : ''}`}>
+              {outstanding < 0 ? `Credit ${formatCurrency(Math.abs(outstanding))}` : formatCurrency(outstanding)}
+            </div>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        {!cycle || items.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">No billing data for this month yet.</p>
+        {billItems.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">No line items yet.</p>
         ) : (
           <div className="space-y-6">
             {Object.entries(sections).map(([sectionName, sectionItems]) => (
@@ -463,87 +392,64 @@ const ClientBillingTab = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sectionItems.map((item) => {
-                      const isMonthlyDeposit = item.service_name === "Monthly Deposit";
-                      
-                      return (
-                        <TableRow key={item.id} className={isMonthlyDeposit ? "bg-green-50" : ""}>
-                          <TableCell className="font-medium">
-                            {item.service_name}
-                            {isMonthlyDeposit && (
-                              <span className="text-xs text-green-600 ml-2">(Applied as Payment)</span>
-                            )}
-                            {item.item_type && item.item_type !== "quote" && !isMonthlyDeposit && (
-                              <span className="text-xs text-muted-foreground ml-2">
-                                ({item.item_type === "adjustment" ? "Adjustment" : "Custom"})
-                              </span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">{item.quantity}</TableCell>
-                          <TableCell className="text-right">{formatCurrency(Number(item.unit_price))}</TableCell>
-                          <TableCell className={`text-right font-semibold ${
-                            isMonthlyDeposit ? 'text-green-600' : ''
-                          }`}>
-                            {formatCurrency(Number(item.total_amount))}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            ))}
-
-            {/* Payments section */}
-            {payments.length > 0 && (
-              <div className="border rounded-lg p-4 bg-green-50">
-                <h3 className="font-semibold text-lg mb-3">Payments/Deposits</h3>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Payment Name</TableHead>
-                      <TableHead>Method</TableHead>
-                      <TableHead className="text-right">Date</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {payments.map((payment) => (
-                      <TableRow key={payment.id}>
-                        <TableCell className="font-medium">{payment.payment_name}</TableCell>
-                        <TableCell>{payment.payment_method}</TableCell>
-                        <TableCell className="text-right">
-                          {new Date(payment.payment_date).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold text-green-600">
-                          {formatCurrency(Number(payment.amount))}
+                    {sectionItems.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell className="font-medium">{item.service_name}</TableCell>
+                        <TableCell className="text-right">{item.qty_decimal}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(item.unit_price_cents / 100)}</TableCell>
+                        <TableCell className="text-right font-semibold">
+                          {formatCurrency(Number(item.qty_decimal) * item.unit_price_cents / 100)}
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </div>
-            )}
+            ))}
+          </div>
+        )}
 
-            {/* Totals section */}
-            <div className="border-t pt-4 space-y-2">
-              <div className="flex justify-between text-lg">
-                <span className="font-semibold">Subtotal (MTD Charges):</span>
-                <span className="font-bold">{formatCurrency(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-lg">
-                <span className="font-semibold">Deposits / Payments (MTD):</span>
-                <span className="font-bold text-green-600">{formatCurrency(totalPayments)}</span>
-              </div>
-              <div className="flex justify-between text-xl border-t pt-2">
-                <span className="font-bold">Outstanding Balance:</span>
-                <span className={`font-bold ${outstanding < 0 ? 'text-green-600' : 'text-foreground'}`}>
-                  {outstanding < 0
-                    ? `Credit ${formatCurrency(Math.abs(outstanding))}`
-                    : formatCurrency(outstanding)}
-                </span>
-              </div>
-            </div>
+        {/* Payments Section */}
+        {payments.length > 0 && (
+          <div className="mt-6 border rounded-lg p-4">
+            <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Payments & Deposits
+            </h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments.map((payment) => {
+                  const isDeposit = payment.method === "deposit_application" || payment.payment_type === "deposit_application";
+                  return (
+                    <TableRow key={payment.id}>
+                      <TableCell>
+                        {isDeposit ? (
+                          <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400">
+                            <Wallet className="mr-1 h-3 w-3" />
+                            Deposit
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary">Payment</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>{isDeposit ? "Deposit Application" : payment.method}</TableCell>
+                      <TableCell>{new Date(payment.received_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">
+                        {formatCurrency(payment.amount_cents / 100)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
         )}
       </CardContent>

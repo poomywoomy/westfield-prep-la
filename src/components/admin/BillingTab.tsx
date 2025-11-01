@@ -1,30 +1,29 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Calendar } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Plus, Search } from "lucide-react";
 import { StartNewBillDialog } from "./StartNewBillDialog";
 import { BillView } from "./BillView";
 import { BillingSummaryDashboard } from "./BillingSummaryDashboard";
+import BillingClientsGrid from "./BillingClientsGrid";
 import type { Database } from "@/integrations/supabase/types";
 
 type Bill = Database["public"]["Tables"]["bills"]["Row"];
 type Client = Database["public"]["Tables"]["clients"]["Row"];
 
 const BillingTab = () => {
-  const [bills, setBills] = useState<Bill[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
+  const [selectedClient, setSelectedClient] = useState<any | null>(null);
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
   const [newBillDialogOpen, setNewBillDialogOpen] = useState(false);
+  const [billModalOpen, setBillModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("open");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,6 +35,7 @@ const BillingTab = () => {
       .channel("billing-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "bills" }, () => fetchData())
       .on("postgres_changes", { event: "*", schema: "public", table: "bill_items" }, () => fetchData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "payments" }, () => fetchData())
       .subscribe();
 
     return () => {
@@ -45,13 +45,57 @@ const BillingTab = () => {
 
   const fetchData = async () => {
     try {
-      const [{ data: billsData }, { data: clientsData }] = await Promise.all([
-        supabase.from("bills").select("*").order("created_at", { ascending: false }),
-        supabase.from("clients").select("*").order("company_name"),
-      ]);
+      // Fetch all clients with their current billing info
+      const { data: clientsData, error: clientsError } = await supabase
+        .from("clients")
+        .select(`
+          *,
+          quotes!inner(id, status)
+        `)
+        .eq("status", "active")
+        .order("company_name");
 
-      if (billsData) setBills(billsData);
-      if (clientsData) setClients(clientsData);
+      if (clientsError) throw clientsError;
+
+      // For each client, fetch their current open bill and MTD info
+      const clientsWithBilling = await Promise.all(
+        (clientsData || []).map(async (client) => {
+          // Get current open bill
+          const { data: openBills } = await supabase
+            .from("bills")
+            .select("*")
+            .eq("client_id", client.id)
+            .eq("status", "open")
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+          const currentBill = openBills?.[0] || null;
+
+          // Calculate MTD totals for current bill
+          let mtdSubtotal = 0;
+          let mtdDeposits = 0;
+
+          if (currentBill) {
+            mtdSubtotal = currentBill.subtotal_cents / 100;
+
+            const { data: paymentsData } = await supabase
+              .from("payments")
+              .select("amount_cents")
+              .eq("bill_id", currentBill.id);
+
+            mtdDeposits = (paymentsData || []).reduce((sum, p) => sum + p.amount_cents, 0) / 100;
+          }
+
+          return {
+            ...client,
+            current_bill: currentBill,
+            mtd_subtotal: mtdSubtotal,
+            mtd_deposits: mtdDeposits,
+          };
+        })
+      );
+
+      setClients(clientsWithBilling);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -63,192 +107,92 @@ const BillingTab = () => {
     }
   };
 
-  const handleBillClick = (bill: Bill) => {
-    const client = clients.find((c) => c.id === bill.client_id);
-    if (client) {
-      setSelectedBill(bill);
+  const handleClientClick = (client: any) => {
+    if (client.current_bill) {
+      setSelectedBill(client.current_bill);
       setSelectedClient(client);
+      setBillModalOpen(true);
     }
   };
 
   const handleNewBillSuccess = (billId: string) => {
     fetchData();
-    const newBill = bills.find((b) => b.id === billId);
-    if (newBill) {
-      handleBillClick(newBill);
-    }
+    // Find the bill and open it
+    setTimeout(async () => {
+      const { data: newBill } = await supabase
+        .from("bills")
+        .select("*, clients(*)")
+        .eq("id", billId)
+        .single();
+
+      if (newBill) {
+        setSelectedBill(newBill);
+        setSelectedClient(newBill.clients);
+        setBillModalOpen(true);
+      }
+    }, 500);
   };
 
-  const filteredBills = bills.filter((bill) => {
-    const client = clients.find((c) => c.id === bill.client_id);
+  const handleModalClose = () => {
+    setBillModalOpen(false);
+    setSelectedBill(null);
+    setSelectedClient(null);
+    fetchData();
+  };
+
+  const filteredClients = clients.filter((client) => {
     const matchesSearch =
       searchTerm === "" ||
-      client?.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bill.label?.toLowerCase().includes(searchTerm.toLowerCase());
+      client.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.contact_name?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === "all" || bill.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" ||
+      (statusFilter === "open" && client.current_bill) ||
+      (statusFilter === "closed" && !client.current_bill);
 
-    let matchesDate = true;
-    if (dateFilter !== "all") {
-      const billDate = new Date(bill.billing_month);
-      const now = new Date();
-      
-      if (dateFilter === "this_month") {
-        matchesDate = billDate.getMonth() === now.getMonth() && billDate.getFullYear() === now.getFullYear();
-      } else if (dateFilter === "last_month") {
-        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
-        matchesDate = billDate.getMonth() === lastMonth.getMonth() && billDate.getFullYear() === lastMonth.getFullYear();
-      } else if (dateFilter === "this_year") {
-        matchesDate = billDate.getFullYear() === now.getFullYear();
-      }
-    }
-
-    return matchesSearch && matchesStatus && matchesDate;
+    return matchesSearch && matchesStatus;
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "open":
-        return "bg-blue-500/10 text-blue-500";
-      case "closed":
-        return "bg-gray-500/10 text-gray-500";
-      case "sent":
-        return "bg-yellow-500/10 text-yellow-500";
-      case "paid":
-        return "bg-green-500/10 text-green-500";
-      case "partial":
-        return "bg-orange-500/10 text-orange-500";
-      case "voided":
-        return "bg-red-500/10 text-red-500";
-      default:
-        return "bg-gray-500/10 text-gray-500";
-    }
-  };
-
   if (loading) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground text-center">Loading bills...</p>
-        </CardContent>
-      </Card>
-    );
+    return <div className="text-center py-8 text-muted-foreground">Loading billing data...</div>;
   }
 
   return (
     <div className="space-y-6">
-      {/* Dashboard Summary */}
       <BillingSummaryDashboard />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Panel - Bill History */}
-        <Card className="h-[calc(100vh-20rem)] flex flex-col">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Bill History</CardTitle>
-                <CardDescription>Search and manage all bills</CardDescription>
-              </div>
-              <Button onClick={() => setNewBillDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Start New Bill
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col space-y-4 overflow-hidden">
-            {/* Enhanced Filters */}
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by client or label..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8"
-                  />
-                </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="open">Open</SelectItem>
-                    <SelectItem value="closed">Closed</SelectItem>
-                    <SelectItem value="sent">Sent</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Select value={dateFilter} onValueChange={setDateFilter}>
-                <SelectTrigger>
-                  <Calendar className="mr-2 h-4 w-4" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Time</SelectItem>
-                  <SelectItem value="this_month">This Month</SelectItem>
-                  <SelectItem value="last_month">Last Month</SelectItem>
-                  <SelectItem value="this_year">This Year</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-          <div className="flex-1 overflow-y-auto space-y-2">
-            {filteredBills.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">No bills found</p>
-            ) : (
-              filteredBills.map((bill) => {
-                const client = clients.find((c) => c.id === bill.client_id);
-                const isSelected = selectedBill?.id === bill.id;
-
-                return (
-                  <div
-                    key={bill.id}
-                    onClick={() => handleBillClick(bill)}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                      isSelected ? "bg-primary/5 border-primary" : "hover:bg-accent"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="font-semibold">{client?.company_name || "Unknown Client"}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
-                        </div>
-                        {bill.statement_start_date && bill.statement_end_date && (
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {new Date(bill.statement_start_date).toLocaleDateString()} - {new Date(bill.statement_end_date).toLocaleDateString()}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-right space-y-1">
-                        <Badge className={getStatusColor(bill.status)}>{bill.status}</Badge>
-                        <div className="text-sm font-semibold">${(bill.amount_due_cents / 100).toFixed(2)}</div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </CardContent>
-        </Card>
-
-        {/* Right Panel - Selected Bill View */}
-        <div className="h-[calc(100vh-20rem)] overflow-y-auto">
-          {selectedBill && selectedClient ? (
-            <BillView bill={selectedBill} client={selectedClient} onRefresh={fetchData} />
-          ) : (
-            <Card className="h-full flex items-center justify-center">
-              <CardContent>
-                <p className="text-muted-foreground text-center">Select a bill to view details</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Active Clients</h2>
+        <Button onClick={() => setNewBillDialogOpen(true)} size="lg">
+          <Plus className="mr-2 h-4 w-4" />
+          Start New Bill
+        </Button>
       </div>
+
+      <div className="flex gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by client name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Clients</SelectItem>
+            <SelectItem value="open">With Open Bills</SelectItem>
+            <SelectItem value="closed">No Open Bills</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <BillingClientsGrid clients={filteredClients} onClientClick={handleClientClick} />
 
       <StartNewBillDialog
         open={newBillDialogOpen}
@@ -256,6 +200,14 @@ const BillingTab = () => {
         clients={clients}
         onSuccess={handleNewBillSuccess}
       />
+
+      <Dialog open={billModalOpen} onOpenChange={handleModalClose}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          {selectedBill && selectedClient && (
+            <BillView bill={selectedBill} client={selectedClient} onRefresh={handleModalClose} />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

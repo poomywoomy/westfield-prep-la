@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,8 @@ interface StartNewBillDialogProps {
 export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: StartNewBillDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [clientId, setClientId] = useState("");
+  const [statementStartDate, setStatementStartDate] = useState("");
+  const [statementEndDate, setStatementEndDate] = useState("");
   const { toast } = useToast();
 
   const handleSubmit = async () => {
@@ -31,9 +34,44 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
       return;
     }
 
+    if (!statementStartDate || !statementEndDate) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter statement start and end dates",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (new Date(statementStartDate) > new Date(statementEndDate)) {
+      toast({
+        title: "Validation Error",
+        description: "Start date must be before end date",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Check if client already has an open bill
+      const { data: existingBills } = await supabase
+        .from("bills")
+        .select("id")
+        .eq("client_id", clientId)
+        .eq("status", "open");
+
+      if (existingBills && existingBills.length > 0) {
+        toast({
+          title: "Validation Error",
+          description: "This client already has an open bill. Please close it first.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       // Get client's active quote
       const { data: quotes } = await supabase
         .from("quotes")
@@ -45,9 +83,8 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
 
       const activeQuote = quotes?.[0];
 
-      // Generate billing month from current date
-      const now = new Date();
-      const billingMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+      // Generate billing month from statement start date
+      const billingMonth = statementStartDate.substring(0, 7) + "-01";
 
       const { data: bill, error: billError } = await supabase
         .from("bills")
@@ -56,16 +93,19 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
           billing_month: billingMonth,
           status: "open",
           pricing_quote_id: activeQuote?.id || null,
+          statement_start_date: statementStartDate,
+          statement_end_date: statementEndDate,
         })
         .select()
         .single();
 
       if (billError) throw billError;
 
-      // Auto-populate line items from quote with quantity 0
+      // Auto-populate line items from quote with quantity 0 and proper section_type
       if (activeQuote) {
         const quoteData = activeQuote.quote_data as any;
         const lineItems: any[] = [];
+        const now = new Date();
 
         if (quoteData.standard_operations && Array.isArray(quoteData.standard_operations)) {
           quoteData.standard_operations.forEach((op: any) => {
@@ -76,6 +116,7 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
               unit_price_cents: Math.round(op.service_price * 100),
               line_date: now.toISOString().split("T")[0],
               source: "quote",
+              section_type: "Standard Operations",
             });
           });
         }
@@ -91,6 +132,7 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
                   unit_price_cents: Math.round(item.service_price * 100),
                   line_date: now.toISOString().split("T")[0],
                   source: "quote",
+                  section_type: section.type || "Other Services",
                 });
               });
             }
@@ -108,12 +150,14 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
 
       toast({
         title: "Success",
-        description: "New bill created with services from quote",
+        description: "New bill created with all services from quote",
       });
 
       onSuccess(bill.id);
       onOpenChange(false);
       setClientId("");
+      setStatementStartDate("");
+      setStatementEndDate("");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -147,10 +191,31 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground mt-1">
-              All services from client's active quote will be auto-populated with quantity 0
-            </p>
           </div>
+
+          <div>
+            <Label htmlFor="start">Statement Start Date *</Label>
+            <Input
+              id="start"
+              type="date"
+              value={statementStartDate}
+              onChange={(e) => setStatementStartDate(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="end">Statement End Date *</Label>
+            <Input
+              id="end"
+              type="date"
+              value={statementEndDate}
+              onChange={(e) => setStatementEndDate(e.target.value)}
+            />
+          </div>
+
+          <p className="text-xs text-muted-foreground bg-muted p-3 rounded">
+            All services from client's active quote will be auto-populated with quantity 0. Statement dates are required.
+          </p>
         </div>
 
         <DialogFooter>

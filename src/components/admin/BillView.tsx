@@ -231,30 +231,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     }
   };
 
-  const deletePayment = async (paymentId: string) => {
-    if (!confirm("Delete this payment?")) return;
-
-    try {
-      const { error } = await supabase.from("payments").delete().eq("id", paymentId);
-
-      if (error) throw error;
-
-      setPayments((prev) => prev.filter((p) => p.id !== paymentId));
-      await recalculateBillTotals();
-      onRefresh();
-
-      toast({
-        title: "Success",
-        description: "Payment deleted",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
+  // Removed - deletePayment is defined later with enhanced functionality
 
   const recalculateBillTotals = async () => {
     const subtotal = billItems.reduce(
@@ -349,20 +326,37 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     doc.text("Bill Statement", 105, yPos, { align: "center" });
     yPos += 15;
 
-    // Client and date info
+    // Client info (full contact details)
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.text("Client:", 20, yPos);
+    doc.text("BILL TO:", 20, yPos);
+    yPos += 5;
     doc.setFont("helvetica", "normal");
-    doc.text(client.company_name, 50, yPos);
+    doc.text(client.contact_name || client.company_name, 20, yPos);
+    yPos += 4;
+    doc.text(client.company_name, 20, yPos);
+    yPos += 4;
+    doc.text(`Phone: ${client.phone_number || 'N/A'}`, 20, yPos);
+    yPos += 4;
+    doc.text(`Email: ${client.email || 'N/A'}`, 20, yPos);
+    yPos += 8;
+
+    // Statement date (always use manual dates, no fallback)
+    if (!statementStartDate || !statementEndDate) {
+      toast({
+        title: "Error",
+        description: "Statement dates must be set before generating PDF",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     doc.setFont("helvetica", "bold");
-    doc.text("Statement Date:", 120, yPos);
+    doc.text("Statement Period:", 20, yPos);
     doc.setFont("helvetica", "normal");
-    const dateRange = statementStartDate && statementEndDate 
-      ? `${new Date(statementStartDate).toLocaleDateString()} - ${new Date(statementEndDate).toLocaleDateString()}`
-      : new Date().toLocaleDateString();
-    doc.text(dateRange, 165, yPos);
-    yPos += 15;
+    const dateRange = `${new Date(statementStartDate).toLocaleDateString()} - ${new Date(statementEndDate).toLocaleDateString()}`;
+    doc.text(dateRange, 70, yPos);
+    yPos += 10;
 
     // Line items grouped by section
     Object.entries(billItemsBySection).forEach(([sectionType, items]) => {
@@ -456,7 +450,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       return;
     }
 
-    if (!confirm("Close this bill? This will generate and download the PDF.")) return;
+    if (!confirm("Close this billing cycle? This will generate the PDF and lock the bill from further edits.")) return;
 
     try {
       setLoading(true);
@@ -476,8 +470,8 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Bill closed and PDF downloaded",
+        title: "Billing Cycle Closed",
+        description: "PDF generated and bill locked. Create a new bill to continue billing for this client.",
       });
 
       onRefresh();
@@ -489,6 +483,82 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const reopenBill = async () => {
+    if (!confirm("Reopen this bill? This will allow editing line items and payments again.")) return;
+
+    try {
+      setLoading(true);
+      const { error } = await supabase
+        .from("bills")
+        .update({
+          status: "open",
+          closed_at: null,
+        })
+        .eq("id", bill.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Bill Reopened",
+        description: "You can now edit this bill again",
+      });
+
+      onRefresh();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deletePayment = async (paymentId: string) => {
+    if (!confirm("Remove this payment? The balance due will be updated.")) return;
+
+    try {
+      // Get payment details before deleting
+      const payment = payments.find(p => p.id === paymentId);
+      if (!payment) return;
+
+      const isDepositApplication = payment.method === "deposit_application" || payment.payment_type === "deposit_application";
+
+      // Delete payment
+      const { error } = await supabase.from("payments").delete().eq("id", paymentId);
+      if (error) throw error;
+
+      // If it was a deposit application, restore the deposit balance
+      if (isDepositApplication) {
+        const { error: depositError } = await supabase
+          .from("clients")
+          .update({
+            deposit_balance_cents: Math.round((depositBalance + (payment.amount_cents / 100)) * 100),
+          })
+          .eq("id", client.id);
+
+        if (depositError) throw depositError;
+      }
+
+      setPayments((prev) => prev.filter((p) => p.id !== paymentId));
+      await recalculateBillTotals();
+      fetchBillData();
+      onRefresh();
+
+      toast({
+        title: "Payment Removed",
+        description: isDepositApplication ? "Deposit balance restored" : "Payment deleted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -838,25 +908,33 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex gap-2">
-            <Button onClick={generatePDF} variant="outline">
+          {/* Quick Actions */}
+          <div className="flex gap-2 flex-wrap">
+            <Button onClick={generatePDF} variant="outline" disabled={!statementStartDate || !statementEndDate}>
               <Download className="mr-2 h-4 w-4" />
               Download PDF
             </Button>
-            {!isClosed && (
+            {isClosed ? (
+              <Button onClick={reopenBill} variant="secondary" disabled={loading}>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Reopen Bill
+              </Button>
+            ) : (
               <>
-                <Button onClick={closeBill} disabled={loading || !statementStartDate || !statementEndDate}>
+                <Button onClick={closeBill} disabled={loading || !statementStartDate || !statementEndDate} variant="default">
                   <Lock className="mr-2 h-4 w-4" />
-                  Close Bill
+                  Close Billing Cycle
                 </Button>
-                <Button onClick={deleteBill} variant="destructive">
+                <Button onClick={deleteBill} variant="destructive" disabled={loading}>
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete Bill
                 </Button>
               </>
             )}
           </div>
+          <p className="text-xs text-muted-foreground">
+            {isClosed ? "Bill is closed. Reopen to make changes." : "Set statement dates before closing the billing cycle."}
+          </p>
         </CardContent>
       </Card>
 
