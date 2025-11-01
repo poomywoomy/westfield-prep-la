@@ -1119,7 +1119,6 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
         onOpenChange={setAddPaymentOpen}
         billId={bill.id}
         clientId={client.id}
-        depositBalance={depositBalance}
         onSuccess={() => {
           fetchBillData();
           recalculateBillTotals();
