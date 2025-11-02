@@ -51,7 +51,7 @@ const Hero = () => {
               </h1>
               
               <h2 className="text-2xl md:text-3xl mb-4 text-white/95 font-semibold">
-                Same-Day Amazon FBA & Shopify Fulfillment
+                Same-Day Fulfillment for Multi-Channel E-Commerce Brands
               </h2>
               
               <p className="text-xl md:text-2xl mb-8 text-white/90 font-light leading-relaxed">
