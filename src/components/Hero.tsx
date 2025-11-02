@@ -38,20 +38,24 @@ const Hero = () => {
 
       <div className="container mx-auto px-4 relative z-10 pt-20 pb-16">
         <div className="max-w-7xl mx-auto">
+          {/* Full Width Header Section */}
+          <div className="text-left animate-fade-in mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/20 backdrop-blur-sm border border-secondary/30 rounded-full mb-6">
+              <TrendingUp className="w-4 h-4 text-secondary" />
+              <span className="text-white font-medium text-sm">Trusted by Growing E-Commerce Brands</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-white drop-shadow-lg max-w-none">
+              Los Angeles Prep Center | Professional E-Commerce Fulfillment
+            </h1>
+          </div>
+
+          {/* Two Column Content Section */}
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="text-left animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/20 backdrop-blur-sm border border-secondary/30 rounded-full mb-6">
-                <TrendingUp className="w-4 h-4 text-secondary" />
-                <span className="text-white font-medium text-sm">Trusted by Growing E-Commerce Brands</span>
-              </div>
-              
-              <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                Los Angeles Prep Center | Professional E-Commerce Fulfillment
-              </h1>
-              
               <h2 className="text-2xl md:text-3xl mb-4 text-white/95 font-semibold">
-                Same-Day Fulfillment for Multi-Channel E-Commerce Brands
+                Grow Faster with Fulfillment That Scales with You
               </h2>
               
               <p className="text-xl md:text-2xl mb-8 text-white/90 font-light leading-relaxed">
