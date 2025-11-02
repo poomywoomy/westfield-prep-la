@@ -1,56 +1,66 @@
-import { Package, Camera, Shield, Tag, Box, Truck, ShoppingCart, Video, Store, ShoppingBag, Users } from "lucide-react";
+import { Package, Camera, Truck, Users, Zap, Clock, Globe, Building2, Warehouse, TruckIcon, Headphones, RotateCcw, Network } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const services = [
   {
-    icon: Store,
-    title: "Shopify Fulfillment",
-    description: "Seamless integration and order fulfillment for your Shopify store.",
+    icon: Zap,
+    title: "Same-Day Shipping",
+    description: "Orders received before 2PM PST ship the same day. Fast nationwide delivery from our Los Angeles hub.",
   },
   {
-    icon: ShoppingBag,
-    title: "Amazon Fulfillment",
-    description: "Expert FBA prep and fulfillment services for Amazon sellers with FNSKU labeling.",
+    icon: Clock,
+    title: "Same-Day Check-Ins",
+    description: "Inventory received and processed within 24 hours with complete photo documentation.",
   },
   {
-    icon: Video,
-    title: "TikTok Shop Fulfillment",
-    description: "Fast-turnaround fulfillment solutions optimized for TikTok Shop orders.",
+    icon: Globe,
+    title: "International Shipping",
+    description: "Worldwide fulfillment with customs documentation and global carrier partnerships.",
+  },
+  {
+    icon: Building2,
+    title: "B2B Fulfillment",
+    description: "Wholesale orders, pallet forwarding, and bulk distribution for business clients.",
   },
   {
     icon: Users,
     title: "DTC Fulfillment",
-    description: "Direct-to-consumer fulfillment with branded packaging and personalized unboxing experiences.",
+    description: "Direct-to-consumer orders with branded packaging and premium unboxing experiences.",
   },
   {
-    icon: Package,
-    title: "Receiving & Inspection",
-    description: "Thorough inspection of all incoming shipments to ensure quality standards.",
+    icon: Warehouse,
+    title: "Storage & Warehousing",
+    description: "Climate-controlled secure storage starting at $0.80/unit/month in Los Angeles.",
   },
   {
-    icon: Shield,
-    title: "Polybagging & Bubble Wrap",
-    description: "Professional packaging to protect your products during transit and storage.",
-  },
-  {
-    icon: Box,
-    title: "Bundling & Case Prep",
-    description: "Expert bundling and carton preparation to platform specifications.",
-  },
-  {
-    icon: Tag,
-    title: "Product Labeling",
-    description: "Accurate labeling including FNSKU for seamless inventory management.",
-  },
-  {
-    icon: Truck,
-    title: "LTL & SPD Shipping",
-    description: "Efficient shipping solutions with major carriers for fast delivery.",
+    icon: TruckIcon,
+    title: "Carton/Pallet Forwarding",
+    description: "LTL freight management and professional pallet prep to any destination nationwide.",
   },
   {
     icon: Camera,
     title: "Photo Proof QC",
-    description: "Detailed photo documentation of every step for complete transparency.",
+    description: "Timestamped photo documentation of every step for complete order transparency.",
+  },
+  {
+    icon: Headphones,
+    title: "Dedicated Brand Support",
+    description: "Personal account manager with priority processing and custom workflow setup.",
+  },
+  {
+    icon: RotateCcw,
+    title: "Returns Processing",
+    description: "Inspection, restocking, refurbishment, and complete returns management.",
+  },
+  {
+    icon: Network,
+    title: "Multi-Channel Inventory",
+    description: "Real-time inventory sync across Shopify, Amazon, TikTok Shop, and all sales channels.",
+  },
+  {
+    icon: Package,
+    title: "Custom Kitting",
+    description: "Bundle assembly, promotional sets, and subscription box preparation services.",
   },
 ];
 
@@ -59,9 +69,9 @@ const Services = () => {
     <section id="services" className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Full-Service Prep Center in Los Angeles</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Premium 3PL Services in Los Angeles</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Comprehensive prep center services for online sellers in Los Angeles and Southern California
+            Full-service fulfillment solutions for DTC brands, Amazon sellers, and multi-channel e-commerce businesses
           </p>
         </div>
 

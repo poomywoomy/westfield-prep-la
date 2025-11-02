@@ -9,6 +9,8 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import LiveMetrics from "@/components/LiveMetrics";
+import ResultsSnapshot from "@/components/ResultsSnapshot";
 import { Zap, Package, Camera, Truck, Award, CheckCircle, Store, Heart, Clock, BarChart } from "lucide-react";
 
 const ShopifyFulfillment = () => {
@@ -205,6 +207,41 @@ const ShopifyFulfillment = () => {
             </div>
           </section>
 
+          {/* Live Metrics */}
+          <LiveMetrics 
+            metrics={[
+              { label: "Orders Fulfilled This Year", value: 400000, type: "counter" },
+              { label: "Same-Day Ship Rate", value: 99.2, type: "percentage" },
+              { label: "Average Order Accuracy", value: 99.8, type: "percentage" }
+            ]}
+            platformTheme="shopify"
+          />
+
+          {/* Results Snapshot */}
+          <ResultsSnapshot 
+            results={[
+              {
+                industry: "Beauty & Skincare",
+                challenge: "High-volume DTC brand needed same-day fulfillment for flash sales",
+                solution: "Implemented rapid pick-pack workflow with custom branded packaging",
+                results: "50% faster order processing, 99.9% accuracy maintained during peak"
+              },
+              {
+                industry: "Fashion & Apparel",
+                challenge: "Subscription box company required custom kitting and branded inserts",
+                solution: "Dedicated kitting station with photo QC for every box assembly",
+                results: "Zero assembly errors, 100% positive unboxing feedback"
+              },
+              {
+                industry: "Home Goods",
+                challenge: "Multi-channel seller needed real-time inventory sync across platforms",
+                solution: "Integrated inventory management with automated stock updates",
+                results: "Eliminated overselling, 24hr inventory accuracy guarantee"
+              }
+            ]}
+            platformTheme="shopify"
+          />
+
           {/* Capabilities */}
           <section className="py-20 bg-gradient-to-b from-[hsl(var(--shopify-accent))]/40 to-background">
             <div className="container mx-auto px-4">
@@ -257,6 +294,72 @@ const ShopifyFulfillment = () => {
                     <AccordionTrigger>How does your pricing model work?</AccordionTrigger>
                     <AccordionContent>
                       We charge per-unit pricing based on your services: receiving, pick/pack, kitting, storage, and shipping. No hidden fees. Get a custom quote today.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-5">
+                    <AccordionTrigger>Do you integrate with Shopify apps like Klaviyo and Recharge?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we integrate with major Shopify apps for email marketing, subscriptions, and more. Our system syncs seamlessly with your tech stack.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-6">
+                    <AccordionTrigger>Can you handle subscription box fulfillment for Shopify?</AccordionTrigger>
+                    <AccordionContent>
+                      Absolutely. We specialize in subscription box kitting with custom inserts, branded packaging, and recurring order management.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-7">
+                    <AccordionTrigger>What shipping carriers do you use for Shopify orders?</AccordionTrigger>
+                    <AccordionContent>
+                      We use USPS, UPS, FedEx, and DHL for domestic and international shipping, with carrier selection based on speed and cost optimization.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-8">
+                    <AccordionTrigger>Do you offer international Shopify fulfillment?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we ship worldwide with customs documentation, duty calculations, and international carrier partnerships for smooth global delivery.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-9">
+                    <AccordionTrigger>Can you handle pre-orders and backorders?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we can hold pre-orders and ship when inventory arrives, with automated notifications to keep your customers informed.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-10">
+                    <AccordionTrigger>What's your accuracy rate for Shopify order fulfillment?</AccordionTrigger>
+                    <AccordionContent>
+                      We maintain 99.8% order accuracy with photo proof QC on every shipment. Every order is documented before leaving our facility.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-11">
+                    <AccordionTrigger>Do you support split shipments and partial fulfillment?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we can split orders across multiple shipments or partially fulfill based on available stock, with automatic customer notifications.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-12">
+                    <AccordionTrigger>Can you handle gift messages and gift wrapping?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we offer gift wrapping, custom messages, premium packaging, and special occasion inserts for a personalized experience.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-13">
+                    <AccordionTrigger>How do you manage inventory across multiple Shopify stores?</AccordionTrigger>
+                    <AccordionContent>
+                      Our system syncs inventory in real-time across all your Shopify stores automatically, preventing overselling and maintaining accurate stock levels.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-14">
+                    <AccordionTrigger>Do you offer same-day Shopify order processing?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, orders received before 2PM PST are processed and shipped the same business day for maximum customer satisfaction.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-15">
+                    <AccordionTrigger>Can you handle fragile or oversized Shopify products?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we specialize in custom packaging solutions for delicate and bulky items, including bubble wrap, foam inserts, and reinforced boxes.
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

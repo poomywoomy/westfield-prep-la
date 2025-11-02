@@ -122,15 +122,41 @@ const Header = () => {
                 </div>
               </HoverCardContent>
             </HoverCard>
-            <Link to="/shopify-fulfillment" className="text-foreground hover:text-primary transition-colors font-bold">
-              Shopify Fulfillment
-            </Link>
-            <Link to="/amazon-fba-prep" className="text-foreground hover:text-primary transition-colors font-medium">
-              Amazon FBA
-            </Link>
-            <Link to="/tiktok-shop-fulfillment" className="text-foreground hover:text-primary transition-colors font-medium">
-              TikTok Shop
-            </Link>
+            <HoverCard openDelay={100} closeDelay={200}>
+              <HoverCardTrigger className="text-foreground hover:text-primary transition-colors font-medium cursor-pointer flex items-center gap-1">
+                Sales Channels
+                <ChevronDown className="h-4 w-4" />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-48 p-2 bg-background border shadow-lg z-[100]">
+                <div className="flex flex-col gap-1">
+                  <Link
+                    to="/shopify-fulfillment"
+                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                  >
+                    Shopify
+                  </Link>
+                  <Link
+                    to="/amazon-fba-prep"
+                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                  >
+                    Amazon FBA
+                  </Link>
+                  <Link
+                    to="/tiktok-shop-fulfillment"
+                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                  >
+                    TikTok Shop
+                  </Link>
+                  <div className="h-px bg-border my-1" />
+                  <Link
+                    to="/sales-channels"
+                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                  >
+                    Many Others...
+                  </Link>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
             <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium">
               Blog
             </Link>

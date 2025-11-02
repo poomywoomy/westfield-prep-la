@@ -9,6 +9,8 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import LiveMetrics from "@/components/LiveMetrics";
+import ResultsSnapshot from "@/components/ResultsSnapshot";
 import { Zap, Video, Package, Truck, Sparkles, TrendingUp, Camera, CheckCircle, Users, Clock, Award, Boxes } from "lucide-react";
 
 const TikTokShopFulfillment = () => {
@@ -249,6 +251,41 @@ const TikTokShopFulfillment = () => {
             </div>
           </section>
 
+          {/* Live Metrics */}
+          <LiveMetrics 
+            metrics={[
+              { label: "Orders Fulfilled This Year", value: 400000, type: "counter" },
+              { label: "Same-Day Ship Rate", value: 99.2, type: "percentage" },
+              { label: "Average Order Accuracy", value: 99.8, type: "percentage" }
+            ]}
+            platformTheme="tiktok"
+          />
+
+          {/* Results Snapshot */}
+          <ResultsSnapshot 
+            results={[
+              {
+                industry: "Beauty & Cosmetics",
+                challenge: "Creator-owned brand experienced viral spike with 10x normal order volume overnight",
+                solution: "Scaled fulfillment team and extended hours to handle surge within 48 hours",
+                results: "Maintained 99.8% same-day ship rate during viral moment"
+              },
+              {
+                industry: "Fashion Accessories",
+                challenge: "Jewelry brand needed creator-optimized packaging for influencer unboxing videos",
+                solution: "Custom branded boxes with tissue paper, stickers, and thank-you cards",
+                results: "Featured in 50+ creator unboxing videos, 200% sales increase"
+              },
+              {
+                industry: "Wellness Products",
+                challenge: "Flash drop required assembly of 5,000 promotional bundles in 72 hours",
+                solution: "Dedicated kitting team worked around the clock with quality control",
+                results: "All bundles assembled on time, zero assembly errors reported"
+              }
+            ]}
+            platformTheme="tiktok"
+          />
+
           <Reviews />
 
           {/* FAQ */}
@@ -279,6 +316,72 @@ const TikTokShopFulfillment = () => {
                     <AccordionTrigger>Do you offer photo documentation?</AccordionTrigger>
                     <AccordionContent>
                       Yes, every order includes photo-proof QC documentation so you can verify quality before shipping.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-5">
+                    <AccordionTrigger>Do you integrate with TikTok Shop API?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we can integrate with TikTok Shop for automated order import, inventory sync, and real-time tracking updates.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-6">
+                    <AccordionTrigger>Can you handle influencer collaboration orders?</AccordionTrigger>
+                    <AccordionContent>
+                      Absolutely. We specialize in creator-friendly packaging and fast turnaround for influencer collabs with special handling options.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-7">
+                    <AccordionTrigger>How fast can you scale for viral products?</AccordionTrigger>
+                    <AccordionContent>
+                      We can scale to 10x volume within 48 hours by adding team members, extending hours, and prioritizing viral products.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-8">
+                    <AccordionTrigger>Do you offer rush processing for trending items?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we offer same-day rush service for viral products that need immediate fulfillment to capitalize on trending moments.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-9">
+                    <AccordionTrigger>Can you create custom bundles for TikTok promotions?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we excel at rapid bundle assembly for flash sales, limited drops, and promotional campaigns with quick turnaround.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-10">
+                    <AccordionTrigger>Do you support TikTok Shop returns and exchanges?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we handle returns inspection, restocking, exchange processing, and refurbishment with full documentation.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-11">
+                    <AccordionTrigger>How do you handle flash sale fulfillment?</AccordionTrigger>
+                    <AccordionContent>
+                      Priority queue for flash sales with dedicated team members assigned during peak periods to ensure rapid fulfillment.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-12">
+                    <AccordionTrigger>Can you ship internationally for TikTok Shop?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we ship worldwide with customs forms, duty calculations, and international carrier partnerships for global reach.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-13">
+                    <AccordionTrigger>Do you offer branded packaging for TikTok creators?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, custom branded boxes, tissue paper, stickers, and inserts specifically designed for unboxing content and social media.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-14">
+                    <AccordionTrigger>What's your capacity for high-volume TikTok orders?</AccordionTrigger>
+                    <AccordionContent>
+                      We process up to 5,000 orders per day with ability to scale for viral spikes through flexible staffing and extended hours.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-15">
+                    <AccordionTrigger>Can you handle live shopping event fulfillment?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we offer real-time fulfillment support during TikTok live shopping events with dedicated team members on standby.
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

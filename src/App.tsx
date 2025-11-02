@@ -30,6 +30,7 @@ const Testimonials = lazy(() => import("./pages/Testimonials"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const WhyChooseUs = lazy(() => import("./pages/WhyChooseUs"));
+const SalesChannels = lazy(() => import("./pages/SalesChannels"));
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => {
               <Route path="/shopify-fulfillment" element={<ShopifyFulfillment />} />
               <Route path="/amazon-fba-prep" element={<AmazonFBAPrep />} />
               <Route path="/tiktok-shop-fulfillment" element={<TikTokShopFulfillment />} />
+              <Route path="/sales-channels" element={<SalesChannels />} />
               <Route path="/kitting-bundling" element={<KittingBundling />} />
               <Route path="/labeling-fnsku" element={<LabelingCompliance />} />
               <Route path="/storage-warehousing" element={<StorageWarehousing />} />

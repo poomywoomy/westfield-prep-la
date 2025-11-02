@@ -20,24 +20,24 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Los Angeles Shopify Prep Center | DTC Fulfillment & Amazon FBA Services</title>
-        <meta name="description" content="Professional Los Angeles Shopify prep center specializing in DTC fulfillment, custom branding, and Amazon FBA prep. Fast 24-48hr turnaround. Serving e-commerce businesses nationwide." />
+        <title>Los Angeles 3PL | Multi-Channel Fulfillment for Shopify, Amazon & TikTok</title>
+        <meta name="description" content="Professional Los Angeles 3PL offering same-day shipping, B2B fulfillment, and storage for Shopify, Amazon FBA, TikTok Shop, and all sales channels. Fast turnaround nationwide." />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.placename" content="Los Angeles, California" />
         <meta name="geo.position" content="34.0522;-118.2437" />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content="Los Angeles Shopify Prep Center | DTC Fulfillment & Amazon FBA Services" />
-        <meta property="og:description" content="Professional Los Angeles Shopify prep center specializing in DTC fulfillment, custom branding, and Amazon FBA prep. Fast 24-48hr turnaround. Serving e-commerce businesses nationwide." />
+        <meta property="og:title" content="Los Angeles 3PL | Multi-Channel Fulfillment for Shopify, Amazon & TikTok" />
+        <meta property="og:description" content="Professional Los Angeles 3PL offering same-day shipping, B2B fulfillment, and storage for Shopify, Amazon FBA, TikTok Shop, and all sales channels. Fast turnaround nationwide." />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
         <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
         <meta property="og:type" content="website" />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Los Angeles Shopify Prep Center | DTC Fulfillment & Amazon FBA Services" />
-        <meta name="twitter:description" content="Professional Los Angeles Shopify prep center specializing in DTC fulfillment, custom branding, and Amazon FBA prep. Fast turnaround nationwide." />
+        <meta name="twitter:title" content="Los Angeles 3PL | Multi-Channel Fulfillment for Shopify, Amazon & TikTok" />
+        <meta name="twitter:description" content="Professional Los Angeles 3PL offering same-day shipping, B2B fulfillment, and storage for Shopify, Amazon FBA, TikTok Shop, and all sales channels." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="organization" />
@@ -48,11 +48,11 @@ const Index = () => {
           questions: [
             {
               question: "Do you offer Shopify fulfillment services?",
-              answer: "Yes! We specialize in Shopify fulfillment with custom branding, same-day processing, and direct integration with your Shopify store. We handle everything from receiving to shipping with full photo documentation."
+              answer: "Yes! We specialize in Shopify fulfillment with custom branding, same-day processing, and direct integration. Whether you're selling on Shopify, Amazon FBA, TikTok Shop, or other channels, we handle everything from receiving to shipping with full photo documentation."
             },
             {
               question: "What areas do you serve?",
-              answer: "We're based in Los Angeles and provide fulfillment services to e-commerce businesses in all 50 states. We handle shipments to Amazon FBA warehouses, direct-to-consumer orders, and multi-channel fulfillment nationwide."
+              answer: "We're based in Los Angeles and provide fulfillment services to e-commerce businesses in all 50 states. We handle shipments to Amazon FBA warehouses, direct-to-consumer Shopify orders, TikTok Shop fulfillment, and multi-channel distribution nationwide."
             },
             {
               question: "Do you offer same-day processing?",
@@ -60,7 +60,7 @@ const Index = () => {
             },
             {
               question: "What makes your prep center different?",
-              answer: "As a boutique Los Angeles prep center, we offer personalized service, same-day processing, custom branding for Shopify stores, and full photo documentation. You get dedicated support instead of ticket-based systems."
+              answer: "As a boutique Los Angeles 3PL, we offer personalized service, same-day processing, custom branding for DTC brands, and full photo documentation. You get dedicated support for all your sales channels—Shopify, Amazon, TikTok Shop, and more—instead of generic ticket-based systems."
             }
           ]
         }}

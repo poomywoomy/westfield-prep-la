@@ -9,6 +9,9 @@ import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import LiveMetrics from "@/components/LiveMetrics";
+import ResultsSnapshot from "@/components/ResultsSnapshot";
 import { CheckCircle, Package, Tag, Shield, Boxes, TrendingUp } from "lucide-react";
 
 const AmazonFBAPrep = () => {
@@ -207,6 +210,41 @@ const AmazonFBAPrep = () => {
             </div>
           </section>
 
+          {/* Live Metrics */}
+          <LiveMetrics 
+            metrics={[
+              { label: "Orders Fulfilled This Year", value: 400000, type: "counter" },
+              { label: "Same-Day Ship Rate", value: 99.2, type: "percentage" },
+              { label: "Average Order Accuracy", value: 99.8, type: "percentage" }
+            ]}
+            platformTheme="amazon"
+          />
+
+          {/* Results Snapshot */}
+          <ResultsSnapshot 
+            results={[
+              {
+                industry: "Electronics & Accessories",
+                challenge: "High-value electronics seller required photo QC for every unit due to fragile products",
+                solution: "Implemented comprehensive photo documentation and bubble wrap packaging",
+                results: "Zero damage claims, 100% FBA compliance maintained"
+              },
+              {
+                industry: "Supplements & Health",
+                challenge: "Vitamins brand needed expiration date labeling and lot tracking",
+                solution: "Custom labeling workflow with batch tracking and FNSKU application",
+                results: "100% Amazon compliance, zero restricted inventory"
+              },
+              {
+                industry: "Toys & Games",
+                challenge: "Seasonal toy seller needed rapid pallet forwarding during Q4 rush",
+                solution: "Priority processing with same-day LTL booking and BOL generation",
+                results: "99% same-day ship rate during peak season"
+              }
+            ]}
+            platformTheme="amazon"
+          />
+
           {/* Compliance Checklist */}
           <section className="py-16 bg-muted/30">
             <div className="container mx-auto px-4">
@@ -232,6 +270,107 @@ const AmazonFBAPrep = () => {
           </section>
 
           <Reviews />
+
+          {/* FAQ */}
+          <section className="py-16 bg-background">
+            <div className="container mx-auto px-4">
+              <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+              <div className="max-w-3xl mx-auto">
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger>What Amazon compliance standards do you follow?</AccordionTrigger>
+                    <AccordionContent>
+                      We follow all Amazon FBA prep requirements including FNSKU labeling, case pack guidelines, polybagging standards, and hazmat regulations.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-2">
+                    <AccordionTrigger>Can you handle hazmat and lithium battery products?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we are certified to handle hazmat items and lithium batteries with proper documentation, labeling, and compliance procedures.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-3">
+                    <AccordionTrigger>Do you support Amazon Vendor Central shipments?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we handle both Seller Central (FBA) and Vendor Central routing, with experience in purchase order fulfillment and compliance.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-4">
+                    <AccordionTrigger>What's your experience with FBA shipment plans?</AccordionTrigger>
+                    <AccordionContent>
+                      We process 1000+ FBA shipments monthly and understand all Amazon placement requirements, routing, and box content documentation.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-5">
+                    <AccordionTrigger>Can you handle Amazon Seller Fulfilled Prime (SFP)?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we meet SFP requirements including same-day processing, weekend shipping, and 2-day delivery capabilities nationwide.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-6">
+                    <AccordionTrigger>Do you offer expiration date labeling for consumables?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we apply expiration date labels and maintain lot tracking for all consumable products per Amazon requirements.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-7">
+                    <AccordionTrigger>How do you handle Amazon inventory discrepancies?</AccordionTrigger>
+                    <AccordionContent>
+                      We provide photo proof of all shipments and work with Amazon to resolve any receiving discrepancies with complete documentation.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-8">
+                    <AccordionTrigger>Can you create multi-unit bundles for Amazon?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we create suffocation-warning labeled bundles and polybagged sets per Amazon requirements for virtual bundles.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-9">
+                    <AccordionTrigger>Do you support Amazon FBA Small and Light program?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we prep items for Small and Light with proper labeling, carton requirements, and compliance for this cost-effective program.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-10">
+                    <AccordionTrigger>What's your turnaround time for urgent Amazon prep?</AccordionTrigger>
+                    <AccordionContent>
+                      Same-day processing for orders received before 2PM PST. Rush service available for tight deadlines and last-minute needs.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-11">
+                    <AccordionTrigger>How do you handle Amazon returns and refurbishments?</AccordionTrigger>
+                    <AccordionContent>
+                      We inspect, repackage, and re-prep returned items for FBA restock, or liquidate damaged goods based on your preferences.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-12">
+                    <AccordionTrigger>Can you manage multiple Amazon seller accounts?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we manage inventory separately for multiple accounts with unique FNSKU labeling and segregated storage.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-13">
+                    <AccordionTrigger>Do you provide BOL and freight documentation?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we generate all LTL freight documents including BOLs, pallet labels, and shipment manifests for Amazon compliance.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-14">
+                    <AccordionTrigger>What are your rates for FNSKU labeling?</AccordionTrigger>
+                    <AccordionContent>
+                      Competitive per-unit rates with volume discounts available. Contact us for custom pricing based on your specific needs.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-15">
+                    <AccordionTrigger>Can you handle oversize/heavy bulky items?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes, we have equipment and experience handling large, heavy products per Amazon oversize requirements with proper palletization.
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            </div>
+          </section>
 
           {/* CTA - Amazon Professional Theme */}
           <section className="relative py-20 overflow-hidden">
