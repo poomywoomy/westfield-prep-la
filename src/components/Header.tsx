@@ -79,27 +79,6 @@ const Header = () => {
             <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium">
               Home
             </Link>
-            {isHomePage ? (
-              <button
-                onClick={() => scrollToSection("pricing")}
-                className="text-foreground hover:text-primary transition-colors font-medium"
-              >
-                Pricing
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  navigate("/");
-                  setTimeout(() => {
-                    const element = document.getElementById("pricing");
-                    if (element) element.scrollIntoView({ behavior: "smooth" });
-                  }, 100);
-                }}
-                className="text-foreground hover:text-primary transition-colors font-medium"
-              >
-                Pricing
-              </button>
-            )}
             <HoverCard openDelay={100} closeDelay={200}>
               <HoverCardTrigger className="text-foreground hover:text-primary transition-colors font-medium cursor-pointer flex items-center gap-1">
                 About Us
@@ -157,6 +136,9 @@ const Header = () => {
                 </div>
               </HoverCardContent>
             </HoverCard>
+            <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium">
+              Pricing
+            </Link>
             <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium">
               Blog
             </Link>

@@ -1,15 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Footer from "@/components/Footer";
+import PlatformInfoDialog from "@/components/PlatformInfoDialog";
+import { platformsData } from "@/data/platformsData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Store, ShoppingBag, Video, Package, ShoppingCart, Globe, Building2, Boxes } from "lucide-react";
+import { Store, Video, ShoppingCart, Globe, Building2, Boxes } from "lucide-react";
 
 const SalesChannels = () => {
   const navigate = useNavigate();
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -56,8 +59,6 @@ const SalesChannels = () => {
       platforms: [
         { name: "Faire", description: "Wholesale marketplace" },
         { name: "Alibaba", description: "Global wholesale" },
-        { name: "Custom EDI", description: "Enterprise integration" },
-        { name: "Direct B2B", description: "Bulk distribution" },
       ],
     },
     {
@@ -66,7 +67,6 @@ const SalesChannels = () => {
       platforms: [
         { name: "Mercado Libre", description: "Latin America marketplace" },
         { name: "Rakuten", description: "Japan e-commerce" },
-        { name: "Custom API", description: "International integrations" },
       ],
     },
   ];
@@ -124,24 +124,16 @@ const SalesChannels = () => {
                         {category.platforms.map((platform, pIdx) => (
                           <Card
                             key={pIdx}
-                            className={`hover:shadow-lg transition-all ${
+                            className={`hover:shadow-lg transition-all cursor-pointer ${
                               platform.featured
                                 ? "border-primary/50 bg-gradient-to-br from-primary/5 to-secondary/5"
-                                : "border-border"
+                                : "border-border hover:border-primary/30"
                             }`}
+                            onClick={() => platform.path ? navigate(platform.path) : setSelectedPlatform(platform.name)}
                           >
                             <CardHeader>
                               <CardTitle className="flex items-center justify-between">
-                                {platform.path ? (
-                                  <button
-                                    onClick={() => navigate(platform.path)}
-                                    className="text-lg font-semibold hover:text-primary transition-colors text-left"
-                                  >
-                                    {platform.name}
-                                  </button>
-                                ) : (
-                                  <span className="text-lg font-semibold">{platform.name}</span>
-                                )}
+                                <span className="text-lg font-semibold">{platform.name}</span>
                                 {platform.featured && (
                                   <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
                                     Featured
@@ -150,19 +142,12 @@ const SalesChannels = () => {
                               </CardTitle>
                             </CardHeader>
                             <CardContent>
-                              <p className="text-muted-foreground text-sm">
+                              <p className="text-muted-foreground text-sm mb-3">
                                 {platform.description || "Full fulfillment integration available"}
                               </p>
-                              {platform.path && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="mt-3 text-primary hover:text-primary/90"
-                                  onClick={() => navigate(platform.path)}
-                                >
-                                  Learn More →
-                                </Button>
-                              )}
+                              <span className="text-sm font-medium text-primary hover:underline">
+                                Learn More →
+                              </span>
                             </CardContent>
                           </Card>
                         ))}
@@ -196,6 +181,12 @@ const SalesChannels = () => {
 
         <Footer />
       </div>
+
+      <PlatformInfoDialog
+        platform={selectedPlatform ? platformsData[selectedPlatform as keyof typeof platformsData] : null}
+        open={!!selectedPlatform}
+        onClose={() => setSelectedPlatform(null)}
+      />
     </>
   );
 };

@@ -10,6 +10,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 const Index = lazy(() => import("./pages/Index"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Contact = lazy(() => import("./pages/Contact"));
+const Pricing = lazy(() => import("./pages/Pricing"));
 const ShopifyFulfillment = lazy(() => import("./pages/ShopifyFulfillment"));
 const AmazonFBAPrep = lazy(() => import("./pages/AmazonFBAPrep"));
 const TikTokShopFulfillment = lazy(() => import("./pages/TikTokShopFulfillment"));
@@ -47,6 +48,7 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/testimonials" element={<Testimonials />} />
               <Route path="/why-choose-us" element={<WhyChooseUs />} />
               <Route path="/blog" element={<Blog />} />
