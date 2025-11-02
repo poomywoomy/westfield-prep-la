@@ -15,6 +15,7 @@ import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { AuthorBio } from "@/components/blog/AuthorBio";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 
+// Blog post page component
 interface BlogPost {
   id: string;
   title: string;
