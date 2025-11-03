@@ -80,8 +80,20 @@
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/blog/</loc>
-    <lastmod>2025-10-27</lastmod>
+    <lastmod>2025-11-03</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/blog/things-reliable-prep-center-los-angeles/</loc>
+    <lastmod>2025-11-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/blog/shopify-3pl-services-los-angeles/</loc>
+    <lastmod>2025-10-30</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>
