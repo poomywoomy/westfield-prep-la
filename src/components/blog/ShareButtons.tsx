@@ -66,7 +66,7 @@ export const ShareButtons = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant={variant} size={size}>
+        <Button variant={variant} size={size} className="gap-2">
           <Share2 className="h-4 w-4" />
           {showLabel && <span>Share</span>}
         </Button>
