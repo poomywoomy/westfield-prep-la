@@ -84,9 +84,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    const authUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&grant_options[]=per-user`;
+    // Build OAuth URL without grant_options to avoid installation link errors
+    const authUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
     
     console.log('Generated OAuth URL with state:', state);
+    console.log('Full OAuth URL:', authUrl);
 
     return new Response(
       JSON.stringify({ authUrl, state }),
