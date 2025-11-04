@@ -8,11 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, User, Store, Package, ShoppingCart } from "lucide-react";
+import { ArrowLeft, User, Store } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientShopifyTab from "@/components/client/ClientShopifyTab";
-import ClientProductsTab from "@/components/client/ClientProductsTab";
-import ClientOrdersTab from "@/components/client/ClientOrdersTab";
 
 const ClientSettings = () => {
   const { user, role, loading } = useAuth();
@@ -201,7 +199,7 @@ const ClientSettings = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="account" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+          <TabsList className="grid grid-cols-2 w-full max-w-2xl">
             <TabsTrigger value="account">
               <User className="mr-2 h-4 w-4" />
               Account
@@ -209,14 +207,6 @@ const ClientSettings = () => {
             <TabsTrigger value="shopify">
               <Store className="mr-2 h-4 w-4" />
               Shopify
-            </TabsTrigger>
-            <TabsTrigger value="products">
-              <Package className="mr-2 h-4 w-4" />
-              Products
-            </TabsTrigger>
-            <TabsTrigger value="orders">
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Orders
             </TabsTrigger>
           </TabsList>
 
@@ -327,14 +317,6 @@ const ClientSettings = () => {
 
           <TabsContent value="shopify">
             <ClientShopifyTab />
-          </TabsContent>
-
-          <TabsContent value="products">
-            <ClientProductsTab />
-          </TabsContent>
-
-          <TabsContent value="orders">
-            <ClientOrdersTab />
           </TabsContent>
         </Tabs>
       </main>

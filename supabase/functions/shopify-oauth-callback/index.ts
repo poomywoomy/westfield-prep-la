@@ -167,7 +167,7 @@ Deno.serve(async (req) => {
 
     // Redirect back to client dashboard using stored frontend origin
     const frontendOrigin = stateRecord.frontend_origin || url.origin;
-    const redirectUrl = `${frontendOrigin}/client-dashboard?shopify_connected=true`;
+    const redirectUrl = `${frontendOrigin}/client/dashboard?shopify_connected=true`;
     
     return new Response(null, {
       status: 302,
@@ -183,7 +183,7 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const referer = req.headers.get('Referer') || '';
     const frontendOrigin = referer ? new URL(referer).origin : url.origin;
-    const errorUrl = `${frontendOrigin}/client-dashboard?shopify_error=${encodeURIComponent('Failed to connect Shopify store. Please try again.')}`;
+    const errorUrl = `${frontendOrigin}/client/dashboard?shopify_error=${encodeURIComponent('Failed to connect Shopify store. Please try again.')}`;
     
     return new Response(null, {
       status: 302,
