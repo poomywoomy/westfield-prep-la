@@ -31,7 +31,7 @@ function parseLinkHeader(header: string | null): string | null {
 
 async function fetchAllProducts(shopDomain: string, accessToken: string, apiVersion: string) {
   const allProducts = [];
-  let nextPageUrl = `https://${shopDomain}/admin/api/${apiVersion}/products.json?limit=250`;
+  let nextPageUrl: string | null = `https://${shopDomain}/admin/api/${apiVersion}/products.json?limit=250`;
   let pageCount = 0;
   
   while (nextPageUrl) {
@@ -169,14 +169,16 @@ Deno.serve(async (req) => {
     
     let errorMessage = 'Unable to sync products from Shopify. Please try again or contact support.';
     
-    if (error.message?.includes('authentication') || error.message?.includes('401')) {
-      errorMessage = 'Shopify authentication failed. Please reconnect your store.';
-    } else if (error.message?.includes('429')) {
-      errorMessage = 'Shopify API rate limit reached. Please try again in a few minutes.';
-    } else if (error.message?.includes('402')) {
-      errorMessage = 'Shopify store is frozen or suspended.';
-    } else if (error.message?.includes('does not exist')) {
-      errorMessage = 'Database error. Please contact support.';
+    if (error instanceof Error) {
+      if (error.message?.includes('authentication') || error.message?.includes('401')) {
+        errorMessage = 'Shopify authentication failed. Please reconnect your store.';
+      } else if (error.message?.includes('429')) {
+        errorMessage = 'Shopify API rate limit reached. Please try again in a few minutes.';
+      } else if (error.message?.includes('402')) {
+        errorMessage = 'Shopify store is frozen or suspended.';
+      } else if (error.message?.includes('does not exist')) {
+        errorMessage = 'Database error. Please contact support.';
+      }
     }
     
     return new Response(

@@ -55,14 +55,14 @@ Deno.serve(async (req) => {
 
     // Fetch all orders with pagination
     const allOrders = [];
-    let nextPageUrl = `https://${store.shop_domain}/admin/api/2024-01/orders.json?limit=250&status=any`;
+    let nextPageUrl: string | null = `https://${store.shop_domain}/admin/api/2024-01/orders.json?limit=250&status=any`;
     let pageCount = 0;
     
     while (nextPageUrl) {
       pageCount++;
       console.log(`Fetching orders page ${pageCount}...`);
       
-      const shopifyResponse = await fetch(nextPageUrl, {
+      const shopifyResponse: Response = await fetch(nextPageUrl, {
         headers: {
           'X-Shopify-Access-Token': store.access_token,
           'Content-Type': 'application/json',
@@ -77,8 +77,8 @@ Deno.serve(async (req) => {
       allOrders.push(...orders);
       
       // Get next page from Link header
-      const linkHeader = shopifyResponse.headers.get('Link');
-      const nextMatch = linkHeader?.match(/<([^>]+)>;\s*rel="next"/);
+      const linkHeader: string | null = shopifyResponse.headers.get('Link');
+      const nextMatch: RegExpMatchArray | null = linkHeader?.match(/<([^>]+)>;\s*rel="next"/) || null;
       nextPageUrl = nextMatch ? nextMatch[1] : null;
       
       // Add delay to respect rate limits
@@ -128,12 +128,14 @@ Deno.serve(async (req) => {
     
     let errorMessage = 'Unable to sync orders from Shopify. Please try again or contact support.';
     
-    if (error.message?.includes('authentication') || error.message?.includes('401')) {
-      errorMessage = 'Shopify authentication failed. Please reconnect your store.';
-    } else if (error.message?.includes('429')) {
-      errorMessage = 'Shopify API rate limit reached. Please try again in a few minutes.';
-    } else if (error.message?.includes('402')) {
-      errorMessage = 'Shopify store is frozen or suspended.';
+    if (error instanceof Error) {
+      if (error.message?.includes('authentication') || error.message?.includes('401')) {
+        errorMessage = 'Shopify authentication failed. Please reconnect your store.';
+      } else if (error.message?.includes('429')) {
+        errorMessage = 'Shopify API rate limit reached. Please try again in a few minutes.';
+      } else if (error.message?.includes('402')) {
+        errorMessage = 'Shopify store is frozen or suspended.';
+      }
     }
     
     return new Response(
