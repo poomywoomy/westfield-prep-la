@@ -184,8 +184,9 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         ],
         offers: {
           "@type": "AggregateOffer",
+          price: "Custom",
           priceCurrency: "USD",
-          description: "Custom pricing based on volume and services"
+          description: "Custom pricing based on your business needs and volume"
         },
         hasOfferCatalog: {
           "@type": "OfferCatalog",

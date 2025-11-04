@@ -208,30 +208,24 @@ Most Shopify prep centers use:
 
 ### Typical Shopify Prep Center Pricing
 
-**Receiving**
-- $0.50-1.00 per unit received
+Most Shopify prep centers offer volume-based pricing with transparent fee structures. Pricing typically includes:
 
-**Storage**
-- $10-20 per pallet per month
-- Or $0.10-0.50 per cubic foot
+**Receiving & Storage**
+- Per-unit receiving fees
+- Monthly storage (by pallet or cubic footage)
 
-**Pick & Pack**
-- $2-5 per order (single item)
-- +$0.50-1.00 per additional item
+**Order Fulfillment**
+- Per-order pick & pack fees
+- Additional item fees for multi-item orders
 
-**Kitting/Bundling**
-- $1-3 per kit
+**Value-Added Services**
+- Kitting and bundling services
+- Custom packaging and branded materials
 
-**Custom Packaging**
-- $0.50-2.00 per order (branded materials)
+**Monthly Cost Example**
+For a store processing 500 orders/month with custom branded packaging and average 1.5 items per order, costs typically range from $1,500-2,500/month, which compares favorably to DIY fulfillment costs (warehouse rent + labor + supplies = $3,000-5,000/month).
 
-**Example Monthly Cost**
-- 500 orders/month
-- Average 1.5 items per order
-- Custom branded packaging
-- **Total:** $1,500-2,500/month
-
-Compare to DIY: Warehouse rent + labor + supplies = $3,000-5,000/month
+Most prep centers offer custom quotes based on your specific volume and service needs. Contact providers directly for accurate pricing tailored to your business.
 
 ## Common Shopify Fulfillment Questions (150 words)
 

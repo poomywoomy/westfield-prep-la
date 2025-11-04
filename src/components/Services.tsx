@@ -17,7 +17,7 @@ const services = [
       "Weekend processing available for high-volume clients"
     ],
     bestFor: ["DTC Brands", "Time-Sensitive Products", "High-Volume Sellers"],
-    pricing: "Contact us for volume-based pricing tailored to your shipping needs"
+    pricing: "Contact us for custom pricing"
   },
   {
     icon: Clock,
@@ -32,7 +32,7 @@ const services = [
       "Quick turnaround for restocks and new product launches"
     ],
     bestFor: ["Fast-Moving Inventory", "Product Launches", "Seasonal Restocks"],
-    pricing: "Starting at $3/carton or $50/pallet"
+    pricing: "Contact us for custom pricing"
   },
   {
     icon: Globe,
@@ -77,7 +77,7 @@ const services = [
       "Premium unboxing materials for product launches"
     ],
     bestFor: ["Luxury Brands", "Subscription Boxes", "Gift Products"],
-    pricing: "Starting at $2.50/order plus materials"
+    pricing: "Contact us for custom pricing"
   },
   {
     icon: Warehouse,
@@ -92,7 +92,7 @@ const services = [
       "Prime Los Angeles location near major ports"
     ],
     bestFor: ["Seasonal Inventory", "Long-Term Storage", "Overflow Stock"],
-    pricing: "Flexible pricing based on space and duration"
+    pricing: "Contact us for custom pricing"
   },
   {
     icon: TruckIcon,
@@ -107,7 +107,7 @@ const services = [
       "Freight tracking and delivery confirmation"
     ],
     bestFor: ["Bulk Shippers", "Amazon FBA Sellers", "B2B Distributors"],
-    pricing: "Based on weight, dimensions, and destination"
+    pricing: "Contact us for custom pricing"
   },
   {
     icon: Camera,
@@ -122,7 +122,7 @@ const services = [
       "Digital photo archive accessible anytime"
     ],
     bestFor: ["High-Value Products", "Quality-Critical Items", "Accountability"],
-    pricing: "Included with all fulfillment services"
+    pricing: "Contact us for custom pricing"
   },
   {
     icon: Headphones,
@@ -137,7 +137,7 @@ const services = [
       "Quarterly business reviews and optimization"
     ],
     bestFor: ["Growing Brands", "High-Volume Clients", "Complex Operations"],
-    pricing: "Available for qualifying accounts - contact us"
+    pricing: "Contact us for custom pricing"
   },
   {
     icon: RotateCcw,
@@ -152,7 +152,7 @@ const services = [
       "Automated customer refund notifications"
     ],
     bestFor: ["Apparel Brands", "Electronics Sellers", "High-Return Categories"],
-    pricing: "Per-return pricing based on complexity"
+    pricing: "Contact us for custom pricing"
   },
   {
     icon: Network,
@@ -167,7 +167,7 @@ const services = [
       "Prevention of overselling across platforms"
     ],
     bestFor: ["Multi-Channel Sellers", "Omnichannel Brands", "Growing Businesses"],
-    pricing: "Included with multi-channel fulfillment plans"
+    pricing: "Contact us for custom pricing"
   },
   {
     icon: Package,
@@ -182,7 +182,7 @@ const services = [
       "Flexible kitting for seasonal offerings"
     ],
     bestFor: ["Subscription Boxes", "Gift Sets", "Promotional Bundles"],
-    pricing: "Starting at $0.50/unit kitting fee plus materials"
+    pricing: "Contact us for custom pricing"
   },
 ];
 

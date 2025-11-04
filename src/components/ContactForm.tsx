@@ -168,7 +168,7 @@ const ContactForm = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Get Your Free Quote</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Request onboarding and receive your custom pricing sheet
+            Tell us about your business and get your custom quote within 24 hours
           </p>
         </div>
 
@@ -366,7 +366,7 @@ const ContactForm = () => {
               disabled={isSubmitting}
               className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold text-lg py-6"
             >
-              {isSubmitting ? "Submitting..." : "Request Onboarding & Pricing Sheet"}
+              {isSubmitting ? "Submitting..." : "Get Custom Quote"}
             </Button>
           </form>
         </div>

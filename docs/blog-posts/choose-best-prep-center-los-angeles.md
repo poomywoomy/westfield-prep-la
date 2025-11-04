@@ -141,21 +141,8 @@ Use the comparison checklist in this guide (below).
 
 ### 5. Pricing & Transparency
 
-**Typical LA Prep Center Pricing:**
-- **Receiving:** $0.50-1.00 per unit
-- **FNSKU labeling:** $0.30-0.50 per unit
-- **Polybagging:** $0.20-0.40 per unit
-- **Bubble wrap:** $0.30-0.60 per unit
-- **Carton prep:** $2-5 per box
-- **Storage:** $10-20 per pallet/month
-- **Pick/pack (Shopify):** $2-5 per order
-
-**Hidden Fees to Watch For:**
-- 🚨 "Label fee" (printing labels)
-- 🚨 "Materials fee" (polyb bags, boxes)
-- 🚨 "Inspection fee" (separate from receiving)
-- 🚨 "ASN fee" (uploading shipping notices)
-- 🚨 "Minimum monthly fee" (even if you don't use service)
+**Pricing Structure:**
+Most prep centers offer per-unit pricing with volume discounts for larger accounts. Pricing varies based on services needed, monthly volume, and special requirements.
 
 **Questions to Ask:**
 - "What's your all-in cost per unit for basic FBA prep?"

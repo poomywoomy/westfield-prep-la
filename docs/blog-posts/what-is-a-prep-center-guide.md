@@ -211,7 +211,7 @@
 ## Common Prep Center Questions (150 words)
 
 ### How much does a prep center cost?
-Typically $1-5 per unit depending on services. Receiving, labeling, and basic prep usually $2-3 per unit.
+Prep center costs vary based on volume and services needed. Most prep centers charge per-unit fees for services like receiving, labeling, and packaging, with volume discounts available for larger accounts. Storage is typically charged by pallet or cubic footage on a monthly basis. The more you ship, the better your per-unit rates become. Contact prep centers directly for custom quotes based on your specific volume and service requirements.
 
 ### What's the turnaround time?
 Most prep centers offer 1-3 day turnaround. Premium services like Westfield offer same-day processing for orders received before 2 PM.

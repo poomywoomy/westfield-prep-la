@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
-import Pricing from "@/components/Pricing";
+import { Button } from "@/components/ui/button";
 import Compliance from "@/components/Compliance";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import Reviews from "@/components/Reviews";
@@ -73,10 +73,26 @@ const Index = () => {
         {/* Location-Specific Content Section */}
         <LocationShowcase />
         
-        <Services />
-        <Reviews />
-        <Pricing />
-        <Compliance />
+      <Services />
+      <Reviews />
+      
+      {/* Pricing CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Pricing Built for Your Business
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            From startups to enterprises, we create custom pricing that scales with you. 
+            Get your personalized quote today.
+          </p>
+          <Button size="lg" onClick={() => window.location.href = '/pricing'}>
+            Get Custom Quote
+          </Button>
+        </div>
+      </section>
+      
+      <Compliance />
         <Footer />
       </div>
     </>

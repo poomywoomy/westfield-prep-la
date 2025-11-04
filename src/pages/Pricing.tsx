@@ -1,8 +1,11 @@
-import { useEffect, useState, Fragment } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { Check, Zap, Clock, Shield, DollarSign } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -11,208 +14,271 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Info } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-
-const pricingData = [
-  { service: "Receiving", price: "$3/carton" },
-  { service: "Pallet Receiving", price: "$50/pallet" },
-  { service: "Direct to Consumer Fulfillment", price: "$2.50/shipment" },
-  { service: "FNSKU Label", price: "$0.70/unit" },
-  { service: "Polybag + Label", price: "$1.40/unit" },
-  { service: "Bubble Wrap", price: "+$0.50/unit" },
-  { service: "Bundling", price: "+$0.50/unit" },
-  { service: "Deposit", price: "$300" },
-];
-
-const additionalServices = [
-  "Storage",
-  "Special Prep",
-  "Additional Label",
-  "Shipment Box",
-];
 
 const Pricing = () => {
   const navigate = useNavigate();
-  const [selfFulfilledExpanded, setSelfFulfilledExpanded] = useState(false);
-  const [additionalServicesExpanded, setAdditionalServicesExpanded] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  const serviceInclusions = [
+    { service: "Receiving", description: "Per carton or pallet inspection and check-in" },
+    { service: "FBA Prep", description: "FNSKU labeling, polybagging, bubble wrap, bundling" },
+    { service: "DTC Fulfillment", description: "Pick, pack, and ship direct to your customers" },
+    { service: "Storage", description: "Secure, climate-controlled warehouse space" },
+    { service: "Returns Processing", description: "Inspection, restocking, and customer updates" },
+    { service: "Photo Documentation", description: "Quality control and proof of service" },
+    { service: "Inventory Tracking", description: "Real-time dashboard access to your stock" },
+    { service: "Multi-Channel Support", description: "Shopify, Amazon, TikTok Shop integration" },
+  ];
+
   return (
     <>
       <Helmet>
-        <title>3PL Pricing Los Angeles | Transparent Fulfillment Costs - Westfield</title>
-        <meta name="description" content="Clear, honest pricing for our Los Angeles 3PL services. No hidden fees. See our fulfillment, storage, and prep service costs." />
+        <title>Custom 3PL Pricing for Your Business | Westfield Prep Center</title>
+        <meta 
+          name="description" 
+          content="Get custom 3PL pricing for your business. Transparent, volume-based rates for fulfillment, prep, and storage in Los Angeles. Request your quote today." 
+        />
         <link rel="canonical" href="https://westfieldprepcenter.com/pricing/" />
       </Helmet>
 
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen bg-background">
         <Header />
-        <Breadcrumbs items={[{ label: "Pricing", path: "/pricing/" }]} />
 
-        <main className="flex-1">
-          <section className="py-24 mt-16 bg-gradient-to-br from-muted/30 via-background to-muted/50">
+        <main>
+          {/* Breadcrumbs */}
+          <section className="py-4 bg-muted/30">
             <div className="container mx-auto px-4">
+              <Breadcrumbs
+                items={[
+                  { label: "Home", path: "/" },
+                  { label: "Pricing", path: "/pricing" },
+                ]}
+              />
+            </div>
+          </section>
+
+          {/* Hero Section */}
+          <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
+            <div className="container mx-auto px-4 text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Custom Pricing Built for Your Business
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+                Every business is unique. Tell us your needs and we'll create a pricing model that scales with you. 
+                No hidden fees, no surprises—just transparent pricing tailored to your volume and services.
+              </p>
+            </div>
+          </section>
+
+          {/* How We Price Section */}
+          <section className="py-20 bg-background">
+            <div className="container mx-auto px-4 max-w-5xl">
               <div className="text-center mb-16">
-                <div className="inline-block px-6 py-2 bg-primary/10 rounded-full mb-4">
-                  <span className="text-primary font-semibold text-sm">💰 TRANSPARENT PRICING</span>
-                </div>
-                <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6 tracking-tight">
-                  Clear, Honest Pricing
-                </h1>
-                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                  No hidden fees. No surprise charges. Just straightforward rates that help you grow your business.
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">How We Determine Your Pricing</h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  We believe in transparent, fair pricing based on your actual needs
                 </p>
               </div>
 
-              <div className="max-w-5xl mx-auto">
-                <div className="bg-card border-2 border-primary/20 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow">
-                  <div className="bg-gradient-to-r from-primary via-primary/90 to-secondary p-6">
-                    <h2 className="text-2xl font-bold text-white text-center">Service Pricing</h2>
-                    <p className="text-white/90 text-center mt-2">Pay only for what you use</p>
-                  </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-muted/70 border-b-2 border-primary/10">
-                        <TableHead className="text-primary font-bold text-lg py-4">Service</TableHead>
-                        <TableHead className="text-primary font-bold text-lg text-right py-4">
-                          Price
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {pricingData.map((item, index) => {
-                        if (item.service === "Direct to Consumer Fulfillment") {
-                          return (
-                            <Fragment key={index}>
-                              <TableRow 
-                                className="hover:bg-muted/30 transition-colors cursor-pointer"
-                                onClick={() => setSelfFulfilledExpanded(!selfFulfilledExpanded)}
-                              >
-                                <TableCell className="font-medium text-foreground">
-                                  <div className="flex items-center gap-2">
-                                    <span>Direct to Consumer Fulfillment</span>
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Info className="h-4 w-4 text-muted-foreground" />
-                                        </TooltipTrigger>
-                                        <TooltipContent className="max-w-xs">
-                                          <p>For dropship orders or shipping direct to consumers</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
-                                    {selfFulfilledExpanded ? (
-                                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                                    ) : (
-                                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                                    )}
-                                  </div>
-                                </TableCell>
-                                <TableCell className="text-right text-foreground font-semibold">
-                                  $2.50/order
-                                </TableCell>
-                              </TableRow>
-                              {selfFulfilledExpanded && (
-                                <>
-                                  <TableRow key={`${index}-standard`} className="bg-muted/30">
-                                    <TableCell className="pl-8 text-sm font-medium text-foreground">
-                                      Standard
-                                    </TableCell>
-                                    <TableCell className="text-right text-sm font-medium text-foreground">
-                                      $2.50/order
-                                    </TableCell>
-                                  </TableRow>
-                                  <TableRow key={`${index}-oversized`} className="bg-muted/30">
-                                    <TableCell className="pl-8 text-sm font-medium text-foreground">
-                                      Oversized
-                                    </TableCell>
-                                    <TableCell className="text-right text-sm font-medium text-foreground">
-                                      $8.00/order
-                                    </TableCell>
-                                  </TableRow>
-                                </>
-                              )}
-                            </Fragment>
-                          );
-                        }
-                        
-                        return (
-                          <TableRow key={index} className="hover:bg-muted/40 transition-colors border-b border-border/50">
-                            <TableCell className="font-semibold text-foreground py-4">{item.service}</TableCell>
-                            <TableCell className="text-right text-foreground font-semibold py-4">{item.price}</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                      
-                      <Fragment>
-                        <TableRow 
-                          className="hover:bg-muted/40 transition-colors cursor-pointer border-t-2 border-primary/20"
-                          onClick={() => setAdditionalServicesExpanded(!additionalServicesExpanded)}
-                        >
-                          <TableCell className="font-semibold text-foreground py-4">
-                            <div className="flex items-center gap-2">
-                              <span>Additional Services Available</span>
-                              {additionalServicesExpanded ? (
-                                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right text-foreground font-semibold py-4">
-                            Contact for Pricing
-                          </TableCell>
-                        </TableRow>
-                        {additionalServicesExpanded && (
-                          <>
-                            {additionalServices.map((service, idx) => (
-                              <TableRow key={`additional-${idx}`} className="bg-muted/30">
-                                <TableCell className="pl-8 text-sm font-medium text-foreground">
-                                  {service}
-                                </TableCell>
-                                <TableCell className="text-right text-sm font-medium text-muted-foreground">
-                                  Contact Us
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </>
-                        )}
-                      </Fragment>
-                    </TableBody>
-                  </Table>
-                </div>
-
-                <div className="mt-10 text-center space-y-4">
-                  <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-6 max-w-2xl mx-auto">
-                    <p className="text-foreground font-semibold text-lg mb-2">
-                      🎉 Volume Discounts Available
-                    </p>
-                    <p className="text-muted-foreground mb-4">
-                      Contact us for custom quotes and special pricing for high-volume orders
-                    </p>
-                    <Button 
-                      size="lg"
-                      className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-                      onClick={() => navigate("/contact")}
-                    >
-                      Get Custom Quote
-                    </Button>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    * Prices subject to change. All rates shown are standard pricing.
+              <div className="grid md:grid-cols-2 gap-8 mb-12">
+                <div className="bg-card p-8 rounded-lg border">
+                  <DollarSign className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="text-xl font-semibold mb-3">Volume-Based Pricing</h3>
+                  <p className="text-muted-foreground">
+                    The more you ship, the better your rates. Our pricing scales with your business, 
+                    ensuring you always get competitive rates that improve as you grow.
                   </p>
                 </div>
+
+                <div className="bg-card p-8 rounded-lg border">
+                  <Shield className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="text-xl font-semibold mb-3">No Hidden Fees</h3>
+                  <p className="text-muted-foreground">
+                    What we quote is what you pay. No surprise charges, no hidden costs. 
+                    We provide detailed breakdowns so you know exactly where your money goes.
+                  </p>
+                </div>
+
+                <div className="bg-card p-8 rounded-lg border">
+                  <Zap className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="text-xl font-semibold mb-3">Custom Quotes Within 24 Hours</h3>
+                  <p className="text-muted-foreground">
+                    Fill out our form below and receive a detailed pricing breakdown within 24 hours. 
+                    Fast, accurate, and tailored specifically to your business needs.
+                  </p>
+                </div>
+
+                <div className="bg-card p-8 rounded-lg border">
+                  <Clock className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="text-xl font-semibold mb-3">Flexible & Scalable</h3>
+                  <p className="text-muted-foreground">
+                    Our pricing adapts to your business. Whether you're shipping 100 units or 10,000, 
+                    we have a solution that works for your current size and future growth.
+                  </p>
+                </div>
+              </div>
+
+              {/* What Affects Your Price */}
+              <div className="bg-muted/30 p-8 rounded-lg mb-12">
+                <h3 className="text-2xl font-bold mb-6 text-center">What Affects Your Price</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="flex gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <p className="font-semibold mb-1">Monthly Unit Volume</p>
+                      <p className="text-sm text-muted-foreground">
+                        Higher volumes unlock better per-unit rates and additional benefits
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <p className="font-semibold mb-1">Service Complexity</p>
+                      <p className="text-sm text-muted-foreground">
+                        Simple FBA prep costs less than custom kitting and branded packaging
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <p className="font-semibold mb-1">Storage Requirements</p>
+                      <p className="text-sm text-muted-foreground">
+                        Short-term vs. long-term storage, pallet count, and special handling needs
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <p className="font-semibold mb-1">Special Handling</p>
+                      <p className="text-sm text-muted-foreground">
+                        Custom branding, gift wrapping, expiration date tracking, and fragile items
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* What's Included Section */}
+          <section className="py-20 bg-muted/30">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">What We Offer</h2>
+                <p className="text-lg text-muted-foreground">
+                  Professional services included in your custom quote
+                </p>
+              </div>
+
+              <div className="bg-card rounded-lg border overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-1/3">Service</TableHead>
+                      <TableHead>Description</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {serviceInclusions.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{item.service}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {item.description}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <p className="text-center text-sm text-muted-foreground mt-6">
+                All services are customized based on your specific needs and volume. Contact us for detailed pricing.
+              </p>
+            </div>
+          </section>
+
+          {/* Why Choose Us Section */}
+          <section className="py-20 bg-background">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
+                Why Our Clients Choose Us
+              </h2>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">24-Hour Turnaround Guaranteed</h3>
+                    <p className="text-muted-foreground">
+                      Orders received before 2 PM PST ship the same day. Fast processing means happy customers 
+                      and better reviews for your business.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">Dedicated Account Management</h3>
+                    <p className="text-muted-foreground">
+                      Direct access to your account manager via phone and email. No ticket systems, 
+                      no automated responses—just real support when you need it.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <DollarSign className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">Los Angeles Port Proximity</h3>
+                    <p className="text-muted-foreground">
+                      Located minutes from LA/Long Beach ports. Faster inbound receiving, lower drayage costs, 
+                      and quicker time to market for imported goods.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">Flexible & Scalable Solutions</h3>
+                    <p className="text-muted-foreground">
+                      We adapt to your business, not the other way around. Custom workflows, 
+                      special handling, and solutions that grow with your success.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Contact Form Section */}
+          <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
+            <div className="container mx-auto px-4 max-w-4xl">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Tell us about your business and receive a detailed pricing breakdown within 24 hours. 
+                  No pressure, no commitment—just honest answers to help you make the right decision.
+                </p>
+              </div>
+
+              <div className="bg-card p-8 rounded-lg border">
+                <ContactForm />
               </div>
             </div>
           </section>

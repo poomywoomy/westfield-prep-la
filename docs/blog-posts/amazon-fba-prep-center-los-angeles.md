@@ -85,15 +85,8 @@ Preparing products to meet Amazon's strict fulfillment requirements before sendi
 
 ### 5. Transparent Pricing
 - **Ask:** "What's your pricing structure? Are there hidden fees?"
-- **Look for:** Clear per-unit pricing with detailed breakdown
-- **Typical LA prep center pricing:**
-  - Receiving: $0.50-1.00 per unit
-  - FNSKU labeling: $0.30-0.50 per unit
-  - Polybagging: $0.20-0.40 per unit
-  - Bubble wrap: $0.30-0.60 per unit
-  - Carton prep: $2-5 per box
-  - Storage: $10-20 per pallet/month
-- **Red flag:** "Pricing depends" or hidden fees
+- **Look for:** Clear per-unit pricing with detailed breakdown and volume-based pricing options
+- **Red flag:** "Pricing depends" or hidden fees revealed later
 
 ### 6. Communication & Support
 - **Ask:** "How quickly do you respond to questions?"
@@ -185,24 +178,8 @@ Can't explain FNSKU labeling, polybagging, or carton prep requirements.
 
 ## Pricing Comparison (LA vs. Other Regions) (100 words)
 
-### Los Angeles FBA Prep Center Pricing
-- Receiving: $0.50-1.00/unit
-- FNSKU labeling: $0.30-0.50/unit
-- Polybagging: $0.20-0.40/unit
-- Bubble wrap: $0.30-0.60/unit
-- Carton prep: $2-5/box
-- Storage: $10-20/pallet/month
-
-### Midwest FBA Prep Center Pricing
-- Receiving: $0.40-0.80/unit
-- FNSKU labeling: $0.25-0.40/unit
-- Polybagging: $0.20-0.40/unit
-- Storage: $8-15/pallet/month
-
-**LA costs slightly higher but offset by:**
-- Faster port receiving (saves 5-8 days)
-- Lower drayage fees (saves $200-500 per container)
-- West Coast shipping advantages
+### Amazon FBA Prep Center Pricing
+Pricing varies by prep center based on services, volume, and location. LA prep centers may have slightly higher labor costs but offer significant advantages through port proximity, which can save you days in processing time and hundreds of dollars in freight per container. Most prep centers offer volume discounts for larger accounts and custom pricing based on your specific needs. Contact prep centers directly for custom quotes based on your monthly volume and required services.
 
 ## Common LA FBA Prep Center Mistakes to Avoid (100 words)
 

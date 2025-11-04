@@ -67,7 +67,7 @@
 
 ### Lower Overhead
 - No need to lease California warehouse space
-- Pay per-unit pricing
+- Pay per-unit pricing based on your volume
 - Scale up or down based on volume
 
 ### Competitive Shipping Rates
@@ -85,13 +85,7 @@
 - **Reduce damaged goods:** Professional handling reduces losses
 - **Faster inventory turnover:** Get products to market quicker
 
-### Pricing Comparison
-| Service | DIY Cost | LA Prep Center |
-|---------|----------|----------------|
-| Warehouse space | $2,000+/mo | $0 (included) |
-| Labor | $15-20/hr | Per-unit fee |
-| Shipping supplies | Variable | Included |
-| Total | $3,000+/mo | Pay only for what you use |
+Most LA prep centers offer transparent, volume-based pricing. Contact providers directly for custom quotes based on your specific needs and monthly volume.
 
 ## Benefit #4: Local Support & Communication (200 words)
 

@@ -526,7 +526,7 @@ export const IntakeForm = () => {
                 required
               />
               <Label htmlFor="agreedToDeposit" className="cursor-pointer text-sm">
-                I understand that a $500 deposit is required to set up an account *
+                I understand that deposit requirements will be discussed during onboarding based on my account size *
               </Label>
             </div>
           </div>

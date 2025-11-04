@@ -108,26 +108,16 @@ You're probably thinking: "This all sounds great, but what about the bottom line
 
 Here's a typical monthly cost breakdown for a medium-sized Shopify store (let's say you're doing 500 orders per month):
 
-**LA 3PL Pricing (Average):**
-- **Storage**: $40-80 per pallet per month
-- **Receiving**: $0.50-1.00 per unit
-- **Pick & Pack**: $2.50-4.00 per order
-- **Shipping**: Variable (but discounted 30-50% off retail rates)
-- **Returns Processing**: $2.00-3.50 per return
+**LA 3PL Pricing:**
+Most LA-based 3PLs offer competitive, volume-based pricing with transparent fee structures. Services typically include storage (by pallet or cubic footage), order fulfillment (pick & pack fees), and shipping at discounted carrier rates. Many providers offer custom quotes based on your specific volume and needs, with volume discounts for larger accounts.
 
-**Key Takeaway**: With an LA 3PL, you're looking at around **$3,000-3,500/month** for a 500-order store. Compare that to doing it yourself (easily $8,000-10,000/month when you factor in rent, labor, insurance, and your time), and the value becomes crystal clear.
+**Key Takeaway**: With an LA 3PL, you get professional fulfillment services at a fraction of the cost of managing it yourself (warehouse rent, labor, insurance, and your time). Most businesses see significant cost savings compared to DIY fulfillment, especially when factoring in the time freed up to focus on growth.
 
 But it's not just about the monthly fees. It's about scalability. During peak seasons like Black Friday or holiday shopping, your order volume might triple or quadruple. A 3PL can handle that surge without you needing to hire temporary staff, rent additional space, or stress about logistics.
 
 ### Warehouse Costs in LA
 
-Let's talk about warehouse costs specifically. Warehouse space in LA is competitively priced, especially when you factor in the logistics advantages. According to recent commercial real estate data:
-
-- **Inland Empire (Riverside/San Bernardino)**: $0.75-1.20 per sq ft/month
-- **LA County (South Bay, Carson area)**: $1.00-1.50 per sq ft/month
-- **Orange County**: $1.20-1.80 per sq ft/month
-
-**Important Note**: These are wholesale rates for renting entire warehouses. When you work with a 3PL, you're essentially sharing warehouse space, which means you get the benefits of premium LA locations at a fraction of the cost, typically $40-100 per pallet per month, depending on the services included.
+Let's talk about warehouse costs specifically. Warehouse space in LA is competitively priced, especially when you factor in the logistics advantages. When you work with a 3PL, you're essentially sharing warehouse space, which means you get the benefits of premium LA locations at a fraction of the cost of leasing your own facility.
 
 ### Freight and Inventory Management
 
@@ -197,18 +187,11 @@ Let's look at a practical comparison. Imagine you're running a Shopify store sel
 
 ### Annual Cost Comparison: Managing Your Own Fulfillment vs. Using an LA 3PL
 
-The table below shows real cost comparisons at different order volumes, comparing DIY fulfillment (managing it yourself with part-time help) versus outsourcing to a Los Angeles-based 3PL:
+Managing your own fulfillment typically includes warehouse rent, part-time labor, packing materials, shipping software, utilities, insurance, and your time. Using an LA 3PL consolidates these costs into volume-based pricing that includes storage, order fulfillment, receiving, handling, and returns processing.
 
-| Monthly Order Volume | Managing It Yourself (Annual) | Using LA 3PL (Annual) | Your Annual Savings |
-|----------------------|-------------------------------|----------------------|---------------------|
-| 250 orders/month | $73,000-105,000 | $19,000-32,000 | $54,000-73,000 |
-| 500 orders/month | $98,000-140,000 | $38,000-64,000 | $60,000-76,000 |
-| 1,000 orders/month | $135,000-195,000 | $76,000-128,000 | $59,000-67,000 |
-| 2,500 orders/month | $195,000-285,000 | $190,000-320,000 | Save time, not money* |
+For most growing Shopify stores, an LA 3PL provides significant cost savings (often $50,000-75,000 annually for mid-volume sellers) while freeing up 15-20+ hours per week to focus on marketing, product development, and customer service. At higher volumes, costs approach parity with DIY, but the time savings and professional infrastructure become even more valuable.
 
-*At higher volumes, 3PL costs approach DIY costs, but you save 15-20+ hours per week managing operations. Time better spent growing your business.
-
-**The Bottom Line**: For most growing Shopify stores, an LA 3PL saves $50,000-75,000 annually while freeing up your time to focus on marketing, product development, and customer service.
+Contact LA 3PL providers directly for custom quotes based on your specific monthly order volume and service needs.
 
 ---
 
