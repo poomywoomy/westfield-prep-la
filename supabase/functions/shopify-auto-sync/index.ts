@@ -30,28 +30,53 @@ const isRetryableError = (error: any): boolean => {
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+function parseLinkHeader(header: string | null): string | null {
+  if (!header) return null;
+  const nextMatch = header.match(/<([^>]+)>;\s*rel="next"/);
+  return nextMatch ? nextMatch[1] : null;
+}
+
 async function fetchShopifyProductsWithRetry(
   shopDomain: string,
   accessToken: string,
   attempt = 1
-): Promise<any> {
+): Promise<any[]> {
   try {
-    const response = await fetch(
-      `https://${shopDomain}/admin/api/2024-01/products.json?limit=250`,
-      {
+    const allProducts = [];
+    let nextPageUrl = `https://${shopDomain}/admin/api/2024-01/products.json?limit=250`;
+    let pageCount = 0;
+    
+    while (nextPageUrl) {
+      pageCount++;
+      console.log(`Fetching products page ${pageCount} (attempt ${attempt})...`);
+      
+      const response = await fetch(nextPageUrl, {
         headers: {
           'X-Shopify-Access-Token': accessToken,
           'Content-Type': 'application/json',
         },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw { status: response.status, message: errorText };
       }
-    );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw { status: response.status, message: errorText };
+      const data = await response.json();
+      allProducts.push(...data.products);
+      
+      // Get next page from Link header
+      const linkHeader = response.headers.get('Link');
+      nextPageUrl = parseLinkHeader(linkHeader);
+      
+      // Add delay to respect rate limits
+      if (nextPageUrl) {
+        await sleep(500);
+      }
     }
-
-    return await response.json();
+    
+    console.log(`Fetched ${allProducts.length} total products from ${pageCount} pages`);
+    return allProducts;
   } catch (error) {
     console.error(`Shopify API error (attempt ${attempt}):`, error);
     
@@ -125,26 +150,28 @@ Deno.serve(async (req) => {
         }
 
         // Fetch products from Shopify with retry logic
-        const { products } = await fetchShopifyProductsWithRetry(
+        const products = await fetchShopifyProductsWithRetry(
           store.shop_domain,
           store.access_token
         );
 
-        // Process and upsert products
+        // Process and upsert products to skus table
         const productData = products.flatMap((product: any) =>
           product.variants.map((variant: any) => ({
             client_id: config.client_id,
-            sku: variant.sku || `${product.id}-${variant.id}`,
-            product_name: variant.title !== 'Default Title' 
+            client_sku: variant.sku || `SHOP-${product.id}-${variant.id}`,
+            title: variant.title !== 'Default Title' 
               ? `${product.title} - ${variant.title}`
               : product.title,
-            default_unit_price: parseFloat(variant.price) || 0,
+            unit_cost: parseFloat(variant.price) || 0,
+            notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}`,
+            status: 'active',
           }))
         );
 
         const { error: upsertError } = await supabase
-          .from('client_skus')
-          .upsert(productData, { onConflict: 'client_id,sku' });
+          .from('skus')
+          .upsert(productData, { onConflict: 'client_id,client_sku' });
 
         if (upsertError) {
           throw upsertError;

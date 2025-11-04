@@ -332,6 +332,11 @@ export default function ClientShopifyTab() {
                 </>
               )}
             </Button>
+            {syncing && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Syncing all products... This may take a few minutes for large catalogs.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>

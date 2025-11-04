@@ -161,28 +161,30 @@ async function handleProductWebhook(
   console.log(`Handling ${topic} for product ${product.id}`);
 
   if (topic === 'products/delete') {
-    // Delete all variants of this product
+    // Delete all variants of this product from skus table
     await supabase
-      .from('client_skus')
+      .from('skus')
       .delete()
       .eq('client_id', clientId)
-      .like('sku', `${product.id}-%`);
+      .like('client_sku', `SHOP-${product.id}-%`);
     return;
   }
 
-  // Upsert product variants
+  // Upsert product variants to skus table
   const productData = product.variants.map((variant: any) => ({
     client_id: clientId,
-    sku: variant.sku || `${product.id}-${variant.id}`,
-    product_name: variant.title !== 'Default Title' 
+    client_sku: variant.sku || `SHOP-${product.id}-${variant.id}`,
+    title: variant.title !== 'Default Title' 
       ? `${product.title} - ${variant.title}`
       : product.title,
-    default_unit_price: parseFloat(variant.price) || 0,
+    unit_cost: parseFloat(variant.price) || 0,
+    notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}`,
+    status: 'active',
   }));
 
   await supabase
-    .from('client_skus')
-    .upsert(productData, { onConflict: 'client_id,sku' });
+    .from('skus')
+    .upsert(productData, { onConflict: 'client_id,client_sku' });
 }
 
 async function handleInventoryWebhook(

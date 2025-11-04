@@ -53,25 +53,44 @@ Deno.serve(async (req) => {
       throw new Error('Store not found or inactive');
     }
 
-    // Fetch orders from Shopify (last 250)
-    const shopifyResponse = await fetch(
-      `https://${store.shop_domain}/admin/api/2024-01/orders.json?limit=250&status=any`,
-      {
+    // Fetch all orders with pagination
+    const allOrders = [];
+    let nextPageUrl = `https://${store.shop_domain}/admin/api/2024-01/orders.json?limit=250&status=any`;
+    let pageCount = 0;
+    
+    while (nextPageUrl) {
+      pageCount++;
+      console.log(`Fetching orders page ${pageCount}...`);
+      
+      const shopifyResponse = await fetch(nextPageUrl, {
         headers: {
           'X-Shopify-Access-Token': store.access_token,
           'Content-Type': 'application/json',
         },
+      });
+
+      if (!shopifyResponse.ok) {
+        throw new Error(`Shopify API error: ${shopifyResponse.statusText}`);
       }
-    );
 
-    if (!shopifyResponse.ok) {
-      throw new Error(`Shopify API error: ${shopifyResponse.statusText}`);
+      const { orders } = await shopifyResponse.json();
+      allOrders.push(...orders);
+      
+      // Get next page from Link header
+      const linkHeader = shopifyResponse.headers.get('Link');
+      const nextMatch = linkHeader?.match(/<([^>]+)>;\s*rel="next"/);
+      nextPageUrl = nextMatch ? nextMatch[1] : null;
+      
+      // Add delay to respect rate limits
+      if (nextPageUrl) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
-
-    const { orders } = await shopifyResponse.json();
+    
+    console.log(`Fetched ${allOrders.length} total orders from ${pageCount} pages`);
 
     // Process and upsert orders
-    const ordersData = orders.map((order: any) => ({
+    const ordersData = allOrders.map((order: any) => ({
       client_id,
       shopify_order_id: order.id.toString(),
       order_number: order.name,
@@ -106,10 +125,19 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Order sync error:', error);
+    
+    let errorMessage = 'Unable to sync orders from Shopify. Please try again or contact support.';
+    
+    if (error.message?.includes('authentication') || error.message?.includes('401')) {
+      errorMessage = 'Shopify authentication failed. Please reconnect your store.';
+    } else if (error.message?.includes('429')) {
+      errorMessage = 'Shopify API rate limit reached. Please try again in a few minutes.';
+    } else if (error.message?.includes('402')) {
+      errorMessage = 'Shopify store is frozen or suspended.';
+    }
+    
     return new Response(
-      JSON.stringify({ 
-        error: 'Unable to sync orders from Shopify. Please try again or contact support.' 
-      }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
