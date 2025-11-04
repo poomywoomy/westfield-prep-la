@@ -246,11 +246,8 @@ const ContactForm = () => {
                     <SelectValue placeholder="Select monthly units" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border border-border z-50">
-                    <SelectItem value="0-100">0 - 100</SelectItem>
-                    <SelectItem value="101-500">101 - 500</SelectItem>
-                    <SelectItem value="501-1000">501 - 1,000</SelectItem>
-                    <SelectItem value="1001-3000">1,001 - 3,000</SelectItem>
-                    <SelectItem value="3001-5000">3,001 - 5,000</SelectItem>
+                    <SelectItem value="0-1000">0 - 1,000</SelectItem>
+                    <SelectItem value="1001-5000">1,001 - 5,000</SelectItem>
                     <SelectItem value="5001-10000">5,001 - 10,000</SelectItem>
                     <SelectItem value="10000+">10,000+</SelectItem>
                   </SelectContent>
