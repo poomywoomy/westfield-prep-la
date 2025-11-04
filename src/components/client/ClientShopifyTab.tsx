@@ -150,12 +150,12 @@ export default function ClientShopifyTab() {
         description: "Please complete the authorization in the new page.",
       });
 
-      // Force top-level navigation to break out of any iframe/sandbox
-      // This ensures Shopify can verify the request origin
-      if (window.top && window.top !== window) {
-        window.top.location.replace(authUrl);
-      } else {
-        window.location.replace(authUrl);
+      // Open OAuth URL in new window to bypass iframe/security restrictions
+      const oauthWindow = window.open(authUrl, '_blank', 'noopener,noreferrer');
+      
+      if (!oauthWindow || oauthWindow.closed || typeof oauthWindow.closed === 'undefined') {
+        // Popup blocked, fallback to same-window navigation
+        window.location.href = authUrl;
       }
     } catch (error) {
       console.error('OAuth error:', error);
