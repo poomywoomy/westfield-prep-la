@@ -35,6 +35,19 @@ const ClientDashboard = () => {
     }
   }, [user]);
 
+  // Detect Shopify OAuth success callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('shopify_connected') === 'true') {
+      toast({
+        title: "Success!",
+        description: "Your Shopify store has been connected.",
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', '/client/dashboard');
+    }
+  }, [toast]);
+
   const fetchClientName = async () => {
     try {
       const { data, error } = await supabase

@@ -121,38 +121,8 @@ export default function ClientShopifyTab() {
         throw new Error('Failed to get OAuth URL');
       }
 
-      // Open OAuth URL in popup
-      const width = 600;
-      const height = 700;
-      const left = window.screen.width / 2 - width / 2;
-      const top = window.screen.height / 2 - height / 2;
-
-      const popup = window.open(
-        data.authUrl,
-        'Shopify OAuth',
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
-
-      if (!popup) {
-        toast({
-          title: "Popup blocked",
-          description: "Please allow popups for this site and try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Poll for popup close
-      const pollTimer = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(pollTimer);
-          fetchStoreData();
-          toast({
-            title: "Connection successful",
-            description: "Your Shopify store has been connected.",
-          });
-        }
-      }, 500);
+      // Redirect to Shopify OAuth page (full-page redirect instead of popup)
+      window.location.href = data.authUrl;
     } catch (error) {
       console.error('OAuth error:', error);
       toast({
