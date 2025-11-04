@@ -69,9 +69,46 @@ export const BlogEditorTab = () => {
     }
   };
   
+  const checkForPricingContent = (text: string): { hasPricing: boolean; message?: string } => {
+    const pricingPattern = /\$\s?\d+(?:[.,]\d{3})*(?:\.\d{1,2})?\s*(?:[-–]\s*\$?\d+(?:[.,]\d{3})*(?:\.\d{1,2})?)?\s*(?:\/\s*(unit|order|carton|pallet|month|item|box|piece))/i;
+    const westfieldKeywords = /(westfield|our rate|our pricing|we charge)/i;
+    const serviceKeywords = /(receiving|fnsku|storage|prep|labeling|polybag|bundling|kitting)/i;
+    
+    const lines = text.split('\n');
+    for (const line of lines) {
+      if (pricingPattern.test(line)) {
+        const lowerLine = line.toLowerCase();
+        if (westfieldKeywords.test(lowerLine) && serviceKeywords.test(lowerLine)) {
+          return {
+            hasPricing: true,
+            message: "Posts must not include Westfield pricing. Please replace with 'Contact us for a custom quote' or link to /pricing."
+          };
+        }
+      }
+    }
+    
+    if (pricingPattern.test(text) && serviceKeywords.test(text)) {
+      const contextCheck = text.toLowerCase();
+      if (westfieldKeywords.test(contextCheck)) {
+        return {
+          hasPricing: true,
+          message: "Posts must not include Westfield pricing. Please replace with 'Contact us for a custom quote' or link to /pricing."
+        };
+      }
+    }
+    
+    return { hasPricing: false };
+  };
+
   const handlePublish = async () => {
     if (!title || !content) {
       toast.error('Title and content are required');
+      return;
+    }
+
+    const pricingCheck = checkForPricingContent(content);
+    if (pricingCheck.hasPricing) {
+      toast.error(pricingCheck.message || 'Content contains Westfield pricing');
       return;
     }
 
