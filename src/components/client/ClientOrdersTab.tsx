@@ -44,7 +44,7 @@ export default function ClientOrdersTab() {
         .from('shopify_orders' as any)
         .select('*')
         .eq('client_id', client.id)
-        .order('shopify_created_at', { ascending: false })
+        .order('created_at_shopify', { ascending: false })
         .limit(50);
 
       if (error) throw error;
