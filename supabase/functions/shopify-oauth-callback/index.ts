@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
 
     const { data: stateRecord, error: stateError } = await supabase
       .from('oauth_states')
-      .select('user_id, expires_at')
+      .select('user_id, expires_at, frontend_origin')
       .eq('state', state)
       .single();
 
@@ -116,8 +116,9 @@ Deno.serve(async (req) => {
 
     console.log('Shopify store connected successfully!');
 
-    // Redirect back to client dashboard
-    const redirectUrl = `${url.origin}/client-dashboard?shopify_connected=true`;
+    // Redirect back to client dashboard using stored frontend origin
+    const frontendOrigin = stateRecord.frontend_origin || url.origin;
+    const redirectUrl = `${frontendOrigin}/client-dashboard?shopify_connected=true`;
     
     return new Response(null, {
       status: 302,
@@ -131,7 +132,9 @@ Deno.serve(async (req) => {
     
     // Redirect to error page with generic message
     const url = new URL(req.url);
-    const errorUrl = `${url.origin}/client-dashboard?shopify_error=${encodeURIComponent('Failed to connect Shopify store. Please try again.')}`;
+    const referer = req.headers.get('Referer') || '';
+    const frontendOrigin = referer ? new URL(referer).origin : url.origin;
+    const errorUrl = `${frontendOrigin}/client-dashboard?shopify_error=${encodeURIComponent('Failed to connect Shopify store. Please try again.')}`;
     
     return new Response(null, {
       status: 302,

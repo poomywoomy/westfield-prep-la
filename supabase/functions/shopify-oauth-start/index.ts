@@ -23,6 +23,12 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Capture frontend origin for redirect after OAuth
+    const frontendOrigin = req.headers.get('Referer') || req.headers.get('Origin') || '';
+    const origin = frontendOrigin ? new URL(frontendOrigin).origin : '';
+    
+    console.log('Captured frontend origin:', origin);
+
     // Get authenticated user for state validation
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -66,7 +72,8 @@ Deno.serve(async (req) => {
       .insert({
         state,
         user_id: user.id,
-        expires_at: expiresAt.toISOString()
+        expires_at: expiresAt.toISOString(),
+        frontend_origin: origin
       });
     
     if (stateError) {
