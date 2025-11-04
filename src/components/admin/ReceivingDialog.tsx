@@ -234,9 +234,14 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      // Generate signed URL for private bucket (7 day expiry for review period)
+      const { data: signedData, error: signedError } = await supabase.storage
         .from('asn-attachments')
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 604800); // 7 days
+
+      if (signedError) throw signedError;
+      
+      const signedUrl = signedData.signedUrl;
 
       await supabase
         .from('attachments')
@@ -244,7 +249,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
           owner_type: 'asn_line',
           owner_id: currentLine.line_id,
           filename: file.name,
-          file_url: publicUrl,
+          file_url: signedUrl,
           mime_type: file.type,
           file_size: file.size
         });

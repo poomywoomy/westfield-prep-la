@@ -30,11 +30,14 @@ export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPho
 
     if (error) throw error;
 
-    const { data: { publicUrl } } = supabase.storage
+    // Generate signed URL for private bucket (48 hour expiry for inspection period)
+    const { data: signedData, error: signedError } = await supabase.storage
       .from('qc-images')
-      .getPublicUrl(filePath);
+      .createSignedUrl(filePath, 172800); // 48 hours
 
-    return publicUrl;
+    if (signedError) throw signedError;
+
+    return signedData.signedUrl;
   };
 
   const handleFiles = useCallback(async (files: FileList | null) => {

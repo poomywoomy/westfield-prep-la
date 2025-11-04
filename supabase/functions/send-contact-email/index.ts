@@ -77,10 +77,10 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data;
     
-    // Rate limiting check (5 submissions per hour per email)
+    // Rate limiting check (5 submissions per hour per IP)
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
-    const rateLimitKey = `contact_form:${email}:${clientIp}`;
+    const rateLimitKey = `contact_form:${clientIp}`;
     const windowStart = new Date(Date.now() - 3600000); // 1 hour ago
     
     const { data: existingAttempts } = await supabase
@@ -91,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
       .maybeSingle();
     
     if (existingAttempts && existingAttempts.request_count >= 5) {
-      console.warn(`Rate limit exceeded for ${email}`);
+      console.warn(`Rate limit exceeded for IP: ${clientIp}`);
       return new Response(
         JSON.stringify({ 
           error: "Too many requests. Please try again later."
