@@ -106,8 +106,26 @@ export default function ClientShopifyTab() {
   };
 
   const handleConnect = async () => {
-    const shopDomain = prompt('Enter your Shopify store domain (e.g., mystore.myshopify.com):');
+    let shopDomain = prompt('Enter your Shopify store domain (e.g., mystore or mystore.myshopify.com):');
     if (!shopDomain) return;
+
+    // Normalize shop domain
+    shopDomain = shopDomain.trim().toLowerCase();
+    
+    // Auto-append .myshopify.com if only subdomain is provided
+    if (!shopDomain.includes('.')) {
+      shopDomain = `${shopDomain}.myshopify.com`;
+    }
+
+    // Validate shop domain format
+    if (!/^[a-z0-9-]+\.myshopify\.com$/i.test(shopDomain)) {
+      toast({
+        title: "Invalid shop domain",
+        description: "Please enter a valid Shopify store domain (e.g., mystore.myshopify.com)",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       // Call edge function to get OAuth URL
@@ -121,8 +139,24 @@ export default function ClientShopifyTab() {
         throw new Error('Failed to get OAuth URL');
       }
 
-      // Redirect to Shopify OAuth page (full-page redirect instead of popup)
-      window.location.href = data.authUrl;
+      const authUrl = data.authUrl as string;
+      
+      // Log for debugging (non-production only)
+      console.log('Redirecting to Shopify OAuth:', authUrl);
+
+      // Show redirecting toast
+      toast({
+        title: "Redirecting to Shopify...",
+        description: "Please complete the authorization in the new page.",
+      });
+
+      // Force top-level navigation to break out of any iframe/sandbox
+      // This ensures Shopify can verify the request origin
+      if (window.top && window.top !== window) {
+        window.top.location.replace(authUrl);
+      } else {
+        window.location.replace(authUrl);
+      }
     } catch (error) {
       console.error('OAuth error:', error);
       toast({
