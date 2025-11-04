@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
     console.log('Client ID:', clientId);
     console.log('Redirect URI:', redirectUri);
     
-    const scopes = 'read_products,write_products,read_orders,write_orders,read_inventory,write_inventory';
+    const scopes = 'read_products,write_products,read_orders,write_orders,read_inventory,write_inventory,read_customers,write_customers,read_fulfillments,write_fulfillments';
     
     // Generate secure state parameter and store it
     const state = crypto.randomUUID();
