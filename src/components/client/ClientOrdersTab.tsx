@@ -172,14 +172,13 @@ export default function ClientOrdersTab() {
                     const lineItems = order.line_items || [];
                     
                     return (
-                      <>
-                        <TableRow key={order.id}>
+                      <Collapsible key={order.id} open={isExpanded} onOpenChange={(open) => setExpandedOrder(open ? order.id : null)}>
+                        <TableRow>
                           <TableCell>
                             <CollapsibleTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
                               >
                                 {isExpanded ? (
                                   <ChevronUp className="h-4 w-4" />
@@ -224,7 +223,7 @@ export default function ClientOrdersTab() {
                             )}
                           </TableCell>
                         </TableRow>
-                        {isExpanded && (
+                        <CollapsibleContent asChild>
                           <TableRow>
                             <TableCell colSpan={8} className="bg-muted/50">
                               <div className="p-4 space-y-4">
@@ -262,8 +261,8 @@ export default function ClientOrdersTab() {
                               </div>
                             </TableCell>
                           </TableRow>
-                        )}
-                      </>
+                        </CollapsibleContent>
+                      </Collapsible>
                     );
                   })
                 )}
