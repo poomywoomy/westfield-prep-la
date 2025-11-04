@@ -760,6 +760,33 @@ export type Database = {
         }
         Relationships: []
       }
+      compliance_webhooks: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          processed: boolean
+          shop_domain: string
+          webhook_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload: Json
+          processed?: boolean
+          shop_domain: string
+          webhook_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          processed?: boolean
+          shop_domain?: string
+          webhook_type?: string
+        }
+        Relationships: []
+      }
       credits: {
         Row: {
           amount_cents: number

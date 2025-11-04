@@ -104,6 +104,9 @@ Deno.serve(async (req) => {
         await handleInventoryWebhook(supabase, store.client_id, payload);
       } else if (topic.startsWith('orders/')) {
         await handleOrderWebhook(supabase, store.client_id, topic, payload);
+      } else if (topic.startsWith('customers/') || topic.startsWith('shop/')) {
+        // Handle mandatory compliance webhooks
+        await handleComplianceWebhook(supabase, shopDomain, topic, payload);
       }
 
       // Update log as successful
@@ -231,4 +234,37 @@ async function handleOrderWebhook(
   await supabase
     .from('shopify_orders')
     .upsert(orderData, { onConflict: 'client_id,shopify_order_id' });
+}
+
+async function handleComplianceWebhook(
+  supabase: any,
+  shopDomain: string,
+  topic: string,
+  payload: any
+) {
+  console.log(`Handling compliance webhook: ${topic} for ${shopDomain}`);
+
+  // Map topic to webhook_type
+  let webhookType: string;
+  if (topic === 'customers/data_request') {
+    webhookType = 'data_request';
+  } else if (topic === 'customers/redact') {
+    webhookType = 'customer_redact';
+  } else if (topic === 'shop/redact') {
+    webhookType = 'shop_redact';
+  } else {
+    throw new Error(`Unknown compliance webhook topic: ${topic}`);
+  }
+
+  // Log the compliance webhook for admin review
+  await supabase
+    .from('compliance_webhooks')
+    .insert({
+      webhook_type: webhookType,
+      shop_domain: shopDomain,
+      payload,
+      processed: false,
+    });
+
+  console.log(`Compliance webhook logged: ${webhookType} for ${shopDomain}`);
 }

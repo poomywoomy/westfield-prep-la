@@ -116,6 +116,55 @@ Deno.serve(async (req) => {
 
     console.log('Shopify store connected successfully!');
 
+    // Register mandatory compliance webhooks
+    const webhookUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/shopify-webhook-handler`;
+    const mandatoryTopics = [
+      'customers/data_request',
+      'customers/redact',
+      'shop/redact'
+    ];
+
+    for (const topic of mandatoryTopics) {
+      try {
+        const webhookResponse = await fetch(
+          `https://${shop}/admin/api/${apiVersion}/webhooks.json`,
+          {
+            method: 'POST',
+            headers: {
+              'X-Shopify-Access-Token': access_token,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              webhook: {
+                topic,
+                address: webhookUrl,
+                format: 'json',
+              },
+            }),
+          }
+        );
+
+        if (webhookResponse.ok) {
+          const webhookData = await webhookResponse.json();
+          console.log(`Registered mandatory webhook: ${topic}`);
+          
+          // Store webhook registration
+          await supabase.from('shopify_webhooks').insert({
+            client_id: client.id,
+            webhook_id: webhookData.webhook.id.toString(),
+            topic,
+            address: webhookUrl,
+            is_active: true,
+          });
+        } else {
+          console.error(`Failed to register webhook ${topic}:`, await webhookResponse.text());
+        }
+      } catch (error) {
+        console.error(`Error registering webhook ${topic}:`, error);
+        // Continue with other webhooks even if one fails
+      }
+    }
+
     // Redirect back to client dashboard using stored frontend origin
     const frontendOrigin = stateRecord.frontend_origin || url.origin;
     const redirectUrl = `${frontendOrigin}/client-dashboard?shopify_connected=true`;
