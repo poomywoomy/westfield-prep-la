@@ -259,6 +259,19 @@ const ClientSettings = () => {
                     placeholder="Enter phone number"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="lowStockThreshold">Default Low Stock Threshold</Label>
+                  <Input 
+                    id="lowStockThreshold"
+                    type="number"
+                    min="0"
+                    defaultValue="10"
+                    placeholder="10"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Alert when inventory falls below this level
+                  </p>
+                </div>
                 <Button type="submit" disabled={isSavingProfile}>
                   {isSavingProfile ? "Saving..." : "Save Changes"}
                 </Button>

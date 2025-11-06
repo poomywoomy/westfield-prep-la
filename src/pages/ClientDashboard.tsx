@@ -15,6 +15,7 @@ import ClientProductsTab from "@/components/client/ClientProductsTab";
 import ClientOrdersTab from "@/components/client/ClientOrdersTab";
 import ClientShopifyTab from "@/components/client/ClientShopifyTab";
 import { ClientInventoryActivityLog } from "@/components/client/ClientInventoryActivityLog";
+import { ClientAnalyticsDashboard } from "@/components/client/ClientAnalyticsDashboard";
 import { sanitizeError } from "@/lib/errorHandler";
 import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
 import type { Database } from "@/integrations/supabase/types";
@@ -320,6 +321,10 @@ const ClientDashboard = () => {
 
           <TabsContent value="orders">
             <ClientOrdersTab />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <ClientAnalyticsDashboard clientId={clientId} />
           </TabsContent>
 
           <TabsContent value="activity">

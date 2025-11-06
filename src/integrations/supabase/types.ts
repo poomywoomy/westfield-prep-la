@@ -666,6 +666,7 @@ export type Database = {
           company_name: string
           contact_name: string
           created_at: string
+          default_low_stock_threshold: number | null
           deposit_balance_cents: number
           email: string
           estimated_units_per_month: number | null
@@ -700,6 +701,7 @@ export type Database = {
           company_name: string
           contact_name: string
           created_at?: string
+          default_low_stock_threshold?: number | null
           deposit_balance_cents?: number
           email: string
           estimated_units_per_month?: number | null
@@ -734,6 +736,7 @@ export type Database = {
           company_name?: string
           contact_name?: string
           created_at?: string
+          default_low_stock_threshold?: number | null
           deposit_balance_cents?: number
           email?: string
           estimated_units_per_month?: number | null
@@ -891,6 +894,7 @@ export type Database = {
           qc_photo_urls: string[] | null
           quantity: number
           sku_id: string
+          source_type: string | null
           status: string
           submitted_at: string | null
           updated_at: string | null
@@ -909,6 +913,7 @@ export type Database = {
           qc_photo_urls?: string[] | null
           quantity: number
           sku_id: string
+          source_type?: string | null
           status?: string
           submitted_at?: string | null
           updated_at?: string | null
@@ -927,6 +932,7 @@ export type Database = {
           qc_photo_urls?: string[] | null
           quantity?: number
           sku_id?: string
+          source_type?: string | null
           status?: string
           submitted_at?: string | null
           updated_at?: string | null
@@ -2096,6 +2102,7 @@ export type Database = {
           id: string
           image_url: string | null
           length: number | null
+          low_stock_threshold: number | null
           notes: string | null
           prep_requirements: Json | null
           status: string
@@ -2120,6 +2127,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           length?: number | null
+          low_stock_threshold?: number | null
           notes?: string | null
           prep_requirements?: Json | null
           status?: string
@@ -2144,6 +2152,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           length?: number | null
+          low_stock_threshold?: number | null
           notes?: string | null
           prep_requirements?: Json | null
           status?: string

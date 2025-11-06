@@ -325,6 +325,19 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="lowStockThreshold">Low Stock Threshold Override</Label>
+            <Input
+              id="lowStockThreshold"
+              type="number"
+              min="0"
+              placeholder="Leave empty to use client default"
+            />
+            <p className="text-xs text-muted-foreground">
+              Override the client's default threshold for this SKU
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="notes">Notes</Label>
             <Textarea
               id="notes"

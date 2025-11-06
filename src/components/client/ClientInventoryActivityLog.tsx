@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ActivityLogItem } from "./ActivityLogItem";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 
 interface ActivityLogEntry {
@@ -21,6 +22,7 @@ interface ClientInventoryActivityLogProps {
 export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivityLogProps) {
   const [activities, setActivities] = useState<ActivityLogEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -164,11 +166,30 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
     };
   };
 
-  const filteredActivities = activities.filter(activity =>
-    (activity.asnNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    activity.skuCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    activity.message.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredActivities = activities.filter(activity => {
+    // Filter by type
+    if (filterType !== "all") {
+      const typeMap: Record<string, ActivityLogEntry['type'][]> = {
+        received: ['receiving_started', 'receiving_completed'],
+        shipped: ['sold', 'transfer'],
+        returns: [], // Would need RETURN type added
+        discrepancies: ['issue_detected'],
+        adjustments: ['adjustment'],
+        lowstock: [], // Would need LOW_STOCK type added
+      };
+      const validTypes = typeMap[filterType] || [];
+      if (validTypes.length > 0 && !validTypes.includes(activity.type)) {
+        return false;
+      }
+    }
+
+    // Search filter
+    return (
+      activity.asnNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      activity.skuCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      activity.message.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
   if (loading) {
     return (
@@ -181,14 +202,28 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
   return (
     <div className="space-y-4">
       <Card className="p-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by ASN number..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Select value={filterType} onValueChange={setFilterType}>
+            <SelectTrigger className="w-full sm:w-[200px]">
+              <SelectValue placeholder="Filter by type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Activity</SelectItem>
+              <SelectItem value="received">Received</SelectItem>
+              <SelectItem value="shipped">Shipped</SelectItem>
+              <SelectItem value="discrepancies">Discrepancies</SelectItem>
+              <SelectItem value="adjustments">Adjustments</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by ASN, SKU, or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
         </div>
       </Card>
 
