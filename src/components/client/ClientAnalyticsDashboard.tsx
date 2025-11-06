@@ -41,13 +41,13 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
     end: endOfDay(new Date()) 
   }), []);
 
-  // Custom period
-  const getCustomRange = () => {
+  // Custom period - memoized to prevent unnecessary re-fetches
+  const customRange = useMemo(() => {
     if (customPeriod === "custom" && customDateRange?.from && customDateRange?.to) {
       return { start: startOfDay(customDateRange.from), end: endOfDay(customDateRange.to) };
     }
     return getDateRange(customPeriod);
-  };
+  }, [customPeriod, customDateRange]);
 
   const getPeriodLabel = (preset: string) => {
     if (preset === "custom" && customDateRange?.from && customDateRange?.to) {
@@ -71,7 +71,7 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
   const todayData = useAnalytics(clientId, todayRange);
   const yesterdayData = useAnalytics(clientId, yesterdayRange);
   const mtdData = useAnalytics(clientId, mtdRange);
-  const customData = useAnalytics(clientId, getCustomRange());
+  const customData = useAnalytics(clientId, customRange);
 
   // Use today's data for low stock issues
   const lowStockIssues = useMemo(() => 
@@ -181,7 +181,7 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
         />
         <PeriodMetricsCard
           period={getPeriodLabel(customPeriod)}
-          dateRange={getCustomRange()}
+          dateRange={customRange}
           data={customData.data}
           loading={customData.loading}
           colorScheme="purple"

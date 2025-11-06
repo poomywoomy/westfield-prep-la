@@ -1,5 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+
+// In-memory cache for analytics data with 60s TTL
+const analyticsCache = new Map<string, { data: AnalyticsData; timestamp: number }>();
+const CACHE_TTL = 60000; // 60 seconds
 import { startOfDay, endOfDay, subDays, startOfMonth, startOfYear } from "date-fns";
 
 interface AnalyticsData {
@@ -45,14 +49,36 @@ interface DateRange {
 export const useAnalytics = (clientId: string, dateRange: DateRange) => {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     if (clientId) {
       fetchAnalytics();
     }
-  }, [clientId, dateRange]);
+  }, [clientId, dateRange.start.getTime(), dateRange.end.getTime()]);
 
   const fetchAnalytics = async () => {
+    if (!clientId || !dateRange.start || !dateRange.end) {
+      setLoading(false);
+      return;
+    }
+
+    const startMs = dateRange.start.getTime();
+    const endMs = dateRange.end.getTime();
+    const cacheKey = `${clientId}:${startMs}-${endMs}`;
+    
+    // Check cache first
+    const cached = analyticsCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      setData(cached.data);
+      setLoading(false);
+      return;
+    }
+
+    // Increment request ID for this fetch
+    requestIdRef.current += 1;
+    const currentRequestId = requestIdRef.current;
+    
     setLoading(true);
     try {
       const { start, end } = dateRange;
@@ -211,7 +237,12 @@ export const useAnalytics = (clientId: string, dateRange: DateRange) => {
           };
         });
 
-      setData({
+      // Only update state if this is still the latest request
+      if (currentRequestId !== requestIdRef.current) {
+        return;
+      }
+
+      const analyticsData: AnalyticsData = {
         orders: ordersCount || 0,
         unitsShipped,
         unitsReceived,
@@ -220,7 +251,12 @@ export const useAnalytics = (clientId: string, dateRange: DateRange) => {
         lowStock,
         currentInventory,
         topPerforming,
-      });
+      };
+
+      // Store in cache
+      analyticsCache.set(cacheKey, { data: analyticsData, timestamp: Date.now() });
+      
+      setData(analyticsData);
     } catch (error) {
       console.error("Error fetching analytics:", error);
     } finally {

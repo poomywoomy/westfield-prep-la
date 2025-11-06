@@ -7,7 +7,18 @@ export const useAutoLogout = (isAuthenticated: boolean) => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const logout = useCallback(async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Clear all Supabase auth tokens from localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (error) {
+      // Ignore errors during auto-logout
+    }
   }, []);
 
   const resetTimer = useCallback(() => {
@@ -35,30 +46,8 @@ export const useAutoLogout = (isAuthenticated: boolean) => {
       document.addEventListener(event, resetTimer);
     });
 
-    // Logout on window close or tab close
-    const handleBeforeUnload = () => {
-      logout();
-    };
-
-    // Handle tab visibility changes (aggressive logout when hidden)
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // User switched tabs - start shorter timeout
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        // Reduced timeout when tab is hidden (5 minutes)
-        timeoutRef.current = setTimeout(() => {
-          logout();
-        }, 5 * 60 * 1000);
-      } else {
-        // Tab is visible again - reset to normal timeout
-        resetTimer();
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // Note: beforeunload logout removed as it's unreliable and can cause session_not_found errors
+    // Users will auto-logout after 30 minutes of inactivity instead
 
     // Start initial timer
     resetTimer();
@@ -71,8 +60,6 @@ export const useAutoLogout = (isAuthenticated: boolean) => {
       events.forEach(event => {
         document.removeEventListener(event, resetTimer);
       });
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [isAuthenticated]);
 };

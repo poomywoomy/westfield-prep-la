@@ -21,7 +21,7 @@ import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
 import type { Database } from "@/integrations/supabase/types";
 
 const ClientDashboard = () => {
-  const { user, role, loading } = useAuth();
+  const { user, role, loading, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [clientName, setClientName] = useState<string>("");
@@ -101,20 +101,9 @@ const ClientDashboard = () => {
   }, [user, role, loading, navigate, toast]);
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut({ scope: 'global' });
-      toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
-      window.location.replace('/');
-    } catch (e) {
-      if (import.meta.env.DEV) {
-        console.error('Logout error:', e);
-      }
-      toast({
-        title: 'Logout error', 
-        description: 'An error occurred during logout. Please try again.',
-        variant: 'destructive'
-      });
-    }
+    await logout();
+    toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
+    window.location.replace('/');
   };
 
   if (loading) {
@@ -198,11 +187,11 @@ const ClientDashboard = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="analytics">
+          <TabsContent value="analytics" forceMount className="data-[state=inactive]:hidden">
             <ClientAnalyticsDashboard clientId={clientId} />
           </TabsContent>
 
-          <TabsContent value="products">
+          <TabsContent value="products" forceMount className="data-[state=inactive]:hidden">
             <div className="space-y-4">
               <div className="flex justify-end">
                 <Button onClick={() => setShowSKUDialog(true)}>
@@ -214,15 +203,15 @@ const ClientDashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="orders">
+          <TabsContent value="orders" forceMount className="data-[state=inactive]:hidden">
             <ClientOrdersTab />
           </TabsContent>
 
-          <TabsContent value="activity">
+          <TabsContent value="activity" forceMount className="data-[state=inactive]:hidden">
             <ClientInventoryActivityLog clientId={clientId} />
           </TabsContent>
 
-          <TabsContent value="billing">
+          <TabsContent value="billing" forceMount className="data-[state=inactive]:hidden">
             <ClientBillingTab />
           </TabsContent>
         </Tabs>
