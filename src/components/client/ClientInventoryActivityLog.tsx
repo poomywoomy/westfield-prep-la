@@ -3,8 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { ActivityLogItem } from "./ActivityLogItem";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Search, CalendarIcon } from "lucide-react";
+import { startOfDay, endOfDay, subDays, format } from "date-fns";
 
 interface ActivityLogEntry {
   id: string;
@@ -23,6 +27,11 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
   const [activities, setActivities] = useState<ActivityLogEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({
+    from: subDays(new Date(), 30),
+    to: new Date()
+  });
+  const [displayCount, setDisplayCount] = useState(50);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,14 +42,18 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
     }
   }, [clientId]);
 
+  // Reset display count when filters change
+  useEffect(() => {
+    setDisplayCount(50);
+  }, [searchQuery, filterType, dateRange]);
+
   const fetchActivities = async () => {
     try {
       const { data: asns, error: asnError } = await supabase
         .from('asn_headers')
         .select('id, asn_number, status, received_at, closed_at, created_at')
         .eq('client_id', clientId)
-        .order('created_at', { ascending: false })
-        .limit(50);
+        .order('created_at', { ascending: false });
 
       if (asnError) throw asnError;
 
@@ -50,8 +63,7 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
         .select('id, ts, qty_delta, reason_code, notes, transaction_type, skus(client_sku, title)')
         .eq('client_id', clientId)
         .in('transaction_type', ['ADJUSTMENT_PLUS', 'ADJUSTMENT_MINUS', 'SALE_DECREMENT', 'TRANSFER', 'RETURN'])
-        .order('ts', { ascending: false })
-        .limit(50);
+        .order('ts', { ascending: false });
 
       if (adjError) throw adjError;
 
@@ -153,7 +165,7 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
       // Sort by timestamp descending
       entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       
-      setActivities(entries.slice(0, 50)); // Keep only latest 50
+      setActivities(entries); // Keep all activities for pagination
     } catch (error) {
       console.error('Error fetching activities:', error);
     } finally {
@@ -192,6 +204,15 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
   };
 
   const filteredActivities = activities.filter(activity => {
+    // Date range filter
+    const activityDate = new Date(activity.timestamp);
+    if (dateRange.from && activityDate < startOfDay(dateRange.from)) {
+      return false;
+    }
+    if (dateRange.to && activityDate > endOfDay(dateRange.to)) {
+      return false;
+    }
+
     // Filter by type
     if (filterType !== "all") {
       const typeMap: Record<string, ActivityLogEntry['type'][]> = {
@@ -215,6 +236,9 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
       activity.message.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
+
+  const visibleActivities = filteredActivities.slice(0, displayCount);
+  const canLoadMore = filteredActivities.length > displayCount;
 
   if (loading) {
     return (
@@ -242,6 +266,29 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
               <SelectItem value="lowstock">Low Stock</SelectItem>
             </SelectContent>
           </Select>
+          
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full sm:w-[280px] justify-start">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dateRange.from && dateRange.to ? (
+                  `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`
+                ) : (
+                  "Select date range"
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="range"
+                selected={dateRange as any}
+                onSelect={setDateRange as any}
+                numberOfMonths={2}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -259,17 +306,35 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
           <p className="text-muted-foreground">No activity found</p>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {filteredActivities.map(activity => (
-            <ActivityLogItem
-              key={activity.id}
-              timestamp={activity.timestamp}
-              type={activity.type}
-              asnNumber={activity.asnNumber}
-              message={activity.message}
-            />
-          ))}
-        </div>
+        <>
+          <div className="space-y-3">
+            {visibleActivities.map(activity => (
+              <ActivityLogItem
+                key={activity.id}
+                timestamp={activity.timestamp}
+                type={activity.type}
+                asnNumber={activity.asnNumber}
+                message={activity.message}
+              />
+            ))}
+          </div>
+          
+          {canLoadMore && (
+            <Card className="p-4 text-center">
+              <Button
+                variant="outline"
+                onClick={() => setDisplayCount(prev => prev + 50)}
+                className="w-full sm:w-auto"
+              >
+                Load More Activities ({filteredActivities.length - displayCount} remaining)
+              </Button>
+            </Card>
+          )}
+          
+          <p className="text-sm text-muted-foreground text-center">
+            Showing {visibleActivities.length} of {filteredActivities.length} activities
+          </p>
+        </>
       )}
     </div>
   );
