@@ -42,6 +42,9 @@ export const useClientIssues = (clientId: string, sourceType?: 'receiving' | 're
         query = query.eq("source_type", sourceType);
       }
 
+      // Only show issues that client hasn't submitted a decision for yet
+      query = query.is("submitted_at", null);
+
       const { data, error } = await query;
 
       if (error) throw error;

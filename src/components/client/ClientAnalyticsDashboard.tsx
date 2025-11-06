@@ -67,12 +67,15 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
   const shipmentIssues = useClientIssues(clientId, "receiving");
   const returnIssues = useClientIssues(clientId, "return");
   
-  // Fetch low stock using existing analytics hook
-  const { data: analyticsData } = useAnalytics(clientId, todayRange);
+  // Fetch analytics data once for all cards (massive performance improvement)
+  const todayData = useAnalytics(clientId, todayRange);
+  const yesterdayData = useAnalytics(clientId, yesterdayRange);
+  const mtdData = useAnalytics(clientId, mtdRange);
+  const customData = useAnalytics(clientId, getCustomRange());
 
-  // Memoize low stock issues to prevent re-render loops
+  // Use today's data for low stock issues
   const lowStockIssues = useMemo(() => 
-    analyticsData?.lowStock.map(item => ({
+    todayData.data?.lowStock.map(item => ({
       id: item.sku_id,
       client_id: clientId,
       sku_id: item.sku_id,
@@ -84,7 +87,7 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
       title: item.title,
       image_url: item.image_url,
     })) || [], 
-    [analyticsData?.lowStock, clientId]
+    [todayData.data?.lowStock, clientId]
   );
 
   const handleReviewIssue = (issue: any) => {
@@ -153,30 +156,34 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
         )}
       </div>
 
-      {/* Four period cards */}
+      {/* Four period cards - pass data as props to avoid duplicate fetches */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <PeriodMetricsCard
           period="Today"
           dateRange={todayRange}
-          clientId={clientId}
+          data={todayData.data}
+          loading={todayData.loading}
           colorScheme="blue"
         />
         <PeriodMetricsCard
           period="Yesterday"
           dateRange={yesterdayRange}
-          clientId={clientId}
+          data={yesterdayData.data}
+          loading={yesterdayData.loading}
           colorScheme="teal"
         />
         <PeriodMetricsCard
           period="Month to Date"
           dateRange={mtdRange}
-          clientId={clientId}
+          data={mtdData.data}
+          loading={mtdData.loading}
           colorScheme="cyan"
         />
         <PeriodMetricsCard
           period={getPeriodLabel(customPeriod)}
           dateRange={getCustomRange()}
-          clientId={clientId}
+          data={customData.data}
+          loading={customData.loading}
           colorScheme="purple"
           isCustomizable
         />
@@ -212,7 +219,7 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
           issues={lowStockIssues}
           damagedCount={0}
           missingCount={0}
-          loading={!analyticsData}
+          loading={todayData.loading}
           borderColor="orange"
           iconColor="orange"
           onReviewClick={handleReviewIssue}

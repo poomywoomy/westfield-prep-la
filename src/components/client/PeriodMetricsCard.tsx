@@ -5,13 +5,39 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShoppingCart, Package, ArrowDownToLine, Undo2, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
-import { usePeriodMetrics, DateRange } from "@/hooks/usePeriodMetrics";
 import { format } from "date-fns";
+
+interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+interface AnalyticsData {
+  orders: number;
+  unitsShipped: number;
+  unitsReceived: number;
+  returns: number;
+  discrepancies: {
+    total: number;
+    receiving: { damaged: number; missing: number };
+    return: { damaged: number; missing: number };
+  };
+  lowStock: any[];
+  currentInventory: number;
+  topPerforming: Array<{
+    sku_id: string;
+    client_sku: string;
+    title: string;
+    image_url: string | null;
+    units_shipped: number;
+  }>;
+}
 
 interface PeriodMetricsCardProps {
   period: string;
   dateRange: DateRange;
-  clientId: string;
+  data: AnalyticsData | null;
+  loading: boolean;
   colorScheme: "blue" | "teal" | "cyan" | "purple";
   isCustomizable?: boolean;
 }
@@ -26,11 +52,11 @@ const gradients = {
 export const PeriodMetricsCard = ({
   period,
   dateRange,
-  clientId,
+  data,
+  loading,
   colorScheme,
 }: PeriodMetricsCardProps) => {
   const [expanded, setExpanded] = useState(false);
-  const { data: metrics, loading } = usePeriodMetrics(clientId, dateRange);
 
   if (loading) {
     return (
@@ -50,7 +76,27 @@ export const PeriodMetricsCard = ({
     );
   }
 
-  if (!metrics) return null;
+  if (!data) return null;
+
+  // Map analytics data to metrics format
+  const metrics = {
+    orders: data.orders,
+    unitsSold: data.unitsShipped,
+    unitsReceived: data.unitsReceived,
+    unitsReturned: data.returns,
+    receivingDiscrepancies: {
+      count: (data.discrepancies.receiving.damaged > 0 ? 1 : 0) + (data.discrepancies.receiving.missing > 0 ? 1 : 0),
+      total: data.discrepancies.receiving.damaged + data.discrepancies.receiving.missing
+    },
+    returnDiscrepancies: {
+      count: (data.discrepancies.return.damaged > 0 ? 1 : 0) + (data.discrepancies.return.missing > 0 ? 1 : 0),
+      total: data.discrepancies.return.damaged + data.discrepancies.return.missing
+    },
+    topSkus: data.topPerforming.map(item => ({
+      ...item,
+      units_sold: item.units_shipped
+    }))
+  };
 
   const formatDateRange = () => {
     if (format(dateRange.start, "yyyy-MM-dd") === format(dateRange.end, "yyyy-MM-dd")) {

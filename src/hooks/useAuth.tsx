@@ -44,38 +44,29 @@ export const useAuth = () => {
 
     // Check for existing session only if not logging out
     if (!isLoggingOut) {
-      // Check if we just logged out - delay session check to prevent race
+      // Check if we just logged out - clear flag and proceed immediately
       const justLoggedOut = localStorage.getItem('auth:justLoggedOut');
-      
       if (justLoggedOut) {
-        // Wait a bit before checking session, then remove flag
-        setTimeout(() => {
-          localStorage.removeItem('auth:justLoggedOut');
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
-          });
-        }, 1000);
-      } else {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          setSession(session);
-          setUser(session?.user ?? null);
-          
-          if (session?.user) {
-            // Activate client on initial load and fetch role (deferred to avoid blocking)
-            setTimeout(async () => {
-              const { error } = await supabase.rpc('activate_client_on_login');
-              if (error && import.meta.env.DEV) {
-                console.error('Error activating client:', error);
-              }
-              fetchUserRole(session.user.id);
-            }, 0);
-          } else {
-            setLoading(false);
-          }
-        });
+        localStorage.removeItem('auth:justLoggedOut');
       }
+      
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Activate client on initial load and fetch role (deferred to avoid blocking)
+          setTimeout(async () => {
+            const { error } = await supabase.rpc('activate_client_on_login');
+            if (error && import.meta.env.DEV) {
+              console.error('Error activating client:', error);
+            }
+            fetchUserRole(session.user.id);
+          }, 0);
+        } else {
+          setLoading(false);
+        }
+      });
     }
 
     return () => subscription.unsubscribe();
