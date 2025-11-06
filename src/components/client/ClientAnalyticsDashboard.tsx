@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { PeriodMetricsCard } from "./PeriodMetricsCard";
 import { IssuesCard } from "./IssuesCard";
 import { useClientIssues } from "@/hooks/useClientIssues";
 import { DamagedItemReviewDialog } from "./DamagedItemReviewDialog";
 import { MissingItemReviewDialog } from "./MissingItemReviewDialog";
+import { SKUDetailDialog } from "./SKUDetailDialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -22,12 +23,23 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
   const [customPeriod, setCustomPeriod] = useState("ytd");
   const [customDateRange, setCustomDateRange] = useState<{ from?: Date; to?: Date }>();
   const [selectedIssue, setSelectedIssue] = useState<any>(null);
-  const [dialogType, setDialogType] = useState<"damaged" | "missing" | null>(null);
+  const [dialogType, setDialogType] = useState<"damaged" | "missing" | "sku" | null>(null);
 
-  // Fixed periods
-  const todayRange = { start: startOfDay(new Date()), end: endOfDay(new Date()) };
-  const yesterdayRange = { start: startOfDay(subDays(new Date(), 1)), end: endOfDay(subDays(new Date(), 1)) };
-  const mtdRange = { start: startOfMonth(new Date()), end: endOfDay(new Date()) };
+  // Stabilize date ranges with useMemo to prevent re-render loops
+  const todayRange = useMemo(() => ({ 
+    start: startOfDay(new Date()), 
+    end: endOfDay(new Date()) 
+  }), []);
+  
+  const yesterdayRange = useMemo(() => ({ 
+    start: startOfDay(subDays(new Date(), 1)), 
+    end: endOfDay(subDays(new Date(), 1)) 
+  }), []);
+  
+  const mtdRange = useMemo(() => ({ 
+    start: startOfMonth(new Date()), 
+    end: endOfDay(new Date()) 
+  }), []);
 
   // Custom period
   const getCustomRange = () => {
@@ -58,9 +70,30 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
   // Fetch low stock using existing analytics hook
   const { data: analyticsData } = useAnalytics(clientId, todayRange);
 
+  // Memoize low stock issues to prevent re-render loops
+  const lowStockIssues = useMemo(() => 
+    analyticsData?.lowStock.map(item => ({
+      id: item.sku_id,
+      client_id: clientId,
+      sku_id: item.sku_id,
+      asn_id: "",
+      quantity: item.available,
+      discrepancy_type: "low_stock",
+      source_type: "inventory",
+      client_sku: item.client_sku,
+      title: item.title,
+      image_url: item.image_url,
+    })) || [], 
+    [analyticsData?.lowStock, clientId]
+  );
+
   const handleReviewIssue = (issue: any) => {
     setSelectedIssue(issue);
-    setDialogType(issue.discrepancy_type === "damaged" ? "damaged" : "missing");
+    if (issue.discrepancy_type === "low_stock") {
+      setDialogType("sku");
+    } else {
+      setDialogType(issue.discrepancy_type === "damaged" ? "damaged" : "missing");
+    }
   };
 
   const handleCloseDialog = () => {
@@ -152,14 +185,14 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
       {/* Issue cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <IssuesCard
-          title="Shipment Issues"
+          title="Shipment Discrepancies"
           icon="shipment"
           issues={shipmentIssues.issues}
           damagedCount={shipmentIssues.damagedCount}
           missingCount={shipmentIssues.missingCount}
           loading={shipmentIssues.loading}
-          gradientFrom="from-orange-500"
-          gradientTo="to-orange-700"
+          borderColor="red"
+          iconColor="red"
           onReviewClick={handleReviewIssue}
         />
         <IssuesCard
@@ -169,31 +202,20 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
           damagedCount={returnIssues.damagedCount}
           missingCount={returnIssues.missingCount}
           loading={returnIssues.loading}
-          gradientFrom="from-red-500"
-          gradientTo="to-red-700"
+          borderColor="red"
+          iconColor="red"
           onReviewClick={handleReviewIssue}
         />
         <IssuesCard
           title="Low Stock Alerts"
           icon="stock"
-          issues={analyticsData?.lowStock.map(item => ({
-            id: item.sku_id,
-            client_id: clientId,
-            sku_id: item.sku_id,
-            asn_id: "",
-            quantity: item.available,
-            discrepancy_type: "low_stock",
-            source_type: "inventory",
-            client_sku: item.client_sku,
-            title: item.title,
-            image_url: item.image_url,
-          })) || []}
+          issues={lowStockIssues}
           damagedCount={0}
           missingCount={0}
           loading={!analyticsData}
-          gradientFrom="from-yellow-500"
-          gradientTo="to-yellow-700"
-          onReviewClick={() => {}}
+          borderColor="orange"
+          iconColor="orange"
+          onReviewClick={handleReviewIssue}
         />
       </div>
 
@@ -233,6 +255,14 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
             image_url: selectedIssue.image_url,
           }}
           onSuccess={handleCloseDialog}
+        />
+      )}
+      {dialogType === "sku" && selectedIssue && (
+        <SKUDetailDialog
+          open={true}
+          onOpenChange={(open) => !open && handleCloseDialog()}
+          skuId={selectedIssue.sku_id}
+          clientId={clientId}
         />
       )}
     </div>

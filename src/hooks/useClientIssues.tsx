@@ -69,7 +69,9 @@ export const useClientIssues = (clientId: string, sourceType?: 'receiving' | 're
   };
 
   useEffect(() => {
-    fetchIssues();
+    if (clientId) {
+      fetchIssues();
+    }
   }, [clientId, sourceType]);
 
   return { 
