@@ -595,7 +595,16 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
                         <span className="font-medium">{item.quantity} units</span>
                       </TableCell>
                       <TableCell>
-                        <DiscrepancyStatusBadge status={item.status} />
+                        <Badge 
+                          variant={
+                            item.status === "pending" ? "outline" :
+                            item.status === "approved" ? "default" :
+                            item.status === "rejected" ? "destructive" :
+                            "secondary"
+                          }
+                        >
+                          {item.status}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {item.created_at ? format(new Date(item.created_at), "MMM d, yyyy") : "-"}

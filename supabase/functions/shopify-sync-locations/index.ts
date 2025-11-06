@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Location sync error:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Failed to sync locations' }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Failed to sync locations' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }

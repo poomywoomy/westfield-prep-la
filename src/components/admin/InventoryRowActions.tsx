@@ -14,6 +14,7 @@ interface InventoryRowActionsProps {
   onReceive: () => void;
   onCreateShipment: () => void;
   onViewDetails: () => void;
+  onProcessReturn?: () => void;
 }
 
 export const InventoryRowActions = ({
@@ -22,6 +23,7 @@ export const InventoryRowActions = ({
   onReceive,
   onCreateShipment,
   onViewDetails,
+  onProcessReturn,
 }: InventoryRowActionsProps) => {
   return (
     <DropdownMenu>
@@ -52,6 +54,15 @@ export const InventoryRowActions = ({
           <Eye className="mr-2 h-4 w-4" />
           View Details
         </DropdownMenuItem>
+        {onProcessReturn && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onProcessReturn}>
+              <PackagePlus className="mr-2 h-4 w-4" />
+              Process Return
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

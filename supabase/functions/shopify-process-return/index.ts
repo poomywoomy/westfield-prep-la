@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Return processing error:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Failed to process return' }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Failed to process return' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
