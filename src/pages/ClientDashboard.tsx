@@ -28,6 +28,7 @@ const ClientDashboard = () => {
   const [clientId, setClientId] = useState<string>("");
   const [showSKUDialog, setShowSKUDialog] = useState(false);
 
+
   useEffect(() => {
     if (user) {
       fetchClientName();
