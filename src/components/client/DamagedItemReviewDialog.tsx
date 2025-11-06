@@ -50,18 +50,16 @@ export function DamagedItemReviewDialog({
     setLoading(true);
 
     try {
-      const { error } = await supabase.from("damaged_item_decisions").insert({
-        client_id: discrepancy.client_id,
-        asn_id: discrepancy.asn_id,
-        sku_id: discrepancy.sku_id,
-        quantity: discrepancy.damaged_qty,
-        discrepancy_type: "damaged",
-        qc_photo_urls: discrepancy.qc_photo_urls || [],
-        decision,
-        client_notes: notes,
-        submitted_at: new Date().toISOString(),
-        status: "pending",
-      });
+      // Update the existing record instead of inserting a new one
+      const { error } = await supabase
+        .from("damaged_item_decisions")
+        .update({
+          decision,
+          client_notes: notes,
+          submitted_at: new Date().toISOString(),
+          status: "client_reviewed",
+        })
+        .eq("id", discrepancy.id);
 
       if (error) throw error;
 

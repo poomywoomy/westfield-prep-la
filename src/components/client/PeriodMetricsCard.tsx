@@ -12,12 +12,13 @@ interface PeriodMetricsCardProps {
   period: string;
   dateRange: DateRange;
   clientId: string;
-  colorScheme: "blue" | "cyan" | "purple";
+  colorScheme: "blue" | "teal" | "cyan" | "purple";
   isCustomizable?: boolean;
 }
 
 const gradients = {
   blue: "from-blue-500 to-blue-700",
+  teal: "from-teal-500 to-teal-700",
   cyan: "from-cyan-500 to-cyan-700",
   purple: "from-purple-500 to-purple-700",
 };

@@ -237,7 +237,9 @@ export const getDateRange = (preset: string): DateRange => {
       return { start: startOfDay(subDays(now, 89)), end: endOfDay(now) };
     case "ytd":
       return { start: startOfYear(now), end: endOfDay(now) };
+    case "custom":
+      return { start: startOfYear(now), end: endOfDay(now) }; // Default to YTD for custom
     default:
-      return { start: startOfDay(subDays(now, 29)), end: endOfDay(now) };
+      return { start: startOfYear(now), end: endOfDay(now) }; // Default to YTD
   }
 };

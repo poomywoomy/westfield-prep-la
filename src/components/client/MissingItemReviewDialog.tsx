@@ -38,17 +38,16 @@ export function MissingItemReviewDialog({
     setLoading(true);
 
     try {
-      const { error } = await supabase.from("damaged_item_decisions").insert({
-        client_id: discrepancy.client_id,
-        asn_id: discrepancy.asn_id,
-        sku_id: discrepancy.sku_id,
-        quantity: discrepancy.missing_qty,
-        discrepancy_type: "missing",
-        decision: "acknowledge",
-        client_notes: notes || "Acknowledged missing items",
-        submitted_at: new Date().toISOString(),
-        status: "pending",
-      });
+      // Update the existing record instead of inserting a new one
+      const { error } = await supabase
+        .from("damaged_item_decisions")
+        .update({
+          decision: "acknowledge",
+          client_notes: notes || "Acknowledged missing items",
+          submitted_at: new Date().toISOString(),
+          status: "client_reviewed",
+        })
+        .eq("id", discrepancy.id);
 
       if (error) throw error;
 
