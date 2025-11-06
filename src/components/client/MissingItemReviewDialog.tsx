@@ -45,7 +45,7 @@ export function MissingItemReviewDialog({
           decision: "acknowledge",
           client_notes: notes || "Acknowledged missing items",
           submitted_at: new Date().toISOString(),
-          status: "client_reviewed",
+          status: "pending",
         })
         .eq("id", discrepancy.id);
 
@@ -73,7 +73,7 @@ export function MissingItemReviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PackageX className="h-5 w-5 text-red-600" />

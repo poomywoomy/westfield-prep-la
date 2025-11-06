@@ -57,7 +57,7 @@ export function DamagedItemReviewDialog({
           decision,
           client_notes: notes,
           submitted_at: new Date().toISOString(),
-          status: "client_reviewed",
+          status: "pending",
         })
         .eq("id", discrepancy.id);
 
@@ -86,7 +86,7 @@ export function DamagedItemReviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-yellow-600" />

@@ -5,16 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, Package, Edit, Trash, AlertTriangle } from "lucide-react";
+import { Search, Download, Package, Edit, Trash } from "lucide-react";
 import { BulkProductActionsDialog } from "./BulkProductActionsDialog";
 import { DeleteSKUDialog } from "@/components/admin/DeleteSKUDialog";
 import { SKUDetailedHistoryDialog } from "@/components/admin/SKUDetailedHistoryDialog";
-import { DamagedItemReviewDialog } from "./DamagedItemReviewDialog";
-import { MissingItemReviewDialog } from "./MissingItemReviewDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,8 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ClientDiscrepancyStatusBadge } from "./ClientDiscrepancyStatusBadge";
-import { format } from "date-fns";
 
 export default function ClientProductsTab() {
   const { user } = useAuth();
@@ -49,19 +44,10 @@ export default function ClientProductsTab() {
   const [deletingSKU, setDeletingSKU] = useState<any>(null);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"products" | "discrepancies">("products");
-  const [discrepancies, setDiscrepancies] = useState<any[]>([]);
-  const [selectedDiscrepancy, setSelectedDiscrepancy] = useState<any>(null);
-  const [damagedDialogOpen, setDamagedDialogOpen] = useState(false);
-  const [missingDialogOpen, setMissingDialogOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
-      if (activeTab === "products") {
-        fetchProducts();
-      } else {
-        fetchDiscrepancies();
-      }
+      fetchProducts();
       
       // Subscribe to real-time inventory updates
       const channel = supabase
@@ -76,9 +62,7 @@ export default function ClientProductsTab() {
           (payload) => {
             console.log('Inventory update received:', payload);
             // Refetch products when inventory changes
-            if (activeTab === "products") {
-              fetchProducts();
-            }
+            fetchProducts();
           }
         )
         .subscribe();
@@ -87,7 +71,7 @@ export default function ClientProductsTab() {
         supabase.removeChannel(channel);
       };
     }
-  }, [user, activeTab]);
+  }, [user]);
 
   useEffect(() => {
     let filtered = products;
@@ -171,38 +155,6 @@ export default function ClientProductsTab() {
     }
   };
 
-  const fetchDiscrepancies = async () => {
-    try {
-      setLoading(true);
-      
-      const { data: client } = await supabase
-        .from('clients')
-        .select('id')
-        .eq('user_id', user?.id)
-        .single();
-
-      if (!client) return;
-
-      const { data, error } = await supabase
-        .from("inventory_discrepancies_summary")
-        .select("*")
-        .eq("client_id", client.id);
-
-      if (error) throw error;
-
-      setDiscrepancies(data || []);
-    } catch (error) {
-      console.error('Error fetching discrepancies:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load discrepancies",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const toggleSelectAll = () => {
     if (selectedProducts.size === filteredProducts.length) {
       setSelectedProducts(new Set());
@@ -267,20 +219,7 @@ export default function ClientProductsTab() {
 
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)} className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="products">
-            <Package className="mr-2 h-4 w-4" />
-            Products
-          </TabsTrigger>
-          <TabsTrigger value="discrepancies">
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            Discrepancies
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="products" className="space-y-6">
-          <Card>
+      <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -410,120 +349,7 @@ export default function ClientProductsTab() {
             </Table>
           </div>
         </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="discrepancies" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Inventory Discrepancies</CardTitle>
-              <CardDescription>
-                Review and resolve damaged or missing items from recent shipments
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="border rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ASN</TableHead>
-                      <TableHead>SKU / Product</TableHead>
-                      <TableHead className="text-right">Damaged</TableHead>
-                      <TableHead className="text-right">Missing</TableHead>
-                  <TableHead className="text-right">Quarantined</TableHead>
-                  <TableHead>Client Status</TableHead>
-                  <TableHead>Date</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {loading ? (
-                      <TableRow>
-                        <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
-                          Loading...
-                        </TableCell>
-                      </TableRow>
-                    ) : discrepancies.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
-                          No discrepancies found
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      discrepancies.map((item) => (
-                        <TableRow key={item.sku_id + item.asn_id}>
-                          <TableCell>
-                            <Badge variant="outline">{item.asn_number}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <span className="font-medium">{item.client_sku}</span>
-                              <span className="text-xs text-muted-foreground">{item.title}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {item.damaged_qty > 0 && (
-                              <Badge variant="destructive">{item.damaged_qty}</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {item.missing_qty > 0 && (
-                              <Badge variant="destructive">{item.missing_qty}</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {item.quarantined_qty > 0 && (
-                              <Badge variant="outline" className="border-amber-500 text-amber-500">
-                                {item.quarantined_qty}
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={item.status === 'pending' ? 'secondary' : 'default'}>
-                              {item.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {item.received_at
-                              ? format(new Date(item.received_at), "MMM d, HH:mm")
-                              : "N/A"}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {item.damaged_qty > 0 && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedDiscrepancy(item);
-                                  setDamagedDialogOpen(true);
-                                }}
-                              >
-                                Review Damaged
-                              </Button>
-                            )}
-                            {item.missing_qty > 0 && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedDiscrepancy(item);
-                                  setMissingDialogOpen(true);
-                                }}
-                              >
-                                Review Missing
-                              </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      </Card>
 
       <BulkProductActionsDialog
         open={bulkDialog.open}
@@ -554,50 +380,6 @@ export default function ClientProductsTab() {
         clientSku={selectedProduct?.client_sku || ""}
         title={selectedProduct?.title || ""}
       />
-
-      {selectedDiscrepancy && (
-        <>
-          <DamagedItemReviewDialog
-            open={damagedDialogOpen}
-            onOpenChange={setDamagedDialogOpen}
-            discrepancy={{
-              id: selectedDiscrepancy.sku_id,
-              client_id: selectedDiscrepancy.client_id,
-              sku_id: selectedDiscrepancy.sku_id,
-              asn_id: selectedDiscrepancy.asn_id,
-              asn_number: selectedDiscrepancy.asn_number || 'N/A',
-              client_sku: selectedDiscrepancy.client_sku || 'N/A',
-              title: selectedDiscrepancy.title || 'Product',
-              damaged_qty: selectedDiscrepancy.damaged_qty || 0,
-              image_url: selectedDiscrepancy.image_url,
-              qc_photo_urls: [],
-            }}
-            onSuccess={() => {
-              fetchDiscrepancies();
-              toast({ title: "Success", description: "Decision submitted" });
-            }}
-          />
-          <MissingItemReviewDialog
-            open={missingDialogOpen}
-            onOpenChange={setMissingDialogOpen}
-            discrepancy={{
-              id: selectedDiscrepancy.sku_id,
-              client_id: selectedDiscrepancy.client_id,
-              sku_id: selectedDiscrepancy.sku_id,
-              asn_id: selectedDiscrepancy.asn_id,
-              asn_number: selectedDiscrepancy.asn_number || 'N/A',
-              client_sku: selectedDiscrepancy.client_sku || 'N/A',
-              title: selectedDiscrepancy.title || 'Product',
-              missing_qty: selectedDiscrepancy.missing_qty || 0,
-              image_url: selectedDiscrepancy.image_url,
-            }}
-            onSuccess={() => {
-              fetchDiscrepancies();
-              toast({ title: "Success", description: "Acknowledgment submitted" });
-            }}
-          />
-        </>
-      )}
     </div>
   );
 }
