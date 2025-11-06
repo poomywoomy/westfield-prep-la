@@ -9,23 +9,35 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload } from "lucide-react";
 
 interface ReturnProcessingDialogProps {
-  open: boolean;
+  open?: boolean;
   onClose: () => void;
-  skuId: string;
-  clientId: string;
-  skuCode: string;
+  skuId?: string;
+  clientId?: string;
+  skuCode?: string;
   onSuccess?: () => void;
+  returnId?: string;
+  expectedReturn?: {
+    shopify_return_id: string;
+    order_number: string | null;
+    expected_qty: number;
+    line_items: any;
+    client_id: string;
+  };
 }
 
 export const ReturnProcessingDialog = ({
-  open,
+  open = true,
   onClose,
-  skuId,
-  clientId,
+  skuId: propSkuId,
+  clientId: propClientId,
   skuCode,
   onSuccess,
+  returnId,
+  expectedReturn,
 }: ReturnProcessingDialogProps) => {
-  const [expectedQty, setExpectedQty] = useState<number>(0);
+  const [skuId, setSkuId] = useState<string>(propSkuId || "");
+  const [clientId, setClientId] = useState<string>(propClientId || expectedReturn?.client_id || "");
+  const [expectedQty, setExpectedQty] = useState<number>(expectedReturn?.expected_qty || 0);
   const [goodQty, setGoodQty] = useState<number>(0);
   const [damagedQty, setDamagedQty] = useState<number>(0);
   const [missingQty, setMissingQty] = useState<number>(0);
@@ -35,13 +47,22 @@ export const ReturnProcessingDialog = ({
   const { toast } = useToast();
 
   useEffect(() => {
+    if (expectedReturn) {
+      setExpectedQty(expectedReturn.expected_qty);
+      setClientId(expectedReturn.client_id);
+    }
+  }, [expectedReturn]);
+
+  useEffect(() => {
     if (open) {
       resetForm();
     }
   }, [open]);
 
   const resetForm = () => {
-    setExpectedQty(0);
+    if (!expectedReturn) {
+      setExpectedQty(0);
+    }
     setGoodQty(0);
     setDamagedQty(0);
     setMissingQty(0);
@@ -179,6 +200,18 @@ export const ReturnProcessingDialog = ({
         });
       }
 
+      // Update shopify_returns if this is from Shopify
+      if (returnId) {
+        await supabase
+          .from("shopify_returns")
+          .update({
+            status: "completed",
+            processed_qty: goodQty + damagedQty + missingQty,
+            received_at: new Date().toISOString(),
+          })
+          .eq("id", returnId);
+      }
+
       toast({
         title: "Success",
         description: "Return processed successfully",
@@ -202,7 +235,14 @@ export const ReturnProcessingDialog = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Process Return - {skuCode}</DialogTitle>
+          <DialogTitle>
+            Process Return {expectedReturn && `- Shopify Order #${expectedReturn.order_number}`}
+          </DialogTitle>
+          {expectedReturn && (
+            <p className="text-sm text-muted-foreground">
+              Return ID: #{expectedReturn.shopify_return_id.slice(-8)}
+            </p>
+          )}
         </DialogHeader>
         <div className="space-y-6">
           <div className="space-y-2">

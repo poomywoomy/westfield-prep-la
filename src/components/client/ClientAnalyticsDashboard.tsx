@@ -1,117 +1,83 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useAnalytics, getDateRange } from "@/hooks/useAnalytics";
-import { AnalyticsKPICard } from "./AnalyticsKPICard";
+import { PeriodMetricsCard } from "./PeriodMetricsCard";
+import { ReturnDiscrepancyWidget } from "./ReturnDiscrepancyWidget";
 import { DiscrepancyBreakdown } from "./DiscrepancyBreakdown";
 import { LowStockAlertsList } from "./LowStockAlertsList";
-import { TopPerformingSKUs } from "./TopPerformingSKUs";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Calendar, ShoppingCart, Package, TrendingUp, ArrowDownToLine, ArrowUpFromLine, Undo2 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getDateRange } from "@/hooks/useAnalytics";
+import { startOfDay, startOfMonth } from "date-fns";
 
 interface ClientAnalyticsDashboardProps {
   clientId: string;
 }
 
 export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardProps) => {
-  const [datePreset, setDatePreset] = useState("last30");
-  const dateRange = getDateRange(datePreset);
-  const { data, loading } = useAnalytics(clientId, dateRange);
+  const [customPeriod, setCustomPeriod] = useState("last30");
 
-  const datePresets = [
-    { value: "today", label: "Today" },
-    { value: "yesterday", label: "Yesterday" },
-    { value: "last7", label: "Last 7 Days" },
-    { value: "last30", label: "Last 30 Days" },
-    { value: "mtd", label: "Month to Date" },
-    { value: "last90", label: "Last 90 Days" },
-    { value: "ytd", label: "Year to Date" },
-  ];
+  // Fixed periods
+  const todayRange = { start: startOfDay(new Date()), end: new Date() };
+  const mtdRange = { start: startOfMonth(new Date()), end: new Date() };
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-wrap gap-2">
-          {datePresets.map((preset) => (
-            <Skeleton key={preset.value} className="h-10 w-32" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(7)].map((_, i) => (
-            <Skeleton key={i} className="h-40" />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  // Custom period
+  const getCustomRange = () => {
+    return getDateRange(customPeriod);
+  };
 
-  if (!data) {
-    return (
-      <Card className="p-12 text-center">
-        <p className="text-muted-foreground">No analytics data available</p>
-      </Card>
-    );
-  }
+  const getPeriodLabel = (preset: string) => {
+    switch (preset) {
+      case "last7": return "Last 7 Days";
+      case "last30": return "Last 30 Days";
+      case "last90": return "Last 90 Days";
+      case "ytd": return "Year to Date";
+      default: return "Last 30 Days";
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 flex-wrap">
-        <Calendar className="h-5 w-5 text-muted-foreground" />
-        {datePresets.map((preset) => (
-          <Button
-            key={preset.value}
-            variant={datePreset === preset.value ? "default" : "outline"}
-            size="sm"
-            onClick={() => setDatePreset(preset.value)}
-          >
-            {preset.label}
-          </Button>
-        ))}
+      {/* Period selector for Card 3 */}
+      <div className="flex justify-end">
+        <Select value={customPeriod} onValueChange={setCustomPeriod}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Select period" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="last7">Last 7 Days</SelectItem>
+            <SelectItem value="last30">Last 30 Days</SelectItem>
+            <SelectItem value="last90">Last 90 Days</SelectItem>
+            <SelectItem value="ytd">Year to Date</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <AnalyticsKPICard
-          title="Orders"
-          value={data.orders}
-          icon={ShoppingCart}
+      {/* Three period cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <PeriodMetricsCard
+          period="Today"
+          dateRange={todayRange}
+          clientId={clientId}
+          colorScheme="blue"
         />
-        <AnalyticsKPICard
-          title="Units Shipped"
-          value={data.unitsShipped.toLocaleString()}
-          icon={Package}
-          subtitle="Total units sent"
+        <PeriodMetricsCard
+          period="Month to Date"
+          dateRange={mtdRange}
+          clientId={clientId}
+          colorScheme="cyan"
         />
-        <AnalyticsKPICard
-          title="Units Received"
-          value={data.unitsReceived.toLocaleString()}
-          icon={ArrowDownToLine}
-          subtitle="Total units inbound"
-        />
-        <AnalyticsKPICard
-          title="Returns"
-          value={data.returns.toLocaleString()}
-          icon={Undo2}
-          subtitle="Units returned"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <DiscrepancyBreakdown
-          total={data.discrepancies.total}
-          receiving={data.discrepancies.receiving}
-          return={data.discrepancies.return}
-        />
-        <LowStockAlertsList alerts={data.lowStock} />
-        <AnalyticsKPICard
-          title="Current Inventory"
-          value={data.currentInventory.toLocaleString()}
-          icon={ArrowUpFromLine}
-          subtitle="Total units available"
+        <PeriodMetricsCard
+          period={getPeriodLabel(customPeriod)}
+          dateRange={getCustomRange()}
+          clientId={clientId}
+          colorScheme="purple"
+          isCustomizable
         />
       </div>
 
-      <TopPerformingSKUs skus={data.topPerforming} />
+      {/* Secondary widgets */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ReturnDiscrepancyWidget clientId={clientId} />
+        <LowStockAlertsList alerts={[]} />
+      </div>
     </div>
   );
 };

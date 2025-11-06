@@ -1932,6 +1932,62 @@ export type Database = {
           },
         ]
       }
+      shopify_returns: {
+        Row: {
+          client_id: string
+          created_at_shopify: string | null
+          expected_qty: number | null
+          id: string
+          line_items: Json
+          order_number: string | null
+          processed_qty: number | null
+          received_at: string | null
+          return_reason: string | null
+          shopify_order_id: string | null
+          shopify_return_id: string
+          status: string
+          synced_at: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at_shopify?: string | null
+          expected_qty?: number | null
+          id?: string
+          line_items?: Json
+          order_number?: string | null
+          processed_qty?: number | null
+          received_at?: string | null
+          return_reason?: string | null
+          shopify_order_id?: string | null
+          shopify_return_id: string
+          status: string
+          synced_at?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at_shopify?: string | null
+          expected_qty?: number | null
+          id?: string
+          line_items?: Json
+          order_number?: string | null
+          processed_qty?: number | null
+          received_at?: string | null
+          return_reason?: string | null
+          shopify_order_id?: string | null
+          shopify_return_id?: string
+          status?: string
+          synced_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_returns_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shopify_stores: {
         Row: {
           access_token: string
