@@ -44,6 +44,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
     has_lot_tracking: false,
     status: "active",
     notes: "",
+    low_stock_threshold: "",
   });
 
   useEffect(() => {
@@ -66,6 +67,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
         has_lot_tracking: sku.has_lot_tracking,
         status: sku.status,
         notes: sku.notes || "",
+        low_stock_threshold: sku.low_stock_threshold?.toString() || "",
       });
     } else {
       setFormData({
@@ -86,6 +88,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
         has_lot_tracking: false,
         status: "active",
         notes: "",
+        low_stock_threshold: "",
       });
     }
   }, [sku, open]);
@@ -112,6 +115,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
       has_lot_tracking: formData.has_lot_tracking,
       status: formData.status,
       notes: formData.notes || null,
+      low_stock_threshold: formData.low_stock_threshold ? parseInt(formData.low_stock_threshold) : null,
     };
 
     const { error } = sku
@@ -330,6 +334,8 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
               id="lowStockThreshold"
               type="number"
               min="0"
+              value={formData.low_stock_threshold}
+              onChange={(e) => setFormData({ ...formData, low_stock_threshold: e.target.value })}
               placeholder="Leave empty to use client default"
             />
             <p className="text-xs text-muted-foreground">

@@ -22,6 +22,7 @@ interface DiscrepancyActionsDialogProps {
     client_notes: string;
     submitted_at: string;
     status: string;
+    source_type?: string;
     client_sku?: string;
     title?: string;
     asn_number?: string;
@@ -98,6 +99,14 @@ export function DiscrepancyActionsDialog({
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-primary" />
             Process Client Decision
+            {decision.source_type && (
+              <Badge 
+                variant="outline" 
+                className={decision.source_type === "return" ? "border-blue-500 text-blue-600 ml-2" : "border-amber-500 text-amber-600 ml-2"}
+              >
+                {decision.source_type === "return" ? "🔄 Return" : "📦 Receiving"}
+              </Badge>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -111,8 +120,13 @@ export function DiscrepancyActionsDialog({
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">SKU: {decision.client_sku}</p>
-            <p className="text-sm text-muted-foreground">ASN: {decision.asn_number}</p>
+            {decision.asn_number && (
+              <p className="text-sm text-muted-foreground">ASN: {decision.asn_number}</p>
+            )}
             <p className="text-sm font-medium mt-2">Quantity: {decision.quantity} units</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Source: {decision.source_type === "return" ? "Customer Return Processing" : "Inbound Receiving"}
+            </p>
           </div>
 
           {/* Client Decision */}
@@ -145,35 +159,52 @@ export function DiscrepancyActionsDialog({
 
           {/* Action Guidance */}
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm font-medium text-blue-900 mb-2">Next Steps:</p>
+            <p className="text-sm font-medium text-blue-900 mb-2">
+              Next Steps {decision.source_type && `(${decision.source_type === "return" ? "Return" : "Receiving"} Workflow)`}:
+            </p>
             {decision.decision === "discard" && (
               <p className="text-sm text-blue-800">
+                {decision.source_type === "return" 
+                  ? "• Item returned by customer in damaged condition" 
+                  : "• Item received damaged during inbound shipment"}<br />
                 • Remove items from inventory<br />
                 • Document disposal for records
               </p>
             )}
             {decision.decision === "sell_as_bstock" && (
               <p className="text-sm text-blue-800">
+                {decision.source_type === "return" 
+                  ? "• Customer return - cosmetic damage only" 
+                  : "• Received with minor damage"}<br />
                 • Create new SKU variant for B-stock<br />
                 • Adjust pricing and list for sale
               </p>
             )}
             {decision.decision === "return_to_sender" && (
               <p className="text-sm text-blue-800">
+                {decision.source_type === "return" 
+                  ? "• Return to original customer" 
+                  : "• Return to supplier/sender"}<br />
                 • Generate return shipping label<br />
                 • Package items for return
               </p>
             )}
             {decision.decision === "rework" && (
               <p className="text-sm text-blue-800">
+                {decision.source_type === "return" 
+                  ? "• Customer return - repairable" 
+                  : "• Received damaged but repairable"}<br />
                 • Move to rework area<br />
                 • Schedule inspection and repair
               </p>
             )}
             {decision.decision === "acknowledge" && (
               <p className="text-sm text-blue-800">
-                • Client has acknowledged missing items<br />
-                • Follow up with carrier if needed
+                {decision.source_type === "return" 
+                  ? "• Customer return - missing items acknowledged" 
+                  : "• Inbound shipment - missing items acknowledged"}<br />
+                • Client has acknowledged the discrepancy<br />
+                • Follow up with carrier/supplier if needed
               </p>
             )}
           </div>

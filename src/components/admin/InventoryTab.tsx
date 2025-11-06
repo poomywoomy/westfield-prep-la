@@ -6,12 +6,15 @@ import { SKUList } from "./SKUList";
 import { ASNList } from "./ASNList";
 import { InventorySummary } from "./InventorySummary";
 import { QuickScanModal } from "./QuickScanModal";
+import { ReturnProcessingDialog } from "./ReturnProcessingDialog";
 import { useToast } from "@/hooks/use-toast";
 
 export const InventoryTab = () => {
   const [activeSubTab, setActiveSubTab] = useState("skus");
   const [quickAdjustOpen, setQuickAdjustOpen] = useState(false);
   const [quickScanOpen, setQuickScanOpen] = useState(false);
+  const [returnProcessingOpen, setReturnProcessingOpen] = useState(false);
+  const [selectedReturnSku, setSelectedReturnSku] = useState<any>(null);
   const { toast } = useToast();
 
   return (
@@ -51,11 +54,32 @@ export const InventoryTab = () => {
         </TabsContent>
 
         <TabsContent value="inventory">
-          <InventorySummary />
+          <InventorySummary 
+            onProcessReturn={(skuData) => {
+              setSelectedReturnSku(skuData);
+              setReturnProcessingOpen(true);
+            }}
+          />
         </TabsContent>
       </Tabs>
 
       <QuickScanModal open={quickScanOpen} onOpenChange={setQuickScanOpen} />
+      
+      {selectedReturnSku && (
+        <ReturnProcessingDialog
+          open={returnProcessingOpen}
+          onClose={() => {
+            setReturnProcessingOpen(false);
+            setSelectedReturnSku(null);
+          }}
+          skuId={selectedReturnSku.sku_id}
+          clientId={selectedReturnSku.client_id}
+          skuCode={selectedReturnSku.client_sku}
+          onSuccess={() => {
+            toast({ title: "Success", description: "Return processed successfully" });
+          }}
+        />
+      )}
     </div>
   );
 };

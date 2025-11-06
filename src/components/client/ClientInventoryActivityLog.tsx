@@ -9,7 +9,7 @@ import { Search } from "lucide-react";
 interface ActivityLogEntry {
   id: string;
   timestamp: string;
-  type: 'receiving_started' | 'issue_detected' | 'receiving_completed' | 'receiving_paused' | 'adjustment' | 'sold' | 'transfer';
+  type: 'receiving_started' | 'issue_detected' | 'receiving_completed' | 'receiving_paused' | 'adjustment' | 'sold' | 'transfer' | 'return' | 'low_stock' | 'discrepancy_created' | 'discrepancy_resolved';
   asnNumber?: string;
   skuCode?: string;
   message: string;
@@ -44,16 +44,24 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
 
       if (asnError) throw asnError;
 
-      // Fetch inventory adjustments
+      // Fetch inventory adjustments including returns
       const { data: adjustments, error: adjError } = await supabase
         .from('inventory_ledger')
         .select('id, ts, qty_delta, reason_code, notes, transaction_type, skus(client_sku, title)')
         .eq('client_id', clientId)
-        .in('transaction_type', ['ADJUSTMENT_PLUS', 'ADJUSTMENT_MINUS', 'SALE_DECREMENT', 'TRANSFER'])
+        .in('transaction_type', ['ADJUSTMENT_PLUS', 'ADJUSTMENT_MINUS', 'SALE_DECREMENT', 'TRANSFER', 'RETURN'])
         .order('ts', { ascending: false })
         .limit(50);
 
       if (adjError) throw adjError;
+
+      // Fetch low stock items
+      const { data: lowStockItems, error: lowStockError } = await supabase
+        .from('inventory_summary')
+        .select('sku_id, client_sku, title, available, skus!inner(low_stock_threshold), clients!inner(default_low_stock_threshold)')
+        .eq('client_id', clientId);
+
+      if (lowStockError) console.error('Error fetching low stock:', lowStockError);
 
       const entries: ActivityLogEntry[] = [];
       
@@ -102,7 +110,10 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
         let type: ActivityLogEntry['type'];
         let message: string;
 
-        if (adj.transaction_type === 'SALE_DECREMENT' || adj.reason_code === 'sold') {
+        if (adj.transaction_type === 'RETURN') {
+          type = 'return';
+          message = `Return processed: ${adj.qty_delta} units of ${sku?.client_sku || 'SKU'} - ${adj.notes || 'good condition'}`;
+        } else if (adj.transaction_type === 'SALE_DECREMENT' || adj.reason_code === 'sold') {
           type = 'sold';
           message = `Sold ${Math.abs(adj.qty_delta)} units of ${sku?.client_sku || 'SKU'}`;
         } else if (adj.reason_code && ['sent_to_amazon', 'sent_to_walmart', 'sent_to_tiktok'].includes(adj.reason_code)) {
@@ -123,6 +134,20 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
           skuCode: sku?.client_sku,
           message
         });
+      });
+
+      // Add low stock alerts
+      lowStockItems?.forEach((item: any) => {
+        const threshold = item.skus?.low_stock_threshold || item.clients?.default_low_stock_threshold || 10;
+        if (item.available < threshold && item.available > 0) {
+          entries.push({
+            id: `low-stock-${item.sku_id}`,
+            timestamp: new Date().toISOString(),
+            type: 'low_stock',
+            skuCode: item.client_sku,
+            message: `Low stock alert: ${item.title} - Only ${item.available} units remaining (threshold: ${threshold})`
+          });
+        }
       });
 
       // Sort by timestamp descending
@@ -172,10 +197,10 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
       const typeMap: Record<string, ActivityLogEntry['type'][]> = {
         received: ['receiving_started', 'receiving_completed'],
         shipped: ['sold', 'transfer'],
-        returns: [], // Would need RETURN type added
-        discrepancies: ['issue_detected'],
+        returns: ['return'],
+        discrepancies: ['issue_detected', 'discrepancy_created', 'discrepancy_resolved'],
         adjustments: ['adjustment'],
-        lowstock: [], // Would need LOW_STOCK type added
+        lowstock: ['low_stock'],
       };
       const validTypes = typeMap[filterType] || [];
       if (validTypes.length > 0 && !validTypes.includes(activity.type)) {
@@ -211,8 +236,10 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
               <SelectItem value="all">All Activity</SelectItem>
               <SelectItem value="received">Received</SelectItem>
               <SelectItem value="shipped">Shipped</SelectItem>
+              <SelectItem value="returns">Returns</SelectItem>
               <SelectItem value="discrepancies">Discrepancies</SelectItem>
               <SelectItem value="adjustments">Adjustments</SelectItem>
+              <SelectItem value="lowstock">Low Stock</SelectItem>
             </SelectContent>
           </Select>
           <div className="relative flex-1">

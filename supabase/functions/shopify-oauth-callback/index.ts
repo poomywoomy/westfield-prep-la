@@ -116,15 +116,28 @@ Deno.serve(async (req) => {
 
     console.log('Shopify store connected successfully!');
 
-    // Register mandatory compliance webhooks
+    // Register webhooks (compliance + fulfillment + orders + returns)
     const webhookUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/shopify-webhook-handler`;
-    const mandatoryTopics = [
+    const webhookTopics = [
+      // Compliance (mandatory)
       'customers/data_request',
       'customers/redact',
-      'shop/redact'
+      'shop/redact',
+      
+      // Fulfillment Orders (new API)
+      'fulfillment_orders/order_routing_complete',
+      
+      // Orders (existing)
+      'orders/fulfilled',
+      'orders/cancelled',
+      
+      // Returns (optional but recommended)
+      'returns/request',
+      'returns/approve',
+      'returns/decline',
     ];
 
-    for (const topic of mandatoryTopics) {
+    for (const topic of webhookTopics) {
       try {
         const webhookResponse = await fetch(
           `https://${shop}/admin/api/${apiVersion}/webhooks.json`,
@@ -146,7 +159,7 @@ Deno.serve(async (req) => {
 
         if (webhookResponse.ok) {
           const webhookData = await webhookResponse.json();
-          console.log(`Registered mandatory webhook: ${topic}`);
+          console.log(`Registered webhook: ${topic}`);
           
           // Store webhook registration
           await supabase.from('shopify_webhooks').insert({

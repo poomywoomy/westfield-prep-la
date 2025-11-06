@@ -104,6 +104,10 @@ Deno.serve(async (req) => {
         await handleInventoryWebhook(supabase, store.client_id, payload);
       } else if (topic.startsWith('orders/')) {
         await handleOrderWebhook(supabase, store.client_id, topic, payload);
+      } else if (topic === 'fulfillment_orders/order_routing_complete') {
+        await handleFulfillmentOrderWebhook(supabase, store.client_id, payload);
+      } else if (topic.startsWith('returns/')) {
+        await handleReturnWebhook(supabase, store.client_id, topic, payload);
       } else if (topic.startsWith('customers/') || topic.startsWith('shop/')) {
         // Handle mandatory compliance webhooks
         await handleComplianceWebhook(supabase, shopDomain, topic, payload);
@@ -267,4 +271,44 @@ async function handleComplianceWebhook(
     });
 
   console.log(`Compliance webhook logged: ${webhookType} for ${shopDomain}`);
+}
+
+async function handleFulfillmentOrderWebhook(
+  supabase: any,
+  clientId: string,
+  payload: any
+) {
+  console.log(`Handling fulfillment order routing for client ${clientId}`);
+  
+  const fulfillmentOrder = payload.fulfillment_order;
+  
+  // Update order record with fulfillment_order_id
+  const { error } = await supabase
+    .from('shopify_orders')
+    .update({ fulfillment_order_id: fulfillmentOrder.id.toString() })
+    .eq('shopify_order_id', fulfillmentOrder.order_id.toString())
+    .eq('client_id', clientId);
+  
+  if (error) {
+    console.error('Failed to update fulfillment order ID:', error);
+  } else {
+    console.log(`Updated order ${fulfillmentOrder.order_id} with fulfillment order ID ${fulfillmentOrder.id}`);
+  }
+}
+
+async function handleReturnWebhook(
+  supabase: any,
+  clientId: string,
+  topic: string,
+  payload: any
+) {
+  console.log(`Handling return webhook: ${topic} for client ${clientId}`);
+  
+  const returnRequest = payload.return;
+  
+  // Log return event for admin/client review
+  console.log(`Return ${returnRequest.id} - Status: ${returnRequest.status}`);
+  
+  // Could create notification or activity log entry here
+  // For now, just log it for reference
 }

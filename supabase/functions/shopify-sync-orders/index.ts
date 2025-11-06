@@ -90,20 +90,26 @@ Deno.serve(async (req) => {
     console.log(`Fetched ${allOrders.length} total orders from ${pageCount} pages`);
 
     // Process and upsert orders
-    const ordersData = allOrders.map((order: any) => ({
-      client_id,
-      shopify_order_id: order.id.toString(),
-      order_number: order.name,
-      customer_email: order.email,
-      customer_name: order.customer?.name || order.shipping_address?.name,
-      total_price: parseFloat(order.total_price),
-      currency: order.currency,
-      fulfillment_status: order.fulfillment_status,
-      financial_status: order.financial_status,
-      line_items: order.line_items,
-      shipping_address: order.shipping_address,
-      shopify_created_at: order.created_at,
-    }));
+    const ordersData = allOrders.map((order: any) => {
+      // Get first fulfillment order ID if available
+      const fulfillmentOrderId = order.fulfillment_orders?.[0]?.id?.toString() || null;
+      
+      return {
+        client_id,
+        shopify_order_id: order.id.toString(),
+        order_number: order.name,
+        customer_email: order.email,
+        customer_name: order.customer?.name || order.shipping_address?.name,
+        total_price: parseFloat(order.total_price),
+        currency: order.currency,
+        fulfillment_status: order.fulfillment_status,
+        financial_status: order.financial_status,
+        line_items: order.line_items,
+        shipping_address: order.shipping_address,
+        shopify_created_at: order.created_at,
+        fulfillment_order_id: fulfillmentOrderId,
+      };
+    });
 
     const { error: upsertError } = await supabase
       .from('shopify_orders')

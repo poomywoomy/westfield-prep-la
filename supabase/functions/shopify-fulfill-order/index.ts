@@ -72,9 +72,34 @@ Deno.serve(async (req) => {
 
     const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
 
-    // Create fulfillment in Shopify
+    // Step 1: Get fulfillment order ID for this order
+    const fulfillmentOrderResponse = await fetch(
+      `https://${store.shop_domain}/admin/api/${apiVersion}/orders/${order.shopify_order_id}/fulfillment_orders.json`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Access-Token': store.access_token,
+        },
+      }
+    );
+
+    if (!fulfillmentOrderResponse.ok) {
+      throw new Error('Failed to fetch fulfillment orders');
+    }
+
+    const fulfillmentOrderData = await fulfillmentOrderResponse.json();
+    const fulfillmentOrder = fulfillmentOrderData.fulfillment_orders?.find(
+      (fo: any) => fo.status === 'open' || fo.status === 'in_progress'
+    );
+
+    if (!fulfillmentOrder) {
+      throw new Error('No open fulfillment order found');
+    }
+
+    // Step 2: Create fulfillment using Third Party Fulfillment Orders API
     const fulfillmentResponse = await fetch(
-      `https://${store.shop_domain}/admin/api/${apiVersion}/orders/${order.shopify_order_id}/fulfillments.json`,
+      `https://${store.shop_domain}/admin/api/${apiVersion}/fulfillments.json`,
       {
         method: 'POST',
         headers: {
@@ -83,11 +108,16 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           fulfillment: {
-            notify_customer,
+            line_items_by_fulfillment_order: [
+              {
+                fulfillment_order_id: fulfillmentOrder.id,
+              },
+            ],
             tracking_info: {
               number: tracking_number,
               company: carrier,
             },
+            notify_customer,
           },
         }),
       }
@@ -96,7 +126,7 @@ Deno.serve(async (req) => {
     if (!fulfillmentResponse.ok) {
       const errorText = await fulfillmentResponse.text();
       console.error('Shopify fulfillment failed:', errorText);
-      throw new Error(`Failed to create fulfillment in Shopify: ${errorText}`);
+      throw new Error(`Failed to create fulfillment: ${errorText}`);
     }
 
     const fulfillmentData = await fulfillmentResponse.json();

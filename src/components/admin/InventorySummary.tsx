@@ -37,7 +37,11 @@ interface EnhancedInventoryRow {
   last_activity: string | null;
 }
 
-export const InventorySummary = () => {
+interface InventorySummaryProps {
+  onProcessReturn?: (skuData: any) => void;
+}
+
+export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => {
   const [inventory, setInventory] = useState<EnhancedInventoryRow[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -175,12 +179,21 @@ export const InventorySummary = () => {
     setLoading(false);
   };
 
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
+
   const fetchDiscrepancies = async () => {
     setLoading(true);
     
+    // Fetch from damaged_item_decisions with proper joins
     let query = supabase
-      .from("inventory_discrepancies_summary")
-      .select("*");
+      .from("damaged_item_decisions")
+      .select(`
+        *,
+        clients!inner(company_name),
+        skus!inner(client_sku, title),
+        asn_headers(asn_number)
+      `)
+      .order("created_at", { ascending: false });
     
     if (selectedClient !== "all") {
       query = query.eq("client_id", selectedClient);
@@ -454,6 +467,7 @@ export const InventorySummary = () => {
                       onViewHistory={() => openHistoryDialog(item)}
                       onCreateShipment={() => toast({ title: "Coming Soon", description: "Shipment creation" })}
                       onViewDetails={() => toast({ title: "Coming Soon", description: "SKU details view" })}
+                      onProcessReturn={onProcessReturn ? () => onProcessReturn(item) : undefined}
                     />
                   </TableCell>
                 </TableRow>
@@ -499,17 +513,28 @@ export const InventorySummary = () => {
                 ))}
               </SelectContent>
             </Select>
+
+            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sources</SelectItem>
+                <SelectItem value="receiving">Receiving</SelectItem>
+                <SelectItem value="return">Return</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="border rounded-lg">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ASN</TableHead>
-                  <TableHead>SKU / Product</TableHead>
-                  <TableHead className="text-right">Damaged</TableHead>
-                  <TableHead className="text-right">Missing</TableHead>
-                  <TableHead className="text-right">Quarantined</TableHead>
+                  <TableHead>Client / SKU</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Source</TableHead>
+                  <TableHead>Quantity</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -522,83 +547,71 @@ export const InventorySummary = () => {
                       Loading discrepancies...
                     </TableCell>
                   </TableRow>
-                ) : discrepancies.length === 0 ? (
+                ) : discrepancies.filter(item => 
+                  sourceFilter === "all" || item.source_type === sourceFilter
+                ).length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                       No discrepancies found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  discrepancies.map((item) => (
-                    <TableRow key={item.sku_id + item.asn_id}>
+                  discrepancies
+                    .filter(item => sourceFilter === "all" || item.source_type === sourceFilter)
+                    .map((item: any) => (
+                    <TableRow key={item.id}>
                       <TableCell>
-                        <Badge variant="outline">{item.asn_number}</Badge>
+                        <div className="flex flex-col">
+                          <Badge variant="outline" className="w-fit mb-1 text-xs">
+                            {item.clients?.company_name}
+                          </Badge>
+                          <span className="font-medium">{item.skus?.client_sku}</span>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="font-medium">{item.client_sku}</span>
-                          <span className="text-xs text-muted-foreground">{item.title}</span>
+                          <span className="font-medium">{item.skus?.title}</span>
+                          {item.asn_headers && (
+                            <span className="text-xs text-muted-foreground">
+                              ASN: {item.asn_headers.asn_number}
+                            </span>
+                          )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">
-                        {item.damaged_qty > 0 ? (
-                          <Badge variant="destructive">{item.damaged_qty}</Badge>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {item.missing_qty > 0 ? (
-                          <Badge variant="destructive">{item.missing_qty}</Badge>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {item.quarantined_qty > 0 ? (
-                          <Badge variant="outline" className="border-amber-500 text-amber-500">
-                            {item.quarantined_qty}
-                          </Badge>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
                       <TableCell>
-                        <Badge variant={item.status === "issue" ? "destructive" : "default"}>
-                          {item.status}
+                        <Badge variant={item.discrepancy_type === "damaged" ? "default" : "destructive"}>
+                          {item.discrepancy_type}
                         </Badge>
                       </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant="outline" 
+                          className={item.source_type === "return" ? "border-blue-500 text-blue-600" : "border-amber-500 text-amber-600"}
+                        >
+                          {item.source_type === "return" ? "🔄 Return" : "📦 Receiving"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-medium">{item.quantity} units</span>
+                      </TableCell>
+                      <TableCell>
+                        <DiscrepancyStatusBadge status={item.status} />
+                      </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {item.received_at ? format(new Date(item.received_at), "MMM d, yyyy") : "-"}
+                        {item.created_at ? format(new Date(item.created_at), "MMM d, yyyy") : "-"}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={async () => {
-                            // Fetch the decision record for this discrepancy
-                            const { data: decisions } = await supabase
-                              .from("damaged_item_decisions")
-                              .select("*")
-                              .eq("asn_id", item.asn_id)
-                              .eq("sku_id", item.sku_id)
-                              .order("created_at", { ascending: false })
-                              .limit(1);
-
-                            if (decisions && decisions.length > 0) {
-                              setSelectedDiscrepancy({
-                                ...decisions[0],
-                                client_sku: item.client_sku,
-                                title: item.title,
-                                asn_number: item.asn_number,
-                              });
-                              setDiscrepancyDialogOpen(true);
-                            } else {
-                              toast({
-                                title: "No Decision Yet",
-                                description: "Client has not submitted a decision for this discrepancy",
-                              });
-                            }
+                          onClick={() => {
+                            setSelectedDiscrepancy({
+                              ...item,
+                              client_sku: item.skus?.client_sku,
+                              title: item.skus?.title,
+                              asn_number: item.asn_headers?.asn_number,
+                            });
+                            setDiscrepancyDialogOpen(true);
                           }}
                         >
                           Review

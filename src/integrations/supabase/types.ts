@@ -683,6 +683,7 @@ export type Database = {
           receiving_format:
             | Database["public"]["Enums"]["receiving_format"]
             | null
+          shopify_location_id: string | null
           status: Database["public"]["Enums"]["client_status"] | null
           storage: boolean | null
           storage_method: string | null
@@ -718,6 +719,7 @@ export type Database = {
           receiving_format?:
             | Database["public"]["Enums"]["receiving_format"]
             | null
+          shopify_location_id?: string | null
           status?: Database["public"]["Enums"]["client_status"] | null
           storage?: boolean | null
           storage_method?: string | null
@@ -753,6 +755,7 @@ export type Database = {
           receiving_format?:
             | Database["public"]["Enums"]["receiving_format"]
             | null
+          shopify_location_id?: string | null
           status?: Database["public"]["Enums"]["client_status"] | null
           storage?: boolean | null
           storage_method?: string | null
@@ -1872,6 +1875,7 @@ export type Database = {
           customer_email: string | null
           customer_name: string | null
           financial_status: string | null
+          fulfillment_order_id: string | null
           fulfillment_status: string | null
           id: string
           line_items: Json | null
@@ -1889,6 +1893,7 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string | null
           financial_status?: string | null
+          fulfillment_order_id?: string | null
           fulfillment_status?: string | null
           id?: string
           line_items?: Json | null
@@ -1906,6 +1911,7 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string | null
           financial_status?: string | null
+          fulfillment_order_id?: string | null
           fulfillment_status?: string | null
           id?: string
           line_items?: Json | null

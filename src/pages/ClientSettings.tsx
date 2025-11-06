@@ -21,6 +21,7 @@ const ClientSettings = () => {
   const [lastName, setLastName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [lowStockThreshold, setLowStockThreshold] = useState<number>(10);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,7 +44,7 @@ const ClientSettings = () => {
   const fetchClientData = async () => {
     const { data, error } = await supabase
       .from("clients")
-      .select("id, first_name, last_name, company_name, email, phone_number")
+      .select("id, first_name, last_name, company_name, email, phone_number, default_low_stock_threshold")
       .eq("user_id", user?.id)
       .single();
 
@@ -53,6 +54,7 @@ const ClientSettings = () => {
       setLastName(data.last_name || "");
       setCompanyName(data.company_name || "");
       setPhoneNumber(data.phone_number || "");
+      setLowStockThreshold(data.default_low_stock_threshold || 10);
       setHasSetPassword(true);
     }
   };
@@ -69,6 +71,7 @@ const ClientSettings = () => {
         company_name: companyName,
         phone_number: phoneNumber,
         contact_name: `${firstName} ${lastName}`.trim(),
+        default_low_stock_threshold: lowStockThreshold,
       })
       .eq("user_id", user?.id);
 
@@ -265,7 +268,8 @@ const ClientSettings = () => {
                     id="lowStockThreshold"
                     type="number"
                     min="0"
-                    defaultValue="10"
+                    value={lowStockThreshold}
+                    onChange={(e) => setLowStockThreshold(parseInt(e.target.value) || 0)}
                     placeholder="10"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
