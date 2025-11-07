@@ -280,6 +280,30 @@ export function ShopifyManagementTab() {
     }
   };
 
+  const handleSyncAll = async (clientId: string) => {
+    setSyncing(clientId);
+    try {
+      // First sync products
+      await handleSyncProducts(clientId);
+      // Then sync inventory
+      await handleSyncInventory(clientId);
+      
+      toast({
+        title: "Complete Sync Successful",
+        description: "Products and inventory synced successfully",
+      });
+    } catch (error: any) {
+      console.error("Error in complete sync:", error);
+      toast({
+        title: "Sync Failed",
+        description: error.message || "Failed to complete full sync",
+        variant: "destructive",
+      });
+    } finally {
+      setSyncing(null);
+    }
+  };
+
   const testConnection = async (clientId: string, storeDomain: string) => {
     setTesting(clientId);
     try {
@@ -566,7 +590,7 @@ export function ShopifyManagementTab() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                              onClick={() => handleSyncProducts(store.client_id)}
+                              onClick={() => handleSyncAll(store.client_id)}
                               disabled={syncing === store.client_id}
                             >
                               {syncing === store.client_id ? (
@@ -575,20 +599,7 @@ export function ShopifyManagementTab() {
                                   Syncing...
                                 </>
                               ) : (
-                                'Sync Products'
-                              )}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleSyncInventory(store.client_id)}
-                              disabled={syncing === store.client_id}
-                            >
-                              {syncing === store.client_id ? (
-                                <>
-                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                  Syncing...
-                                </>
-                              ) : (
-                                'Sync Inventory'
+                                'Sync Now (Products + Inventory)'
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuItem

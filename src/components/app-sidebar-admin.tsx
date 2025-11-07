@@ -24,7 +24,6 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount }: Ap
 
   const menuItems = [
     { id: "clients", label: "Clients", icon: Users },
-    { id: "quotes", label: "Quotes", icon: FileText },
     { id: "billing", label: "Billing", icon: DollarSign },
     { id: "inventory", label: "Inventory", icon: Package },
     { id: "discrepancies", label: "Discrepancies", icon: AlertTriangle, badge: discrepancyCount },

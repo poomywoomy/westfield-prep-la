@@ -144,7 +144,7 @@ export const StartBillingCycleDialog = ({
             itemsToInsert.push({
               service_name: service.service_name,
               service_code: service.service_code || null,
-              unit_price_cents: Math.round(service.price_per_unit * 100),
+              unit_price_cents: Math.round((service.service_price || 0) * 100),
               qty_decimal: 0,
               section_type: "Standard Operations",
               source: "quote",
@@ -159,7 +159,7 @@ export const StartBillingCycleDialog = ({
               itemsToInsert.push({
                 service_name: service.service_name,
                 service_code: service.service_code || null,
-                unit_price_cents: Math.round(service.price_per_unit * 100),
+                unit_price_cents: Math.round((service.service_price || 0) * 100),
                 qty_decimal: 0,
                 section_type: section.type,
                 source: "quote",

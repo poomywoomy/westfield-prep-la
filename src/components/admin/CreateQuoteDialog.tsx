@@ -58,16 +58,17 @@ interface CreateQuoteDialogProps {
   clients: any[];
   onQuoteCreated: () => void;
   editingQuote?: any;
+  manualOnly?: boolean;
 }
 
-const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editingQuote }: CreateQuoteDialogProps) => {
+const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editingQuote, manualOnly = false }: CreateQuoteDialogProps) => {
   const { toast } = useToast();
   const [selectedClientId, setSelectedClientId] = useState("");
   const [manualClientName, setManualClientName] = useState("");
   const [manualContactName, setManualContactName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
   const [manualPhone, setManualPhone] = useState("");
-  const [useManualEntry, setUseManualEntry] = useState(false);
+  const [useManualEntry, setUseManualEntry] = useState(manualOnly);
   const [standardItems, setStandardItems] = useState<LineItem[]>([]);
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
   const [additionalComments, setAdditionalComments] = useState("");
@@ -720,22 +721,24 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
 
         <div className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant={useManualEntry ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  setUseManualEntry(!useManualEntry);
-                  // Clear selections when toggling modes
-                  if (!useManualEntry) {
-                    setSelectedClientId("");
-                  }
-                }}
-              >
-                {useManualEntry ? "Using Manual Entry" : "Manual Entry"}
-              </Button>
-            </div>
+            {!manualOnly && (
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant={useManualEntry ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setUseManualEntry(!useManualEntry);
+                    // Clear selections when toggling modes
+                    if (!useManualEntry) {
+                      setSelectedClientId("");
+                    }
+                  }}
+                >
+                  {useManualEntry ? "Using Manual Entry" : "Manual Entry"}
+                </Button>
+              </div>
+            )}
 
             {useManualEntry ? (
               <div className="space-y-4">

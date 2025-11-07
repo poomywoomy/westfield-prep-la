@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { LogOut, Settings, ChevronDown, Scan } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientsTab from "@/components/admin/ClientsTab";
-import QuotesTab from "@/components/admin/QuotesTab";
 import BillingTab from "@/components/admin/BillingTab";
 import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
 import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
@@ -139,10 +138,6 @@ const AdminDashboard = () => {
 
           <TabsContent value="clients">
             <ClientsTab />
-          </TabsContent>
-
-          <TabsContent value="quotes">
-            <QuotesTab />
           </TabsContent>
 
           <TabsContent value="billing">

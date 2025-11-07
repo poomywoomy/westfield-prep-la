@@ -300,7 +300,7 @@ Deno.serve(async (req) => {
                         sku_id: existingSku.id,
                         location_id: primaryLocation.id,
                         qty_delta: availableQty,
-                        transaction_type: 'adjustment',
+                        transaction_type: 'ADJUSTMENT_PLUS',
                         reason_code: 'shopify_seed',
                         notes: `Initial inventory seeded from Shopify (${availableQty} units)`,
                         source_type: 'shopify_sync',

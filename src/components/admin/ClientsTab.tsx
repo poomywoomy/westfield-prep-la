@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, RefreshCw } from "lucide-react";
 import CreateClientDialog from "./CreateClientDialog";
+import CreateQuoteDialog from "./CreateQuoteDialog";
 import ClientsList from "./ClientsList";
 
 const ClientsTab = () => {
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showQuoteDialog, setShowQuoteDialog] = useState(false);
   const { toast } = useToast();
 
   const fetchClients = async () => {
@@ -79,6 +81,10 @@ const ClientsTab = () => {
               <Plus className="mr-2 h-4 w-4" />
               Create Client
             </Button>
+            <Button onClick={() => setShowQuoteDialog(true)} variant="secondary">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Quote (Prospect)
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -94,6 +100,14 @@ const ClientsTab = () => {
         open={showCreateDialog}
         onOpenChange={setShowCreateDialog}
         onSuccess={fetchClients}
+      />
+      
+      <CreateQuoteDialog
+        open={showQuoteDialog}
+        onOpenChange={setShowQuoteDialog}
+        clients={clients}
+        onQuoteCreated={fetchClients}
+        manualOnly={true}
       />
     </Card>
   );
