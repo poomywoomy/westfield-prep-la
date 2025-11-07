@@ -10,6 +10,9 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const startTime = Date.now();
+  let syncLogId: string | null = null;
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
@@ -32,6 +35,23 @@ Deno.serve(async (req) => {
     const serviceClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
     const { client_id } = await req.json();
+
+    // Start sync log
+    const { data: syncLog } = await serviceClient
+      .from('sync_logs')
+      .insert({
+        client_id: client_id,
+        sync_type: 'orders',
+        status: 'in_progress',
+        products_synced: 0,
+        triggered_by: user.id,
+      })
+      .select()
+      .single();
+
+    if (syncLog) {
+      syncLogId = syncLog.id;
+    }
 
     // Get client info using service client
     const { data: client } = await serviceClient
@@ -122,6 +142,20 @@ Deno.serve(async (req) => {
       throw upsertError;
     }
 
+    const durationMs = Date.now() - startTime;
+
+    // Update sync log to success
+    if (syncLogId) {
+      await serviceClient
+        .from('sync_logs')
+        .update({
+          status: 'success',
+          products_synced: ordersData.length,
+          duration_ms: durationMs,
+        })
+        .eq('id', syncLogId);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -134,6 +168,25 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Order sync error:', error);
+    
+    const durationMs = Date.now() - startTime;
+
+    // Update sync log to failed
+    if (syncLogId) {
+      const serviceClient = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      );
+
+      await serviceClient
+        .from('sync_logs')
+        .update({
+          status: 'failed',
+          duration_ms: durationMs,
+          error_message: error instanceof Error ? error.message : 'Unknown error',
+        })
+        .eq('id', syncLogId);
+    }
     
     let errorMessage = 'Unable to sync orders from Shopify. Please try again or contact support.';
     

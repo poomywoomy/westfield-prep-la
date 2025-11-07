@@ -73,36 +73,100 @@ export const StartBillingCycleDialog = ({
       }
 
       // Get active quote
-      const { data: activeQuote, error: quoteError } = await supabase
+      const { data: activeQuote } = await supabase
         .from("quotes")
         .select("*")
         .eq("client_id", client.id)
         .eq("status", "active")
         .maybeSingle();
 
-      if (!activeQuote) {
-        // Check if any quote exists
-        const { data: anyQuote } = await supabase
-          .from("quotes")
-          .select("status")
-          .eq("client_id", client.id)
-          .maybeSingle();
+      // If no active quote, check for custom_pricing
+      let pricingQuoteId: string | null = null;
+      const itemsToInsert: any[] = [];
 
-        if (!anyQuote) {
-          toast({
-            title: "No Quote Found",
-            description: "This client has no pricing quote. Please create a quote first.",
-            variant: "destructive",
+      if (!activeQuote) {
+        // Check if custom_pricing exists
+        const { data: customPricing } = await supabase
+          .from("custom_pricing")
+          .select("*")
+          .eq("client_id", client.id);
+
+        if (!customPricing || customPricing.length === 0) {
+          // Check if user is admin
+          const { data: { user } } = await supabase.auth.getUser();
+          const { data: userRole } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user?.id)
+            .single();
+
+          const isAdmin = userRole?.role === 'admin';
+
+          if (isAdmin) {
+            toast({
+              title: "No Pricing Found",
+              description: "This client has no active quote and no pricing. Please create/activate a quote or apply pricing first.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "No Quote Found",
+              description: "This client has no pricing quote. Please create a quote first.",
+              variant: "destructive",
+            });
+          }
+          setLoading(false);
+          return;
+        }
+
+        // Use custom_pricing instead
+        pricingQuoteId = null;
+        customPricing.forEach((pricing: any) => {
+          itemsToInsert.push({
+            service_name: pricing.service_name,
+            service_code: null,
+            unit_price_cents: Math.round(pricing.price_per_unit * 100),
+            qty_decimal: 0,
+            section_type: pricing.section_type || "Standard Operations",
+            source: "pricing",
+            note: pricing.notes,
           });
-        } else {
-          toast({
-            title: "Quote Not Active",
-            description: "This client has a quote but it's not activated. Please activate the quote first.",
-            variant: "destructive",
+        });
+      } else {
+        pricingQuoteId = activeQuote.id;
+
+        // Auto-populate from quote
+        const quoteData = activeQuote.quote_data as any;
+
+        // Add Standard Operations
+        if (quoteData.standard_operations) {
+          quoteData.standard_operations.forEach((service: any) => {
+            itemsToInsert.push({
+              service_name: service.service_name,
+              service_code: service.service_code || null,
+              unit_price_cents: Math.round(service.price_per_unit * 100),
+              qty_decimal: 0,
+              section_type: "Standard Operations",
+              source: "quote",
+            });
           });
         }
-        setLoading(false);
-        return;
+
+        // Add fulfillment sections
+        if (quoteData.fulfillment_sections) {
+          quoteData.fulfillment_sections.forEach((section: any) => {
+            section.items?.forEach((service: any) => {
+              itemsToInsert.push({
+                service_name: service.service_name,
+                service_code: service.service_code || null,
+                unit_price_cents: Math.round(service.price_per_unit * 100),
+                qty_decimal: 0,
+                section_type: section.type,
+                source: "quote",
+              });
+            });
+          });
+        }
       }
 
       // Create the bill
@@ -115,7 +179,7 @@ export const StartBillingCycleDialog = ({
           statement_start_date: statementStartDate,
           statement_end_date: statementEndDate,
           status: "open",
-          pricing_quote_id: activeQuote.id,
+          pricing_quote_id: pricingQuoteId,
           subtotal_cents: 0,
           amount_due_cents: 0,
         })
@@ -124,41 +188,10 @@ export const StartBillingCycleDialog = ({
 
       if (billError) throw billError;
 
-      // Auto-populate from quote
-      const quoteData = activeQuote.quote_data as any;
-      const itemsToInsert: any[] = [];
-
-      // Add Standard Operations
-      if (quoteData.standard_operations) {
-        quoteData.standard_operations.forEach((service: any) => {
-          itemsToInsert.push({
-            bill_id: newBill.id,
-            service_name: service.service_name,
-            service_code: service.service_code || null,
-            unit_price_cents: Math.round(service.price_per_unit * 100),
-            qty_decimal: 0,
-            section_type: "Standard Operations",
-            source: "quote",
-          });
-        });
-      }
-
-      // Add fulfillment sections
-      if (quoteData.fulfillment_sections) {
-        quoteData.fulfillment_sections.forEach((section: any) => {
-          section.items?.forEach((service: any) => {
-            itemsToInsert.push({
-              bill_id: newBill.id,
-              service_name: service.service_name,
-              service_code: service.service_code || null,
-              unit_price_cents: Math.round(service.price_per_unit * 100),
-              qty_decimal: 0,
-              section_type: section.type,
-              source: "quote",
-            });
-          });
-        });
-      }
+      // Add bill_id to all items
+      itemsToInsert.forEach(item => {
+        item.bill_id = newBill.id;
+      });
 
       if (itemsToInsert.length > 0) {
         const { error: itemsError } = await supabase

@@ -73,6 +73,9 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const startTime = Date.now();
+  let syncLogId: string | null = null;
+
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -130,6 +133,23 @@ Deno.serve(async (req) => {
       targetClientId = client.id;
     }
 
+    // Start sync log
+    const { data: syncLog } = await serviceClient
+      .from('sync_logs')
+      .insert({
+        client_id: targetClientId,
+        sync_type: 'products',
+        status: 'in_progress',
+        products_synced: 0,
+        triggered_by: user.id,
+      })
+      .select()
+      .single();
+
+    if (syncLog) {
+      syncLogId = syncLog.id;
+    }
+
     const { data: shopifyStore } = await serviceClient
       .from('shopify_stores')
       .select('*')
@@ -184,6 +204,43 @@ Deno.serve(async (req) => {
 
     if (skuError) {
       throw skuError;
+    }
+
+    // After upserting SKUs, map inventory_item_id to sku_id via sku_aliases
+    const aliasesToInsert = [];
+    for (const product of validatedProducts) {
+      for (const variant of product.variants) {
+        const clientSku = variant.sku || `SHOP-${product.id}-${variant.id}`;
+        
+        // Find the sku_id
+        const { data: skuRecord } = await serviceClient
+          .from('skus')
+          .select('id')
+          .eq('client_id', targetClientId)
+          .eq('client_sku', clientSku)
+          .single();
+
+        if (skuRecord) {
+          aliasesToInsert.push({
+            sku_id: skuRecord.id,
+            alias_type: 'shopify_inventory_item_id',
+            alias_value: variant.inventory_item_id.toString(),
+          });
+        }
+      }
+    }
+
+    // Upsert aliases
+    if (aliasesToInsert.length > 0) {
+      const { error: aliasError } = await serviceClient
+        .from('sku_aliases')
+        .upsert(aliasesToInsert, {
+          onConflict: 'sku_id,alias_type',
+        });
+
+      if (aliasError) {
+        console.error('Error upserting sku_aliases:', aliasError);
+      }
     }
 
     // Seed inventory from Shopify for new SKUs
@@ -266,6 +323,21 @@ Deno.serve(async (req) => {
       }
     }
 
+    const durationMs = Date.now() - startTime;
+
+    // Update sync log to success
+    if (syncLogId) {
+      await serviceClient
+        .from('sync_logs')
+        .update({
+          status: 'success',
+          products_synced: skusToInsert.length,
+          duration_ms: durationMs,
+          error_message: seedErrors.length > 0 ? JSON.stringify(seedErrors) : null,
+        })
+        .eq('id', syncLogId);
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -281,6 +353,25 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Product sync error:', error);
+    
+    const durationMs = Date.now() - startTime;
+
+    // Update sync log to failed
+    if (syncLogId) {
+      const serviceClient = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      );
+
+      await serviceClient
+        .from('sync_logs')
+        .update({
+          status: 'failed',
+          duration_ms: durationMs,
+          error_message: error instanceof Error ? error.message : 'Unknown error',
+        })
+        .eq('id', syncLogId);
+    }
     
     let errorMessage = 'Unable to sync products from Shopify. Please try again or contact support.';
     

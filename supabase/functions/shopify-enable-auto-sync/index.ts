@@ -57,8 +57,6 @@ serve(async (req) => {
       client_id: store.client_id,
       auto_sync_enabled: true,
       sync_frequency: "hourly",
-      sync_inventory: true,
-      sync_orders: true,
       next_sync_at: new Date().toISOString(),
     }));
 

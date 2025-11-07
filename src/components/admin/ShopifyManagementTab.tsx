@@ -228,11 +228,51 @@ export function ShopifyManagementTab() {
       });
 
       fetchStores();
+      fetchStats();
     } catch (error: any) {
       console.error("Error syncing products:", error);
+      const { data } = error;
       toast({
         title: "Sync Failed",
-        description: error.message || "Failed to sync products from Shopify",
+        description: data?.error || error.message || "Failed to sync products from Shopify",
+        variant: "destructive",
+      });
+    } finally {
+      setSyncing(null);
+    }
+  };
+
+  const handleSyncInventory = async (clientId: string) => {
+    setSyncing(clientId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { data, error } = await supabase.functions.invoke("shopify-sync-inventory", {
+        body: { client_id: clientId },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      toast({
+        title: "Success",
+        description: `Successfully synced ${data?.synced || 0} of ${data?.total || 0} inventory items`,
+      });
+
+      fetchStores();
+      fetchStats();
+    } catch (error: any) {
+      console.error("Error syncing inventory:", error);
+      const { data } = error;
+      toast({
+        title: "Sync Failed",
+        description: data?.error || error.message || "Failed to sync inventory to Shopify",
         variant: "destructive",
       });
     } finally {
@@ -352,9 +392,10 @@ export function ShopifyManagementTab() {
       fetchStats();
     } catch (error: any) {
       console.error("Error enabling auto-sync:", error);
+      const { data } = error;
       toast({
         title: "Error",
-        description: error.message || "Failed to enable auto-sync",
+        description: data?.error || error.message || "Failed to enable auto-sync",
         variant: "destructive",
       });
     } finally {
@@ -534,7 +575,20 @@ export function ShopifyManagementTab() {
                                   Syncing...
                                 </>
                               ) : (
-                                'Sync Now'
+                                'Sync Products'
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleSyncInventory(store.client_id)}
+                              disabled={syncing === store.client_id}
+                            >
+                              {syncing === store.client_id ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  Syncing...
+                                </>
+                              ) : (
+                                'Sync Inventory'
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuItem
