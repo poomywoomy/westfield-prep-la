@@ -18,7 +18,7 @@ export const InventoryTab = () => {
   const { toast } = useToast();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Inventory Management</h2>
         <div className="flex gap-2">

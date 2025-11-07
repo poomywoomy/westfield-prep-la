@@ -6,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Users, FileText, DollarSign, LogOut, Settings, ChevronDown, FileSignature, Store, Package, Scan, PenSquare } from "lucide-react";
+import { Users, FileText, DollarSign, LogOut, Settings, ChevronDown, FileSignature, Store, Package, Scan, PenSquare, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientsTab from "@/components/admin/ClientsTab";
 import QuotesTab from "@/components/admin/QuotesTab";
@@ -16,13 +17,15 @@ import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
 import { InventoryTab } from "@/components/admin/InventoryTab";
 import { QuickScanModal } from "@/components/admin/QuickScanModal";
 import { BlogTab } from "@/components/admin/BlogTab";
-import { BlogEditorTab } from "@/components/admin/BlogEditorTab";
+import { DiscrepanciesTab } from "@/components/admin/DiscrepanciesTab";
+import { usePendingDiscrepancyCount } from "@/hooks/usePendingDiscrepancyCount";
 
 const AdminDashboard = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showQuickScan, setShowQuickScan] = useState(false);
+  const { count: discrepancyCount } = usePendingDiscrepancyCount();
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -119,7 +122,7 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 pb-28">
         <Tabs defaultValue="clients" className="space-y-6">
           <TabsList className="grid grid-cols-8 w-full max-w-6xl">
             <TabsTrigger value="clients">
@@ -134,9 +137,23 @@ const AdminDashboard = () => {
               <DollarSign className="mr-2 h-4 w-4" />
               Billing
             </TabsTrigger>
-            <TabsTrigger value="inventory">
+            <TabsTrigger value="inventory" className="relative">
               <Package className="mr-2 h-4 w-4" />
               Inventory
+              {discrepancyCount > 0 && (
+                <Badge className="ml-2 h-5 px-1.5 bg-red-500 text-white text-xs">
+                  {discrepancyCount}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="discrepancies" className="relative">
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              Discrepancies
+              {discrepancyCount > 0 && (
+                <Badge className="ml-2 h-5 px-1.5 bg-red-500 text-white text-xs">
+                  {discrepancyCount}
+                </Badge>
+              )}
             </TabsTrigger>
             <TabsTrigger value="shopify">
               <Store className="mr-2 h-4 w-4" />
@@ -145,10 +162,6 @@ const AdminDashboard = () => {
             <TabsTrigger value="blog">
               <PenSquare className="mr-2 h-4 w-4" />
               Blog
-            </TabsTrigger>
-            <TabsTrigger value="blog-editor">
-              <PenSquare className="mr-2 h-4 w-4" />
-              Editor
             </TabsTrigger>
             <TabsTrigger value="documents">
               <FileSignature className="mr-2 h-4 w-4" />
@@ -172,16 +185,16 @@ const AdminDashboard = () => {
             <InventoryTab />
           </TabsContent>
 
+          <TabsContent value="discrepancies">
+            <DiscrepanciesTab />
+          </TabsContent>
+
           <TabsContent value="shopify">
             <ShopifyManagementTab />
           </TabsContent>
 
           <TabsContent value="blog">
             <BlogTab />
-          </TabsContent>
-
-          <TabsContent value="blog-editor">
-            <BlogEditorTab />
           </TabsContent>
 
           <TabsContent value="documents">
@@ -192,7 +205,7 @@ const AdminDashboard = () => {
         {/* Floating Action Button */}
         <Button
           size="lg"
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
+          className="fixed bottom-20 right-6 h-14 w-14 rounded-full shadow-lg"
           onClick={() => setShowQuickScan(true)}
           title="Quick Scan (Ctrl+K)"
         >

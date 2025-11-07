@@ -50,7 +50,7 @@ const BillingTab = () => {
         .from("clients")
         .select(`
           *,
-          quotes!inner(id, status)
+          quotes(id, status)
         `)
         .eq("status", "active")
         .order("company_name");

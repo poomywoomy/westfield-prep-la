@@ -50,6 +50,8 @@ const colorMap = {
   },
 };
 
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
 export const IssuesCard = ({
   title,
   icon,
@@ -151,7 +153,7 @@ export const IssuesCard = ({
                     variant="secondary" 
                     className={colors.badge}
                   >
-                    {issue.discrepancy_type === 'low_stock' ? 'Low Stock' : issue.discrepancy_type}
+                    {issue.discrepancy_type === 'low_stock' ? 'Low Stock' : capitalize(issue.discrepancy_type)}
                   </Badge>
                 </div>
                 <p className="text-sm text-gray-600 truncate">{issue.title || 'No title'}</p>

@@ -517,6 +517,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
           .update({
             client_id: useManualEntry ? null : (selectedClientId || null),
             quote_data: quoteData as any,
+            status: (useManualEntry ? null : selectedClientId) ? 'active' : 'draft',
           })
           .eq("id", editingQuote.id);
 
@@ -532,7 +533,7 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
           .insert([{
             client_id: useManualEntry ? null : (selectedClientId || null),
             quote_data: quoteData as any,
-            status: 'draft'
+            status: (useManualEntry ? null : selectedClientId) ? 'active' : 'draft',
           }]);
 
         if (error) throw error;
@@ -645,6 +646,8 @@ const CreateQuoteDialog = ({ open, onOpenChange, clients, onQuoteCreated, editin
           .update({
             client_id: selectedClientId,
             quote_data: updatedQuoteData as any,
+            status: 'active',
+            activated_at: new Date().toISOString(),
           })
           .eq("id", editingQuote.id);
 

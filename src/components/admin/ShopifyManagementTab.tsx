@@ -434,7 +434,7 @@ export function ShopifyManagementTab() {
                       <TableCell className="font-medium">{store.clients.company_name}</TableCell>
                       <TableCell className="font-mono text-sm">{store.shop_domain}</TableCell>
                       <TableCell>
-                        <Badge variant={store.is_active ? "default" : "secondary"}>
+                        <Badge variant={store.is_active ? "default" : "secondary"} className={store.is_active ? "bg-green-500 hover:bg-green-600 text-white" : ""}>
                           {store.is_active ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>

@@ -76,7 +76,7 @@ export function ClientDiscrepancyStatusBadge({
   }
 
   return (
-    <Badge className="bg-red-600 hover:bg-red-700 text-white">
+    <Badge className="bg-yellow-600 hover:bg-yellow-700 text-white">
       Awaiting Response
     </Badge>
   );

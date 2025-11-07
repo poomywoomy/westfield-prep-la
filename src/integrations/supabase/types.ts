@@ -884,6 +884,9 @@ export type Database = {
       }
       damaged_item_decisions: {
         Row: {
+          admin_close_notes: string | null
+          admin_closed_at: string | null
+          admin_closed_by: string | null
           admin_notes: string | null
           asn_id: string
           client_id: string
@@ -896,6 +899,7 @@ export type Database = {
           processed_by: string | null
           qc_photo_urls: string[] | null
           quantity: number
+          reopened_count: number | null
           sku_id: string
           source_type: string | null
           status: string
@@ -903,6 +907,9 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          admin_close_notes?: string | null
+          admin_closed_at?: string | null
+          admin_closed_by?: string | null
           admin_notes?: string | null
           asn_id: string
           client_id: string
@@ -915,6 +922,7 @@ export type Database = {
           processed_by?: string | null
           qc_photo_urls?: string[] | null
           quantity: number
+          reopened_count?: number | null
           sku_id: string
           source_type?: string | null
           status?: string
@@ -922,6 +930,9 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          admin_close_notes?: string | null
+          admin_closed_at?: string | null
+          admin_closed_by?: string | null
           admin_notes?: string | null
           asn_id?: string
           client_id?: string
@@ -934,6 +945,7 @@ export type Database = {
           processed_by?: string | null
           qc_photo_urls?: string[] | null
           quantity?: number
+          reopened_count?: number | null
           sku_id?: string
           source_type?: string | null
           status?: string
@@ -1102,6 +1114,8 @@ export type Database = {
           notes: string | null
           qty_delta: number
           reason_code: string | null
+          shopify_fulfillment_id: string | null
+          shopify_order_id: string | null
           sku_id: string
           source_ref: string | null
           source_type: string | null
@@ -1119,6 +1133,8 @@ export type Database = {
           notes?: string | null
           qty_delta: number
           reason_code?: string | null
+          shopify_fulfillment_id?: string | null
+          shopify_order_id?: string | null
           sku_id: string
           source_ref?: string | null
           source_type?: string | null
@@ -1136,6 +1152,8 @@ export type Database = {
           notes?: string | null
           qty_delta?: number
           reason_code?: string | null
+          shopify_fulfillment_id?: string | null
+          shopify_order_id?: string | null
           sku_id?: string
           source_ref?: string | null
           source_type?: string | null

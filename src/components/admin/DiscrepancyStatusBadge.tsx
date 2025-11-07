@@ -29,17 +29,25 @@ export function DiscrepancyStatusBadge({ asnId, skuId }: DiscrepancyStatusBadgeP
     }
   };
 
-  if (status === "submitted" || status === "processed") {
+  if (status === "closed") {
     return (
-      <Badge className="bg-green-600 hover:bg-green-700 text-white">
-        Responded
+      <Badge className="bg-green-500 hover:bg-green-600 text-white">
+        Closed
+      </Badge>
+    );
+  }
+  
+  if (status === "processed") {
+    return (
+      <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">
+        Processed
       </Badge>
     );
   }
 
   return (
-    <Badge className="bg-red-600 hover:bg-red-700 text-white">
-      Awaiting Response
+    <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+      Pending
     </Badge>
   );
 }

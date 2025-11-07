@@ -73,19 +73,34 @@ export const StartBillingCycleDialog = ({
       }
 
       // Get active quote
-      const { data: activeQuote } = await supabase
+      const { data: activeQuote, error: quoteError } = await supabase
         .from("quotes")
         .select("*")
         .eq("client_id", client.id)
         .eq("status", "active")
-        .single();
+        .maybeSingle();
 
       if (!activeQuote) {
-        toast({
-          title: "No Active Quote",
-          description: "This client has no active pricing quote. Please assign one first.",
-          variant: "destructive",
-        });
+        // Check if any quote exists
+        const { data: anyQuote } = await supabase
+          .from("quotes")
+          .select("status")
+          .eq("client_id", client.id)
+          .maybeSingle();
+
+        if (!anyQuote) {
+          toast({
+            title: "No Quote Found",
+            description: "This client has no pricing quote. Please create a quote first.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Quote Not Active",
+            description: "This client has a quote but it's not activated. Please activate the quote first.",
+            variant: "destructive",
+          });
+        }
         setLoading(false);
         return;
       }

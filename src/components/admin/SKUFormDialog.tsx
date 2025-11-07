@@ -35,7 +35,6 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
     ean: "",
     title: "",
     brand: "",
-    unit_cost: "",
     weight: "",
     length: "",
     width: "",
@@ -58,7 +57,6 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
         ean: sku.ean || "",
         title: sku.title,
         brand: sku.brand || "",
-        unit_cost: sku.unit_cost?.toString() || "",
         weight: sku.weight?.toString() || "",
         length: sku.length?.toString() || "",
         width: sku.width?.toString() || "",
@@ -79,7 +77,6 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
         ean: "",
         title: "",
         brand: "",
-        unit_cost: "",
         weight: "",
         length: "",
         width: "",
@@ -106,7 +103,6 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
       ean: formData.ean || null,
       title: formData.title,
       brand: formData.brand || null,
-      unit_cost: formData.unit_cost ? parseFloat(formData.unit_cost) : null,
       weight: formData.weight ? parseFloat(formData.weight) : null,
       length: formData.length ? parseFloat(formData.length) : null,
       width: formData.width ? parseFloat(formData.width) : null,
@@ -235,19 +231,6 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
                 onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
               />
             </div>
-
-            {!isClientView && (
-              <div className="space-y-2">
-                <Label htmlFor="unit_cost">Unit Cost</Label>
-                <Input
-                  id="unit_cost"
-                  type="number"
-                  step="0.01"
-                  value={formData.unit_cost}
-                  onChange={(e) => setFormData({ ...formData, unit_cost: e.target.value })}
-                />
-              </div>
-            )}
           </div>
 
           <div className="grid grid-cols-4 gap-4">
