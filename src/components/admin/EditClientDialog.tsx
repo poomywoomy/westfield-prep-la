@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, FileText } from "lucide-react";
 import { validatePricingDocument } from "@/lib/fileValidation";
 import { sanitizeError } from "@/lib/errorHandler";
 import { clientUpdateSchema } from "@/lib/clientValidation";
+import { ClientPricingTab } from "./ClientPricingTab";
 
 interface EditClientDialogProps {
   open: boolean;
@@ -243,7 +245,7 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Client</DialogTitle>
           <DialogDescription>
@@ -251,7 +253,14 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="pricing">Pricing</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details">
+            <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="company_name">Company Name *</Label>
@@ -551,6 +560,12 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
             </Button>
           </div>
         </form>
+          </TabsContent>
+
+          <TabsContent value="pricing">
+            <ClientPricingTab clientId={client?.id} onSuccess={onSuccess} />
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

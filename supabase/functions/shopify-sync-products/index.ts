@@ -244,12 +244,31 @@ Deno.serve(async (req) => {
     }
 
     // Seed inventory from Shopify for new SKUs
-    // Get primary location
-    const { data: primaryLocation } = await serviceClient
+    // Get or create primary location
+    let { data: primaryLocation } = await serviceClient
       .from('locations')
       .select('id')
       .eq('code', 'MAIN')
       .single();
+    
+    if (!primaryLocation) {
+      // Create MAIN location if it doesn't exist
+      const { data: newLocation, error: locationError } = await serviceClient
+        .from('locations')
+        .insert({
+          code: 'MAIN',
+          name: 'Main Warehouse',
+          is_active: true
+        })
+        .select()
+        .single();
+      
+      if (locationError) {
+        console.error('Error creating MAIN location:', locationError);
+      } else {
+        primaryLocation = newLocation;
+      }
+    }
 
     let seededCount = 0;
     const seedErrors = [];

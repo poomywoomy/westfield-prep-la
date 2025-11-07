@@ -197,108 +197,81 @@ export function ShopifyManagementTab() {
   };
 
   const handleSyncProducts = async (clientId: string) => {
-    setSyncing(clientId);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const { data, error } = await supabase.functions.invoke("shopify-sync-products", {
-        body: { client_id: clientId },
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`
-        }
-      });
+    const { data, error } = await supabase.functions.invoke("shopify-sync-products", {
+      body: { client_id: clientId }
+    });
 
-      if (error) throw error;
-
-      if (data?.error) {
-        throw new Error(data.error);
-      }
-
-      // Audit log
-      await supabase.from('audit_log').insert({
-        action: 'shopify_manual_sync',
-        table_name: 'shopify_stores',
-        record_id: clientId,
-        new_data: { action: 'manual_sync', timestamp: new Date().toISOString() }
-      });
-
+    if (error) {
       toast({
-        title: "Success",
-        description: data?.message || `Successfully synced ${data?.synced || 0} products${data?.seeded ? ` and seeded ${data.seeded} inventory records` : ''}`,
-      });
-
-      fetchStores();
-      fetchStats();
-    } catch (error: any) {
-      console.error("Error syncing products:", error);
-      const { data } = error;
-      toast({
-        title: "Sync Failed",
-        description: data?.error || error.message || "Failed to sync products from Shopify",
+        title: "Product sync failed",
+        description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setSyncing(null);
+      throw error;
     }
+
+    if (data?.error) {
+      toast({
+        title: "Product sync failed",
+        description: data.error,
+        variant: "destructive",
+      });
+      throw new Error(data.error);
+    }
+
+    // Audit log
+    await supabase.from('audit_log').insert({
+      action: 'shopify_manual_sync',
+      table_name: 'shopify_stores',
+      record_id: clientId,
+      new_data: { action: 'manual_sync', timestamp: new Date().toISOString() }
+    });
+    
+    return data;
   };
 
   const handleSyncInventory = async (clientId: string) => {
-    setSyncing(clientId);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const { data, error } = await supabase.functions.invoke("shopify-sync-inventory", {
-        body: { client_id: clientId },
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`
-        }
-      });
+    const { data, error } = await supabase.functions.invoke("shopify-sync-inventory", {
+      body: { client_id: clientId }
+    });
 
-      if (error) throw error;
-
-      if (data?.error) {
-        throw new Error(data.error);
-      }
-
+    if (error) {
       toast({
-        title: "Success",
-        description: `Successfully synced ${data?.synced || 0} of ${data?.total || 0} inventory items`,
-      });
-
-      fetchStores();
-      fetchStats();
-    } catch (error: any) {
-      console.error("Error syncing inventory:", error);
-      const { data } = error;
-      toast({
-        title: "Sync Failed",
-        description: data?.error || error.message || "Failed to sync inventory to Shopify",
+        title: "Inventory sync failed",
+        description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setSyncing(null);
+      throw error;
     }
+
+    if (data?.error) {
+      toast({
+        title: "Inventory sync failed",
+        description: data.error,
+        variant: "destructive",
+      });
+      throw new Error(data.error);
+    }
+    
+    return data;
   };
 
   const handleSyncAll = async (clientId: string) => {
     setSyncing(clientId);
     try {
-      // First sync products
-      await handleSyncProducts(clientId);
-      // Then sync inventory
-      await handleSyncInventory(clientId);
+      const productsData = await handleSyncProducts(clientId);
+      const inventoryData = await handleSyncInventory(clientId);
       
       toast({
-        title: "Complete Sync Successful",
-        description: "Products and inventory synced successfully",
+        title: "Complete sync successful",
+        description: `Synced ${productsData?.synced || 0} products${productsData?.seeded ? ` (seeded ${productsData.seeded})` : ''} and ${inventoryData?.synced || 0} inventory items`,
       });
+      
+      await fetchStores();
+      await fetchStats();
     } catch (error: any) {
-      console.error("Error in complete sync:", error);
-      toast({
-        title: "Sync Failed",
-        description: error.message || "Failed to complete full sync",
-        variant: "destructive",
-      });
+      console.error("Complete sync error:", error);
+      // Error toast already shown by the individual handlers
     } finally {
       setSyncing(null);
     }
