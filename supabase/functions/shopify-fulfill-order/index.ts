@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
       throw new Error('No active Shopify store found');
     }
 
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
+    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
 
     // Step 1: Get fulfillment order ID for this order
     const fulfillmentOrderResponse = await fetch(

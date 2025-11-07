@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       if (webhooks && webhooks.length > 0) {
         for (const webhook of webhooks) {
           await fetch(
-            `https://${store.shop_domain}/admin/api/2024-01/webhooks/${webhook.webhook_id}.json`,
+            `https://${store.shop_domain}/admin/api/2024-07/webhooks/${webhook.webhook_id}.json`,
             {
               method: 'DELETE',
               headers: {

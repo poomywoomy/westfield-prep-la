@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
 
     const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
     const clientSecret = Deno.env.get('SHOPIFY_CLIENT_SECRET');
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
+    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
 
     console.log('Exchanging code for access token...');
 

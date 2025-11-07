@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
       throw new Error('No active Shopify store found for this client');
     }
 
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
+    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
     const callbackUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/shopify-webhook-handler`;
 
     // Register webhook with Shopify

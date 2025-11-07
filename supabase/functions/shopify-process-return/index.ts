@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
 
     if (!store) throw new Error('Store not found');
 
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
+    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
 
     // Update return status in Shopify
     const endpoint = action === 'approve' 

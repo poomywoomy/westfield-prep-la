@@ -43,7 +43,7 @@ async function fetchShopifyProductsWithRetry(
 ): Promise<any[]> {
   try {
     const allProducts = [];
-    let nextPageUrl: string | null = `https://${shopDomain}/admin/api/2024-01/products.json?limit=250`;
+    let nextPageUrl: string | null = `https://${shopDomain}/admin/api/2024-07/products.json?limit=250`;
     let pageCount = 0;
     
     while (nextPageUrl) {

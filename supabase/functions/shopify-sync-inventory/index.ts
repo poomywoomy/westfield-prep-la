@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
     if (!locationId) {
       // Fetch locations from Shopify and store primary
       const locationsResponse = await fetch(
-        `https://${store.shop_domain}/admin/api/2024-01/locations.json`,
+        `https://${store.shop_domain}/admin/api/2024-07/locations.json`,
         {
           headers: {
             'X-Shopify-Access-Token': store.access_token,
@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
 
         // Update inventory level in Shopify
         const response = await fetch(
-          `https://${store.shop_domain}/admin/api/2024-01/inventory_levels/set.json`,
+          `https://${store.shop_domain}/admin/api/2024-07/inventory_levels/set.json`,
           {
             method: 'POST',
             headers: {

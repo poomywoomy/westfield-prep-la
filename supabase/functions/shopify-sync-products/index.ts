@@ -164,7 +164,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
+    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
 
     // Fetch all products with pagination
     const products = await fetchAllProducts(

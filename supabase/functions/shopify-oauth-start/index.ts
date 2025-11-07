@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
     }
 
     const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
+    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
     const redirectUri = `${Deno.env.get('SUPABASE_URL')}/functions/v1/shopify-oauth-callback`;
     
     console.log('Client ID:', clientId);

@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
 
     // Fetch all orders with pagination
     const allOrders = [];
-    let nextPageUrl: string | null = `https://${store.shop_domain}/admin/api/2024-01/orders.json?limit=250&status=any`;
+    let nextPageUrl: string | null = `https://${store.shop_domain}/admin/api/2024-07/orders.json?limit=250&status=any`;
     let pageCount = 0;
     
     while (nextPageUrl) {
