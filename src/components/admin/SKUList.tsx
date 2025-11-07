@@ -30,6 +30,8 @@ export const SKUList = () => {
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<string>("created");
+  const [stockFilter, setStockFilter] = useState<string>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSKU, setEditingSKU] = useState<SKU | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -160,19 +162,40 @@ export const SKUList = () => {
     fetchSKUs();
   };
 
-  const filteredSKUs = skus.filter(sku => 
-    searchQuery === "" || 
-    sku.client_sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    sku.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (sku.fnsku && sku.fnsku.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredAndSortedSKUs = skus
+    .filter(sku => {
+      // Stock filter
+      if (stockFilter === "instock" && sku.available <= 0) return false;
+      if (stockFilter === "lowstock" && (sku.available === 0 || sku.available >= 10)) return false;
+      if (stockFilter === "outofstock" && sku.available !== 0) return false;
+
+      // Search filter
+      if (searchQuery && !(
+        sku.client_sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        sku.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (sku.fnsku && sku.fnsku.toLowerCase().includes(searchQuery.toLowerCase()))
+      )) return false;
+
+      return true;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "available-high": return b.available - a.available;
+        case "available-low": return a.available - b.available;
+        case "discrepancies-high": return b.discrepancies - a.discrepancies;
+        case "received-high": return b.received_this_month - a.received_this_month;
+        case "sold-high": return b.sold_this_month - a.sold_this_month;
+        case "sku-alpha": return a.client_sku.localeCompare(b.client_sku);
+        default: return 0; // Keep original order
+      }
+    });
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-4 flex-1">
           <Select value={selectedClient} onValueChange={setSelectedClient}>
-            <SelectTrigger className="w-[250px]">
+            <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Select client" />
             </SelectTrigger>
             <SelectContent>
@@ -184,6 +207,34 @@ export const SKUList = () => {
               ))}
             </SelectContent>
           </Select>
+
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="created">Recently Created</SelectItem>
+              <SelectItem value="available-high">Available (High → Low)</SelectItem>
+              <SelectItem value="available-low">Available (Low → High)</SelectItem>
+              <SelectItem value="discrepancies-high">Discrepancies (High → Low)</SelectItem>
+              <SelectItem value="received-high">Received (High → Low)</SelectItem>
+              <SelectItem value="sold-high">Sold (High → Low)</SelectItem>
+              <SelectItem value="sku-alpha">SKU (A → Z)</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={stockFilter} onValueChange={setStockFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Stock Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Stock</SelectItem>
+              <SelectItem value="instock">In Stock</SelectItem>
+              <SelectItem value="lowstock">Low Stock</SelectItem>
+              <SelectItem value="outofstock">Out of Stock</SelectItem>
+            </SelectContent>
+          </Select>
+
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -237,14 +288,14 @@ export const SKUList = () => {
                   Loading...
                 </TableCell>
               </TableRow>
-            ) : filteredSKUs.length === 0 ? (
+            ) : filteredAndSortedSKUs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={9} className="text-center text-muted-foreground">
                   No SKUs found
                 </TableCell>
               </TableRow>
             ) : (
-              filteredSKUs.map(sku => (
+              filteredAndSortedSKUs.map(sku => (
                 <TableRow 
                   key={sku.id}
                   className="cursor-pointer hover:bg-muted/50"

@@ -3,9 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Package, ArrowDownToLine } from "lucide-react";
+import { Package, ArrowDownToLine, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { ReturnProcessingDialog } from "./ReturnProcessingDialog";
+import { MultiSKUReturnProcessingDialog } from "./MultiSKUReturnProcessingDialog";
 import { format } from "date-fns";
 
 interface ExpectedReturn {
@@ -81,6 +81,7 @@ export const ExpectedReturnsSection = () => {
                 <TableRow>
                   <TableHead>Order #</TableHead>
                   <TableHead>Return #</TableHead>
+                  <TableHead>Products</TableHead>
                   <TableHead>Reason</TableHead>
                   <TableHead>Expected Qty</TableHead>
                   <TableHead>Date</TableHead>
@@ -88,13 +89,32 @@ export const ExpectedReturnsSection = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {returns.map((ret) => (
+              {returns.map((ret) => {
+                const lineItems = Array.isArray(ret.line_items) ? ret.line_items : [];
+                const productCount = lineItems.length;
+                const unmappedCount = lineItems.filter((item: any) => !item.sku_matched).length;
+                const hasUnmapped = unmappedCount > 0;
+
+                return (
                   <TableRow key={ret.id}>
                     <TableCell className="font-medium">
                       {ret.order_number || "-"}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       #{ret.shopify_return_id.slice(-8)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Badge variant={productCount > 1 ? "default" : "secondary"}>
+                          {productCount} {productCount === 1 ? "product" : "products"}
+                        </Badge>
+                        {hasUnmapped && (
+                          <Badge variant="destructive" className="gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {unmappedCount} unmapped
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-sm">
                       {ret.return_reason || "No reason provided"}
@@ -118,7 +138,8 @@ export const ExpectedReturnsSection = () => {
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))}
+                );
+              })}
               </TableBody>
             </Table>
           </CardContent>
@@ -126,16 +147,16 @@ export const ExpectedReturnsSection = () => {
       </Card>
 
       {showDialog && selectedReturn && (
-        <ReturnProcessingDialog
-          returnId={selectedReturn.id}
-          expectedReturn={{
+        <MultiSKUReturnProcessingDialog
+          open={showDialog}
+          onClose={handleCloseDialog}
+          returnData={{
+            id: selectedReturn.id,
             shopify_return_id: selectedReturn.shopify_return_id,
             order_number: selectedReturn.order_number,
-            expected_qty: selectedReturn.expected_qty,
-            line_items: selectedReturn.line_items,
             client_id: selectedReturn.client_id,
+            line_items: Array.isArray(selectedReturn.line_items) ? selectedReturn.line_items : [],
           }}
-          onClose={handleCloseDialog}
         />
       )}
     </>

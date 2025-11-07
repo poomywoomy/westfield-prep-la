@@ -3,10 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, RefreshCw, Search, MoreHorizontal, Store, Activity, TrendingUp, AlertCircle } from "lucide-react";
+import { Loader2, RefreshCw, Search, MoreHorizontal, Store, Activity, TrendingUp, AlertCircle, Link as LinkIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,6 +62,8 @@ export function ShopifyManagementTab() {
   const [syncing, setSyncing] = useState<string | null>(null);
   const [testing, setTesting] = useState<string | null>(null);
   const [enablingAutoSync, setEnablingAutoSync] = useState(false);
+  const [unmappedProducts, setUnmappedProducts] = useState<any[]>([]);
+  const [skuList, setSkuList] = useState<any[]>([]);
   
   // Dialog states
   const [logsDialog, setLogsDialog] = useState<{ open: boolean; clientId: string; clientName: string }>({
@@ -88,6 +92,8 @@ export function ShopifyManagementTab() {
   useEffect(() => {
     fetchStores();
     fetchStats();
+    fetchUnmappedProducts();
+    fetchSKUList();
 
     // Real-time subscriptions
     const storesChannel = supabase
@@ -406,6 +412,81 @@ export function ShopifyManagementTab() {
     }
   };
 
+  const fetchUnmappedProducts = async () => {
+    try {
+      const { data: returns, error } = await supabase
+        .from('shopify_returns')
+        .select('line_items, client_id, clients!inner(company_name)')
+        .in('status', ['requested', 'approved']);
+
+      if (error) throw error;
+
+      const unmapped: any[] = [];
+      returns?.forEach((ret: any) => {
+        const lineItems = Array.isArray(ret.line_items) ? ret.line_items : [];
+        lineItems.forEach((item: any) => {
+          if (!item.sku_matched && item.variant_id) {
+            unmapped.push({
+              variant_id: item.variant_id,
+              sku: item.sku,
+              product_title: item.title,
+              client_id: ret.client_id,
+              client_name: ret.clients.company_name,
+              selectedSkuId: null,
+            });
+          }
+        });
+      });
+
+      setUnmappedProducts(unmapped);
+    } catch (error) {
+      console.error('Error fetching unmapped products:', error);
+    }
+  };
+
+  const fetchSKUList = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('skus')
+        .select('id, client_id, client_sku, title')
+        .eq('status', 'active')
+        .order('client_sku');
+
+      if (error) throw error;
+      setSkuList(data || []);
+    } catch (error) {
+      console.error('Error fetching SKU list:', error);
+    }
+  };
+
+  const mapSKU = async (variantId: string, skuId: string, clientId: string) => {
+    try {
+      const { error } = await supabase
+        .from('sku_aliases')
+        .insert({
+          sku_id: skuId,
+          alias_type: 'shopify_variant_id',
+          alias_value: variantId,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "SKU mapped successfully",
+      });
+
+      // Refresh unmapped products
+      fetchUnmappedProducts();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to map SKU",
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredStores = stores.filter(store =>
     store.shop_domain.toLowerCase().includes(searchTerm.toLowerCase()) ||
     store.clients.company_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -645,6 +726,111 @@ export function ShopifyManagementTab() {
               </TableBody>
             </Table>
           )}
+        </CardContent>
+      </Card>
+
+      {/* SKU Mapping Tool */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <LinkIcon className="h-5 w-5" />
+                Unmapped Products
+              </CardTitle>
+              <CardDescription>
+                Map Shopify products to your local SKUs for accurate return processing
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchUnmappedProducts()}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Alert className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Returns from Shopify require proper SKU mapping. Map unmapped products here to enable return processing.
+            </AlertDescription>
+          </Alert>
+
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Shopify Product</TableHead>
+                  <TableHead>Variant ID</TableHead>
+                  <TableHead>Map to SKU</TableHead>
+                  <TableHead>Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {unmappedProducts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                      No unmapped products found. All Shopify products are mapped!
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  unmappedProducts.map((product: any, index: number) => (
+                    <TableRow key={`${product.variant_id}-${index}`}>
+                      <TableCell className="font-medium">
+                        {product.client_name}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{product.product_title}</span>
+                          <span className="text-xs text-muted-foreground">SKU: {product.sku}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {product.variant_id}
+                      </TableCell>
+                      <TableCell>
+                        <Select
+                          value={product.selectedSkuId || ""}
+                          onValueChange={(value) => {
+                            const updated = [...unmappedProducts];
+                            updated[index].selectedSkuId = value;
+                            setUnmappedProducts(updated);
+                          }}
+                        >
+                          <SelectTrigger className="w-[250px]">
+                            <SelectValue placeholder="Select SKU..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {skuList
+                              .filter((sku: any) => sku.client_id === product.client_id)
+                              .map((sku: any) => (
+                                <SelectItem key={sku.id} value={sku.id}>
+                                  {sku.client_sku} - {sku.title}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          onClick={() => mapSKU(product.variant_id, product.selectedSkuId, product.client_id)}
+                          disabled={!product.selectedSkuId}
+                        >
+                          Map SKU
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

@@ -227,6 +227,13 @@ export type Database = {
             foreignKeyName: "asn_lines_sku_id_fkey"
             columns: ["sku_id"]
             isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "asn_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
             referencedRelation: "skus"
             referencedColumns: ["id"]
           },
@@ -978,6 +985,13 @@ export type Database = {
             foreignKeyName: "damaged_item_decisions_sku_id_fkey"
             columns: ["sku_id"]
             isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "damaged_item_decisions_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
             referencedRelation: "skus"
             referencedColumns: ["id"]
           },
@@ -1175,6 +1189,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "locations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_ledger_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
           },
           {
             foreignKeyName: "inventory_ledger_sku_id_fkey"
@@ -1823,6 +1844,13 @@ export type Database = {
             foreignKeyName: "shipment_template_lines_sku_id_fkey"
             columns: ["sku_id"]
             isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "shipment_template_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
             referencedRelation: "skus"
             referencedColumns: ["id"]
           },
@@ -2162,6 +2190,13 @@ export type Database = {
             foreignKeyName: "sku_aliases_sku_id_fkey"
             columns: ["sku_id"]
             isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "sku_aliases_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
             referencedRelation: "skus"
             referencedColumns: ["id"]
           },
@@ -2381,6 +2416,13 @@ export type Database = {
             foreignKeyName: "asn_lines_sku_id_fkey"
             columns: ["sku_id"]
             isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "asn_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
             referencedRelation: "skus"
             referencedColumns: ["id"]
           },
@@ -2418,7 +2460,37 @@ export type Database = {
             foreignKeyName: "inventory_ledger_sku_id_fkey"
             columns: ["sku_id"]
             isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "inventory_ledger_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
             referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_summary_complete: {
+        Row: {
+          available: number | null
+          client_id: string | null
+          client_sku: string | null
+          fnsku: string | null
+          location_id: string | null
+          location_name: string | null
+          on_hand: number | null
+          reserved: number | null
+          sku_id: string | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skus_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]

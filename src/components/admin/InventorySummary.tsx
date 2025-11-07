@@ -114,7 +114,7 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
     setLoading(true);
     
     let query = supabase
-      .from("inventory_summary")
+      .from("inventory_summary_complete")
       .select(`
         *,
         clients!inner(company_name)
