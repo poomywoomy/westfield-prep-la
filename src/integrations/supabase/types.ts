@@ -376,6 +376,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           discount_cents: number
+          fulfillment_id: string | null
           id: string
           line_date: string
           note: string | null
@@ -383,6 +384,7 @@ export type Database = {
           section_type: string | null
           service_code: string | null
           service_name: string
+          shopify_order_id: string | null
           sku_ref: string | null
           source: string
           unit_price_cents: number
@@ -393,6 +395,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           discount_cents?: number
+          fulfillment_id?: string | null
           id?: string
           line_date?: string
           note?: string | null
@@ -400,6 +403,7 @@ export type Database = {
           section_type?: string | null
           service_code?: string | null
           service_name: string
+          shopify_order_id?: string | null
           sku_ref?: string | null
           source?: string
           unit_price_cents: number
@@ -410,6 +414,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           discount_cents?: number
+          fulfillment_id?: string | null
           id?: string
           line_date?: string
           note?: string | null
@@ -417,6 +422,7 @@ export type Database = {
           section_type?: string | null
           service_code?: string | null
           service_name?: string
+          shopify_order_id?: string | null
           sku_ref?: string | null
           source?: string
           unit_price_cents?: number
@@ -1553,6 +1559,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      prep_center_config: {
+        Row: {
+          config_key: string
+          config_value: Json
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          config_key: string
+          config_value: Json
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          config_key?: string
+          config_value?: Json
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       price_changes: {
         Row: {

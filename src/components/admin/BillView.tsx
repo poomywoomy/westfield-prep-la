@@ -834,8 +834,11 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
                 <CardTitle>{client.company_name}</CardTitle>
                 <Badge className={getStatusColor(bill.status)}>{bill.status}</Badge>
               </div>
-              <CardDescription>
-                {bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+              <CardDescription className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                {statementStartDate && statementEndDate 
+                  ? `${new Date(statementStartDate).toLocaleDateString()} - ${new Date(statementEndDate).toLocaleDateString()}`
+                  : (bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { month: "long", year: "numeric" }))}
               </CardDescription>
               {statementStartDate && statementEndDate && (
                 <p className="text-xs text-muted-foreground">

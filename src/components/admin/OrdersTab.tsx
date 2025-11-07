@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, RefreshCw, Search, Package } from "lucide-react";
+import { Loader2, RefreshCw, Search, Package, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
+import { EnhancedOrderFulfillmentDialog } from "./EnhancedOrderFulfillmentDialog";
 
 interface ShopifyOrder {
   id: string;
@@ -37,6 +38,9 @@ export function OrdersTab() {
   const [selectedClient, setSelectedClient] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [fulfillmentDialogOpen, setFulfillmentDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -268,12 +272,13 @@ export function OrdersTab() {
                   <TableHead>Financial</TableHead>
                   <TableHead>Fulfillment</TableHead>
                   <TableHead>Created</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredOrders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                       {selectedClient === "all" 
                         ? "Select a client to view orders"
                         : "No orders found"}
@@ -299,6 +304,26 @@ export function OrdersTab() {
                           ? format(new Date(order.created_at_shopify), "MMM dd, yyyy HH:mm")
                           : "-"}
                       </TableCell>
+                      <TableCell>
+                        {order.fulfillment_status === "fulfilled" ? (
+                          <Badge variant="outline" className="gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Fulfilled
+                          </Badge>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setSelectedClientId(order.client_id);
+                              setFulfillmentDialogOpen(true);
+                            }}
+                          >
+                            <Package className="h-4 w-4 mr-1" />
+                            Fulfill
+                          </Button>
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -307,6 +332,16 @@ export function OrdersTab() {
           )}
         </CardContent>
       </Card>
+
+      {selectedOrder && (
+        <EnhancedOrderFulfillmentDialog
+          open={fulfillmentDialogOpen}
+          onOpenChange={setFulfillmentDialogOpen}
+          order={selectedOrder}
+          clientId={selectedClientId}
+          onSuccess={fetchOrders}
+        />
+      )}
     </div>
   );
 }

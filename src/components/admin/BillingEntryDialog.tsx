@@ -179,7 +179,40 @@ const BillingEntryDialog = ({
     }
   };
 
-  const initializeFromQuote = () => {
+  const initializeFromQuote = async () => {
+    if (!quote) {
+      // Fallback to custom_pricing if no quote exists
+      console.log("No quote found, checking custom_pricing");
+      const { data: customPricing, error } = await supabase
+        .from("custom_pricing")
+        .select("*")
+        .eq("client_id", client.id);
+
+      if (error) {
+        console.error("Error fetching custom pricing:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load custom pricing",
+          variant: "destructive",
+        });
+        setBillingItems([]);
+        return;
+      }
+
+      if (customPricing && customPricing.length > 0) {
+        console.log("Found custom pricing:", customPricing);
+        const items: BillingItem[] = customPricing.map((pricing: any) => ({
+          service_name: pricing.service_name,
+          unit_price: Number(pricing.price_per_unit || 0),
+          quantity: 0,
+          section_type: pricing.section_type || "Standard Operations",
+          item_type: "quote" as const,
+        }));
+        setBillingItems(items);
+      }
+      return;
+    }
+
     const quoteData = quote.quote_data;
     const items: BillingItem[] = [];
 
