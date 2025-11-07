@@ -259,6 +259,12 @@ export function ShopifyManagementTab() {
   const handleSyncAll = async (clientId: string) => {
     setSyncing(clientId);
     try {
+      // Sync locations first to ensure location_id is set
+      const { error: locError } = await supabase.functions.invoke("shopify-sync-locations", {
+        body: { client_id: clientId }
+      });
+      if (locError) throw locError;
+
       const productsData = await handleSyncProducts(clientId);
       const inventoryData = await handleSyncInventory(clientId);
       
