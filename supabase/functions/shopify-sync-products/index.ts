@@ -84,13 +84,20 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    // Get user's Shopify store
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    // Verify user authentication
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
       throw new Error('User not authenticated');
     }
 
-    const { data: client } = await supabase
+    // Create service client for RLS-free database operations
+    const serviceClient = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
+    // Get user's Shopify store using service client
+    const { data: client } = await serviceClient
       .from('clients')
       .select('id')
       .eq('user_id', user.id)
@@ -100,7 +107,7 @@ Deno.serve(async (req) => {
       throw new Error('Client profile not found');
     }
 
-    const { data: shopifyStore } = await supabase
+    const { data: shopifyStore } = await serviceClient
       .from('shopify_stores')
       .select('*')
       .eq('client_id', client.id)
@@ -130,7 +137,7 @@ Deno.serve(async (req) => {
 
     const validatedProducts = productsValidation.data;
 
-    // Sync products to skus table (correct table name)
+    // Sync products to skus table using service client
     const skusToInsert = validatedProducts.flatMap((product) => 
       product.variants.map((variant) => ({
         client_id: client.id,
@@ -142,8 +149,8 @@ Deno.serve(async (req) => {
       }))
     );
 
-    // Upsert SKUs with correct conflict key
-    const { error: skuError } = await supabase
+    // Upsert SKUs using service client
+    const { error: skuError } = await serviceClient
       .from('skus')
       .upsert(skusToInsert, {
         onConflict: 'client_id,client_sku',
@@ -151,6 +158,75 @@ Deno.serve(async (req) => {
 
     if (skuError) {
       throw skuError;
+    }
+
+    // Seed inventory from Shopify for new SKUs
+    // Get primary location
+    const { data: primaryLocation } = await serviceClient
+      .from('locations')
+      .select('id')
+      .eq('code', 'MAIN')
+      .single();
+
+    if (primaryLocation) {
+      for (const product of validatedProducts) {
+        for (const variant of product.variants) {
+          const clientSku = variant.sku || `SHOP-${product.id}-${variant.id}`;
+          
+          // Check if SKU has existing inventory
+          const { data: existingSku } = await serviceClient
+            .from('skus')
+            .select('id')
+            .eq('client_id', client.id)
+            .eq('client_sku', clientSku)
+            .single();
+
+          if (existingSku) {
+            const { count: ledgerCount } = await serviceClient
+              .from('inventory_ledger')
+              .select('id', { count: 'exact', head: true })
+              .eq('sku_id', existingSku.id);
+
+            // Only seed if no existing ledger entries
+            if (ledgerCount === 0) {
+              // Fetch Shopify inventory level
+              try {
+                const inventoryResponse = await fetch(
+                  `https://${shopifyStore.shop_domain}/admin/api/${apiVersion}/inventory_levels.json?inventory_item_ids=${variant.id}`,
+                  {
+                    headers: {
+                      'X-Shopify-Access-Token': shopifyStore.access_token,
+                    }
+                  }
+                );
+
+                if (inventoryResponse.ok) {
+                  const { inventory_levels } = await inventoryResponse.json();
+                  const availableQty = inventory_levels?.[0]?.available || 0;
+
+                  if (availableQty > 0) {
+                    // Create initial ledger entry
+                    await serviceClient
+                      .from('inventory_ledger')
+                      .insert({
+                        client_id: client.id,
+                        sku_id: existingSku.id,
+                        location_id: primaryLocation.id,
+                        qty_delta: availableQty,
+                        transaction_type: 'adjustment',
+                        reason_code: 'shopify_seed',
+                        notes: `Initial inventory seeded from Shopify (${availableQty} units)`,
+                        source_type: 'shopify_sync',
+                      });
+                  }
+                }
+              } catch (invError) {
+                console.error(`Failed to seed inventory for SKU ${clientSku}:`, invError);
+              }
+            }
+          }
+        }
+      }
     }
 
     return new Response(

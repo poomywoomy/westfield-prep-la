@@ -59,6 +59,7 @@ export function ShopifyManagementTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [syncing, setSyncing] = useState<string | null>(null);
   const [testing, setTesting] = useState<string | null>(null);
+  const [enablingAutoSync, setEnablingAutoSync] = useState(false);
   
   // Dialog states
   const [logsDialog, setLogsDialog] = useState<{ open: boolean; clientId: string; clientName: string }>({
@@ -198,8 +199,13 @@ export function ShopifyManagementTab() {
   const handleSyncProducts = async (clientId: string) => {
     setSyncing(clientId);
     try {
-      const { error } = await supabase.functions.invoke("shopify-sync-products", {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { data, error } = await supabase.functions.invoke("shopify-sync-products", {
         body: { client_id: clientId },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
       });
 
       if (error) throw error;
@@ -214,15 +220,15 @@ export function ShopifyManagementTab() {
 
       toast({
         title: "Success",
-        description: "Product sync initiated",
+        description: data?.message || "Product sync initiated",
       });
 
       fetchStores();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error syncing products:", error);
       toast({
-        title: "Error",
-        description: "Failed to sync products",
+        title: "Sync Failed",
+        description: error.message || "Failed to sync products from Shopify",
         variant: "destructive",
       });
     } finally {
@@ -316,6 +322,38 @@ export function ShopifyManagementTab() {
     }
   };
 
+  const handleEnableAutoSyncAll = async () => {
+    setEnablingAutoSync(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { data, error } = await supabase.functions.invoke("shopify-enable-auto-sync", {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: data?.message || "Auto-sync enabled for all stores",
+      });
+
+      fetchStores();
+      fetchStats();
+    } catch (error: any) {
+      console.error("Error enabling auto-sync:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to enable auto-sync",
+        variant: "destructive",
+      });
+    } finally {
+      setEnablingAutoSync(false);
+    }
+  };
+
   const filteredStores = stores.filter(store =>
     store.shop_domain.toLowerCase().includes(searchTerm.toLowerCase()) ||
     store.clients.company_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -398,6 +436,23 @@ export function ShopifyManagementTab() {
                 className="pl-9"
               />
             </div>
+            <Button
+              onClick={handleEnableAutoSyncAll}
+              disabled={enablingAutoSync}
+              variant="outline"
+            >
+              {enablingAutoSync ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Enabling...
+                </>
+              ) : (
+                <>
+                  <Activity className="h-4 w-4 mr-2" />
+                  Enable Auto-Sync All
+                </>
+              )}
+            </Button>
             <Button variant="outline" onClick={fetchStores}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh

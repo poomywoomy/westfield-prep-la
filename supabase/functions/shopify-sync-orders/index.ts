@@ -28,10 +28,13 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
+    // Create service client for RLS-free database operations
+    const serviceClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
     const { client_id } = await req.json();
 
-    // Get client info
-    const { data: client } = await supabase
+    // Get client info using service client
+    const { data: client } = await serviceClient
       .from('clients')
       .select('id')
       .eq('id', client_id)
@@ -41,8 +44,8 @@ Deno.serve(async (req) => {
       throw new Error('Client not found');
     }
 
-    // Get store credentials
-    const { data: store } = await supabase
+    // Get store credentials using service client
+    const { data: store } = await serviceClient
       .from('shopify_stores')
       .select('shop_domain, access_token')
       .eq('client_id', client_id)
@@ -89,7 +92,7 @@ Deno.serve(async (req) => {
     
     console.log(`Fetched ${allOrders.length} total orders from ${pageCount} pages`);
 
-    // Process and upsert orders
+    // Process and upsert orders using service client
     const ordersData = allOrders.map((order: any) => {
       // Get first fulfillment order ID if available
       const fulfillmentOrderId = order.fulfillment_orders?.[0]?.id?.toString() || null;
@@ -106,12 +109,12 @@ Deno.serve(async (req) => {
         financial_status: order.financial_status,
         line_items: order.line_items,
         shipping_address: order.shipping_address,
-        shopify_created_at: order.created_at,
+        created_at_shopify: order.created_at,
         fulfillment_order_id: fulfillmentOrderId,
       };
     });
 
-    const { error: upsertError } = await supabase
+    const { error: upsertError } = await serviceClient
       .from('shopify_orders')
       .upsert(ordersData, { onConflict: 'client_id,shopify_order_id' });
 

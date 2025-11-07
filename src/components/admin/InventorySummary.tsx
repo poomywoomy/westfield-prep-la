@@ -4,8 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, FileDown, AlertTriangle } from "lucide-react";
+import { Search, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,8 +13,6 @@ import { InventoryRowActions } from "./InventoryRowActions";
 import { InventoryAdjustmentDialog } from "./InventoryAdjustmentDialog";
 import { InventoryHistoryDialog } from "./InventoryHistoryDialog";
 import { QuickScanModal } from "./QuickScanModal";
-import { DiscrepancyActionsDialog } from "./DiscrepancyActionsDialog";
-import { DiscrepancyStatusBadge } from "./DiscrepancyStatusBadge";
 import { ExpectedReturnsSection } from "./ExpectedReturnsSection";
 import { format } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
@@ -56,22 +53,14 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [quickScanOpen, setQuickScanOpen] = useState(false);
   const [selectedSku, setSelectedSku] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"available" | "discrepancies">("available");
-  const [discrepancies, setDiscrepancies] = useState<any[]>([]);
-  const [selectedDiscrepancy, setSelectedDiscrepancy] = useState<any>(null);
-  const [discrepancyDialogOpen, setDiscrepancyDialogOpen] = useState(false);
   const [realtimeEnabled, setRealtimeEnabled] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchClients();
     fetchLocations();
-    if (activeTab === "available") {
-      fetchInventory();
-    } else {
-      fetchDiscrepancies();
-    }
-  }, [selectedClient, selectedLocation, stockStatus, activeTab]);
+    fetchInventory();
+  }, [selectedClient, selectedLocation, stockStatus]);
 
   // Real-time subscription
   useEffect(() => {
@@ -180,36 +169,6 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
     setLoading(false);
   };
 
-  const [sourceFilter, setSourceFilter] = useState<string>("all");
-
-  const fetchDiscrepancies = async () => {
-    setLoading(true);
-    
-    // Fetch from damaged_item_decisions with proper joins
-    let query = supabase
-      .from("damaged_item_decisions")
-      .select(`
-        *,
-        clients!inner(company_name),
-        skus!inner(client_sku, title),
-        asn_headers(asn_number)
-      `)
-      .order("created_at", { ascending: false });
-    
-    if (selectedClient !== "all") {
-      query = query.eq("client_id", selectedClient);
-    }
-    
-    const { data, error } = await query;
-    
-    if (error) {
-      toast({ title: "Error", description: "Failed to load discrepancies", variant: "destructive" });
-      setDiscrepancies([]);
-    } else {
-      setDiscrepancies(data || []);
-    }
-    setLoading(false);
-  };
 
   const filteredInventory = inventory.filter(item => {
     // Stock status filter
@@ -302,16 +261,6 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
 
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)} className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="available">Available Inventory</TabsTrigger>
-          <TabsTrigger value="discrepancies">
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            Discrepancies
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="available" className="space-y-6">
           <InventoryMetricsCards 
             metrics={metrics}
             onMetricClick={(filter) => setStockStatus(filter)}
@@ -497,175 +446,7 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
         />
       )}
 
-        </TabsContent>
-
-        <TabsContent value="discrepancies" className="space-y-6">
-          <div className="flex items-center gap-4 flex-wrap">
-            <Select value={selectedClient} onValueChange={setSelectedClient}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select client" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Clients</SelectItem>
-                {clients.map(client => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.company_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Source" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Sources</SelectItem>
-                <SelectItem value="receiving">Receiving</SelectItem>
-                <SelectItem value="return">Return</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Client / SKU</TableHead>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
-                      Loading discrepancies...
-                    </TableCell>
-                  </TableRow>
-                ) : discrepancies.filter(item => 
-                  sourceFilter === "all" || item.source_type === sourceFilter
-                ).length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
-                      No discrepancies found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  discrepancies
-                    .filter(item => sourceFilter === "all" || item.source_type === sourceFilter)
-                    .map((item: any) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <Badge variant="outline" className="w-fit mb-1 text-xs">
-                            {item.clients?.company_name}
-                          </Badge>
-                          <span className="font-medium">{item.skus?.client_sku}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{item.skus?.title}</span>
-                          {item.asn_headers && (
-                            <span className="text-xs text-muted-foreground">
-                              ASN: {item.asn_headers.asn_number}
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={item.discrepancy_type === "damaged" ? "default" : "destructive"}>
-                          {item.discrepancy_type}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant="outline" 
-                          className={item.source_type === "return" ? "border-blue-500 text-blue-600" : "border-amber-500 text-amber-600"}
-                        >
-                          {item.source_type === "return" ? "🔄 Return" : "📦 Receiving"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <span className="font-medium">{item.quantity} units</span>
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant={
-                            item.status === "pending" ? "outline" :
-                            item.status === "approved" ? "default" :
-                            item.status === "rejected" ? "destructive" :
-                            "secondary"
-                          }
-                        >
-                          {item.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {item.created_at ? format(new Date(item.created_at), "MMM d, yyyy") : "-"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedDiscrepancy({
-                              ...item,
-                              client_sku: item.skus?.client_sku,
-                              title: item.skus?.title,
-                              asn_number: item.asn_headers?.asn_number,
-                            });
-                            setDiscrepancyDialogOpen(true);
-                          }}
-                        >
-                          Review
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      <InventoryAdjustmentDialog
-        open={adjustDialogOpen}
-        onOpenChange={setAdjustDialogOpen}
-        onSuccess={() => {
-          fetchInventory();
-          toast({ title: "Success", description: "Inventory adjusted" });
-        }}
-      />
-
-      {selectedSku && (
-        <InventoryHistoryDialog
-          open={historyDialogOpen}
-          onOpenChange={setHistoryDialogOpen}
-          skuId={selectedSku.sku_id}
-          clientSku={selectedSku.client_sku}
-          title={selectedSku.title}
-        />
-      )}
-
-      {selectedDiscrepancy && (
-        <DiscrepancyActionsDialog
-          open={discrepancyDialogOpen}
-          onOpenChange={setDiscrepancyDialogOpen}
-          decision={selectedDiscrepancy}
-          onSuccess={() => {
-            fetchDiscrepancies();
-            toast({ title: "Success", description: "Discrepancy processed" });
-          }}
-        />
-      )}
+      <ExpectedReturnsSection />
 
       <QuickScanModal
         open={quickScanOpen}

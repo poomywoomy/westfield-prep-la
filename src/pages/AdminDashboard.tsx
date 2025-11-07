@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Users, FileText, DollarSign, LogOut, Settings, ChevronDown, FileSignature, Store, Package, Scan, PenSquare, AlertTriangle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { LogOut, Settings, ChevronDown, Scan } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientsTab from "@/components/admin/ClientsTab";
 import QuotesTab from "@/components/admin/QuotesTab";
@@ -18,13 +18,16 @@ import { InventoryTab } from "@/components/admin/InventoryTab";
 import { QuickScanModal } from "@/components/admin/QuickScanModal";
 import { BlogTab } from "@/components/admin/BlogTab";
 import { DiscrepanciesTab } from "@/components/admin/DiscrepanciesTab";
+import { OrdersTab } from "@/components/admin/OrdersTab";
 import { usePendingDiscrepancyCount } from "@/hooks/usePendingDiscrepancyCount";
+import { AppSidebarAdmin } from "@/components/app-sidebar-admin";
 
 const AdminDashboard = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showQuickScan, setShowQuickScan] = useState(false);
+  const [activeTab, setActiveTab] = useState("clients");
   const { count: discrepancyCount } = usePendingDiscrepancyCount();
 
   useEffect(() => {
@@ -90,84 +93,49 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/admin/dashboard">
-              <img src={westfieldLogo} alt="Westfield Logo" className="h-10 cursor-pointer" />
-            </Link>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <Settings className="mr-2 h-4 w-4" />
-                Account
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate("/admin/settings")}>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <AppSidebarAdmin 
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          discrepancyCount={discrepancyCount}
+        />
+        
+        <div className="flex-1 flex flex-col">
+          <header className="border-b border-border bg-card">
+            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <SidebarTrigger />
+                <Link to="/admin/dashboard">
+                  <img src={westfieldLogo} alt="Westfield Logo" className="h-10 cursor-pointer" />
+                </Link>
+                <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Account
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate("/admin/settings")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </header>
 
-      <main className="container mx-auto px-4 py-8 pb-28">
-        <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="grid grid-cols-8 w-full max-w-6xl">
-            <TabsTrigger value="clients">
-              <Users className="mr-2 h-4 w-4" />
-              Clients
-            </TabsTrigger>
-            <TabsTrigger value="quotes">
-              <FileText className="mr-2 h-4 w-4" />
-              Quotes
-            </TabsTrigger>
-            <TabsTrigger value="billing">
-              <DollarSign className="mr-2 h-4 w-4" />
-              Billing
-            </TabsTrigger>
-            <TabsTrigger value="inventory" className="relative">
-              <Package className="mr-2 h-4 w-4" />
-              Inventory
-              {discrepancyCount > 0 && (
-                <Badge className="ml-2 h-5 px-1.5 bg-red-500 text-white text-xs">
-                  {discrepancyCount}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="discrepancies" className="relative">
-              <AlertTriangle className="mr-2 h-4 w-4" />
-              Discrepancies
-              {discrepancyCount > 0 && (
-                <Badge className="ml-2 h-5 px-1.5 bg-red-500 text-white text-xs">
-                  {discrepancyCount}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="shopify">
-              <Store className="mr-2 h-4 w-4" />
-              Shopify
-            </TabsTrigger>
-            <TabsTrigger value="blog">
-              <PenSquare className="mr-2 h-4 w-4" />
-              Blog
-            </TabsTrigger>
-            <TabsTrigger value="documents">
-              <FileSignature className="mr-2 h-4 w-4" />
-              Documents
-            </TabsTrigger>
-          </TabsList>
+          <main className="container mx-auto px-4 py-8 pb-28">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
 
           <TabsContent value="clients">
             <ClientsTab />
@@ -191,6 +159,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="shopify">
             <ShopifyManagementTab />
+          </TabsContent>
+
+          <TabsContent value="orders">
+            <OrdersTab />
           </TabsContent>
 
           <TabsContent value="blog">
@@ -217,7 +189,9 @@ const AdminDashboard = () => {
           onOpenChange={setShowQuickScan} 
         />
       </main>
-    </div>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
