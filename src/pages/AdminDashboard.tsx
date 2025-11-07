@@ -26,8 +26,8 @@ const AdminDashboard = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [showQuickScan, setShowQuickScan] = useState(false);
   const [activeTab, setActiveTab] = useState("clients");
+  const [showQuickScan, setShowQuickScan] = useState(false);
   const { count: discrepancyCount } = usePendingDiscrepancyCount();
 
   useEffect(() => {
