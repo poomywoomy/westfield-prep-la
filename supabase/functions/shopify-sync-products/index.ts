@@ -9,6 +9,7 @@ const corsHeaders = {
 // Validation schemas for Shopify data
 const shopifyVariantSchema = z.object({
   id: z.union([z.string(), z.number()]),
+  inventory_item_id: z.union([z.string(), z.number()]),
   sku: z.string().max(100).optional().nullable(),
   title: z.string().max(200),
   price: z.union([z.string(), z.number()]).transform(val => {
@@ -96,26 +97,51 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    // Get user's Shopify store using service client
-    const { data: client } = await serviceClient
-      .from('clients')
-      .select('id')
+    // Parse request body to get client_id
+    const body = await req.json().catch(() => null);
+    const requestedClientId = body?.client_id;
+
+    // Check if user is admin
+    const { data: userRole } = await serviceClient
+      .from('user_roles')
+      .select('role')
       .eq('user_id', user.id)
       .single();
 
-    if (!client) {
-      throw new Error('Client profile not found');
+    const isAdmin = userRole?.role === 'admin';
+
+    // Determine target client
+    let targetClientId: string;
+    if (isAdmin && requestedClientId) {
+      targetClientId = requestedClientId;
+    } else {
+      const { data: client } = await serviceClient
+        .from('clients')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!client) {
+        return new Response(
+          JSON.stringify({ error: 'Client profile not found' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      targetClientId = client.id;
     }
 
     const { data: shopifyStore } = await serviceClient
       .from('shopify_stores')
       .select('*')
-      .eq('client_id', client.id)
+      .eq('client_id', targetClientId)
       .eq('is_active', true)
       .single();
 
     if (!shopifyStore) {
-      throw new Error('No active Shopify store connected');
+      return new Response(
+        JSON.stringify({ error: 'No active Shopify store connected for this client' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-01';
@@ -140,11 +166,11 @@ Deno.serve(async (req) => {
     // Sync products to skus table using service client
     const skusToInsert = validatedProducts.flatMap((product) => 
       product.variants.map((variant) => ({
-        client_id: client.id,
+        client_id: targetClientId,
         client_sku: variant.sku || `SHOP-${product.id}-${variant.id}`,
         title: `${product.title}${variant.title !== 'Default Title' ? ` - ${variant.title}` : ''}`,
         unit_cost: variant.price,
-        notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}`,
+        notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}, Inventory Item ID: ${variant.inventory_item_id}`,
         status: 'active',
       }))
     );
@@ -168,6 +194,9 @@ Deno.serve(async (req) => {
       .eq('code', 'MAIN')
       .single();
 
+    let seededCount = 0;
+    const seedErrors = [];
+
     if (primaryLocation) {
       for (const product of validatedProducts) {
         for (const variant of product.variants) {
@@ -177,7 +206,7 @@ Deno.serve(async (req) => {
           const { data: existingSku } = await serviceClient
             .from('skus')
             .select('id')
-            .eq('client_id', client.id)
+            .eq('client_id', targetClientId)
             .eq('client_sku', clientSku)
             .single();
 
@@ -189,10 +218,11 @@ Deno.serve(async (req) => {
 
             // Only seed if no existing ledger entries
             if (ledgerCount === 0) {
-              // Fetch Shopify inventory level
+              // Fetch Shopify inventory level using inventory_item_id
               try {
+                const inventoryItemId = variant.inventory_item_id.toString();
                 const inventoryResponse = await fetch(
-                  `https://${shopifyStore.shop_domain}/admin/api/${apiVersion}/inventory_levels.json?inventory_item_ids=${variant.id}`,
+                  `https://${shopifyStore.shop_domain}/admin/api/${apiVersion}/inventory_levels.json?inventory_item_ids=${inventoryItemId}`,
                   {
                     headers: {
                       'X-Shopify-Access-Token': shopifyStore.access_token,
@@ -202,14 +232,14 @@ Deno.serve(async (req) => {
 
                 if (inventoryResponse.ok) {
                   const { inventory_levels } = await inventoryResponse.json();
-                  const availableQty = inventory_levels?.[0]?.available || 0;
+                  const availableQty = inventory_levels?.reduce((sum: number, level: any) => sum + (level.available || 0), 0) || 0;
 
                   if (availableQty > 0) {
                     // Create initial ledger entry
-                    await serviceClient
+                    const { error: seedError } = await serviceClient
                       .from('inventory_ledger')
                       .insert({
-                        client_id: client.id,
+                        client_id: targetClientId,
                         sku_id: existingSku.id,
                         location_id: primaryLocation.id,
                         qty_delta: availableQty,
@@ -218,10 +248,17 @@ Deno.serve(async (req) => {
                         notes: `Initial inventory seeded from Shopify (${availableQty} units)`,
                         source_type: 'shopify_sync',
                       });
+                    
+                    if (!seedError) {
+                      seededCount++;
+                    } else {
+                      seedErrors.push({ sku: clientSku, error: seedError.message });
+                    }
                   }
                 }
               } catch (invError) {
                 console.error(`Failed to seed inventory for SKU ${clientSku}:`, invError);
+                seedErrors.push({ sku: clientSku, error: invError instanceof Error ? invError.message : 'Unknown error' });
               }
             }
           }
@@ -233,7 +270,9 @@ Deno.serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         synced: skusToInsert.length,
-        message: `Successfully synced ${skusToInsert.length} products from Shopify` 
+        seeded: seededCount,
+        message: `Successfully synced ${skusToInsert.length} products from Shopify${seededCount > 0 ? ` and seeded ${seededCount} inventory records` : ''}`,
+        seedErrors: seedErrors.length > 0 ? seedErrors : undefined
       }),
       { 
         status: 200, 

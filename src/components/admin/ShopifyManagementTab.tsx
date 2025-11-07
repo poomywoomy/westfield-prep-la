@@ -210,6 +210,10 @@ export function ShopifyManagementTab() {
 
       if (error) throw error;
 
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
       // Audit log
       await supabase.from('audit_log').insert({
         action: 'shopify_manual_sync',
@@ -220,7 +224,7 @@ export function ShopifyManagementTab() {
 
       toast({
         title: "Success",
-        description: data?.message || "Product sync initiated",
+        description: data?.message || `Successfully synced ${data?.synced || 0} products${data?.seeded ? ` and seeded ${data.seeded} inventory records` : ''}`,
       });
 
       fetchStores();
@@ -334,6 +338,10 @@ export function ShopifyManagementTab() {
       });
 
       if (error) throw error;
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       toast({
         title: "Success",

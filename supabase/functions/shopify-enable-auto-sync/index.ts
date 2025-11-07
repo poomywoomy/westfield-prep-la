@@ -82,7 +82,10 @@ serve(async (req) => {
 
   } catch (error) {
     console.error("Error enabling auto-sync:", error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    let errorMessage = 'Failed to enable auto-sync';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

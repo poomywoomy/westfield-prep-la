@@ -28,12 +28,15 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
+    // Create service client for RLS-free database operations
+    const serviceClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
     const { client_id } = await req.json();
 
-    // Get client info
-    const { data: client } = await supabase
+    // Get client info with Shopify location
+    const { data: client } = await serviceClient
       .from('clients')
-      .select('id')
+      .select('id, shopify_location_id')
       .eq('id', client_id)
       .single();
 
@@ -42,7 +45,7 @@ Deno.serve(async (req) => {
     }
 
     // Get store credentials
-    const { data: store } = await supabase
+    const { data: store } = await serviceClient
       .from('shopify_stores')
       .select('shop_domain, access_token')
       .eq('client_id', client_id)
@@ -53,8 +56,40 @@ Deno.serve(async (req) => {
       throw new Error('Store not found or inactive');
     }
 
+    // Ensure we have a Shopify location ID
+    let locationId = client.shopify_location_id;
+    if (!locationId) {
+      // Fetch locations from Shopify and store primary
+      const locationsResponse = await fetch(
+        `https://${store.shop_domain}/admin/api/2024-01/locations.json`,
+        {
+          headers: {
+            'X-Shopify-Access-Token': store.access_token,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (locationsResponse.ok) {
+        const { locations } = await locationsResponse.json();
+        const primaryLocation = locations.find((loc: any) => loc.active) || locations[0];
+        if (primaryLocation) {
+          locationId = primaryLocation.id.toString();
+          // Store for future use
+          await serviceClient
+            .from('clients')
+            .update({ shopify_location_id: locationId })
+            .eq('id', client_id);
+        }
+      }
+
+      if (!locationId) {
+        throw new Error('No Shopify location found for this store');
+      }
+    }
+
     // Get inventory items that need syncing
-    const { data: inventoryItems } = await supabase
+    const { data: inventoryItems } = await serviceClient
       .from('inventory_sync')
       .select('*')
       .eq('client_id', client_id)
@@ -75,6 +110,9 @@ Deno.serve(async (req) => {
 
     for (const item of inventoryItems) {
       try {
+        // Extract inventory_item_id from SKU or use stored value
+        const inventoryItemId = item.inventory_item_id || item.sku;
+        
         // Update inventory level in Shopify
         const response = await fetch(
           `https://${store.shop_domain}/admin/api/2024-01/inventory_levels/set.json`,
@@ -85,19 +123,20 @@ Deno.serve(async (req) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              location_id: item.location_id, // This would need to be stored in inventory_sync
-              inventory_item_id: item.sku,
+              location_id: Number(locationId),
+              inventory_item_id: Number(inventoryItemId),
               available: item.westfield_quantity,
             }),
           }
         );
 
         if (!response.ok) {
-          throw new Error(`Failed to update ${item.sku}: ${response.statusText}`);
+          const errorText = await response.text();
+          throw new Error(`Failed to update ${item.sku}: ${response.statusText} - ${errorText}`);
         }
 
         // Update last synced timestamp
-        await supabase
+        await serviceClient
           .from('inventory_sync')
           .update({
             last_synced_at: new Date().toISOString(),
@@ -126,9 +165,10 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Inventory sync error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unable to sync inventory with Shopify. Please try again or contact support.';
     return new Response(
       JSON.stringify({ 
-        error: 'Unable to sync inventory with Shopify. Please try again or contact support.' 
+        error: errorMessage
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
