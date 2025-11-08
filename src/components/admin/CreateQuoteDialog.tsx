@@ -30,8 +30,9 @@ const STANDARD_SERVICES = [
   "Monthly Deposit",
   "Pallet Receiving",
   "Carton Receiving",
-  "Cubic Feet Storage",
-  "Shelf Storage",
+  "Bin Storage (per bin per month)",
+  "Cubic Feet Storage (per month)",
+  "Shelf Storage (per month)",
   "Custom Entry"
 ];
 
