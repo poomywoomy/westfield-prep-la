@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Save } from "lucide-react";
-import { StartBillingCycleDialog } from "./StartBillingCycleDialog";
+import { Plus, Trash2, Save, CheckCircle } from "lucide-react";
 
 interface PricingItem {
   id: string;
@@ -61,23 +60,10 @@ export const ClientPricingTab = ({ clientId, onSuccess }: ClientPricingTabProps)
   const [isDirty, setIsDirty] = useState(false);
   const [standardItems, setStandardItems] = useState<PricingItem[]>([]);
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
-  const [showBillingDialog, setShowBillingDialog] = useState(false);
-  const [client, setClient] = useState<any>(null);
 
   useEffect(() => {
     fetchPricing();
-    fetchClient();
   }, [clientId]);
-
-  const fetchClient = async () => {
-    const { data } = await supabase
-      .from("clients")
-      .select("*")
-      .eq("id", clientId)
-      .single();
-    
-    if (data) setClient(data);
-  };
 
   const fetchPricing = async () => {
     const { data } = await supabase
@@ -258,11 +244,76 @@ export const ClientPricingTab = ({ clientId, onSuccess }: ClientPricingTabProps)
     }
   };
 
-  const handleActivateAndStartBill = async () => {
-    if (isDirty) {
-      await savePricing();
+  const handleActivateQuote = async () => {
+    setLoading(true);
+
+    try {
+      // Save pricing first if dirty
+      if (isDirty) {
+        await savePricing();
+      }
+
+      // Deactivate any existing active quotes for this client
+      await supabase
+        .from("quotes")
+        .update({ status: "draft" })
+        .eq("client_id", clientId)
+        .eq("status", "active");
+
+      // Build quote_data from current custom_pricing state
+      const standardOperations = standardItems
+        .filter(item => item.service_name)
+        .map(item => ({
+          service_name: item.service_name,
+          service_price: item.price_per_unit,
+          service_code: null
+        }));
+
+      const fulfillmentSectionsData = fulfillmentSections.map(section => ({
+        type: section.type,
+        items: section.items
+          .filter(item => item.service_name)
+          .map(item => ({
+            service_name: item.service_name,
+            service_price: item.price_per_unit,
+            service_code: null
+          }))
+      })).filter(section => section.items.length > 0);
+
+      const quoteData = {
+        standard_operations: standardOperations,
+        fulfillment_sections: fulfillmentSectionsData
+      };
+
+      // Create new active quote
+      const { error: quoteError } = await supabase
+        .from("quotes")
+        .insert({
+          client_id: clientId,
+          status: "active",
+          quote_data: quoteData,
+          activated_at: new Date().toISOString(),
+          memo: "Auto-activated from pricing tab"
+        });
+
+      if (quoteError) throw quoteError;
+
+      toast({
+        title: "Quote Activated",
+        description: "Pricing quote has been activated successfully. You can now start billing cycles from the Billing tab.",
+      });
+
+      onSuccess();
+    } catch (error: any) {
+      console.error("Error activating quote:", error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-    setShowBillingDialog(true);
   };
 
   return (
@@ -279,8 +330,9 @@ export const ClientPricingTab = ({ clientId, onSuccess }: ClientPricingTabProps)
             <Save className="w-4 h-4 mr-2" />
             Save Pricing
           </Button>
-          <Button onClick={handleActivateAndStartBill} disabled={loading} variant="default">
-            Activate & Start Bill
+          <Button onClick={handleActivateQuote} disabled={loading} variant="default">
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Activate Quote
           </Button>
         </div>
       </div>
@@ -447,20 +499,6 @@ export const ClientPricingTab = ({ clientId, onSuccess }: ClientPricingTabProps)
           Add Self Fulfillment
         </Button>
       </div>
-
-      <StartBillingCycleDialog
-        open={showBillingDialog}
-        onOpenChange={setShowBillingDialog}
-        client={client}
-        onSuccess={(billId) => {
-          setShowBillingDialog(false);
-          toast({
-            title: "Success",
-            description: "Billing cycle started with custom pricing",
-          });
-          onSuccess();
-        }}
-      />
     </div>
   );
 };

@@ -23,7 +23,7 @@ const BillingTab = () => {
   const [cycleDialogOpen, setCycleDialogOpen] = useState(false);
   const [billModalOpen, setBillModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("open");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const { toast } = useToast();
 
   useEffect(() => {

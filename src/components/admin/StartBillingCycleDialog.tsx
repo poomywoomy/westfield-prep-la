@@ -42,19 +42,28 @@ export const StartBillingCycleDialog = ({
       const statementEndDate = toYmd(end);
       const billingMonth = statementStartDate;
 
-      // Check for existing open bills
+      // Check for existing bills for the current month (any status)
       const { data: existingBills } = await supabase
         .from("bills")
-        .select("id")
+        .select("id, status")
         .eq("client_id", client.id)
-        .eq("status", "open");
+        .eq("billing_month", billingMonth);
 
       if (existingBills && existingBills.length > 0) {
-        toast({
-          title: "Open Bill Exists",
-          description: "This client already has an open bill. Please close it before starting a new one.",
-          variant: "destructive",
-        });
+        const existingBill = existingBills[0];
+        if (existingBill.status === "open") {
+          toast({
+            title: "Open Bill Exists",
+            description: "This client already has an open bill for this month. Please close it before starting a new one.",
+            variant: "destructive",
+          });
+        } else if (existingBill.status === "closed") {
+          toast({
+            title: "Closed Bill Exists",
+            description: `A closed bill already exists for ${statementStartDate.substring(0, 7)}. Please reopen it from the Billing History, or wait until next month.`,
+            variant: "destructive",
+          });
+        }
         setLoading(false);
         return;
       }
