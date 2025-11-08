@@ -42,5 +42,11 @@ verify_jwt = true
 [functions.shopify-register-webhook]
 verify_jwt = true
 
-[functions.shopify-fulfill-order]
+[functions.shopify-buy-label]
+verify_jwt = true
+
+[functions.shopify-auto-sync]
+verify_jwt = false
+
+[functions.shopify-get-shipping-rates]
 verify_jwt = true

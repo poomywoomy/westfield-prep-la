@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Building2, User } from "lucide-react";
+import { formatDateRange } from "@/lib/dateFormatters";
 
 interface BillingClientsGridProps {
   clients: any[];
@@ -16,12 +17,6 @@ const BillingClientsGrid = ({ clients, onClientClick }: BillingClientsGridProps)
     }).format(amount);
   };
 
-  const formatDateRange = (startDate: string | null, endDate: string | null) => {
-    if (!startDate || !endDate) return null;
-    const start = new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const end = new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    return `${start} - ${end}`;
-  };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

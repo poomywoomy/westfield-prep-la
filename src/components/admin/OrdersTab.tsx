@@ -81,7 +81,7 @@ export function OrdersTab() {
     let query = supabase
       .from("shopify_orders")
       .select("*")
-      .order("created_at_shopify", { ascending: false });
+      .order("created_at_shopify", { ascending: true });
     
     if (selectedClient !== "all") {
       query = query.eq("client_id", selectedClient);
