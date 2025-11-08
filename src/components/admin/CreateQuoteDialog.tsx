@@ -30,11 +30,18 @@ const STANDARD_SERVICES = [
   "Monthly Deposit",
   "Pallet Receiving",
   "Carton Receiving",
-  "Bin Storage (per bin per month)",
-  "Cubic Feet Storage (per month)",
-  "Shelf Storage (per month)",
+  "Bin Storage",
+  "Cubic Feet Storage",
+  "Shelf Storage",
   "Custom Entry"
 ];
+
+// Billing notes for storage services
+const STORAGE_BILLING_NOTES: Record<string, string> = {
+  "Bin Storage": "Per bin, per month",
+  "Cubic Feet Storage": "Per month",
+  "Shelf Storage": "Per shelf, per month"
+};
 
 const MARKETPLACE_SERVICES = [
   "FNSKU Label",
@@ -294,12 +301,26 @@ export function CreateQuoteDialog({
               y = 20;
             }
             
+            // Service name in bold
             doc.setFont(undefined, 'bold');
             doc.text(item.service_name, 20, y);
             doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
-            doc.setFont(undefined, 'normal');
             y += 5;
             
+            // Billing note (if applicable)
+            if (STORAGE_BILLING_NOTES[item.service_name]) {
+              doc.setFontSize(8);
+              doc.setFont(undefined, 'normal');
+              doc.setTextColor(120, 120, 120);
+              doc.text(STORAGE_BILLING_NOTES[item.service_name], 25, y);
+              y += 4;
+              doc.setFontSize(10);
+              doc.setTextColor(0, 0, 0);
+            } else {
+              doc.setFont(undefined, 'normal');
+            }
+            
+            // Item notes
             if (item.notes) {
               doc.setFontSize(8);
               doc.setTextColor(100, 100, 100);
@@ -356,12 +377,26 @@ export function CreateQuoteDialog({
                 y = 20;
               }
               
+              // Service name in bold
               doc.setFont(undefined, 'bold');
               doc.text(item.service_name, 20, y);
               doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
-              doc.setFont(undefined, 'normal');
               y += 5;
               
+              // Billing note (if applicable)
+              if (STORAGE_BILLING_NOTES[item.service_name]) {
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(120, 120, 120);
+                doc.text(STORAGE_BILLING_NOTES[item.service_name], 25, y);
+                y += 4;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+              } else {
+                doc.setFont(undefined, 'normal');
+              }
+              
+              // Item notes
               if (item.notes) {
                 doc.setFontSize(8);
                 doc.setTextColor(100, 100, 100);
