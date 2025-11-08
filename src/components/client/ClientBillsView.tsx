@@ -61,6 +61,7 @@ const ClientBillsView = () => {
         .from("bills")
         .select("*")
         .eq("client_id", client.id)
+        .eq("status", "open")
         .order("created_at", { ascending: false });
 
       if (billsError) throw billsError;

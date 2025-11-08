@@ -11,6 +11,7 @@ import { LogOut, Settings, ChevronDown, Scan } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientsTab from "@/components/admin/ClientsTab";
 import BillingTab from "@/components/admin/BillingTab";
+import { BillingHistoryTab } from "@/components/admin/BillingHistoryTab";
 import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
 import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
 import { InventoryTab } from "@/components/admin/InventoryTab";
@@ -142,6 +143,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="billing">
             <BillingTab />
+          </TabsContent>
+
+          <TabsContent value="billing-history">
+            <BillingHistoryTab />
           </TabsContent>
 
           <TabsContent value="inventory">

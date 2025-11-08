@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Trash2, Plus, Download, Lock, Calendar, DollarSign, Wallet, ArrowLeft, ArrowRight, Copy, Mail, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { AddBillingPaymentDialog } from "./AddBillingPaymentDialog";
 import { AddCustomBillingItemDialog } from "./AddCustomBillingItemDialog";
 import { CollapsibleBillSection } from "./CollapsibleBillSection";
@@ -42,6 +43,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   const [loading, setLoading] = useState(false);
   const [depositBalance, setDepositBalance] = useState(0);
   const [cycleDialogOpen, setCycleDialogOpen] = useState(false);
+  const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -488,10 +490,13 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       return;
     }
 
-    if (!confirm("Close this billing cycle? This will generate the PDF and lock the bill from further edits.")) return;
+    setCloseConfirmOpen(true);
+  };
 
+  const confirmCloseBill = async () => {
     try {
       setLoading(true);
+      setCloseConfirmOpen(false);
 
       // Generate PDF first
       await generatePDF();
@@ -509,7 +514,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
 
       toast({
         title: "Billing Cycle Closed",
-        description: "PDF generated and bill locked. Create a new bill to continue billing for this client.",
+        description: "PDF generated and bill locked. View it in Bill History to reopen or download.",
       });
 
       onRefresh();
@@ -681,7 +686,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   };
 
   const resetBill = async () => {
-    if (!confirm("Reset this bill? This will delete all line items and payments, then re-populate from the quote or custom pricing with qty=0. Statement dates will be preserved.")) return;
+    if (!confirm("⚠️ CAUTION: Reset Bill?\n\nThis will DELETE all line items and payments, then repopulate from quote/pricing with qty=0. Statement dates will be preserved.\n\nThis action cannot be undone.")) return;
 
     setLoading(true);
     try {
@@ -1225,6 +1230,29 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={closeConfirmOpen} onOpenChange={setCloseConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Close This Bill?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>Once closed:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>The client will no longer see this bill</li>
+                <li>Line items cannot be edited until reopened</li>
+                <li>A PDF will be generated automatically</li>
+                <li>You can reopen this bill from Bill History if needed</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmCloseBill}>
+              Close Bill
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

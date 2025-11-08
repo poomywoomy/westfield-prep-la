@@ -58,9 +58,10 @@ export const StartBillingCycleDialog = ({
             variant: "destructive",
           });
         } else if (existingBill.status === "closed") {
+          const monthName = new Date(billingMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" });
           toast({
             title: "Closed Bill Exists",
-            description: `A closed bill already exists for ${statementStartDate.substring(0, 7)}. Please reopen it from the Billing History, or wait until next month.`,
+            description: `A closed bill already exists for ${monthName}. View it in the Bill History tab to reopen or download PDF.`,
             variant: "destructive",
           });
         }

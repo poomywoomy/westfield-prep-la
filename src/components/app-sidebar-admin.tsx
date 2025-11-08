@@ -1,4 +1,4 @@
-import { Users, FileText, DollarSign, Package, AlertTriangle, Store, ShoppingCart, PenSquare, FileSignature } from "lucide-react";
+import { Users, FileText, DollarSign, Package, AlertTriangle, Store, ShoppingCart, PenSquare, FileSignature, History } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -25,6 +25,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount }: Ap
   const menuItems = [
     { id: "clients", label: "Clients", icon: Users },
     { id: "billing", label: "Billing", icon: DollarSign },
+    { id: "billing-history", label: "Bill History", icon: History },
     { id: "inventory", label: "Inventory", icon: Package },
     { id: "discrepancies", label: "Discrepancies", icon: AlertTriangle, badge: discrepancyCount },
     { id: "shopify", label: "Shopify", icon: Store },
