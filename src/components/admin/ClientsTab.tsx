@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, RefreshCw } from "lucide-react";
 import CreateClientDialog from "./CreateClientDialog";
-import CreateQuoteDialog from "./CreateQuoteDialog";
+import { CreateQuoteDialog } from "./CreateQuoteDialog";
 import ClientsList from "./ClientsList";
 
 const ClientsTab = () => {
@@ -105,9 +105,6 @@ const ClientsTab = () => {
       <CreateQuoteDialog
         open={showQuoteDialog}
         onOpenChange={setShowQuoteDialog}
-        clients={clients}
-        onQuoteCreated={fetchClients}
-        manualOnly={true}
       />
     </Card>
   );

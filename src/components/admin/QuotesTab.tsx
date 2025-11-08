@@ -16,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import CreateQuoteDialog from "./CreateQuoteDialog";
+import { CreateQuoteDialog } from "./CreateQuoteDialog";
 import jsPDF from "jspdf";
 
 const QuotesTab = () => {
@@ -482,12 +482,6 @@ const QuotesTab = () => {
       <CreateQuoteDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        clients={clients}
-        onQuoteCreated={() => {
-          fetchClients();
-          fetchQuotes();
-        }}
-        editingQuote={editingQuote}
       />
 
       <AlertDialog open={!!deleteQuoteId} onOpenChange={() => setDeleteQuoteId(null)}>
