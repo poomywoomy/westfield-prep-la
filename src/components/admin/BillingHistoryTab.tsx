@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Download, RefreshCw } from "lucide-react";
 import { BillView } from "./BillView";
+import { formatDateRange } from "@/lib/dateFormatters";
 import type { Database } from "@/integrations/supabase/types";
 
 type Bill = Database["public"]["Tables"]["bills"]["Row"];
@@ -196,7 +197,7 @@ export const BillingHistoryTab = () => {
                         </TableCell>
                         <TableCell>
                           {bill.statement_start_date && bill.statement_end_date
-                            ? `${new Date(bill.statement_start_date).toLocaleDateString()} - ${new Date(bill.statement_end_date).toLocaleDateString()}`
+                            ? formatDateRange(bill.statement_start_date, bill.statement_end_date)
                             : "-"}
                         </TableCell>
                         <TableCell>{getStatusBadge(bill.status)}</TableCell>

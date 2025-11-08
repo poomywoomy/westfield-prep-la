@@ -113,7 +113,7 @@ export const StartBillingCycleDialog = ({
               unit_price_cents: Math.round((service.service_price || 0) * 100),
               qty_decimal: 0,
               section_type: "Standard Operations",
-              source: "quote",
+              source: "manual",
             });
           });
         }
@@ -128,7 +128,7 @@ export const StartBillingCycleDialog = ({
                 unit_price_cents: Math.round((service.service_price || 0) * 100),
                 qty_decimal: 0,
                 section_type: section.type,
-                source: "quote",
+                source: "manual",
               });
             });
           });
@@ -143,7 +143,7 @@ export const StartBillingCycleDialog = ({
               unit_price_cents: Math.round((service.service_price || 0) * 100),
               qty_decimal: 0,
               section_type: service.section_type || "Standard Operations",
-              source: "quote",
+              source: "manual",
             });
           });
         }
@@ -172,7 +172,7 @@ export const StartBillingCycleDialog = ({
             unit_price_cents: Math.round(pricing.price_per_unit * 100),
             qty_decimal: 0,
             section_type: pricing.section_type || "Standard Operations",
-            source: "pricing",
+            source: "manual",
             note: pricing.notes,
           });
         });

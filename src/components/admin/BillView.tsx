@@ -645,7 +645,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
             qty_decimal: 0,
             unit_price_cents: Math.round(Number(price) * 100),
             line_date: now.toISOString().split("T")[0],
-            source: "quote",
+            source: "manual",
             section_type: sectionType,
           });
         }
@@ -712,7 +712,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
               unit_price_cents: Math.round((service.service_price || 0) * 100),
               qty_decimal: 0,
               section_type: "Standard Operations",
-              source: "quote",
+              source: "manual",
             });
           });
         }
@@ -728,7 +728,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
                 unit_price_cents: Math.round((service.service_price || 0) * 100),
                 qty_decimal: 0,
                 section_type: section.type,
-                source: "quote",
+                source: "manual",
               });
             });
           });
@@ -748,7 +748,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
               unit_price_cents: Math.round(pricing.price_per_unit * 100),
               qty_decimal: 0,
               section_type: pricing.section_type || "Standard Operations",
-              source: "pricing",
+              source: "manual",
               note: pricing.notes,
             });
           });
@@ -952,45 +952,6 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           )}
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Statement Date Range */}
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="statement-start">Statement Start Date *</Label>
-              <Input
-                id="statement-start"
-                type="date"
-                value={statementStartDate}
-                onChange={(e) => setStatementStartDate(e.target.value)}
-                disabled={isClosed}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="statement-end">Statement End Date *</Label>
-              <Input
-                id="statement-end"
-                type="date"
-                value={statementEndDate}
-                onChange={(e) => setStatementEndDate(e.target.value)}
-                disabled={isClosed}
-                className="mt-1"
-              />
-            </div>
-            <div className="flex items-end">
-              <Button onClick={saveStatementDates} disabled={isClosed || !statementStartDate || !statementEndDate} className="w-full">
-                <Calendar className="mr-2 h-4 w-4" />
-                Save Dates
-              </Button>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Date range will display on client side automatically
-          </p>
-
-          <div className="text-right">
-            <div className="text-2xl font-bold">${balance.toFixed(2)}</div>
-            <div className="text-sm text-muted-foreground">Balance Due</div>
-          </div>
 
           {/* Quote Warning */}
           {!quote && (

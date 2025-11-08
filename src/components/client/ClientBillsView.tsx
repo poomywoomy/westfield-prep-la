@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Download } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
+import { formatDateRange } from "@/lib/dateFormatters";
 import type { Database } from "@/integrations/supabase/types";
 
 type Bill = Database["public"]["Tables"]["bills"]["Row"];
@@ -146,7 +147,8 @@ const ClientBillsView = () => {
       doc.setFont("helvetica", "bold");
       doc.text("Period:", 120, yPos);
       doc.setFont("helvetica", "normal");
-      doc.text(`${new Date(selectedBill.statement_start_date).toLocaleDateString()} - ${new Date(selectedBill.statement_end_date).toLocaleDateString()}`, 140, yPos);
+      const periodText = formatDateRange(selectedBill.statement_start_date, selectedBill.statement_end_date) || "N/A";
+      doc.text(periodText, 140, yPos);
     }
     yPos += 15;
 
@@ -235,7 +237,7 @@ const ClientBillsView = () => {
                     </div>
                     {bill.statement_start_date && bill.statement_end_date && (
                       <div className="text-xs text-muted-foreground mt-1">
-                        {new Date(bill.statement_start_date).toLocaleDateString()} - {new Date(bill.statement_end_date).toLocaleDateString()}
+                        {formatDateRange(bill.statement_start_date, bill.statement_end_date)}
                       </div>
                     )}
                   </div>
@@ -260,7 +262,7 @@ const ClientBillsView = () => {
                   <CardTitle>Bill Statement</CardTitle>
                   {selectedBill.statement_start_date && selectedBill.statement_end_date && (
                     <CardDescription>
-                      {new Date(selectedBill.statement_start_date).toLocaleDateString()} - {new Date(selectedBill.statement_end_date).toLocaleDateString()}
+                      {formatDateRange(selectedBill.statement_start_date, selectedBill.statement_end_date)}
                     </CardDescription>
                   )}
                 </div>
