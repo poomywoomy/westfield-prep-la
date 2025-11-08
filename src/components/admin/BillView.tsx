@@ -98,7 +98,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
         setStatementEndDate(endStr);
       }
 
-      // Resolve quote: use attached quote if present, otherwise find active quote
+      // Resolve quote: use attached quote if present, otherwise find active or latest quote
       let resolvedQuote: Quote | null = null;
 
       if (bill.pricing_quote_id) {
@@ -112,15 +112,31 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           setQuote(quoteData);
         }
       } else {
+        // Try active quote first
         const { data: activeQuote } = await supabase
           .from("quotes")
           .select("*")
           .eq("client_id", client.id)
           .eq("status", "active")
           .maybeSingle();
+        
         if (activeQuote) {
           resolvedQuote = activeQuote;
           setQuote(activeQuote);
+        } else {
+          // Fallback to most recent quote (including draft)
+          const { data: latestQuote } = await supabase
+            .from("quotes")
+            .select("*")
+            .eq("client_id", client.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          
+          if (latestQuote) {
+            resolvedQuote = latestQuote;
+            setQuote(latestQuote);
+          }
         }
       }
 

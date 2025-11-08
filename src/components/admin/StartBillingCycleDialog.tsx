@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -27,45 +25,23 @@ export const StartBillingCycleDialog = ({
   onSuccess,
 }: StartBillingCycleDialogProps) => {
   const [loading, setLoading] = useState(false);
-  const [statementStartDate, setStatementStartDate] = useState("");
-  const [statementEndDate, setStatementEndDate] = useState("");
   const { toast } = useToast();
-
-  // Prefill current month statement dates when dialog opens
-  useEffect(() => {
-    if (!open) return;
-    const today = new Date();
-    const start = new Date(today.getFullYear(), today.getMonth(), 1);
-    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    const toYmd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    setStatementStartDate((prev) => prev || toYmd(start));
-    setStatementEndDate((prev) => prev || toYmd(end));
-  }, [open]);
 
   const handleSubmit = async () => {
     if (!client) return;
 
-    if (!statementStartDate || !statementEndDate) {
-      toast({
-        title: "Missing Information",
-        description: "Please provide both statement start and end dates",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (new Date(statementStartDate) >= new Date(statementEndDate)) {
-      toast({
-        title: "Invalid Date Range",
-        description: "Statement start date must be before end date",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
 
     try {
+      // Auto-calculate current month dates
+      const today = new Date();
+      const start = new Date(today.getFullYear(), today.getMonth(), 1);
+      const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      const toYmd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const statementStartDate = toYmd(start);
+      const statementEndDate = toYmd(end);
+      const billingMonth = statementStartDate;
+
       // Check for existing open bills
       const { data: existingBills } = await supabase
         .from("bills")
@@ -83,7 +59,12 @@ export const StartBillingCycleDialog = ({
         return;
       }
 
-      // Get active quote
+      // Robust pricing resolution: active quote → latest draft → custom pricing
+      let pricingQuoteId: string | null = null;
+      const itemsToInsert: any[] = [];
+      let resolvedQuote: any = null;
+
+      // 1) Try active quote
       const { data: activeQuote } = await supabase
         .from("quotes")
         .select("*")
@@ -91,65 +72,29 @@ export const StartBillingCycleDialog = ({
         .eq("status", "active")
         .maybeSingle();
 
-      // If no active quote, check for custom_pricing
-      let pricingQuoteId: string | null = null;
-      const itemsToInsert: any[] = [];
-
-      if (!activeQuote) {
-        // Check if custom_pricing exists
-        const { data: customPricing } = await supabase
-          .from("custom_pricing")
-          .select("*")
-          .eq("client_id", client.id);
-
-        if (!customPricing || customPricing.length === 0) {
-          // Check if user is admin
-          const { data: { user } } = await supabase.auth.getUser();
-          const { data: userRole } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', user?.id)
-            .single();
-
-          const isAdmin = userRole?.role === 'admin';
-
-          if (isAdmin) {
-            toast({
-              title: "No Pricing Found",
-              description: "This client has no active quote and no pricing. Please create/activate a quote or apply pricing first.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "No Quote Found",
-              description: "This client has no pricing quote. Please create a quote first.",
-              variant: "destructive",
-            });
-          }
-          setLoading(false);
-          return;
-        }
-
-        // Use custom_pricing instead
-        pricingQuoteId = null;
-        customPricing.forEach((pricing: any) => {
-          itemsToInsert.push({
-            service_name: pricing.service_name,
-            service_code: null,
-            unit_price_cents: Math.round(pricing.price_per_unit * 100),
-            qty_decimal: 0,
-            section_type: pricing.section_type || "Standard Operations",
-            source: "pricing",
-            note: pricing.notes,
-          });
-        });
+      if (activeQuote) {
+        resolvedQuote = activeQuote;
       } else {
-        pricingQuoteId = activeQuote.id;
+        // 2) Try most recent quote (including draft)
+        const { data: latestQuote } = await supabase
+          .from("quotes")
+          .select("*")
+          .eq("client_id", client.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-        // Auto-populate from quote
-        const quoteData = activeQuote.quote_data as any;
+        if (latestQuote) {
+          resolvedQuote = latestQuote;
+        }
+      }
 
-        // Add Standard Operations
+      if (resolvedQuote) {
+        pricingQuoteId = resolvedQuote.id;
+        const quoteData = resolvedQuote.quote_data as any;
+
+        // Support multiple quote schemas
+        // New schema: standard_operations
         if (quoteData.standard_operations) {
           quoteData.standard_operations.forEach((service: any) => {
             itemsToInsert.push({
@@ -163,7 +108,7 @@ export const StartBillingCycleDialog = ({
           });
         }
 
-        // Add fulfillment sections
+        // New schema: fulfillment_sections
         if (quoteData.fulfillment_sections) {
           quoteData.fulfillment_sections.forEach((section: any) => {
             section.items?.forEach((service: any) => {
@@ -178,15 +123,57 @@ export const StartBillingCycleDialog = ({
             });
           });
         }
+
+        // Old schema: flat services array
+        if (quoteData.services && Array.isArray(quoteData.services)) {
+          quoteData.services.forEach((service: any) => {
+            itemsToInsert.push({
+              service_name: service.service_name,
+              service_code: service.service_code || null,
+              unit_price_cents: Math.round((service.service_price || 0) * 100),
+              qty_decimal: 0,
+              section_type: service.section_type || "Standard Operations",
+              source: "quote",
+            });
+          });
+        }
+      } else {
+        // 3) Fallback to custom_pricing
+        const { data: customPricing } = await supabase
+          .from("custom_pricing")
+          .select("*")
+          .eq("client_id", client.id);
+
+        if (!customPricing || customPricing.length === 0) {
+          toast({
+            title: "No Pricing Found",
+            description: "This client has no quote or custom pricing. Please configure pricing first.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        pricingQuoteId = null;
+        customPricing.forEach((pricing: any) => {
+          itemsToInsert.push({
+            service_name: pricing.service_name,
+            service_code: null,
+            unit_price_cents: Math.round(pricing.price_per_unit * 100),
+            qty_decimal: 0,
+            section_type: pricing.section_type || "Standard Operations",
+            source: "pricing",
+            note: pricing.notes,
+          });
+        });
       }
 
       // Create the bill
-      const billingMonth = new Date(statementStartDate);
       const { data: newBill, error: billError } = await supabase
         .from("bills")
         .insert({
           client_id: client.id,
-          billing_month: billingMonth.toISOString().split("T")[0],
+          billing_month: billingMonth,
           statement_start_date: statementStartDate,
           statement_end_date: statementEndDate,
           status: "open",
@@ -214,11 +201,9 @@ export const StartBillingCycleDialog = ({
 
       toast({
         title: "Success",
-        description: "Billing cycle started and services auto-populated from quote",
+        description: `Billing cycle started with ${itemsToInsert.length} services auto-populated`,
       });
 
-      setStatementStartDate("");
-      setStatementEndDate("");
       onSuccess(newBill.id);
     } catch (error: any) {
       console.error("Error starting billing cycle:", error);
@@ -238,33 +223,16 @@ export const StartBillingCycleDialog = ({
         <DialogHeader>
           <DialogTitle>Start New Billing Cycle</DialogTitle>
           <DialogDescription>
-            Set the statement period for {client?.company_name || client?.contact_name}. 
-            All services from the active quote will be auto-populated with quantity 0.
+            Statement dates will be auto-set to the current month. 
+            Services from the client's pricing will be preloaded with quantity 0.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="start-date">Statement Start Date *</Label>
-            <Input
-              id="start-date"
-              type="date"
-              value={statementStartDate}
-              onChange={(e) => setStatementStartDate(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="end-date">Statement End Date *</Label>
-            <Input
-              id="end-date"
-              type="date"
-              value={statementEndDate}
-              onChange={(e) => setStatementEndDate(e.target.value)}
-              required
-            />
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Click "Start Billing Cycle" to create a new bill for <strong>{client?.company_name || client?.contact_name}</strong>.
+            The system will automatically set the billing period to the current month and populate all services.
+          </p>
         </div>
 
         <DialogFooter>
