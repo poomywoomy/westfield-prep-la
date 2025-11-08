@@ -2389,6 +2389,7 @@ export type Database = {
           error_message: string | null
           id: string
           payload: Json | null
+          response_code: number | null
           shop_domain: string
           status: string
           topic: string
@@ -2399,6 +2400,7 @@ export type Database = {
           error_message?: string | null
           id?: string
           payload?: Json | null
+          response_code?: number | null
           shop_domain: string
           status: string
           topic: string
@@ -2409,6 +2411,7 @@ export type Database = {
           error_message?: string | null
           id?: string
           payload?: Json | null
+          response_code?: number | null
           shop_domain?: string
           status?: string
           topic?: string
