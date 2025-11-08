@@ -1,10 +1,16 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { guardedShopifyREST } from '../_shared/shopify-rest-guard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+/**
+ * Process Shopify return actions
+ * Note: Returns API has limited GraphQL support. Using REST with guard to prevent
+ * deprecated products/variants endpoints. All REST calls are logged for monitoring.
+ */
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -36,25 +42,24 @@ Deno.serve(async (req) => {
 
     if (!store) throw new Error('Store not found');
 
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
-
-    // Update return status in Shopify
+    // Construct endpoint based on action
     const endpoint = action === 'approve' 
-      ? `https://${store.shop_domain}/admin/api/${apiVersion}/returns/${return_id}/approve.json`
+      ? `/returns/${return_id}/approve.json`
       : action === 'decline'
-      ? `https://${store.shop_domain}/admin/api/${apiVersion}/returns/${return_id}/decline.json`
-      : `https://${store.shop_domain}/admin/api/${apiVersion}/returns/${return_id}/mark_as_received.json`;
+      ? `/returns/${return_id}/decline.json`
+      : `/returns/${return_id}/mark_as_received.json`;
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'X-Shopify-Access-Token': store.access_token,
-        'Content-Type': 'application/json',
-      },
-    });
+    // Use guarded REST call - blocks products/variants endpoints
+    const response = await guardedShopifyREST(
+      store.shop_domain,
+      store.access_token,
+      endpoint,
+      { method: 'POST' }
+    );
 
     if (!response.ok) {
-      throw new Error('Failed to update return status in Shopify');
+      const errorText = await response.text();
+      throw new Error(`Failed to update return status: ${errorText}`);
     }
 
     console.log(`Return ${return_id} ${action} for client ${client_id}`);

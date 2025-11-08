@@ -1,9 +1,41 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { shopifyGraphQL } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Map REST topic names to GraphQL enum values
+const TOPIC_MAP: Record<string, string> = {
+  'customers/data_request': 'CUSTOMERS_DATA_REQUEST',
+  'customers/redact': 'CUSTOMERS_REDACT',
+  'shop/redact': 'SHOP_REDACT',
+  'fulfillment_orders/order_routing_complete': 'FULFILLMENT_ORDERS_ORDER_ROUTING_COMPLETE',
+  'orders/fulfilled': 'ORDERS_FULFILLED',
+  'orders/cancelled': 'ORDERS_CANCELLED',
+  'returns/request': 'RETURNS_REQUEST',
+  'returns/approve': 'RETURNS_APPROVE',
+  'returns/decline': 'RETURNS_DECLINE',
+};
+
+const WEBHOOK_SUBSCRIPTION_CREATE = `
+  mutation webhookSubscriptionCreate($topic: WebhookSubscriptionTopic!, $callbackUrl: URL!) {
+    webhookSubscriptionCreate(
+      topic: $topic
+      webhookSubscription: { format: JSON, callbackUrl: $callbackUrl }
+    ) {
+      webhookSubscription {
+        id
+        topic
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -57,7 +89,6 @@ Deno.serve(async (req) => {
 
     const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
     const clientSecret = Deno.env.get('SHOPIFY_CLIENT_SECRET');
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
 
     console.log('Exchanging code for access token...');
 
@@ -116,22 +147,15 @@ Deno.serve(async (req) => {
 
     console.log('Shopify store connected successfully!');
 
-    // Register webhooks (compliance + fulfillment + orders + returns)
+    // Register webhooks using GraphQL
     const webhookUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/shopify-webhook-handler`;
     const webhookTopics = [
-      // Compliance (mandatory)
       'customers/data_request',
       'customers/redact',
       'shop/redact',
-      
-      // Fulfillment Orders (new API)
       'fulfillment_orders/order_routing_complete',
-      
-      // Orders (existing)
       'orders/fulfilled',
       'orders/cancelled',
-      
-      // Returns (optional but recommended)
       'returns/request',
       'returns/approve',
       'returns/decline',
@@ -139,38 +163,30 @@ Deno.serve(async (req) => {
 
     for (const topic of webhookTopics) {
       try {
-        const webhookResponse = await fetch(
-          `https://${shop}/admin/api/${apiVersion}/webhooks.json`,
-          {
-            method: 'POST',
-            headers: {
-              'X-Shopify-Access-Token': access_token,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              webhook: {
-                topic,
-                address: webhookUrl,
-                format: 'json',
-              },
-            }),
-          }
+        const graphqlTopic = TOPIC_MAP[topic] || topic.toUpperCase().replace(/\//g, '_');
+        
+        const data = await shopifyGraphQL(
+          shop,
+          access_token,
+          WEBHOOK_SUBSCRIPTION_CREATE,
+          { topic: graphqlTopic, callbackUrl: webhookUrl }
         );
 
-        if (webhookResponse.ok) {
-          const webhookData = await webhookResponse.json();
+        if (data.webhookSubscriptionCreate.userErrors?.length > 0) {
+          console.error(`Failed to register webhook ${topic}:`, data.webhookSubscriptionCreate.userErrors);
+        } else {
+          const webhook = data.webhookSubscriptionCreate.webhookSubscription;
+          const webhookId = webhook.id.split('/').pop();
           console.log(`Registered webhook: ${topic}`);
           
           // Store webhook registration
           await supabase.from('shopify_webhooks').insert({
             client_id: client.id,
-            webhook_id: webhookData.webhook.id.toString(),
+            webhook_id: webhookId,
             topic,
             address: webhookUrl,
             is_active: true,
           });
-        } else {
-          console.error(`Failed to register webhook ${topic}:`, await webhookResponse.text());
         }
       } catch (error) {
         console.error(`Error registering webhook ${topic}:`, error);

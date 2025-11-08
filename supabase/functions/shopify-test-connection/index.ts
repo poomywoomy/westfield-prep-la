@@ -1,9 +1,23 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { shopifyGraphQL } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const SHOP_QUERY = `
+  query {
+    shop {
+      name
+      myshopifyDomain
+      email
+      plan {
+        displayName
+      }
+    }
+  }
+`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -58,23 +72,14 @@ Deno.serve(async (req) => {
       throw new Error('Store not found or inactive');
     }
 
-    // Test connection by fetching shop info
-    const shopifyResponse = await fetch(
-      `https://${store.shop_domain}/admin/api/2024-07/shop.json`,
-      {
-        headers: {
-          'X-Shopify-Access-Token': store.access_token,
-          'Content-Type': 'application/json',
-        },
-      }
+    // Test connection using GraphQL
+    const data = await shopifyGraphQL(
+      store.shop_domain,
+      store.access_token,
+      SHOP_QUERY
     );
 
-    if (!shopifyResponse.ok) {
-      const errorText = await shopifyResponse.text();
-      throw new Error(`Shopify API error: ${shopifyResponse.status} - ${errorText}`);
-    }
-
-    const { shop } = await shopifyResponse.json();
+    const shop = data.shop;
 
     // Log the test in audit_log
     await supabase.from('audit_log').insert({
@@ -89,8 +94,9 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         shop_name: shop.name,
-        shop_domain: shop.domain,
+        shop_domain: shop.myshopifyDomain,
         email: shop.email,
+        plan: shop.plan?.displayName,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

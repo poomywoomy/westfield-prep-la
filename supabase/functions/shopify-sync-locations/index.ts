@@ -1,9 +1,36 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { shopifyGraphQLPaginated } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const LOCATIONS_QUERY = `
+  query ($cursor: String) {
+    locations(first: 100, after: $cursor) {
+      edges {
+        node {
+          id
+          name
+          isActive
+          address {
+            address1
+            city
+            province
+            zip
+            country
+          }
+          legacyResourceId
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -35,49 +62,41 @@ Deno.serve(async (req) => {
 
     if (!store) throw new Error('Store not found');
 
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
-
-    // Fetch locations from Shopify
-    const locationsResponse = await fetch(
-      `https://${store.shop_domain}/admin/api/${apiVersion}/locations.json`,
-      {
-        headers: {
-          'X-Shopify-Access-Token': store.access_token,
-          'Content-Type': 'application/json',
-        },
-      }
+    // Fetch locations using GraphQL
+    const locations = await shopifyGraphQLPaginated(
+      store.shop_domain,
+      store.access_token,
+      LOCATIONS_QUERY,
+      'locations'
     );
-
-    if (!locationsResponse.ok) {
-      throw new Error('Failed to fetch locations from Shopify');
-    }
-
-    const { locations } = await locationsResponse.json();
     
     // Get primary location (first active location)
-    const primaryLocation = locations.find((loc: any) => loc.active) || locations[0];
+    const primaryLocation = locations.find((loc: any) => loc.isActive) || locations[0];
     
     if (!primaryLocation) {
       throw new Error('No active location found in Shopify');
     }
 
+    // Use legacyResourceId for compatibility with existing code
+    const locationId = primaryLocation.legacyResourceId || primaryLocation.id.split('/').pop();
+
     // Store location ID in clients table
     const { error: updateError } = await supabase
       .from('clients')
-      .update({ shopify_location_id: primaryLocation.id.toString() })
+      .update({ shopify_location_id: locationId.toString() })
       .eq('id', client_id);
 
     if (updateError) throw updateError;
 
-    console.log(`Stored Shopify location ${primaryLocation.id} for client ${client_id}`);
+    console.log(`Stored Shopify location ${locationId} for client ${client_id}`);
 
     return new Response(
       JSON.stringify({
         success: true,
         location: {
-          id: primaryLocation.id,
+          id: locationId,
           name: primaryLocation.name,
-          address: primaryLocation.address1,
+          address: primaryLocation.address?.address1,
         },
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }

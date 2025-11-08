@@ -4,8 +4,9 @@ export async function shopifyGraphQL(
   query: string,
   variables?: any
 ) {
+  const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-10';
   const response = await fetch(
-    `https://${shopDomain}/admin/api/2024-10/graphql.json`,
+    `https://${shopDomain}/admin/api/${apiVersion}/graphql.json`,
     {
       method: 'POST',
       headers: {

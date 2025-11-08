@@ -1,9 +1,44 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { shopifyGraphQL, shopifyGraphQLPaginated } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const WEBHOOK_SUBSCRIPTIONS_QUERY = `
+  query ($cursor: String) {
+    webhookSubscriptions(first: 100, after: $cursor) {
+      edges {
+        node {
+          id
+          endpoint {
+            __typename
+            ... on WebhookHttpEndpoint {
+              callbackUrl
+            }
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+const WEBHOOK_SUBSCRIPTION_DELETE = `
+  mutation webhookSubscriptionDelete($id: ID!) {
+    webhookSubscriptionDelete(id: $id) {
+      deletedWebhookSubscriptionId
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -69,33 +104,48 @@ Deno.serve(async (req) => {
       .update({ auto_sync_enabled: false })
       .eq('client_id', client_id);
 
-    // Delete webhooks from Shopify
+    // Delete webhooks from Shopify using GraphQL
     try {
-      const { data: webhooks } = await supabase
-        .from('shopify_webhooks')
-        .select('webhook_id')
-        .eq('client_id', client_id);
+      const webhookUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/shopify-webhook-handler`;
+      
+      // Fetch all webhook subscriptions
+      const allWebhooks = await shopifyGraphQLPaginated(
+        store.shop_domain,
+        store.access_token,
+        WEBHOOK_SUBSCRIPTIONS_QUERY,
+        'webhookSubscriptions'
+      );
 
-      if (webhooks && webhooks.length > 0) {
-        for (const webhook of webhooks) {
-          await fetch(
-            `https://${store.shop_domain}/admin/api/2024-07/webhooks/${webhook.webhook_id}.json`,
-            {
-              method: 'DELETE',
-              headers: {
-                'X-Shopify-Access-Token': store.access_token,
-                'Content-Type': 'application/json',
-              },
-            }
+      // Filter for our webhooks (matching callback URL)
+      const ourWebhooks = allWebhooks.filter((webhook: any) => 
+        webhook.endpoint?.callbackUrl === webhookUrl
+      );
+
+      // Delete each webhook
+      for (const webhook of ourWebhooks) {
+        try {
+          const data = await shopifyGraphQL(
+            store.shop_domain,
+            store.access_token,
+            WEBHOOK_SUBSCRIPTION_DELETE,
+            { id: webhook.id }
           );
-        }
 
-        // Delete webhook records from database
-        await supabase
-          .from('shopify_webhooks')
-          .delete()
-          .eq('client_id', client_id);
+          if (data.webhookSubscriptionDelete.userErrors?.length > 0) {
+            console.error('Error deleting webhook:', data.webhookSubscriptionDelete.userErrors);
+          } else {
+            console.log('Deleted webhook:', webhook.id);
+          }
+        } catch (error) {
+          console.error('Error deleting webhook:', error);
+        }
       }
+
+      // Delete webhook records from database
+      await supabase
+        .from('shopify_webhooks')
+        .delete()
+        .eq('client_id', client_id);
     } catch (error) {
       console.error('Error deleting webhooks:', error);
       // Continue even if webhook deletion fails
