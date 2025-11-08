@@ -16,6 +16,7 @@ import { AddCustomBillingItemDialog } from "./AddCustomBillingItemDialog";
 import { CollapsibleBillSection } from "./CollapsibleBillSection";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
+import { formatDateRange } from "@/lib/dateFormatters";
 import type { Database } from "@/integrations/supabase/types";
 
 type Bill = Database["public"]["Tables"]["bills"]["Row"];
@@ -350,7 +351,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
     doc.setFont("helvetica", "bold");
     doc.text("Statement Period:", 20, yPos);
     doc.setFont("helvetica", "normal");
-    const dateRange = `${new Date(statementStartDate).toLocaleDateString()} - ${new Date(statementEndDate).toLocaleDateString()}`;
+    const dateRange = formatDateRange(statementStartDate, statementEndDate) || "N/A";
     doc.text(dateRange, 70, yPos);
     yPos += 10;
 
@@ -633,7 +634,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   };
 
   const resetBill = async () => {
-    if (!confirm("Reset this bill? This will delete all line items and payments, then re-populate from the quote with qty=0. Statement dates will be preserved.")) return;
+    if (!confirm("Reset this bill? This will delete all line items and payments, then re-populate from the quote or custom pricing with qty=0. Statement dates will be preserved.")) return;
 
     setLoading(true);
     try {
@@ -643,10 +644,11 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       // Delete all payments
       await supabase.from("payments").delete().eq("bill_id", bill.id);
 
-      // Re-populate from quote
+      const itemsToInsert: any[] = [];
+
+      // Re-populate from quote if available
       if (quote) {
         const quoteData = quote.quote_data as any;
-        const itemsToInsert: any[] = [];
 
         // Add Standard Operations
         if (quoteData.standard_operations) {
@@ -655,7 +657,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
               bill_id: bill.id,
               service_name: service.service_name,
               service_code: service.service_code || null,
-              unit_price_cents: Math.round(service.price_per_unit * 100),
+              unit_price_cents: Math.round((service.service_price || 0) * 100),
               qty_decimal: 0,
               section_type: "Standard Operations",
               source: "quote",
@@ -671,7 +673,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
                 bill_id: bill.id,
                 service_name: service.service_name,
                 service_code: service.service_code || null,
-                unit_price_cents: Math.round(service.price_per_unit * 100),
+                unit_price_cents: Math.round((service.service_price || 0) * 100),
                 qty_decimal: 0,
                 section_type: section.type,
                 source: "quote",
@@ -679,10 +681,30 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
             });
           });
         }
+      } else {
+        // Fallback to custom_pricing if no quote
+        const { data: customPricing } = await supabase
+          .from("custom_pricing")
+          .select("*")
+          .eq("client_id", client.id);
 
-        if (itemsToInsert.length > 0) {
-          await supabase.from("bill_items").insert(itemsToInsert);
+        if (customPricing && customPricing.length > 0) {
+          customPricing.forEach((pricing: any) => {
+            itemsToInsert.push({
+              bill_id: bill.id,
+              service_name: pricing.service_name,
+              unit_price_cents: Math.round(pricing.price_per_unit * 100),
+              qty_decimal: 0,
+              section_type: pricing.section_type || "Standard Operations",
+              source: "pricing",
+              note: pricing.notes,
+            });
+          });
         }
+      }
+
+      if (itemsToInsert.length > 0) {
+        await supabase.from("bill_items").insert(itemsToInsert);
       }
 
       // Recalculate totals
@@ -690,7 +712,9 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
 
       toast({
         title: "Bill Reset",
-        description: "All items and payments cleared, services re-populated from quote.",
+        description: itemsToInsert.length > 0 
+          ? `All items and payments cleared, ${itemsToInsert.length} services re-populated.`
+          : "Bill cleared. No pricing found to populate.",
       });
 
       await fetchBillData();
@@ -837,14 +861,9 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
               <CardDescription className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 {statementStartDate && statementEndDate 
-                  ? `${new Date(statementStartDate).toLocaleDateString()} - ${new Date(statementEndDate).toLocaleDateString()}`
+                  ? formatDateRange(statementStartDate, statementEndDate)
                   : (bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { month: "long", year: "numeric" }))}
               </CardDescription>
-              {statementStartDate && statementEndDate && (
-                <p className="text-xs text-muted-foreground">
-                  {new Date(statementStartDate).toLocaleDateString()} - {new Date(statementEndDate).toLocaleDateString()}
-                </p>
-              )}
             </div>
             
             {/* Financial Summary */}
@@ -924,7 +943,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           {/* Quote Warning */}
           {!quote && (
             <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-700 dark:text-yellow-300">
-              No active quote assigned to this client. Services will not auto-populate.
+              No active quote assigned. Click 'Reset Bill' to populate from custom pricing if available.
             </div>
           )}
 

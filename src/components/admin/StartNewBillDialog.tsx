@@ -83,34 +83,50 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
 
       const activeQuote = quotes?.[0];
 
-      // Generate billing month from statement start date
-      const billingMonth = statementStartDate.substring(0, 7) + "-01";
+      // If no active quote, check for custom_pricing
+      let pricingQuoteId: string | null = null;
+      const itemsToInsert: any[] = [];
+      const now = new Date();
 
-      const { data: bill, error: billError } = await supabase
-        .from("bills")
-        .insert({
-          client_id: clientId,
-          billing_month: billingMonth,
-          status: "open",
-          pricing_quote_id: activeQuote?.id || null,
-          statement_start_date: statementStartDate,
-          statement_end_date: statementEndDate,
-        })
-        .select()
-        .single();
+      if (!activeQuote) {
+        // Check if custom_pricing exists
+        const { data: customPricing } = await supabase
+          .from("custom_pricing")
+          .select("*")
+          .eq("client_id", clientId);
 
-      if (billError) throw billError;
+        if (!customPricing || customPricing.length === 0) {
+          toast({
+            title: "No Pricing Found",
+            description: "This client has no active quote and no custom pricing. Please create/activate a quote or apply pricing first.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
 
-      // Auto-populate line items from quote with quantity 0 and proper section_type
-      if (activeQuote) {
+        // Use custom_pricing instead
+        pricingQuoteId = null;
+        customPricing.forEach((pricing: any) => {
+          itemsToInsert.push({
+            service_name: pricing.service_name,
+            unit_price_cents: Math.round(pricing.price_per_unit * 100),
+            qty_decimal: 0,
+            line_date: now.toISOString().split("T")[0],
+            section_type: pricing.section_type || "Standard Operations",
+            source: "pricing",
+            note: pricing.notes,
+          });
+        });
+      } else {
+        pricingQuoteId = activeQuote.id;
+
+        // Auto-populate from quote
         const quoteData = activeQuote.quote_data as any;
-        const lineItems: any[] = [];
-        const now = new Date();
 
         if (quoteData.standard_operations && Array.isArray(quoteData.standard_operations)) {
           quoteData.standard_operations.forEach((op: any) => {
-            lineItems.push({
-              bill_id: bill.id,
+            itemsToInsert.push({
               service_name: op.service_name,
               qty_decimal: 0,
               unit_price_cents: Math.round(op.service_price * 100),
@@ -125,8 +141,7 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
           quoteData.fulfillment_sections.forEach((section: any) => {
             if (section.items && Array.isArray(section.items)) {
               section.items.forEach((item: any) => {
-                lineItems.push({
-                  bill_id: bill.id,
+                itemsToInsert.push({
                   service_name: item.service_name,
                   qty_decimal: 0,
                   unit_price_cents: Math.round(item.service_price * 100),
@@ -138,19 +153,42 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
             }
           });
         }
+      }
 
-        if (lineItems.length > 0) {
-          const { error: itemsError } = await supabase
-            .from("bill_items")
-            .insert(lineItems);
+      // Generate billing month from statement start date
+      const billingMonth = statementStartDate.substring(0, 7) + "-01";
 
-          if (itemsError) throw itemsError;
-        }
+      const { data: bill, error: billError } = await supabase
+        .from("bills")
+        .insert({
+          client_id: clientId,
+          billing_month: billingMonth,
+          status: "open",
+          pricing_quote_id: pricingQuoteId,
+          statement_start_date: statementStartDate,
+          statement_end_date: statementEndDate,
+        })
+        .select()
+        .single();
+
+      if (billError) throw billError;
+
+      // Add bill_id to all items and insert
+      if (itemsToInsert.length > 0) {
+        itemsToInsert.forEach(item => {
+          item.bill_id = bill.id;
+        });
+
+        const { error: itemsError } = await supabase
+          .from("bill_items")
+          .insert(itemsToInsert);
+
+        if (itemsError) throw itemsError;
       }
 
       toast({
         title: "Success",
-        description: "New bill created with all services from quote",
+        description: `New bill created with ${itemsToInsert.length} services auto-populated`,
       });
 
       onSuccess(bill.id);
@@ -214,7 +252,7 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
           </div>
 
           <p className="text-xs text-muted-foreground bg-muted p-3 rounded">
-            All services from client's active quote will be auto-populated with quantity 0. Statement dates are required.
+            All services from client's active quote or custom pricing will be auto-populated with quantity 0. Statement dates are required.
           </p>
         </div>
 
