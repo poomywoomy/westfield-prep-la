@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,17 @@ export const StartNewBillDialog = ({ open, onOpenChange, clients, onSuccess }: S
   const [statementStartDate, setStatementStartDate] = useState("");
   const [statementEndDate, setStatementEndDate] = useState("");
   const { toast } = useToast();
+
+  // Prefill current month statement dates when dialog opens
+  useEffect(() => {
+    if (!open) return;
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const toYmd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    setStatementStartDate((prev) => prev || toYmd(start));
+    setStatementEndDate((prev) => prev || toYmd(end));
+  }, [open]);
 
   const handleSubmit = async () => {
     if (!clientId) {

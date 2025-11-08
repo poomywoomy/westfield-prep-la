@@ -65,7 +65,7 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       if (clientError) throw clientError;
       setDepositBalance((clientData?.deposit_balance_cents || 0) / 100);
 
-      // Fetch bill items
+      // Fetch bill items first to know if we need to auto-populate
       const { data: itemsData, error: itemsError } = await supabase
         .from("bill_items")
         .select("*")
@@ -85,26 +85,51 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       if (paymentsError) throw paymentsError;
       setPayments(paymentsData || []);
 
-      // Fetch assigned quote if any
+      // Ensure statement dates are set once based on billing_month if missing
+      if (!bill.statement_start_date || !bill.statement_end_date) {
+        const bm = new Date(bill.billing_month);
+        const start = new Date(bm.getFullYear(), bm.getMonth(), 1);
+        const end = new Date(bm.getFullYear(), bm.getMonth() + 1, 0);
+        const toYmd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const startStr = toYmd(start);
+        const endStr = toYmd(end);
+        await supabase.from("bills").update({ statement_start_date: startStr, statement_end_date: endStr }).eq("id", bill.id);
+        setStatementStartDate(startStr);
+        setStatementEndDate(endStr);
+      }
+
+      // Resolve quote: use attached quote if present, otherwise find active quote
+      let resolvedQuote: Quote | null = null;
+
       if (bill.pricing_quote_id) {
         const { data: quoteData, error: quoteError } = await supabase
           .from("quotes")
           .select("*")
           .eq("id", bill.pricing_quote_id)
           .single();
-
-        if (!quoteError && quoteData) {
-          setQuote(quoteData);
-        } else {
-          const { data: quoteData, error: quoteError } = await supabase
-            .from("quotes")
-            .select("*")
-            .eq("id", bill.pricing_quote_id)
-            .single();
-
-          if (quoteError) throw quoteError;
+        if (quoteData && !quoteError) {
+          resolvedQuote = quoteData;
           setQuote(quoteData);
         }
+      } else {
+        const { data: activeQuote } = await supabase
+          .from("quotes")
+          .select("*")
+          .eq("client_id", client.id)
+          .eq("status", "active")
+          .maybeSingle();
+        if (activeQuote) {
+          resolvedQuote = activeQuote;
+          setQuote(activeQuote);
+        }
+      }
+
+      // If we have a quote and no items yet, auto-attach and populate
+      if (resolvedQuote && (itemsData?.length || 0) === 0) {
+        if (!bill.pricing_quote_id) {
+          await supabase.from("bills").update({ pricing_quote_id: resolvedQuote.id }).eq("id", bill.id);
+        }
+        await populateFromQuote(resolvedQuote);
       }
     } catch (error: any) {
       toast({
@@ -615,6 +640,12 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
           }
         });
       }
+      // Backward compatibility: some quotes may store services in a flat array
+      if (data?.services && Array.isArray(data.services)) {
+        data.services.forEach((svc: any) => {
+          pushItem(svc.service_name, svc.service_price, svc.section_type || "Standard Operations");
+        });
+      }
 
       if (lineItems.length === 0) {
         toast({ title: "Nothing to add", description: "All services already exist on this bill." });
@@ -970,6 +1001,12 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
                   <Lock className="mr-2 h-4 w-4" />
                   Close Billing Cycle
                 </Button>
+                {quote && (
+                  <Button onClick={() => populateFromQuote(quote)} variant="outline" disabled={loading}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Populate from Quote
+                  </Button>
+                )}
                 <Button onClick={resetBill} variant="outline" disabled={loading}>
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Reset Bill

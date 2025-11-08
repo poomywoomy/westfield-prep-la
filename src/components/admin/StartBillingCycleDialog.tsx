@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,17 @@ export const StartBillingCycleDialog = ({
   const [statementStartDate, setStatementStartDate] = useState("");
   const [statementEndDate, setStatementEndDate] = useState("");
   const { toast } = useToast();
+
+  // Prefill current month statement dates when dialog opens
+  useEffect(() => {
+    if (!open) return;
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const toYmd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    setStatementStartDate((prev) => prev || toYmd(start));
+    setStatementEndDate((prev) => prev || toYmd(end));
+  }, [open]);
 
   const handleSubmit = async () => {
     if (!client) return;
