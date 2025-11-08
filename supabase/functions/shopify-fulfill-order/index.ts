@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { shopifyGraphQL } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -70,66 +71,96 @@ Deno.serve(async (req) => {
       throw new Error('No active Shopify store found');
     }
 
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
-
-    // Step 1: Get fulfillment order ID for this order
-    const fulfillmentOrderResponse = await fetch(
-      `https://${store.shop_domain}/admin/api/${apiVersion}/orders/${order.shopify_order_id}/fulfillment_orders.json`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Access-Token': store.access_token,
-        },
+    // Step 1: Get fulfillment order ID via GraphQL
+    console.log('Fetching fulfillment orders via GraphQL...');
+    
+    const fulfillmentOrderQuery = `
+      query getFulfillmentOrders($orderId: ID!) {
+        order(id: $orderId) {
+          id
+          fulfillmentOrders(first: 10) {
+            edges {
+              node {
+                id
+                status
+                lineItems(first: 100) {
+                  edges {
+                    node {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
+    `;
+
+    const orderGid = `gid://shopify/Order/${order.shopify_order_id}`;
+    const orderData = await shopifyGraphQL(
+      store.shop_domain,
+      store.access_token,
+      fulfillmentOrderQuery,
+      { orderId: orderGid }
     );
 
-    if (!fulfillmentOrderResponse.ok) {
-      throw new Error('Failed to fetch fulfillment orders');
-    }
-
-    const fulfillmentOrderData = await fulfillmentOrderResponse.json();
-    const fulfillmentOrder = fulfillmentOrderData.fulfillment_orders?.find(
-      (fo: any) => fo.status === 'open' || fo.status === 'in_progress'
-    );
+    const fulfillmentOrder = orderData.order.fulfillmentOrders.edges.find(
+      (edge: any) => edge.node.status === 'OPEN' || edge.node.status === 'IN_PROGRESS'
+    )?.node;
 
     if (!fulfillmentOrder) {
       throw new Error('No open fulfillment order found');
     }
 
-    // Step 2: Create fulfillment using Third Party Fulfillment Orders API
-    const fulfillmentResponse = await fetch(
-      `https://${store.shop_domain}/admin/api/${apiVersion}/fulfillments.json`,
+    // Step 2: Create fulfillment via GraphQL mutation
+    console.log('Creating fulfillment via GraphQL...');
+    
+    const fulfillmentMutation = `
+      mutation fulfillmentCreateV2($fulfillment: FulfillmentV2Input!) {
+        fulfillmentCreateV2(fulfillment: $fulfillment) {
+          fulfillment {
+            id
+            status
+            trackingInfo {
+              number
+              company
+            }
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    const mutationResult = await shopifyGraphQL(
+      store.shop_domain,
+      store.access_token,
+      fulfillmentMutation,
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Access-Token': store.access_token,
-        },
-        body: JSON.stringify({
-          fulfillment: {
-            line_items_by_fulfillment_order: [
-              {
-                fulfillment_order_id: fulfillmentOrder.id,
-              },
-            ],
-            tracking_info: {
-              number: tracking_number,
-              company: carrier,
-            },
-            notify_customer,
+        fulfillment: {
+          lineItemsByFulfillmentOrder: [
+            {
+              fulfillmentOrderId: fulfillmentOrder.id,
+            }
+          ],
+          trackingInfo: {
+            number: tracking_number,
+            company: carrier,
           },
-        }),
+          notifyCustomer: notify_customer,
+        }
       }
     );
 
-    if (!fulfillmentResponse.ok) {
-      const errorText = await fulfillmentResponse.text();
-      console.error('Shopify fulfillment failed:', errorText);
-      throw new Error(`Failed to create fulfillment: ${errorText}`);
+    if (mutationResult.fulfillmentCreateV2?.userErrors?.length > 0) {
+      const errors = mutationResult.fulfillmentCreateV2.userErrors;
+      throw new Error(`Fulfillment failed: ${JSON.stringify(errors)}`);
     }
 
-    const fulfillmentData = await fulfillmentResponse.json();
+    const fulfillmentData = mutationResult.fulfillmentCreateV2.fulfillment;
 
     // Update local order record
     const { error: updateError } = await supabase
@@ -162,7 +193,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        fulfillment_id: fulfillmentData.fulfillment?.id,
+        fulfillment_id: fulfillmentData.id,
         tracking_number,
         carrier,
       }),

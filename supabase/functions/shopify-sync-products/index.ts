@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { shopifyGraphQLPaginated, shopifyGraphQL } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,48 +25,61 @@ const shopifyProductSchema = z.object({
   variants: z.array(shopifyVariantSchema).min(1),
 });
 
-function parseLinkHeader(header: string | null): string | null {
-  if (!header) return null;
-  const nextMatch = header.match(/<([^>]+)>;\s*rel="next"/);
-  return nextMatch ? nextMatch[1] : null;
-}
+async function fetchAllProducts(shopDomain: string, accessToken: string) {
+  console.log('Fetching products via GraphQL...');
+  
+  const query = `
+    query getProducts($cursor: String) {
+      products(first: 250, after: $cursor) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        edges {
+          node {
+            id
+            title
+            variants(first: 100) {
+              edges {
+                node {
+                  id
+                  sku
+                  title
+                  price
+                  inventoryItem {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
 
-async function fetchAllProducts(shopDomain: string, accessToken: string, apiVersion: string) {
-  const allProducts = [];
-  let nextPageUrl: string | null = `https://${shopDomain}/admin/api/${apiVersion}/products.json?limit=250`;
-  let pageCount = 0;
-  
-  while (nextPageUrl) {
-    pageCount++;
-    console.log(`Fetching products page ${pageCount}...`);
-    
-    const response = await fetch(nextPageUrl, {
-      headers: {
-        'X-Shopify-Access-Token': accessToken,
-        'Content-Type': 'application/json',
-      },
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch products: ${response.status} ${errorText}`);
-    }
-    
-    const data = await response.json();
-    allProducts.push(...data.products);
-    
-    // Get next page from Link header
-    const linkHeader = response.headers.get('Link');
-    nextPageUrl = parseLinkHeader(linkHeader);
-    
-    // Add small delay to respect rate limits (2 req/sec for REST Admin API)
-    if (nextPageUrl) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-  }
-  
-  console.log(`Fetched ${allProducts.length} total products from ${pageCount} pages`);
-  return allProducts;
+  const rawProducts = await shopifyGraphQLPaginated(
+    shopDomain,
+    accessToken,
+    query,
+    'products'
+  );
+
+  // Transform GraphQL response to match REST format
+  const products = rawProducts.map((product: any) => ({
+    id: product.id.split('/').pop(),
+    title: product.title,
+    variants: product.variants.edges.map((v: any) => ({
+      id: v.node.id.split('/').pop(),
+      inventory_item_id: v.node.inventoryItem.id.split('/').pop(),
+      sku: v.node.sku,
+      title: v.node.title,
+      price: v.node.price,
+    })),
+  }));
+
+  console.log(`Fetched ${products.length} total products via GraphQL`);
+  return products;
 }
 
 Deno.serve(async (req) => {
@@ -164,13 +178,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    const apiVersion = Deno.env.get('SHOPIFY_API_VERSION') || '2024-07';
-
-    // Fetch all products with pagination
+    // Fetch all products with GraphQL
     const products = await fetchAllProducts(
       shopifyStore.shop_domain,
-      shopifyStore.access_token,
-      apiVersion
+      shopifyStore.access_token
     );
 
     // Validate Shopify product data
@@ -294,42 +305,55 @@ Deno.serve(async (req) => {
 
             // Only seed if no existing ledger entries
             if (ledgerCount === 0) {
-              // Fetch Shopify inventory level using inventory_item_id
+              // Fetch Shopify inventory level via GraphQL
               try {
                 const inventoryItemId = variant.inventory_item_id.toString();
-                const inventoryResponse = await fetch(
-                  `https://${shopifyStore.shop_domain}/admin/api/${apiVersion}/inventory_levels.json?inventory_item_ids=${inventoryItemId}`,
-                  {
-                    headers: {
-                      'X-Shopify-Access-Token': shopifyStore.access_token,
+                
+                const inventoryQuery = `
+                  query getInventoryItem($id: ID!) {
+                    inventoryItem(id: $id) {
+                      id
+                      inventoryLevels(first: 10) {
+                        edges {
+                          node {
+                            id
+                            available
+                          }
+                        }
+                      }
                     }
                   }
+                `;
+
+                const inventoryData = await shopifyGraphQL(
+                  shopifyStore.shop_domain,
+                  shopifyStore.access_token,
+                  inventoryQuery,
+                  { id: `gid://shopify/InventoryItem/${inventoryItemId}` }
                 );
 
-                if (inventoryResponse.ok) {
-                  const { inventory_levels } = await inventoryResponse.json();
-                  const availableQty = inventory_levels?.reduce((sum: number, level: any) => sum + (level.available || 0), 0) || 0;
+                const inventoryLevels = inventoryData.inventoryItem?.inventoryLevels?.edges || [];
+                const availableQty = inventoryLevels.reduce((sum: number, edge: any) => sum + (edge.node.available || 0), 0);
 
-                  if (availableQty > 0) {
-                    // Create initial ledger entry
-                    const { error: seedError } = await serviceClient
-                      .from('inventory_ledger')
-                      .insert({
-                        client_id: targetClientId,
-                        sku_id: existingSku.id,
-                        location_id: primaryLocation.id,
-                        qty_delta: availableQty,
-                        transaction_type: 'ADJUSTMENT_PLUS',
-                        reason_code: 'shopify_seed',
-                        notes: `Initial inventory seeded from Shopify (${availableQty} units)`,
-                        source_type: 'shopify_sync',
-                      });
-                    
-                    if (!seedError) {
-                      seededCount++;
-                    } else {
-                      seedErrors.push({ sku: clientSku, error: seedError.message });
-                    }
+                if (availableQty > 0) {
+                  // Create initial ledger entry
+                  const { error: seedError } = await serviceClient
+                    .from('inventory_ledger')
+                    .insert({
+                      client_id: targetClientId,
+                      sku_id: existingSku.id,
+                      location_id: primaryLocation.id,
+                      qty_delta: availableQty,
+                      transaction_type: 'ADJUSTMENT_PLUS',
+                      reason_code: 'shopify_seed',
+                      notes: `Initial inventory seeded from Shopify (${availableQty} units)`,
+                      source_type: 'shopify_sync',
+                    });
+                  
+                  if (!seedError) {
+                    seededCount++;
+                  } else {
+                    seedErrors.push({ sku: clientSku, error: seedError.message });
                   }
                 }
               } catch (invError) {

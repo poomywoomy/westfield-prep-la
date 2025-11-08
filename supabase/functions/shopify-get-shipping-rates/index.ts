@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+import { shopifyGraphQL } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -63,57 +64,150 @@ Deno.serve(async (req) => {
       country: "US"
     };
 
-    // Prepare shipping rate request for Shopify
-    const apiVersion = '2024-07';
-    const shopifyUrl = `https://${client.shopify_store_domain}/admin/api/${apiVersion}/carrier_services.json`;
+    // Fetch real shipping rates from Shopify via GraphQL
+    console.log('Fetching delivery profiles via GraphQL...');
+    
+    // Get client's Shopify location ID
+    const { data: clientData } = await supabase
+      .from('clients')
+      .select('shopify_location_id')
+      .eq('id', requestData.client_id)
+      .single();
 
-    // For now, return mock rates since Shopify Carrier Service requires app setup
-    // In production, you would call Shopify's actual shipping rate API
-    const mockRates = [
-      {
-        service_name: "USPS Priority Mail",
-        service_code: "usps_priority",
-        total_price: "12.50",
-        currency: "USD",
-        delivery_days: "2-3"
-      },
-      {
-        service_name: "USPS First Class",
-        service_code: "usps_first_class",
-        total_price: "5.99",
-        currency: "USD",
-        delivery_days: "3-5"
-      },
-      {
-        service_name: "UPS Ground",
-        service_code: "ups_ground",
-        total_price: "15.99",
-        currency: "USD",
-        delivery_days: "3-5"
-      },
-      {
-        service_name: "FedEx 2Day",
-        service_code: "fedex_2day",
-        total_price: "22.50",
-        currency: "USD",
-        delivery_days: "2"
+    let locationId = clientData?.shopify_location_id;
+    
+    // If no location, fetch and store primary location
+    if (!locationId) {
+      const locationsQuery = `
+        query getLocations {
+          locations(first: 10) {
+            edges {
+              node {
+                id
+                name
+                isActive
+              }
+            }
+          }
+        }
+      `;
+
+      const locationsData = await shopifyGraphQL(
+        client.shopify_store_domain,
+        client.shopify_access_token,
+        locationsQuery
+      );
+
+      const locations = locationsData.locations.edges.map((edge: any) => edge.node);
+      const primaryLocation = locations.find((loc: any) => loc.isActive) || locations[0];
+      
+      if (primaryLocation) {
+        locationId = primaryLocation.id;
+        await supabase
+          .from('clients')
+          .update({ shopify_location_id: locationId.split('/').pop() })
+          .eq('id', requestData.client_id);
       }
-    ];
+    } else {
+      locationId = `gid://shopify/Location/${locationId}`;
+    }
 
-    // Calculate approximate rates based on weight and dimensions
-    const weight = requestData.package.weight;
-    const adjustedRates = mockRates.map(rate => ({
-      ...rate,
-      total_price: (parseFloat(rate.total_price) * (1 + weight * 0.1)).toFixed(2)
-    }));
+    if (!locationId) {
+      throw new Error('No Shopify location found. Please configure your shipping settings in Shopify.');
+    }
 
-    console.log('Returning shipping rates:', adjustedRates);
+    // Fetch delivery profiles
+    const deliveryProfileQuery = `
+      query deliveryProfilesForLocation($locationId: ID!) {
+        location(id: $locationId) {
+          id
+          name
+          deliveryProfiles(first: 10) {
+            edges {
+              node {
+                name
+                profileLocationGroups {
+                  locationGroupZones(first: 10) {
+                    edges {
+                      node {
+                        methodDefinitions(first: 20) {
+                          edges {
+                            node {
+                              name
+                              active
+                              rateProvider {
+                                ... on DeliveryRateDefinition {
+                                  price {
+                                    amount
+                                    currencyCode
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const deliveryData = await shopifyGraphQL(
+      client.shopify_store_domain,
+      client.shopify_access_token,
+      deliveryProfileQuery,
+      { locationId }
+    );
+
+    // Extract and format rates
+    const rates = [];
+    const profiles = deliveryData.location?.deliveryProfiles?.edges || [];
+    
+    for (const profileEdge of profiles) {
+      const groups = profileEdge.node.profileLocationGroups || [];
+      for (const group of groups) {
+        const zones = group.locationGroupZones?.edges || [];
+        for (const zoneEdge of zones) {
+          const methods = zoneEdge.node.methodDefinitions?.edges || [];
+          for (const methodEdge of methods) {
+            const method = methodEdge.node;
+            if (method.active && method.rateProvider?.price) {
+              const basePrice = parseFloat(method.rateProvider.price.amount);
+              // Adjust rate based on weight
+              const weight = requestData.package.weight;
+              const adjustedPrice = (basePrice * (1 + weight * 0.1)).toFixed(2);
+              
+              rates.push({
+                service_name: method.name,
+                service_code: method.name.toLowerCase().replace(/\s+/g, '_'),
+                total_price: adjustedPrice,
+                currency: method.rateProvider.price.currencyCode,
+                delivery_days: "2-5"
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // If no rates found, provide friendly message
+    if (rates.length === 0) {
+      throw new Error('No shipping rates configured in Shopify. Please set up your delivery profiles in Shopify Admin → Settings → Shipping and delivery.');
+    }
+
+    console.log(`Found ${rates.length} shipping rates via GraphQL`);
 
     return new Response(
       JSON.stringify({ 
-        rates: adjustedRates,
+        rates: rates,
         origin: originAddress,
-        destination: requestData.destination
+        destination: requestData.destination,
+        source: 'shopify_delivery_profiles'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

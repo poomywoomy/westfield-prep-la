@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { shopifyGraphQLPaginated } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -76,41 +77,98 @@ Deno.serve(async (req) => {
       throw new Error('Store not found or inactive');
     }
 
-    // Fetch all orders with pagination
-    const allOrders = [];
-    let nextPageUrl: string | null = `https://${store.shop_domain}/admin/api/2024-07/orders.json?limit=250&status=any`;
-    let pageCount = 0;
+    // Fetch all orders via GraphQL
+    console.log('Fetching orders via GraphQL...');
     
-    while (nextPageUrl) {
-      pageCount++;
-      console.log(`Fetching orders page ${pageCount}...`);
-      
-      const shopifyResponse: Response = await fetch(nextPageUrl, {
-        headers: {
-          'X-Shopify-Access-Token': store.access_token,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!shopifyResponse.ok) {
-        throw new Error(`Shopify API error: ${shopifyResponse.statusText}`);
+    const query = `
+      query getOrders($cursor: String) {
+        orders(first: 250, after: $cursor, query: "status:any") {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          edges {
+            node {
+              id
+              name
+              email
+              totalPriceSet {
+                shopMoney {
+                  amount
+                  currencyCode
+                }
+              }
+              displayFulfillmentStatus
+              displayFinancialStatus
+              customer {
+                displayName
+              }
+              shippingAddress {
+                name
+                address1
+                address2
+                city
+                provinceCode
+                zip
+                countryCodeV2
+              }
+              lineItems(first: 100) {
+                edges {
+                  node {
+                    id
+                    title
+                    quantity
+                    sku
+                    variant {
+                      id
+                    }
+                  }
+                }
+              }
+              createdAt
+            }
+          }
+        }
       }
+    `;
 
-      const { orders } = await shopifyResponse.json();
-      allOrders.push(...orders);
-      
-      // Get next page from Link header
-      const linkHeader: string | null = shopifyResponse.headers.get('Link');
-      const nextMatch: RegExpMatchArray | null = linkHeader?.match(/<([^>]+)>;\s*rel="next"/) || null;
-      nextPageUrl = nextMatch ? nextMatch[1] : null;
-      
-      // Add delay to respect rate limits
-      if (nextPageUrl) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-    }
+    const rawOrders = await shopifyGraphQLPaginated(
+      store.shop_domain,
+      store.access_token,
+      query,
+      'orders'
+    );
+
+    // Transform GraphQL response to REST format
+    const allOrders = rawOrders.map((order: any) => ({
+      id: order.id.split('/').pop(),
+      name: order.name,
+      email: order.email,
+      total_price: order.totalPriceSet.shopMoney.amount,
+      currency: order.totalPriceSet.shopMoney.currencyCode,
+      fulfillment_status: order.displayFulfillmentStatus?.toLowerCase() || null,
+      financial_status: order.displayFinancialStatus?.toLowerCase() || null,
+      customer: order.customer ? { name: order.customer.displayName } : null,
+      shipping_address: order.shippingAddress ? {
+        name: order.shippingAddress.name,
+        address1: order.shippingAddress.address1,
+        address2: order.shippingAddress.address2,
+        city: order.shippingAddress.city,
+        province_code: order.shippingAddress.provinceCode,
+        zip: order.shippingAddress.zip,
+        country_code: order.shippingAddress.countryCodeV2,
+      } : null,
+      line_items: order.lineItems.edges.map((li: any) => ({
+        id: li.node.id.split('/').pop(),
+        title: li.node.title,
+        quantity: li.node.quantity,
+        sku: li.node.sku,
+        variant_id: li.node.variant?.id.split('/').pop(),
+      })),
+      created_at: order.createdAt,
+    }));
     
-    console.log(`Fetched ${allOrders.length} total orders from ${pageCount} pages`);
+    console.log(`Fetched ${allOrders.length} total orders via GraphQL`);
 
     // Process and upsert orders using service client
     const ordersData = allOrders.map((order: any) => {

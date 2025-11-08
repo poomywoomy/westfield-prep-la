@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { shopifyGraphQL } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -62,28 +63,39 @@ Deno.serve(async (req) => {
     // Ensure we have a Shopify location ID
     let locationId = client.shopify_location_id;
     if (!locationId) {
-      // Fetch locations from Shopify and store primary
-      const locationsResponse = await fetch(
-        `https://${store.shop_domain}/admin/api/2024-07/locations.json`,
-        {
-          headers: {
-            'X-Shopify-Access-Token': store.access_token,
-            'Content-Type': 'application/json',
-          },
+      // Fetch locations via GraphQL
+      console.log('Fetching Shopify locations via GraphQL...');
+      
+      const locationsQuery = `
+        query getLocations {
+          locations(first: 10) {
+            edges {
+              node {
+                id
+                name
+                isActive
+              }
+            }
+          }
         }
+      `;
+
+      const locationsData = await shopifyGraphQL(
+        store.shop_domain,
+        store.access_token,
+        locationsQuery
       );
 
-      if (locationsResponse.ok) {
-        const { locations } = await locationsResponse.json();
-        const primaryLocation = locations.find((loc: any) => loc.active) || locations[0];
-        if (primaryLocation) {
-          locationId = primaryLocation.id.toString();
-          // Store for future use
-          await serviceClient
-            .from('clients')
-            .update({ shopify_location_id: locationId })
-            .eq('id', client_id);
-        }
+      const locations = locationsData.locations.edges.map((edge: any) => edge.node);
+      const primaryLocation = locations.find((loc: any) => loc.isActive) || locations[0];
+      
+      if (primaryLocation) {
+        locationId = primaryLocation.id.split('/').pop();
+        // Store for future use
+        await serviceClient
+          .from('clients')
+          .update({ shopify_location_id: locationId })
+          .eq('id', client_id);
       }
 
       if (!locationId) {
@@ -164,26 +176,45 @@ Deno.serve(async (req) => {
 
         const westfieldQuantity = ledgerEntries?.reduce((sum, entry) => sum + entry.qty_delta, 0) || 0;
 
-        // Update inventory level in Shopify
-        const response = await fetch(
-          `https://${store.shop_domain}/admin/api/2024-07/inventory_levels/set.json`,
+        // Update inventory level via GraphQL mutation
+        const inventoryMutation = `
+          mutation inventorySetQuantities($input: InventorySetQuantitiesInput!) {
+            inventorySetQuantities(input: $input) {
+              inventoryAdjustmentGroup {
+                id
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }
+        `;
+
+        const inventoryLevelId = `gid://shopify/InventoryLevel/${inventoryItemId}?inventory_location_id=${locationId}`;
+
+        const mutationResult = await shopifyGraphQL(
+          store.shop_domain,
+          store.access_token,
+          inventoryMutation,
           {
-            method: 'POST',
-            headers: {
-              'X-Shopify-Access-Token': store.access_token,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              location_id: Number(locationId),
-              inventory_item_id: Number(inventoryItemId),
-              available: westfieldQuantity,
-            }),
+            input: {
+              reason: 'correction',
+              name: 'available',
+              quantities: [
+                {
+                  inventoryItemId: `gid://shopify/InventoryItem/${inventoryItemId}`,
+                  locationId: `gid://shopify/Location/${locationId}`,
+                  quantity: westfieldQuantity,
+                }
+              ],
+            }
           }
         );
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to update ${sku.client_sku}: ${response.statusText} - ${errorText}`);
+        if (mutationResult.inventorySetQuantities?.userErrors?.length > 0) {
+          const errors = mutationResult.inventorySetQuantities.userErrors;
+          throw new Error(`Failed to update ${sku.client_sku}: ${JSON.stringify(errors)}`);
         }
 
         synced++;

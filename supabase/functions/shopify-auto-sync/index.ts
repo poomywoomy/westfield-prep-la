@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { shopifyGraphQLPaginated } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,55 +31,68 @@ const isRetryableError = (error: any): boolean => {
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-function parseLinkHeader(header: string | null): string | null {
-  if (!header) return null;
-  const nextMatch = header.match(/<([^>]+)>;\s*rel="next"/);
-  return nextMatch ? nextMatch[1] : null;
-}
-
 async function fetchShopifyProductsWithRetry(
   shopDomain: string,
   accessToken: string,
   attempt = 1
 ): Promise<any[]> {
   try {
-    const allProducts = [];
-    let nextPageUrl: string | null = `https://${shopDomain}/admin/api/2024-07/products.json?limit=250`;
-    let pageCount = 0;
+    console.log(`Fetching products via GraphQL (attempt ${attempt})...`);
     
-    while (nextPageUrl) {
-      pageCount++;
-      console.log(`Fetching products page ${pageCount} (attempt ${attempt})...`);
-      
-      const response = await fetch(nextPageUrl, {
-        headers: {
-          'X-Shopify-Access-Token': accessToken,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw { status: response.status, message: errorText };
+    const query = `
+      query getProducts($cursor: String) {
+        products(first: 250, after: $cursor) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          edges {
+            node {
+              id
+              title
+              variants(first: 100) {
+                edges {
+                  node {
+                    id
+                    sku
+                    title
+                    price
+                    inventoryItem {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
+    `;
 
-      const data = await response.json();
-      allProducts.push(...data.products);
-      
-      // Get next page from Link header
-      const linkHeader = response.headers.get('Link');
-      nextPageUrl = parseLinkHeader(linkHeader);
-      
-      // Add delay to respect rate limits
-      if (nextPageUrl) {
-        await sleep(500);
-      }
-    }
-    
-    console.log(`Fetched ${allProducts.length} total products from ${pageCount} pages`);
-    return allProducts;
+    const rawProducts = await shopifyGraphQLPaginated(
+      shopDomain,
+      accessToken,
+      query,
+      'products'
+    );
+
+    // Transform GraphQL response to REST format
+    const products = rawProducts.map((product: any) => ({
+      id: product.id.split('/').pop(),
+      title: product.title,
+      variants: product.variants.edges.map((v: any) => ({
+        id: v.node.id.split('/').pop(),
+        inventory_item_id: v.node.inventoryItem.id.split('/').pop(),
+        sku: v.node.sku,
+        title: v.node.title,
+        price: v.node.price,
+      })),
+    }));
+
+    console.log(`Fetched ${products.length} total products via GraphQL`);
+    return products;
   } catch (error) {
-    console.error(`Shopify API error (attempt ${attempt}):`, error);
+    console.error(`Shopify GraphQL error (attempt ${attempt}):`, error);
     
     if (attempt < MAX_RETRIES && isRetryableError(error)) {
       const delay = RETRY_DELAY_MS * attempt;
