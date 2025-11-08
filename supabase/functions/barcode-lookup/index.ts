@@ -420,12 +420,9 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('[Barcode Lookup] Error:', error);
     
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    
     return new Response(
       JSON.stringify({ 
-        error: 'Internal server error', 
-        message: errorMessage 
+        error: 'Unable to process barcode lookup. Please try again or contact support.'
       }),
       { 
         status: 500, 

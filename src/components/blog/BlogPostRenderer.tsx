@@ -1,4 +1,5 @@
 import { parseMarkdown } from "@/lib/markdownParser";
+import DOMPurify from 'dompurify';
 
 interface BlogPostRendererProps {
   content: string;
@@ -9,10 +10,23 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
   const htmlContent = parseMarkdown(content);
   
   // Add lazy loading to all images
-  const enhancedHtml = htmlContent.replace(
+  const htmlWithLazyLoad = htmlContent.replace(
     /<img /g,
     '<img loading="lazy" '
   );
+  
+  // Sanitize HTML to prevent XSS attacks (defense-in-depth)
+  const enhancedHtml = DOMPurify.sanitize(htmlWithLazyLoad, {
+    ALLOWED_TAGS: [
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'p', 'a', 'ul', 'ol', 'li', 
+      'code', 'pre', 'img', 'blockquote',
+      'strong', 'em', 'br', 'hr',
+      'table', 'thead', 'tbody', 'tr', 'th', 'td',
+      'details', 'summary'
+    ],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'loading', 'open']
+  });
   
   return (
     <div
