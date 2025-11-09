@@ -48,6 +48,7 @@ const MARKETPLACE_SERVICES = [
   "Polybox+Label",
   "Bubble Wrap",
   "Bundling",
+  "Kitting",
   "Additional Label",
   "Shipment Box",
   "Custom Entry"
@@ -57,6 +58,7 @@ const SELF_FULFILLMENT_SERVICES = [
   "Single Product",
   "Oversized Product",
   "Bundling",
+  "Kitting",
   "Bubble Wrapping",
   "Custom Entry"
 ];

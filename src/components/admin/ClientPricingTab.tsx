@@ -36,6 +36,7 @@ const MARKETPLACE_SERVICES = [
   "Polybox+Label",
   "Bubble Wrap",
   "Bundling",
+  "Kitting",
   "Additional Label",
   "Shipment Box",
   "Custom Entry"
@@ -45,6 +46,7 @@ const SELF_FULFILLMENT_SERVICES = [
   "Single Product",
   "Oversized Product",
   "Bundling",
+  "Kitting",
   "Bubble Wrapping",
   "Custom Entry"
 ];
@@ -223,6 +225,137 @@ export const ClientPricingTab = ({ clientId, onSuccess }: ClientPricingTabProps)
           .insert(itemsToInsert);
 
         if (error) throw error;
+      }
+
+      // Sync to active quote if one exists
+      const { data: activeQuote } = await supabase
+        .from("quotes")
+        .select("id, quote_data")
+        .eq("client_id", clientId)
+        .eq("status", "active")
+        .order("activated_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (activeQuote) {
+        const quoteData = activeQuote.quote_data as any || {};
+        
+        // Merge standard operations
+        const existingStandardOps = quoteData.standard_operations || [];
+        standardItems.forEach(item => {
+          if (item.service_name) {
+            const existingIndex = existingStandardOps.findIndex(
+              (op: any) => op.service_name === item.service_name
+            );
+            if (existingIndex >= 0) {
+              existingStandardOps[existingIndex].service_price = item.price_per_unit;
+            } else {
+              existingStandardOps.push({
+                service_name: item.service_name,
+                service_price: item.price_per_unit,
+                service_code: null
+              });
+            }
+          }
+        });
+
+        // Merge fulfillment sections
+        const existingFulfillmentSections = quoteData.fulfillment_sections || [];
+        fulfillmentSections.forEach(section => {
+          let existingSection = existingFulfillmentSections.find(
+            (s: any) => s.type === section.type
+          );
+          
+          if (!existingSection) {
+            existingSection = { type: section.type, items: [] };
+            existingFulfillmentSections.push(existingSection);
+          }
+
+          section.items.forEach(item => {
+            if (item.service_name) {
+              const existingItemIndex = existingSection.items.findIndex(
+                (i: any) => i.service_name === item.service_name
+              );
+              if (existingItemIndex >= 0) {
+                existingSection.items[existingItemIndex].service_price = item.price_per_unit;
+              } else {
+                existingSection.items.push({
+                  service_name: item.service_name,
+                  service_price: item.price_per_unit,
+                  service_code: null
+                });
+              }
+            }
+          });
+        });
+
+        await supabase
+          .from("quotes")
+          .update({ 
+            quote_data: {
+              standard_operations: existingStandardOps,
+              fulfillment_sections: existingFulfillmentSections
+            }
+          })
+          .eq("id", activeQuote.id);
+      }
+
+      // Sync to open bill if one exists
+      const { data: openBill } = await supabase
+        .from("bills")
+        .select("id")
+        .eq("client_id", clientId)
+        .eq("status", "open")
+        .order("cycle_start", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (openBill) {
+        const { data: existingBillItems } = await supabase
+          .from("bill_items")
+          .select("service_name, section_type")
+          .eq("bill_id", openBill.id);
+
+        const existingSet = new Set(
+          existingBillItems?.map(item => `${item.service_name}:${item.section_type}`) || []
+        );
+
+        const newBillItems: any[] = [];
+        const today = new Date().toISOString().split('T')[0];
+
+        standardItems.forEach(item => {
+          if (item.service_name && !existingSet.has(`${item.service_name}:Standard Operations`)) {
+            newBillItems.push({
+              bill_id: openBill.id,
+              service_name: item.service_name,
+              unit_price_cents: Math.round(item.price_per_unit * 100),
+              qty_decimal: 0,
+              line_date: today,
+              source: "pricing",
+              section_type: "Standard Operations"
+            });
+          }
+        });
+
+        fulfillmentSections.forEach(section => {
+          section.items.forEach(item => {
+            if (item.service_name && !existingSet.has(`${item.service_name}:${section.type}`)) {
+              newBillItems.push({
+                bill_id: openBill.id,
+                service_name: item.service_name,
+                unit_price_cents: Math.round(item.price_per_unit * 100),
+                qty_decimal: 0,
+                line_date: today,
+                source: "pricing",
+                section_type: section.type
+              });
+            }
+          });
+        });
+
+        if (newBillItems.length > 0) {
+          await supabase.from("bill_items").insert(newBillItems);
+        }
       }
 
       toast({

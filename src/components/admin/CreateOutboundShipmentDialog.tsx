@@ -576,8 +576,10 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
                           <Input
                             type="number"
                             min="0"
+                            step="1"
+                            inputMode="numeric"
                             placeholder="Qty per box"
-                            value={sku.allocations[boxes[0]?.id] !== undefined && sku.allocations[boxes[0]?.id] !== 0 ? sku.allocations[boxes[0]?.id] : ""}
+                            value={sku.allocations[boxes[0]?.id] ?? ""}
                             onChange={(e) => {
                               const inputValue = e.target.value;
                               
@@ -609,29 +611,31 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
                       </div>
                     ) : (
                       // Minimal Split: Single total quantity input
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Total quantity</Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          placeholder="Total units"
-                          value={sku.quantity !== 0 ? sku.quantity : ""}
-                          onChange={(e) => {
-                            const inputValue = e.target.value;
-                            
-                            if (inputValue === "") {
-                              updateSKUQuantity(sku.sku_id, 0);
-                              return;
-                            }
-                            
-                            const qty = parseInt(inputValue);
-                            if (!isNaN(qty) && qty >= 0) {
-                              updateSKUQuantity(sku.sku_id, qty);
-                            }
-                          }}
-                          className="w-32"
-                        />
-                      </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Total quantity</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="1"
+                    inputMode="numeric"
+                    placeholder="Total units"
+                    value={sku.quantity ?? ""}
+                    onChange={(e) => {
+                      const inputValue = e.target.value;
+                      
+                      if (inputValue === "") {
+                        updateSKUQuantity(sku.sku_id, 0);
+                        return;
+                      }
+                      
+                      const qty = parseInt(inputValue);
+                      if (!isNaN(qty) && qty >= 0) {
+                        updateSKUQuantity(sku.sku_id, qty);
+                      }
+                    }}
+                    className="w-32"
+                  />
+                </div>
                     )}
                   </div>
                 ))}
