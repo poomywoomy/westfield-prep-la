@@ -270,7 +270,7 @@ export const SKUList = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Client SKU</TableHead>
+              <TableHead>Internal SKU</TableHead>
               <TableHead>Title</TableHead>
               <TableHead className="text-right">Available</TableHead>
               <TableHead className="text-right">Received (Month)</TableHead>
@@ -304,7 +304,12 @@ export const SKUList = () => {
                     setHistoryDialogOpen(true);
                   }}
                 >
-                  <TableCell className="font-medium">{sku.client_sku}</TableCell>
+                  <TableCell className="font-medium">
+                    {(sku as any).internal_sku || sku.client_sku}
+                    {sku.client_sku && (sku as any).internal_sku && (
+                      <div className="text-xs text-muted-foreground">{sku.client_sku}</div>
+                    )}
+                  </TableCell>
                   <TableCell>{sku.title}</TableCell>
                   <TableCell className="text-right">{sku.available}</TableCell>
                   <TableCell className="text-right">{sku.received_this_month}</TableCell>

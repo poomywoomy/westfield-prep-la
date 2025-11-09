@@ -158,11 +158,24 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
   };
 
   const updateSKUAllocation = (skuId: string, boxId: string, quantity: number) => {
-    setSkus(skus.map(s => 
-      s.sku_id === skuId 
-        ? { ...s, allocations: { ...s.allocations, [boxId]: quantity } }
-        : s
-    ));
+    setSkus(prev =>
+      prev.map(s =>
+        s.sku_id === skuId
+          ? { ...s, allocations: { ...s.allocations, [boxId]: quantity } }
+          : s
+      )
+    );
+  };
+
+  const setSKUAllocationsAllBoxes = (skuId: string, qty: number) => {
+    setSkus(prev =>
+      prev.map(s => {
+        if (s.sku_id !== skuId) return s;
+        const newAllocations = { ...s.allocations };
+        boxes.forEach(b => { newAllocations[b.id] = qty; });
+        return { ...s, allocations: newAllocations, quantity: qty * boxes.length };
+      })
+    );
   };
 
   const validatePhase1 = () => {
@@ -585,21 +598,13 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
                               
                               // Allow empty string while typing
                               if (inputValue === "") {
-                                boxes.forEach(box => {
-                                  updateSKUAllocation(sku.sku_id, box.id, 0);
-                                });
-                                updateSKUQuantity(sku.sku_id, 0);
+                                setSKUAllocationsAllBoxes(sku.sku_id, 0);
                                 return;
                               }
                               
                               const qty = parseInt(inputValue);
                               if (!isNaN(qty) && qty >= 0) {
-                                // Apply same quantity to ALL boxes
-                                boxes.forEach(box => {
-                                  updateSKUAllocation(sku.sku_id, box.id, qty);
-                                });
-                                // Total = qty per box × number of boxes
-                                updateSKUQuantity(sku.sku_id, qty * boxes.length);
+                                setSKUAllocationsAllBoxes(sku.sku_id, qty);
                               }
                             }}
                             className="w-32"
