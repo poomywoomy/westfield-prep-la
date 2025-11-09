@@ -172,7 +172,15 @@ export default function ClientShopifyTab() {
       setSyncing(true);
       const { data, error } = await supabase.functions.invoke('shopify-sync-products');
 
-      if (error) throw error;
+      if (error) {
+        // Show actual error message from function
+        throw new Error(error.message || 'Failed to sync products');
+      }
+
+      // Check for non-success responses
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       if (data?.seedErrors && data.seedErrors.length > 0) {
         toast({
@@ -191,9 +199,10 @@ export default function ClientShopifyTab() {
       fetchStoreData();
     } catch (error) {
       console.error('Sync error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sync products';
       toast({
         title: "Sync failed",
-        description: error instanceof Error ? error.message : "Failed to sync products",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

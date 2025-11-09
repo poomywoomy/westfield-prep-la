@@ -202,62 +202,57 @@ Deno.serve(async (req) => {
 
     const existingSkuMap = new Map(existingSkus?.map(s => [s.client_sku, s.internal_sku]) || []);
 
-    // Split into inserts (need internal_sku) and updates (preserve internal_sku)
-    const skusToInsert = [];
-    const skusToUpdate = [];
+    // Build SKU records with proper internal_sku fallback
+    const skusToUpsert = [];
 
     for (const product of validatedProducts) {
       for (const variant of product.variants) {
-        const clientSku = variant.sku || `SHOP-${product.id}-${variant.id}`;
+        // Generate fallback internal_sku for SKU-less variants
+        const fallbackInternalSku = `SHOP-${String(product.id).trim()}-${String(variant.id).trim()}`;
+        const rawSku = (variant.sku ?? '').trim();
+        const internalSku = rawSku.length > 0 ? rawSku : fallbackInternalSku;
+        const clientSku = internalSku;
+        
+        // Defensive logging for empty internal_sku (should never happen)
+        if (!internalSku) {
+          console.error(`Empty internal_sku for product ${product.id}, variant ${variant.id}, title: ${variant.title}`);
+          continue;
+        }
+
         const title = `${product.title}${variant.title !== 'Default Title' ? ` - ${variant.title}` : ''}`;
-        const skuData = {
+        
+        skusToUpsert.push({
           client_id: targetClientId,
           client_sku: clientSku,
+          internal_sku: existingSkuMap.get(clientSku) ?? internalSku, // Use existing or fallback
           title,
           unit_cost: variant.price,
           notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}, Inventory Item ID: ${variant.inventory_item_id}`,
           status: 'active' as const,
-        };
-
-        if (existingSkuMap.has(clientSku)) {
-          // Existing SKU - update only title, cost, notes, status (NOT internal_sku)
-          skusToUpdate.push(skuData);
-        } else {
-          // New SKU - include internal_sku
-          skusToInsert.push({
-            ...skuData,
-            internal_sku: variant.sku || `SHOP-${product.id}-${variant.id}`,
-          });
-        }
+        });
       }
     }
 
-    // Insert new SKUs with internal_sku
-    if (skusToInsert.length > 0) {
-      const { error: insertError } = await serviceClient
+    // Upsert all SKUs with internal_sku always present
+    if (skusToUpsert.length > 0) {
+      const { error: upsertError } = await serviceClient
         .from('skus')
-        .insert(skusToInsert);
-      if (insertError) throw insertError;
-    }
-
-    // Update existing SKUs without touching internal_sku
-    if (skusToUpdate.length > 0) {
-      const { error: updateError } = await serviceClient
-        .from('skus')
-        .upsert(skusToUpdate, {
+        .upsert(skusToUpsert, {
           onConflict: 'client_id,client_sku',
           ignoreDuplicates: false,
         });
-      if (updateError) throw updateError;
+      if (upsertError) throw upsertError;
     }
 
-    const totalSynced = skusToInsert.length + skusToUpdate.length;
+    const totalSynced = skusToUpsert.length;
 
     // After upserting SKUs, map inventory_item_id to sku_id via sku_aliases
     const aliasesToInsert = [];
     for (const product of validatedProducts) {
       for (const variant of product.variants) {
-        const clientSku = variant.sku || `SHOP-${product.id}-${variant.id}`;
+        const fallbackInternalSku = `SHOP-${String(product.id).trim()}-${String(variant.id).trim()}`;
+        const rawSku = (variant.sku ?? '').trim();
+        const clientSku = rawSku.length > 0 ? rawSku : fallbackInternalSku;
         
         // Find the sku_id
         const { data: skuRecord } = await serviceClient
@@ -323,7 +318,9 @@ Deno.serve(async (req) => {
     if (primaryLocation) {
       for (const product of validatedProducts) {
         for (const variant of product.variants) {
-          const clientSku = variant.sku || `SHOP-${product.id}-${variant.id}`;
+          const fallbackInternalSku = `SHOP-${String(product.id).trim()}-${String(variant.id).trim()}`;
+          const rawSku = (variant.sku ?? '').trim();
+          const clientSku = rawSku.length > 0 ? rawSku : fallbackInternalSku;
           
           // Check if SKU has existing inventory
           const { data: existingSku } = await serviceClient
