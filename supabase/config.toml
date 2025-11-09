@@ -46,7 +46,10 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.shopify-auto-sync]
-verify_jwt = true
+verify_jwt = false
+
+[[functions.shopify-auto-sync.schedule]]
+cron = "0 * * * *"
 
 [functions.shopify-get-shipping-rates]
 verify_jwt = true

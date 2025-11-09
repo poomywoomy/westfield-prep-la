@@ -244,10 +244,7 @@ export const BillingHistoryTab = () => {
             <BillView
               bill={selectedBill}
               client={selectedBill.client}
-              onRefresh={() => {
-                fetchBills();
-                setSelectedBill(null);
-              }}
+              onRefresh={fetchBills}
             />
           )}
         </DialogContent>

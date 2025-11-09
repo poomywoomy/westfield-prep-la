@@ -145,7 +145,13 @@ const BillingTab = () => {
     }
   };
 
+  const handleBillDataRefresh = async () => {
+    // Only refresh data without closing modal
+    await fetchData();
+  };
+
   const handleModalClose = () => {
+    // Close modal and clean up
     setBillModalOpen(false);
     setCycleDialogOpen(false);
     setSelectedBill(null);
@@ -214,7 +220,7 @@ const BillingTab = () => {
       <Dialog open={billModalOpen} onOpenChange={handleModalClose}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           {selectedBill && selectedClient && (
-            <BillView bill={selectedBill} client={selectedClient} onRefresh={handleModalClose} />
+            <BillView bill={selectedBill} client={selectedClient} onRefresh={handleBillDataRefresh} />
           )}
         </DialogContent>
       </Dialog>

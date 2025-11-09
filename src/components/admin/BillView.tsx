@@ -673,14 +673,21 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
         return;
       }
 
-      const { error } = await supabase.from("bill_items").insert(lineItems);
-      if (error) throw error;
+      console.log("Attempting to insert line items:", lineItems);
+      const { data: insertData, error } = await supabase.from("bill_items").insert(lineItems).select();
+      
+      if (error) {
+        console.error("Line items insert error:", error);
+        throw error;
+      }
 
+      console.log("Line items inserted successfully:", insertData);
       toast({ title: "Added from quote", description: `${lineItems.length} services added` });
       await fetchBillData();
       await recalculateBillTotals();
       onRefresh();
     } catch (error: any) {
+      console.error("populateFromQuote error:", error);
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
@@ -756,7 +763,14 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
       }
 
       if (itemsToInsert.length > 0) {
-        await supabase.from("bill_items").insert(itemsToInsert);
+        console.log("Attempting to insert reset items:", itemsToInsert);
+        const { data: insertData, error: insertError } = await supabase.from("bill_items").insert(itemsToInsert).select();
+        
+        if (insertError) {
+          console.error("Reset bill insert error:", insertError);
+          throw insertError;
+        }
+        console.log("Reset items inserted successfully:", insertData);
       }
 
       // Recalculate totals
