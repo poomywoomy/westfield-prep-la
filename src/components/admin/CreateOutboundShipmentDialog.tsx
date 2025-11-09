@@ -106,6 +106,24 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
     updateBox(boxId, "length_in", box1.length_in);
     updateBox(boxId, "width_in", box1.width_in);
     updateBox(boxId, "height_in", box1.height_in);
+    toast.success("Copied Box 1 dimensions");
+  };
+
+  const copyBox1ToAllBoxes = () => {
+    const box1 = boxes[0];
+    if (!box1) return;
+    
+    setBoxes(boxes.map((box, idx) => 
+      idx === 0 ? box : {
+        ...box,
+        weight_lbs: box1.weight_lbs,
+        length_in: box1.length_in,
+        width_in: box1.width_in,
+        height_in: box1.height_in,
+      }
+    ));
+    
+    toast.success("Copied Box 1 dimensions to all boxes");
   };
 
   const addSKU = (skuId: string) => {
@@ -159,16 +177,22 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
       }
     });
 
-    // Amazon Optimized: validate all boxes have same SKUs with same quantities
+    // Amazon Optimized: validate all SKUs have quantities allocated
     if (splitType === "amazon_optimized") {
       skus.forEach(sku => {
-        const allocations = Object.values(sku.allocations);
-        if (allocations.length !== boxes.length) {
-          errors.push(`${sku.client_sku}: Must allocate to all boxes`);
+        // Check if any quantity is allocated
+        const qtyPerBox = sku.allocations[boxes[0]?.id] || 0;
+        
+        if (qtyPerBox === 0) {
+          errors.push(`${sku.client_sku}: Must specify quantity per box`);
         }
-        const firstQty = allocations[0];
-        if (!allocations.every(qty => qty === firstQty)) {
-          errors.push(`${sku.client_sku}: All boxes must have same quantity`);
+        
+        // Verify all boxes have the same quantity (should be automatic now)
+        const allAllocations = boxes.map(box => sku.allocations[box.id] || 0);
+        const allSame = allAllocations.every(qty => qty === qtyPerBox);
+        
+        if (!allSame) {
+          errors.push(`${sku.client_sku}: All boxes should have same quantity (${qtyPerBox})`);
         }
       });
     }
@@ -441,33 +465,49 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
             <div>
               <div className="flex items-center justify-between mb-3">
                 <Label className="text-lg">Boxes</Label>
-                <Button onClick={addBox} size="sm">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Box
-                </Button>
+                <div className="flex gap-2">
+                  {splitType === "amazon_optimized" && boxes.length > 1 && (
+                    <Button onClick={copyBox1ToAllBoxes} size="sm" variant="secondary">
+                      <Package className="h-4 w-4 mr-1" />
+                      Copy Box 1 to All Boxes
+                    </Button>
+                  )}
+                  <Button onClick={addBox} size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Box
+                  </Button>
+                </div>
               </div>
               
               <div className="space-y-3 max-h-[300px] overflow-y-auto">
                 {boxes.map((box, idx) => (
                   <div key={box.id} className="border p-4 rounded-lg space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-medium">Box #{box.box_number}</h4>
-                      {boxes.length > 1 && (
-                        <Button variant="ghost" size="icon" onClick={() => removeBox(box.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium">Box #{box.box_number}</h4>
+                        {idx === 0 && (
+                          <Badge variant="secondary" className="text-xs">
+                            Reference Box
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        {idx > 0 && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => copyBox1Dimensions(box.id)}
+                          >
+                            Copy Box 1 Dimensions
+                          </Button>
+                        )}
+                        {boxes.length > 1 && (
+                          <Button variant="ghost" size="icon" onClick={() => removeBox(box.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                    
-                    {splitType === "amazon_optimized" && idx > 0 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyBox1Dimensions(box.id)}
-                      >
-                        Copy Box 1 Dimensions
-                      </Button>
-                    )}
 
                     <div className="grid grid-cols-4 gap-2">
                       <Input
@@ -527,28 +567,71 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
                     </div>
 
                     {splitType === "amazon_optimized" ? (
-                      <div className="grid grid-cols-5 gap-2">
-                        {boxes.map(box => (
+                      // Amazon Optimized: Single input applies to ALL boxes
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">
+                          Quantity per box (applies to all {boxes.length} boxes)
+                        </Label>
+                        <div className="flex items-center gap-3">
                           <Input
-                            key={box.id}
                             type="number"
-                            placeholder={`Box ${box.box_number}`}
-                            value={sku.allocations[box.id] || ""}
+                            min="0"
+                            placeholder="Qty per box"
+                            value={sku.allocations[boxes[0]?.id] !== undefined && sku.allocations[boxes[0]?.id] !== 0 ? sku.allocations[boxes[0]?.id] : ""}
                             onChange={(e) => {
-                              const qty = parseInt(e.target.value) || 0;
-                              updateSKUAllocation(sku.sku_id, box.id, qty);
-                              updateSKUQuantity(sku.sku_id, qty * boxes.length);
+                              const inputValue = e.target.value;
+                              
+                              // Allow empty string while typing
+                              if (inputValue === "") {
+                                boxes.forEach(box => {
+                                  updateSKUAllocation(sku.sku_id, box.id, 0);
+                                });
+                                updateSKUQuantity(sku.sku_id, 0);
+                                return;
+                              }
+                              
+                              const qty = parseInt(inputValue);
+                              if (!isNaN(qty) && qty >= 0) {
+                                // Apply same quantity to ALL boxes
+                                boxes.forEach(box => {
+                                  updateSKUAllocation(sku.sku_id, box.id, qty);
+                                });
+                                // Total = qty per box × number of boxes
+                                updateSKUQuantity(sku.sku_id, qty * boxes.length);
+                              }
                             }}
+                            className="w-32"
                           />
-                        ))}
+                          <div className="text-sm text-muted-foreground">
+                            = {(sku.allocations[boxes[0]?.id] || 0) * boxes.length} total units
+                          </div>
+                        </div>
                       </div>
                     ) : (
-                      <Input
-                        type="number"
-                        placeholder="Total quantity"
-                        value={sku.quantity || ""}
-                        onChange={(e) => updateSKUQuantity(sku.sku_id, parseInt(e.target.value) || 0)}
-                      />
+                      // Minimal Split: Single total quantity input
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Total quantity</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="Total units"
+                          value={sku.quantity !== 0 ? sku.quantity : ""}
+                          onChange={(e) => {
+                            const inputValue = e.target.value;
+                            
+                            if (inputValue === "") {
+                              updateSKUQuantity(sku.sku_id, 0);
+                              return;
+                            }
+                            
+                            const qty = parseInt(inputValue);
+                            if (!isNaN(qty) && qty >= 0) {
+                              updateSKUQuantity(sku.sku_id, qty);
+                            }
+                          }}
+                          className="w-32"
+                        />
+                      </div>
                     )}
                   </div>
                 ))}
