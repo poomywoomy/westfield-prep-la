@@ -19,6 +19,7 @@ import { QuickScanModal } from "@/components/admin/QuickScanModal";
 import { BlogTab } from "@/components/admin/BlogTab";
 import { DiscrepanciesTab } from "@/components/admin/DiscrepanciesTab";
 import { OrdersTab } from "@/components/admin/OrdersTab";
+import { ShipmentsTab } from "@/components/admin/ShipmentsTab";
 import { usePendingDiscrepancyCount } from "@/hooks/usePendingDiscrepancyCount";
 import { AppSidebarAdmin } from "@/components/app-sidebar-admin";
 
@@ -155,6 +156,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="discrepancies">
             <DiscrepanciesTab />
+          </TabsContent>
+
+          <TabsContent value="shipments">
+            <ShipmentsTab />
           </TabsContent>
 
           <TabsContent value="shopify">

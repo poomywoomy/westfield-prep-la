@@ -13,7 +13,7 @@ import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientBillingTab from "@/components/client/ClientBillingTab";
 import ClientProductsTab from "@/components/client/ClientProductsTab";
 import ClientOrdersTab from "@/components/client/ClientOrdersTab";
-
+import { ClientShipmentsTab } from "@/components/client/ClientShipmentsTab";
 import { ClientInventoryActivityLog } from "@/components/client/ClientInventoryActivityLog";
 import { ClientAnalyticsDashboard } from "@/components/client/ClientAnalyticsDashboard";
 import { sanitizeError } from "@/lib/errorHandler";
@@ -164,7 +164,7 @@ const ClientDashboard = () => {
         )}
         
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid grid-cols-5 w-full">
+          <TabsList className="grid grid-cols-6 w-full">
             <TabsTrigger value="analytics">
               <Activity className="mr-2 h-4 w-4" />
               Analytics
@@ -176,6 +176,10 @@ const ClientDashboard = () => {
             <TabsTrigger value="orders">
               <Package className="mr-2 h-4 w-4" />
               Orders
+            </TabsTrigger>
+            <TabsTrigger value="shipments">
+              <Package className="mr-2 h-4 w-4" />
+              Shipments
             </TabsTrigger>
             <TabsTrigger value="activity">
               <Activity className="mr-2 h-4 w-4" />
@@ -205,6 +209,10 @@ const ClientDashboard = () => {
 
           <TabsContent value="orders" forceMount className="data-[state=inactive]:hidden">
             <ClientOrdersTab />
+          </TabsContent>
+
+          <TabsContent value="shipments" forceMount className="data-[state=inactive]:hidden">
+            <ClientShipmentsTab />
           </TabsContent>
 
           <TabsContent value="activity" forceMount className="data-[state=inactive]:hidden">

@@ -28,6 +28,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount }: Ap
     { id: "billing-history", label: "Bill History", icon: History },
     { id: "inventory", label: "Inventory", icon: Package },
     { id: "discrepancies", label: "Discrepancies", icon: AlertTriangle, badge: discrepancyCount },
+    { id: "shipments", label: "Shipments", icon: Package },
     { id: "shopify", label: "Shopify", icon: Store },
     { id: "orders", label: "Orders", icon: ShoppingCart },
     { id: "blog", label: "Blog", icon: PenSquare },

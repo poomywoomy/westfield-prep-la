@@ -1462,6 +1462,174 @@ export type Database = {
         }
         Relationships: []
       }
+      outbound_shipment_boxes: {
+        Row: {
+          box_number: number
+          carrier: string | null
+          created_at: string
+          fba_destination_fc: string | null
+          fba_shipment_id: string | null
+          height_in: number | null
+          id: string
+          length_in: number | null
+          shipment_id: string
+          tracking_number: string | null
+          weight_lbs: number | null
+          width_in: number | null
+        }
+        Insert: {
+          box_number: number
+          carrier?: string | null
+          created_at?: string
+          fba_destination_fc?: string | null
+          fba_shipment_id?: string | null
+          height_in?: number | null
+          id?: string
+          length_in?: number | null
+          shipment_id: string
+          tracking_number?: string | null
+          weight_lbs?: number | null
+          width_in?: number | null
+        }
+        Update: {
+          box_number?: number
+          carrier?: string | null
+          created_at?: string
+          fba_destination_fc?: string | null
+          fba_shipment_id?: string | null
+          height_in?: number | null
+          id?: string
+          length_in?: number | null
+          shipment_id?: string
+          tracking_number?: string | null
+          weight_lbs?: number | null
+          width_in?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outbound_shipment_boxes_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "outbound_shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      outbound_shipment_lines: {
+        Row: {
+          box_id: string | null
+          created_at: string
+          id: string
+          quantity: number
+          shipment_id: string
+          sku_id: string
+        }
+        Insert: {
+          box_id?: string | null
+          created_at?: string
+          id?: string
+          quantity: number
+          shipment_id: string
+          sku_id: string
+        }
+        Update: {
+          box_id?: string | null
+          created_at?: string
+          id?: string
+          quantity?: number
+          shipment_id?: string
+          sku_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outbound_shipment_lines_box_id_fkey"
+            columns: ["box_id"]
+            isOneToOne: false
+            referencedRelation: "outbound_shipment_boxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outbound_shipment_lines_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "outbound_shipments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outbound_shipment_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "outbound_shipment_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      outbound_shipments: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          destination_type: Database["public"]["Enums"]["destination_type"]
+          id: string
+          notes: string | null
+          ship_from_address: string
+          shipment_number: string
+          shipment_split_type: Database["public"]["Enums"]["shipment_split_type"]
+          shipment_status: Database["public"]["Enums"]["shipment_status"]
+          shipped_at: string | null
+          total_boxes: number
+          total_units: number
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          destination_type?: Database["public"]["Enums"]["destination_type"]
+          id?: string
+          notes?: string | null
+          ship_from_address?: string
+          shipment_number: string
+          shipment_split_type?: Database["public"]["Enums"]["shipment_split_type"]
+          shipment_status?: Database["public"]["Enums"]["shipment_status"]
+          shipped_at?: string | null
+          total_boxes?: number
+          total_units?: number
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          destination_type?: Database["public"]["Enums"]["destination_type"]
+          id?: string
+          notes?: string | null
+          ship_from_address?: string
+          shipment_number?: string
+          shipment_split_type?: Database["public"]["Enums"]["shipment_split_type"]
+          shipment_status?: Database["public"]["Enums"]["shipment_status"]
+          shipped_at?: string | null
+          total_boxes?: number
+          total_units?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outbound_shipments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_events: {
         Row: {
           actor_id: string | null
@@ -2538,6 +2706,10 @@ export type Database = {
       clear_password_expiration: { Args: never; Returns: undefined }
       delete_own_client_account: { Args: never; Returns: Json }
       generate_asn_number: { Args: { p_client_id: string }; Returns: string }
+      generate_shipment_number: {
+        Args: { p_client_id: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2557,6 +2729,7 @@ export type Database = {
       channel_type: "amazon" | "walmart" | "shopify" | "ebay" | "other"
       client_status: "pending" | "active" | "inactive"
       condition_type: "normal" | "damaged" | "quarantined" | "rework"
+      destination_type: "amazon_fba" | "walmart_wfs" | "tiktok_shop"
       fulfillment_service:
         | "fba_prep"
         | "wfs_prep"
@@ -2577,6 +2750,8 @@ export type Database = {
       prep_status: "awaiting" | "in_progress" | "ready"
       quote_status: "draft" | "active" | "replaced" | "archived"
       receiving_format: "pallets" | "cartons" | "both"
+      shipment_split_type: "amazon_optimized" | "minimal_split"
+      shipment_status: "draft" | "shipped"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2710,6 +2885,7 @@ export const Constants = {
       channel_type: ["amazon", "walmart", "shopify", "ebay", "other"],
       client_status: ["pending", "active", "inactive"],
       condition_type: ["normal", "damaged", "quarantined", "rework"],
+      destination_type: ["amazon_fba", "walmart_wfs", "tiktok_shop"],
       fulfillment_service: [
         "fba_prep",
         "wfs_prep",
@@ -2732,6 +2908,8 @@ export const Constants = {
       prep_status: ["awaiting", "in_progress", "ready"],
       quote_status: ["draft", "active", "replaced", "archived"],
       receiving_format: ["pallets", "cartons", "both"],
+      shipment_split_type: ["amazon_optimized", "minimal_split"],
+      shipment_status: ["draft", "shipped"],
     },
   },
 } as const
