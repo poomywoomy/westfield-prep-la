@@ -103,7 +103,6 @@ const ClientDashboard = () => {
   const handleLogout = async () => {
     await logout();
     toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
-    window.location.replace('/');
   };
 
   if (loading) {

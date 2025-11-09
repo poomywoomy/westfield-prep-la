@@ -24,7 +24,7 @@ import { usePendingDiscrepancyCount } from "@/hooks/usePendingDiscrepancyCount";
 import { AppSidebarAdmin } from "@/components/app-sidebar-admin";
 
 const AdminDashboard = () => {
-  const { user, role, loading } = useAuth();
+  const { user, role, loading, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("clients");
@@ -65,20 +65,8 @@ const AdminDashboard = () => {
   }, [user, role, loading, navigate, toast]);
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut({ scope: 'global' });
-      toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
-      window.location.replace('/');
-    } catch (e) {
-      if (import.meta.env.DEV) {
-        console.error('Logout error:', e);
-      }
-      toast({
-        title: 'Logout error', 
-        description: 'An error occurred during logout. Please try again.',
-        variant: 'destructive'
-      });
-    }
+    await logout();
+    toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
   };
 
   if (loading) {

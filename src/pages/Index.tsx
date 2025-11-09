@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
@@ -10,11 +11,26 @@ import Reviews from "@/components/Reviews";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import LocationShowcase from "@/components/LocationShowcase";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
+  const { user, role, loading } = useAuth();
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    // Redirect logged-in users to their dashboard
+    if (!loading && user && role) {
+      if (role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else if (role === 'client') {
+        navigate('/client/dashboard', { replace: true });
+      }
+    }
+  }, [user, role, loading, navigate]);
 
   return (
     <>

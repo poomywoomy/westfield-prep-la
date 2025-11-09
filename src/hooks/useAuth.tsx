@@ -8,25 +8,46 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<"admin" | "client" | null>(null);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Auto-logout on tab close or 30 minutes inactivity
-  useAutoLogout(!!user);
+  const logout = useCallback(async () => {
+    try {
+      // Clear React state first
+      setSession(null);
+      setUser(null);
+      setRole(null);
+      
+      // Sign out from Supabase
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Clear all Supabase tokens from localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Force redirect to homepage
+      window.location.replace('/');
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error('Logout error:', error);
+      }
+      // Even if there's an error, force redirect
+      window.location.replace('/');
+    }
+  }, []);
+
+  // Auto-logout on 30 minutes inactivity
+  useAutoLogout(!!user, logout);
 
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // Prevent state updates during logout process
-        if (isLoggingOut && event === 'SIGNED_OUT') {
-          setIsLoggingOut(false);
-          return;
-        }
-        
         setSession(session);
         setUser(session?.user ?? null);
         
-        if (session?.user && !isLoggingOut) {
+        if (session?.user) {
           // Activate client on login and fetch role (deferred to avoid blocking)
           setTimeout(async () => {
             const { error } = await supabase.rpc('activate_client_on_login');
@@ -42,35 +63,27 @@ export const useAuth = () => {
       }
     );
 
-    // Check for existing session only if not logging out
-    if (!isLoggingOut) {
-      // Check if we just logged out - clear flag and proceed immediately
-      const justLoggedOut = localStorage.getItem('auth:justLoggedOut');
-      if (justLoggedOut) {
-        localStorage.removeItem('auth:justLoggedOut');
-      }
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
       
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Activate client on initial load and fetch role (deferred to avoid blocking)
-          setTimeout(async () => {
-            const { error } = await supabase.rpc('activate_client_on_login');
-            if (error && import.meta.env.DEV) {
-              console.error('Error activating client:', error);
-            }
-            fetchUserRole(session.user.id);
-          }, 0);
-        } else {
-          setLoading(false);
-        }
-      });
-    }
+      if (session?.user) {
+        // Activate client on initial load and fetch role (deferred to avoid blocking)
+        setTimeout(async () => {
+          const { error } = await supabase.rpc('activate_client_on_login');
+          if (error && import.meta.env.DEV) {
+            console.error('Error activating client:', error);
+          }
+          fetchUserRole(session.user.id);
+        }, 0);
+      } else {
+        setLoading(false);
+      }
+    });
 
     return () => subscription.unsubscribe();
-  }, [isLoggingOut]);
+  }, []);
 
   const fetchUserRole = async (userId: string) => {
     try {
@@ -91,26 +104,6 @@ export const useAuth = () => {
       setLoading(false);
     }
   };
-
-  const logout = useCallback(async () => {
-    setIsLoggingOut(true);
-    setSession(null);
-    setUser(null);
-    setRole(null);
-    
-    // Global sign out to invalidate all sessions
-    await supabase.auth.signOut({ scope: 'global' });
-    
-    // Clear all Supabase auth tokens from localStorage
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('sb-')) {
-        localStorage.removeItem(key);
-      }
-    });
-    
-    // Set flag to prevent immediate rehydration race
-    localStorage.setItem('auth:justLoggedOut', '1');
-  }, []);
 
   return { user, session, loading, role, logout };
 };
