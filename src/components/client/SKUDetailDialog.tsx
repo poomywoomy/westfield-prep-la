@@ -17,9 +17,9 @@ export const SKUDetailDialog = ({ open, onOpenChange, skuId, clientId }: SKUDeta
   const { data: skuData, isLoading } = useQuery({
     queryKey: ["sku-detail", skuId],
     queryFn: async () => {
-      // Fetch inventory summary for current levels
+      // Fetch inventory summary (complete) for current levels and metadata
       const { data: inventoryData, error: invError } = await supabase
-        .from("inventory_summary")
+        .from("inventory_summary_complete")
         .select("*")
         .eq("sku_id", skuId)
         .eq("client_id", clientId)
@@ -30,7 +30,7 @@ export const SKUDetailDialog = ({ open, onOpenChange, skuId, clientId }: SKUDeta
       // Fetch SKU details for metadata
       const { data: skuDetails, error: skuError } = await supabase
         .from("skus")
-        .select("low_stock_threshold, image_url")
+        .select("low_stock_threshold, image_url, title, client_sku, internal_sku")
         .eq("id", skuId)
         .single();
 
@@ -39,6 +39,9 @@ export const SKUDetailDialog = ({ open, onOpenChange, skuId, clientId }: SKUDeta
       // Combine the data
       return {
         ...inventoryData,
+        title: skuDetails?.title,
+        client_sku: skuDetails?.client_sku,
+        internal_sku: skuDetails?.internal_sku,
         image_url: skuDetails?.image_url,
         reorder_point: skuDetails?.low_stock_threshold || 10,
       };
@@ -91,10 +94,7 @@ export const SKUDetailDialog = ({ open, onOpenChange, skuId, clientId }: SKUDeta
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-gray-900">{skuData.title || "Untitled Product"}</h3>
-                <p className="text-sm text-gray-600 mt-1">SKU: {skuData.client_sku}</p>
-                {skuData.fnsku && (
-                  <p className="text-sm text-gray-600">FNSKU: {skuData.fnsku}</p>
-                )}
+                <p className="text-sm text-gray-600 mt-1">SKU: {skuData.internal_sku || skuData.client_sku}</p>
                 <Badge 
                   variant="secondary"
                   className={`mt-2 ${

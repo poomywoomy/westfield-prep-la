@@ -29,7 +29,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
   const [formData, setFormData] = useState({
     client_id: "",
     client_sku: "",
-    fnsku: "",
+    internal_sku: "",
     asin: "",
     upc: "",
     ean: "",
@@ -51,7 +51,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
       setFormData({
         client_id: sku.client_id,
         client_sku: sku.client_sku,
-        fnsku: sku.fnsku || "",
+        internal_sku: (sku as any).internal_sku || "",
         asin: sku.asin || "",
         upc: sku.upc || "",
         ean: sku.ean || "",
@@ -71,7 +71,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
       setFormData({
         client_id: presetClientId || "",
         client_sku: "",
-        fnsku: "",
+        internal_sku: "",
         asin: "",
         upc: "",
         ean: "",
@@ -97,7 +97,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
     const payload = {
       client_id: formData.client_id,
       client_sku: formData.client_sku,
-      fnsku: formData.fnsku || null,
+      internal_sku: formData.internal_sku || formData.client_sku,
       asin: formData.asin || null,
       upc: formData.upc || null,
       ean: formData.ean || null,
@@ -170,18 +170,28 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
               <Input
                 id="client_sku"
                 value={formData.client_sku}
-                onChange={(e) => setFormData({ ...formData, client_sku: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData({
+                    ...formData,
+                    client_sku: value,
+                    internal_sku: formData.internal_sku ? formData.internal_sku : value,
+                  });
+                }}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="fnsku">FNSKU</Label>
+              <Label htmlFor="internal_sku">Internal SKU (Warehouse) *</Label>
               <Input
-                id="fnsku"
-                value={formData.fnsku}
-                onChange={(e) => setFormData({ ...formData, fnsku: e.target.value })}
+                id="internal_sku"
+                value={formData.internal_sku}
+                onChange={(e) => setFormData({ ...formData, internal_sku: e.target.value })}
+                required
+                placeholder="e.g., WH-12345"
               />
+              <p className="text-xs text-muted-foreground">Used internally; prefilled from Client SKU.</p>
             </div>
 
             <div className="space-y-2">

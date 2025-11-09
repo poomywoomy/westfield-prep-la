@@ -171,9 +171,9 @@ export const SKUList = () => {
 
       // Search filter
       if (searchQuery && !(
+        (sku as any).internal_sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         sku.client_sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        sku.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (sku.fnsku && sku.fnsku.toLowerCase().includes(searchQuery.toLowerCase()))
+        sku.title.toLowerCase().includes(searchQuery.toLowerCase())
       )) return false;
 
       return true;
@@ -238,7 +238,7 @@ export const SKUList = () => {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by SKU, FNSKU, or title..."
+              placeholder="Search by internal SKU, client SKU, or title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"

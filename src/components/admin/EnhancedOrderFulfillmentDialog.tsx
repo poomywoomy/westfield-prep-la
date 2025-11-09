@@ -45,11 +45,56 @@ export function EnhancedOrderFulfillmentDialog({
   const [loading, setLoading] = useState(false);
   const [fetchingRates, setFetchingRates] = useState(false);
   const [trackingNumber, setTrackingNumber] = useState("");
+  const [savedTemplate, setSavedTemplate] = useState<any>(null);
+  const [loadingTemplate, setLoadingTemplate] = useState(false);
 
   const lineItems = order?.line_items || [];
   const shippingAddress = order?.shipping_address;
 
   const canFetchRates = length && width && height && weight && packageType;
+
+  useEffect(() => {
+    const loadTemplate = async () => {
+      try {
+        setLoadingTemplate(true);
+        // Map order line item SKUs to internal IDs
+        const { data: skus } = await supabase
+          .from("skus")
+          .select("id, client_sku")
+          .eq("client_id", clientId);
+        const skuCombination = (lineItems || [])
+          .map((item: any) => {
+            const match = skus?.find((s: any) => s.client_sku === item.sku);
+            return match ? { sku_id: match.id, quantity: item.quantity } : null;
+          })
+          .filter(Boolean) as { sku_id: string; quantity: number }[];
+        if (skuCombination.length === 0) return;
+        const { data: template } = await supabase
+          .from("sku_package_templates")
+          .select("*")
+          .eq("client_id", clientId)
+          .eq("sku_combination", JSON.stringify(
+            skuCombination.sort((a, b) => a.sku_id.localeCompare(b.sku_id))
+          ))
+          .maybeSingle();
+        if (template) {
+          setSavedTemplate(template);
+          setPackageType(template.package_type);
+          setLength(String(template.length_in));
+          setWidth(String(template.width_in));
+          setHeight(String(template.height_in));
+          setWeight(String(template.weight_lbs));
+        }
+      } catch (e) {
+        console.error("Failed loading package template", e);
+      } finally {
+        setLoadingTemplate(false);
+      }
+    };
+    if (open && order && lineItems.length > 0) {
+      loadTemplate();
+    }
+  }, [open, order, clientId]);
 
   const fetchShippingRates = async () => {
     if (!canFetchRates) {
@@ -194,6 +239,58 @@ export function EnhancedOrderFulfillmentDialog({
         toast.info("Order fulfilled but no open bill found to add charges");
       }
 
+      // Save package template for future use
+      try {
+        const { data: skus } = await supabase
+          .from("skus")
+          .select("id, client_sku")
+          .eq("client_id", clientId);
+        const skuCombination = (lineItems || [])
+          .map((item: any) => {
+            const match = skus?.find((s: any) => s.client_sku === item.sku);
+            return match ? { sku_id: match.id, quantity: item.quantity } : null;
+          })
+          .filter(Boolean) as { sku_id: string; quantity: number }[];
+        if (skuCombination.length > 0) {
+          const { data: existing } = await supabase
+            .from("sku_package_templates")
+            .select("id, use_count")
+            .eq("client_id", clientId)
+            .eq("sku_combination", JSON.stringify(
+              skuCombination.sort((a, b) => a.sku_id.localeCompare(b.sku_id))
+            ))
+            .maybeSingle();
+          if (existing) {
+            await supabase
+              .from("sku_package_templates")
+              .update({
+                package_type: packageType,
+                length_in: parseFloat(length),
+                width_in: parseFloat(width),
+                height_in: parseFloat(height),
+                weight_lbs: parseFloat(weight),
+                use_count: (existing.use_count || 0) + 1,
+                last_used_at: new Date().toISOString(),
+              })
+              .eq("id", existing.id);
+          } else {
+            await supabase
+              .from("sku_package_templates")
+              .insert({
+                client_id: clientId,
+                sku_combination: skuCombination.sort((a, b) => a.sku_id.localeCompare(b.sku_id)),
+                package_type: packageType,
+                length_in: parseFloat(length),
+                width_in: parseFloat(width),
+                height_in: parseFloat(height),
+                weight_lbs: parseFloat(weight),
+              });
+          }
+        }
+      } catch (e) {
+        console.error("Failed saving package template", e);
+      }
+
       toast.success("Order fulfilled successfully");
       onSuccess();
       onOpenChange(false);
@@ -259,6 +356,13 @@ export function EnhancedOrderFulfillmentDialog({
           {/* Package Details */}
           <div className="space-y-4">
             <h3 className="font-semibold">Package Details</h3>
+
+            {savedTemplate && (
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm">
+                Using saved dimensions for this SKU combination (used {savedTemplate.use_count} times)
+              </div>
+            )}
+            
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

@@ -10,7 +10,7 @@ export const useSKUs = (clientId?: string) => {
     queryFn: async () => {
       let query = supabase
         .from("skus")
-        .select("id, client_id, client_sku, upc, fnsku, title, status, created_at")
+        .select("id, client_id, client_sku, internal_sku, upc, title, status, created_at")
         .order("created_at", { ascending: false })
         .limit(100);
       

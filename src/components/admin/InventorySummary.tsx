@@ -23,9 +23,9 @@ type Location = Database["public"]["Tables"]["locations"]["Row"];
 interface EnhancedInventoryRow {
   sku_id: string;
   client_id: string;
+  internal_sku: string;
   client_sku: string;
   title: string;
-  fnsku: string | null;
   company_name: string;
   location_id: string | null;
   location_name: string | null;
@@ -152,9 +152,9 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
       const enhanced = data?.map(item => ({
         sku_id: item.sku_id!,
         client_id: item.client_id!,
-        client_sku: item.client_sku || "",
+        internal_sku: (item as any).internal_sku || "",
+        client_sku: (item as any).client_sku || "",
         title: item.title || "",
-        fnsku: item.fnsku,
         company_name: (item.clients as any)?.company_name || "",
         location_id: item.location_id,
         location_name: item.location_name,
@@ -180,9 +180,9 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       return (
+        item.internal_sku.toLowerCase().includes(query) ||
         item.client_sku.toLowerCase().includes(query) ||
         item.title.toLowerCase().includes(query) ||
-        (item.fnsku && item.fnsku.toLowerCase().includes(query)) ||
         item.company_name.toLowerCase().includes(query)
       );
     }
@@ -237,12 +237,12 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
   };
 
   const exportToCSV = () => {
-    const headers = ["Client", "SKU", "Title", "FNSKU", "Location", "On Hand", "Reserved", "Available"];
+    const headers = ["Client", "Internal SKU", "Client SKU", "Title", "Location", "On Hand", "Reserved", "Available"];
     const rows = filteredInventory.map(item => [
       item.company_name,
+      item.internal_sku,
       item.client_sku,
       item.title,
-      item.fnsku || "",
       item.location_name || "",
       item.on_hand,
       item.reserved,
@@ -312,7 +312,7 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by SKU, FNSKU, title, or client..."
+              placeholder="Search by internal SKU, client SKU, title, or client..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -385,15 +385,13 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
                       <Badge variant="outline" className="w-fit mb-1 text-xs">
                         {item.company_name}
                       </Badge>
-                      <span className="font-medium">{item.client_sku}</span>
+                      <span className="font-medium">{item.internal_sku}</span>
+                      <span className="text-xs text-muted-foreground">Client: {item.client_sku}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-medium">{item.title}</span>
-                      {item.fnsku && (
-                        <span className="text-xs text-muted-foreground">FNSKU: {item.fnsku}</span>
-                      )}
                     </div>
                   </TableCell>
                   <TableCell>{item.location_name || "-"}</TableCell>

@@ -55,6 +55,7 @@ export const QuickAddSKUModal = ({ open, onOpenChange, clientId, onSuccess }: Qu
         .insert({
           client_id: validated.client_id,
           client_sku: validated.client_sku,
+          internal_sku: validated.client_sku,
           title: validated.title,
           status: "active",
         })
