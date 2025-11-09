@@ -45,14 +45,17 @@ verify_jwt = true
 [functions.shopify-buy-label]
 verify_jwt = true
 
-[functions.shopify-auto-sync]
-verify_jwt = false
-
-[[functions.shopify-auto-sync.schedule]]
-cron = "*/5 * * * *"
-
 [functions.shopify-get-shipping-rates]
 verify_jwt = true
 
 [functions.shopify-push-inventory-single]
+verify_jwt = true
+
+[functions.shopify-process-return]
+verify_jwt = true
+
+[functions.shopify-comprehensive-sync]
 verify_jwt = false
+
+[[functions.shopify-comprehensive-sync.schedule]]
+cron = "*/5 * * * *"

@@ -1,15 +1,62 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
-import { guardedShopifyREST } from '../_shared/shopify-rest-guard.ts';
+import { shopifyGraphQL } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const APPROVE_RETURN_MUTATION = `
+  mutation returnApproveRequest($id: ID!) {
+    returnApproveRequest(input: { id: $id }) {
+      return {
+        id
+        status
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+const DECLINE_RETURN_MUTATION = `
+  mutation returnDeclineRequest($id: ID!, $declineReason: ReturnDeclineReason) {
+    returnDeclineRequest(input: { 
+      id: $id,
+      declineReason: $declineReason
+    }) {
+      return {
+        id
+        status
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+const CLOSE_RETURN_MUTATION = `
+  mutation returnClose($id: ID!) {
+    returnClose(input: { id: $id }) {
+      return {
+        id
+        status
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
 /**
- * Process Shopify return actions
- * Note: Returns API has limited GraphQL support. Using REST with guard to prevent
- * deprecated products/variants endpoints. All REST calls are logged for monitoring.
+ * Process Shopify return actions using GraphQL
+ * All operations use GraphQL mutations - zero REST API calls
  */
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -42,30 +89,55 @@ Deno.serve(async (req) => {
 
     if (!store) throw new Error('Store not found');
 
-    // Construct endpoint based on action
-    const endpoint = action === 'approve' 
-      ? `/returns/${return_id}/approve.json`
-      : action === 'decline'
-      ? `/returns/${return_id}/decline.json`
-      : `/returns/${return_id}/mark_as_received.json`;
+    // Convert to Shopify GID format
+    const returnGid = `gid://shopify/Return/${return_id}`;
 
-    // Use guarded REST call - blocks products/variants endpoints
-    const response = await guardedShopifyREST(
-      store.shop_domain,
-      store.access_token,
-      endpoint,
-      { method: 'POST' }
-    );
+    // Execute GraphQL mutation based on action
+    let mutationResult;
+    let mutationKey;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to update return status: ${errorText}`);
+    if (action === 'approve') {
+      mutationResult = await shopifyGraphQL(
+        store.shop_domain,
+        store.access_token,
+        APPROVE_RETURN_MUTATION,
+        { id: returnGid }
+      );
+      mutationKey = 'returnApproveRequest';
+    } else if (action === 'decline') {
+      mutationResult = await shopifyGraphQL(
+        store.shop_domain,
+        store.access_token,
+        DECLINE_RETURN_MUTATION,
+        { id: returnGid, declineReason: 'OTHER' }
+      );
+      mutationKey = 'returnDeclineRequest';
+    } else if (action === 'mark_as_received' || action === 'mark_received') {
+      mutationResult = await shopifyGraphQL(
+        store.shop_domain,
+        store.access_token,
+        CLOSE_RETURN_MUTATION,
+        { id: returnGid }
+      );
+      mutationKey = 'returnClose';
+    } else {
+      throw new Error(`Invalid action: ${action}`);
     }
 
-    console.log(`Return ${return_id} ${action} for client ${client_id}`);
+    // Check for GraphQL userErrors
+    if (mutationResult[mutationKey]?.userErrors?.length > 0) {
+      const errors = mutationResult[mutationKey].userErrors.map((e: any) => e.message).join(', ');
+      throw new Error(`Shopify GraphQL error: ${errors}`);
+    }
+
+    console.log(`Return ${return_id} ${action} completed via GraphQL for client ${client_id}`);
 
     return new Response(
-      JSON.stringify({ success: true, action }),
+      JSON.stringify({ 
+        success: true, 
+        action,
+        status: mutationResult[mutationKey]?.return?.status 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
   } catch (error) {

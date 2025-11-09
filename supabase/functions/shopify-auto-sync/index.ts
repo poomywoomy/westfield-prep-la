@@ -228,6 +228,43 @@ Deno.serve(async (req) => {
 
         const totalSynced = skusToInsert.length + skusToUpdate.length;
 
+        // After upserting SKUs, create sku_aliases for inventory mapping
+        const aliasesToInsert = [];
+        for (const product of products) {
+          for (const variant of product.variants) {
+            const clientSku = variant.sku || `SHOP-${product.id}-${variant.id}`;
+            
+            // Find the sku_id
+            const { data: skuRecord } = await supabase
+              .from('skus')
+              .select('id')
+              .eq('client_id', config.client_id)
+              .eq('client_sku', clientSku)
+              .single();
+
+            if (skuRecord) {
+              aliasesToInsert.push({
+                sku_id: skuRecord.id,
+                alias_type: 'shopify_inventory_item_id',
+                alias_value: variant.inventory_item_id.toString(),
+              });
+            }
+          }
+        }
+
+        // Upsert aliases
+        if (aliasesToInsert.length > 0) {
+          const { error: aliasError } = await supabase
+            .from('sku_aliases')
+            .upsert(aliasesToInsert, {
+              onConflict: 'sku_id,alias_type',
+            });
+
+          if (aliasError) {
+            console.error('Error upserting sku_aliases:', aliasError);
+          }
+        }
+
         const duration = Date.now() - startTime;
 
         // Calculate next sync time
