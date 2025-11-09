@@ -426,18 +426,34 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
       if (skuIdsToSync.length > 0) {
         console.log(`Syncing ${skuIdsToSync.length} SKUs to Shopify...`);
         
-        // Fire-and-forget parallel sync calls
-        Promise.all(
-          skuIdsToSync.map(skuId =>
-            supabase.functions
-              .invoke('shopify-push-inventory-single', {
-                body: { client_id: asn!.client_id, sku_id: skuId }
-              })
-              .catch(err => console.error(`Shopify sync failed for SKU ${skuId}:`, err))
-          )
-        ).then(() => {
+        const syncResults = await Promise.all(
+          skuIdsToSync.map(async (skuId) => {
+            const { data, error } = await supabase.functions.invoke(
+              'shopify-push-inventory-single',
+              { body: { client_id: asn!.client_id, sku_id: skuId } }
+            );
+            
+            if (error) {
+              console.error(`Shopify sync error for SKU ${skuId}:`, error);
+              return { skuId, success: false, error: error.message };
+            } else if (data?.success === false) {
+              console.warn(`Shopify sync incomplete for SKU ${skuId}:`, data.message);
+              return { skuId, success: false, message: data.message };
+            }
+            return { skuId, success: true };
+          })
+        );
+
+        const failedSyncs = syncResults.filter(r => !r.success);
+        if (failedSyncs.length > 0) {
+          toast({
+            variant: 'default',
+            title: 'Some Shopify syncs failed',
+            description: `${failedSyncs.length} of ${skuIdsToSync.length} SKUs failed to sync to Shopify`
+          });
+        } else {
           console.log('✓ Shopify inventory sync completed');
-        });
+        }
       }
 
       // Create damaged_item_decisions for discrepancies

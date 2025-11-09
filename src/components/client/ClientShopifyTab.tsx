@@ -174,10 +174,19 @@ export default function ClientShopifyTab() {
 
       if (error) throw error;
 
-      toast({
-        title: "Sync complete",
-        description: `Successfully synced ${data.synced_count} products.`,
-      });
+      if (data?.seedErrors && data.seedErrors.length > 0) {
+        toast({
+          title: "Sync completed with warnings",
+          description: `Synced ${data.synced} products. ${data.seedErrors.length} inventory seeds had issues. Check logs for details.`,
+          variant: "default",
+        });
+        console.warn('Seed errors:', data.seedErrors);
+      } else {
+        toast({
+          title: "Sync complete",
+          description: `Successfully synced ${data.synced} products${data.seeded ? ` and seeded ${data.seeded} inventory records` : ''}.`,
+        });
+      }
 
       fetchStoreData();
     } catch (error) {
@@ -202,7 +211,29 @@ export default function ClientShopifyTab() {
       if (field === 'auto_sync_enabled' && value === true) {
         const now = new Date();
         let nextSync = new Date(now);
-        switch (syncConfig.sync_frequency) {
+        const freq = syncConfig.sync_frequency || '5min';
+        switch (freq) {
+          case '5min':
+            nextSync.setMinutes(now.getMinutes() + 5);
+            break;
+          case 'hourly':
+            nextSync.setHours(now.getHours() + 1);
+            break;
+          case 'daily':
+            nextSync.setDate(now.getDate() + 1);
+            break;
+          case 'weekly':
+            nextSync.setDate(now.getDate() + 7);
+            break;
+        }
+        updates.next_sync_at = nextSync.toISOString();
+      } else if (field === 'sync_frequency' && syncConfig.auto_sync_enabled) {
+        const now = new Date();
+        let nextSync = new Date(now);
+        switch (value) {
+          case '5min':
+            nextSync.setMinutes(now.getMinutes() + 5);
+            break;
           case 'hourly':
             nextSync.setHours(now.getHours() + 1);
             break;
@@ -386,6 +417,7 @@ export default function ClientShopifyTab() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="5min">Every 5 minutes</SelectItem>
                       <SelectItem value="hourly">Every Hour</SelectItem>
                       <SelectItem value="daily">Daily</SelectItem>
                       <SelectItem value="weekly">Weekly</SelectItem>

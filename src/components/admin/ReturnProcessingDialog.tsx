@@ -157,12 +157,27 @@ export const ReturnProcessingDialog = ({
           notes: "Return processed - good condition",
         });
 
-        // Sync to Shopify immediately (fire-and-forget)
-        supabase.functions
-          .invoke('shopify-push-inventory-single', {
-            body: { client_id: clientId, sku_id: skuId }
-          })
-          .catch(err => console.error('Shopify sync failed:', err));
+        // Sync to Shopify immediately with error handling
+        const { data: syncData, error: syncError } = await supabase.functions.invoke(
+          'shopify-push-inventory-single',
+          { body: { client_id: clientId, sku_id: skuId } }
+        );
+        
+        if (syncError) {
+          console.error('Shopify sync error:', syncError);
+          toast({
+            variant: 'destructive',
+            title: 'Shopify sync failed',
+            description: syncError.message || 'Failed to update Shopify inventory'
+          });
+        } else if (syncData?.success === false) {
+          console.warn('Shopify sync incomplete:', syncData.message);
+          toast({
+            variant: 'default',
+            title: 'Shopify not updated',
+            description: syncData.message || 'SKU not mapped to Shopify'
+          });
+        }
       }
 
       // Process damaged units

@@ -194,28 +194,64 @@ Deno.serve(async (req) => {
 
     const validatedProducts = productsValidation.data;
 
-    // Sync products to skus table using service client
-    const skusToInsert = validatedProducts.flatMap((product) => 
-      product.variants.map((variant) => ({
-        client_id: targetClientId,
-        client_sku: variant.sku || `SHOP-${product.id}-${variant.id}`,
-        title: `${product.title}${variant.title !== 'Default Title' ? ` - ${variant.title}` : ''}`,
-        unit_cost: variant.price,
-        notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}, Inventory Item ID: ${variant.inventory_item_id}`,
-        status: 'active',
-      }))
-    );
-
-    // Upsert SKUs using service client
-    const { error: skuError } = await serviceClient
+    // Get existing SKUs to determine inserts vs updates
+    const { data: existingSkus } = await serviceClient
       .from('skus')
-      .upsert(skusToInsert, {
-        onConflict: 'client_id,client_sku',
-      });
+      .select('client_sku, internal_sku')
+      .eq('client_id', targetClientId);
 
-    if (skuError) {
-      throw skuError;
+    const existingSkuMap = new Map(existingSkus?.map(s => [s.client_sku, s.internal_sku]) || []);
+
+    // Split into inserts (need internal_sku) and updates (preserve internal_sku)
+    const skusToInsert = [];
+    const skusToUpdate = [];
+
+    for (const product of validatedProducts) {
+      for (const variant of product.variants) {
+        const clientSku = variant.sku || `SHOP-${product.id}-${variant.id}`;
+        const title = `${product.title}${variant.title !== 'Default Title' ? ` - ${variant.title}` : ''}`;
+        const skuData = {
+          client_id: targetClientId,
+          client_sku: clientSku,
+          title,
+          unit_cost: variant.price,
+          notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}, Inventory Item ID: ${variant.inventory_item_id}`,
+          status: 'active' as const,
+        };
+
+        if (existingSkuMap.has(clientSku)) {
+          // Existing SKU - update only title, cost, notes, status (NOT internal_sku)
+          skusToUpdate.push(skuData);
+        } else {
+          // New SKU - include internal_sku
+          skusToInsert.push({
+            ...skuData,
+            internal_sku: variant.sku || `SHOP-${product.id}-${variant.id}`,
+          });
+        }
+      }
     }
+
+    // Insert new SKUs with internal_sku
+    if (skusToInsert.length > 0) {
+      const { error: insertError } = await serviceClient
+        .from('skus')
+        .insert(skusToInsert);
+      if (insertError) throw insertError;
+    }
+
+    // Update existing SKUs without touching internal_sku
+    if (skusToUpdate.length > 0) {
+      const { error: updateError } = await serviceClient
+        .from('skus')
+        .upsert(skusToUpdate, {
+          onConflict: 'client_id,client_sku',
+          ignoreDuplicates: false,
+        });
+      if (updateError) throw updateError;
+    }
+
+    const totalSynced = skusToInsert.length + skusToUpdate.length;
 
     // After upserting SKUs, map inventory_item_id to sku_id via sku_aliases
     const aliasesToInsert = [];
@@ -374,7 +410,7 @@ Deno.serve(async (req) => {
         .from('sync_logs')
         .update({
           status: 'success',
-          products_synced: skusToInsert.length,
+          products_synced: totalSynced,
           duration_ms: durationMs,
           error_message: seedErrors.length > 0 ? JSON.stringify(seedErrors) : null,
         })
@@ -384,9 +420,9 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        synced: skusToInsert.length,
+        synced: totalSynced,
         seeded: seededCount,
-        message: `Successfully synced ${skusToInsert.length} products from Shopify${seededCount > 0 ? ` and seeded ${seededCount} inventory records` : ''}`,
+        message: `Successfully synced ${totalSynced} products from Shopify${seededCount > 0 ? ` and seeded ${seededCount} inventory records` : ''}`,
         seedErrors: seedErrors.length > 0 ? seedErrors : undefined
       }),
       { 

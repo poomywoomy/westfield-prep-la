@@ -10,7 +10,7 @@ interface SyncConfig {
   id: string;
   client_id: string;
   auto_sync_enabled: boolean;
-  sync_frequency: 'hourly' | 'daily' | 'weekly';
+  sync_frequency: '5min' | 'hourly' | 'daily' | 'weekly';
   next_sync_at: string | null;
 }
 
@@ -169,27 +169,64 @@ Deno.serve(async (req) => {
           store.access_token
         );
 
-        // Process and upsert products to skus table
-        const productData = products.flatMap((product: any) =>
-          product.variants.map((variant: any) => ({
-            client_id: config.client_id,
-            client_sku: variant.sku || `SHOP-${product.id}-${variant.id}`,
-            title: variant.title !== 'Default Title' 
-              ? `${product.title} - ${variant.title}`
-              : product.title,
-            unit_cost: parseFloat(variant.price) || 0,
-            notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}`,
-            status: 'active',
-          }))
-        );
-
-        const { error: upsertError } = await supabase
+        // Get existing SKUs to determine inserts vs updates
+        const { data: existingSkus } = await supabase
           .from('skus')
-          .upsert(productData, { onConflict: 'client_id,client_sku' });
+          .select('client_sku, internal_sku')
+          .eq('client_id', config.client_id);
 
-        if (upsertError) {
-          throw upsertError;
+        const existingSkuMap = new Map(existingSkus?.map(s => [s.client_sku, s.internal_sku]) || []);
+
+        // Split into inserts and updates
+        const skusToInsert = [];
+        const skusToUpdate = [];
+
+        for (const product of products) {
+          for (const variant of product.variants) {
+            const clientSku = variant.sku || `SHOP-${product.id}-${variant.id}`;
+            const title = variant.title !== 'Default Title' 
+              ? `${product.title} - ${variant.title}`
+              : product.title;
+            const skuData = {
+              client_id: config.client_id,
+              client_sku: clientSku,
+              title,
+              unit_cost: parseFloat(variant.price) || 0,
+              notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}`,
+              status: 'active' as const,
+            };
+
+            if (existingSkuMap.has(clientSku)) {
+              skusToUpdate.push(skuData);
+            } else {
+              skusToInsert.push({
+                ...skuData,
+                internal_sku: variant.sku || `SHOP-${product.id}-${variant.id}`,
+              });
+            }
+          }
         }
+
+        // Insert new SKUs
+        if (skusToInsert.length > 0) {
+          const { error: insertError } = await supabase
+            .from('skus')
+            .insert(skusToInsert);
+          if (insertError) throw insertError;
+        }
+
+        // Update existing SKUs
+        if (skusToUpdate.length > 0) {
+          const { error: updateError } = await supabase
+            .from('skus')
+            .upsert(skusToUpdate, {
+              onConflict: 'client_id,client_sku',
+              ignoreDuplicates: false,
+            });
+          if (updateError) throw updateError;
+        }
+
+        const totalSynced = skusToInsert.length + skusToUpdate.length;
 
         const duration = Date.now() - startTime;
 
@@ -197,6 +234,9 @@ Deno.serve(async (req) => {
         const now = new Date();
         let nextSync = new Date(now);
         switch (config.sync_frequency) {
+          case '5min':
+            nextSync.setMinutes(now.getMinutes() + 5);
+            break;
           case 'hourly':
             nextSync.setHours(now.getHours() + 1);
             break;
@@ -215,7 +255,7 @@ Deno.serve(async (req) => {
             last_sync_at: new Date().toISOString(),
             next_sync_at: nextSync.toISOString(),
             last_sync_status: 'success',
-            last_sync_product_count: productData.length,
+            last_sync_product_count: totalSynced,
           })
           .eq('id', config.id);
 
@@ -224,7 +264,7 @@ Deno.serve(async (req) => {
             .from('sync_logs')
             .update({
               status: 'success',
-              products_synced: productData.length,
+              products_synced: totalSynced,
               duration_ms: duration,
               completed_at: new Date().toISOString(),
             })
@@ -234,10 +274,10 @@ Deno.serve(async (req) => {
         results.push({
           client_id: config.client_id,
           success: true,
-          products: productData.length,
+          products: totalSynced,
         });
 
-        console.log(`Successfully synced ${productData.length} products for client ${config.client_id}`);
+        console.log(`Successfully synced ${totalSynced} products for client ${config.client_id}`);
       } catch (error) {
         console.error(`Error syncing client ${config.client_id}:`, error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';

@@ -169,12 +169,27 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
 
       if (error) throw error;
 
-      // Sync to Shopify immediately (fire-and-forget)
-      supabase.functions
-        .invoke('shopify-push-inventory-single', {
-          body: { client_id: validated.client_id, sku_id: validated.sku_id }
-        })
-        .catch(err => console.error('Shopify sync failed:', err));
+      // Sync to Shopify immediately with error handling
+      const { data: syncData, error: syncError } = await supabase.functions.invoke(
+        'shopify-push-inventory-single',
+        { body: { client_id: validated.client_id, sku_id: validated.sku_id } }
+      );
+      
+      if (syncError) {
+        console.error('Shopify sync error:', syncError);
+        toast({
+          variant: 'destructive',
+          title: 'Shopify sync failed',
+          description: syncError.message || 'Failed to update Shopify inventory'
+        });
+      } else if (syncData?.success === false) {
+        console.warn('Shopify sync incomplete:', syncData.message);
+        toast({
+          variant: 'default',
+          title: 'Shopify not updated',
+          description: syncData.message || 'SKU not mapped to Shopify'
+        });
+      }
 
       // Handle damaged return workflow
       if (validated.reason_code === 'return' && validated.mark_as_damaged && ledgerData) {
@@ -344,19 +359,36 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
       const { error } = await supabase.from("inventory_ledger").insert(entries);
       if (error) throw error;
 
-      // Sync all unique SKUs to Shopify in parallel (fire-and-forget)
+      // Sync all unique SKUs to Shopify in parallel with error handling
       const uniqueSkus = [...new Set(batchItems.map(item => item.sku_id))];
       console.log(`Syncing ${uniqueSkus.length} SKUs to Shopify...`);
       
-      Promise.all(
-        uniqueSkus.map(skuId =>
-          supabase.functions
-            .invoke('shopify-push-inventory-single', {
-              body: { client_id: formData.client_id, sku_id: skuId }
-            })
-            .catch(err => console.error(`Shopify sync failed for SKU ${skuId}:`, err))
-        )
-      ).then(() => console.log('✓ Shopify batch sync completed'));
+      const syncResults = await Promise.all(
+        uniqueSkus.map(async (skuId) => {
+          const { data, error } = await supabase.functions.invoke(
+            'shopify-push-inventory-single',
+            { body: { client_id: formData.client_id, sku_id: skuId } }
+          );
+          
+          if (error) {
+            console.error(`Shopify sync error for SKU ${skuId}:`, error);
+            return { skuId, success: false, error: error.message };
+          } else if (data?.success === false) {
+            console.warn(`Shopify sync incomplete for SKU ${skuId}:`, data.message);
+            return { skuId, success: false, message: data.message };
+          }
+          return { skuId, success: true };
+        })
+      );
+
+      const failedSyncs = syncResults.filter(r => !r.success);
+      if (failedSyncs.length > 0) {
+        toast({
+          variant: 'default',
+          title: 'Some Shopify syncs failed',
+          description: `${failedSyncs.length} of ${uniqueSkus.length} SKUs failed to sync to Shopify`
+        });
+      }
 
       toast({ title: "Batch complete", description: `${batchItems.length} adjustments recorded` });
       setBatchItems([]);
