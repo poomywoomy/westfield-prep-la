@@ -156,6 +156,13 @@ export const ReturnProcessingDialog = ({
           user_id: userId,
           notes: "Return processed - good condition",
         });
+
+        // Sync to Shopify immediately (fire-and-forget)
+        supabase.functions
+          .invoke('shopify-push-inventory-single', {
+            body: { client_id: clientId, sku_id: skuId }
+          })
+          .catch(err => console.error('Shopify sync failed:', err));
       }
 
       // Process damaged units
@@ -214,7 +221,7 @@ export const ReturnProcessingDialog = ({
 
       toast({
         title: "Success",
-        description: "Return processed successfully",
+        description: "Return processed successfully. Syncing inventory to Shopify...",
       });
 
       onSuccess?.();

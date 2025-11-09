@@ -416,8 +416,32 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
             if (ledgerError) throw ledgerError;
           }
         }
+      }
 
-        // Create damaged_item_decisions for discrepancies
+      // Sync inventory to Shopify for all SKUs that were updated
+      const skuIdsToSync = lines
+        .filter(line => line.normal_units > 0 || line.received_units > 0)
+        .map(line => line.sku.id);
+
+      if (skuIdsToSync.length > 0) {
+        console.log(`Syncing ${skuIdsToSync.length} SKUs to Shopify...`);
+        
+        // Fire-and-forget parallel sync calls
+        Promise.all(
+          skuIdsToSync.map(skuId =>
+            supabase.functions
+              .invoke('shopify-push-inventory-single', {
+                body: { client_id: asn!.client_id, sku_id: skuId }
+              })
+              .catch(err => console.error(`Shopify sync failed for SKU ${skuId}:`, err))
+          )
+        ).then(() => {
+          console.log('✓ Shopify inventory sync completed');
+        });
+      }
+
+      // Create damaged_item_decisions for discrepancies
+      for (const line of lines) {
         if (line.damaged_units > 0) {
           await supabase.from("damaged_item_decisions").insert({
             client_id: asn!.client_id,
@@ -493,7 +517,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
           ? "ASN marked as issue - discrepancies require client review"
           : newStatus === "receiving"
           ? "Receiving paused - complete breakdown to finish"
-          : "ASN successfully received",
+          : "ASN successfully received. Syncing inventory to Shopify...",
       });
 
       onSuccess();

@@ -53,3 +53,6 @@ cron = "0 * * * *"
 
 [functions.shopify-get-shipping-rates]
 verify_jwt = true
+
+[functions.shopify-push-inventory-single]
+verify_jwt = false

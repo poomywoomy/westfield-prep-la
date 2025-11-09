@@ -169,6 +169,13 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
 
       if (error) throw error;
 
+      // Sync to Shopify immediately (fire-and-forget)
+      supabase.functions
+        .invoke('shopify-push-inventory-single', {
+          body: { client_id: validated.client_id, sku_id: validated.sku_id }
+        })
+        .catch(err => console.error('Shopify sync failed:', err));
+
       // Handle damaged return workflow
       if (validated.reason_code === 'return' && validated.mark_as_damaged && ledgerData) {
         // Get client info for ASN number
@@ -336,6 +343,20 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
 
       const { error } = await supabase.from("inventory_ledger").insert(entries);
       if (error) throw error;
+
+      // Sync all unique SKUs to Shopify in parallel (fire-and-forget)
+      const uniqueSkus = [...new Set(batchItems.map(item => item.sku_id))];
+      console.log(`Syncing ${uniqueSkus.length} SKUs to Shopify...`);
+      
+      Promise.all(
+        uniqueSkus.map(skuId =>
+          supabase.functions
+            .invoke('shopify-push-inventory-single', {
+              body: { client_id: formData.client_id, sku_id: skuId }
+            })
+            .catch(err => console.error(`Shopify sync failed for SKU ${skuId}:`, err))
+        )
+      ).then(() => console.log('✓ Shopify batch sync completed'));
 
       toast({ title: "Batch complete", description: `${batchItems.length} adjustments recorded` });
       setBatchItems([]);
