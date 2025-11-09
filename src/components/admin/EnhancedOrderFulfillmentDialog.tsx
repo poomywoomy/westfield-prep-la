@@ -162,7 +162,7 @@ export function EnhancedOrderFulfillmentDialog({
         // Find matching SKU by variant_id or sku
         const { data: skus } = await supabase
           .from("skus")
-          .select("id")
+          .select("id, client_sku")
           .eq("client_id", clientId);
 
         const sku = skus?.find((s: any) => 
@@ -193,6 +193,18 @@ export function EnhancedOrderFulfillmentDialog({
             
             if (ledgerError) {
               console.error("Inventory ledger error:", ledgerError);
+            }
+
+            // Push to Shopify with error handling
+            const { data: pushData, error: pushError } = await supabase.functions.invoke(
+              'shopify-push-inventory-single',
+              { body: { client_id: clientId, sku_id: sku.id } }
+            );
+
+            if (pushError) {
+              toast.error(`Shopify sync failed for ${sku.client_sku}: ${pushError.message}`);
+            } else if (pushData?.success === false) {
+              toast.error(`Shopify not updated for ${sku.client_sku}: ${pushData.message || 'Unknown reason'}`);
             }
           }
         }

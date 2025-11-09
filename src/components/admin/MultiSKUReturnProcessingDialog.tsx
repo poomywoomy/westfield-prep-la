@@ -158,6 +158,26 @@ export const MultiSKUReturnProcessingDialog = ({
             source_ref: returnData.id,
             notes: `Return #${returnData.shopify_return_id.slice(-8)} - ${row.client_sku}`,
           });
+
+          // Push to Shopify with error handling
+          const { data: pushData, error: pushError } = await supabase.functions.invoke(
+            'shopify-push-inventory-single',
+            { body: { client_id: returnData.client_id, sku_id: row.sku_id } }
+          );
+
+          if (pushError) {
+            toast({
+              title: "Shopify sync failed",
+              description: `${row.client_sku}: ${pushError.message}`,
+              variant: "destructive",
+            });
+          } else if (pushData?.success === false) {
+            toast({
+              title: "Shopify not updated",
+              description: `${row.client_sku}: ${pushData.message || 'Unknown reason'}`,
+              variant: "destructive",
+            });
+          }
         }
 
         // Damaged units

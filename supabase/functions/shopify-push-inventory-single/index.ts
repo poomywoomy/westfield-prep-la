@@ -18,7 +18,9 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { client_id, sku_id } = await req.json();
+    // Parse request body once at the top
+    const body = await req.json();
+    const { client_id, sku_id } = body;
 
     if (!client_id || !sku_id) {
       throw new Error('Missing required parameters: client_id and sku_id');
@@ -47,11 +49,52 @@ Deno.serve(async (req) => {
       .eq('id', client_id)
       .single();
 
-    if (!client?.shopify_location_id) {
-      throw new Error('Client missing Shopify location ID');
-    }
+    let locationId = client?.shopify_location_id;
 
-    const locationId = client.shopify_location_id;
+    // Auto-fetch and store location if missing
+    if (!locationId) {
+      console.log(`Fetching Shopify location for client ${client_id}...`);
+      
+      const locationsQuery = `
+        query {
+          locations(first: 10) {
+            edges {
+              node {
+                id
+                name
+                isActive
+                fulfillsOnlineOrders
+              }
+            }
+          }
+        }
+      `;
+
+      const locationsData = await shopifyGraphQL(
+        store.shop_domain,
+        store.access_token,
+        locationsQuery
+      );
+
+      const activeLocation = locationsData.locations.edges.find(
+        (edge: any) => edge.node.isActive && edge.node.fulfillsOnlineOrders
+      )?.node || locationsData.locations.edges[0]?.node;
+
+      if (!activeLocation) {
+        throw new Error('No Shopify location found for this store');
+      }
+
+      // Extract numeric ID from GID
+      locationId = activeLocation.id.split('/').pop();
+
+      // Save to clients table
+      await supabase
+        .from('clients')
+        .update({ shopify_location_id: locationId })
+        .eq('id', client_id);
+
+      console.log(`✓ Saved Shopify location ${locationId} for client ${client_id}`);
+    }
 
     // Get SKU info
     const { data: sku } = await supabase
@@ -153,16 +196,18 @@ Deno.serve(async (req) => {
     const durationMs = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-    // Try to log error
+    // Try to log error (avoid double JSON parsing)
     try {
-      const { client_id, sku_id } = await req.json();
       const supabase = createClient(
         Deno.env.get('SUPABASE_URL')!,
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
       );
       
+      // Use body from outer try block if available
+      const bodyForLog = req.bodyUsed ? {} : await req.json().catch(() => ({}));
+      
       await supabase.from('sync_logs').insert({
-        client_id,
+        client_id: bodyForLog.client_id || null,
         sync_type: 'inventory_push_single',
         status: 'failed',
         products_synced: 0,

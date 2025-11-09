@@ -393,12 +393,19 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
 
         await supabase.from("inventory_ledger").insert(ledgerEntries);
 
-        // Trigger Shopify sync
-        const syncPromises = skus.map(sku =>
-          supabase.functions.invoke("shopify-push-inventory-single", {
-            body: { client_id: selectedClient, sku_id: sku.sku_id }
-          }).catch(err => console.error("Shopify sync error:", err))
-        );
+        // Push inventory updates to Shopify with error handling
+        const syncPromises = skus.map(async (sku) => {
+          const { data: pushData, error: pushError } = await supabase.functions.invoke(
+            "shopify-push-inventory-single",
+            { body: { client_id: selectedClient, sku_id: sku.sku_id } }
+          );
+
+          if (pushError) {
+            toast.error(`Shopify sync failed for ${sku.client_sku}: ${pushError.message}`);
+          } else if (pushData?.success === false) {
+            toast.error(`Shopify not updated for ${sku.client_sku}: ${pushData.message || 'Unknown reason'}`);
+          }
+        });
 
         await Promise.all(syncPromises);
       }
