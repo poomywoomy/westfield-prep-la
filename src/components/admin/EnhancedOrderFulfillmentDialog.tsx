@@ -157,7 +157,7 @@ export function EnhancedOrderFulfillmentDialog({
 
       if (orderError) throw orderError;
 
-      // 2. Deduct inventory for each line item
+      // 2. Deduct inventory for each line item (only if not already decremented by webhook)
       for (const item of lineItems) {
         // Find matching SKU by variant_id or sku
         const { data: skus } = await supabase
@@ -170,6 +170,18 @@ export function EnhancedOrderFulfillmentDialog({
         );
 
         if (sku) {
+          // Check if webhook already decremented this item
+          const ledgerCheck = await (supabase as any)
+            .from("inventory_ledger")
+            .select("id")
+            .eq("sku_id", sku.id)
+            .eq("source_type", "shopify_order")
+            .eq("source_id", order.shopify_order_id)
+            .limit(1)
+            .maybeSingle();
+          
+          const existingDecrement = ledgerCheck.data;
+
           // Get primary location
           const { data: location } = await supabase
             .from("locations")
@@ -179,20 +191,24 @@ export function EnhancedOrderFulfillmentDialog({
             .single();
 
           if (location) {
-            // Create inventory ledger entry
-            const { error: ledgerError } = await supabase.from("inventory_ledger").insert([{
-              client_id: clientId,
-              sku_id: sku.id,
-              location_id: location.id,
-              qty_delta: -item.quantity,
-              transaction_type: "OUTBOUND" as any,
-              source_type: "shopify_fulfillment",
-              shopify_order_id: order.shopify_order_id,
-              notes: `Fulfilled order #${order.order_number}`,
-            }]);
-            
-            if (ledgerError) {
-              console.error("Inventory ledger error:", ledgerError);
+            // Only decrement if webhook hasn't already done it
+            if (!existingDecrement) {
+              const { error: ledgerError } = await supabase.from("inventory_ledger").insert([{
+                client_id: clientId,
+                sku_id: sku.id,
+                location_id: location.id,
+                qty_delta: -item.quantity,
+                transaction_type: "OUTBOUND" as any,
+                source_type: "shopify_fulfillment",
+                shopify_order_id: order.shopify_order_id,
+                notes: `Fulfilled order #${order.order_number}`,
+              }]);
+              
+              if (ledgerError) {
+                console.error("Inventory ledger error:", ledgerError);
+              }
+            } else {
+              console.log(`Skipping inventory decrement for ${sku.client_sku} - already decremented by webhook`);
             }
 
             // Push to Shopify with error handling

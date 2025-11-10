@@ -238,6 +238,98 @@ async function handleOrderWebhook(
   await supabase
     .from('shopify_orders')
     .upsert(orderData, { onConflict: 'client_id,shopify_order_id' });
+
+  // CRITICAL: Auto-decrement inventory when order is created/paid
+  // This keeps app inventory in sync with Shopify's automatic decrements
+  if (topic === 'orders/create' || topic === 'orders/paid') {
+    await decrementInventoryForOrder(supabase, clientId, order);
+  }
+}
+
+async function decrementInventoryForOrder(
+  supabase: any,
+  clientId: string,
+  order: any
+) {
+  console.log(`Attempting to decrement inventory for order ${order.id}`);
+  
+  // Check if we've already processed this order's inventory
+  const { data: existingEntries } = await supabase
+    .from('inventory_ledger')
+    .select('id')
+    .eq('source_type', 'shopify_order')
+    .eq('source_id', order.id.toString())
+    .limit(1);
+
+  if (existingEntries && existingEntries.length > 0) {
+    console.log(`Inventory already decremented for order ${order.id}`);
+    return;
+  }
+
+  // Get main location for this client
+  const { data: location } = await supabase
+    .from('locations')
+    .select('id')
+    .eq('client_id', clientId)
+    .eq('name', 'MAIN')
+    .single();
+
+  if (!location) {
+    console.error(`No MAIN location found for client ${clientId}`);
+    return;
+  }
+
+  // Process each line item
+  const ledgerEntries = [];
+  
+  for (const lineItem of order.line_items) {
+    if (!lineItem.variant_id) {
+      console.warn(`No variant_id for line item in order ${order.id}`);
+      continue;
+    }
+
+    // Look up app SKU ID from Shopify variant ID via sku_aliases
+    const { data: alias } = await supabase
+      .from('sku_aliases')
+      .select('sku_id')
+      .eq('client_id', clientId)
+      .eq('alias_type', 'shopify_variant_id')
+      .eq('alias_value', lineItem.variant_id.toString())
+      .single();
+
+    if (!alias) {
+      console.warn(`No SKU mapping found for variant ${lineItem.variant_id} in order ${order.id}`);
+      continue;
+    }
+
+    // Create ledger entry to decrement inventory
+    ledgerEntries.push({
+      client_id: clientId,
+      sku_id: alias.sku_id,
+      location_id: location.id,
+      qty_delta: -lineItem.quantity, // Negative = decrement
+      transaction_type: 'SALE_DECREMENT',
+      source_type: 'shopify_order',
+      source_id: order.id.toString(),
+      notes: `Shopify order ${order.name} - ${lineItem.title}`,
+      user_id: null, // System-generated
+    });
+  }
+
+  if (ledgerEntries.length > 0) {
+    const { error } = await supabase
+      .from('inventory_ledger')
+      .insert(ledgerEntries);
+
+    if (error) {
+      console.error('Failed to create ledger entries for order:', error);
+      throw error;
+    }
+
+    console.log(`✓ Decremented inventory for ${ledgerEntries.length} items in order ${order.id}`);
+  } else {
+    console.log(`No SKU mappings found for order ${order.id}, skipping inventory decrement`);
+  }
 }
 
 async function handleComplianceWebhook(
