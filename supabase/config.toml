@@ -55,7 +55,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.shopify-comprehensive-sync]
-verify_jwt = false
+verify_jwt = true
 
 [[functions.shopify-comprehensive-sync.schedule]]
 cron = "*/5 * * * *"
