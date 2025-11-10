@@ -198,23 +198,26 @@ async function syncProducts(supabase: any, clientId: string, store: any) {
         .single();
 
       if (skuRecord) {
-        aliasesToInsert.push({
-          sku_id: skuRecord.id,
-          alias_type: 'shopify_inventory_item_id',
-          alias_value: variant.inventory_item_id.toString(),
-        });
-        aliasesToInsert.push({
-          sku_id: skuRecord.id,
-          alias_type: 'shopify_variant_id',
-          alias_value: variant.id.toString(),
-        });
+        // Create BOTH inventory_item_id AND variant_id aliases
+        aliasesToInsert.push(
+          {
+            sku_id: skuRecord.id,
+            alias_type: 'shopify_inventory_item_id',
+            alias_value: variant.inventory_item_id.toString(),
+          },
+          {
+            sku_id: skuRecord.id,
+            alias_type: 'shopify_variant_id',
+            alias_value: variant.id.toString(),
+          }
+        );
       }
     }
   }
 
   if (aliasesToInsert.length > 0) {
     await supabase.from('sku_aliases').upsert(aliasesToInsert, {
-      onConflict: 'sku_id,alias_type',
+      onConflict: 'sku_id,alias_type,alias_value',
     });
   }
 

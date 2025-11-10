@@ -51,9 +51,9 @@ Deno.serve(async (req) => {
 
     let locationId = client?.shopify_location_id;
 
-    // Auto-fetch and store location if missing
+    // Auto-fetch and store location if missing (with improved validation)
     if (!locationId) {
-      console.log(`Fetching Shopify location for client ${client_id}...`);
+      console.log(`⚠️  No Shopify location configured for client ${client_id}, fetching...`);
       
       const locationsQuery = `
         query {
@@ -81,19 +81,19 @@ Deno.serve(async (req) => {
       )?.node || locationsData.locations.edges[0]?.node;
 
       if (!activeLocation) {
-        throw new Error('No Shopify location found for this store');
+        throw new Error('No Shopify location found. Please sync location from admin dashboard first.');
       }
 
       // Extract numeric ID from GID
       locationId = activeLocation.id.split('/').pop();
 
-      // Save to clients table
+      // Save to clients table for future use
       await supabase
         .from('clients')
         .update({ shopify_location_id: locationId })
         .eq('id', client_id);
 
-      console.log(`✓ Saved Shopify location ${locationId} for client ${client_id}`);
+      console.log(`✓ Auto-saved Shopify location ${locationId} for client ${client_id}`);
     }
 
     // Get SKU info

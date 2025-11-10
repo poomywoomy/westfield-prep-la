@@ -60,11 +60,10 @@ Deno.serve(async (req) => {
       throw new Error('Store not found or inactive');
     }
 
-    // Ensure we have a Shopify location ID
+    // Ensure we have a Shopify location ID (auto-fetch if missing)
     let locationId = client.shopify_location_id;
     if (!locationId) {
-      // Fetch locations via GraphQL
-      console.log('Fetching Shopify locations via GraphQL...');
+      console.log('⚠️  No Shopify location configured, fetching from Shopify...');
       
       const locationsQuery = `
         query getLocations {
@@ -89,18 +88,19 @@ Deno.serve(async (req) => {
       const locations = locationsData.locations.edges.map((edge: any) => edge.node);
       const primaryLocation = locations.find((loc: any) => loc.isActive) || locations[0];
       
-      if (primaryLocation) {
-        locationId = primaryLocation.id.split('/').pop();
-        // Store for future use
-        await serviceClient
-          .from('clients')
-          .update({ shopify_location_id: locationId })
-          .eq('id', client_id);
+      if (!primaryLocation) {
+        throw new Error('No Shopify location found. Please connect your store via admin dashboard first.');
       }
 
-      if (!locationId) {
-        throw new Error('No Shopify location found for this store');
-      }
+      locationId = primaryLocation.id.split('/').pop();
+      
+      // Store for future use
+      await serviceClient
+        .from('clients')
+        .update({ shopify_location_id: locationId })
+        .eq('id', client_id);
+      
+      console.log(`✓ Auto-saved Shopify location ${locationId}`);
     }
 
     // Start sync log
