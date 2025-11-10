@@ -242,10 +242,30 @@ Deno.serve(async (req) => {
       } else {
         console.log(`✓ Decremented ${item.quantity} units of SKU ${skuAlias.sku_id}`);
         
-        // Push to Shopify (fire and forget, don't block fulfillment)
-        supabase.functions.invoke('shopify-push-inventory-single', {
-          body: { client_id: order.client_id, sku_id: skuAlias.sku_id }
-        }).catch(err => console.error('Shopify push warning:', err));
+        // PHASE 4 FIX: Validate Shopify push and audit failures
+        const { data: pushData, error: pushError } = await supabase.functions.invoke(
+          'shopify-push-inventory-single',
+          { body: { client_id: order.client_id, sku_id: skuAlias.sku_id } }
+        );
+
+        if (pushError || !pushData?.success) {
+          console.error(`❌ Shopify push failed for SKU ${(skuAlias as any).skus.client_sku}:`, 
+            pushError?.message || pushData?.message || pushData?.error);
+          
+          // Log to audit for admin review
+          await supabase.from('audit_log').insert({
+            action: 'SHOPIFY_PUSH_FAILED',
+            table_name: 'inventory_ledger',
+            record_id: skuAlias.sku_id,
+            new_data: { 
+              error: pushError?.message || pushData?.message || pushData?.error,
+              order_id: order.shopify_order_id,
+              sku: (skuAlias as any).skus.client_sku,
+            }
+          });
+        } else {
+          console.log(`✅ Shopify updated: ${(skuAlias as any).skus.client_sku} = ${pushData.quantity} units`);
+        }
       }
     }
 

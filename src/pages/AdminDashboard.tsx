@@ -14,6 +14,7 @@ import BillingTab from "@/components/admin/BillingTab";
 import { BillingHistoryTab } from "@/components/admin/BillingHistoryTab";
 import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
 import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
+import { ShopifySyncHealthDashboard } from "@/components/admin/ShopifySyncHealthDashboard";
 import { InventoryTab } from "@/components/admin/InventoryTab";
 import { QuickScanModal } from "@/components/admin/QuickScanModal";
 import { BlogTab } from "@/components/admin/BlogTab";
@@ -152,6 +153,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="shopify">
             <ShopifyManagementTab />
+          </TabsContent>
+
+          <TabsContent value="health">
+            <ShopifySyncHealthDashboard />
           </TabsContent>
 
           <TabsContent value="orders">

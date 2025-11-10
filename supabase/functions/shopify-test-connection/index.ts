@@ -81,6 +81,52 @@ Deno.serve(async (req) => {
 
     const shop = data.shop;
 
+    // PHASE 6 P4: Validate required scopes
+    const scopeQuery = `
+      query {
+        app {
+          installation {
+            accessScopes {
+              handle
+            }
+          }
+        }
+      }
+    `;
+
+    const scopeData = await shopifyGraphQL(store.shop_domain, store.access_token, scopeQuery);
+
+    const requiredScopes = [
+      'read_products',
+      'write_products',
+      'read_orders',
+      'write_orders',
+      'read_inventory',
+      'write_inventory',
+      'read_fulfillments',
+      'write_fulfillments',
+    ];
+
+    const grantedScopes = scopeData.app?.installation?.accessScopes?.map((s: any) => s.handle) || [];
+    const missingScopes = requiredScopes.filter(scope => !grantedScopes.includes(scope));
+
+    if (missingScopes.length > 0) {
+      console.warn(`⚠️  Missing scopes: ${missingScopes.join(', ')}`);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: `Missing required permissions: ${missingScopes.join(', ')}. Please reinstall the Shopify app.`,
+          missing_scopes: missingScopes,
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 403,
+        }
+      );
+    }
+
+    console.log('✓ All required scopes present');
+
     // Check if location is configured
     const { data: clientConfig } = await supabase
       .from('clients')

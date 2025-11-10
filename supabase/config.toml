@@ -59,3 +59,9 @@ verify_jwt = true
 
 [[functions.shopify-comprehensive-sync.schedule]]
 cron = "*/5 * * * *"
+
+[functions.cleanup-old-webhooks]
+verify_jwt = false
+
+[[functions.cleanup-old-webhooks.schedule]]
+cron = "0 2 * * *"

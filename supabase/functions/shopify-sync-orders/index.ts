@@ -93,10 +93,11 @@ Deno.serve(async (req) => {
       throw new Error('Store not found or inactive');
     }
 
-    // Get last successful sync date
+    // Get last successful sync date and cursor
+    // PHASE 3 M2: Store pagination cursor for incremental syncs
     const { data: lastSync } = await serviceClient
       .from('sync_logs')
-      .select('created_at')
+      .select('created_at, metadata')
       .eq('client_id', client_id)
       .eq('sync_type', 'orders')
       .eq('status', 'success')
@@ -235,6 +236,7 @@ Deno.serve(async (req) => {
     const durationMs = Date.now() - startTime;
 
     // Update sync log to success
+    // PHASE 3 M2: Store pagination cursor for next incremental sync
     if (syncLogId) {
       await serviceClient
         .from('sync_logs')
@@ -242,6 +244,9 @@ Deno.serve(async (req) => {
           status: 'success',
           products_synced: ordersData.length,
           duration_ms: durationMs,
+          metadata: { 
+            endCursor: rawOrders.length > 0 ? rawOrders[rawOrders.length - 1]?.pageInfo?.endCursor : null 
+          }
         })
         .eq('id', syncLogId);
     }

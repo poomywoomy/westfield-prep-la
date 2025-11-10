@@ -2602,6 +2602,7 @@ export type Database = {
           duration_ms: number | null
           error_message: string | null
           id: string
+          metadata: Json | null
           products_synced: number | null
           status: string
           sync_type: string
@@ -2613,6 +2614,7 @@ export type Database = {
           duration_ms?: number | null
           error_message?: string | null
           id?: string
+          metadata?: Json | null
           products_synced?: number | null
           status?: string
           sync_type: string
@@ -2624,6 +2626,7 @@ export type Database = {
           duration_ms?: number | null
           error_message?: string | null
           id?: string
+          metadata?: Json | null
           products_synced?: number | null
           status?: string
           sync_type?: string

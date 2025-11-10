@@ -303,46 +303,66 @@ async function reconcileInventory(supabase: any, clientId: string, store: any) {
     { locationId: locationGid }
   );
 
+  // PHASE 3 P3: Batch reconciliation to prevent timeouts
   const discrepancies = [];
+  const BATCH_SIZE = 100;
+  let processedCount = 0;
 
-  for (const level of rawLevels) {
-    const inventoryItemId = level.item.id.split('/').pop();
-    const shopifyQty = level.available || 0;
+  for (let i = 0; i < rawLevels.length; i += BATCH_SIZE) {
+    const batch = rawLevels.slice(i, i + BATCH_SIZE);
+    console.log(`[${clientId}] Processing reconciliation batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(rawLevels.length / BATCH_SIZE)}`);
+    
+    for (const level of batch) {
+      const inventoryItemId = level.item.id.split('/').pop();
+      const shopifyQty = level.available || 0;
 
-    // Find SKU by inventory_item_id with client_id filter
-    const { data: alias } = await supabase
-      .from('sku_aliases')
-      .select('sku_id, skus!inner(client_id)')
-      .eq('alias_type', 'shopify_inventory_item_id')
-      .eq('alias_value', inventoryItemId)
-      .eq('skus.client_id', clientId)
-      .maybeSingle();
+      // Find SKU by inventory_item_id with client_id filter
+      const { data: alias } = await supabase
+        .from('sku_aliases')
+        .select('sku_id, skus!inner(client_id)')
+        .eq('alias_type', 'shopify_inventory_item_id')
+        .eq('alias_value', inventoryItemId)
+        .eq('skus.client_id', clientId)
+        .maybeSingle();
 
-    if (!alias) continue;
+      if (!alias) continue;
 
-    // PHASE 3 FIX: Calculate app quantity via SQL aggregation (not JS reduce)
-    const { data: aggregation } = await supabase
-      .from('inventory_ledger')
-      .select('qty_delta')
-      .eq('sku_id', alias.sku_id)
-      .eq('client_id', clientId);
+      // PHASE 3 C5: Use SQL aggregation function instead of JS reduce
+      const { data: ledgerSum } = await supabase
+        .rpc('sum_inventory_ledger', { 
+          p_sku_id: alias.sku_id, 
+          p_client_id: clientId 
+        });
 
-    const appQty = aggregation?.reduce((sum: number, entry: any) => sum + entry.qty_delta, 0) || 0;
+      const appQty = ledgerSum || 0;
 
-    if (shopifyQty !== appQty) {
-      discrepancies.push({
-        sku_id: alias.sku_id,
-        shopify_qty: shopifyQty,
-        app_qty: appQty,
-        difference: shopifyQty - appQty,
-      });
+      if (shopifyQty !== appQty) {
+        discrepancies.push({
+          sku_id: alias.sku_id,
+          shopify_qty: shopifyQty,
+          app_qty: appQty,
+          difference: shopifyQty - appQty,
+        });
+      }
+    }
+    
+    processedCount += batch.length;
+    
+    // Brief pause between batches to avoid overwhelming database
+    if (i + BATCH_SIZE < rawLevels.length) {
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
   }
+
+  console.log(`[${clientId}] ✓ Reconciliation complete: ${processedCount} SKUs processed`);
 
   if (discrepancies.length > 0) {
     console.log(`[${clientId}] Found ${discrepancies.length} discrepancies, auto-correcting to match app inventory...`);
     
+    // PHASE 4 M6: Add retry logic for Shopify inventory pushes
     let corrected = 0;
+    const MAX_RETRIES = 3;
+    
     for (const disc of discrepancies) {
       try {
         // Get SKU details for logging
@@ -354,16 +374,45 @@ async function reconcileInventory(supabase: any, clientId: string, store: any) {
 
         const clientSku = skuData?.client_sku || disc.sku_id;
 
-        const { data: pushResult, error: pushError } = await supabase.functions.invoke(
-          'shopify-push-inventory-single',
-          { body: { client_id: clientId, sku_id: disc.sku_id } }
-        );
-        
-        if (!pushError && pushResult?.success) {
-          corrected++;
-          console.log(`✓ Corrected ${clientSku}: ${disc.shopify_qty} → ${disc.app_qty}`);
-        } else {
-          console.error(`Failed to correct ${clientSku}:`, pushError || pushResult?.error);
+        let success = false;
+        let lastError = null;
+
+        // Retry push up to 3 times with exponential backoff
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+          const { data: pushResult, error: pushError } = await supabase.functions.invoke(
+            'shopify-push-inventory-single',
+            { body: { client_id: clientId, sku_id: disc.sku_id } }
+          );
+          
+          if (!pushError && pushResult?.success) {
+            success = true;
+            corrected++;
+            console.log(`✓ Corrected ${clientSku}: ${disc.shopify_qty} → ${disc.app_qty} (attempt ${attempt})`);
+            break;
+          } else {
+            lastError = pushError || pushResult?.error;
+            if (attempt < MAX_RETRIES) {
+              const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+              console.log(`⚠️  Retry ${attempt}/${MAX_RETRIES} for ${clientSku} after ${delay}ms...`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+          }
+        }
+
+        if (!success) {
+          console.error(`❌ Failed to correct ${clientSku} after ${MAX_RETRIES} attempts:`, lastError);
+          // Audit log for admin review
+          await supabase.from('audit_log').insert({
+            action: 'INVENTORY_RECONCILIATION_FAILED',
+            table_name: 'inventory_ledger',
+            record_id: disc.sku_id,
+            new_data: { 
+              error: lastError,
+              sku: clientSku,
+              shopify_qty: disc.shopify_qty,
+              app_qty: disc.app_qty,
+            }
+          });
         }
       } catch (err) {
         console.error(`Error correcting discrepancy:`, err);

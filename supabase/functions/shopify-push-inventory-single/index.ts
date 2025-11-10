@@ -12,15 +12,15 @@ Deno.serve(async (req) => {
   }
 
   const startTime = Date.now();
+  // PHASE 2 FIX: Declare body at function scope to avoid variable scope issues
+  let body: any;
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // C6 FIX: Parse body once and store it to avoid double parsing
-  let body: any;
-  try {
+    // C6 FIX: Parse body once and store it to avoid double parsing
     body = await req.json();
     const { client_id, sku_id } = body;
 
@@ -199,7 +199,7 @@ Deno.serve(async (req) => {
     const durationMs = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-    // C6 FIX: Use already parsed requestBody (avoid double parsing)
+    // C6 FIX: Use already parsed body (avoid double parsing)
     try {
       const supabase = createClient(
         Deno.env.get('SUPABASE_URL')!,
