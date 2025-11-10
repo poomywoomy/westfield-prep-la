@@ -18,8 +18,10 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Parse request body once at the top
-    const body = await req.json();
+  // C6 FIX: Parse body once and store it to avoid double parsing
+  let body: any;
+  try {
+    body = await req.json();
     const { client_id, sku_id } = body;
 
     if (!client_id || !sku_id) {
@@ -197,18 +199,15 @@ Deno.serve(async (req) => {
     const durationMs = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-    // Try to log error (avoid double JSON parsing)
+    // C6 FIX: Use already parsed requestBody (avoid double parsing)
     try {
       const supabase = createClient(
         Deno.env.get('SUPABASE_URL')!,
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
       );
       
-      // Use body from outer try block if available
-      const bodyForLog = req.bodyUsed ? {} : await req.json().catch(() => ({}));
-      
       await supabase.from('sync_logs').insert({
-        client_id: bodyForLog.client_id || null,
+        client_id: body?.client_id || null,
         sync_type: 'inventory_push_single',
         status: 'failed',
         products_synced: 0,

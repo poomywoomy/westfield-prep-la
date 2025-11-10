@@ -48,20 +48,23 @@ Deno.serve(async (req) => {
 
       console.log(`Processing ${aliases.length} aliases in this batch`);
 
+      // Batch fetch existing variant_id aliases to avoid N+1 queries
+      const skuIds = aliases.map(a => a.sku_id);
+      const { data: existingVariants } = await supabase
+        .from('sku_aliases')
+        .select('sku_id')
+        .in('sku_id', skuIds)
+        .eq('alias_type', 'shopify_variant_id');
+
+      const existingSet = new Set(existingVariants?.map(v => v.sku_id) || []);
+
       // Find missing variant_id aliases
       const aliasesToBackfill = [];
       
       for (const alias of aliases) {
-        // Check if variant_id alias already exists
-        const { data: existingVariant } = await supabase
-          .from('sku_aliases')
-          .select('id')
-          .eq('sku_id', alias.sku_id)
-          .eq('alias_type', 'shopify_variant_id')
-          .maybeSingle();
-
-        if (existingVariant) {
-          continue; // Already has variant_id alias
+        // Skip if variant_id alias already exists
+        if (existingSet.has(alias.sku_id)) {
+          continue;
         }
 
         // Extract variant_id from notes

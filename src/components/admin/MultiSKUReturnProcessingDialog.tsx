@@ -136,15 +136,45 @@ export const MultiSKUReturnProcessingDialog = ({
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData.user?.id;
 
+      // C4 FIX: Get location with client_id filter + N2: is_active check
       const { data: locations } = await supabase
         .from("locations")
         .select("id")
+        .eq("client_id", returnData.client_id)
         .eq("is_active", true)
+        .eq("code", "MAIN")
         .limit(1);
       const locationId = locations?.[0]?.id;
 
       // Process each SKU
       for (const row of processingRows) {
+        // M3 FIX: Check for existing return entry (idempotency)
+        const { data: existingReturn } = await supabase
+          .from('inventory_ledger')
+          .select('id')
+          .eq('source_ref', returnData.id)
+          .eq('sku_id', row.sku_id)
+          .eq('transaction_type', 'RETURN')
+          .maybeSingle();
+
+        if (existingReturn) {
+          console.log(`Return already processed for SKU ${row.client_sku}, skipping`);
+          continue;
+        }
+
+        // P2 FIX: Validate SKU ownership
+        const { data: skuCheck } = await supabase
+          .from('skus')
+          .select('client_id')
+          .eq('id', row.sku_id)
+          .eq('client_id', returnData.client_id)
+          .maybeSingle();
+
+        if (!skuCheck) {
+          console.error(`SKU ${row.sku_id} does not belong to client ${returnData.client_id}`);
+          continue;
+        }
+
         // Good condition units → inventory
         if (row.good_qty > 0) {
           await supabase.from("inventory_ledger").insert({
@@ -159,13 +189,13 @@ export const MultiSKUReturnProcessingDialog = ({
             notes: `Return #${returnData.shopify_return_id.slice(-8)} - ${row.client_sku}`,
           });
 
-          // Push to Shopify with error handling
+          // P10 FIX: Validate Shopify push success
           const { data: pushData, error: pushError } = await supabase.functions.invoke(
             'shopify-push-inventory-single',
             { body: { client_id: returnData.client_id, sku_id: row.sku_id } }
           );
 
-          if (pushError) {
+          if (pushError || pushData?.success === false) {
             toast({
               title: "Shopify sync failed",
               description: `${row.client_sku}: ${pushError.message}`,

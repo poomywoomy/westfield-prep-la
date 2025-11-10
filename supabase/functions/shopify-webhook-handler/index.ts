@@ -91,15 +91,7 @@ Deno.serve(async (req) => {
       .select()
       .single();
 
-    // Mark as processed using UPSERT to handle race conditions gracefully
-    await supabase
-      .from('processed_webhooks')
-      .upsert({
-        webhook_id: webhookId,
-        shop_domain: shopDomain,
-        topic
-      }, { onConflict: 'webhook_id', ignoreDuplicates: true });
-
+    // C2 FIX: Process BEFORE marking as processed (race condition fix)
     try {
       // Handle different webhook topics
       if (topic.startsWith('products/')) {
@@ -115,6 +107,16 @@ Deno.serve(async (req) => {
       } else if (topic.startsWith('customers/') || topic.startsWith('shop/')) {
         await handleComplianceWebhook(supabase, shopDomain, topic, payload);
       }
+
+      // C2 FIX: Mark as processed ONLY after successful handling
+      await supabase
+        .from('processed_webhooks')
+        .upsert({
+          webhook_id: webhookId,
+          shop_domain: shopDomain,
+          topic,
+          processed_at: new Date().toISOString(),
+        }, { onConflict: 'webhook_id', ignoreDuplicates: false });
 
       // Update log as successful
       if (logEntry) {
@@ -148,11 +150,21 @@ Deno.serve(async (req) => {
           .eq('id', logEntry.id);
       }
 
-      // Delete from processed_webhooks to allow retry on transient failures
-      await supabase
-        .from('processed_webhooks')
-        .delete()
-        .eq('webhook_id', webhookId);
+      // M7 FIX: Smarter webhook deletion - only delete for retryable errors
+      const isRetryable = !errorMessage.toLowerCase().includes('invalid') &&
+                          !errorMessage.toLowerCase().includes('not found') &&
+                          !errorMessage.toLowerCase().includes('unauthorized') &&
+                          !errorMessage.toLowerCase().includes('bad request');
+
+      if (isRetryable) {
+        await supabase
+          .from('processed_webhooks')
+          .delete()
+          .eq('webhook_id', webhookId);
+        console.log(`[Webhook] Deleted processed entry to allow retry (error: ${errorMessage})`);
+      } else {
+        console.log(`[Webhook] Non-retryable error, keeping processed entry (error: ${errorMessage})`);
+      }
 
       throw error;
     }

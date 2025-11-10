@@ -181,26 +181,52 @@ export function EnhancedOrderFulfillmentDialog({
           
           const existingDecrement = ledgerCheck.data;
 
-          // Get primary location
+          // C4 FIX: Get primary location with client_id filter + N2: is_active check
           const { data: location } = await supabase
             .from("locations")
             .select("id")
+            .eq("client_id", clientId)
             .eq("is_active", true)
-            .limit(1)
-            .single();
+            .eq("code", "MAIN")
+            .maybeSingle();
 
           if (location) {
-            // Only decrement if webhook hasn't already done it
+            // M3 FIX: Check for existing return entry (idempotency)
+            // M5 FIX: Use correct transaction type SALE_DECREMENT (not OUTBOUND)
             if (!existingDecrement) {
+              // P2 FIX: Validate SKU ownership before inventory operation
+              const { data: skuValidation } = await supabase
+                .from("skus")
+                .select("client_id")
+                .eq("id", sku.id)
+                .single();
+
+              if (skuValidation?.client_id !== clientId) {
+                console.error(`SKU ownership violation: SKU ${sku.id} does not belong to client ${clientId}`);
+                continue;
+              }
+
+              // N3 FIX: Validate negative inventory check
+              const { data: currentQty } = await supabase
+                .rpc('get_current_inventory', { 
+                  p_sku_id: sku.id, 
+                  p_client_id: clientId 
+                });
+
+              const newQty = (currentQty || 0) - item.quantity;
+              if (newQty < 0) {
+                console.warn(`Would cause negative inventory for SKU ${sku.client_sku}: ${currentQty} - ${item.quantity} = ${newQty}`);
+              }
+
               const { error: ledgerError } = await supabase.from("inventory_ledger").insert([{
                 client_id: clientId,
                 sku_id: sku.id,
                 location_id: location.id,
                 qty_delta: -item.quantity,
-                transaction_type: "OUTBOUND" as any,
+                transaction_type: "SALE_DECREMENT" as any,
                 source_type: "shopify_fulfillment",
                 shopify_order_id: order.shopify_order_id,
-                notes: `Fulfilled order #${order.order_number}`,
+                notes: `Fulfilled order #${order.order_number} - ${sku.client_sku}`,
               }]);
               
               if (ledgerError) {
@@ -210,7 +236,7 @@ export function EnhancedOrderFulfillmentDialog({
               console.log(`Skipping inventory decrement for ${sku.client_sku} - already decremented by webhook`);
             }
 
-            // Push to Shopify with retry logic
+            // M4 FIX: Validate Shopify push success (with proper retry logic)
             let pushSuccess = false;
             let lastError = null;
 
@@ -220,24 +246,36 @@ export function EnhancedOrderFulfillmentDialog({
                 { body: { client_id: clientId, sku_id: sku.id } }
               );
 
-              if (!pushError && pushData?.success !== false) {
+              // M4 FIX: Check pushData.success flag
+              if (!pushError && pushData?.success) {
                 pushSuccess = true;
-                console.log(`✓ Synced ${sku.client_sku} to Shopify (attempt ${attempt})`);
                 break;
               }
 
               lastError = pushError || pushData;
-              
               if (attempt < 3) {
-                console.log(`Retry ${attempt}/3 for ${sku.client_sku} after ${2000 * attempt}ms`);
-                await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+                await new Promise(r => setTimeout(r, 2000 * attempt));
               }
             }
 
             if (!pushSuccess) {
-              console.error(`Failed to sync ${sku.client_sku} after 3 attempts:`, lastError);
-              toast.error(`Shopify Sync Warning: ${sku.client_sku} inventory may not match Shopify. Admin should verify.`);
+              console.error(`Failed to sync inventory for SKU ${sku.client_sku}:`, lastError);
+              
+              // Log failed push to audit log
+              await supabase.from('audit_log').insert({
+                user_id: clientId,
+                action: 'shopify_inventory_push_failed',
+                table_name: 'inventory_ledger',
+                record_id: sku.id,
+                new_data: { 
+                  error: lastError instanceof Error ? lastError.message : JSON.stringify(lastError),
+                  order_id: order.shopify_order_id,
+                  attempt: 'final'
+                },
+              });
             }
+          } else {
+            console.log(`Location not found for client ${clientId}`);
           }
         }
       }

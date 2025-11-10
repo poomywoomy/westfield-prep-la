@@ -137,13 +137,45 @@ export const ReturnProcessingDialog = ({
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData.user?.id;
 
-      // Get location
+      // C4 FIX: Get location with client_id filter + N2: is_active check
       const { data: locations } = await supabase
         .from("locations")
         .select("id")
+        .eq("client_id", clientId)
         .eq("is_active", true)
+        .eq("code", "MAIN")
         .limit(1);
       const locationId = locations?.[0]?.id;
+
+      // M3 FIX: Check for existing return entry (idempotency)
+      const { data: existingReturn } = await supabase
+        .from('inventory_ledger')
+        .select('id')
+        .eq('source_ref', returnId)
+        .eq('sku_id', skuId)
+        .eq('transaction_type', 'RETURN')
+        .maybeSingle();
+
+      if (existingReturn) {
+        toast({
+          title: "Already processed",
+          description: "This return has already been processed",
+        });
+        onClose();
+        return;
+      }
+
+      // P2 FIX: Validate SKU ownership
+      const { data: skuCheck } = await supabase
+        .from('skus')
+        .select('client_id')
+        .eq('id', skuId)
+        .eq('client_id', clientId)
+        .maybeSingle();
+
+      if (!skuCheck) {
+        throw new Error('SKU does not belong to this client');
+      }
 
       // Process good condition units
       if (goodQty > 0) {
@@ -153,18 +185,19 @@ export const ReturnProcessingDialog = ({
           location_id: locationId,
           qty_delta: goodQty,
           transaction_type: "RETURN",
+          source_ref: returnId,
           user_id: userId,
           notes: "Return processed - good condition",
         });
 
-        // Sync to Shopify immediately with error handling
+        // P10 FIX: Sync to Shopify after return processing with validation
         const { data: syncData, error: syncError } = await supabase.functions.invoke(
           'shopify-push-inventory-single',
           { body: { client_id: clientId, sku_id: skuId } }
         );
         
-        if (syncError) {
-          console.error('Shopify sync error:', syncError);
+        if (syncError || syncData?.success === false) {
+          console.error('Shopify sync error:', syncError || syncData);
           toast({
             variant: 'destructive',
             title: 'Shopify sync failed',
