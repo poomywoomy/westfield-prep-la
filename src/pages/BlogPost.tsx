@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, ArrowLeft, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { BlogPostRenderer } from "@/components/blog/BlogPostRenderer";
+import { BlogPostSchema } from "@/components/blog/BlogPostSchema";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { AuthorBio } from "@/components/blog/AuthorBio";
@@ -98,30 +99,6 @@ const BlogPost = () => {
 
   const estimatedReadTime = post.read_time_minutes || Math.max(1, Math.ceil((post.content?.split(' ').length || 0) / 200));
 
-  // Article schema for SEO
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": post.title,
-    "description": post.meta_description || post.excerpt || "",
-    "image": post.cover_image_url || "",
-    "datePublished": post.published_at,
-    "dateModified": post.published_at,
-    "author": {
-      "@type": "Organization",
-      "name": post.author_name || "Westfield Prep Center",
-      "url": "https://westfieldprepcenter.com"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Westfield Prep Center",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://westfieldprepcenter.com/westfield-logo.png"
-      }
-    }
-  };
-
   return (
     <>
       <Helmet>
@@ -143,12 +120,23 @@ const BlogPost = () => {
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.meta_description || post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
         {post.cover_image_url && <meta name="twitter:image" content={post.cover_image_url} />}
-
-        {/* Article Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify(articleSchema)}
-        </script>
       </Helmet>
+
+      {/* Enhanced 2025-compliant JSON-LD Schema for Google Rich Results */}
+      <BlogPostSchema
+        title={post.title}
+        excerpt={post.meta_description || post.excerpt || ""}
+        content={post.content || ""}
+        coverImageUrl={post.cover_image_url || undefined}
+        authorName={post.author_name || "Westfield Team"}
+        authorBio={post.author_bio || "Expert team at Westfield Prep Center with years of experience in e-commerce fulfillment."}
+        publishedAt={post.published_at || new Date().toISOString()}
+        updatedAt={post.published_at || new Date().toISOString()}
+        category={post.category || "Fulfillment"}
+        tags={(post as any).tags || []}
+        slug={post.slug}
+      />
+
       <StructuredData type="breadcrumb" data={[
         { name: "Home", url: "https://westfieldprepcenter.com/" },
         { name: "Blog", url: "https://westfieldprepcenter.com/blog/" },
