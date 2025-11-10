@@ -156,6 +156,7 @@ Deno.serve(async (req) => {
         input: {
           reason: 'correction',
           name: 'available',
+          ignoreCompareQuantity: true,
           quantities: [
             {
               inventoryItemId: `gid://shopify/InventoryItem/${inventoryItemId}`,

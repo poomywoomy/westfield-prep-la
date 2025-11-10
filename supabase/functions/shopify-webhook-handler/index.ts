@@ -267,16 +267,32 @@ async function decrementInventoryForOrder(
   }
 
   // Get main location for this client
-  const { data: location } = await supabase
+  let { data: location } = await supabase
     .from('locations')
     .select('id')
     .eq('client_id', clientId)
-    .eq('name', 'MAIN')
-    .single();
+    .eq('code', 'MAIN')
+    .maybeSingle();
 
+  // Auto-create if missing
   if (!location) {
-    console.error(`No MAIN location found for client ${clientId}`);
-    return;
+    console.log(`Creating MAIN location for client ${clientId}`);
+    const { data: newLocation, error: createError } = await supabase
+      .from('locations')
+      .insert({
+        client_id: clientId,
+        code: 'MAIN',
+        name: 'Main Warehouse',
+        is_active: true
+      })
+      .select()
+      .single();
+    
+    if (createError) {
+      console.error(`Failed to create location for client ${clientId}:`, createError);
+      return;
+    }
+    location = newLocation;
   }
 
   // Process each line item
@@ -288,24 +304,53 @@ async function decrementInventoryForOrder(
       continue;
     }
 
-    // Look up app SKU ID from Shopify variant ID via sku_aliases
+    // Strategy 1: Look up by shopify_variant_id alias
+    let sku_id = null;
     const { data: alias } = await supabase
       .from('sku_aliases')
       .select('sku_id')
-      .eq('client_id', clientId)
       .eq('alias_type', 'shopify_variant_id')
       .eq('alias_value', lineItem.variant_id.toString())
-      .single();
+      .maybeSingle();
 
-    if (!alias) {
-      console.warn(`No SKU mapping found for variant ${lineItem.variant_id} in order ${order.id}`);
+    if (alias) {
+      sku_id = alias.sku_id;
+    } else {
+      // Strategy 2: Direct SKU match
+      const { data: skuByClientSku } = await supabase
+        .from('skus')
+        .select('id')
+        .eq('client_id', clientId)
+        .eq('client_sku', lineItem.sku)
+        .maybeSingle();
+      
+      if (skuByClientSku) {
+        sku_id = skuByClientSku.id;
+      } else {
+        // Strategy 3: Fallback internal SKU pattern
+        const fallbackSku = `SHOP-${lineItem.product_id}-${lineItem.variant_id}`;
+        const { data: skuByFallback } = await supabase
+          .from('skus')
+          .select('id')
+          .eq('client_id', clientId)
+          .eq('client_sku', fallbackSku)
+          .maybeSingle();
+        
+        if (skuByFallback) {
+          sku_id = skuByFallback.id;
+        }
+      }
+    }
+
+    if (!sku_id) {
+      console.warn(`No SKU mapping found for variant ${lineItem.variant_id} using any strategy in order ${order.id}`);
       continue;
     }
 
     // Create ledger entry to decrement inventory
     ledgerEntries.push({
       client_id: clientId,
-      sku_id: alias.sku_id,
+      sku_id: sku_id,
       location_id: location.id,
       qty_delta: -lineItem.quantity, // Negative = decrement
       transaction_type: 'SALE_DECREMENT',

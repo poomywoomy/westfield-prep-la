@@ -268,6 +268,11 @@ Deno.serve(async (req) => {
             alias_type: 'shopify_inventory_item_id',
             alias_value: variant.inventory_item_id.toString(),
           });
+          aliasesToInsert.push({
+            sku_id: skuRecord.id,
+            alias_type: 'shopify_variant_id',
+            alias_value: variant.id.toString(),
+          });
         }
       }
     }

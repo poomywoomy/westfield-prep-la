@@ -193,24 +193,25 @@ Deno.serve(async (req) => {
 
         const inventoryLevelId = `gid://shopify/InventoryLevel/${inventoryItemId}?inventory_location_id=${locationId}`;
 
-        const mutationResult = await shopifyGraphQL(
-          store.shop_domain,
-          store.access_token,
-          inventoryMutation,
-          {
-            input: {
-              reason: 'correction',
-              name: 'available',
-              quantities: [
-                {
-                  inventoryItemId: `gid://shopify/InventoryItem/${inventoryItemId}`,
-                  locationId: `gid://shopify/Location/${locationId}`,
-                  quantity: westfieldQuantity,
-                }
-              ],
+    const mutationResult = await shopifyGraphQL(
+      store.shop_domain,
+      store.access_token,
+      inventoryMutation,
+      {
+        input: {
+          reason: 'correction',
+          name: 'available',
+          ignoreCompareQuantity: true,
+          quantities: [
+            {
+              inventoryItemId: `gid://shopify/InventoryItem/${inventoryItemId}`,
+              locationId: `gid://shopify/Location/${locationId}`,
+              quantity: westfieldQuantity,
             }
-          }
-        );
+          ],
+        }
+      }
+    );
 
         if (mutationResult.inventorySetQuantities?.userErrors?.length > 0) {
           const errors = mutationResult.inventorySetQuantities.userErrors;
