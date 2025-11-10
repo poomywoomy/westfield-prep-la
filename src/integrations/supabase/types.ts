@@ -2845,6 +2845,10 @@ export type Database = {
         Args: { p_client_id: string }
         Returns: string
       }
+      get_current_inventory: {
+        Args: { p_client_id: string; p_sku_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2855,6 +2859,10 @@ export type Database = {
       increment_blog_view_count: {
         Args: { post_id: string }
         Returns: undefined
+      }
+      sum_inventory_ledger: {
+        Args: { p_client_id: string; p_sku_id: string }
+        Returns: number
       }
     }
     Enums: {
