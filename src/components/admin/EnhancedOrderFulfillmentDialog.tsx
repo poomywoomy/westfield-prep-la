@@ -175,9 +175,8 @@ export function EnhancedOrderFulfillmentDialog({
             .from("inventory_ledger")
             .select("id")
             .eq("sku_id", sku.id)
-            .eq("source_type", "shopify_order")
-            .eq("source_id", order.shopify_order_id)
-            .limit(1)
+            .eq("shopify_order_id", order.shopify_order_id) // FIXED: was source_id
+            .eq("transaction_type", "SALE_DECREMENT") // ADDED: more specific
             .maybeSingle();
           
           const existingDecrement = ledgerCheck.data;
@@ -211,16 +210,33 @@ export function EnhancedOrderFulfillmentDialog({
               console.log(`Skipping inventory decrement for ${sku.client_sku} - already decremented by webhook`);
             }
 
-            // Push to Shopify with error handling
-            const { data: pushData, error: pushError } = await supabase.functions.invoke(
-              'shopify-push-inventory-single',
-              { body: { client_id: clientId, sku_id: sku.id } }
-            );
+            // Push to Shopify with retry logic
+            let pushSuccess = false;
+            let lastError = null;
 
-            if (pushError) {
-              toast.error(`Shopify sync failed for ${sku.client_sku}: ${pushError.message}`);
-            } else if (pushData?.success === false) {
-              toast.error(`Shopify not updated for ${sku.client_sku}: ${pushData.message || 'Unknown reason'}`);
+            for (let attempt = 1; attempt <= 3; attempt++) {
+              const { data: pushData, error: pushError } = await supabase.functions.invoke(
+                'shopify-push-inventory-single',
+                { body: { client_id: clientId, sku_id: sku.id } }
+              );
+
+              if (!pushError && pushData?.success !== false) {
+                pushSuccess = true;
+                console.log(`✓ Synced ${sku.client_sku} to Shopify (attempt ${attempt})`);
+                break;
+              }
+
+              lastError = pushError || pushData;
+              
+              if (attempt < 3) {
+                console.log(`Retry ${attempt}/3 for ${sku.client_sku} after ${2000 * attempt}ms`);
+                await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+              }
+            }
+
+            if (!pushSuccess) {
+              console.error(`Failed to sync ${sku.client_sku} after 3 attempts:`, lastError);
+              toast.error(`Shopify Sync Warning: ${sku.client_sku} inventory may not match Shopify. Admin should verify.`);
             }
           }
         }

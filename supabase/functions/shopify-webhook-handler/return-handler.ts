@@ -79,6 +79,40 @@ export async function handleReturnWebhook(
     })
   );
   
+  // Check if return already fully processed (idempotency)
+  const { data: existingReturn } = await supabase
+    .from('shopify_returns')
+    .select('id, status')
+    .eq('client_id', clientId)
+    .eq('shopify_return_id', returnId)
+    .maybeSingle();
+
+  if (existingReturn) {
+    console.log(`Return ${returnId} already exists with status ${existingReturn.status}`);
+    
+    // Determine new status
+    const newStatus = topic.includes('request') ? 'requested' : 
+                      topic.includes('approve') ? 'approved' : 
+                      topic.includes('decline') ? 'declined' : 'requested';
+    
+    // Only update status if it changed, don't re-upsert line items
+    if (existingReturn.status !== newStatus) {
+      await supabase
+        .from('shopify_returns')
+        .update({
+          status: newStatus,
+          synced_at: new Date().toISOString(),
+        })
+        .eq('id', existingReturn.id);
+      
+      console.log(`Updated return ${returnId} status to ${newStatus}`);
+    }
+    
+    return; // Skip re-inserting
+  }
+
+  console.log(`Creating new return record: ${returnId}`);
+
   const returnData = {
     client_id: clientId,
     shopify_return_id: returnId,

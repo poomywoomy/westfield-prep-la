@@ -265,12 +265,40 @@ export function ShopifyManagementTab() {
   const handleSyncAll = async (clientId: string) => {
     setSyncing(clientId);
     try {
-      // Sync locations first to ensure location_id is set
-      const { error: locError } = await supabase.functions.invoke("shopify-sync-locations", {
-        body: { client_id: clientId }
-      });
-      if (locError) throw locError;
+      // Step 1: Sync locations and verify success
+      toast({ title: "Step 1/3: Syncing location..." });
 
+      const { data: locData, error: locError } = await supabase.functions.invoke(
+        "shopify-sync-locations",
+        { body: { client_id: clientId } }
+      );
+
+      if (locError) {
+        throw new Error(`Location sync failed: ${locError.message}`);
+      }
+
+      if (!locData?.success) {
+        throw new Error(`Location sync did not succeed: ${locData?.error || 'Unknown error'}`);
+      }
+
+      // Verify location was actually set
+      const { data: verifyClient } = await supabase
+        .from('clients')
+        .select('shopify_location_id')
+        .eq('id', clientId)
+        .single();
+
+      if (!verifyClient?.shopify_location_id) {
+        throw new Error('Location sync completed but shopify_location_id was not set');
+      }
+
+      toast({ 
+        title: "✓ Step 1/3 Complete", 
+        description: `Location set: ${verifyClient.shopify_location_id}` 
+      });
+
+      // Step 2: Sync products
+      toast({ title: "Step 2/3: Syncing products..." });
       const productsData = await handleSyncProducts(clientId);
       const inventoryData = await handleSyncInventory(clientId);
       

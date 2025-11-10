@@ -315,7 +315,10 @@ async function decrementInventoryForOrder(
 
     if (alias) {
       sku_id = alias.sku_id;
+      console.log(`✓ Strategy 1 (variant_id alias): Found SKU ${sku_id} for variant ${lineItem.variant_id}`);
     } else {
+      console.log(`✗ Strategy 1 failed: No alias for variant_id ${lineItem.variant_id}`);
+      
       // Strategy 2: Direct SKU match
       const { data: skuByClientSku } = await supabase
         .from('skus')
@@ -326,7 +329,10 @@ async function decrementInventoryForOrder(
       
       if (skuByClientSku) {
         sku_id = skuByClientSku.id;
+        console.log(`✓ Strategy 2 (client_sku): Found SKU ${sku_id} for client_sku ${lineItem.sku}`);
       } else {
+        console.log(`✗ Strategy 2 failed: No SKU with client_sku ${lineItem.sku}`);
+        
         // Strategy 3: Fallback internal SKU pattern
         const fallbackSku = `SHOP-${lineItem.product_id}-${lineItem.variant_id}`;
         const { data: skuByFallback } = await supabase
@@ -338,6 +344,9 @@ async function decrementInventoryForOrder(
         
         if (skuByFallback) {
           sku_id = skuByFallback.id;
+          console.log(`✓ Strategy 3 (fallback): Found SKU ${sku_id} for fallback ${fallbackSku}`);
+        } else {
+          console.log(`✗ Strategy 3 failed: No fallback SKU ${fallbackSku}`);
         }
       }
     }

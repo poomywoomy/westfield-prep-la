@@ -54,16 +54,32 @@ Deno.serve(async (req) => {
       syncLogId = syncLog.id;
     }
 
-    // Get client info using service client
-    const { data: client } = await serviceClient
+    // Verify user owns this client or is admin
+    const { data: clientData } = await serviceClient
       .from('clients')
-      .select('id')
+      .select('id, user_id')
       .eq('id', client_id)
       .single();
 
-    if (!client) {
+    if (!clientData) {
       throw new Error('Client not found');
     }
+
+    // Check authorization
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    const isAdmin = userRole?.role === 'admin';
+    const isOwner = clientData.user_id === user.id;
+
+    if (!isAdmin && !isOwner) {
+      throw new Error('Unauthorized: You do not have access to this client');
+    }
+
+    console.log(`User ${user.id} authorized to sync orders for client ${client_id}`);
 
     // Get store credentials using service client
     const { data: store } = await serviceClient
@@ -77,12 +93,27 @@ Deno.serve(async (req) => {
       throw new Error('Store not found or inactive');
     }
 
-    // Fetch all orders via GraphQL
-    console.log('Fetching orders via GraphQL...');
-    
+    // Get last successful sync date
+    const { data: lastSync } = await serviceClient
+      .from('sync_logs')
+      .select('created_at')
+      .eq('client_id', client_id)
+      .eq('sync_type', 'orders')
+      .eq('status', 'success')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const lastSyncDate = lastSync 
+      ? new Date(lastSync.created_at).toISOString().split('T')[0]
+      : '2020-01-01';
+
+    console.log(`Fetching orders since ${lastSyncDate}`);
+
+    // Fetch orders via GraphQL with date filter
     const query = `
-      query getOrders($cursor: String) {
-        orders(first: 250, after: $cursor, query: "status:any") {
+      query getOrders($cursor: String, $query: String) {
+        orders(first: 250, after: $cursor, query: $query) {
           pageInfo {
             hasNextPage
             endCursor
@@ -136,7 +167,8 @@ Deno.serve(async (req) => {
       store.shop_domain,
       store.access_token,
       query,
-      'orders'
+      'orders',
+      { query: `status:any created_at:>=${lastSyncDate}` }
     );
 
     // Transform GraphQL response to REST format
@@ -240,6 +272,7 @@ Deno.serve(async (req) => {
         .from('sync_logs')
         .update({
           status: 'failed',
+          products_synced: 0, // Track partial progress even on failure
           duration_ms: durationMs,
           error_message: error instanceof Error ? error.message : 'Unknown error',
         })

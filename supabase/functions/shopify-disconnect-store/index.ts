@@ -154,7 +154,7 @@ Deno.serve(async (req) => {
     // Optionally delete synced products
     if (delete_products) {
       await supabase
-        .from('client_skus')
+        .from('skus')
         .delete()
         .eq('client_id', client_id);
     }

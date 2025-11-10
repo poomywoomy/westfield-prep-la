@@ -2804,6 +2804,33 @@ export type Database = {
           },
         ]
       }
+      webhook_recent_failures: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          shop_domain: string | null
+          status: string | null
+          topic: string | null
+          webhook_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          shop_domain?: string | null
+          status?: string | null
+          topic?: string | null
+          webhook_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          shop_domain?: string | null
+          status?: string | null
+          topic?: string | null
+          webhook_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       activate_client_on_login: { Args: never; Returns: undefined }

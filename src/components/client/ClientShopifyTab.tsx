@@ -18,6 +18,7 @@ export default function ClientShopifyTab() {
   const [store, setStore] = useState<any>(null);
   const [syncConfig, setSyncConfig] = useState<any>(null);
   const [clientId, setClientId] = useState<string | null>(null);
+  const [clientData, setClientData] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -57,12 +58,13 @@ export default function ClientShopifyTab() {
       // Get client ID
       const { data: client } = await supabase
         .from('clients')
-        .select('id')
+        .select('id, shopify_location_id')
         .eq('user_id', user?.id)
         .single();
 
       if (!client) return;
       setClientId(client.id);
+      setClientData(client);
 
       // Get store connection
       const { data: storeData } = await supabase
@@ -168,9 +170,45 @@ export default function ClientShopifyTab() {
   };
 
   const handleSync = async () => {
+    if (!clientId) {
+      toast({ 
+        title: "Error", 
+        description: "Client ID not found", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    // Check if location is synced first
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .select('shopify_location_id')
+      .eq('id', clientId)
+      .single();
+
+    if (clientError || !clientData) {
+      toast({
+        title: "Error",
+        description: "Unable to verify sync configuration",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!clientData.shopify_location_id) {
+      toast({
+        title: "Location Not Configured",
+        description: "Please contact your administrator to sync your Shopify location before syncing products.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setSyncing(true);
-      const { data, error } = await supabase.functions.invoke('shopify-sync-products');
+      const { data, error } = await supabase.functions.invoke('shopify-sync-products', {
+        body: { client_id: clientId } // ADD client_id to request
+      });
 
       if (error) {
         // Show actual error message from function
@@ -354,6 +392,20 @@ export default function ClientShopifyTab() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Products synced:</span>
                 <span className="font-medium">{syncConfig.last_sync_product_count}</span>
+              </div>
+            )}
+            {clientData && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Location ID:</span>
+                <span className="font-medium text-sm">
+                  {clientData.shopify_location_id ? (
+                    <Badge variant="outline" className="font-mono">
+                      {clientData.shopify_location_id}
+                    </Badge>
+                  ) : (
+                    <Badge variant="destructive">Not Synced</Badge>
+                  )}
+                </span>
               </div>
             )}
           </div>

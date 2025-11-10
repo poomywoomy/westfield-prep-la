@@ -330,7 +330,37 @@ async function reconcileInventory(supabase: any, clientId: string, store: any) {
   }
 
   if (discrepancies.length > 0) {
-    console.log(`[${clientId}] Found ${discrepancies.length} inventory discrepancies (not auto-adjusting)`);
+    console.log(`[${clientId}] Found ${discrepancies.length} discrepancies, auto-correcting to match app inventory...`);
+    
+    let corrected = 0;
+    for (const disc of discrepancies) {
+      try {
+        // Get SKU details for logging
+        const { data: skuData } = await supabase
+          .from('skus')
+          .select('client_sku')
+          .eq('id', disc.sku_id)
+          .single();
+
+        const clientSku = skuData?.client_sku || disc.sku_id;
+
+        const { data: pushResult, error: pushError } = await supabase.functions.invoke(
+          'shopify-push-inventory-single',
+          { body: { client_id: clientId, sku_id: disc.sku_id } }
+        );
+        
+        if (!pushError && pushResult?.success) {
+          corrected++;
+          console.log(`✓ Corrected ${clientSku}: ${disc.shopify_qty} → ${disc.app_qty}`);
+        } else {
+          console.error(`Failed to correct ${clientSku}:`, pushError || pushResult?.error);
+        }
+      } catch (err) {
+        console.error(`Error correcting discrepancy:`, err);
+      }
+    }
+    
+    console.log(`Auto-corrected ${corrected}/${discrepancies.length} discrepancies`);
   }
 
   return discrepancies;

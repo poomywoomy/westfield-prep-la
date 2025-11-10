@@ -175,6 +175,80 @@ Deno.serve(async (req) => {
       console.error('Failed to update local order:', updateError);
     }
 
+    // Deduct inventory for each fulfilled line item
+    console.log(`Processing inventory for ${order.line_items?.length || 0} line items`);
+
+    for (const item of order.line_items || []) {
+      if (!item.variant_id) continue;
+
+      // Find SKU by variant_id
+      const { data: skuAlias } = await supabase
+        .from('sku_aliases')
+        .select('sku_id, skus!inner(client_sku, client_id)')
+        .eq('alias_type', 'shopify_variant_id')
+        .eq('alias_value', item.variant_id.toString())
+        .eq('skus.client_id', order.client_id)
+        .maybeSingle();
+
+      if (!skuAlias) {
+        console.warn(`No SKU mapping for variant ${item.variant_id}`);
+        continue;
+      }
+
+      // Get main location
+      const { data: location } = await supabase
+        .from('locations')
+        .select('id')
+        .eq('client_id', order.client_id)
+        .eq('code', 'MAIN')
+        .maybeSingle();
+
+      if (!location) {
+        console.error(`No MAIN location for client ${order.client_id}`);
+        continue;
+      }
+
+      // Check if webhook already decremented (idempotency)
+      const { data: existing } = await supabase
+        .from('inventory_ledger')
+        .select('id')
+        .eq('sku_id', skuAlias.sku_id)
+        .eq('shopify_order_id', order.shopify_order_id)
+        .eq('transaction_type', 'SALE_DECREMENT')
+        .maybeSingle();
+
+      if (existing) {
+        console.log(`Inventory already decremented by webhook for ${skuAlias.sku_id}`);
+        continue;
+      }
+
+      // Insert ledger entry
+      const { error: ledgerError } = await supabase
+        .from('inventory_ledger')
+        .insert({
+          client_id: order.client_id,
+          sku_id: skuAlias.sku_id,
+          location_id: location.id,
+          qty_delta: -item.quantity,
+          transaction_type: 'SALE_DECREMENT',
+          source_type: 'shopify_fulfillment',
+          shopify_order_id: order.shopify_order_id,
+          shopify_fulfillment_id: fulfillmentData.id,
+          notes: `Edge function fulfillment - Order ${order.order_number}`,
+        });
+
+      if (ledgerError) {
+        console.error(`Ledger error for SKU ${skuAlias.sku_id}:`, ledgerError);
+      } else {
+        console.log(`✓ Decremented ${item.quantity} units of SKU ${skuAlias.sku_id}`);
+        
+        // Push to Shopify (fire and forget, don't block fulfillment)
+        supabase.functions.invoke('shopify-push-inventory-single', {
+          body: { client_id: order.client_id, sku_id: skuAlias.sku_id }
+        }).catch(err => console.error('Shopify push warning:', err));
+      }
+    }
+
     // Log the fulfillment
     await supabase.from('audit_log').insert({
       user_id: user.id,

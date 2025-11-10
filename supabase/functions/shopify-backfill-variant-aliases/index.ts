@@ -20,98 +20,93 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    console.log('Starting variant_id alias backfill...');
+    console.log('Starting paginated variant_id alias backfill...');
 
-    // Get all SKUs that have shopify_inventory_item_id but missing shopify_variant_id
-    const { data: skusWithInventoryAlias } = await supabase
-      .from('sku_aliases')
-      .select('sku_id, alias_value')
-      .eq('alias_type', 'shopify_inventory_item_id');
+    let totalBackfilled = 0;
+    let offset = 0;
+    const batchSize = 500;
+    let hasMore = true;
 
-    if (!skusWithInventoryAlias || skusWithInventoryAlias.length === 0) {
-      return new Response(
-        JSON.stringify({ success: true, message: 'No inventory aliases found', backfilled: 0 }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log(`Found ${skusWithInventoryAlias.length} SKUs with inventory_item_id aliases`);
-
-    // Check which ones already have variant_id aliases
-    const { data: existingVariantAliases } = await supabase
-      .from('sku_aliases')
-      .select('sku_id')
-      .eq('alias_type', 'shopify_variant_id');
-
-    const skusWithVariantAlias = new Set(existingVariantAliases?.map(a => a.sku_id) || []);
-
-    // Filter to only SKUs missing variant_id
-    const skusNeedingVariantAlias = skusWithInventoryAlias.filter(
-      alias => !skusWithVariantAlias.has(alias.sku_id)
-    );
-
-    console.log(`${skusNeedingVariantAlias.length} SKUs need variant_id aliases`);
-
-    if (skusNeedingVariantAlias.length === 0) {
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'All SKUs already have variant_id aliases', 
-          backfilled: 0 
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Extract variant_id from SKU notes field (fallback strategy)
-    const aliasesToInsert = [];
-
-    for (const alias of skusNeedingVariantAlias) {
-      const { data: sku } = await supabase
-        .from('skus')
-        .select('id, notes, client_id')
-        .eq('id', alias.sku_id)
-        .single();
-
-      if (!sku?.notes) continue;
-
-      // Parse "Variant ID: 123456" from notes
-      const variantIdMatch = sku.notes.match(/Variant ID: (\d+)/);
+    while (hasMore) {
+      console.log(`Processing batch at offset ${offset}...`);
       
-      if (variantIdMatch) {
-        const variantId = variantIdMatch[1];
-        aliasesToInsert.push({
-          sku_id: sku.id,
-          alias_type: 'shopify_variant_id',
-          alias_value: variantId,
-        });
-      }
-    }
-
-    console.log(`Extracted ${aliasesToInsert.length} variant_ids from SKU notes`);
-
-    // Insert missing aliases
-    if (aliasesToInsert.length > 0) {
-      const { error } = await supabase
+      const { data: aliases, error: fetchError } = await supabase
         .from('sku_aliases')
-        .upsert(aliasesToInsert, {
-          onConflict: 'sku_id,alias_type,alias_value',
-        });
+        .select('sku_id, alias_value, skus!inner(client_id, notes)')
+        .eq('alias_type', 'shopify_inventory_item_id')
+        .range(offset, offset + batchSize - 1);
 
-      if (error) {
-        console.error('Error inserting aliases:', error);
-        throw error;
+      if (fetchError) {
+        console.error('Error fetching aliases:', fetchError);
+        break;
       }
+
+      if (!aliases || aliases.length === 0) {
+        console.log('No more aliases to process');
+        break;
+      }
+
+      console.log(`Processing ${aliases.length} aliases in this batch`);
+
+      // Find missing variant_id aliases
+      const aliasesToBackfill = [];
+      
+      for (const alias of aliases) {
+        // Check if variant_id alias already exists
+        const { data: existingVariant } = await supabase
+          .from('sku_aliases')
+          .select('id')
+          .eq('sku_id', alias.sku_id)
+          .eq('alias_type', 'shopify_variant_id')
+          .maybeSingle();
+
+        if (existingVariant) {
+          continue; // Already has variant_id alias
+        }
+
+        // Extract variant_id from notes
+        const notes = (alias.skus as any)?.notes || '';
+        const variantMatch = notes.match(/Variant ID:\s*(\d+)/i);
+        
+        if (variantMatch) {
+          const variantId = variantMatch[1];
+          aliasesToBackfill.push({
+            sku_id: alias.sku_id,
+            alias_type: 'shopify_variant_id',
+            alias_value: variantId,
+          });
+        }
+      }
+
+      // Bulk insert this batch
+      if (aliasesToBackfill.length > 0) {
+        const { error: insertError } = await supabase
+          .from('sku_aliases')
+          .upsert(aliasesToBackfill, {
+            onConflict: 'sku_id,alias_type,alias_value',
+            ignoreDuplicates: true,
+          });
+
+        if (insertError) {
+          console.error('Batch insert error:', insertError);
+        } else {
+          totalBackfilled += aliasesToBackfill.length;
+          console.log(`✓ Backfilled ${aliasesToBackfill.length} aliases in this batch`);
+        }
+      }
+
+      // Check if we should continue
+      hasMore = aliases.length === batchSize;
+      offset += batchSize;
     }
 
-    console.log(`✓ Successfully backfilled ${aliasesToInsert.length} variant_id aliases`);
+    console.log(`Backfill complete: ${totalBackfilled} total aliases created`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        backfilled: aliasesToInsert.length,
-        total_checked: skusWithInventoryAlias.length,
-        message: `Backfilled ${aliasesToInsert.length} missing variant_id aliases`,
+        backfilled: totalBackfilled,
+        message: `Backfilled ${totalBackfilled} missing variant_id aliases`,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

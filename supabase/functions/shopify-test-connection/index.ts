@@ -81,13 +81,24 @@ Deno.serve(async (req) => {
 
     const shop = data.shop;
 
+    // Check if location is configured
+    const { data: clientConfig } = await supabase
+      .from('clients')
+      .select('shopify_location_id')
+      .eq('id', client_id)
+      .single();
+
+    const locationConfigured = !!clientConfig?.shopify_location_id;
+
+    console.log(`Location configured: ${locationConfigured}, ID: ${clientConfig?.shopify_location_id || 'N/A'}`);
+
     // Log the test in audit_log
     await supabase.from('audit_log').insert({
       user_id: user.id,
       action: 'TEST_CONNECTION',
       table_name: 'shopify_stores',
       record_id: client_id,
-      new_data: { shop_name: shop.name, test_successful: true },
+      new_data: { shop_name: shop.name, test_successful: true, location_configured: locationConfigured },
     });
 
     return new Response(
@@ -97,6 +108,9 @@ Deno.serve(async (req) => {
         shop_domain: shop.myshopifyDomain,
         email: shop.email,
         plan: shop.plan?.displayName,
+        location_configured: locationConfigured,
+        location_id: clientConfig?.shopify_location_id || null,
+        warning: !locationConfigured ? 'Location not configured. Run location sync before inventory sync.' : null,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

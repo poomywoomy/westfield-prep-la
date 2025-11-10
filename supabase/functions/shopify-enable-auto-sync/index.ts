@@ -52,12 +52,32 @@ serve(async (req) => {
       );
     }
 
-    // Enable auto-sync for all stores
-    const configRecords = stores.map(store => ({
-      client_id: store.client_id,
-      auto_sync_enabled: true,
-      sync_frequency: "5min",
-      next_sync_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+    // Enable auto-sync for all stores (preserve existing sync frequencies)
+    const configRecords = await Promise.all(stores.map(async (store) => {
+      const { data: existing } = await supabase
+        .from('shopify_sync_config')
+        .select('sync_frequency')
+        .eq('client_id', store.client_id)
+        .maybeSingle();
+
+      const frequency = existing?.sync_frequency || '5min';
+      
+      // Calculate next sync time based on frequency
+      const frequencyMinutes: Record<string, number> = {
+        '5min': 5,
+        '10min': 10,
+        'hourly': 60,
+        'daily': 1440,
+        'weekly': 10080,
+      };
+      const minutes = frequencyMinutes[frequency] || 5;
+
+      return {
+        client_id: store.client_id,
+        auto_sync_enabled: true,
+        sync_frequency: frequency,
+        next_sync_at: new Date(Date.now() + minutes * 60 * 1000).toISOString(),
+      };
     }));
 
     // Upsert sync configs
