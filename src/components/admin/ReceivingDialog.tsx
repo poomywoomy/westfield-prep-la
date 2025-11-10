@@ -66,14 +66,22 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
   const [mainLocationId, setMainLocationId] = useState<string | null>(null);
   const [qcPhotos, setQCPhotos] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cachedUserId, setCachedUserId] = useState<string | null>(null);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open && asn) {
-      fetchMainLocation();
-      fetchLines();
-      setIsSubmitting(false);
+      const initializeReceiving = async () => {
+        // Cache user ID early to prevent session issues during long receiving process
+        const { data: { user } } = await supabase.auth.getUser();
+        setCachedUserId(user?.id || null);
+        
+        fetchMainLocation();
+        fetchLines();
+        setIsSubmitting(false);
+      };
+      initializeReceiving();
     }
   }, [open, asn]);
 
@@ -359,7 +367,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
       }
 
       // Update ASN lines and create ledger entries
-      const { data: { user } } = await supabase.auth.getUser();
+      // Use cached user ID to avoid session-related errors during receiving
       
       for (const line of lines) {
         // Update ASN line
@@ -400,7 +408,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                 client_id: asn!.client_id,
                 sku_id: line.sku.id,
                 location_id: mainLocationId,
-                user_id: user?.id || null,
+                user_id: cachedUserId || null,
                 qty_delta: normalDelta,
                 transaction_type: normalDelta > 0 ? "RECEIPT" : "ADJUSTMENT_MINUS",
                 reason_code: normalDelta < 0 ? "correction" : undefined,
@@ -539,11 +547,24 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
+      // Check if error is session-related
+      const isAuthError = error?.message?.includes('session') || 
+                          error?.message?.includes('JWT') ||
+                          error?.message?.includes('auth') ||
+                          error?.message?.includes('token');
+      
       toast({
-        title: "Error",
-        description: error.message || "Failed to complete receiving",
+        title: isAuthError ? "Session Expired" : "Error",
+        description: isAuthError 
+          ? "Your session has expired. Please save your progress and log in again."
+          : error.message || "Failed to complete receiving",
         variant: "destructive",
       });
+      
+      // Don't close dialog on auth errors so user can see their progress
+      if (!isAuthError) {
+        onOpenChange(false);
+      }
     } finally {
       setLoading(false);
       setIsSubmitting(false);

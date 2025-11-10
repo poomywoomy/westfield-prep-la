@@ -277,7 +277,7 @@ Deno.serve(async (req) => {
       const { error: aliasError } = await serviceClient
         .from('sku_aliases')
         .upsert(aliasesToInsert, {
-          onConflict: 'sku_id,alias_type',
+          onConflict: 'sku_id,alias_type,alias_value',
         });
 
       if (aliasError) {
@@ -350,7 +350,10 @@ Deno.serve(async (req) => {
                         edges {
                           node {
                             id
-                            available
+                            quantities(names: "available") {
+                              name
+                              quantity
+                            }
                           }
                         }
                       }
@@ -366,7 +369,10 @@ Deno.serve(async (req) => {
                 );
 
                 const inventoryLevels = inventoryData.inventoryItem?.inventoryLevels?.edges || [];
-                const availableQty = inventoryLevels.reduce((sum: number, edge: any) => sum + (edge.node.available || 0), 0);
+                const availableQty = inventoryLevels.reduce((sum: number, edge: any) => {
+                  const availableQuantity = edge.node.quantities?.find((q: any) => q.name === 'available');
+                  return sum + (availableQuantity?.quantity || 0);
+                }, 0);
 
                 if (availableQty > 0) {
                   // Create initial ledger entry
