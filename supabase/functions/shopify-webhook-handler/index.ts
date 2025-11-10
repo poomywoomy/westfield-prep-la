@@ -27,40 +27,44 @@ Deno.serve(async (req) => {
       throw new Error('Missing required webhook headers');
     }
 
-    // Check for replay attacks - verify webhook hasn't been processed before
+    console.log(`[Webhook] Received: ${topic} from ${shopDomain} (ID: ${webhookId})`);
+
+    // Read body ONCE for HMAC verification
+    const body = await req.text();
+
+    // PHASE 1 FIX: Verify HMAC BEFORE checking processed_webhooks (prevent poisoning attacks)
+    const generatedHmac = createHmac('sha256', shopifySecret)
+      .update(body)
+      .digest();
+
+    const hmacDecoded = Uint8Array.from(atob(hmac), c => c.charCodeAt(0));
+
+    if (generatedHmac.length !== hmacDecoded.length || !timingSafeEqual(generatedHmac, hmacDecoded)) {
+      console.error('[Webhook] HMAC verification failed');
+      return new Response(
+        JSON.stringify({ error: 'Invalid signature' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
+    }
+
+    console.log('[Webhook] ✓ HMAC verified');
+
+    // NOW check for replay attacks (after HMAC is verified)
     const { data: existingWebhook } = await supabase
       .from('processed_webhooks')
       .select('id')
       .eq('webhook_id', webhookId)
-      .single();
+      .maybeSingle();
 
     if (existingWebhook) {
-      console.log('Webhook already processed:', webhookId);
+      console.log(`[Webhook] Already processed: ${webhookId}`);
       return new Response(
         JSON.stringify({ success: true, message: 'Webhook already processed' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
 
-    // Read and verify webhook payload with timing-safe comparison
-    const body = await req.text();
-    const generatedHmac = createHmac('sha256', shopifySecret)
-      .update(body)
-      .digest();
-
-    // Decode received HMAC from base64
-    const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
-    const hmacDecoded = Uint8Array.from(atob(hmac), c => c.charCodeAt(0));
-
-    // Use timing-safe comparison
-    if (generatedHmac.length !== hmacDecoded.length || !timingSafeEqual(generatedHmac, hmacDecoded)) {
-      console.error('HMAC verification failed');
-      throw new Error('Invalid webhook signature');
-    }
-
     const payload = JSON.parse(body);
-    console.log(`Received webhook: ${topic} from ${shopDomain}`);
 
     // Get client_id from shop domain
     const { data: store } = await supabase
@@ -68,22 +72,13 @@ Deno.serve(async (req) => {
       .select('client_id, id')
       .eq('shop_domain', shopDomain)
       .eq('is_active', true)
-      .single();
+      .maybeSingle();
 
     if (!store) {
       throw new Error('Store not found');
     }
 
-    // Mark webhook as processed to prevent replay attacks
-    await supabase
-      .from('processed_webhooks')
-      .insert({
-        webhook_id: webhookId,
-        shop_domain: shopDomain,
-        topic
-      });
-
-    // Log webhook delivery
+    // Log webhook delivery (before processing)
     const { data: logEntry } = await supabase
       .from('webhook_delivery_logs')
       .insert({
@@ -95,6 +90,15 @@ Deno.serve(async (req) => {
       })
       .select()
       .single();
+
+    // Mark as processed using UPSERT to handle race conditions gracefully
+    await supabase
+      .from('processed_webhooks')
+      .upsert({
+        webhook_id: webhookId,
+        shop_domain: shopDomain,
+        topic
+      }, { onConflict: 'webhook_id', ignoreDuplicates: true });
 
     try {
       // Handle different webhook topics
@@ -109,7 +113,6 @@ Deno.serve(async (req) => {
       } else if (topic.startsWith('returns/')) {
         await handleReturnWebhook(supabase, store.client_id, topic, payload);
       } else if (topic.startsWith('customers/') || topic.startsWith('shop/')) {
-        // Handle mandatory compliance webhooks
         await handleComplianceWebhook(supabase, shopDomain, topic, payload);
       }
 
@@ -144,11 +147,17 @@ Deno.serve(async (req) => {
           })
           .eq('id', logEntry.id);
       }
+
+      // Delete from processed_webhooks to allow retry on transient failures
+      await supabase
+        .from('processed_webhooks')
+        .delete()
+        .eq('webhook_id', webhookId);
+
       throw error;
     }
   } catch (error) {
-    console.error('Webhook handler error:', error);
-    // Return generic error message to prevent information leakage
+    console.error('[Webhook] Fatal error:', error);
     return new Response(
       JSON.stringify({ error: 'Webhook processing failed' }),
       {
@@ -165,10 +174,9 @@ async function handleProductWebhook(
   topic: string,
   product: any
 ) {
-  console.log(`Handling ${topic} for product ${product.id}`);
+  console.log(`[Product] Handling ${topic} for product ${product.id}`);
 
   if (topic === 'products/delete') {
-    // Delete all variants of this product from skus table
     await supabase
       .from('skus')
       .delete()
@@ -177,7 +185,6 @@ async function handleProductWebhook(
     return;
   }
 
-  // Upsert product variants to skus table
   const productData = product.variants.map((variant: any) => ({
     client_id: clientId,
     client_sku: variant.sku || `SHOP-${product.id}-${variant.id}`,
@@ -199,9 +206,8 @@ async function handleInventoryWebhook(
   clientId: string,
   payload: any
 ) {
-  console.log(`Updating inventory for item ${payload.inventory_item_id}`);
+  console.log(`[Inventory] Updating for item ${payload.inventory_item_id}`);
 
-  // Update inventory_sync table
   await supabase
     .from('inventory_sync')
     .upsert({
@@ -218,7 +224,7 @@ async function handleOrderWebhook(
   topic: string,
   order: any
 ) {
-  console.log(`Handling ${topic} for order ${order.id}`);
+  console.log(`[Order] Handling ${topic} for order ${order.id}`);
 
   const orderData = {
     client_id: clientId,
@@ -239,8 +245,7 @@ async function handleOrderWebhook(
     .from('shopify_orders')
     .upsert(orderData, { onConflict: 'client_id,shopify_order_id' });
 
-  // CRITICAL: Auto-decrement inventory when order is created/paid
-  // This keeps app inventory in sync with Shopify's automatic decrements
+  // Auto-decrement inventory when order is created/paid
   if (topic === 'orders/create' || topic === 'orders/paid') {
     await decrementInventoryForOrder(supabase, clientId, order);
   }
@@ -251,18 +256,21 @@ async function decrementInventoryForOrder(
   clientId: string,
   order: any
 ) {
-  console.log(`Attempting to decrement inventory for order ${order.id}`);
+  const shopifyOrderId = order.id.toString();
+  console.log(`[Inventory] Decrementing for order ${shopifyOrderId}`);
   
-  // Check if we've already processed this order's inventory
+  // PHASE 1 FIX: Proper idempotency check using shopify_order_id
   const { data: existingEntries } = await supabase
     .from('inventory_ledger')
     .select('id')
-    .eq('source_type', 'shopify_order')
-    .eq('source_id', order.id.toString())
-    .limit(1);
+    .eq('client_id', clientId)
+    .eq('shopify_order_id', shopifyOrderId)
+    .eq('transaction_type', 'SALE_DECREMENT')
+    .limit(1)
+    .maybeSingle();
 
-  if (existingEntries && existingEntries.length > 0) {
-    console.log(`Inventory already decremented for order ${order.id}`);
+  if (existingEntries) {
+    console.log(`[Inventory] Order ${shopifyOrderId} already processed, skipping`);
     return;
   }
 
@@ -274,9 +282,8 @@ async function decrementInventoryForOrder(
     .eq('code', 'MAIN')
     .maybeSingle();
 
-  // Auto-create if missing
   if (!location) {
-    console.log(`Creating MAIN location for client ${clientId}`);
+    console.log(`[Inventory] Creating MAIN location for client ${clientId}`);
     const { data: newLocation, error: createError } = await supabase
       .from('locations')
       .insert({
@@ -289,52 +296,64 @@ async function decrementInventoryForOrder(
       .single();
     
     if (createError) {
-      console.error(`Failed to create location for client ${clientId}:`, createError);
+      console.error(`[Inventory] Failed to create location:`, createError);
       return;
     }
     location = newLocation;
   }
 
-  // Process each line item
   const ledgerEntries = [];
   
   for (const lineItem of order.line_items) {
     if (!lineItem.variant_id) {
-      console.warn(`No variant_id for line item in order ${order.id}`);
+      console.warn(`[Inventory] No variant_id for line item in order ${shopifyOrderId}`);
       continue;
     }
 
-    // Strategy 1: Look up by shopify_variant_id alias
+    const variantId = lineItem.variant_id.toString();
+    const clientSku = lineItem.sku;
+
+    // PHASE 1 FIX: Enhanced SKU matching with detailed logging
     let sku_id = null;
+    let matchStrategy = 'none';
+
+    // Strategy 1: variant_id alias (most reliable)
     const { data: alias } = await supabase
       .from('sku_aliases')
-      .select('sku_id')
+      .select('sku_id, skus!inner(client_id)')
       .eq('alias_type', 'shopify_variant_id')
-      .eq('alias_value', lineItem.variant_id.toString())
+      .eq('alias_value', variantId)
+      .eq('skus.client_id', clientId)
       .maybeSingle();
 
     if (alias) {
       sku_id = alias.sku_id;
-      console.log(`✓ Strategy 1 (variant_id alias): Found SKU ${sku_id} for variant ${lineItem.variant_id}`);
+      matchStrategy = 'variant_id_alias';
+      console.log(`[Inventory] ✓ Strategy 1 (variant_id alias): SKU ${sku_id} for variant ${variantId}`);
     } else {
-      console.log(`✗ Strategy 1 failed: No alias for variant_id ${lineItem.variant_id}`);
+      console.log(`[Inventory] ✗ Strategy 1: No alias for variant_id ${variantId}`);
       
-      // Strategy 2: Direct SKU match
-      const { data: skuByClientSku } = await supabase
-        .from('skus')
-        .select('id')
-        .eq('client_id', clientId)
-        .eq('client_sku', lineItem.sku)
-        .maybeSingle();
-      
-      if (skuByClientSku) {
-        sku_id = skuByClientSku.id;
-        console.log(`✓ Strategy 2 (client_sku): Found SKU ${sku_id} for client_sku ${lineItem.sku}`);
-      } else {
-        console.log(`✗ Strategy 2 failed: No SKU with client_sku ${lineItem.sku}`);
+      // Strategy 2: Direct client_sku match
+      if (clientSku) {
+        const { data: skuByClientSku } = await supabase
+          .from('skus')
+          .select('id')
+          .eq('client_id', clientId)
+          .eq('client_sku', clientSku)
+          .maybeSingle();
         
-        // Strategy 3: Fallback internal SKU pattern
-        const fallbackSku = `SHOP-${lineItem.product_id}-${lineItem.variant_id}`;
+        if (skuByClientSku) {
+          sku_id = skuByClientSku.id;
+          matchStrategy = 'direct_sku_match';
+          console.log(`[Inventory] ✓ Strategy 2 (direct match): SKU ${sku_id} for client_sku ${clientSku}`);
+        } else {
+          console.log(`[Inventory] ✗ Strategy 2: No SKU with client_sku ${clientSku}`);
+        }
+      }
+
+      // Strategy 3: Fallback pattern SHOP-{product_id}-{variant_id}
+      if (!sku_id) {
+        const fallbackSku = `SHOP-${lineItem.product_id}-${variantId}`;
         const { data: skuByFallback } = await supabase
           .from('skus')
           .select('id')
@@ -344,29 +363,32 @@ async function decrementInventoryForOrder(
         
         if (skuByFallback) {
           sku_id = skuByFallback.id;
-          console.log(`✓ Strategy 3 (fallback): Found SKU ${sku_id} for fallback ${fallbackSku}`);
+          matchStrategy = 'fallback_pattern';
+          console.log(`[Inventory] ✓ Strategy 3 (fallback): SKU ${sku_id} for ${fallbackSku}`);
         } else {
-          console.log(`✗ Strategy 3 failed: No fallback SKU ${fallbackSku}`);
+          console.log(`[Inventory] ✗ Strategy 3: No fallback SKU ${fallbackSku}`);
         }
       }
     }
 
     if (!sku_id) {
-      console.warn(`No SKU mapping found for variant ${lineItem.variant_id} using any strategy in order ${order.id}`);
+      console.warn(`[Inventory] ✗ No SKU mapping found for variant ${variantId}, client_sku ${clientSku}`);
       continue;
     }
 
-    // Create ledger entry to decrement inventory
+    // PHASE 1 FIX: Include shopify_order_id for proper idempotency tracking
     ledgerEntries.push({
       client_id: clientId,
       sku_id: sku_id,
       location_id: location.id,
-      qty_delta: -lineItem.quantity, // Negative = decrement
+      qty_delta: -lineItem.quantity,
       transaction_type: 'SALE_DECREMENT',
-      source_type: 'shopify_order',
-      source_id: order.id.toString(),
-      notes: `Shopify order ${order.name} - ${lineItem.title}`,
-      user_id: null, // System-generated
+      source_type: 'webhook',
+      source_ref: null,
+      shopify_order_id: shopifyOrderId,
+      shopify_fulfillment_id: null,
+      notes: `Shopify order ${order.name} via webhook (${matchStrategy})`,
+      user_id: null,
     });
   }
 
@@ -376,13 +398,13 @@ async function decrementInventoryForOrder(
       .insert(ledgerEntries);
 
     if (error) {
-      console.error('Failed to create ledger entries for order:', error);
+      console.error('[Inventory] Failed to create ledger entries:', error);
       throw error;
     }
 
-    console.log(`✓ Decremented inventory for ${ledgerEntries.length} items in order ${order.id}`);
+    console.log(`[Inventory] ✓ Decremented ${ledgerEntries.length} items for order ${shopifyOrderId}`);
   } else {
-    console.log(`No SKU mappings found for order ${order.id}, skipping inventory decrement`);
+    console.log(`[Inventory] No SKU mappings found for order ${shopifyOrderId}`);
   }
 }
 
@@ -392,9 +414,8 @@ async function handleComplianceWebhook(
   topic: string,
   payload: any
 ) {
-  console.log(`Handling compliance webhook: ${topic} for ${shopDomain}`);
+  console.log(`[Compliance] Handling ${topic} for ${shopDomain}`);
 
-  // Map topic to webhook_type
   let webhookType: string;
   if (topic === 'customers/data_request') {
     webhookType = 'data_request';
@@ -406,7 +427,6 @@ async function handleComplianceWebhook(
     throw new Error(`Unknown compliance webhook topic: ${topic}`);
   }
 
-  // Log the compliance webhook for admin review
   await supabase
     .from('compliance_webhooks')
     .insert({
@@ -416,7 +436,7 @@ async function handleComplianceWebhook(
       processed: false,
     });
 
-  console.log(`Compliance webhook logged: ${webhookType} for ${shopDomain}`);
+  console.log(`[Compliance] Logged: ${webhookType}`);
 }
 
 async function handleFulfillmentOrderWebhook(
@@ -424,11 +444,10 @@ async function handleFulfillmentOrderWebhook(
   clientId: string,
   payload: any
 ) {
-  console.log(`Handling fulfillment order routing for client ${clientId}`);
+  console.log(`[Fulfillment] Handling routing for client ${clientId}`);
   
   const fulfillmentOrder = payload.fulfillment_order;
   
-  // Update order record with fulfillment_order_id
   const { error } = await supabase
     .from('shopify_orders')
     .update({ fulfillment_order_id: fulfillmentOrder.id.toString() })
@@ -436,9 +455,9 @@ async function handleFulfillmentOrderWebhook(
     .eq('client_id', clientId);
   
   if (error) {
-    console.error('Failed to update fulfillment order ID:', error);
+    console.error('[Fulfillment] Update failed:', error);
   } else {
-    console.log(`Updated order ${fulfillmentOrder.order_id} with fulfillment order ID ${fulfillmentOrder.id}`);
+    console.log(`[Fulfillment] Updated order ${fulfillmentOrder.order_id}`);
   }
 }
 
@@ -448,13 +467,10 @@ async function handleReturnWebhook(
   topic: string,
   payload: any
 ) {
-  console.log(`Handling return webhook: ${topic} for client ${clientId}`);
+  console.log(`[Return] Handling ${topic} for client ${clientId}`);
   
   const returnRequest = payload.return;
+  console.log(`[Return] ${returnRequest.id} - Status: ${returnRequest.status}`);
   
-  // Log return event for admin/client review
-  console.log(`Return ${returnRequest.id} - Status: ${returnRequest.status}`);
-  
-  // Could create notification or activity log entry here
-  // For now, just log it for reference
+  // Return webhooks logged for reference
 }

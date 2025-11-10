@@ -233,7 +233,7 @@ Deno.serve(async (req) => {
           transaction_type: 'SALE_DECREMENT',
           source_type: 'shopify_fulfillment',
           shopify_order_id: order.shopify_order_id,
-          shopify_fulfillment_id: fulfillmentData.id,
+          shopify_fulfillment_id: fulfillmentData.id.split('/').pop(), // PHASE 2 FIX: Store numeric ID
           notes: `Edge function fulfillment - Order ${order.order_number}`,
         });
 

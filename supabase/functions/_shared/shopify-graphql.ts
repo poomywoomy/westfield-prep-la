@@ -21,6 +21,22 @@ export async function shopifyGraphQL(
         }
       );
 
+      // PHASE 5 FIX: Parse rate limit headers for proactive throttling
+      const callLimitHeader = response.headers.get('X-Shopify-Shop-Api-Call-Limit');
+      if (callLimitHeader) {
+        const [current, max] = callLimitHeader.split('/').map(Number);
+        const usage = (current / max) * 100;
+        
+        if (usage > 85) {
+          const jitter = Math.random() * 1000;
+          const backoffMs = 2000 + jitter;
+          console.log(`⚠️  Rate limit approaching (${current}/${max} = ${usage.toFixed(1)}%), throttling ${backoffMs.toFixed(0)}ms`);
+          await new Promise(resolve => setTimeout(resolve, backoffMs));
+        } else if (usage > 70) {
+          console.log(`⚠️  Rate limit usage: ${current}/${max} (${usage.toFixed(1)}%)`);
+        }
+      }
+
       // Handle rate limiting (429)
       if (response.status === 429) {
         const retryAfter = response.headers.get('Retry-After') || '5';

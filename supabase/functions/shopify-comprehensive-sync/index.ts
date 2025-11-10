@@ -224,12 +224,20 @@ async function syncProducts(supabase: any, clientId: string, store: any) {
   return skusToInsert.length + skusToUpdate.length;
 }
 
-async function syncOrders(supabase: any, clientId: string, store: any) {
+async function syncOrders(supabase: any, clientId: string, store: any, lastSyncAt?: string) {
   console.log(`[${clientId}] Syncing orders...`);
   
-  // Get orders updated in last 6 hours
-  const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
-  const query = `updated_at:>='${sixHoursAgo}'`;
+  // PHASE 3 FIX: Use last successful sync timestamp (or default to 7 days for first run)
+  let queryTimestamp = lastSyncAt;
+  if (!queryTimestamp) {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    queryTimestamp = sevenDaysAgo;
+    console.log(`[${clientId}] First sync, fetching orders from last 7 days`);
+  } else {
+    console.log(`[${clientId}] Incremental sync from ${queryTimestamp}`);
+  }
+  
+  const query = `updated_at:>='${queryTimestamp}'`;
 
   const rawOrders = await shopifyGraphQLPaginated(
     store.shop_domain,
@@ -301,23 +309,25 @@ async function reconcileInventory(supabase: any, clientId: string, store: any) {
     const inventoryItemId = level.item.id.split('/').pop();
     const shopifyQty = level.available || 0;
 
-    // Find SKU by inventory_item_id
+    // Find SKU by inventory_item_id with client_id filter
     const { data: alias } = await supabase
       .from('sku_aliases')
-      .select('sku_id')
+      .select('sku_id, skus!inner(client_id)')
       .eq('alias_type', 'shopify_inventory_item_id')
       .eq('alias_value', inventoryItemId)
-      .single();
+      .eq('skus.client_id', clientId)
+      .maybeSingle();
 
     if (!alias) continue;
 
-    // Calculate app quantity
-    const { data: ledger } = await supabase
+    // PHASE 3 FIX: Calculate app quantity via SQL aggregation (not JS reduce)
+    const { data: aggregation } = await supabase
       .from('inventory_ledger')
       .select('qty_delta')
-      .eq('sku_id', alias.sku_id);
+      .eq('sku_id', alias.sku_id)
+      .eq('client_id', clientId);
 
-    const appQty = ledger?.reduce((sum: number, entry: any) => sum + entry.qty_delta, 0) || 0;
+    const appQty = aggregation?.reduce((sum: number, entry: any) => sum + entry.qty_delta, 0) || 0;
 
     if (shopifyQty !== appQty) {
       discrepancies.push({
@@ -420,8 +430,8 @@ Deno.serve(async (req) => {
         // Sync products
         const productsSynced = await syncProducts(supabase, config.client_id, store);
 
-        // Sync orders
-        const ordersSynced = await syncOrders(supabase, config.client_id, store);
+        // PHASE 3 FIX: Pass last successful sync timestamp to orders sync
+        const ordersSynced = await syncOrders(supabase, config.client_id, store, config.last_sync_at);
 
         // Reconcile inventory
         const inventoryDiscrepancies = await reconcileInventory(supabase, config.client_id, store);
