@@ -103,22 +103,27 @@ Deno.serve(async (req) => {
       console.log(`✓ Auto-saved Shopify location ${locationId}`);
     }
 
-    // Start sync log
-    const { data: syncLog } = await serviceClient
-      .from('sync_logs')
-      .insert({
-        client_id: client_id,
-        sync_type: 'inventory',
-        status: 'in_progress',
-        products_synced: 0,
-        triggered_by: user.id,
-      })
-      .select()
-      .single();
+    // Get client's MAIN location
+    const { data: mainLocation } = await serviceClient
+      .from('locations')
+      .select('id')
+      .eq('code', 'MAIN')
+      .limit(1)
+      .maybeSingle();
 
-    if (syncLog) {
-      syncLogId = syncLog.id;
-    }
+    if (!mainLocation) throw new Error('MAIN location not found');
+
+    const syncLogId = crypto.randomUUID();
+    const { data: syncLog } = await serviceClient.from('sync_logs').insert({
+      id: syncLogId,
+      client_id: client_id,
+      sync_type: 'inventory',
+      status: 'in_progress',
+      products_synced: 0,
+      triggered_by: user.id,
+    })
+    .select()
+    .single();
 
     // Get all SKUs for this client
     const { data: skus } = await serviceClient
@@ -168,13 +173,18 @@ Deno.serve(async (req) => {
 
         const inventoryItemId = alias.alias_value;
 
-        // Compute westfield_quantity from inventory_ledger
-        const { data: ledgerEntries } = await serviceClient
-          .from('inventory_ledger')
-          .select('qty_delta')
-          .eq('sku_id', sku.id);
+        // Compute westfield_quantity from inventory_ledger (location-aware)
+        const { data: westfieldQty, error: qtyError } = await serviceClient
+          .rpc('get_inventory_at_location', {
+            p_sku_id: sku.id,
+            p_client_id: client_id,
+            p_location_id: mainLocation.id
+          });
 
-        const westfieldQuantity = ledgerEntries?.reduce((sum, entry) => sum + entry.qty_delta, 0) || 0;
+        if (qtyError) {
+          errors.push({ sku: sku.client_sku, error: qtyError.message });
+          continue;
+        }
 
         // Update inventory level via GraphQL mutation
         const inventoryMutation = `
@@ -191,22 +201,20 @@ Deno.serve(async (req) => {
           }
         `;
 
-        const inventoryLevelId = `gid://shopify/InventoryLevel/${inventoryItemId}?inventory_location_id=${locationId}`;
-
     const mutationResult = await shopifyGraphQL(
       store.shop_domain,
       store.access_token,
       inventoryMutation,
       {
         input: {
+          ignoreCompareQuantity: true,
           reason: 'correction',
           name: 'available',
-          ignoreCompareQuantity: true,
           quantities: [
             {
               inventoryItemId: `gid://shopify/InventoryItem/${inventoryItemId}`,
               locationId: `gid://shopify/Location/${locationId}`,
-              quantity: westfieldQuantity,
+              quantity: westfieldQty || 0,
             }
           ],
         }

@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { shopifyGraphQL } from '../_shared/shopify-graphql.ts';
+import { shopifyGraphQL, shopifyGraphQLPaginated } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -102,23 +102,34 @@ Deno.serve(async (req) => {
       console.warn(`⚠️  Found ${conflicts.length} alias conflicts`);
     }
 
-    // Get app quantities from inventory ledger
+    // Get MAIN location for location-aware quantities
+    const { data: mainLocation } = await serviceClient
+      .from('locations')
+      .select('id')
+      .eq('code', 'MAIN')
+      .limit(1)
+      .maybeSingle();
+
+    if (!mainLocation) throw new Error('MAIN location not found');
+
+    // Get app quantities from inventory ledger (location-aware)
     const skuQuantities = new Map<string, number>();
     for (const item of skusWithAliases) {
       const { data: ledgerSum } = await serviceClient
-        .rpc('get_current_inventory', { 
+        .rpc('get_inventory_at_location', { 
           p_sku_id: item.sku_id, 
-          p_client_id: client_id 
+          p_client_id: client_id,
+          p_location_id: mainLocation.id
         });
       
       skuQuantities.set(item.sku_id, ledgerSum || 0);
     }
 
-    // Fetch current Shopify quantities
+    // Fetch current Shopify quantities (paginated)
     const inventoryQuery = `
-      query getInventoryLevels($locationId: ID!) {
+      query getInventoryLevels($locationId: ID!, $cursor: String) {
         location(id: $locationId) {
-          inventoryLevels(first: 250) {
+          inventoryLevels(first: 250, after: $cursor) {
             edges {
               node {
                 id
@@ -140,17 +151,18 @@ Deno.serve(async (req) => {
       }
     `;
 
-    const shopifyData = await shopifyGraphQL(
+    const allLevels = await shopifyGraphQLPaginated(
       store.shop_domain,
       store.access_token,
       inventoryQuery,
+      'location.inventoryLevels',
       { locationId: `gid://shopify/Location/${client.shopify_location_id}` }
     );
 
     const shopifyQuantities = new Map<string, number>();
-    shopifyData.location?.inventoryLevels?.edges?.forEach((edge: any) => {
-      const itemId = edge.node.item.id.split('/').pop();
-      const availableQty = edge.node.quantities?.find((q: any) => q.name === 'available')?.quantity || 0;
+    allLevels.forEach((level: any) => {
+      const itemId = level.item.id.split('/').pop();
+      const availableQty = level.quantities?.find((q: any) => q.name === 'available')?.quantity || 0;
       shopifyQuantities.set(itemId, availableQty);
     });
 
@@ -160,9 +172,10 @@ Deno.serve(async (req) => {
 
     for (const item of skusWithAliases) {
       if (conflicts.some(c => c.inventoryItemId === item.alias_value)) {
+        const skuInfo = item.skus as any;
         discrepancies.push({
           sku_id: item.sku_id,
-          client_sku: item.skus.client_sku,
+          client_sku: skuInfo.client_sku,
           inventory_item_id: item.alias_value,
           status: 'CONFLICT',
           error: 'Multiple SKUs map to same inventory item',
@@ -174,9 +187,10 @@ Deno.serve(async (req) => {
       const shopifyQty = shopifyQuantities.get(item.alias_value) || 0;
 
       if (appQty !== shopifyQty) {
+        const skuInfo = item.skus as any;
         discrepancies.push({
           sku_id: item.sku_id,
-          client_sku: item.skus.client_sku,
+          client_sku: skuInfo.client_sku,
           inventory_item_id: item.alias_value,
           app_qty: appQty,
           shopify_qty_before: shopifyQty,
@@ -187,7 +201,8 @@ Deno.serve(async (req) => {
           updates.push({
             inventoryItemId: item.alias_value,
             quantity: appQty,
-            clientSku: item.skus.client_sku,
+            clientSku: skuInfo.client_sku,
+            shopify_qty_before: shopifyQty,
           });
         }
       }
@@ -197,6 +212,18 @@ Deno.serve(async (req) => {
 
     let correctedCount = 0;
     const errors = [];
+    const itemResults: any[] = [];
+
+    const INVENTORY_ACTIVATE_MUTATION = `
+      mutation inventoryActivate($inventoryItemId: ID!, $locationId: ID!) {
+        inventoryActivate(inventoryItemId: $inventoryItemId, locationId: $locationId) {
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
 
     // Execute updates if authoritative mode
     if (mode === 'authoritative' && updates.length > 0) {
@@ -226,6 +253,7 @@ Deno.serve(async (req) => {
               setQuantityMutation,
               {
                 input: {
+                  ignoreCompareQuantity: true,
                   reason: 'correction',
                   name: 'available',
                   quantities: [{
@@ -239,24 +267,104 @@ Deno.serve(async (req) => {
 
             if (result.inventorySetQuantities.userErrors.length === 0) {
               correctedCount++;
-            } else {
-              errors.push({
+              itemResults.push({
                 sku: update.clientSku,
-                error: result.inventorySetQuantities.userErrors[0].message
+                was: update.shopify_qty_before || 0,
+                now: update.quantity,
+                status: 'updated'
               });
+            } else {
+              const userErrors = result.inventorySetQuantities.userErrors;
+              const notStockedError = userErrors.find((e: any) => 
+                e.message.includes('not stocked') || e.message.includes('must be stocked')
+              );
+
+              if (notStockedError) {
+                // Auto-activate and retry
+                console.log(`🔧 Auto-activating ${update.clientSku} at location...`);
+                await shopifyGraphQL(store.shop_domain, store.access_token, INVENTORY_ACTIVATE_MUTATION, {
+                  inventoryItemId: `gid://shopify/InventoryItem/${update.inventoryItemId}`,
+                  locationId: `gid://shopify/Location/${client.shopify_location_id}`
+                });
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Retry
+                const retryResult = await shopifyGraphQL(
+                  store.shop_domain,
+                  store.access_token,
+                  setQuantityMutation,
+                  {
+                    input: {
+                      ignoreCompareQuantity: true,
+                      reason: 'correction',
+                      name: 'available',
+                      quantities: [{
+                        inventoryItemId: `gid://shopify/InventoryItem/${update.inventoryItemId}`,
+                        locationId: `gid://shopify/Location/${client.shopify_location_id}`,
+                        quantity: update.quantity,
+                      }]
+                    }
+                  }
+                );
+
+                if (retryResult.inventorySetQuantities.userErrors.length === 0) {
+                  correctedCount++;
+                  itemResults.push({
+                    sku: update.clientSku,
+                    was: update.shopify_qty_before || 0,
+                    now: update.quantity,
+                    status: 'updated_after_activation'
+                  });
+                } else {
+                  errors.push({
+                    sku: update.clientSku,
+                    error: retryResult.inventorySetQuantities.userErrors[0].message
+                  });
+                  itemResults.push({
+                    sku: update.clientSku,
+                    status: 'error',
+                    error: retryResult.inventorySetQuantities.userErrors[0].message
+                  });
+                }
+              } else {
+                errors.push({
+                  sku: update.clientSku,
+                  error: userErrors[0].message
+                });
+                itemResults.push({
+                  sku: update.clientSku,
+                  status: 'error',
+                  error: userErrors[0].message
+                });
+              }
             }
           } catch (err) {
-            errors.push({ sku: update.clientSku, error: err.message });
+            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+            errors.push({ sku: update.clientSku, error: errorMessage });
+            itemResults.push({
+              sku: update.clientSku,
+              status: 'error',
+              error: errorMessage
+            });
           }
 
           await new Promise(resolve => setTimeout(resolve, pauseMs));
         }
       }
+    } else if (mode === 'dryRun' && discrepancies.length > 0) {
+      itemResults.push(...discrepancies.map(d => ({
+        sku: d.client_sku,
+        current: d.shopify_qty_before,
+        target: d.app_qty,
+        delta: d.diff,
+        status: 'would_update'
+      })));
     }
 
     const durationMs = Date.now() - startTime;
 
-    // Create sync log
+    // Create sync log with detailed results
     await serviceClient.from('sync_logs').insert({
       client_id,
       sync_type: 'inventory_reconciliation',
@@ -270,6 +378,8 @@ Deno.serve(async (req) => {
         discrepancies_found: discrepancies.length,
         corrections_applied: correctedCount,
         conflicts: conflicts.length,
+        item_results: itemResults.slice(0, 50),
+        location_id: client.shopify_location_id
       }
     });
 
@@ -302,15 +412,17 @@ Deno.serve(async (req) => {
         discrepancies: discrepancies.slice(0, 100),
         conflicts,
         errors: errors.slice(0, 20),
+        item_results: itemResults.slice(0, 50)
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Reconcile error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: errorMessage }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

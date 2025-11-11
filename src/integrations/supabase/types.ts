@@ -2852,6 +2852,10 @@ export type Database = {
         Args: { p_client_id: string; p_sku_id: string }
         Returns: number
       }
+      get_inventory_at_location: {
+        Args: { p_client_id: string; p_location_id: string; p_sku_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

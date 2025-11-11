@@ -63,41 +63,50 @@ Deno.serve(async (req) => {
     if (!store) throw new Error('Store not found');
 
     // Fetch locations using GraphQL
-    const locations = await shopifyGraphQLPaginated(
+    const allLocations = await shopifyGraphQLPaginated(
       store.shop_domain,
       store.access_token,
       LOCATIONS_QUERY,
       'locations'
     );
     
-    // Get primary location (first active location)
-    const primaryLocation = locations.find((loc: any) => loc.isActive) || locations[0];
+    const activeLocations = allLocations.filter((loc: any) => loc.isActive);
     
-    if (!primaryLocation) {
+    if (activeLocations.length === 0) {
       throw new Error('No active location found in Shopify');
     }
 
-    // Use legacyResourceId for compatibility with existing code
-    const locationId = primaryLocation.legacyResourceId || primaryLocation.id.split('/').pop();
+    // Return all active locations for user selection
+    const locations = activeLocations.map((loc: any) => ({
+      id: loc.legacyResourceId || loc.id.split('/').pop(),
+      gid: loc.id,
+      name: loc.name,
+      address: loc.address,
+      isActive: loc.isActive
+    }));
 
-    // Store location ID in clients table
-    const { error: updateError } = await supabase
+    // Auto-set first location if none configured
+    const { data: client } = await supabase
       .from('clients')
-      .update({ shopify_location_id: locationId.toString() })
-      .eq('id', client_id);
+      .select('shopify_location_id')
+      .eq('id', client_id)
+      .single();
 
-    if (updateError) throw updateError;
+    if (!client?.shopify_location_id && locations.length > 0) {
+      const primaryLocation = locations[0];
+      await supabase
+        .from('clients')
+        .update({ shopify_location_id: primaryLocation.id })
+        .eq('id', client_id);
 
-    console.log(`Stored Shopify location ${locationId} for client ${client_id}`);
+      console.log(`Auto-set Shopify location ${primaryLocation.id} for client ${client_id}`);
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
-        location: {
-          id: locationId,
-          name: primaryLocation.name,
-          address: primaryLocation.address?.address1,
-        },
+        locations,
+        current_location_id: client?.shopify_location_id || locations[0]?.id
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );

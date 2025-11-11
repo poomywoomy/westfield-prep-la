@@ -178,6 +178,13 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Get client's configured Shopify location for seeding
+    const { data: clientData } = await serviceClient
+      .from('clients')
+      .select('id, company_name, shopify_location_id')
+      .eq('id', targetClientId)
+      .single();
+
     // Fetch all products with GraphQL
     const products = await fetchAllProducts(
       shopifyStore.shop_domain,
@@ -343,7 +350,7 @@ Deno.serve(async (req) => {
 
             // Only seed if no existing ledger entries
             if (ledgerCount === 0) {
-              // Fetch Shopify inventory level via GraphQL
+              // Fetch Shopify inventory level via GraphQL for configured location
               try {
                 const inventoryItemId = variant.inventory_item_id.toString();
                 
@@ -355,6 +362,9 @@ Deno.serve(async (req) => {
                         edges {
                           node {
                             id
+                            location {
+                              id
+                            }
                             quantities(names: "available") {
                               name
                               quantity
@@ -374,10 +384,18 @@ Deno.serve(async (req) => {
                 );
 
                 const inventoryLevels = inventoryData.inventoryItem?.inventoryLevels?.edges || [];
-                const availableQty = inventoryLevels.reduce((sum: number, edge: any) => {
-                  const availableQuantity = edge.node.quantities?.find((q: any) => q.name === 'available');
-                  return sum + (availableQuantity?.quantity || 0);
-                }, 0);
+                
+                // Find quantity at client's configured Shopify location
+                let availableQty = 0;
+                if (clientData?.shopify_location_id) {
+                  const shopifyLocationGid = `gid://shopify/Location/${clientData.shopify_location_id}`;
+                  const matchingLevel = inventoryLevels.find(
+                    (edge: any) => edge.node.location.id === shopifyLocationGid
+                  );
+                  if (matchingLevel) {
+                    availableQty = matchingLevel.node.quantities?.find((q: any) => q.name === 'available')?.quantity || 0;
+                  }
+                }
 
                 if (availableQty > 0) {
                   // Create initial ledger entry
