@@ -16,7 +16,7 @@ const Footer = () => {
               </p>
               <div className="pt-2">
                 <p className="text-sm text-secondary font-semibold">Open 7 Days a Week</p>
-                <p className="text-sm text-white/90">9am - 8pm PST</p>
+                <p className="text-sm text-white/90">8am - 5pm PT</p>
               </div>
             </div>
 

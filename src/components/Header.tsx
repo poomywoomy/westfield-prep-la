@@ -154,7 +154,7 @@ const Header = () => {
                 <span className="font-bold text-sm">1.818.935.5478</span>
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  Mon-Sun | 9am-8pm PST
+                  Daily | 8am-5pm PT
                 </span>
               </div>
             </a>

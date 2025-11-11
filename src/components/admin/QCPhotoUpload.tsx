@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { resignPhotoUrls } from "@/lib/photoUtils";
 
 interface QCPhotoUploadProps {
   lineId: string;
@@ -13,8 +14,18 @@ interface QCPhotoUploadProps {
 
 export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPhotos = [] }: QCPhotoUploadProps) {
   const [photos, setPhotos] = useState<string[]>(existingPhotos);
+  const [displayUrls, setDisplayUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+
+  // Re-sign URLs when photos change for display
+  useEffect(() => {
+    if (photos.length > 0) {
+      resignPhotoUrls(photos).then(setDisplayUrls);
+    } else {
+      setDisplayUrls([]);
+    }
+  }, [photos]);
 
   const uploadPhoto = async (file: File) => {
     const fileExt = file.name.split('.').pop();
@@ -30,14 +41,8 @@ export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPho
 
     if (error) throw error;
 
-    // Generate signed URL for private bucket (48 hour expiry for inspection period)
-    const { data: signedData, error: signedError } = await supabase.storage
-      .from('qc-images')
-      .createSignedUrl(filePath, 172800); // 48 hours
-
-    if (signedError) throw signedError;
-
-    return signedData.signedUrl;
+    // Return the storage path instead of signed URL
+    return filePath;
   };
 
   const handleFiles = useCallback(async (files: FileList | null) => {
@@ -60,9 +65,9 @@ export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPho
     setUploading(true);
     try {
       const uploadPromises = validFiles.map(file => uploadPhoto(file));
-      const urls = await Promise.all(uploadPromises);
+      const paths = await Promise.all(uploadPromises);
       
-      const newPhotos = [...photos, ...urls];
+      const newPhotos = [...photos, ...paths];
       setPhotos(newPhotos);
       onPhotosUploaded(newPhotos);
       
@@ -94,15 +99,23 @@ export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPho
     setDragActive(false);
   }, []);
 
-  const removePhoto = async (url: string, index: number) => {
+  const removePhoto = async (index: number) => {
     try {
-      // Extract path from URL
-      const urlParts = url.split('/');
-      const pathIndex = urlParts.findIndex(part => part === asnNumber);
-      if (pathIndex !== -1) {
-        const filePath = urlParts.slice(pathIndex).join('/');
-        await supabase.storage.from('qc-images').remove([filePath]);
+      const photoPath = photos[index];
+      
+      // If it's a storage path (not a URL), use it directly
+      let filePath = photoPath;
+      
+      // If it's a URL, extract the path
+      if (photoPath.includes('/')) {
+        const parts = photoPath.split('/');
+        const asnIndex = parts.findIndex(part => part === asnNumber);
+        if (asnIndex !== -1) {
+          filePath = parts.slice(asnIndex).join('/');
+        }
       }
+
+      await supabase.storage.from('qc-images').remove([filePath]);
 
       const newPhotos = photos.filter((_, i) => i !== index);
       setPhotos(newPhotos);
@@ -148,9 +161,9 @@ export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPho
         </div>
       </div>
 
-      {photos.length > 0 && (
+      {displayUrls.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
-          {photos.map((url, index) => (
+          {displayUrls.map((url, index) => (
             <div key={index} className="relative group aspect-square">
               <img
                 src={url}
@@ -161,7 +174,7 @@ export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPho
                 variant="destructive"
                 size="icon"
                 className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => removePhoto(url, index)}
+                onClick={() => removePhoto(index)}
               >
                 <X className="h-3 w-3" />
               </Button>

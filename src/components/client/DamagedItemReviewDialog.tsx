@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle, Package } from "lucide-react";
+import { resignPhotoUrls } from "@/lib/photoUtils";
 
 interface DamagedItemReviewDialogProps {
   open: boolean;
@@ -36,6 +37,16 @@ export function DamagedItemReviewDialog({
   const [decision, setDecision] = useState<string>("");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  const [displayPhotos, setDisplayPhotos] = useState<string[]>([]);
+
+  // Re-sign photo URLs when dialog opens
+  useEffect(() => {
+    if (open && discrepancy.qc_photo_urls && discrepancy.qc_photo_urls.length > 0) {
+      resignPhotoUrls(discrepancy.qc_photo_urls).then(setDisplayPhotos);
+    } else {
+      setDisplayPhotos([]);
+    }
+  }, [open, discrepancy.qc_photo_urls]);
 
   const handleSubmit = async () => {
     if (!decision) {
@@ -119,11 +130,11 @@ export function DamagedItemReviewDialog({
           </div>
 
           {/* QC Photos */}
-          {discrepancy.qc_photo_urls && discrepancy.qc_photo_urls.length > 0 && (
+          {displayPhotos.length > 0 && (
             <div>
               <Label className="mb-2 block">QC Photos</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {discrepancy.qc_photo_urls.map((url, index) => (
+                {displayPhotos.map((url, index) => (
                   <img
                     key={index}
                     src={url}
@@ -149,7 +160,7 @@ export function DamagedItemReviewDialog({
               <div className="flex items-center space-x-2 p-3 border rounded hover:bg-muted/50">
                 <RadioGroupItem value="sell_as_bstock" id="sell_as_bstock" />
                 <Label htmlFor="sell_as_bstock" className="flex-1 cursor-pointer">
-                  <span className="font-medium">Sell as B-Stock</span>
+                  <span className="font-medium">Sell</span>
                   <p className="text-sm text-muted-foreground">List at reduced price</p>
                 </Label>
               </div>

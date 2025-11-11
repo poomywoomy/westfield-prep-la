@@ -64,19 +64,34 @@ export const SKUDiscrepanciesDialog = ({
       missing: "secondary",
       quarantined: "default",
     };
-    return <Badge variant={variants[type] || "outline"}>{type.toUpperCase()}</Badge>;
+    return <Badge variant={variants[type] || "default"}>{type.toUpperCase()}</Badge>;
   };
 
   const getDecisionBadge = (decision: string | null) => {
-    if (!decision) return <Badge variant="outline">Pending</Badge>;
+    if (!decision) return <Badge variant="secondary">Pending</Badge>;
+    
+    const labels: Record<string, string> = {
+      discard: "Discard",
+      sell_as_bstock: "Sell",
+      'sell-as-b-stock': "Sell",
+      return_to_sender: "Return to Sender",
+      return: "Return to Sender",
+      rework: "Rework/Repair",
+      acknowledge: "Acknowledged",
+    };
     
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
       discard: "destructive",
+      sell_as_bstock: "secondary",
       'sell-as-b-stock': "secondary",
+      return_to_sender: "default",
       return: "default",
       rework: "default",
+      acknowledge: "secondary",
     };
-    return <Badge variant={variants[decision] || "outline"}>{decision}</Badge>;
+    
+    const label = labels[decision] || decision;
+    return <Badge variant={variants[decision] || "default"}>{label}</Badge>;
   };
 
   const getStatusBadge = (status: string) => {

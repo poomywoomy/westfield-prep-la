@@ -17,7 +17,7 @@ const Contact = () => {
     <>
       <Helmet>
         <title>Contact Los Angeles Shopify Prep Center | DTC Fulfillment & FBA Quote</title>
-        <meta name="description" content="Contact Westfield Prep Center in Los Angeles for Shopify fulfillment and e-commerce services. Call +1 (818) 935-5478 or email info@westfieldprepcenter.com. Serving businesses nationwide. Open 7 days, 9am-8pm PST." />
+        <meta name="description" content="Contact Westfield Prep Center in Los Angeles for Shopify fulfillment and e-commerce services. Call +1 (818) 935-5478 or email info@westfieldprepcenter.com. Serving businesses nationwide. Open 7 days, 8am-5pm PT." />
         <link rel="canonical" href="https://westfieldprepcenter.com/contact/" />
       </Helmet>
       <StructuredData type="organization" />

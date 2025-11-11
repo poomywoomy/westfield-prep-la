@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle2, Package } from "lucide-react";
+import { resignPhotoUrls } from "@/lib/photoUtils";
 
 interface DiscrepancyActionsDialogProps {
   open: boolean;
@@ -40,11 +41,21 @@ export function DiscrepancyActionsDialog({
   const { toast } = useToast();
   const [adminNotes, setAdminNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  const [displayPhotos, setDisplayPhotos] = useState<string[]>([]);
+
+  // Re-sign photo URLs when dialog opens
+  useEffect(() => {
+    if (open && decision.qc_photo_urls && decision.qc_photo_urls.length > 0) {
+      resignPhotoUrls(decision.qc_photo_urls).then(setDisplayPhotos);
+    } else {
+      setDisplayPhotos([]);
+    }
+  }, [open, decision.qc_photo_urls]);
 
   const getDecisionLabel = (dec: string) => {
     const labels: Record<string, string> = {
       discard: "Discard",
-      sell_as_bstock: "Sell as B-Stock",
+      sell_as_bstock: "Sell",
       return_to_sender: "Return to Sender",
       rework: "Rework/Repair",
       acknowledge: "Acknowledged",
@@ -141,11 +152,11 @@ export function DiscrepancyActionsDialog({
           </div>
 
           {/* QC Photos */}
-          {decision.qc_photo_urls && decision.qc_photo_urls.length > 0 && (
+          {displayPhotos.length > 0 && (
             <div>
               <Label className="mb-2 block">QC Photos</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {decision.qc_photo_urls.map((url, index) => (
+                {displayPhotos.map((url, index) => (
                   <img
                     key={index}
                     src={url}

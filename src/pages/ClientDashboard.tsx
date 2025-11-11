@@ -16,6 +16,7 @@ import ClientOrdersTab from "@/components/client/ClientOrdersTab";
 import { ClientShipmentsTab } from "@/components/client/ClientShipmentsTab";
 import { ClientInventoryActivityLog } from "@/components/client/ClientInventoryActivityLog";
 import { ClientAnalyticsDashboard } from "@/components/client/ClientAnalyticsDashboard";
+import { ClientASNsTab } from "@/components/client/ClientASNsTab";
 import { sanitizeError } from "@/lib/errorHandler";
 import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
 import type { Database } from "@/integrations/supabase/types";
@@ -163,7 +164,7 @@ const ClientDashboard = () => {
         )}
         
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid grid-cols-6 w-full">
+          <TabsList className="grid grid-cols-7 w-full">
             <TabsTrigger value="analytics">
               <Activity className="mr-2 h-4 w-4" />
               Analytics
@@ -175,6 +176,10 @@ const ClientDashboard = () => {
             <TabsTrigger value="orders">
               <Package className="mr-2 h-4 w-4" />
               Orders
+            </TabsTrigger>
+            <TabsTrigger value="asns">
+              <Package className="mr-2 h-4 w-4" />
+              ASNs
             </TabsTrigger>
             <TabsTrigger value="shipments">
               <Package className="mr-2 h-4 w-4" />
@@ -208,6 +213,10 @@ const ClientDashboard = () => {
 
           <TabsContent value="orders" forceMount className="data-[state=inactive]:hidden">
             <ClientOrdersTab />
+          </TabsContent>
+
+          <TabsContent value="asns" forceMount className="data-[state=inactive]:hidden">
+            <ClientASNsTab clientId={clientId} />
           </TabsContent>
 
           <TabsContent value="shipments" forceMount className="data-[state=inactive]:hidden">

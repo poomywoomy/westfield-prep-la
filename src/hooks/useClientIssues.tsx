@@ -32,8 +32,8 @@ export const useClientIssues = (clientId: string, sourceType?: 'receiving' | 're
         .from("damaged_item_decisions")
         .select(`
           *,
-          skus:sku_id(client_sku, title, image_url),
-          asn_headers:asn_id(asn_number)
+          skus(client_sku, title, image_url),
+          asn_headers(asn_number)
         `)
         .eq("client_id", clientId)
         .eq("status", "pending");
