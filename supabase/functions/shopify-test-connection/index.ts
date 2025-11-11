@@ -105,6 +105,7 @@ Deno.serve(async (req) => {
       'write_inventory',
       'read_fulfillments',
       'write_fulfillments',
+      'read_locations',
     ];
 
     const grantedScopes = scopeData.app?.installation?.accessScopes?.map((s: any) => s.handle) || [];

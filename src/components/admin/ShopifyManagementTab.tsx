@@ -65,6 +65,13 @@ export function ShopifyManagementTab() {
   const [unmappedProducts, setUnmappedProducts] = useState<any[]>([]);
   const [skuList, setSkuList] = useState<any[]>([]);
   
+  // Inventory repair states
+  const [activateClientId, setActivateClientId] = useState<string>("");
+  const [reconcileClientId, setReconcileClientId] = useState<string>("");
+  const [activating, setActivating] = useState(false);
+  const [reconciling, setReconciling] = useState(false);
+  const [reconcileResults, setReconcileResults] = useState<any>(null);
+  
   // Dialog states
   const [logsDialog, setLogsDialog] = useState<{ open: boolean; clientId: string; clientName: string }>({
     open: false,
@@ -487,6 +494,76 @@ export function ShopifyManagementTab() {
     }
   };
 
+  const handleActivateLocation = async () => {
+    if (!activateClientId) return;
+    
+    setActivating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("shopify-activate-location-inventory", {
+        body: { client_id: activateClientId }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast({
+          title: "Location activation complete",
+          description: `Activated ${data.activated}/${data.total} inventory items`,
+        });
+      } else {
+        throw new Error(data?.error || 'Activation failed');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Activation failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setActivating(false);
+    }
+  };
+
+  const handleReconcile = async (mode: 'dryRun' | 'authoritative') => {
+    if (!reconcileClientId) return;
+
+    setReconciling(true);
+    setReconcileResults(null);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("shopify-reconcile-inventory-bulk", {
+        body: { 
+          client_id: reconcileClientId,
+          mode 
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        setReconcileResults(data);
+        
+        const summary = data.summary;
+        toast({
+          title: mode === 'dryRun' ? "Scan complete" : "Reconciliation complete",
+          description: mode === 'dryRun'
+            ? `Found ${summary.discrepancies_found} discrepancies out of ${summary.total_skus} SKUs`
+            : `Corrected ${summary.corrections_applied} of ${summary.discrepancies_found} discrepancies`,
+        });
+      } else {
+        throw new Error(data?.error || 'Reconciliation failed');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Reconciliation failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setReconciling(false);
+    }
+  };
+
   const mapSKU = async (variantId: string, skuId: string, clientId: string) => {
     try {
       const { error } = await supabase
@@ -753,6 +830,225 @@ export function ShopifyManagementTab() {
                 )}
               </TableBody>
             </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Inventory Repair Tools */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            Inventory Repair & Reconciliation
+          </CardTitle>
+          <CardDescription>
+            Diagnose and fix inventory sync issues between app and Shopify
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              These tools perform bulk inventory operations. Always run a dry-run first to preview changes before applying them.
+            </AlertDescription>
+          </Alert>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Activate Location Inventory</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Ensures all inventory items are "stocked" at the configured Shopify location.
+                </p>
+                <Select
+                  value={activateClientId}
+                  onValueChange={setActivateClientId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stores.map(store => (
+                      <SelectItem key={store.client_id} value={store.client_id}>
+                        {store.clients.company_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={handleActivateLocation}
+                  disabled={!activateClientId || activating}
+                  className="w-full"
+                >
+                  {activating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Activating...
+                    </>
+                  ) : (
+                    'Activate Items'
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Dry-Run Reconcile</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Preview inventory differences without making changes.
+                </p>
+                <Select
+                  value={reconcileClientId}
+                  onValueChange={setReconcileClientId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stores.map(store => (
+                      <SelectItem key={store.client_id} value={store.client_id}>
+                        {store.clients.company_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={() => handleReconcile('dryRun')}
+                  disabled={!reconcileClientId || reconciling}
+                  variant="outline"
+                  className="w-full"
+                >
+                  {reconciling ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Scanning...
+                    </>
+                  ) : (
+                    'Preview Discrepancies'
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Authoritative Push</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Force Shopify to match app inventory exactly.
+                </p>
+                <Select
+                  value={reconcileClientId}
+                  onValueChange={setReconcileClientId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stores.map(store => (
+                      <SelectItem key={store.client_id} value={store.client_id}>
+                        {store.clients.company_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={() => handleReconcile('authoritative')}
+                  disabled={!reconcileClientId || reconciling}
+                  variant="default"
+                  className="w-full"
+                >
+                  {reconciling ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Fixing...
+                    </>
+                  ) : (
+                    'Fix Now'
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {reconcileResults && (
+            <Card className="bg-muted/50">
+              <CardHeader>
+                <CardTitle className="text-sm">Reconciliation Results</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Total SKUs</p>
+                    <p className="text-lg font-bold">{reconcileResults.summary?.total_skus || 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Discrepancies</p>
+                    <p className="text-lg font-bold text-destructive">
+                      {reconcileResults.summary?.discrepancies_found || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Corrected</p>
+                    <p className="text-lg font-bold text-green-600">
+                      {reconcileResults.summary?.corrections_applied || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Conflicts</p>
+                    <p className="text-lg font-bold text-orange-600">
+                      {reconcileResults.summary?.conflicts || 0}
+                    </p>
+                  </div>
+                </div>
+                
+                {reconcileResults.discrepancies?.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium mb-2">Top Discrepancies:</p>
+                    <div className="border rounded-lg">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>SKU</TableHead>
+                            <TableHead>App Qty</TableHead>
+                            <TableHead>Shopify Qty</TableHead>
+                            <TableHead>Diff</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {reconcileResults.discrepancies.slice(0, 10).map((disc: any, i: number) => (
+                            <TableRow key={i}>
+                              <TableCell className="font-mono text-xs">{disc.client_sku}</TableCell>
+                              <TableCell>{disc.app_qty}</TableCell>
+                              <TableCell>{disc.shopify_qty_before}</TableCell>
+                              <TableCell className={disc.diff > 0 ? 'text-green-600' : 'text-destructive'}>
+                                {disc.diff > 0 ? '+' : ''}{disc.diff}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                )}
+
+                {reconcileResults.conflicts?.length > 0 && (
+                  <Alert variant="destructive" className="mt-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      {reconcileResults.conflicts.length} SKUs have conflicting aliases (multiple SKUs map to same inventory item). 
+                      These require manual resolution.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
           )}
         </CardContent>
       </Card>

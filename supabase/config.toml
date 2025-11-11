@@ -65,3 +65,9 @@ verify_jwt = false
 
 [[functions.cleanup-old-webhooks.schedule]]
 cron = "0 2 * * *"
+
+[functions.shopify-activate-location-inventory]
+verify_jwt = true
+
+[functions.shopify-reconcile-inventory-bulk]
+verify_jwt = true

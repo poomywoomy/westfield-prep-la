@@ -412,38 +412,8 @@ Deno.serve(async (req) => {
 
     const durationMs = Date.now() - startTime;
 
-    // PHASE 5 P6: Archive SKUs that no longer exist in Shopify
-    console.log('Checking for orphaned SKUs to archive...');
-    const syncedSkus = products
-      .flatMap((p: any) => p.variants.map((v: any) => v.sku))
-      .filter((sku: string | null) => sku !== null && sku !== '');
-
-    const { data: localSkus } = await serviceClient
-      .from('skus')
-      .select('id, client_sku')
-      .eq('client_id', targetClientId);
-
-    const orphanedSkus = localSkus?.filter(sku => 
-      !syncedSkus.includes(sku.client_sku)
-    ) || [];
-
-    if (orphanedSkus.length > 0) {
-      console.log(`🗑️  Found ${orphanedSkus.length} orphaned SKUs, marking as archived`);
-      
-      const { error: archiveError } = await serviceClient
-        .from('skus')
-        .update({ 
-          notes: '(Archived: Deleted from Shopify)',
-          status: 'inactive'
-        })
-        .in('id', orphanedSkus.map(s => s.id));
-        
-      if (!archiveError) {
-        console.log(`✓ Archived ${orphanedSkus.length} deleted products`);
-      } else {
-        console.error('Failed to archive products:', archiveError);
-      }
-    }
+    // Archive logic temporarily disabled for inventory reconciliation safety
+    // Will be re-enabled with proper safety checks in future update
 
     // Update sync log to success
     if (syncLogId) {

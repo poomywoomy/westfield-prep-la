@@ -41,6 +41,8 @@ export function ShopifySyncHealthDashboard() {
     webhookSuccessRate: 0,
     inventoryDiscrepancies: 0,
     lastSuccessfulSync: null as Date | null,
+    inventoryAccuracy: 0,
+    conflictingAliases: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -92,11 +94,43 @@ export function ShopifySyncHealthDashboard() {
         .limit(1)
         .maybeSingle();
 
+      // Calculate inventory accuracy from recent reconcile logs
+      const { data: recentReconcile } = await supabase
+        .from('sync_logs')
+        .select('metadata')
+        .eq('sync_type', 'inventory_reconciliation')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      let inventoryAccuracy = 100;
+      if (recentReconcile?.metadata) {
+        const meta = recentReconcile.metadata as any;
+        const totalSkus = meta.total_skus || 1;
+        const discrepanciesFound = meta.discrepancies_found || 0;
+        inventoryAccuracy = Math.round(((totalSkus - discrepanciesFound) / totalSkus) * 100);
+      }
+
+      // Count conflicting aliases
+      const { data: allAliases } = await supabase
+        .from('sku_aliases')
+        .select('alias_value, alias_type')
+        .in('alias_type', ['shopify_inventory_item_id', 'shopify_variant_id']);
+
+      const aliasMap = new Map<string, number>();
+      allAliases?.forEach(alias => {
+        const key = `${alias.alias_type}:${alias.alias_value}`;
+        aliasMap.set(key, (aliasMap.get(key) || 0) + 1);
+      });
+      const conflicts = Array.from(aliasMap.values()).filter(count => count > 1).length;
+
       setHealthData({
         recentFailures: failedSyncs || 0,
         webhookSuccessRate: webhookRate,
         inventoryDiscrepancies: discrepancies || 0,
         lastSuccessfulSync: lastSync ? new Date(lastSync.created_at) : null,
+        inventoryAccuracy,
+        conflictingAliases: conflicts,
       });
     } catch (error) {
       console.error('Error fetching health metrics:', error);
@@ -121,7 +155,9 @@ export function ShopifySyncHealthDashboard() {
   const allSystemsHealthy = 
     healthData.recentFailures === 0 && 
     healthData.webhookSuccessRate >= 95 && 
-    healthData.inventoryDiscrepancies < 10;
+    healthData.inventoryDiscrepancies < 10 &&
+    healthData.inventoryAccuracy >= 95 &&
+    healthData.conflictingAliases === 0;
 
   return (
     <Card>
@@ -132,7 +168,7 @@ export function ShopifySyncHealthDashboard() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <MetricCard 
             title="Failed Syncs (24h)" 
             value={healthData.recentFailures} 
@@ -160,6 +196,20 @@ export function ShopifySyncHealthDashboard() {
             icon={<RefreshCw className="h-6 w-6" />}
             status="healthy"
           />
+          <MetricCard 
+            title="Inventory Accuracy" 
+            value={`${healthData.inventoryAccuracy}%`} 
+            threshold={95}
+            icon={<CheckCircle2 className="h-6 w-6" />}
+            status={healthData.inventoryAccuracy >= 95 ? 'healthy' : 'warning'}
+          />
+          <MetricCard 
+            title="Conflicting Aliases" 
+            value={healthData.conflictingAliases} 
+            threshold={1}
+            icon={<AlertCircle className="h-6 w-6" />}
+            status={healthData.conflictingAliases > 0 ? 'error' : 'healthy'}
+          />
         </div>
         
         <Alert variant={allSystemsHealthy ? "default" : "destructive"}>
@@ -171,7 +221,7 @@ export function ShopifySyncHealthDashboard() {
           <AlertDescription>
             {allSystemsHealthy
               ? "All systems operational ✅" 
-              : `${healthData.recentFailures} syncs failed, ${healthData.inventoryDiscrepancies} discrepancies require attention`}
+              : `Issues: ${healthData.recentFailures} failed syncs, ${healthData.inventoryDiscrepancies} discrepancies, ${healthData.inventoryAccuracy}% inventory accuracy, ${healthData.conflictingAliases} conflicting aliases`}
           </AlertDescription>
         </Alert>
       </CardContent>
