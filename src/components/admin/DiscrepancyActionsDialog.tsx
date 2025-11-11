@@ -56,6 +56,7 @@ export function DiscrepancyActionsDialog({
     const labels: Record<string, string> = {
       discard: "Discard",
       sell_as_bstock: "Sell",
+      return_to_inventory: "Return to Inventory",
       return_to_sender: "Return to Sender",
       rework: "Rework/Repair",
       acknowledge: "Acknowledged",
@@ -189,6 +190,15 @@ export function DiscrepancyActionsDialog({
                   : "• Received with minor damage"}<br />
                 • Create new SKU variant for B-stock<br />
                 • Adjust pricing and list for sale
+              </p>
+            )}
+            {decision.decision === "return_to_inventory" && (
+              <p className="text-sm text-blue-800">
+                {decision.source_type === "return" 
+                  ? "• Customer return - sellable condition" 
+                  : "• Received in sellable condition"}<br />
+                • Return units to active inventory<br />
+                • Remove from quarantine/damage status
               </p>
             )}
             {decision.decision === "return_to_sender" && (

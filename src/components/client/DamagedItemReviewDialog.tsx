@@ -158,10 +158,10 @@ export function DamagedItemReviewDialog({
                 </Label>
               </div>
               <div className="flex items-center space-x-2 p-3 border rounded hover:bg-muted/50">
-                <RadioGroupItem value="sell_as_bstock" id="sell_as_bstock" />
-                <Label htmlFor="sell_as_bstock" className="flex-1 cursor-pointer">
-                  <span className="font-medium">Sell</span>
-                  <p className="text-sm text-muted-foreground">List at reduced price</p>
+                <RadioGroupItem value="return_to_inventory" id="return_to_inventory" />
+                <Label htmlFor="return_to_inventory" className="flex-1 cursor-pointer">
+                  <span className="font-medium">Return to Inventory</span>
+                  <p className="text-sm text-muted-foreground">Add back to sellable stock</p>
                 </Label>
               </div>
               <div className="flex items-center space-x-2 p-3 border rounded hover:bg-muted/50">

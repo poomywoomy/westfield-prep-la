@@ -53,7 +53,7 @@ export const ReturnDiscrepancyWidget = ({ clientId }: ReturnDiscrepancyWidgetPro
           client_notes,
           qc_photo_urls,
           created_at,
-          skus!inner(client_sku, title, image_url)
+          skus(client_sku, title, image_url)
         `)
         .eq("client_id", clientId)
         .eq("source_type", "return")
@@ -124,10 +124,10 @@ export const ReturnDiscrepancyWidget = ({ clientId }: ReturnDiscrepancyWidgetPro
                 key={disc.id}
                 className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
               >
-                {disc.skus.image_url ? (
+                {disc.skus?.image_url ? (
                   <img
                     src={disc.skus.image_url}
-                    alt={disc.skus.title}
+                    alt={disc.skus?.title || "Product"}
                     className="w-12 h-12 rounded object-cover"
                   />
                 ) : (
@@ -136,8 +136,8 @@ export const ReturnDiscrepancyWidget = ({ clientId }: ReturnDiscrepancyWidgetPro
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{disc.skus.title}</p>
-                  <p className="text-xs text-muted-foreground">{disc.skus.client_sku}</p>
+                  <p className="font-medium text-sm truncate">{disc.skus?.title || "Unknown Product"}</p>
+                  <p className="text-xs text-muted-foreground">{disc.skus?.client_sku || "N/A"}</p>
                   <p className="text-xs text-orange-600 capitalize mt-1">
                     {disc.discrepancy_type} - {disc.quantity} unit{disc.quantity > 1 ? "s" : ""}
                   </p>
@@ -161,10 +161,10 @@ export const ReturnDiscrepancyWidget = ({ clientId }: ReturnDiscrepancyWidgetPro
             client_id: selectedDiscrepancy.client_id,
             asn_id: selectedDiscrepancy.asn_id,
             asn_number: "",
-            client_sku: selectedDiscrepancy.skus.client_sku,
-            title: selectedDiscrepancy.skus.title,
+            client_sku: selectedDiscrepancy.skus?.client_sku || "N/A",
+            title: selectedDiscrepancy.skus?.title || "Unknown Product",
             damaged_qty: selectedDiscrepancy.quantity,
-            image_url: selectedDiscrepancy.skus.image_url || undefined,
+            image_url: selectedDiscrepancy.skus?.image_url || undefined,
             qc_photo_urls: selectedDiscrepancy.qc_photo_urls || undefined,
           }}
         />
@@ -180,10 +180,10 @@ export const ReturnDiscrepancyWidget = ({ clientId }: ReturnDiscrepancyWidgetPro
             client_id: selectedDiscrepancy.client_id,
             asn_id: selectedDiscrepancy.asn_id,
             asn_number: "",
-            client_sku: selectedDiscrepancy.skus.client_sku,
-            title: selectedDiscrepancy.skus.title,
+            client_sku: selectedDiscrepancy.skus?.client_sku || "N/A",
+            title: selectedDiscrepancy.skus?.title || "Unknown Product",
             missing_qty: selectedDiscrepancy.quantity,
-            image_url: selectedDiscrepancy.skus.image_url || undefined,
+            image_url: selectedDiscrepancy.skus?.image_url || undefined,
           }}
         />
       )}
