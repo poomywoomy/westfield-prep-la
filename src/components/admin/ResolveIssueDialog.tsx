@@ -43,7 +43,7 @@ export function ResolveIssueDialog({ asnId, asnNumber, open, onOpenChange, onSuc
         .eq('asn_id', asnId);
 
       const submittedOrProcessed = decisions?.filter(d => 
-        d.status === 'submitted' || d.status === 'processed'
+        d.status === 'submitted' || d.status === 'closed'
       ) || [];
 
       const decidedDamaged = submittedOrProcessed
@@ -76,14 +76,14 @@ export function ResolveIssueDialog({ asnId, asnNumber, open, onOpenChange, onSuc
 
       const { data: userData } = await supabase.auth.getUser();
       
-      // Update all decisions to processed
+      // Update all decisions to closed
       const { error: decisionsError } = await supabase
         .from('damaged_item_decisions')
         .update({
-          status: 'processed',
-          processed_at: new Date().toISOString(),
-          processed_by: userData.user?.id,
-          admin_notes: notes || 'Resolved via ASN resolution',
+          status: 'closed',
+          admin_closed_at: new Date().toISOString(),
+          admin_closed_by: userData.user?.id,
+          admin_close_notes: notes || 'Resolved via ASN resolution',
         })
         .eq('asn_id', asnId)
         .in('status', ['pending', 'submitted']);

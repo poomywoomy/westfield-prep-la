@@ -117,19 +117,22 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
     const skuMap = new Map(skus.map(s => [s.id, s]));
 
-    const lineData = asnLines.map(line => ({
-      line_id: line.id,
-      sku: skuMap.get(line.sku_id)!,
-      expected: line.expected_units,
-      received_units: line.received_units,
-      normal_units: line.normal_units,
-      damaged_units: line.damaged_units,
-      quarantined_units: line.quarantined_units,
-      missing_units: line.missing_units,
-      lot_number: line.lot_number || "",
-      expiry_date: line.expiry_date || "",
-      notes: line.notes || "",
-    }));
+    const lineData = asnLines.map(line => {
+      const sku = skuMap.get(line.sku_id)!;
+      return {
+        line_id: line.id,
+        sku: sku,
+        expected: line.expected_units,
+        received_units: line.received_units,
+        normal_units: line.normal_units,
+        damaged_units: line.damaged_units,
+        quarantined_units: line.quarantined_units,
+        missing_units: line.missing_units,
+        lot_number: line.lot_number || "",
+        expiry_date: line.expiry_date || "",
+        notes: line.notes || "",
+      };
+    });
 
     // Store initial state for delta computation
     const initialMap = new Map(lineData.map(line => [line.line_id, { ...line }]));
@@ -661,12 +664,12 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
                     }`}
                     onClick={() => setCurrentLineIndex(index)}
                   >
-                    <div className="flex items-start justify-between">
+                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate flex items-center gap-2">
-                          {isComplete && "✓"} {line.sku.client_sku}
+                          {isComplete && "✓"} {line.sku.internal_sku} - {line.sku.title}
                         </p>
-                        <p className="text-sm text-muted-foreground truncate">{line.sku.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">Client SKU: {line.sku.client_sku}</p>
                       </div>
                       <div className="ml-2 text-right">
                         <p className="text-sm font-medium">

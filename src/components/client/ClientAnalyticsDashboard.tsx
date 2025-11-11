@@ -26,15 +26,22 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
   const [dialogType, setDialogType] = useState<"damaged" | "missing" | "sku" | null>(null);
 
   // Stabilize date ranges with useMemo to prevent re-render loops
-  const todayRange = useMemo(() => ({ 
-    start: startOfDay(new Date()), 
-    end: endOfDay(new Date()) 
-  }), []);
+  // Use local date to match admin side and prevent timezone issues
+  const todayRange = useMemo(() => {
+    const now = new Date();
+    return { 
+      start: startOfDay(now), 
+      end: endOfDay(now) 
+    };
+  }, []);
   
-  const yesterdayRange = useMemo(() => ({ 
-    start: startOfDay(subDays(new Date(), 1)), 
-    end: endOfDay(subDays(new Date(), 1)) 
-  }), []);
+  const yesterdayRange = useMemo(() => {
+    const yesterday = subDays(new Date(), 1);
+    return { 
+      start: startOfDay(yesterday), 
+      end: endOfDay(yesterday) 
+    };
+  }, []);
   
   const mtdRange = useMemo(() => ({ 
     start: startOfMonth(new Date()), 

@@ -45,7 +45,7 @@ export function MissingItemReviewDialog({
           decision: "acknowledge",
           client_notes: notes || "Acknowledged missing items",
           submitted_at: new Date().toISOString(),
-          status: "pending",
+          status: "submitted", // Change status to 'submitted' when client responds
         })
         .eq("id", discrepancy.id);
 

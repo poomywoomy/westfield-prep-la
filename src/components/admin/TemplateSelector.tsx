@@ -41,7 +41,15 @@ export const TemplateSelector = ({
       .order('last_used_at', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false });
     
-    setTemplates(data || []);
+    // Filter out templates with deleted/inactive SKUs
+    const validTemplates = (data || []).map(template => ({
+      ...template,
+      shipment_template_lines: (template.shipment_template_lines || []).filter(
+        (line: any) => line.skus && line.skus.status === 'active'
+      )
+    })).filter(template => template.shipment_template_lines.length > 0);
+    
+    setTemplates(validTemplates);
     setLoading(false);
   };
 

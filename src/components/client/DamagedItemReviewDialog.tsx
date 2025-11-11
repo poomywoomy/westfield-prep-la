@@ -57,7 +57,7 @@ export function DamagedItemReviewDialog({
           decision,
           client_notes: notes,
           submitted_at: new Date().toISOString(),
-          status: "pending",
+          status: "submitted", // Change status to 'submitted' when client responds
         })
         .eq("id", discrepancy.id);
 
@@ -65,7 +65,7 @@ export function DamagedItemReviewDialog({
 
       toast({
         title: "Decision Submitted",
-        description: "Your decision has been sent to admin for processing",
+        description: "Your decision has been sent to the warehouse team.",
       });
 
       onSuccess?.();

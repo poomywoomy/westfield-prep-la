@@ -26,6 +26,24 @@ export const DiscrepancyAdminActions = ({
   const { user } = useAuth();
 
   const handleClose = async () => {
+    if (!discrepancy.submitted_at) {
+      toast({
+        title: "Cannot Close",
+        description: "Client has not responded yet. Please wait for client decision.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!notes.trim()) {
+      toast({
+        title: "Notes Required",
+        description: "Please add resolution notes before closing",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -147,13 +165,17 @@ export const DiscrepancyAdminActions = ({
             Cancel
           </Button>
           <Button 
-            variant="destructive" 
+            variant="secondary" 
             onClick={handleReopen} 
             disabled={isSubmitting}
           >
             {isSubmitting ? "Reopening..." : "Reopen & Send to Client"}
           </Button>
-          <Button onClick={handleClose} disabled={isSubmitting}>
+          <Button 
+            onClick={handleClose} 
+            disabled={isSubmitting || !discrepancy.submitted_at}
+            title={!discrepancy.submitted_at ? "Waiting for client response" : ""}
+          >
             {isSubmitting ? "Closing..." : "Close Discrepancy"}
           </Button>
         </DialogFooter>

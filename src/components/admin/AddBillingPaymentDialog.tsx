@@ -217,9 +217,8 @@ export const AddBillingPaymentDialog = ({
                   <SelectItem value="check">Check</SelectItem>
                   <SelectItem value="wire">Wire Transfer</SelectItem>
                   <SelectItem value="ach">ACH</SelectItem>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="credit_card">Credit Card</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="card">Card</SelectItem>
+                  <SelectItem value="manual">Manual</SelectItem>
                 </SelectContent>
               </Select>
             </div>

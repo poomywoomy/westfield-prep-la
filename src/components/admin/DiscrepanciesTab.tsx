@@ -45,7 +45,7 @@ export const DiscrepanciesTab = () => {
   const fetchDiscrepancies = async () => {
     setLoading(true);
     try {
-      const statusFilter = activeTab === "active" ? ["pending", "processed"] : ["closed"];
+      const statusFilter = activeTab === "active" ? ["pending", "submitted"] : ["closed"];
 
       const { data, error } = await supabase
         .from("damaged_item_decisions")
@@ -92,9 +92,9 @@ export const DiscrepanciesTab = () => {
 
   const getStatusBadge = (status: string) => {
     if (status === "pending") {
-      return <Badge variant="outline" className="bg-yellow-100 text-yellow-700">Pending</Badge>;
-    } else if (status === "processed") {
-      return <Badge variant="outline" className="bg-blue-100 text-blue-700">Processed</Badge>;
+      return <Badge variant="outline" className="bg-yellow-100 text-yellow-700">Awaiting Client</Badge>;
+    } else if (status === "submitted") {
+      return <Badge variant="outline" className="bg-blue-100 text-blue-700">Ready to Review</Badge>;
     } else {
       return <Badge variant="outline" className="bg-green-500 text-white">Closed</Badge>;
     }
@@ -151,7 +151,7 @@ export const DiscrepanciesTab = () => {
                     <TableCell>{getStatusBadge(disc.status)}</TableCell>
                     <TableCell>{format(new Date(disc.created_at), "MMM d, yyyy")}</TableCell>
                     <TableCell>
-                      {disc.status === "processed" && (
+                      {disc.status === "submitted" && (
                         <Button
                           size="sm"
                           variant="outline"

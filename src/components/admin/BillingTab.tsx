@@ -178,8 +178,7 @@ const BillingTab = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <BillingSummaryDashboard />
+    <div className="space-y-6">{/* Removed BillingSummaryDashboard per client request */}
 
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Active Clients</h2>

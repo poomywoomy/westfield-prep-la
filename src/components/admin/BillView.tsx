@@ -161,6 +161,13 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
   const updateQuantity = async (itemId: string, newQty: number) => {
     if (newQty < 0) return;
 
+    // Optimistic UI update
+    setBillItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, qty_decimal: newQty } : item
+      )
+    );
+
     try {
       const { error } = await supabase
         .from("bill_items")
@@ -168,12 +175,6 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
         .eq("id", itemId);
 
       if (error) throw error;
-
-      setBillItems((prev) =>
-        prev.map((item) =>
-          item.id === itemId ? { ...item, qty_decimal: newQty } : item
-        )
-      );
 
       await recalculateBillTotals();
       onRefresh();
@@ -183,6 +184,8 @@ export const BillView = ({ bill, client, onRefresh }: BillViewProps) => {
         description: error.message,
         variant: "destructive",
       });
+      // Revert on error
+      fetchBillData();
     }
   };
 
