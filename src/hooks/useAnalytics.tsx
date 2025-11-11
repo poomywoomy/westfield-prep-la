@@ -13,8 +13,14 @@ interface AnalyticsData {
   returns: number;
   discrepancies: {
     total: number;
-    receiving: { damaged: number; missing: number };
-    return: { damaged: number; missing: number };
+    receiving: { 
+      damaged: { count: number; total: number };
+      missing: { count: number; total: number };
+    };
+    return: { 
+      damaged: { count: number; total: number };
+      missing: { count: number; total: number };
+    };
   };
   lowStock: Array<{
     sku_id: string;
@@ -130,13 +136,15 @@ export const useAnalytics = (clientId: string, dateRange: DateRange) => {
           .gte("ts", start.toISOString())
           .lte("ts", end.toISOString()),
         
-        // Discrepancies (only unsubmitted ones)
+        // Discrepancies (filtered by date range)
         supabase
           .from("damaged_item_decisions")
           .select("discrepancy_type, source_type, quantity")
           .eq("client_id", clientId)
           .eq("status", "pending")
-          .is("submitted_at", null),
+          .is("submitted_at", null)
+          .gte("created_at", start.toISOString())
+          .lte("created_at", end.toISOString()),
         
         // Client threshold
         supabase
@@ -176,26 +184,42 @@ export const useAnalytics = (clientId: string, dateRange: DateRange) => {
       const returns = returnsData.data?.reduce((sum, row) => sum + (row.qty_delta || 0), 0) || 0;
 
       const discrepancies = {
-        total: discrepanciesData.data?.reduce((sum, d) => sum + d.quantity, 0) || 0,
+        total: discrepanciesData.data?.length || 0,
         receiving: {
-          damaged:
-            discrepanciesData.data
+          damaged: {
+            count: discrepanciesData.data
               ?.filter((d) => d.source_type === "receiving" && d.discrepancy_type === "damaged")
-              .reduce((sum, d) => sum + d.quantity, 0) || 0,
-          missing:
-            discrepanciesData.data
+              .length || 0,
+            total: discrepanciesData.data
+              ?.filter((d) => d.source_type === "receiving" && d.discrepancy_type === "damaged")
+              .reduce((sum, d) => sum + d.quantity, 0) || 0
+          },
+          missing: {
+            count: discrepanciesData.data
               ?.filter((d) => d.source_type === "receiving" && d.discrepancy_type === "missing")
-              .reduce((sum, d) => sum + d.quantity, 0) || 0,
+              .length || 0,
+            total: discrepanciesData.data
+              ?.filter((d) => d.source_type === "receiving" && d.discrepancy_type === "missing")
+              .reduce((sum, d) => sum + d.quantity, 0) || 0
+          }
         },
         return: {
-          damaged:
-            discrepanciesData.data
+          damaged: {
+            count: discrepanciesData.data
               ?.filter((d) => d.source_type === "return" && d.discrepancy_type === "damaged")
-              .reduce((sum, d) => sum + d.quantity, 0) || 0,
-          missing:
-            discrepanciesData.data
+              .length || 0,
+            total: discrepanciesData.data
+              ?.filter((d) => d.source_type === "return" && d.discrepancy_type === "damaged")
+              .reduce((sum, d) => sum + d.quantity, 0) || 0
+          },
+          missing: {
+            count: discrepanciesData.data
               ?.filter((d) => d.source_type === "return" && d.discrepancy_type === "missing")
-              .reduce((sum, d) => sum + d.quantity, 0) || 0,
+              .length || 0,
+            total: discrepanciesData.data
+              ?.filter((d) => d.source_type === "return" && d.discrepancy_type === "missing")
+              .reduce((sum, d) => sum + d.quantity, 0) || 0
+          }
         },
       };
 

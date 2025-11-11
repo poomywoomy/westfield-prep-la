@@ -84,9 +84,56 @@ export function DiscrepancyActionsDialog({
 
       if (error) throw error;
 
+      // Check if this is a "return to inventory" decision - restore units to available inventory
+      if (decision.decision === "return_to_inventory") {
+        // Get MAIN location
+        const { data: location, error: locError } = await supabase
+          .from('locations')
+          .select('id')
+          .eq('code', 'MAIN')
+          .maybeSingle();
+        
+        if (locError) throw locError;
+        
+        if (location) {
+          // Create inventory adjustment to add units back
+          const { error: ledgerError } = await supabase
+            .from('inventory_ledger')
+            .insert({
+              client_id: decision.client_id,
+              sku_id: decision.sku_id,
+              location_id: location.id,
+              user_id: user.id,
+              qty_delta: decision.quantity,
+              transaction_type: 'ADJUSTMENT_PLUS',
+              reason_code: 'return_to_inventory',
+              source_type: decision.source_type === 'return' ? 'customer_return' : 'receiving',
+              source_ref: decision.asn_id || decision.id,
+              notes: `Units returned to inventory after ${decision.source_type === 'return' ? 'return' : 'receiving'} review. Client decision: Return to Inventory. Admin processed by ${user.email}.`,
+            });
+          
+          if (ledgerError) throw ledgerError;
+          
+          // Sync to Shopify
+          const { error: syncError } = await supabase.functions.invoke('shopify-push-inventory-single', {
+            body: { 
+              client_id: decision.client_id, 
+              sku_id: decision.sku_id 
+            }
+          });
+          
+          if (syncError) {
+            console.warn('Shopify sync warning:', syncError);
+            // Don't fail the whole operation if Shopify sync fails
+          }
+        }
+      }
+
       toast({
         title: "Decision Processed",
-        description: "Discrepancy has been marked as processed",
+        description: decision.decision === "return_to_inventory" 
+          ? `${decision.quantity} units returned to available inventory`
+          : "Discrepancy has been marked as processed",
       });
 
       onSuccess?.();

@@ -64,7 +64,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
   const [lastScanned, setLastScanned] = useState<string>("");
   const [showHelp, setShowHelp] = useState(false);
   const [mainLocationId, setMainLocationId] = useState<string | null>(null);
-  const [qcPhotos, setQCPhotos] = useState<string[]>([]);
+  const [linePhotos, setLinePhotos] = useState<Map<string, string[]>>(new Map());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cachedUserId, setCachedUserId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -131,6 +131,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
         lot_number: line.lot_number || "",
         expiry_date: line.expiry_date || "",
         notes: line.notes || "",
+        qc_photo_urls: [],
       };
     });
 
@@ -138,6 +139,15 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
     const initialMap = new Map(lineData.map(line => [line.line_id, { ...line }]));
     setInitialLines(initialMap);
     setLines(lineData);
+    
+    // Initialize linePhotos map with existing photos
+    const photosMap = new Map<string, string[]>();
+    lineData.forEach(line => {
+      if (line.qc_photo_urls && line.qc_photo_urls.length > 0) {
+        photosMap.set(line.line_id, line.qc_photo_urls);
+      }
+    });
+    setLinePhotos(photosMap);
   };
 
   const updateLine = (index: number, field: keyof LineReceiving, value: any) => {
@@ -160,6 +170,18 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
     }
     
     setLines(updated);
+  };
+
+  const updateLinePhotos = (lineId: string, urls: string[]) => {
+    const updated = new Map(linePhotos);
+    updated.set(lineId, urls);
+    setLinePhotos(updated);
+    
+    // CRITICAL: Update the line's qc_photo_urls
+    const lineIndex = lines.findIndex(l => l.line_id === lineId);
+    if (lineIndex !== -1) {
+      updateLine(lineIndex, 'qc_photo_urls', urls);
+    }
   };
 
   const getVariance = (line: LineReceiving) => {
@@ -822,8 +844,8 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
               <QCPhotoUpload
                 lineId={currentLine.line_id}
                 asnNumber={asn?.asn_number || ""}
-                onPhotosUploaded={(urls) => setQCPhotos(urls)}
-                existingPhotos={qcPhotos}
+                onPhotosUploaded={(urls) => updateLinePhotos(currentLine.line_id, urls)}
+                existingPhotos={linePhotos.get(currentLine.line_id) || currentLine.qc_photo_urls || []}
               />
             </div>
           </div>

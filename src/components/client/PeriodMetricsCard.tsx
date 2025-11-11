@@ -19,8 +19,14 @@ interface AnalyticsData {
   returns: number;
   discrepancies: {
     total: number;
-    receiving: { damaged: number; missing: number };
-    return: { damaged: number; missing: number };
+    receiving: { 
+      damaged: { count: number; total: number };
+      missing: { count: number; total: number };
+    };
+    return: { 
+      damaged: { count: number; total: number };
+      missing: { count: number; total: number };
+    };
   };
   lowStock: any[];
   currentInventory: number;
@@ -85,12 +91,12 @@ export const PeriodMetricsCard = ({
     unitsReceived: data.unitsReceived,
     unitsReturned: data.returns,
     receivingDiscrepancies: {
-      count: (data.discrepancies.receiving.damaged > 0 ? 1 : 0) + (data.discrepancies.receiving.missing > 0 ? 1 : 0),
-      total: data.discrepancies.receiving.damaged + data.discrepancies.receiving.missing
+      count: data.discrepancies.receiving.damaged.count + data.discrepancies.receiving.missing.count,
+      total: data.discrepancies.receiving.damaged.total + data.discrepancies.receiving.missing.total
     },
     returnDiscrepancies: {
-      count: (data.discrepancies.return.damaged > 0 ? 1 : 0) + (data.discrepancies.return.missing > 0 ? 1 : 0),
-      total: data.discrepancies.return.damaged + data.discrepancies.return.missing
+      count: data.discrepancies.return.damaged.count + data.discrepancies.return.missing.count,
+      total: data.discrepancies.return.damaged.total + data.discrepancies.return.missing.total
     },
     topSkus: data.topPerforming.map(item => ({
       ...item,
