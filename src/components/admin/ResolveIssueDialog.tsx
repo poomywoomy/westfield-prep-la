@@ -36,23 +36,23 @@ export function ResolveIssueDialog({ asnId, asnNumber, open, onOpenChange, onSuc
       const totalMissing = asnLines.reduce((sum, line) => sum + (line.missing_units || 0), 0);
       const totalQuarantined = asnLines.reduce((sum, line) => sum + (line.quarantined_units || 0), 0);
 
-      // Check if all have decisions
+      // Check if all have decisions and are PROCESSED
       const { data: decisions } = await supabase
         .from('damaged_item_decisions')
         .select('*')
         .eq('asn_id', asnId);
 
-      const submittedOrProcessed = decisions?.filter(d => 
-        d.status === 'submitted' || d.status === 'closed'
+      const processedOrClosed = decisions?.filter(d => 
+        d.status === 'processed' || d.status === 'closed'
       ) || [];
 
-      const decidedDamaged = submittedOrProcessed
+      const decidedDamaged = processedOrClosed
         .filter(d => d.discrepancy_type === 'damaged')
         .reduce((sum, d) => sum + d.quantity, 0);
-      const decidedMissing = submittedOrProcessed
+      const decidedMissing = processedOrClosed
         .filter(d => d.discrepancy_type === 'missing')
         .reduce((sum, d) => sum + d.quantity, 0);
-      const decidedQuarantined = submittedOrProcessed
+      const decidedQuarantined = processedOrClosed
         .filter(d => d.discrepancy_type === 'quarantined')
         .reduce((sum, d) => sum + d.quantity, 0);
 
@@ -66,17 +66,21 @@ export function ResolveIssueDialog({ asnId, asnNumber, open, onOpenChange, onSuc
         if (pendingMissing > 0) pendingItems.push(`${pendingMissing} missing`);
         if (pendingQuarantined > 0) pendingItems.push(`${pendingQuarantined} quarantined`);
 
-        toast.error(
-          `Cannot resolve: Client has not responded to all discrepancies. ${pendingItems.join(', ')} items await client review.`,
-          { duration: 5000 }
-        );
+        // Check if items are submitted but not processed
+        const submittedNotProcessed = decisions?.filter(d => d.status === 'submitted').length || 0;
+        
+        const message = submittedNotProcessed > 0
+          ? `Cannot resolve: ${submittedNotProcessed} discrepanc${submittedNotProcessed > 1 ? 'ies are' : 'y is'} awaiting admin review. Please process all client decisions first.`
+          : `Cannot resolve: Client has not responded to all discrepancies. ${pendingItems.join(', ')} items await client review.`;
+
+        toast.error(message, { duration: 5000 });
         setLoading(false);
         return;
       }
 
       const { data: userData } = await supabase.auth.getUser();
       
-      // Update all decisions to closed
+      // Update only PROCESSED decisions to closed
       const { error: decisionsError } = await supabase
         .from('damaged_item_decisions')
         .update({
@@ -86,7 +90,7 @@ export function ResolveIssueDialog({ asnId, asnNumber, open, onOpenChange, onSuc
           admin_close_notes: notes || 'Resolved via ASN resolution',
         })
         .eq('asn_id', asnId)
-        .in('status', ['pending', 'submitted']);
+        .eq('status', 'processed');
 
       if (decisionsError) throw decisionsError;
 

@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DiscrepancyAdminActions } from "./DiscrepancyAdminActions";
+import { DiscrepancyActionsDialog } from "./DiscrepancyActionsDialog";
 import { format } from "date-fns";
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -45,7 +45,7 @@ export const DiscrepanciesTab = () => {
   const fetchDiscrepancies = async () => {
     setLoading(true);
     try {
-      const statusFilter = activeTab === "active" ? ["pending", "submitted"] : ["closed"];
+      const statusFilter = activeTab === "active" ? ["pending", "submitted", "processed"] : ["closed"];
 
       const { data, error } = await supabase
         .from("damaged_item_decisions")
@@ -95,6 +95,8 @@ export const DiscrepanciesTab = () => {
       return <Badge variant="outline" className="bg-yellow-100 text-yellow-700">Awaiting Client</Badge>;
     } else if (status === "submitted") {
       return <Badge variant="outline" className="bg-blue-100 text-blue-700">Ready to Review</Badge>;
+    } else if (status === "processed") {
+      return <Badge variant="outline" className="bg-purple-100 text-purple-700">Processed</Badge>;
     } else {
       return <Badge variant="outline" className="bg-green-500 text-white">Closed</Badge>;
     }
@@ -151,13 +153,13 @@ export const DiscrepanciesTab = () => {
                     <TableCell>{getStatusBadge(disc.status)}</TableCell>
                     <TableCell>{format(new Date(disc.created_at), "MMM d, yyyy")}</TableCell>
                     <TableCell>
-                      {disc.status === "submitted" && (
+                      {(disc.status === "submitted" || disc.status === "processed") && (
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => handleReviewClick(disc)}
                         >
-                          Review
+                          {disc.status === "submitted" ? "Review" : "View"}
                         </Button>
                       )}
                       {disc.status === "pending" && (
@@ -228,13 +230,13 @@ export const DiscrepanciesTab = () => {
       </Tabs>
 
       {selectedDiscrepancy && (
-        <DiscrepancyAdminActions
+        <DiscrepancyActionsDialog
           open={actionsDialogOpen}
-          onClose={() => {
-            setActionsDialogOpen(false);
-            setSelectedDiscrepancy(null);
+          onOpenChange={(open) => {
+            setActionsDialogOpen(open);
+            if (!open) setSelectedDiscrepancy(null);
           }}
-          discrepancy={selectedDiscrepancy}
+          decision={selectedDiscrepancy}
           onSuccess={fetchDiscrepancies}
         />
       )}

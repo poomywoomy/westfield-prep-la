@@ -18,6 +18,7 @@ const createClientSchema = z.object({
   extra_prep: z.boolean(),
   storage: z.boolean(),
   storage_units_per_month: z.number().int().positive().nullable(),
+  storage_method: z.string().max(100).nullable(),
   admin_notes: z.string().max(2000),
   fulfillment_services: z.array(z.string()),
 });
@@ -33,6 +34,7 @@ interface CreateClientRequest {
   extra_prep: boolean;
   storage: boolean;
   storage_units_per_month: number | null;
+  storage_method: string | null;
   admin_notes: string;
   fulfillment_services: string[];
 }
@@ -194,6 +196,7 @@ serve(async (req) => {
         extra_prep: requestData.extra_prep,
         storage: requestData.storage,
         storage_units_per_month: requestData.storage_units_per_month,
+        storage_method: requestData.storage_method,
         admin_notes: requestData.admin_notes,
         fulfillment_services: requestData.fulfillment_services,
         status: 'pending',
