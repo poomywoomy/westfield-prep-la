@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Download, RefreshCw } from "lucide-react";
 import { BillView } from "./BillView";
-import { formatDateRange } from "@/lib/dateFormatters";
+import { formatDateRange, formatDate } from "@/lib/dateFormatters";
 import type { Database } from "@/integrations/supabase/types";
 
 type Bill = Database["public"]["Tables"]["bills"]["Row"];
@@ -193,7 +193,7 @@ export const BillingHistoryTab = () => {
                           {bill.client.company_name}
                         </TableCell>
                         <TableCell>
-                          {bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { year: "numeric", month: "long" })}
+                          {bill.label || formatDate(bill.billing_month, 'MMMM yyyy')}
                         </TableCell>
                         <TableCell>
                           {bill.statement_start_date && bill.statement_end_date

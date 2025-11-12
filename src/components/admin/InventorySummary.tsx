@@ -115,10 +115,7 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
     
     let query = supabase
       .from("inventory_summary_complete")
-      .select(`
-        *,
-        clients!inner(company_name)
-      `);
+      .select("*");
     
     if (selectedClient !== "all") {
       query = query.eq("client_id", selectedClient);
@@ -131,9 +128,18 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
     const { data, error } = await query;
     
     if (error) {
+      console.error("Inventory fetch error:", error);
       toast({ title: "Error", description: "Failed to load inventory", variant: "destructive" });
       setInventory([]);
     } else {
+      // Fetch client names separately
+      const clientIds = [...new Set(data?.map(d => d.client_id) || [])];
+      const { data: clientsData } = await supabase
+        .from("clients")
+        .select("id, company_name")
+        .in("id", clientIds);
+      
+      const clientMap = new Map(clientsData?.map(c => [c.id, c.company_name]) || []);
       // Fetch last activity for each SKU
       const skuIds = [...new Set(data?.map(d => d.sku_id) || [])];
       const { data: activityData } = await supabase
@@ -155,7 +161,7 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
         internal_sku: (item as any).internal_sku || "",
         client_sku: (item as any).client_sku || "",
         title: item.title || "",
-        company_name: (item.clients as any)?.company_name || "",
+        company_name: clientMap.get(item.client_id!) || "Unknown",
         location_id: item.location_id,
         location_name: item.location_name,
         on_hand: item.on_hand || 0,

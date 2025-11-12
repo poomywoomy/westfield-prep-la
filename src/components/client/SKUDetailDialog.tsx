@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Package, TrendingDown, AlertTriangle, Box } from "lucide-react";
+import { Package, TrendingDown, AlertTriangle, Box, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +17,10 @@ export const SKUDetailDialog = ({ open, onOpenChange, skuId, clientId }: SKUDeta
   const { data: skuData, isLoading } = useQuery({
     queryKey: ["sku-detail", skuId],
     queryFn: async () => {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
       // Fetch inventory summary (complete) for current levels and metadata
       const { data: inventoryData, error: invError } = await supabase
         .from("inventory_summary_complete")
@@ -36,6 +40,40 @@ export const SKUDetailDialog = ({ open, onOpenChange, skuId, clientId }: SKUDeta
 
       if (skuError) throw skuError;
 
+      // Monthly received units
+      const { data: receivedData } = await supabase
+        .from("inventory_ledger")
+        .select("qty_delta")
+        .eq("sku_id", skuId)
+        .eq("client_id", clientId)
+        .in("transaction_type", ["RECEIPT", "ADJUSTMENT_PLUS"])
+        .gte("ts", startOfMonth.toISOString())
+        .lte("ts", endOfMonth.toISOString());
+      
+      const receivedMonth = receivedData?.reduce((sum, r) => sum + r.qty_delta, 0) || 0;
+
+      // Monthly sold units
+      const { data: soldData } = await supabase
+        .from("inventory_ledger")
+        .select("qty_delta")
+        .eq("sku_id", skuId)
+        .eq("client_id", clientId)
+        .in("transaction_type", ["SALE_DECREMENT", "TRANSFER"])
+        .gte("ts", startOfMonth.toISOString())
+        .lte("ts", endOfMonth.toISOString());
+      
+      const soldMonth = Math.abs(soldData?.reduce((sum, s) => sum + s.qty_delta, 0) || 0);
+
+      // Discrepancies count
+      const { data: discrepanciesData } = await supabase
+        .from("damaged_item_decisions")
+        .select("id, quantity, discrepancy_type")
+        .eq("sku_id", skuId)
+        .eq("client_id", clientId)
+        .in("status", ["pending", "submitted", "processed"]);
+      
+      const discrepanciesCount = discrepanciesData?.length || 0;
+
       // Combine the data
       return {
         ...inventoryData,
@@ -44,6 +82,9 @@ export const SKUDetailDialog = ({ open, onOpenChange, skuId, clientId }: SKUDeta
         internal_sku: skuDetails?.internal_sku,
         image_url: skuDetails?.image_url,
         reorder_point: skuDetails?.low_stock_threshold || 10,
+        received_month: receivedMonth,
+        sold_month: soldMonth,
+        discrepancies: discrepanciesCount,
       };
     },
     enabled: open && !!skuId,
@@ -137,6 +178,31 @@ export const SKUDetailDialog = ({ open, onOpenChange, skuId, clientId }: SKUDeta
                   <p className="text-xs font-medium text-gray-600">Reorder At</p>
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{skuData.reorder_point || 10}</p>
+              </Card>
+            </div>
+
+            {/* Monthly Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                  <p className="text-xs font-medium text-gray-600">Received (Month)</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{skuData.received_month || 0}</p>
+              </Card>
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingDown className="h-4 w-4 text-blue-600" />
+                  <p className="text-xs font-medium text-gray-600">Sold (Month)</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{skuData.sold_month || 0}</p>
+              </Card>
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <p className="text-xs font-medium text-gray-600">Discrepancies</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{skuData.discrepancies || 0}</p>
               </Card>
             </div>
 

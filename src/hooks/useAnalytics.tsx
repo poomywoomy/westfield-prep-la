@@ -136,13 +136,12 @@ export const useAnalytics = (clientId: string, dateRange: DateRange) => {
           .gte("ts", start.toISOString())
           .lte("ts", end.toISOString()),
         
-        // Discrepancies (filtered by date range)
+        // Discrepancies (ALL statuses created within date range)
         supabase
           .from("damaged_item_decisions")
-          .select("discrepancy_type, source_type, quantity")
+          .select("discrepancy_type, source_type, quantity, status")
           .eq("client_id", clientId)
-          .eq("status", "pending")
-          .is("submitted_at", null)
+          .in("status", ["pending", "submitted", "processed"])
           .gte("created_at", start.toISOString())
           .lte("created_at", end.toISOString()),
         

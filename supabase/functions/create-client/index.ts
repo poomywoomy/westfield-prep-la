@@ -181,6 +181,14 @@ serve(async (req) => {
       ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() 
       : null;
 
+    console.log("Creating/updating client with data:", {
+      user_id: userId,
+      company_name: requestData.company_name,
+      storage: requestData.storage,
+      storage_method: requestData.storage_method,
+      storage_units_per_month: requestData.storage_units_per_month,
+    });
+
     const { error: clientError } = await supabaseAdmin
       .from("clients")
       .upsert({
@@ -206,6 +214,7 @@ serve(async (req) => {
       });
 
     if (clientError) {
+      console.error("Client upsert error:", clientError);
       throw clientError;
     }
 
