@@ -150,7 +150,36 @@ serve(async (req) => {
 
     if (existingUser) {
       userId = existingUser.id;
-      console.log(`Updating existing user: ${userId}`);
+      
+      // Check if this user has an existing client record
+      const { data: existingClient } = await supabaseAdmin
+        .from('clients')
+        .select('id')
+        .eq('user_id', existingUser.id)
+        .single();
+      
+      // If user exists in auth but NO client record = orphaned user from previous deletion
+      // Treat as NEW client with fresh temp password
+      if (!existingClient) {
+        console.log(`Orphaned auth user detected (no client record) - treating as new client: ${userId}`);
+        isNewUser = true;
+        tempPassword = generatePassword();
+        
+        // Reset the user's password to the new temp password
+        const { error: resetError } = await supabaseAdmin.auth.admin.updateUserById(
+          existingUser.id,
+          { password: tempPassword }
+        );
+        
+        if (resetError) {
+          console.error("Failed to reset password for orphaned user:", resetError);
+          throw resetError;
+        }
+        
+        console.log(`Password reset for orphaned user (expires in 24 hours)`);
+      } else {
+        console.log(`Updating existing client: ${userId}`);
+      }
     } else {
       // Generate secure temporary password for new user
       tempPassword = generatePassword();
@@ -294,9 +323,9 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: existingUser 
-          ? "Client account updated successfully" 
-          : "Client account created successfully. Welcome email with temporary 24-hour password sent to client.",
+        message: isNewUser
+          ? "Client account created successfully. Welcome email with temporary 24-hour password sent to client."
+          : "Client account updated successfully",
         user_id: userId,
         is_new_user: isNewUser
       }),
