@@ -103,9 +103,9 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
       }
 
       toast({
-        title: "Client created",
+        title: "Client Created Successfully",
         description: clientData?.is_new_user
-          ? "Account setup instructions have been sent to the client's email."
+          ? "Welcome email sent with temporary 24-hour password. Client should change password on first login."
           : "Client account updated successfully.",
       });
 

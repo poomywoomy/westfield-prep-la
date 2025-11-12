@@ -697,6 +697,7 @@ export type Database = {
             | null
           id: string
           last_name: string | null
+          password_expires_at: string | null
           phone_number: string
           pricing_active: boolean | null
           pricing_document_url: string | null
@@ -733,6 +734,7 @@ export type Database = {
             | null
           id?: string
           last_name?: string | null
+          password_expires_at?: string | null
           phone_number: string
           pricing_active?: boolean | null
           pricing_document_url?: string | null
@@ -769,6 +771,7 @@ export type Database = {
             | null
           id?: string
           last_name?: string | null
+          password_expires_at?: string | null
           phone_number?: string
           pricing_active?: boolean | null
           pricing_document_url?: string | null

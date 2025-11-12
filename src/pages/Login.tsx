@@ -86,6 +86,30 @@ const Login = () => {
         throw error;
       }
 
+      // Check if temporary password has expired (for new clients)
+      const { data: clientData } = await supabase
+        .from("clients")
+        .select("password_expires_at, status")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
+
+      if (clientData?.password_expires_at) {
+        const expiresAt = new Date(clientData.password_expires_at);
+        const now = new Date();
+        
+        if (now > expiresAt) {
+          await supabase.auth.signOut();
+          toast({
+            title: "Temporary Password Expired",
+            description: "Your temporary password has expired. Please request a new password reset.",
+            variant: "destructive",
+          });
+          setShowForgotPassword(true);
+          setLoading(false);
+          return;
+        }
+      }
+
       // Check user role
       const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
@@ -98,10 +122,19 @@ const Login = () => {
         throw new Error("Authentication failed. Please check your credentials.");
       }
 
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      });
+      // Show password change reminder for pending clients with temp password
+      if (clientData?.password_expires_at && clientData?.status === 'pending') {
+        toast({
+          title: "Login successful",
+          description: "Please change your temporary password immediately in Settings.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+        });
+      }
 
       // Redirect based on role
       if (roleData.role === "admin") {

@@ -122,10 +122,15 @@ serve(async (req) => {
       }
     });
 
-    // Clear password expiration if it exists (for clients with temporary passwords)
-    await supabaseAdmin.from('clients')
+    // Clear password expiration and activate account (for clients with temporary passwords)
+    const { error: clearExpiryError } = await supabaseAdmin.from('clients')
       .update({ password_expires_at: null, status: 'active' })
       .eq('user_id', user.id);
+
+    // Don't fail the whole operation if this fails (user might not be a client)
+    if (clearExpiryError) {
+      console.warn('Could not clear password expiration (user may not be a client):', clearExpiryError.message);
+    }
 
     return new Response(
       JSON.stringify({ success: true, message: 'Password updated successfully' }),

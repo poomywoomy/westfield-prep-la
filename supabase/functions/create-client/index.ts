@@ -39,6 +39,28 @@ interface CreateClientRequest {
   fulfillment_services: string[];
 }
 
+// Generate secure temporary password
+function generatePassword(): string {
+  const length = 16;
+  const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const lowercase = "abcdefghijklmnopqrstuvwxyz";
+  const numbers = "0123456789";
+  const symbols = "!@#$%^&*";
+  const allChars = uppercase + lowercase + numbers + symbols;
+
+  let password = "";
+  password += uppercase[Math.floor(Math.random() * uppercase.length)];
+  password += lowercase[Math.floor(Math.random() * lowercase.length)];
+  password += numbers[Math.floor(Math.random() * numbers.length)];
+  password += symbols[Math.floor(Math.random() * symbols.length)];
+
+  for (let i = password.length; i < length; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)];
+  }
+
+  return password.split('').sort(() => Math.random() - 0.5).join('');
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -124,22 +146,30 @@ serve(async (req) => {
     let userId: string;
     let isNewUser = false;
 
+    let tempPassword: string | null = null;
+
     if (existingUser) {
       userId = existingUser.id;
+      console.log(`Updating existing user: ${userId}`);
     } else {
-      // Create new user with placeholder password (they'll set it via email link)
+      // Generate secure temporary password for new user
+      tempPassword = generatePassword();
+      console.log(`Creating new user with temporary password (expires in 24 hours)`);
+
       const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: requestData.email,
-        password: crypto.randomUUID() + crypto.randomUUID(), // Random password they'll never use
+        password: tempPassword,
         email_confirm: true,
       });
 
       if (authError || !authData.user) {
+        console.error("Failed to create auth user:", authError);
         throw authError || new Error("Failed to create user");
       }
 
       userId = authData.user.id;
       isNewUser = true;
+      console.log(`New auth user created: ${userId}`);
     }
 
     // Upsert profile
@@ -176,6 +206,11 @@ serve(async (req) => {
       throw roleError;
     }
 
+    // Calculate password expiration (24 hours from now)
+    const passwordExpiresAt = isNewUser 
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      : null;
+
     console.log("Creating/updating client with data:", {
       user_id: userId,
       company_name: requestData.company_name,
@@ -183,60 +218,85 @@ serve(async (req) => {
       storage_method: requestData.storage_method,
       storage_units_per_month: requestData.storage_units_per_month,
       is_new_user: isNewUser,
+      password_expires_at: passwordExpiresAt,
     });
 
-    const { error: clientError } = await supabaseAdmin
+    const clientPayload = {
+      user_id: userId,
+      company_name: requestData.company_name,
+      first_name: requestData.first_name,
+      last_name: requestData.last_name,
+      contact_name: `${requestData.first_name} ${requestData.last_name}`,
+      email: requestData.email,
+      phone_number: requestData.phone_number,
+      estimated_units_per_month: requestData.estimated_units_per_month,
+      receiving_format: requestData.receiving_format,
+      extra_prep: requestData.extra_prep,
+      storage: requestData.storage,
+      storage_units_per_month: requestData.storage_units_per_month,
+      storage_method: requestData.storage_method,
+      admin_notes: requestData.admin_notes,
+      fulfillment_services: requestData.fulfillment_services,
+      status: 'pending',
+      password_expires_at: passwordExpiresAt,
+    };
+
+    console.log("About to upsert client with payload:", JSON.stringify(clientPayload, null, 2));
+
+    const { data: clientData, error: clientError } = await supabaseAdmin
       .from("clients")
-      .upsert({
-        user_id: userId,
-        company_name: requestData.company_name,
-        first_name: requestData.first_name,
-        last_name: requestData.last_name,
-        contact_name: `${requestData.first_name} ${requestData.last_name}`,
-        email: requestData.email,
-        phone_number: requestData.phone_number,
-        estimated_units_per_month: requestData.estimated_units_per_month,
-        receiving_format: requestData.receiving_format,
-        extra_prep: requestData.extra_prep,
-        storage: requestData.storage,
-        storage_units_per_month: requestData.storage_units_per_month,
-        storage_method: requestData.storage_method,
-        admin_notes: requestData.admin_notes,
-        fulfillment_services: requestData.fulfillment_services,
-        status: 'pending',
-      }, {
+      .upsert(clientPayload, {
         onConflict: 'user_id'
-      });
+      })
+      .select()
+      .single();
 
     if (clientError) {
-      console.error("Client upsert error:", clientError);
-      throw clientError;
+      console.error("Client upsert error - Full details:", {
+        message: clientError.message,
+        details: clientError.details,
+        hint: clientError.hint,
+        code: clientError.code,
+      });
+      throw new Error(`Failed to create client record: ${clientError.message}`);
     }
 
-    // For new users, send password reset link instead of plaintext password
-    if (isNewUser) {
+    console.log("Client record created/updated successfully:", clientData?.id);
+
+    // For new users, send welcome email with temporary password
+    if (isNewUser && tempPassword) {
       try {
         const origin = req.headers.get('origin') || Deno.env.get("SUPABASE_URL") || "";
+        const loginUrl = `${origin}/login`;
         
-        const { error: resetError } = await supabaseAdmin.functions.invoke('send-password-reset', {
+        console.log(`Sending welcome email to ${requestData.email} with login URL: ${loginUrl}`);
+        
+        const { error: emailError } = await supabaseAdmin.functions.invoke('send-welcome-email', {
           body: {
             email: requestData.email,
-            redirectUrl: `${origin}/reset-password`,
+            tempPassword: tempPassword,
+            redirectUrl: loginUrl,
           },
         });
 
-        if (resetError) {
-          console.error("Failed to send password reset email:", resetError);
+        if (emailError) {
+          console.error("Failed to send welcome email:", emailError);
+          // Don't fail the whole operation if email fails
+        } else {
+          console.log("Welcome email sent successfully");
         }
       } catch (emailError) {
         console.error("Error sending welcome email:", emailError);
+        // Don't fail the whole operation if email fails
       }
     }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: existingUser ? "Client account updated successfully" : "Client account created successfully. Password reset email sent.",
+        message: existingUser 
+          ? "Client account updated successfully" 
+          : "Client account created successfully. Welcome email with temporary 24-hour password sent to client.",
         user_id: userId,
         is_new_user: isNewUser
       }),
