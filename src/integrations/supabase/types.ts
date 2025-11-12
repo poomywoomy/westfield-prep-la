@@ -1892,6 +1892,41 @@ export type Database = {
         }
         Relationships: []
       }
+      qc_images: {
+        Row: {
+          client_id: string
+          created_at: string
+          expires_at: string
+          file_path: string
+          id: string
+          image_url: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          expires_at?: string
+          file_path: string
+          id?: string
+          image_url: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          expires_at?: string
+          file_path?: string
+          id?: string
+          image_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qc_images_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_lines: {
         Row: {
           created_at: string
