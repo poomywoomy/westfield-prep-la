@@ -857,6 +857,7 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
               <QCPhotoUpload
                 lineId={currentLine.line_id}
                 asnNumber={asn?.asn_number || ""}
+                clientId={asn?.client_id || ""}
                 onPhotosUploaded={(urls) => updateLinePhotos(currentLine.line_id, urls)}
                 existingPhotos={linePhotos.get(currentLine.line_id) || currentLine.qc_photo_urls || []}
               />

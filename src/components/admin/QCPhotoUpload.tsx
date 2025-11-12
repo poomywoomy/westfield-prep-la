@@ -8,11 +8,12 @@ import { resignPhotoUrls } from "@/lib/photoUtils";
 interface QCPhotoUploadProps {
   lineId: string;
   asnNumber: string;
+  clientId: string;
   onPhotosUploaded: (urls: string[]) => void;
   existingPhotos?: string[];
 }
 
-export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPhotos = [] }: QCPhotoUploadProps) {
+export function QCPhotoUpload({ lineId, asnNumber, clientId, onPhotosUploaded, existingPhotos = [] }: QCPhotoUploadProps) {
   const [photos, setPhotos] = useState<string[]>(existingPhotos);
   const [displayUrls, setDisplayUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -40,6 +41,25 @@ export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPho
       });
 
     if (error) throw error;
+
+    // Get signed URL for immediate display
+    const { data: urlData } = await supabase.storage
+      .from('qc-images')
+      .createSignedUrl(filePath, 60 * 60 * 24 * 30); // 30 days
+
+    // Insert metadata into qc_images table for auto-deletion tracking
+    const { error: dbError } = await supabase
+      .from('qc_images')
+      .insert({
+        client_id: clientId,
+        file_path: filePath,
+        image_url: urlData?.signedUrl || filePath,
+      });
+
+    if (dbError) {
+      console.error('Failed to insert QC image metadata:', dbError);
+      // Don't throw - photo is already uploaded to storage
+    }
 
     // Return the storage path instead of signed URL
     return filePath;
@@ -115,7 +135,15 @@ export function QCPhotoUpload({ lineId, asnNumber, onPhotosUploaded, existingPho
         }
       }
 
+      // Delete from storage
       await supabase.storage.from('qc-images').remove([filePath]);
+
+      // Delete from qc_images table
+      await supabase
+        .from('qc_images')
+        .delete()
+        .eq('client_id', clientId)
+        .eq('file_path', filePath);
 
       const newPhotos = photos.filter((_, i) => i !== index);
       setPhotos(newPhotos);

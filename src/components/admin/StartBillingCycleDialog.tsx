@@ -178,12 +178,59 @@ export const StartBillingCycleDialog = ({
         });
       }
 
-      // TODO: Shopify product type billing check temporarily disabled due to Supabase TypeScript complexity
-      // When this is re-enabled, check for:
-      // 1. SKUs with product_type='single' and shopify_variant_id not null
-      // 2. SKUs with product_type='kit' and shopify_variant_id not null
-      // 3. Show toast warning if custom_pricing missing 'single_product_fee' or 'kit_product_fee'
-      // Admin should manually verify pricing includes these service types for Shopify-connected clients
+      // Check for Shopify product types without pricing
+      try {
+        // Check for single products
+        const { data: singleProducts, error: singleError } = await supabase
+          .from('skus')
+          .select('id')
+          .eq('client_id', client.id)
+          .eq('product_type', 'single')
+          .not('shopify_variant_id', 'is', null);
+
+        if (!singleError && singleProducts && singleProducts.length > 0) {
+          const hasSingleFee = itemsToInsert.some(item => 
+            item.service_name.toLowerCase().includes('single') || 
+            item.service_name.toLowerCase().includes('single_product_fee')
+          );
+
+          if (!hasSingleFee) {
+            toast({
+              title: "⚠️ Missing Pricing",
+              description: `Client has ${singleProducts.length} Shopify single products but no "single_product_fee" pricing. Add to custom pricing or update bill manually.`,
+              variant: "default",
+              duration: 8000,
+            });
+          }
+        }
+
+        // Check for kit products
+        const { data: kitProducts, error: kitError } = await supabase
+          .from('skus')
+          .select('id')
+          .eq('client_id', client.id)
+          .eq('product_type', 'kit')
+          .not('shopify_variant_id', 'is', null);
+
+        if (!kitError && kitProducts && kitProducts.length > 0) {
+          const hasKitFee = itemsToInsert.some(item => 
+            item.service_name.toLowerCase().includes('kit') ||
+            item.service_name.toLowerCase().includes('kit_product_fee')
+          );
+
+          if (!hasKitFee) {
+            toast({
+              title: "⚠️ Missing Pricing",
+              description: `Client has ${kitProducts.length} Shopify kit products but no "kit_product_fee" pricing. Add to custom pricing or update bill manually.`,
+              variant: "default",
+              duration: 8000,
+            });
+          }
+        }
+      } catch (pricingCheckError) {
+        console.error('Error checking Shopify product pricing:', pricingCheckError);
+        // Don't block bill creation if pricing check fails
+      }
 
       // Create the bill
       const { data: newBill, error: billError } = await supabase
