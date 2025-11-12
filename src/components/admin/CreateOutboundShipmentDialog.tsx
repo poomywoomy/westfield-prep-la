@@ -178,7 +178,7 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
     );
   };
 
-  const validatePhase1 = () => {
+  const validatePhase1 = async () => {
     const errors: string[] = [];
     if (!selectedClient) errors.push("Please select a client");
     if (boxes.length === 0) errors.push("Please add at least one box");
@@ -210,6 +210,19 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
       });
     }
 
+    // CRITICAL: Check inventory BEFORE allowing Phase A completion
+    for (const sku of skus) {
+      const { data: summary } = await supabase
+        .from("inventory_summary")
+        .select("available")
+        .eq("sku_id", sku.sku_id)
+        .maybeSingle();
+      
+      if (!summary || summary.available < sku.quantity) {
+        errors.push(`Insufficient inventory for ${sku.client_sku}. Available: ${summary?.available || 0}, Requested: ${sku.quantity}`);
+      }
+    }
+
     return errors;
   };
 
@@ -237,18 +250,7 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
       if (!box.carrier) errors.push(`Box ${box.box_number}: Missing carrier`);
     });
 
-    // Check inventory
-    for (const sku of skus) {
-      const { data: summary } = await supabase
-        .from("inventory_summary")
-        .select("available")
-        .eq("sku_id", sku.sku_id)
-        .maybeSingle();
-      
-      if (!summary || summary.available < sku.quantity) {
-        errors.push(`Insufficient inventory for ${sku.client_sku} (need ${sku.quantity}, have ${summary?.available || 0})`);
-      }
-    }
+    // Inventory check removed from Phase 3 (now in Phase 1)
 
     return errors;
   };
@@ -257,7 +259,7 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
     let errors: string[] = [];
     
     if (currentPhase === 1) {
-      errors = validatePhase1();
+      errors = await validatePhase1(); // Now async
     } else if (currentPhase === 2) {
       errors = validatePhase2();
     }

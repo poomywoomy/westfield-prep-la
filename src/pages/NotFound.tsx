@@ -1,15 +1,36 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const NotFound = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [countdown, setCountdown] = useState(2);
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-  }, [location.pathname]);
+    
+    // Show error toast
+    toast.error("Page not found. Redirecting to homepage...");
+    
+    // Countdown timer
+    const countdownInterval = setInterval(() => {
+      setCountdown(prev => prev - 1);
+    }, 1000);
+    
+    // Redirect after 2 seconds
+    const redirectTimer = setTimeout(() => {
+      navigate('/');
+    }, 2000);
+    
+    return () => {
+      clearInterval(countdownInterval);
+      clearTimeout(redirectTimer);
+    };
+  }, [location.pathname, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -18,8 +39,11 @@ const NotFound = () => {
         <div className="text-center">
           <h1 className="mb-4 text-4xl font-bold text-foreground">404</h1>
           <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-          <Button asChild>
-            <a href="/">Return to Home</a>
+          <p className="mb-6 text-sm text-muted-foreground">
+            Redirecting to homepage in {countdown}...
+          </p>
+          <Button onClick={() => navigate('/')}>
+            Return to Home Now
           </Button>
         </div>
       </div>

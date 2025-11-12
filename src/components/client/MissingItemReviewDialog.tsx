@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { PackageX, Package } from "lucide-react";
+import { resignPhotoUrls } from "@/lib/photoUtils";
 
 interface MissingItemReviewDialogProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface MissingItemReviewDialogProps {
     title: string;
     missing_qty: number;
     image_url?: string;
+    qc_photo_urls?: string[];
   };
   onSuccess?: () => void;
 }
@@ -33,6 +35,14 @@ export function MissingItemReviewDialog({
   const { toast } = useToast();
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  const [displayPhotos, setDisplayPhotos] = useState<string[]>([]);
+
+  // Re-sign photo URLs when dialog opens
+  useEffect(() => {
+    if (discrepancy.qc_photo_urls && open) {
+      resignPhotoUrls(discrepancy.qc_photo_urls).then(setDisplayPhotos);
+    }
+  }, [discrepancy.qc_photo_urls, open]);
 
   const handleAcknowledge = async () => {
     setLoading(true);
@@ -103,6 +113,32 @@ export function MissingItemReviewDialog({
                 {discrepancy.missing_qty} units missing
               </p>
             </div>
+          </div>
+
+          {/* QC Photos Section */}
+          <div className="space-y-2">
+            <Label>QC Photos (Receiving Documentation)</Label>
+            {displayPhotos.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {displayPhotos.map((url, index) => (
+                  <div
+                    key={index}
+                    className="border rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => window.open(url, '_blank')}
+                  >
+                    <img
+                      src={url}
+                      alt={`QC Photo ${index + 1}`}
+                      className="w-full h-48 object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                No QC photos available for this discrepancy.
+              </div>
+            )}
           </div>
 
           {/* Info Message */}

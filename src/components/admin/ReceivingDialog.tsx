@@ -491,6 +491,19 @@ export const ReceivingDialog = ({ asn, open, onOpenChange, onSuccess }: Receivin
 
       // Create damaged_item_decisions for discrepancies
       for (const line of lines) {
+        // Validate: Damaged/Quarantined/Missing items must have QC photos
+        if ((line.damaged_units > 0 || line.quarantined_units > 0 || line.missing_units > 0) && 
+            (!line.qc_photo_urls || line.qc_photo_urls.length === 0)) {
+          toast({
+            title: "QC Photos Required",
+            description: `QC photos are mandatory for ${line.sku.client_sku} with discrepancies (damaged: ${line.damaged_units}, quarantined: ${line.quarantined_units}, missing: ${line.missing_units})`,
+            variant: "destructive",
+          });
+          setLoading(false);
+          setIsSubmitting(false);
+          return;
+        }
+
         if (line.damaged_units > 0) {
           await supabase.from("damaged_item_decisions").insert({
             client_id: asn!.client_id,

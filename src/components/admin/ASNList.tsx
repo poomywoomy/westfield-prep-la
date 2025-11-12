@@ -32,6 +32,7 @@ export const ASNList = () => {
   const [showTemplates, setShowTemplates] = useState(false);
   const [resolveDialogOpen, setResolveDialogOpen] = useState(false);
   const [asnToResolve, setAsnToResolve] = useState<ASN | null>(null);
+  const [qcPhotoAges, setQcPhotoAges] = useState<Map<string, number>>(new Map());
   const { toast } = useToast();
 
   useEffect(() => {
@@ -66,6 +67,33 @@ export const ASNList = () => {
       toast({ title: "Error", description: "Failed to load ASNs", variant: "destructive" });
     } else {
       setASNs(data || []);
+      
+      // Fetch QC photo ages for all ASNs from damaged_item_decisions
+      if (data && data.length > 0) {
+        const asnIds = data.map(asn => asn.id);
+        const { data: decisions } = await supabase
+          .from('damaged_item_decisions')
+          .select('asn_id, created_at')
+          .in('asn_id', asnIds);
+        
+        if (decisions) {
+          const agesMap = new Map<string, number>();
+          const now = new Date();
+          
+          decisions.forEach(decision => {
+            const decisionDate = new Date(decision.created_at || '');
+            const daysSinceCreation = Math.floor((now.getTime() - decisionDate.getTime()) / (1000 * 60 * 60 * 24));
+            
+            // Store the oldest photo age for this ASN
+            const currentAge = agesMap.get(decision.asn_id) || 0;
+            if (daysSinceCreation > currentAge) {
+              agesMap.set(decision.asn_id, daysSinceCreation);
+            }
+          });
+          
+          setQcPhotoAges(agesMap);
+        }
+      }
     }
     setLoading(false);
   };
@@ -316,7 +344,16 @@ export const ASNList = () => {
                   </TableCell>
                   <TableCell>{asn.carrier || "-"}</TableCell>
                   <TableCell>{asn.tracking_number || "-"}</TableCell>
-                  <TableCell>{asn.eta ? new Date(asn.eta).toLocaleDateString() : "-"}</TableCell>
+                  <TableCell>
+                    {asn.eta ? new Date(asn.eta).toLocaleDateString() : "-"}
+                    {qcPhotoAges.has(asn.id) && qcPhotoAges.get(asn.id)! >= 25 && (
+                      <div className="mt-1">
+                        <Badge variant="destructive" className="text-xs">
+                          ⚠️ Photos expire in {30 - qcPhotoAges.get(asn.id)!} days
+                        </Badge>
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Badge 
                       variant={getStatusColor(asn.status)}

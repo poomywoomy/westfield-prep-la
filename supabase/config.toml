@@ -1,5 +1,11 @@
 project_id = "gqnvkecmxjijrxhggcro"
 
+[functions.cleanup-qc-photos]
+verify_jwt = false
+
+[[functions.cleanup-qc-photos.schedule]]
+cron = "0 2 * * *"
+
 [functions.send-contact-email]
 verify_jwt = false
 

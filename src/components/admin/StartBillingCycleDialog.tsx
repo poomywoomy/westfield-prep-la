@@ -178,6 +178,10 @@ export const StartBillingCycleDialog = ({
         });
       }
 
+      // Note: Shopify product type billing check temporarily disabled due to TypeScript complexity
+      // TODO: Re-implement with simpler type handling
+      // Admin can manually check for missing single_product_fee or kit_product_fee in custom_pricing
+
       // Create the bill
       const { data: newBill, error: billError } = await supabase
         .from("bills")

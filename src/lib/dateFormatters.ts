@@ -1,4 +1,31 @@
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
+
+const PACIFIC_TZ = 'America/Los_Angeles';
+
+/**
+ * Format date in Pacific Time
+ */
+export function formatDatePT(date: string | Date): string {
+  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  return formatInTimeZone(dateObj, PACIFIC_TZ, 'MMM dd, yyyy');
+}
+
+/**
+ * Format datetime in Pacific Time
+ */
+export function formatDateTimePT(date: string | Date): string {
+  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  return formatInTimeZone(dateObj, PACIFIC_TZ, 'MMM dd, yyyy h:mm a');
+}
+
+/**
+ * Format time only in Pacific Time
+ */
+export function formatTimePT(date: string | Date): string {
+  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  return formatInTimeZone(dateObj, PACIFIC_TZ, 'h:mm a');
+}
 
 /**
  * Safely format date range from YYYY-MM-DD strings without timezone conversion

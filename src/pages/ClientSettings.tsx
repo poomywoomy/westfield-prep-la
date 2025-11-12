@@ -329,6 +329,67 @@ const ClientSettings = () => {
               </form>
             </CardContent>
           </Card>
+
+          <Card className="border-destructive">
+            <CardHeader>
+              <CardTitle className="text-destructive">Delete Account</CardTitle>
+              <CardDescription>
+                Permanently delete your client account and all associated data
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <p className="text-sm text-destructive font-medium mb-2">⚠️ Warning: This action cannot be undone</p>
+                <p className="text-sm text-muted-foreground">
+                  Deleting your account will permanently remove:
+                </p>
+                <ul className="text-sm text-muted-foreground list-disc list-inside mt-2 space-y-1">
+                  <li>All inventory records and history</li>
+                  <li>All shipments and orders</li>
+                  <li>All billing information</li>
+                  <li>All Shopify integrations</li>
+                  <li>All account settings and preferences</li>
+                </ul>
+              </div>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  if (!confirm("Are you absolutely sure you want to delete your account? This cannot be undone.")) {
+                    return;
+                  }
+                  
+                  if (!confirm("Last chance: Delete all account data permanently?")) {
+                    return;
+                  }
+
+                  try {
+                    const { data, error } = await supabase.rpc('delete_own_client_account');
+                    
+                    if (error) throw error;
+
+                    toast({
+                      title: "Account Deleted",
+                      description: "Your account has been permanently deleted. You will be logged out.",
+                    });
+
+                    // Sign out and redirect
+                    setTimeout(async () => {
+                      await supabase.auth.signOut();
+                      navigate('/');
+                    }, 2000);
+                  } catch (error: any) {
+                    toast({
+                      title: "Deletion Failed",
+                      description: error.message || "Failed to delete account",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+              >
+                Delete Account Permanently
+              </Button>
+            </CardContent>
+          </Card>
             </div>
           </TabsContent>
 
