@@ -84,8 +84,8 @@ export function DiscrepancyActionsDialog({
 
       if (error) throw error;
 
-      // Check if this is a "return to inventory" decision - restore units to available inventory
-      if (decision.decision === "return_to_inventory") {
+      // Check if this is a "return to inventory" or "sell as bstock" decision - restore units to available inventory
+      if (decision.decision === "return_to_inventory" || decision.decision === "sell_as_bstock") {
         // Get MAIN location
         const { data: location, error: locError } = await supabase
           .from('locations')
@@ -106,10 +106,10 @@ export function DiscrepancyActionsDialog({
               user_id: user.id,
               qty_delta: decision.quantity,
               transaction_type: 'ADJUSTMENT_PLUS',
-              reason_code: 'return_to_inventory',
+              reason_code: decision.decision === "sell_as_bstock" ? 'sell_as_bstock' : 'return_to_inventory',
               source_type: decision.source_type === 'return' ? 'customer_return' : 'receiving',
               source_ref: decision.asn_id || decision.id,
-              notes: `Units returned to inventory after ${decision.source_type === 'return' ? 'return' : 'receiving'} review. Client decision: Return to Inventory. Admin processed by ${user.email}.`,
+              notes: `Units ${decision.decision === "sell_as_bstock" ? 'marked for B-stock sale' : 'returned to inventory'} after ${decision.source_type === 'return' ? 'return' : 'receiving'} review. Client decision: ${getDecisionLabel(decision.decision)}. Admin processed by ${user.email}.`,
             });
           
           if (ledgerError) throw ledgerError;
@@ -133,6 +133,8 @@ export function DiscrepancyActionsDialog({
         title: "Decision Processed",
         description: decision.decision === "return_to_inventory" 
           ? `${decision.quantity} units returned to available inventory`
+          : decision.decision === "sell_as_bstock"
+          ? `${decision.quantity} units marked for B-stock sale and added to inventory`
           : "Discrepancy has been marked as processed",
       });
 

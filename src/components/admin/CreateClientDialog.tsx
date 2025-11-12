@@ -87,8 +87,20 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
         }
       });
 
-      if (clientError) throw clientError;
-      if (!clientData?.success) throw new Error(clientData?.error || "Failed to create client");
+      if (clientError) {
+        console.error("Edge function error:", clientError);
+        // Extract more specific error message if available
+        const errorMessage = clientError?.message || 
+          clientError?.context?.error || 
+          "Failed to create client. Please try again.";
+        throw new Error(errorMessage);
+      }
+      
+      if (!clientData?.success) {
+        const errorMessage = clientData?.error || "Failed to create client";
+        console.error("Client creation failed:", errorMessage);
+        throw new Error(errorMessage);
+      }
 
       toast({
         title: "Client created",
@@ -100,9 +112,10 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
+      console.error("Create client error:", error);
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Error creating client",
+        description: error.message || "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {

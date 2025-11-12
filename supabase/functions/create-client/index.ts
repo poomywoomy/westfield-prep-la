@@ -176,17 +176,13 @@ serve(async (req) => {
       throw roleError;
     }
 
-    // Upsert client record with password expiration (48 hours for new accounts)
-    const passwordExpiresAt = isNewUser 
-      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() 
-      : null;
-
     console.log("Creating/updating client with data:", {
       user_id: userId,
       company_name: requestData.company_name,
       storage: requestData.storage,
       storage_method: requestData.storage_method,
       storage_units_per_month: requestData.storage_units_per_month,
+      is_new_user: isNewUser,
     });
 
     const { error: clientError } = await supabaseAdmin
@@ -208,7 +204,6 @@ serve(async (req) => {
         admin_notes: requestData.admin_notes,
         fulfillment_services: requestData.fulfillment_services,
         status: 'pending',
-        password_expires_at: passwordExpiresAt,
       }, {
         onConflict: 'user_id'
       });
@@ -251,9 +246,11 @@ serve(async (req) => {
       }
     );
   } catch (error: any) {
+    console.error("Create client error:", error);
     return new Response(
       JSON.stringify({ 
-        error: "Unable to create client account. Please try again or contact support."
+        error: error.message || "Unable to create client account. Please try again or contact support.",
+        details: error.details || undefined,
       }),
       {
         status: 400,
