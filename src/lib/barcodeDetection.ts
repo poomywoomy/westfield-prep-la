@@ -13,9 +13,9 @@ export const isTrackingNumber = (barcode: string): boolean => {
   // FedEx: 12, 14, 15, or 20 digits
   if (/^\d{12}$|^\d{14}$|^\d{15}$|^\d{20}$/.test(barcode)) return true;
   
-  // USPS: 20-22 digits or starts with 9400/9200
-  if (/^(94|92)\d{20,22}$/.test(barcode)) return true;
-  if (/^\d{20,22}$/.test(barcode)) return true;
+  // USPS: 20-34 digits or starts with 9400/9200
+  if (/^(94|92)\d{18,32}$/.test(barcode)) return true;
+  if (/^\d{20,34}$/.test(barcode)) return true;
   
   // DHL: 10-11 digits
   if (/^\d{10,11}$/.test(barcode)) return true;
@@ -38,8 +38,8 @@ export const detectCarrier = (trackingNumber: string): string => {
   if (/^\d{20}$/.test(trackingNumber)) return 'FedEx';
   
   // USPS patterns
-  if (/^(94|92)\d{20}/.test(trackingNumber)) return 'USPS';
-  if (/^\d{22}$/.test(trackingNumber)) return 'USPS';
+  if (/^(94|92)\d{18,32}$/.test(trackingNumber)) return 'USPS';
+  if (/^\d{20,34}$/.test(trackingNumber)) return 'USPS';
   
   // DHL patterns
   if (/^\d{10,11}$/.test(trackingNumber)) return 'DHL';

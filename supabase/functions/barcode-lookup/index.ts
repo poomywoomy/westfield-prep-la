@@ -46,9 +46,9 @@ const isTrackingNumber = (barcode: string): boolean => {
   // FedEx: 12, 14, 15, or 20 digits
   if (/^\d{12}$|^\d{14}$|^\d{15}$|^\d{20}$/.test(barcode)) return true;
   
-  // USPS: 20-22 digits or starts with 9400/9200
-  if (/^(94|92)\d{20,22}$/.test(barcode)) return true;
-  if (/^\d{20,22}$/.test(barcode)) return true;
+  // USPS: 20-34 digits or starts with 9400/9200
+  if (/^(94|92)\d{18,32}$/.test(barcode)) return true;
+  if (/^\d{20,34}$/.test(barcode)) return true;
   
   // DHL: 10-11 digits
   if (/^\d{10,11}$/.test(barcode)) return true;
@@ -378,8 +378,8 @@ Deno.serve(async (req) => {
     if (!response.found && detectedType === 'tracking') {
       let detectedCarrier = 'Unknown';
       if (normalizedBarcode.startsWith('1Z')) detectedCarrier = 'UPS';
-      else if (/^94\d{20}$/.test(normalizedBarcode)) detectedCarrier = 'USPS';
-      else if (/^92\d{20}$/.test(normalizedBarcode)) detectedCarrier = 'USPS';
+      else if (/^(94|92)\d{18,32}$/.test(normalizedBarcode)) detectedCarrier = 'USPS';
+      else if (/^\d{20,34}$/.test(normalizedBarcode)) detectedCarrier = 'USPS';
       else if (/^\d{12}$/.test(normalizedBarcode)) detectedCarrier = 'FedEx';
       else if (/^\d{14}$/.test(normalizedBarcode)) detectedCarrier = 'FedEx';
       else if (/^\d{15}$/.test(normalizedBarcode)) detectedCarrier = 'FedEx';

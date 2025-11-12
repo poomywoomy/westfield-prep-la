@@ -84,10 +84,10 @@ export const QuickScanModal = ({ open, onOpenChange }: QuickScanModalProps) => {
           // Found existing ASN - Auto-open it
           const asnData = data.data;
           
-          toast({ 
-            title: "ASN Found",
-            description: `#${asnData.asn_number}`,
-          });
+        toast({ 
+          title: "ASN Found",
+          description: `#${asnData.asn_number} - Status: ${asnData.status.toUpperCase()}`,
+        });
           
           // Auto-open ASN form in view/edit mode
           setASNPrefillData({
