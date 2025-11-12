@@ -108,7 +108,7 @@ const FAQ = () => {
       <Helmet>
         <title>FAQ | Los Angeles & Southern California Amazon & E-Commerce Fulfillment</title>
         <meta name="description" content="Find answers to frequently asked questions about WestfieldPrepCenter.com's Amazon FBA prep and e-commerce fulfillment services in Los Angeles and Southern California." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/faq/" />
+        <link rel="canonical" href="https://westfieldprepcenter.com/faq" />
       </Helmet>
       <StructuredData type="faq" data={faqs} />
       

@@ -28,12 +28,12 @@ const StorageWarehousing = () => {
       <Helmet>
         <title>Storage & Warehousing | Westfield Prep Center</title>
         <meta name="description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/storage-warehousing/" />
+        <link rel="canonical" href="https://westfieldprepcenter.com/storage-warehousing" />
         
         {/* Open Graph tags */}
         <meta property="og:title" content="Storage & Warehousing | Westfield Prep Center" />
         <meta property="og:description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
-        <meta property="og:url" content="https://westfieldprepcenter.com/storage-warehousing/" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/storage-warehousing" />
         <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
         <meta property="og:type" content="website" />
         
@@ -47,7 +47,7 @@ const StorageWarehousing = () => {
       
       <div className="min-h-screen flex flex-col">
         <Header />
-        <Breadcrumbs items={[{ label: "Storage & Warehousing", path: "/storage-warehousing/" }]} />
+        <Breadcrumbs items={[{ label: "Storage & Warehousing", path: "/storage-warehousing" }]} />
         
         <main className="flex-1">
           {/* Hero Section */}

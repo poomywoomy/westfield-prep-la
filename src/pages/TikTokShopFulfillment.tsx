@@ -39,8 +39,8 @@ const TikTokShopFulfillment = () => {
       <Helmet>
         <title>TikTok Shop Fulfillment in Los Angeles | TikTok 3PL LA | Westfield Prep Center</title>
         <meta name="description" content="Scale your TikTok Shop with professional fulfillment from WestfieldPrepCenter.com. Based in Los Angeles, we handle order processing, packing, and shipping for sellers across Southern California." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/tiktok-shop-fulfillment/" />
-        <meta property="og:url" content="https://westfieldprepcenter.com/tiktok-shop-fulfillment/" />
+        <link rel="canonical" href="https://westfieldprepcenter.com/tiktok-shop-fulfillment" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/tiktok-shop-fulfillment" />
         <meta property="og:type" content="article" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
@@ -48,7 +48,7 @@ const TikTokShopFulfillment = () => {
       
       <div className="min-h-screen flex flex-col">
         <Header />
-        <Breadcrumbs items={[{ label: "TikTok Shop Fulfillment", path: "/tiktok-shop-fulfillment/" }]} />
+        <Breadcrumbs items={[{ label: "TikTok Shop Fulfillment", path: "/tiktok-shop-fulfillment" }]} />
         
         <main className="flex-1">
           {/* Hero Section - TikTok Dynamic Theme */}

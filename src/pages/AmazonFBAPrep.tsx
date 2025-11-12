@@ -33,15 +33,15 @@ const AmazonFBAPrep = () => {
       <Helmet>
         <title>Amazon FBA Prep Center in Los Angeles & Southern California | Westfield Prep Center</title>
         <meta name="description" content="Westfield Prep Center specializes in Amazon FBA prep for sellers in Los Angeles and Southern California. Inspection, labeling, bundling, and compliant shipping — all handled with care." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/amazon-fba-prep/" />
-        <meta property="og:url" content="https://westfieldprepcenter.com/amazon-fba-prep/" />
+        <link rel="canonical" href="https://westfieldprepcenter.com/amazon-fba-prep" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/amazon-fba-prep" />
         <meta property="og:type" content="article" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
-        <Breadcrumbs items={[{ label: "Amazon FBA Prep", path: "/amazon-fba-prep/" }]} />
+        <Breadcrumbs items={[{ label: "Amazon FBA Prep", path: "/amazon-fba-prep" }]} />
         
         <main className="flex-1">
           {/* Hero Section - Amazon Professional Theme */}

@@ -76,7 +76,7 @@ const Blog = () => {
       <Helmet>
         <title>Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield</title>
         <meta name="description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/blog/" />
+        <link rel="canonical" href="https://westfieldprepcenter.com/blog" />
       </Helmet>
 
       <Header />

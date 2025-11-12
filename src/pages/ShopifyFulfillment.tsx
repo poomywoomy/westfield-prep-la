@@ -39,8 +39,8 @@ const ShopifyFulfillment = () => {
       <Helmet>
         <title>Shopify Prep Center in Los Angeles | DTC Fulfillment & Order Processing - Westfield</title>
         <meta name="description" content="Los Angeles Shopify prep center offering same-day order fulfillment, branded packaging, and inventory management. Trusted Shopify prep center serving LA and Southern California sellers." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/shopify-fulfillment/" />
-        <meta property="og:url" content="https://westfieldprepcenter.com/shopify-fulfillment/" />
+        <link rel="canonical" href="https://westfieldprepcenter.com/shopify-fulfillment" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/shopify-fulfillment" />
         <meta property="og:type" content="article" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
@@ -48,7 +48,7 @@ const ShopifyFulfillment = () => {
       
       <div className="min-h-screen flex flex-col">
         <Header />
-        <Breadcrumbs items={[{ label: "Shopify Fulfillment", path: "/shopify-fulfillment/" }]} />
+        <Breadcrumbs items={[{ label: "Shopify Fulfillment", path: "/shopify-fulfillment" }]} />
         
         <main className="flex-1">
           {/* Hero Section - Shopify Brand-Focused Theme */}
