@@ -97,10 +97,6 @@ const FAQ = () => {
           answer: "Yes! We can ship orders without any Westfield branding, using your company's branded packaging, inserts, and packing slips. Perfect for maintaining your brand identity in direct-to-consumer fulfillment."
         },
         {
-          question: "What technology/warehouse management system do you use?",
-          answer: "We use an advanced warehouse management system (WMS) that integrates with major e-commerce platforms like Shopify, Amazon, and TikTok Shop. Our system provides real-time inventory tracking, automated order routing, and detailed reporting to keep you informed at every step."
-        },
-        {
           question: "Do you provide customer support after hours?",
           answer: "While our standard business hours are Monday-Friday 8 AM to 5 PM PST, we offer emergency support for urgent situations. Your dedicated account manager can be reached for critical issues, and we monitor systems 24/7 to ensure your orders are processed smoothly."
         }
@@ -350,7 +346,7 @@ const FAQ = () => {
       questions: [
         {
           question: "What are your turnaround times?",
-          answer: "As a boutique operation, we pride ourselves on same-day turnaround for orders placed before 2 PM PST. Our small team allows us to process and ship significantly faster than larger prep centers. Rush services are available for urgent shipments, with an additional 30-60% fee."
+          answer: "As a boutique operation, we pride ourselves on same-day turnaround for orders placed before 2 PM PST. Our team allows us to process and ship significantly faster than larger prep centers. Rush services are available for urgent shipments, with an additional 30-60% fee."
         },
         {
           question: "What is your same-day cutoff time?",
