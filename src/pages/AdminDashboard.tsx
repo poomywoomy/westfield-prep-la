@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -9,20 +9,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { LogOut, Settings, ChevronDown, Scan } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
-import ClientsTab from "@/components/admin/ClientsTab";
-import BillingTab from "@/components/admin/BillingTab";
-import { BillingHistoryTab } from "@/components/admin/BillingHistoryTab";
-import DocumentGeneratorTab from "@/components/admin/DocumentGeneratorTab";
-import { ShopifyManagementTab } from "@/components/admin/ShopifyManagementTab";
-import { ShopifySyncHealthDashboard } from "@/components/admin/ShopifySyncHealthDashboard";
-import { InventoryTab } from "@/components/admin/InventoryTab";
 import { QuickScanModal } from "@/components/admin/QuickScanModal";
-import { BlogTab } from "@/components/admin/BlogTab";
-import { DiscrepanciesTab } from "@/components/admin/DiscrepanciesTab";
-import { OrdersTab } from "@/components/admin/OrdersTab";
-import { ShipmentsTab } from "@/components/admin/ShipmentsTab";
 import { usePendingDiscrepancyCount } from "@/hooks/usePendingDiscrepancyCount";
 import { AppSidebarAdmin } from "@/components/app-sidebar-admin";
+
+// Lazy load tab components for better performance
+const ClientsTab = lazy(() => import("@/components/admin/ClientsTab"));
+const BillingTab = lazy(() => import("@/components/admin/BillingTab"));
+const BillingHistoryTab = lazy(() => import("@/components/admin/BillingHistoryTab").then(m => ({ default: m.BillingHistoryTab })));
+const DocumentGeneratorTab = lazy(() => import("@/components/admin/DocumentGeneratorTab"));
+const ShopifyManagementTab = lazy(() => import("@/components/admin/ShopifyManagementTab").then(m => ({ default: m.ShopifyManagementTab })));
+const ShopifySyncHealthDashboard = lazy(() => import("@/components/admin/ShopifySyncHealthDashboard").then(m => ({ default: m.ShopifySyncHealthDashboard })));
+const InventoryTab = lazy(() => import("@/components/admin/InventoryTab").then(m => ({ default: m.InventoryTab })));
+const BlogTab = lazy(() => import("@/components/admin/BlogTab").then(m => ({ default: m.BlogTab })));
+const DiscrepanciesTab = lazy(() => import("@/components/admin/DiscrepanciesTab").then(m => ({ default: m.DiscrepanciesTab })));
+const OrdersTab = lazy(() => import("@/components/admin/OrdersTab").then(m => ({ default: m.OrdersTab })));
+const ShipmentsTab = lazy(() => import("@/components/admin/ShipmentsTab").then(m => ({ default: m.ShipmentsTab })));
 
 const AdminDashboard = () => {
   const { user, role, loading, logout } = useAuth();

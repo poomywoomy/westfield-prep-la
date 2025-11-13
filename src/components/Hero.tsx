@@ -18,22 +18,22 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Dynamic Background with Parallax Effect */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url(${heroImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/80 to-secondary/70" />
-        {/* Animated Overlay Patterns */}
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-secondary/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
-        </div>
+      {/* Optimized Background Image */}
+      <img
+        src={heroImage}
+        alt="Modern warehouse interior with organized inventory at Westfield Prep Center Los Angeles"
+        fetchPriority="high"
+        width={1920}
+        height={1080}
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        loading="eager"
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/80 to-secondary/70 z-[1]" />
+      {/* Animated Overlay Patterns */}
+      <div className="absolute inset-0 z-[2]">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-secondary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 pt-20 pb-16">

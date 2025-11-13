@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { Package, Camera, Truck, Users, Zap, Clock, Globe, Building2, Warehouse, TruckIcon, Headphones, RotateCcw, Network } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import ServiceInfoDialog from "@/components/ServiceInfoDialog";
+
+// Lazy load dialog for code splitting
+const ServiceInfoDialog = lazy(() => import("@/components/ServiceInfoDialog"));
 
 const services = [
   {

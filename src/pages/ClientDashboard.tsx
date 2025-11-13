@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -10,16 +10,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DollarSign, LogOut, Settings, ChevronDown, Package, Activity } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
-import ClientBillingTab from "@/components/client/ClientBillingTab";
-import ClientProductsTab from "@/components/client/ClientProductsTab";
-import ClientOrdersTab from "@/components/client/ClientOrdersTab";
-import { ClientShipmentsTab } from "@/components/client/ClientShipmentsTab";
-import { ClientInventoryActivityLog } from "@/components/client/ClientInventoryActivityLog";
-import { ClientAnalyticsDashboard } from "@/components/client/ClientAnalyticsDashboard";
-import { ClientASNsTab } from "@/components/client/ClientASNsTab";
 import { sanitizeError } from "@/lib/errorHandler";
 import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
 import type { Database } from "@/integrations/supabase/types";
+
+// Lazy load tab components for better performance
+const ClientBillingTab = lazy(() => import("@/components/client/ClientBillingTab"));
+const ClientProductsTab = lazy(() => import("@/components/client/ClientProductsTab"));
+const ClientOrdersTab = lazy(() => import("@/components/client/ClientOrdersTab"));
+const ClientShipmentsTab = lazy(() => import("@/components/client/ClientShipmentsTab").then(m => ({ default: m.ClientShipmentsTab })));
+const ClientInventoryActivityLog = lazy(() => import("@/components/client/ClientInventoryActivityLog").then(m => ({ default: m.ClientInventoryActivityLog })));
+const ClientAnalyticsDashboard = lazy(() => import("@/components/client/ClientAnalyticsDashboard").then(m => ({ default: m.ClientAnalyticsDashboard })));
+const ClientASNsTab = lazy(() => import("@/components/client/ClientASNsTab").then(m => ({ default: m.ClientASNsTab })));
 
 const ClientDashboard = () => {
   const { user, role, loading, logout } = useAuth();
