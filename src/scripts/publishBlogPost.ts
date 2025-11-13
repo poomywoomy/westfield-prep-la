@@ -1,6 +1,6 @@
-// Temporary file to hold blog content - will be inserted into database
-export const blogContent = `
-# 7 Mistakes You're Making with Amazon FBA Prep (and How Same-Day Processing Fixes Them)
+import { supabase } from "@/integrations/supabase/client";
+
+const blogContent = `# 7 Mistakes You're Making with Amazon FBA Prep (and How Same-Day Processing Fixes Them)
 
 ![Amazon FBA prep center with organized inventory and labeling stations](/blog-images/amazon-fba-prep-mistakes-hero.jpg)
 
@@ -201,5 +201,34 @@ Stop losing sales to processing delays. Start capturing the revenue that's right
 
 ---
 
-*Questions about switching to same-day processing? [Contact our team](/contact) for a free consultation on optimizing your fulfillment operations.*
-`;
+*Questions about switching to same-day processing? [Contact our team](/contact) for a free consultation on optimizing your fulfillment operations.*`;
+
+export async function publishBlogPost() {
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .insert({
+      title: '7 Mistakes You\'re Making with Amazon FBA Prep (and How Same-Day Processing Fixes Them)',
+      slug: '7-mistakes-amazon-fba-prep-same-day-processing',
+      excerpt: 'Discover 7 costly Amazon FBA prep mistakes and how same-day processing from Los Angeles 3PL services fixes them. Stop losing sales to processing delays and start capturing revenue.',
+      content: blogContent,
+      cover_image_url: '/blog-images/amazon-fba-prep-mistakes-hero.jpg',
+      category: 'Amazon FBA',
+      tags: ['amazon fba prep', 'same-day processing', '3pl services', 'los angeles fulfillment', 'prep mistakes', 'fba tips', 'fulfillment optimization'],
+      author_name: 'Westfield Prep Team',
+      author_bio: 'Expert team at Westfield Prep Center with years of experience in e-commerce fulfillment, Amazon FBA prep, and Shopify logistics.',
+      meta_description: 'Discover 7 costly Amazon FBA prep mistakes and how same-day processing from Los Angeles 3PL services fixes them. Boost profits with faster fulfillment.',
+      read_time_minutes: 12,
+      published: true,
+      published_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error publishing blog post:', error);
+    return { error };
+  }
+
+  console.log('Blog post published successfully:', data);
+  return { data };
+}
