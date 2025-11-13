@@ -198,39 +198,53 @@ const ClientDashboard = () => {
           </TabsList>
 
           <TabsContent value="analytics" forceMount className="data-[state=inactive]:hidden">
-            <ClientAnalyticsDashboard clientId={clientId} />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ClientAnalyticsDashboard clientId={clientId} />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="products" forceMount className="data-[state=inactive]:hidden">
-            <div className="space-y-4">
-              <div className="flex justify-end">
-                <Button onClick={() => setShowSKUDialog(true)}>
-                  <Package className="mr-2 h-4 w-4" />
-                  Create SKU
-                </Button>
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <div className="space-y-4">
+                <div className="flex justify-end">
+                  <Button onClick={() => setShowSKUDialog(true)}>
+                    <Package className="mr-2 h-4 w-4" />
+                    Create SKU
+                  </Button>
+                </div>
+                <ClientProductsTab />
               </div>
-              <ClientProductsTab />
-            </div>
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="orders" forceMount className="data-[state=inactive]:hidden">
-            <ClientOrdersTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ClientOrdersTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="asns" forceMount className="data-[state=inactive]:hidden">
-            <ClientASNsTab clientId={clientId} />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ClientASNsTab clientId={clientId} />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="shipments" forceMount className="data-[state=inactive]:hidden">
-            <ClientShipmentsTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ClientShipmentsTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="activity" forceMount className="data-[state=inactive]:hidden">
-            <ClientInventoryActivityLog clientId={clientId} />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ClientInventoryActivityLog clientId={clientId} />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="billing" forceMount className="data-[state=inactive]:hidden">
-            <ClientBillingTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ClientBillingTab />
+            </Suspense>
           </TabsContent>
         </Tabs>
       </main>
