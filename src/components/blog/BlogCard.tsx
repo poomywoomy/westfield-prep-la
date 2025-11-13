@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Calendar, Clock, ArrowRight, TrendingUp } from "lucide-react";
+import { Calendar, ArrowRight, TrendingUp } from "lucide-react";
 import { format } from "date-fns";
 
 interface BlogCardProps {
@@ -100,15 +100,6 @@ export const BlogCard = ({
             <Calendar className="w-3.5 h-3.5" />
             {format(new Date(publishedAt), "MMM d, yyyy")}
           </span>
-          {readTimeMinutes && (
-            <>
-              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--blog-orange))]" />
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                {readTimeMinutes} min
-              </span>
-            </>
-          )}
         </div>
         
         {/* Excerpt with better typography */}

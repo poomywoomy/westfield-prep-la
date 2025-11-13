@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { format } from "date-fns";
 
 interface RelatedPost {
@@ -12,7 +12,6 @@ interface RelatedPost {
   excerpt: string | null;
   cover_image_url: string | null;
   published_at: string;
-  read_time_minutes: number | null;
   category: string | null;
 }
 
@@ -33,7 +32,7 @@ export const RelatedPosts = ({ currentPostId, category }: RelatedPostsProps) => 
     try {
       let query = supabase
         .from("blog_posts")
-        .select("id, title, slug, excerpt, cover_image_url, published_at, read_time_minutes, category")
+        .select("id, title, slug, excerpt, cover_image_url, published_at, category")
         .eq("published", true)
         .neq("id", currentPostId)
         .order("published_at", { ascending: false })
@@ -97,12 +96,6 @@ export const RelatedPosts = ({ currentPostId, category }: RelatedPostsProps) => 
                           {format(new Date(post.published_at), "MMM dd")}
                         </time>
                       </div>
-                      {post.read_time_minutes && (
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{post.read_time_minutes} min</span>
-                        </div>
-                      )}
                     </div>
                   </CardContent>
                 </Card>

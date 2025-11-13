@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import StructuredData from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
-import { Calendar, ArrowLeft, Clock } from "lucide-react";
+import { Calendar, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { BlogPostRenderer } from "@/components/blog/BlogPostRenderer";
 import { BlogPostSchema } from "@/components/blog/BlogPostSchema";
@@ -97,7 +97,7 @@ const BlogPost = () => {
     return null;
   }
 
-  const estimatedReadTime = post.read_time_minutes || Math.max(1, Math.ceil((post.content?.split(' ').length || 0) / 200));
+  
 
   return (
     <>
@@ -179,11 +179,7 @@ const BlogPost = () => {
                           </time>
                         </div>
                       )}
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        <span className="text-sm">{estimatedReadTime} min read</span>
-                      </div>
-                      <ShareButtons 
+                      <ShareButtons
                         title={post.title}
                         variant="ghost"
                         size="sm"
@@ -210,11 +206,7 @@ const BlogPost = () => {
                           {format(new Date(post.published_at), "MMMM dd, yyyy")}
                         </time>
                       </div>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      <span className="text-sm">{estimatedReadTime} min read</span>
-                    </div>
+                      )}
                   </div>
                 </div>
               </div>
