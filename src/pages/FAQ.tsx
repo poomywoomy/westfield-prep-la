@@ -8,7 +8,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowLeft } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
