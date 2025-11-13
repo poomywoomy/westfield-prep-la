@@ -1,17 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, lazy, Suspense } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import Services from "@/components/Services";
 import { Button } from "@/components/ui/button";
-import Compliance from "@/components/Compliance";
-import WhyChooseUs from "@/components/WhyChooseUs";
-import Reviews from "@/components/Reviews";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
-import LocationShowcase from "@/components/LocationShowcase";
 import { useAuth } from "@/hooks/useAuth";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Lazy load below-the-fold components
+const WhyChooseUs = lazy(() => import("@/components/WhyChooseUs"));
+const LocationShowcase = lazy(() => import("@/components/LocationShowcase"));
+const Services = lazy(() => import("@/components/Services"));
+const Reviews = lazy(() => import("@/components/Reviews"));
+const Compliance = lazy(() => import("@/components/Compliance"));
 
 const Index = () => {
   const { user, role, loading } = useAuth();
@@ -31,6 +34,24 @@ const Index = () => {
       }
     }
   }, [user, role, loading, navigate]);
+
+  // Memoize FAQ data to prevent regeneration
+  const faqData = useMemo(() => ({
+    questions: [
+      {
+        question: "Do you offer Shopify fulfillment services?",
+        answer: "Yes! We specialize in Shopify fulfillment with custom branding, same-day processing, and direct integration. Whether you're selling on Shopify, Amazon FBA, TikTok Shop, or other channels, we handle everything from receiving to shipping with full photo documentation."
+      },
+      {
+        question: "What areas do you serve?",
+        answer: "We're based in Los Angeles and provide fulfillment services to e-commerce businesses in all 50 states. We handle shipments to Amazon FBA warehouses, direct-to-consumer Shopify orders, TikTok Shop fulfillment, and multi-channel distribution nationwide."
+      },
+      {
+        question: "Do you offer same-day processing?",
+        answer: "Yes! Orders received before 2 PM PST ship the same day. We pride ourselves on fast turnaround times to keep your customers happy and your inventory moving."
+      }
+    ]
+  }), []);
 
   return (
     <>
@@ -57,29 +78,7 @@ const Index = () => {
       </Helmet>
       <StructuredData type="organization" />
       <StructuredData type="website" />
-      <StructuredData 
-        type="faq" 
-        data={{
-          questions: [
-            {
-              question: "Do you offer Shopify fulfillment services?",
-              answer: "Yes! We specialize in Shopify fulfillment with custom branding, same-day processing, and direct integration. Whether you're selling on Shopify, Amazon FBA, TikTok Shop, or other channels, we handle everything from receiving to shipping with full photo documentation."
-            },
-            {
-              question: "What areas do you serve?",
-              answer: "We're based in Los Angeles and provide fulfillment services to e-commerce businesses in all 50 states. We handle shipments to Amazon FBA warehouses, direct-to-consumer Shopify orders, TikTok Shop fulfillment, and multi-channel distribution nationwide."
-            },
-            {
-              question: "Do you offer same-day processing?",
-              answer: "Yes! Orders received before our daily cutoff are processed and shipped the same business day. We pride ourselves on fast turnaround times for both Shopify orders and Amazon FBA prep."
-            },
-            {
-              question: "What makes your prep center different?",
-              answer: "As a boutique Los Angeles 3PL, we offer personalized service, same-day processing, custom branding for DTC brands, and full photo documentation. You get dedicated support for all your sales channels—Shopify, Amazon, TikTok Shop, and more—instead of generic ticket-based systems."
-            }
-          ]
-        }}
-      />
+      <StructuredData type="faq" data={faqData} />
       <div className="min-h-screen">
         <Header />
         <Hero />

@@ -1,11 +1,24 @@
 import { Helmet } from "react-helmet";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
 
 const GoogleAnalytics = () => {
   const { user } = useAuth();
+  const [shouldLoad, setShouldLoad] = useState(false);
 
   // Only load Google Analytics when user is NOT logged in
-  if (user) {
+  useEffect(() => {
+    if (!user) {
+      // Defer GA loading until after page interactive
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => setShouldLoad(true), { timeout: 2000 });
+      } else {
+        setTimeout(() => setShouldLoad(true), 2000);
+      }
+    }
+  }, [user]);
+
+  if (user || !shouldLoad) {
     return null;
   }
 
