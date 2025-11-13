@@ -180,15 +180,18 @@ export const StartBillingCycleDialog = ({
 
       // Check for Shopify product types without pricing
       try {
-        // Check for single products
-        const { data: singleProducts, error: singleError } = await supabase
+        // Check for single products - @ts-ignore to bypass deep type instantiation error
+        // @ts-ignore
+        const { data: singleData } = await supabase
           .from('skus')
           .select('id')
           .eq('client_id', client.id)
           .eq('product_type', 'single')
           .not('shopify_variant_id', 'is', null);
+        
+        const singleCount = singleData?.length || 0;
 
-        if (!singleError && singleProducts && singleProducts.length > 0) {
+        if (singleCount > 0) {
           const hasSingleFee = itemsToInsert.some(item => 
             item.service_name.toLowerCase().includes('single') || 
             item.service_name.toLowerCase().includes('single_product_fee')
@@ -197,22 +200,25 @@ export const StartBillingCycleDialog = ({
           if (!hasSingleFee) {
             toast({
               title: "⚠️ Missing Pricing",
-              description: `Client has ${singleProducts.length} Shopify single products but no "single_product_fee" pricing. Add to custom pricing or update bill manually.`,
+              description: `Client has ${singleCount} Shopify single products but no "single_product_fee" pricing. Add to custom pricing or update bill manually.`,
               variant: "default",
               duration: 8000,
             });
           }
         }
 
-        // Check for kit products
-        const { data: kitProducts, error: kitError } = await supabase
+        // Check for kit products - @ts-ignore to bypass deep type instantiation error
+        // @ts-ignore
+        const { data: kitData } = await supabase
           .from('skus')
           .select('id')
           .eq('client_id', client.id)
           .eq('product_type', 'kit')
           .not('shopify_variant_id', 'is', null);
+        
+        const kitCount = kitData?.length || 0;
 
-        if (!kitError && kitProducts && kitProducts.length > 0) {
+        if (kitCount > 0) {
           const hasKitFee = itemsToInsert.some(item => 
             item.service_name.toLowerCase().includes('kit') ||
             item.service_name.toLowerCase().includes('kit_product_fee')
@@ -221,7 +227,7 @@ export const StartBillingCycleDialog = ({
           if (!hasKitFee) {
             toast({
               title: "⚠️ Missing Pricing",
-              description: `Client has ${kitProducts.length} Shopify kit products but no "kit_product_fee" pricing. Add to custom pricing or update bill manually.`,
+              description: `Client has ${kitCount} Shopify kit products but no "kit_product_fee" pricing. Add to custom pricing or update bill manually.`,
               variant: "default",
               duration: 8000,
             });

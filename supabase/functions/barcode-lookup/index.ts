@@ -267,7 +267,7 @@ Deno.serve(async (req) => {
           ship_from,
           notes,
           created_at,
-          clients!inner(company_name),
+          clients(company_name),
           asn_lines (
             id,
             expected_units,
@@ -290,9 +290,42 @@ Deno.serve(async (req) => {
         query = query.eq('client_id', client_id);
       }
 
+      console.log('[ASN Search] Executing query for tracking:', normalizedBarcode);
       const { data: asnData, error: asnError } = await query.maybeSingle();
 
-      if (asnData && !asnError) {
+      console.log('[ASN Search] Query executed');
+      console.log('[ASN Search] Error:', asnError);
+      console.log('[ASN Search] Data found:', !!asnData);
+      if (asnData) {
+        console.log('[ASN Search] ASN Number:', asnData.asn_number);
+      }
+
+      // If main query fails, try simple query without nested relationships
+      if (!asnData || asnError) {
+        console.log('[ASN Search] Main query failed, trying simple fallback query...');
+        
+        const { data: simpleData, error: simpleError } = await supabase
+          .from('asn_headers')
+          .select('id, asn_number, tracking_number, carrier, eta, status, client_id, ship_from, notes, created_at')
+          .eq('tracking_number', normalizedBarcode)
+          .eq('client_id', client_id)
+          .maybeSingle();
+        
+        console.log('[ASN Search] Fallback query - Error:', simpleError);
+        console.log('[ASN Search] Fallback query - Data found:', !!simpleData);
+        
+        if (simpleData && !simpleError) {
+          console.log('[ASN Search] Fallback query SUCCESS - Found ASN:', simpleData.asn_number);
+          response = {
+            found: true,
+            type: 'tracking',
+            matched_table: 'asn_headers',
+            matched_id: simpleData.id,
+            data: simpleData
+          };
+        }
+      } else if (asnData && !asnError) {
+        console.log('[ASN Search] Main query SUCCESS - Found ASN:', asnData.asn_number);
         response = {
           found: true,
           type: 'tracking',
