@@ -130,47 +130,69 @@ const AdminDashboard = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
 
           <TabsContent value="clients">
-            <ClientsTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ClientsTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="billing">
-            <BillingTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <BillingTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="billing-history">
-            <BillingHistoryTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <BillingHistoryTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="inventory">
-            <InventoryTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <InventoryTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="discrepancies">
-            <DiscrepanciesTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <DiscrepanciesTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="shipments">
-            <ShipmentsTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ShipmentsTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="shopify">
-            <ShopifyManagementTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ShopifyManagementTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="health">
-            <ShopifySyncHealthDashboard />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ShopifySyncHealthDashboard />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="orders">
-            <OrdersTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <OrdersTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="blog">
-            <BlogTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <BlogTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="documents">
-            <DocumentGeneratorTab />
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <DocumentGeneratorTab />
+            </Suspense>
           </TabsContent>
         </Tabs>
 

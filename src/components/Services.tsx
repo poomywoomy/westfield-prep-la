@@ -228,11 +228,15 @@ const Services = () => {
         </div>
       </section>
 
-      <ServiceInfoDialog 
-        service={selectedService}
-        open={!!selectedService}
-        onClose={() => setSelectedService(null)}
-      />
+      <Suspense fallback={null}>
+        {selectedService && (
+          <ServiceInfoDialog
+            service={selectedService}
+            open={!!selectedService}
+            onClose={() => setSelectedService(null)}
+          />
+        )}
+      </Suspense>
     </>
   );
 };

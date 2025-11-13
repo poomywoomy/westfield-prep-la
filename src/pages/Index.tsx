@@ -82,31 +82,43 @@ const Index = () => {
       <div className="min-h-screen">
         <Header />
         <Hero />
-        <WhyChooseUs />
+        
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <WhyChooseUs />
+        </Suspense>
         
         {/* Location-Specific Content Section */}
-        <LocationShowcase />
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <LocationShowcase />
+        </Suspense>
         
-      <Services />
-      <Reviews />
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <Services />
+        </Suspense>
+        
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <Reviews />
+        </Suspense>
       
-      {/* Pricing CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Pricing Built for Your Business
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            From startups to enterprises, we create custom pricing that scales with you. 
-            Get your personalized quote today.
-          </p>
-          <Button size="lg" onClick={() => window.location.href = '/pricing'}>
-            Get Custom Quote
-          </Button>
-        </div>
-      </section>
+        {/* Pricing CTA Section */}
+        <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Ready to Scale Your Fulfillment?
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Get a custom quote tailored to your business needs
+            </p>
+            <Button size="lg" onClick={() => navigate("/contact")}>
+              Get Your Free Quote
+            </Button>
+          </div>
+        </section>
       
-      <Compliance />
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-64 w-full" /></div>}>
+          <Compliance />
+        </Suspense>
+        
         <Footer />
       </div>
     </>
