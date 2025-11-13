@@ -30,7 +30,6 @@ const ClientSettings = lazy(() => import("./pages/ClientSettings"));
 const Testimonials = lazy(() => import("./pages/Testimonials"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
-const PublishBlog = lazy(() => import("./pages/PublishBlog"));
 const WhyChooseUs = lazy(() => import("./pages/WhyChooseUs"));
 const SalesChannels = lazy(() => import("./pages/SalesChannels"));
 
@@ -59,7 +58,6 @@ const App = () => {
               <Route path="/why-choose-us" element={<WhyChooseUs />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/publish-blog-7-mistakes" element={<PublishBlog />} />
               
               {/* Service Pages */}
               <Route path="/shopify-fulfillment" element={<ShopifyFulfillment />} />
