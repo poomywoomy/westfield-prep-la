@@ -123,6 +123,8 @@ You have no idea what's happening in your 3PL's warehouse until they tell you. I
 
 Our client dashboard shows live inventory counts by location, order status updates within 15 minutes, and automatic alerts when inventory hits reorder points. You run your business from data, not hope.
 
+![Modern fulfillment center technology dashboard](/blog-images/modern-fulfillment-center-technology.jpg)
+
 **Power Move:** Ask your 3PL for read-only access to their warehouse management system. If they refuse, they're hiding something.
 
 ---
