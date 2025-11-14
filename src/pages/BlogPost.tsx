@@ -110,7 +110,9 @@ const BlogPost = () => {
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.meta_description || post.excerpt || ""} />
         <meta property="og:url" content={`https://westfieldprepcenter.com/blog/${post.slug}`} />
-        {post.cover_image_url && <meta property="og:image" content={post.cover_image_url} />}
+        {post.cover_image_url && (
+          <meta property="og:image" content={post.cover_image_url.startsWith('http') ? post.cover_image_url : `${window.location.origin}${post.cover_image_url}`} />
+        )}
         <meta property="og:type" content="article" />
         {post.published_at && <meta property="article:published_time" content={post.published_at} />}
         {post.category && <meta property="article:section" content={post.category} />}
@@ -119,7 +121,9 @@ const BlogPost = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.meta_description || post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
-        {post.cover_image_url && <meta name="twitter:image" content={post.cover_image_url} />}
+        {post.cover_image_url && (
+          <meta name="twitter:image" content={post.cover_image_url.startsWith('http') ? post.cover_image_url : `${window.location.origin}${post.cover_image_url}`} />
+        )}
       </Helmet>
 
       {/* Enhanced 2025-compliant JSON-LD Schema for Google Rich Results */}
@@ -152,16 +156,17 @@ const BlogPost = () => {
 
         <article className="flex-1">
           {/* Hero Section with Cover Image */}
-          <section className="relative pt-16 pb-12 overflow-hidden">
+          <section className="relative min-h-[420px] md:min-h-[520px] overflow-hidden">
             {post.cover_image_url ? (
               <>
                 <div className="absolute inset-0">
                   <img
                     src={post.cover_image_url}
-                    alt={post.title}
+                    alt={`${post.title} - Westfield Prep Center blog cover image`}
                     className="w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.src = "/hero-warehouse-optimized.webp"; }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-transparent" />
                 </div>
                 <div className="container mx-auto px-4 relative pt-20 pb-16">
                   <div className="max-w-4xl mx-auto">

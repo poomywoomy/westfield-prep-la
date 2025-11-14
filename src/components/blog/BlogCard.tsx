@@ -48,7 +48,9 @@ export const BlogCard = ({
         {coverImageUrl ? (
           <img
             src={coverImageUrl}
-            alt={title}
+            alt={`${title} - Westfield Prep Center blog`}
+            loading="lazy"
+            onError={(e) => { e.currentTarget.src = "/hero-warehouse-optimized.webp"; }}
             className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1"
           />
         ) : (
