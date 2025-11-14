@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate FAQ PDF - Westfield Prep Center</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      display: block;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>📄 Westfield FAQ PDF Generator</h1>
+  <p>Click the button below to generate a comprehensive PDF of all FAQ questions and answers.</p>
+  
+  <button onclick="generatePDF()">Generate FAQ PDF</button>
+  
+  <div id="status" class="status"></div>
+
+  <script>
+    const { jsPDF } = window.jspdf;
+
+    const faqCategories = [
+      {
+        emoji: "🚀",
+        title: "Getting Started",
+        questions: [
+          {
+            question: "What makes Westfield Prep Center different?",
+            answer: "We're a boutique prep center, which means our dedicated team can check in products and ship them out much faster than traditional large-scale fulfillment centers. You get personalized attention and quicker turnaround times."
+          },
+          {
+            question: "How do I get started?",
+            answer: "Simply fill out our contact form with your business details and monthly volume. We'll respond with an onboarding packet and pricing sheet tailored to your needs within 24 hours."
+          },
+          {
+            question: "What's the onboarding process like?",
+            answer: "Our onboarding process is designed to be quick and seamless. After your initial inquiry, we'll send you an onboarding packet with service agreements and instructions. Once paperwork is complete, you can start sending inventory within 48 hours. We'll provide receiving instructions, warehouse address, and your dedicated account manager contact."
+          },
+          {
+            question: "What information do you need from me?",
+            answer: "We'll need your business name, contact information, types of products you sell, estimated monthly volume, and the marketplaces you sell on (Shopify, Amazon, TikTok Shop, etc.). This helps us create a customized service plan and pricing structure for your needs."
+          },
+          {
+            question: "What are the payment terms for new clients?",
+            answer: "New clients are required to provide a mandatory $300 deposit at the beginning of the month for the first 2 months of service. This deposit will be charged for prep work completed during the month. Any remaining balance, if any, will be charged at the end of the month."
+          },
+          {
+            question: "Is there a minimum order quantity or monthly volume requirement?",
+            answer: "We work with brands of all sizes and don't have strict minimum order requirements. Whether you're just starting out or scaling rapidly, we'll create a custom pricing plan that fits your volume and needs."
+          },
+          {
+            question: "Can you handle large volumes?",
+            answer: "Absolutely! We work with sellers of all sizes, from startups to established brands. We can scale our services to meet your growing business needs. Contact us to discuss volume discounts."
+          }
+        ]
+      },
+      {
+        emoji: "🏢",
+        title: "General Operations",
+        questions: [
+          {
+            question: "What are your business hours?",
+            answer: "Our warehouse operates Monday through Friday, 8:00 AM to 5:00 PM Pacific Time. We process orders during business hours and offer after-hours emergency support for urgent situations. Same-day shipping cutoff is 2:00 PM PST."
+          },
+          {
+            question: "How can I contact customer support?",
+            answer: "You can reach us by phone at (818) 935-5478 during business hours, or submit inquiries through our contact form anytime. Each client is assigned a dedicated account manager who will be your primary point of contact for all questions and updates."
+          },
+          {
+            question: "Can I visit your warehouse?",
+            answer: "Yes! We welcome scheduled warehouse tours for current and prospective clients. Contact us at least 48 hours in advance to schedule a visit. Tours are available Monday through Friday during business hours and give you a firsthand look at our operations and security measures."
+          },
+          {
+            question: "How do I track my inventory in real-time?",
+            answer: "We provide real-time inventory updates through our client portal. You'll have 24/7 access to view current stock levels, incoming shipments, outbound orders, and historical transaction data. We also send regular inventory reports via email."
+          },
+          {
+            question: "What happens if something gets damaged?",
+            answer: "We take photos of all inventory during receiving and prep. If damage occurs while in our care, we document it immediately and notify you with photo evidence. We're fully insured with Warehouse Legal Liability coverage to protect your inventory. Claims are handled promptly and professionally."
+          },
+          {
+            question: "Do you offer white label services?",
+            answer: "Yes! We can ship orders without any Westfield branding, using your company's branded packaging, inserts, and packing slips. Perfect for maintaining your brand identity in direct-to-consumer fulfillment."
+          },
+          {
+            question: "Do you provide customer support after hours?",
+            answer: "While our standard business hours are Monday-Friday 8 AM to 5 PM PST, we offer emergency support for urgent situations. Your dedicated account manager can be reached for critical issues, and we monitor systems 24/7 to ensure your orders are processed smoothly."
+          }
+        ]
+      }
+      // Additional categories would be added here...
+    ];
+
+    function generatePDF() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = 'status';
+      statusDiv.textContent = 'Generating PDF...';
+      statusDiv.style.display = 'block';
+
+      try {
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+        const margin = 20;
+        const contentWidth = pageWidth - (margin * 2);
+        
+        let yPos = margin;
+        let currentPage = 1;
+
+        const addFooter = () => {
+          const footerY = pageHeight - 15;
+          doc.setFontSize(9);
+          doc.setTextColor(100, 100, 100);
+          doc.text(
+            `Page ${currentPage}`,
+            pageWidth / 2,
+            footerY,
+            { align: 'center' }
+          );
+          doc.text(
+            '(818) 935-5478 | www.westfieldprepcenter.com',
+            pageWidth / 2,
+            footerY + 5,
+            { align: 'center' }
+          );
+        };
+
+        const checkPageBreak = (neededSpace) => {
+          if (yPos + neededSpace > pageHeight - 30) {
+            addFooter();
+            doc.addPage();
+            currentPage++;
+            yPos = margin;
+            return true;
+          }
+          return false;
+        };
+
+        // Cover page
+        doc.setFillColor(240, 240, 240);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+        doc.setFontSize(28);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Comprehensive FAQ Guide', pageWidth / 2, 80, { align: 'center' });
+
+        doc.setFontSize(14);
+        doc.setTextColor(80, 80, 80);
+        doc.text('Everything You Need to Know About', pageWidth / 2, 100, { align: 'center' });
+        doc.text('Westfield Prep Center', pageWidth / 2, 110, { align: 'center' });
+
+        const today = new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        doc.setFontSize(12);
+        doc.text(`Generated: ${today}`, pageWidth / 2, 130, { align: 'center' });
+
+        const totalQuestions = faqCategories.reduce((sum, cat) => sum + cat.questions.length, 0);
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${totalQuestions} Questions & Answers`, pageWidth / 2, 150, { align: 'center' });
+
+        doc.setFontSize(11);
+        doc.setTextColor(60, 60, 60);
+        doc.text('Phone: (818) 935-5478', pageWidth / 2, 175, { align: 'center' });
+        doc.text('Address: 1801 Flower Ave Office 2, Duarte, CA 91010', pageWidth / 2, 185, { align: 'center' });
+        doc.text('www.westfieldprepcenter.com', pageWidth / 2, 195, { align: 'center' });
+
+        addFooter();
+
+        // FAQ sections
+        faqCategories.forEach((category) => {
+          doc.addPage();
+          currentPage++;
+          yPos = margin;
+
+          doc.setFillColor(230, 230, 230);
+          doc.rect(margin - 5, yPos - 8, contentWidth + 10, 15, 'F');
+          
+          doc.setFontSize(16);
+          doc.setTextColor(0, 0, 0);
+          doc.text(`${category.emoji} ${category.title}`, margin, yPos);
+          yPos += 20;
+
+          category.questions.forEach((qa, qIndex) => {
+            checkPageBreak(35);
+
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(20, 20, 20);
+            
+            const questionLines = doc.splitTextToSize(`Q${qIndex + 1}: ${qa.question}`, contentWidth);
+            questionLines.forEach((line) => {
+              checkPageBreak(8);
+              doc.text(line, margin, yPos);
+              yPos += 7;
+            });
+
+            yPos += 3;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(60, 60, 60);
+            
+            const answerLines = doc.splitTextToSize(qa.answer, contentWidth - 10);
+            answerLines.forEach((line) => {
+              checkPageBreak(7);
+              doc.text(line, margin + 5, yPos);
+              yPos += 6;
+            });
+
+            yPos += 10;
+          });
+
+          addFooter();
+        });
+
+        const fileName = `Westfield_FAQ_Guide_${new Date().toLocaleDateString('en-US').replace(/\//g, '-')}.pdf`;
+        doc.save(fileName);
+
+        statusDiv.className = 'status success';
+        statusDiv.textContent = `✅ PDF generated successfully! Check your downloads folder for ${fileName}`;
+      } catch (error) {
+        statusDiv.className = 'status error';
+        statusDiv.textContent = `❌ Error generating PDF: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
