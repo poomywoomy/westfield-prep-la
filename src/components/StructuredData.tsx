@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 
 interface StructuredDataProps {
-  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact";
+  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact" | "collectionPage" | "itemList";
   data?: any;
 }
 
@@ -289,6 +289,62 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
     if (type === "localBusinessWithService") {
       // This is now consolidated into the organization schema
       return null;
+    }
+
+    // CollectionPage schema for blog listing
+    if (type === "collectionPage" && data) {
+      return {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "Westfield Prep Center Blog",
+        description: "Expert insights on Amazon FBA prep, Shopify fulfillment, and e-commerce logistics from our Los Angeles fulfillment center.",
+        url: `${baseUrl}/blog`,
+        publisher: {
+          "@type": "Organization",
+          name: "Westfield Prep Center",
+          logo: `${baseUrl}/westfield-logo.png`
+        },
+        mainEntity: {
+          "@type": "Blog",
+          name: "Westfield Prep Center Blog",
+          blogPost: data.posts?.map((post: any) => ({
+            "@type": "BlogPosting",
+            headline: post.title,
+            url: `${baseUrl}/blog/${post.slug}`,
+            datePublished: post.published_at,
+            image: post.cover_image_url ? `${baseUrl}${post.cover_image_url}` : `${baseUrl}/hero-warehouse-optimized.webp`,
+            author: {
+              "@type": "Person",
+              name: post.author_name || "Westfield Prep Team"
+            }
+          }))
+        }
+      };
+    }
+
+    // ItemList schema for sales channels directory
+    if (type === "itemList" && data) {
+      return {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "Supported E-commerce Platforms",
+        description: "Multi-channel fulfillment support for major e-commerce platforms and marketplaces.",
+        numberOfItems: data.platforms?.length || 0,
+        itemListElement: data.platforms?.map((platform: any, index: number) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: {
+            "@type": "Service",
+            name: platform.name,
+            description: platform.description || `${platform.name} fulfillment services`,
+            url: platform.path ? `${baseUrl}${platform.path}` : baseUrl,
+            provider: {
+              "@type": "Organization",
+              name: "Westfield Prep Center"
+            }
+          }
+        }))
+      };
     }
 
     return {};

@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Footer from "@/components/Footer";
+import StructuredData from "@/components/StructuredData";
 import PlatformInfoDialog from "@/components/PlatformInfoDialog";
 import { platformsData } from "@/data/platformsData";
 import { Button } from "@/components/ui/button";
@@ -71,6 +72,15 @@ const SalesChannels = () => {
     },
   ];
 
+  // Flatten all platforms for schema
+  const allPlatforms = channels.flatMap(channel => 
+    channel.platforms.map(platform => ({
+      name: platform.name,
+      description: platform.description,
+      path: platform.path
+    }))
+  );
+
   return (
     <>
       <Helmet>
@@ -78,6 +88,7 @@ const SalesChannels = () => {
         <meta name="description" content="We support all major e-commerce platforms including Shopify, Amazon, TikTok Shop, Walmart, eBay, and more. Multi-channel fulfillment from our Los Angeles warehouse." />
         <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels/" />
       </Helmet>
+      <StructuredData type="itemList" data={{ platforms: allPlatforms }} />
 
       <div className="min-h-screen flex flex-col">
         <Header />

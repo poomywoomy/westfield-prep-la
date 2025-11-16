@@ -19,6 +19,33 @@ const KittingBundling = () => {
     features: ["Multi-SKU Kits", "Gift Sets", "Promotional Bundles", "Photo-Proof QC"]
   };
 
+  const faqData = [
+    {
+      question: "What types of kitting services do you offer?",
+      answer: "We offer multi-SKU kits, gift sets, promotional bundles, subscription box assembly, influencer PR boxes, and custom branded packaging. All kits include photo-proof QC documentation."
+    },
+    {
+      question: "How long does it take to assemble kits?",
+      answer: "Standard kit assembly typically takes 1-3 business days depending on complexity and volume. Rush assembly is available for urgent needs."
+    },
+    {
+      question: "Can you handle branded packaging materials?",
+      answer: "Yes! We can incorporate your branded materials including tissue paper, ribbons, stickers, inserts, and custom boxes into your kits."
+    },
+    {
+      question: "Do you provide photos of completed kits?",
+      answer: "Absolutely. Every kit is photographed during QC to ensure accuracy. Photos are available in your client dashboard for verification."
+    },
+    {
+      question: "What's the minimum order quantity for kitting?",
+      answer: "We don't have a strict minimum, but kitting is most cost-effective for orders of 50+ units. Contact us to discuss your specific needs."
+    },
+    {
+      question: "Can you create new SKUs for assembled kits?",
+      answer: "Yes. We assign new SKU labels to completed kits and integrate them into your inventory system for easy fulfillment tracking."
+    }
+  ];
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -44,6 +71,7 @@ const KittingBundling = () => {
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
+      <StructuredData type="faq" data={faqData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />

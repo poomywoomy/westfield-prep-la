@@ -19,6 +19,33 @@ const StorageWarehousing = () => {
     features: ["Secure Racking", "Pallet Storage", "Lot Control", "Cycle Counts"]
   };
 
+  const faqData = [
+    {
+      question: "What types of storage options do you offer?",
+      answer: "We offer pallet storage, bin storage, and custom shelving solutions. All storage is in a climate-controlled, 24/7 monitored facility with insurance coverage included."
+    },
+    {
+      question: "How is storage pricing calculated?",
+      answer: "Storage is priced per pallet per month or per cubic foot for bin storage. We offer flexible terms with no long-term commitments required."
+    },
+    {
+      question: "Can I access my inventory anytime?",
+      answer: "Yes. We offer same-day access to your inventory during business hours (8am-5pm PT, 7 days a week). Advance notice is appreciated for large retrievals."
+    },
+    {
+      question: "Do you offer cycle counting services?",
+      answer: "Yes. We perform regular cycle counts to ensure inventory accuracy and provide detailed reports for your accounting and forecasting."
+    },
+    {
+      question: "Can you store hazmat products?",
+      answer: "Yes, we are certified to store hazmat products. Additional documentation and fees may apply depending on the hazard class."
+    },
+    {
+      question: "What security measures protect my inventory?",
+      answer: "Our facility features 24/7 video surveillance, restricted access controls, insurance coverage, and regular security audits to protect your inventory."
+    }
+  ];
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -44,6 +71,7 @@ const StorageWarehousing = () => {
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
+      <StructuredData type="faq" data={faqData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
