@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import StructuredData from "@/components/StructuredData";
 import { CategoryFilter } from "@/components/blog/CategoryFilter";
 import { SearchBar } from "@/components/blog/SearchBar";
 import { NewsletterSignup } from "@/components/blog/NewsletterSignup";
@@ -78,6 +79,7 @@ const Blog = () => {
         <meta name="description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
         <link rel="canonical" href="https://westfieldprepcenter.com/blog" />
       </Helmet>
+      <StructuredData type="collectionPage" data={{ posts: posts.slice(0, 10) }} />
 
       <Header />
 
