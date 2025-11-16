@@ -41,6 +41,59 @@ export const BlogTab = () => {
     fetchPosts();
   }, []);
 
+  const handleImportMarkdown = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setImporting(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      for (const file of Array.from(files)) {
+        if (!file.name.endsWith('.md')) {
+          console.log(`⏭️ Skipping non-markdown file: ${file.name}`);
+          continue;
+        }
+
+        try {
+          const markdown = await file.text();
+          
+          const { data, error } = await supabase.functions.invoke('import-blog-post', {
+            body: { markdown }
+          });
+
+          if (error) {
+            console.error(`❌ Failed to import ${file.name}:`, error);
+            errorCount++;
+          } else {
+            console.log(`✅ Imported ${file.name}:`, data);
+            successCount++;
+          }
+        } catch (err) {
+          console.error(`❌ Error reading ${file.name}:`, err);
+          errorCount++;
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`Successfully imported ${successCount} blog post${successCount > 1 ? 's' : ''}`);
+        fetchPosts();
+      }
+      
+      if (errorCount > 0) {
+        toast.error(`Failed to import ${errorCount} file${errorCount > 1 ? 's' : ''}`);
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      toast.error('Failed to import markdown files');
+    } finally {
+      setImporting(false);
+      // Reset input
+      event.target.value = '';
+    }
+  };
+
   const fetchPosts = async () => {
     try {
       const { data, error } = await supabase
