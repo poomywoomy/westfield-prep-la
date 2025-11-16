@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, Phone, Linkedin, Instagram, Twitter } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -17,6 +17,37 @@ const Footer = () => {
               <div className="pt-2">
                 <p className="text-sm text-secondary font-semibold">Open 7 Days a Week</p>
                 <p className="text-sm text-white/90">8am - 5pm PT</p>
+              </div>
+              
+              {/* Social Media Links */}
+              <div className="flex items-center gap-4 pt-4">
+                <a
+                  href="https://www.linkedin.com/company/westfield-prep-center/?viewAsMember=true"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-secondary transition-colors"
+                  aria-label="Follow us on LinkedIn"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.instagram.com/westfieldprepcenter/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-secondary transition-colors"
+                  aria-label="Follow us on Instagram"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://x.com/Westfield3PL"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-secondary transition-colors"
+                  aria-label="Follow us on X"
+                >
+                  <Twitter className="w-5 h-5" />
+                </a>
               </div>
             </div>
 
