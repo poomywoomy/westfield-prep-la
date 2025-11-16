@@ -1,13 +1,42 @@
 import { Helmet } from "react-helmet";
 
 interface StructuredDataProps {
-  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService";
+  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact";
   data?: any;
 }
 
 const StructuredData = ({ type, data }: StructuredDataProps) => {
   const getSchema = () => {
     const baseUrl = "https://westfieldprepcenter.com";
+    
+    if (type === "contact") {
+      return {
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        name: "Contact Westfield Prep Center",
+        description: "Contact Westfield Prep Center for Shopify fulfillment, Amazon FBA prep, and e-commerce logistics services in Los Angeles.",
+        mainEntity: {
+          "@type": "Organization",
+          name: "Westfield Prep Center",
+          telephone: "+1-818-935-5478",
+          email: "info@westfieldprepcenter.com",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "6320 Canoga Ave, Suite 1500",
+            addressLocality: "Woodland Hills",
+            addressRegion: "CA",
+            postalCode: "91367",
+            addressCountry: "US"
+          },
+          openingHoursSpecification: {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            opens: "08:00",
+            closes: "17:00"
+          }
+        }
+      };
+    }
     
     if (type === "organization") {
       return {
@@ -203,10 +232,11 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
     }
 
     if (type === "faq" && data) {
+      const faqArray = Array.isArray(data) ? data : data.questions || [];
       return {
         "@context": "https://schema.org",
         "@type": "FAQPage",
-        mainEntity: data.questions?.map((faq: { question: string; answer: string }) => ({
+        mainEntity: faqArray.map((faq: { question: string; answer: string }) => ({
           "@type": "Question",
           name: faq.question,
           acceptedAnswer: {

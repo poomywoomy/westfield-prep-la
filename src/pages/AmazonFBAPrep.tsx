@@ -24,6 +24,19 @@ const AmazonFBAPrep = () => {
     features: ["FNSKU Labeling", "Polybagging", "Bubble Wrap", "Carton Prep", "Pallet Forwarding", "Photo-Proof QC"]
   };
 
+  const faqData = [
+    { question: "What Amazon compliance standards do you follow?", answer: "We follow all Amazon FBA prep requirements including FNSKU labeling, case pack guidelines, polybagging standards, and hazmat regulations." },
+    { question: "Can you handle hazmat and lithium battery products?", answer: "Yes, we are certified to handle hazmat items and lithium batteries with proper documentation, labeling, and compliance procedures." },
+    { question: "Do you support Amazon Vendor Central shipments?", answer: "Yes, we handle both Seller Central (FBA) and Vendor Central routing, with experience in purchase order fulfillment and compliance." },
+    { question: "What's your experience with FBA shipment plans?", answer: "We process 1000+ FBA shipments monthly and understand all Amazon placement requirements, routing, and box content documentation." },
+    { question: "Can you handle Amazon Seller Fulfilled Prime (SFP)?", answer: "Yes, we meet SFP requirements including same-day processing, weekend shipping, and 2-day delivery capabilities nationwide." },
+    { question: "Do you offer expiration date labeling for consumables?", answer: "Yes, we apply expiration date labels and maintain lot tracking for all consumable products per Amazon requirements." },
+    { question: "How do you handle Amazon inventory discrepancies?", answer: "We provide photo proof of all shipments and work with Amazon to resolve any receiving discrepancies with complete documentation." },
+    { question: "Can you create multi-unit bundles for Amazon?", answer: "Yes, we create suffocation-warning labeled bundles and polybagged sets per Amazon requirements for virtual bundles." },
+    { question: "Do you support Amazon FBA Small and Light program?", answer: "Yes, we prep items for Small and Light with proper labeling, carton requirements, and compliance for this cost-effective program." },
+    { question: "What's your turnaround time for urgent Amazon prep?", answer: "Same-day processing for orders received before 2PM PST. Rush service available for tight deadlines and last-minute needs." }
+  ];
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -38,6 +51,7 @@ const AmazonFBAPrep = () => {
         <meta property="og:type" content="article" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
+      <StructuredData type="faq" data={faqData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />

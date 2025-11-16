@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import ContactForm from "@/components/ContactForm";
+import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Check, Zap, Clock, Shield, DollarSign } from "lucide-react";
@@ -14,9 +15,44 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Pricing = () => {
   const navigate = useNavigate();
+
+  const serviceData = {
+    serviceType: "Service",
+    name: "3PL Fulfillment & Prep Center Services",
+    description: "Custom 3PL pricing for receiving, FBA prep, DTC fulfillment, storage, and multi-channel integration. Transparent, volume-based rates in Los Angeles.",
+    features: ["Receiving & Inspection", "FBA Prep & Labeling", "DTC Fulfillment", "Storage Solutions", "Returns Processing", "Photo Documentation", "Inventory Tracking", "Multi-Channel Support"]
+  };
+
+  const faqData = [
+    { 
+      question: "How is 3PL pricing calculated?", 
+      answer: "We use volume-based pricing that scales with your business. Pricing is based on services needed (receiving, prep, storage, fulfillment), monthly volume, and product complexity. The more you ship, the better your per-unit rates." 
+    },
+    { 
+      question: "Are there any setup fees or minimums?", 
+      answer: "No setup fees or long-term contracts required. We work with businesses of all sizes. While we don't have strict minimums, pricing is optimized for businesses shipping at least 100 units per month." 
+    },
+    { 
+      question: "What's included in your fulfillment pricing?", 
+      answer: "Our fulfillment pricing includes pick, pack, quality control, shipping label generation, and photo documentation. Storage, receiving, and additional prep services are priced separately based on your needs." 
+    },
+    { 
+      question: "Do you charge for receiving inventory?", 
+      answer: "Yes, we charge a per-carton or per-pallet fee for receiving and inspection. This includes check-in, inventory counting, photo documentation, and system updates. Exact rates depend on shipment size and frequency." 
+    },
+    { 
+      question: "How does storage pricing work?", 
+      answer: "Storage is billed monthly based on space used (pallet or cubic feet). Rates vary by volume—higher volume clients receive preferred pricing. We also offer overflow and seasonal storage options." 
+    },
+    { 
+      question: "Can I get a custom quote for my business?", 
+      answer: "Absolutely! Every business is unique. Contact us with your monthly volume, services needed, and product details. We'll provide a detailed pricing breakdown within 24 hours with no commitment required." 
+    }
+  ];
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -43,6 +79,8 @@ const Pricing = () => {
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/pricing" />
       </Helmet>
+      <StructuredData type="service" data={serviceData} />
+      <StructuredData type="faq" data={faqData} />
 
       <div className="min-h-screen bg-background">
         <Header />
@@ -263,6 +301,27 @@ const Pricing = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* FAQ Section */}
+          <section className="py-20 bg-muted/30">
+            <div className="container mx-auto px-4 max-w-3xl">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Pricing FAQs</h2>
+                <p className="text-lg text-muted-foreground">
+                  Common questions about our pricing structure
+                </p>
+              </div>
+
+              <Accordion type="single" collapsible className="w-full">
+                {faqData.map((faq, index) => (
+                  <AccordionItem key={index} value={`item-${index}`}>
+                    <AccordionTrigger>{faq.question}</AccordionTrigger>
+                    <AccordionContent>{faq.answer}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </section>
 
