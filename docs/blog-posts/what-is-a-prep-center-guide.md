@@ -36,6 +36,8 @@
 - International sellers shipping to US markets
 - Sellers without warehouse space
 
+**Ready to streamline your fulfillment?** [Contact us](/contact) to discuss how our prep center can support your specific e-commerce needs.
+
 ## Prep Center Services Explained (300 words)
 
 ### 1. Receiving & Check-In
@@ -79,6 +81,8 @@
 - Direct-to-consumer (DTC) fulfillment
 - Same-day processing options
 - Multi-channel distribution
+
+Whether you're shipping to Amazon FCs or directly to customers, [our Los Angeles location](/why-choose-us) ensures fast delivery across the West Coast and beyond.
 
 ## Prep Center vs. Fulfillment Center vs. 3PL (250 words)
 

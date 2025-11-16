@@ -40,6 +40,8 @@
 - High-volume importers
 - Businesses with frequent container shipments
 
+[See our complete service breakdown](/service-breakdown) to understand how port proximity accelerates your fulfillment timeline.
+
 ## Benefit #2: West Coast Shipping Speed (200 words)
 
 ### Geographic Advantages
@@ -62,6 +64,8 @@
 - Fast forwarding to Amazon FCs
 - Reduced transit time to Amazon warehouses
 - Better inventory management
+
+**Selling on Amazon?** Our [Amazon FBA prep services](/amazon-fba-prep) include same-day processing, FNSKU labeling, and fast forwarding to West Coast fulfillment centers.
 
 ## Benefit #3: Cost Efficiency (200 words)
 

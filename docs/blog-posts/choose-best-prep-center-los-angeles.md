@@ -73,6 +73,8 @@ Use the comparison checklist in this guide (below).
 - "Can you handle custom branded packaging?"
 - "Do you offer kitting and bundling services?"
 
+Need specialized services like [kitting and bundling](/kitting-bundling) or [FNSKU labeling](/labeling-fnsku)? Make sure your prep center can handle your specific requirements.
+
 ---
 
 ### 2. Location & Logistics

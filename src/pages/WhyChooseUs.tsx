@@ -152,6 +152,12 @@ const WhyChooseUs = () => {
         <meta name="twitter:description" content="Discover why e-commerce sellers choose Westfield Prep Center. Photo-proof QC, same-day processing, boutique service, and full insurance coverage." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
+      
+      <StructuredData type="service" data={{
+        name: "Boutique Fulfillment Services",
+        description: "White-glove prep center and fulfillment services in Los Angeles. Specializing in Amazon FBA prep, Shopify fulfillment, and multi-channel e-commerce logistics with same-day processing and photo-proof QC."
+      }} />
+      
       <StructuredData type="breadcrumb" data={[
         { name: "Home", url: "https://westfieldprepcenter.com/" },
         { name: "Why Choose Us", url: "https://westfieldprepcenter.com/why-choose-us/" }
@@ -309,15 +315,15 @@ const WhyChooseUs = () => {
                     <CardTitle className="text-xl">Strategic LA Location</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">Duarte, CA location means easy access to LA/Long Beach ports and fast West Coast shipping.</p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </section>
+                     <p className="text-muted-foreground leading-relaxed">Duarte, CA location means easy access to LA/Long Beach ports and fast West Coast shipping.</p>
+                   </CardContent>
+                 </Card>
+               </div>
+             </div>
+           </section>
 
-          {/* OUR PROCESS - DETAILED WITH ACCORDIONS */}
-          <section className="py-20 bg-gradient-to-br from-background via-muted/30 to-background">
+           {/* OUR PROCESS - DETAILED WITH ACCORDIONS */}
+           <section className="py-20 bg-gradient-to-br from-background via-muted/30 to-background">
             <div className="container mx-auto px-4">
               <div className="text-center mb-16">
                 <h2 className="text-4xl md:text-5xl font-bold mb-4">
