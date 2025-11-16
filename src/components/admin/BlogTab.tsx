@@ -32,6 +32,7 @@ interface BlogPost {
 export const BlogTab = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [editingPost, setEditingPost] = useState<string | undefined>();
   const [deletePost, setDeletePost] = useState<string | null>(null);
@@ -77,16 +78,27 @@ export const BlogTab = () => {
       }
 
       if (successCount > 0) {
-        toast.success(`Successfully imported ${successCount} blog post${successCount > 1 ? 's' : ''}`);
+        toast({
+          title: "Import Successful",
+          description: `Successfully imported ${successCount} blog post${successCount > 1 ? 's' : ''}`,
+        });
         fetchPosts();
       }
       
       if (errorCount > 0) {
-        toast.error(`Failed to import ${errorCount} file${errorCount > 1 ? 's' : ''}`);
+        toast({
+          title: "Import Errors",
+          description: `Failed to import ${errorCount} file${errorCount > 1 ? 's' : ''}`,
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Import error:', error);
-      toast.error('Failed to import markdown files');
+      toast({
+        title: "Error",
+        description: "Failed to import markdown files",
+        variant: "destructive",
+      });
     } finally {
       setImporting(false);
       // Reset input
