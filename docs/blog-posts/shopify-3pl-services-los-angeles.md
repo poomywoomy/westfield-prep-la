@@ -39,6 +39,8 @@ When your container arrives at LA ports, you have two options:
 
 The math is simple: port proximity saves you **thousands of dollars per container** and gets your inventory into stock **5-10x faster**.
 
+For international sellers, this is a game-changer. [Learn more about our Amazon FBA prep services](/amazon-fba-prep) optimized for port proximity.
+
 **Real Numbers**: Here's what the data tells us about port proximity:
 
 - **Drayage from LA Ports**: $200-400 per container
@@ -59,6 +61,8 @@ The table below shows the total cost breakdown for moving a 40-foot container fr
 | LA Port → New York | $200-400 | $3,000-4,500 | $3,200-4,900 | 10-14 days |
 
 The savings are obvious, but the speed advantage is equally important. In eCommerce, time is literally money. Every day your products sit in transit is a day they're not generating revenue.
+
+**Need help with FBA prep and forwarding?** [Our Los Angeles prep center](/amazon-fba-prep) specializes in getting your products from port to Amazon FCs fast.
 
 ---
 

@@ -103,6 +103,8 @@ Preparing products to meet Amazon's strict fulfillment requirements before sendi
 - **Look for:** Real-time tracking, online portal access
 - **Nice-to-have:** ASN (Advanced Shipping Notice) upload
 
+Want to see how seamless integration works? [Contact us](/contact) for a demo of our Shopify-integrated dashboard.
+
 ## Los Angeles FBA Prep Center Advantages (200 words)
 
 ### Port Proximity = Faster Receiving

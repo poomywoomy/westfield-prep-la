@@ -68,7 +68,7 @@ const Testimonials = () => {
         <meta name="twitter:description" content="Read real reviews from satisfied customers. See why businesses trust Westfield Prep Center for fulfillment services." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
-      <StructuredData type="reviews" />
+      
       <StructuredData type="breadcrumb" data={[
         { name: "Home", url: "https://westfieldprepcenter.com/" },
         { name: "Testimonials", url: "https://westfieldprepcenter.com/testimonials/" }
@@ -178,6 +178,36 @@ const Testimonials = () => {
         </main>
 
         <Footer />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Westfield Prep Center",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "5.0",
+              "reviewCount": reviews.length,
+              "bestRating": "5",
+              "worstRating": "1"
+            },
+            "review": reviews.map(review => ({
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": review.name
+              },
+              "datePublished": new Date(review.date).toISOString().split('T')[0],
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": review.rating.toString(),
+                "bestRating": "5",
+                "worstRating": "1"
+              },
+              "reviewBody": review.text
+            }))
+          })}
+        </script>
       </div>
     </>
   );

@@ -92,10 +92,12 @@ A Shopify prep center is a third-party fulfillment service that integrates with 
 - **Happy customers:** Faster shipping = better reviews
 - **Competitive advantage:** Outpace competitors on speed
 
-### 4. Scalability Without Headaches
+### Scalability Without Headaches
 - **Handle peak seasons:** Black Friday, holiday rush, no problem
 - **Scale up or down:** Pay for what you use
 - **No hiring/training:** Prep center staff handles growth
+
+[Explore our storage and warehousing options](/storage-warehousing) designed to scale with your business.
 
 ### 5. Cost Savings
 - **No warehouse lease:** Eliminate real estate costs

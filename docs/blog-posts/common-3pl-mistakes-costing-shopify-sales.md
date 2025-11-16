@@ -10,6 +10,8 @@ Picture this: You've nailed product-market fit. Your Instagram ads are convertin
 
 Here are the 10 red flags your [3PL is costing you sales](/shopify-fulfillment)—and exactly how to fix them before your next peak season.
 
+**Looking for a 3PL partner who actually gets it?** [See our Shopify fulfillment services](/shopify-fulfillment) or [contact us for a free consultation](/contact).
+
 ---
 
 ## 🚨 Red Flag #1: Poor Multi-Channel Inventory Sync
@@ -20,7 +22,7 @@ Your products sell on Shopify, Amazon, TikTok Shop, and your B2B portal. But you
 
 **What Good Looks Like:** Your 3PL should offer real-time inventory visibility across ALL channels from a single dashboard. When a unit ships from any channel, every platform updates instantly. No spreadsheets. No "we'll sync it overnight." Instant.
 
-At Westfield, our LA-based facility processes orders from Shopify, Amazon FBA, and TikTok Shop simultaneously. When inventory moves, all channels reflect it within 60 seconds. Our clients see 94% fewer oversell incidents compared to their previous 3PLs.
+At Westfield, our LA-based facility processes orders from Shopify, Amazon FBA, and TikTok Shop simultaneously. When inventory moves, all channels reflect it within 60 seconds. Our clients see 94% fewer oversell incidents compared to their previous 3PLs. [Learn more about our multi-channel fulfillment capabilities](/why-choose-us).
 
 <details>
 <summary>🎯 Red Flag Self-Assessment →</summary>
@@ -47,7 +49,7 @@ You get an order at 11am PST. Your 3PL promises "next business day processing." 
 
 **What Good Looks Like:** Orders received by 2pm PST should ship same day, period. No exceptions for "high volume days" or "staffing issues." A proper 3PL plans for peak volume and has backup staff ready.
 
-Our Los Angeles location gives us a massive advantage here. Orders to the West Coast (40% of US ecommerce) arrive next day via ground shipping when we process same-day. East Coast orders still arrive in 2-3 days. Compare that to a Midwest 3PL taking 4-5 days to coastal markets—you're losing repeat customers before they even receive their first order.
+Our Los Angeles location gives us a massive advantage here. Orders to the West Coast (40% of US ecommerce) arrive next day via ground shipping when we process same-day. East Coast orders still arrive in 2-3 days. Compare that to a Midwest 3PL taking 4-5 days to coastal markets—you're losing repeat customers before they even receive their first order. [Check our pricing](/pricing) to see how affordable same-day processing can be.
 
 **Pro Tip:** Check your 3PL's actual cutoff time. Many advertise "same-day" but have a 10am cutoff, which means you're really getting next-day service for most orders.
 

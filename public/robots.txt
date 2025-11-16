@@ -6,5 +6,7 @@ Disallow: /client/
 Disallow: /client/*
 Disallow: /login
 Disallow: /reset-password
+Disallow: /thank-you
+Disallow: *.json
 
 Sitemap: https://westfieldprepcenter.com/sitemap.xml

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +16,15 @@ const ThankYou = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Helmet>
+        <title>Thank You | Westfield Prep Center</title>
+        <meta 
+          name="description" 
+          content="Thank you for contacting Westfield Prep Center. We'll review your information and get back to you shortly." 
+        />
+        <link rel="canonical" href="https://westfieldprepcenter.com/thank-you" />
+        <meta name="robots" content="noindex, follow" />
+      </Helmet>
       <div className="max-w-md w-full text-center space-y-6">
         <div className="flex justify-center">
           <CheckCircle className="h-20 w-20 text-primary" />
