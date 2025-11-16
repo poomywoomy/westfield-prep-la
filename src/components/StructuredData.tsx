@@ -85,9 +85,9 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
           }
         ],
         sameAs: [
-          "https://www.facebook.com/westfieldprepcenter",
-          "https://www.linkedin.com/company/westfield-prep-center",
-          "https://g.page/westfield-prep-center"
+          "https://www.linkedin.com/company/westfield-prep-center/?viewAsMember=true",
+          "https://www.instagram.com/westfieldprepcenter/",
+          "https://x.com/Westfield3PL"
         ],
         hasOfferCatalog: {
           "@type": "OfferCatalog",
