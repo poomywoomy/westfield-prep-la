@@ -294,7 +294,7 @@ export const BlogCard = ({
       </div>
       
       {/* Content Area with Enhanced Typography */}
-      <div className="relative p-8 bg-white flex flex-col h-[calc(100%-8rem)]">
+      <div className="relative p-8 bg-white flex flex-col min-h-[320px]">
         {/* Decorative Top Border */}
         <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[hsl(var(--blog-orange))] to-transparent transform -translate-y-full scale-x-0 group-hover:scale-x-110 transition-transform duration-500 origin-left" />
         
