@@ -28,7 +28,7 @@ renderer.tablecell = (content, flags) => {
 };
 
 // Custom link renderer to ensure proper HTML anchor tags
-renderer.link = (href, title, text) => {
+renderer.link = function(href: string, title: string | null, text: string) {
   const titleAttr = title ? ` title="${title}"` : '';
   return `<a href="${href}"${titleAttr}>${text}</a>`;
 };
