@@ -27,6 +27,12 @@ renderer.tablecell = (content, flags) => {
   return `<${type}${align}>${content}</${type}>`;
 };
 
+// Custom link renderer to ensure proper HTML anchor tags
+renderer.link = (href, title, text) => {
+  const titleAttr = title ? ` title="${title}"` : '';
+  return `<a href="${href}"${titleAttr}>${text}</a>`;
+};
+
 // Configure marked with GitHub Flavored Markdown
 marked.setOptions({
   gfm: true,           // GitHub Flavored Markdown
