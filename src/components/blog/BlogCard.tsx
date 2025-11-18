@@ -3,6 +3,8 @@ import { Calendar, ArrowRight, TrendingUp, MoveRight } from "lucide-react";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useState } from "react";
 
 interface BlogCardProps {
   id: string;
@@ -14,6 +16,7 @@ interface BlogCardProps {
   authorName?: string;
   isFeatured?: boolean;
   variant?: 'standard' | 'accent-border' | 'side-accent';
+  coverImageUrl?: string;
 }
 
 const getCategoryGradient = (category?: string) => {
@@ -31,309 +34,112 @@ const getCategoryGradient = (category?: string) => {
 
 const getCategoryColor = (category?: string) => {
   const colors = {
-    '3PL-LOGISTICS': 'hsl(180,60%,45%)',
-    'AMAZON FBA': 'hsl(var(--blog-orange))',
-    'FULFILLMENT': 'hsl(220,70%,45%)',
-    '3PL & FULFILLMENT': 'hsl(220,70%,50%)',
-    'PREP CENTER GUIDE': 'hsl(320,65%,55%)',
-    'SHOPIFY': 'hsl(150,55%,55%)',
+    '3PL-LOGISTICS': 'hsl(180,60%,45%)', 'AMAZON FBA': 'hsl(var(--blog-orange))', 'FULFILLMENT': 'hsl(220,70%,45%)',
+    '3PL & FULFILLMENT': 'hsl(220,70%,50%)', 'PREP CENTER GUIDE': 'hsl(320,65%,55%)', 'SHOPIFY': 'hsl(150,55%,55%)',
   };
-  const key = category?.toUpperCase().replace(/\s+/g, '-');
-  return colors[key as keyof typeof colors] || 'hsl(215,20%,45%)';
+  return colors[category?.toUpperCase().replace(/\s+/g, '-') as keyof typeof colors] || 'hsl(215,20%,45%)';
 };
 
 const getCategoryIcon = (category?: string) => {
-  const icons = {
-    '3PL-LOGISTICS': '🏢',
-    'AMAZON FBA': '📦',
-    'FULFILLMENT': '🚚',
-    '3PL & FULFILLMENT': '🏢',
-    'PREP CENTER GUIDE': '📊',
-    'SHOPIFY': '🛍️',
-  };
-  const key = category?.toUpperCase().replace(/\s+/g, '-');
-  return icons[key as keyof typeof icons] || '📄';
+  const icons = { '3PL-LOGISTICS': '🏢', 'AMAZON FBA': '📦', 'FULFILLMENT': '🚚', '3PL & FULFILLMENT': '🏢', 'PREP CENTER GUIDE': '📊', 'SHOPIFY': '🛍️' };
+  return icons[category?.toUpperCase().replace(/\s+/g, '-') as keyof typeof icons] || '📄';
 };
 
-const extractNumber = (title: string): string | null => {
-  const match = title.match(/\b(\d+)\b/);
-  return match ? match[1] : null;
-};
+const extractNumber = (title: string) => title.match(/\b(\d+)\b/)?.[1] || null;
+const getInitials = (name?: string) => name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'WP';
 
 const getPattern = (variant?: string) => {
-  switch (variant) {
-    case 'accent-border':
-      return `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)`;
-    case 'side-accent':
-      return `repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 15px,
-        rgba(255,255,255,0.05) 15px,
-        rgba(255,255,255,0.05) 30px
-      )`;
-    default:
-      return `repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        rgba(255,255,255,0.1) 10px,
-        rgba(255,255,255,0.1) 20px
-      )`;
-  }
+  if (variant === 'accent-border') return 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)';
+  if (variant === 'side-accent') return 'repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(255,255,255,0.05) 15px, rgba(255,255,255,0.05) 30px)';
+  return 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)';
 };
 
-const getInitials = (name?: string) => {
-  if (!name) return 'WP';
-  return name.split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-};
-
-export const BlogCard = ({
-  id,
-  title,
-  slug,
-  excerpt,
-  publishedAt,
-  category,
-  authorName,
-  isFeatured = false,
-  variant = 'standard',
-}: BlogCardProps) => {
+export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, authorName, isFeatured = false, variant = 'standard', coverImageUrl }: BlogCardProps) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const gradient = getCategoryGradient(category);
   const categoryColor = getCategoryColor(category);
   const categoryIcon = getCategoryIcon(category);
   const titleNumber = extractNumber(title);
+  const effectiveImageUrl = imageError || !coverImageUrl ? undefined : coverImageUrl;
   
-  // Featured post gets hero treatment
   if (isFeatured) {
     return (
-      <Link
-        to={`/blog/${slug}`}
-        className="group relative block bg-white rounded-3xl overflow-hidden
-          shadow-2xl hover:shadow-[0_25px_80px_-15px_rgba(0,0,0,0.3)]
-          transition-all duration-700 ease-out
-          hover:-translate-y-3
-          border-2 border-[hsl(var(--border))]"
-      >
-        {/* Background pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.02]" style={{
-          backgroundImage: `repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0,0,0,0.03) 2px,
-            rgba(0,0,0,0.03) 4px
-          )`
-        }} />
-        
-        {/* Thick left accent border */}
-        <div 
-          className="absolute left-0 top-0 bottom-0 w-2 transition-all duration-700 group-hover:w-3"
-          style={{ background: `linear-gradient(to bottom, ${categoryColor}, transparent)` }}
-        />
-        
-        {/* Animated gradient glow */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--blog-orange))]/0 via-[hsl(var(--blog-navy))]/0 to-[hsl(var(--blog-orange))]/0 group-hover:from-[hsl(var(--blog-orange))]/5 group-hover:via-[hsl(var(--blog-navy))]/5 group-hover:to-[hsl(var(--blog-orange))]/5 transition-all duration-700 pointer-events-none" />
-        
-        <div className="relative grid md:grid-cols-2 gap-0">
-          {/* Left: Gradient Header */}
-          <div className={`relative h-64 md:h-full bg-gradient-to-br ${gradient} overflow-hidden`}>
-            {/* Geometric Pattern */}
-            <div className="absolute inset-0 opacity-10" style={{
-              backgroundImage: getPattern('standard')
-            }} />
-            
-            {/* Large decorative corner */}
-            <div className="absolute top-0 right-0 w-48 h-48 opacity-20">
-              <div className="absolute inset-0 bg-white rounded-bl-[100px]" />
-            </div>
-            
-            {/* Category icon - large and centered */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-9xl opacity-20 group-hover:scale-110 transition-transform duration-700">
-                {categoryIcon}
-              </span>
-            </div>
-            
-            {/* Prominent Featured Badge */}
-            <div className="absolute top-8 left-8">
-              <div className="backdrop-blur-md bg-white/30 text-white px-6 py-3 rounded-full border-2 border-white/50 shadow-2xl">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 animate-pulse" />
-                  <span className="text-sm font-black uppercase tracking-widest">Featured Article</span>
+      <Link to={`/blog/${slug}`} className="group relative block bg-white rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_25px_80px_-15px_rgba(0,0,0,0.3)] transition-all duration-700 ease-out hover:-translate-y-3 border-2 border-[hsl(var(--border))]">
+        {effectiveImageUrl ? (
+          <div className="relative h-[480px] overflow-hidden">
+            <AspectRatio ratio={16/9} className="h-full">
+              <img src={effectiveImageUrl} alt={`${title} - Westfield Prep Center blog cover image`} className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} loading="eager" onLoad={() => setImageLoaded(true)} onError={() => setImageError(true)} />
+              {!imageLoaded && <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '4px 4px' }} />
+            </AspectRatio>
+            <div className="absolute top-6 left-6 z-10"><div className="backdrop-blur-md bg-white/10 text-white px-4 py-2 rounded-full border border-white/20 font-semibold text-xs uppercase tracking-wider shadow-lg" style={{ borderColor: categoryColor }}>{categoryIcon} {category}</div></div>
+            <div className="absolute top-6 right-6 z-10"><div className="backdrop-blur-md bg-[hsl(var(--blog-orange))]/90 text-white px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wider shadow-lg animate-pulse">⭐ Featured</div></div>
+            <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
+              <div className="backdrop-blur-md bg-white/10 p-8 rounded-2xl border border-white/20 shadow-2xl max-w-3xl space-y-4">
+                <h2 className="text-4xl font-bold text-white leading-tight group-hover:text-[hsl(var(--blog-orange))] transition-colors duration-300">{title}</h2>
+                <p className="text-lg text-white/90 line-clamp-2">{excerpt}</p>
+                <div className="flex items-center gap-4 text-white/80 text-sm">
+                  <div className="flex items-center gap-2"><Avatar className="h-8 w-8 border-2 border-white/30"><AvatarFallback className="bg-white/20 text-white text-xs">{getInitials(authorName)}</AvatarFallback></Avatar><span className="font-medium">{authorName || 'Westfield Team'}</span></div>
+                  <div className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /><time>{format(new Date(publishedAt), "MMM dd, yyyy")}</time></div>
                 </div>
+                <Button variant="secondary" className="bg-white text-[hsl(var(--blog-navy))] hover:bg-[hsl(var(--blog-orange))] hover:text-white font-semibold group/btn">Read Full Article<ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" /></Button>
               </div>
             </div>
-            
-            {/* Category badge */}
-            {category && (
-              <div className="absolute bottom-8 left-8 backdrop-blur-md bg-white/20 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border border-white/30">
-                {category}
-              </div>
-            )}
           </div>
-          
-          {/* Right: Content */}
-          <div className="relative p-12 bg-white flex flex-col justify-between">
-            {/* Title and meta */}
-            <div>
-              <h2 className="font-black text-5xl lg:text-6xl text-[hsl(var(--blog-navy))] mb-6 leading-[1.1] transition-colors duration-300 group-hover:text-[hsl(var(--blog-orange))]">
-                {title}
-              </h2>
-              
-              {/* Meta Info */}
-              <div className="flex items-center gap-3 mb-6">
-                {authorName && (
-                  <>
-                    <Avatar className="h-10 w-10 border-2 border-[hsl(var(--blog-orange))]">
-                      <AvatarFallback className="bg-gradient-to-br from-[hsl(var(--blog-orange))] to-[hsl(var(--blog-navy))] text-white text-sm font-bold">
-                        {getInitials(authorName)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-[hsl(var(--blog-navy))] font-bold text-base">{authorName}</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--blog-gray-blue))]" />
-                  </>
-                )}
-                <span className="flex items-center gap-2 text-[hsl(var(--blog-gray-blue))] text-base">
-                  <Calendar className="w-4 h-4" />
-                  {format(new Date(publishedAt), "MMM d, yyyy")}
-                </span>
-              </div>
-              
-              {/* Excerpt */}
-              <p className="text-[hsl(var(--blog-gray-blue))] leading-relaxed text-lg mb-8 line-clamp-3">
-                {excerpt}
-              </p>
+        ) : (
+          <div className={`relative grid md:grid-cols-2 gap-0`}>
+            <div className={`relative h-64 md:h-full bg-gradient-to-br ${gradient} overflow-hidden`}>
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: getPattern('standard') }} />
+              <div className="absolute top-0 right-0 w-48 h-48 opacity-20"><div className="absolute inset-0 bg-white rounded-bl-[100px]" /></div>
+              <div className="absolute inset-0 flex items-center justify-center"><span className="text-9xl opacity-20 group-hover:scale-110 transition-transform duration-700">{categoryIcon}</span></div>
+              <div className="absolute top-8 left-8"><div className="backdrop-blur-md bg-white/30 text-white px-6 py-3 rounded-full border-2 border-white/50 shadow-2xl"><div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 animate-pulse" /><span className="text-sm font-black uppercase tracking-widest">Featured Article</span></div></div></div>
+              {category && <div className="absolute bottom-8 left-8 backdrop-blur-md bg-white/20 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border border-white/30">{category}</div>}
             </div>
-            
-            {/* Large CTA Button */}
-            <Button 
-              asChild
-              size="lg"
-              className="w-full md:w-auto bg-gradient-to-r from-[hsl(var(--blog-orange))] to-[hsl(var(--blog-navy))] hover:from-[hsl(var(--blog-navy))] hover:to-[hsl(var(--blog-orange))] text-white font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <span className="flex items-center justify-center gap-3">
-                Read Full Article
-                <MoveRight className="w-6 h-6 transition-all duration-300 group-hover:translate-x-2" />
-              </span>
-            </Button>
+            <div className="relative p-12 bg-white flex flex-col justify-between">
+              <div><h2 className="text-4xl font-bold text-[hsl(210,30%,12%)] mb-6 leading-tight group-hover:text-[hsl(var(--blog-orange))] transition-colors duration-300">{title}</h2><p className="text-lg text-[hsl(210,15%,35%)] mb-8 line-clamp-3">{excerpt}</p></div>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 text-sm text-[hsl(210,15%,35%)]"><div className="flex items-center gap-2"><Avatar className="h-10 w-10 border-2 border-[hsl(var(--border))]"><AvatarFallback className="bg-[hsl(210,20%,96%)] text-[hsl(210,30%,12%)] font-semibold">{getInitials(authorName)}</AvatarFallback></Avatar><span className="font-medium">{authorName || 'Westfield Team'}</span></div><div className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /><time>{format(new Date(publishedAt), "MMM dd, yyyy")}</time></div></div>
+                <Button className="w-full group/btn">Read Full Article<ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" /></Button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </Link>
     );
   }
-  
-  // Regular posts with variant styles
-  const variantClasses = {
-    'standard': '',
-    'accent-border': 'border-t-4',
-    'side-accent': 'border-l-6',
-  };
-  
+
   return (
-    <Link
-      to={`/blog/${slug}`}
-      className={`group relative block bg-white rounded-2xl overflow-hidden
-        shadow-xl hover:shadow-2xl
-        transition-all duration-500 ease-out
-        hover:-translate-y-6 hover:scale-[1.01]
-        border border-[hsl(var(--border))]
-        min-h-[420px]
-        ${variantClasses[variant]}
-        ${variant === 'accent-border' ? 'shadow-[0_4px_0_0_' + categoryColor + ']' : ''}
-        ${variant === 'side-accent' ? 'shadow-[-6px_0_0_0_' + categoryColor + ']' : ''}
-      `}
-      style={variant === 'accent-border' ? { borderTopColor: categoryColor } : 
-             variant === 'side-accent' ? { borderLeftColor: categoryColor } : {}}
-    >
-      {/* Animated gradient border on hover */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[hsl(var(--blog-orange))] via-[hsl(var(--blog-navy))] to-[hsl(var(--blog-orange))] opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 pointer-events-none -z-10" />
-      
-      {/* Number badge for list-style posts */}
-      {titleNumber && variant === 'accent-border' && (
-        <div 
-          className="absolute -top-4 -right-4 w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-black shadow-2xl z-10 group-hover:scale-110 transition-transform duration-300"
-          style={{ background: `linear-gradient(135deg, ${categoryColor}, ${categoryColor}dd)` }}
-        >
-          {titleNumber}
+    <Link to={`/blog/${slug}`} className="group relative block bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] transition-all duration-500 ease-out hover:-translate-y-2 border border-[hsl(var(--border))]">
+      {variant === 'accent-border' && <div className="absolute top-0 left-0 right-0 h-1 transition-all duration-300 group-hover:h-1.5 z-20" style={{ backgroundColor: categoryColor }} />}
+      {variant === 'side-accent' && <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b transition-all duration-300 group-hover:w-2 z-20" style={{ backgroundImage: `linear-gradient(to bottom, ${categoryColor}, transparent)` }} />}
+      {effectiveImageUrl ? (
+        <div className="relative overflow-hidden">
+          <AspectRatio ratio={4/3}>
+            <img src={effectiveImageUrl} alt={`${title} - Westfield Prep Center blog cover image`} className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.04] ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" decoding="async" onLoad={() => setImageLoaded(true)} onError={() => setImageError(true)} />
+            {!imageLoaded && <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: variant === 'side-accent' ? 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)' : 'repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.1) 8px, rgba(255,255,255,0.1) 16px)', backgroundSize: variant === 'side-accent' ? '4px 4px' : 'auto' }} />
+          </AspectRatio>
+          <div className="absolute top-4 left-4 z-10"><div className="backdrop-blur-md bg-white/90 px-3 py-1.5 rounded-full border font-semibold text-xs uppercase tracking-wider shadow-lg" style={{ borderColor: categoryColor, color: categoryColor }}>{categoryIcon} {category}</div></div>
+          {variant === 'accent-border' && titleNumber && <div className="absolute top-4 right-4 z-10"><div className="backdrop-blur-md bg-white/90 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-lg" style={{ color: categoryColor }}>{titleNumber}</div></div>}
+          {variant === 'accent-border' && <div className="absolute bottom-4 right-4 text-6xl opacity-20" style={{ filter: 'blur(1px)' }}>{categoryIcon}</div>}
+        </div>
+      ) : (
+        <div className={`relative h-32 bg-gradient-to-br ${gradient} overflow-hidden`}>
+          <div className="absolute inset-0 opacity-30" style={{ backgroundImage: getPattern(variant) }} />
+          <div className="absolute top-4 left-4"><div className="backdrop-blur-md bg-white/10 text-white px-3 py-1.5 rounded-full border-2 font-semibold text-xs uppercase tracking-wider" style={{ borderColor: categoryColor }}>{categoryIcon} {category}</div></div>
+          {variant === 'accent-border' && titleNumber && <div className="absolute top-4 right-4"><div className="bg-white/20 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg backdrop-blur-md">{titleNumber}</div></div>}
+          {variant === 'accent-border' && <div className="absolute bottom-2 right-4 text-5xl opacity-20">{categoryIcon}</div>}
         </div>
       )}
-      
-      {/* Gradient Header with Geometric Pattern */}
-      <div className={`relative h-32 bg-gradient-to-br ${gradient} overflow-hidden transition-all duration-700 group-hover:h-36`}>
-        {/* Geometric Pattern Overlay */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: getPattern(variant),
-            backgroundSize: variant === 'accent-border' ? '20px 20px' : 'auto'
-          }} />
-        </div>
-        
-        {/* Decorative Corner Accent */}
-        <div className="absolute top-0 right-0 w-32 h-32 opacity-20">
-          <div className="absolute inset-0 bg-white rounded-bl-full" />
-        </div>
-        
-        {/* Category Icon - large in center */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-6xl opacity-20 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-            {categoryIcon}
-          </span>
-        </div>
-        
-        {/* Category Badge */}
-        {category && (
-          <div className={`absolute ${variant === 'side-accent' ? 'top-1/2 -right-12 -rotate-90' : 'top-4 left-6'} backdrop-blur-md bg-white/20 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg border border-white/30`}>
-            {category}
-          </div>
-        )}
-      </div>
-      
-      {/* Content Area with Enhanced Typography */}
-      <div className="relative p-8 bg-white flex flex-col min-h-[320px]">
-        {/* Decorative Top Border */}
-        <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[hsl(var(--blog-orange))] to-transparent transform -translate-y-full scale-x-0 group-hover:scale-x-110 transition-transform duration-500 origin-left" />
-        
-        {/* Title */}
-        <h3 className="font-extrabold text-[hsl(var(--blog-navy))] mb-4 line-clamp-2 transition-colors duration-300 group-hover:text-[hsl(var(--blog-orange))] leading-tight text-2xl lg:text-3xl">
-          {title}
-        </h3>
-        
-        {/* Meta Info with Avatar */}
-        <div className="flex items-center gap-3 mb-5">
-          {authorName && (
-            <>
-              <Avatar className="h-8 w-8 border-2 border-[hsl(var(--blog-orange))]">
-                <AvatarFallback className="bg-gradient-to-br from-[hsl(var(--blog-orange))] to-[hsl(var(--blog-navy))] text-white text-xs font-bold">
-                  {getInitials(authorName)}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-[hsl(var(--blog-navy))] font-semibold text-sm">{authorName}</span>
-              <span className="w-1 h-1 rounded-full bg-[hsl(var(--blog-gray-blue))]" />
-            </>
-          )}
-          <span className="flex items-center gap-1.5 text-[hsl(var(--blog-gray-blue))] text-sm">
-            <Calendar className="w-3.5 h-3.5" />
-            {format(new Date(publishedAt), "MMM d, yyyy")}
-          </span>
-        </div>
-        
-        {/* Excerpt */}
-        <p className="text-[hsl(var(--blog-gray-blue))] leading-relaxed mb-6 flex-grow text-sm line-clamp-3">
-          {excerpt}
-        </p>
-        
-        {/* Read More CTA */}
-        <div className="flex items-center gap-2 text-[hsl(var(--blog-orange))] font-bold text-sm uppercase tracking-wide mt-auto">
-          <span className="relative">
-            Read Full Article
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[hsl(var(--blog-orange))] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-          </span>
-          <ArrowRight className="w-5 h-5 transition-all duration-300 group-hover:translate-x-2 group-hover:scale-110" />
+      <div className="relative p-6 bg-white">
+        <h3 className="text-xl font-bold text-[hsl(210,30%,12%)] mb-3 line-clamp-2 group-hover:text-[hsl(var(--blog-orange))] transition-colors duration-300">{title}</h3>
+        <p className="text-[hsl(210,15%,35%)] mb-4 line-clamp-2 text-sm">{excerpt}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs text-[hsl(210,15%,35%)]"><Avatar className="h-7 w-7 border border-[hsl(var(--border))]"><AvatarFallback className="bg-[hsl(210,20%,96%)] text-[hsl(210,30%,12%)] text-xs font-semibold">{getInitials(authorName)}</AvatarFallback></Avatar><div className="flex flex-col"><span className="font-medium">{authorName || 'Westfield Team'}</span><time className="text-xs">{format(new Date(publishedAt), "MMM dd, yyyy")}</time></div></div>
+          <div className="flex items-center gap-1 text-[hsl(var(--blog-orange))] font-semibold text-sm relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-[hsl(var(--blog-orange))] after:origin-bottom-right after:transition-transform after:duration-300 group-hover:after:scale-x-100 group-hover:after:origin-bottom-left">Read Article<MoveRight className="w-4 h-4 transition-transform group-hover:translate-x-1" /></div>
         </div>
       </div>
     </Link>

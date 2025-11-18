@@ -21,6 +21,7 @@ interface BlogPost {
   category?: string;
   author_name?: string;
   created_at: string;
+  cover_image_url?: string | null;
 }
 
 const Blog = () => {
@@ -161,6 +162,7 @@ const Blog = () => {
                       publishedAt={post.published_at}
                       category={post.category}
                       authorName={post.author_name}
+                      coverImageUrl={post.cover_image_url || undefined}
                       variant={variant}
                     />
                   );
