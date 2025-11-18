@@ -141,6 +141,7 @@ const Blog = () => {
                     publishedAt={filteredPosts[0].published_at}
                     category={filteredPosts[0].category}
                     authorName={filteredPosts[0].author_name}
+                    coverImageUrl={filteredPosts[0].cover_image_url || undefined}
                     isFeatured={true}
                   />
                 </div>
