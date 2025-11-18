@@ -17,7 +17,6 @@ interface BlogPost {
   title: string;
   slug: string;
   excerpt: string;
-  cover_image_url: string;
   published_at: string;
   category?: string;
   author_name?: string;
@@ -114,10 +113,11 @@ const Blog = () => {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="space-y-4">
-                  <Skeleton className="h-48 w-full" />
-                  <Skeleton className="h-6 w-3/4" />
+                <div key={i} className="space-y-4 min-h-[400px]">
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                  <Skeleton className="h-8 w-3/4" />
                   <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
                 </div>
               ))}
             </div>
@@ -135,12 +135,11 @@ const Blog = () => {
                   title={post.title}
                   slug={post.slug}
                   excerpt={post.excerpt}
-                  coverImageUrl={post.cover_image_url}
                   publishedAt={post.published_at}
                   category={post.category}
                   authorName={post.author_name}
                   readTimeMinutes={post.read_time_minutes}
-                  isFeatured={false}
+                  isFeatured={i === 0}
                 />
               ))}
             </div>
