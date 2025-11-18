@@ -37,7 +37,7 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
         [&>p]:text-[hsl(var(--blog-gray-blue))] [&>p]:text-lg [&>p]:leading-relaxed [&>p]:mb-4
         [&>strong]:text-[hsl(var(--blog-navy))] [&>strong]:font-semibold
         [&>em]:text-[hsl(var(--blog-gray-blue))] [&>em]:italic
-        [&>a]:text-[hsl(var(--blog-orange))] [&>a]:no-underline [&>a]:hover:underline [&>a]:transition-all
+        [&_a]:text-[hsl(var(--blog-orange))] [&_a]:no-underline [&_a]:hover:underline [&_a]:transition-all
         [&>blockquote]:bg-[hsl(var(--blog-light-blue))] [&>blockquote]:border-l-4 [&>blockquote]:border-[hsl(var(--blog-orange))] [&>blockquote]:pl-6 [&>blockquote]:py-4 [&>blockquote]:my-6 [&>blockquote]:italic [&>blockquote]:text-[hsl(var(--blog-navy))] [&>blockquote]:text-xl [&>blockquote]:rounded-r-lg [&>blockquote]:shadow-sm [&>blockquote]:hover:shadow-md [&>blockquote]:transition-shadow
         [&>ul]:list-none [&>ul]:my-6 [&>ul]:space-y-3
         [&>ul>li]:relative [&>ul>li]:pl-8 [&>ul>li]:mb-3
