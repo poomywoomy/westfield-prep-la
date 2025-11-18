@@ -20,7 +20,7 @@ interface BlogPost {
   published_at: string;
   category?: string;
   author_name?: string;
-  read_time_minutes?: number;
+  created_at: string;
 }
 
 const Blog = () => {
@@ -127,22 +127,46 @@ const Blog = () => {
               <h3 className="text-2xl font-bold mb-2">No Articles Found</h3>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredPosts.map((post, i) => (
-                <BlogCard 
-                  key={post.id} 
-                  id={post.id}
-                  title={post.title}
-                  slug={post.slug}
-                  excerpt={post.excerpt}
-                  publishedAt={post.published_at}
-                  category={post.category}
-                  authorName={post.author_name}
-                  readTimeMinutes={post.read_time_minutes}
-                  isFeatured={i === 0}
-                />
-              ))}
-            </div>
+            <>
+              {/* Featured Post - Full Width */}
+              {filteredPosts.length > 0 && (
+                <div className="mb-12">
+                  <BlogCard
+                    key={filteredPosts[0].id}
+                    id={filteredPosts[0].id}
+                    title={filteredPosts[0].title}
+                    slug={filteredPosts[0].slug}
+                    excerpt={filteredPosts[0].excerpt || ""}
+                    publishedAt={filteredPosts[0].published_at}
+                    category={filteredPosts[0].category}
+                    authorName={filteredPosts[0].author_name}
+                    isFeatured={true}
+                  />
+                </div>
+              )}
+
+              {/* Regular Posts Grid with Variants */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredPosts.slice(1).map((post, index) => {
+                  const variants = ['standard', 'accent-border', 'side-accent'] as const;
+                  const variant = variants[index % 3];
+                  
+                  return (
+                    <BlogCard
+                      key={post.id}
+                      id={post.id}
+                      title={post.title}
+                      slug={post.slug}
+                      excerpt={post.excerpt || ""}
+                      publishedAt={post.published_at}
+                      category={post.category}
+                      authorName={post.author_name}
+                      variant={variant}
+                    />
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       </section>
