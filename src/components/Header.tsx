@@ -75,6 +75,10 @@ const Header = () => {
             <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium text-base">
               Home
             </Link>
+            
+            <Link to="/3pl-los-angeles" className="text-foreground hover:text-primary transition-colors font-medium text-base">
+              3PL Los Angeles
+            </Link>
 
             {/* About Dropdown */}
             <NavigationMenu>
@@ -107,19 +111,6 @@ const Header = () => {
                             <div className="text-sm font-medium leading-none">Testimonials</div>
                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                               What our clients say about us
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/contact"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Contact Us</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Get in touch with our team
                             </p>
                           </Link>
                         </NavigationMenuLink>
