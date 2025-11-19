@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { generateMetaTags } from "@/utils/seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Package, MapPin, Truck, Zap, Users, TrendingUp } from "lucide-react";
+import { Package, Truck, Zap, Check, X, ArrowRight } from "lucide-react";
 
 const ThreePLLosAngeles = () => {
   const meta = generateMetaTags(
@@ -31,66 +31,60 @@ const ThreePLLosAngeles = () => {
       <div className="min-h-screen bg-background">
         <Header />
         
-        {/* Hero Section */}
-        <section className="relative py-32 md:py-40 overflow-hidden">
-          <div className="container mx-auto px-6 md:px-12 max-w-7xl">
-            <div className="grid md:grid-cols-2 gap-16 items-center">
-              <div className="space-y-8">
-                <h1 className="text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-foreground leading-[1.1]">
-                  3PL Fulfillment in Los Angeles for Fast-Growing E-Commerce Brands
-                </h1>
-                <p className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-2xl">
-                  A strategically located Los Angeles fulfillment center designed for speed, accuracy, and modern DTC operations.
+        {/* SECTION 1: Premium Editorial Hero */}
+        <section className="relative py-32 md:py-40 bg-white">
+          <div className="container mx-auto px-6 md:px-12 max-w-4xl">
+            <div className="space-y-8 text-left">
+              <h1 className="text-6xl md:text-7xl lg:text-[72px] font-extralight tracking-tight text-foreground leading-[1.1] mb-6">
+                3PL in Los Angeles
+              </h1>
+              <p className="text-2xl md:text-3xl text-muted-foreground/80 font-light leading-relaxed max-w-3xl">
+                3PL Fulfillment in Los Angeles for Fast-Growing E-Commerce Brands
+              </p>
+              <div className="pt-6 space-y-6">
+                <h2 className="text-xl md:text-2xl font-semibold text-foreground">
+                  3PL Services in Los Angeles: Modern Logistics for High-Velocity Brands
+                </h2>
+                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                  Los Angeles is one of the most competitive logistics markets in the country, and growing brands need more than a basic warehouse to scale. A top-tier Los Angeles 3PL gives you the infrastructure, speed, and operational clarity required to keep products moving without bottlenecks, delays, or guesswork. Whether you're fulfilling DTC orders or distributing bulk shipments across multiple channels, partnering with the right LA fulfillment provider positions your business to grow faster and operate with far fewer headaches.
                 </p>
               </div>
-              <div className="relative h-[400px] md:h-[500px] flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl"></div>
-                <MapPin className="w-32 h-32 md:w-40 md:h-40 text-primary/20 stroke-[0.5]" />
-              </div>
             </div>
+            <div className="mt-12 pt-12 border-t border-border/40 max-w-2xl mx-auto"></div>
           </div>
         </section>
 
-        {/* Divider */}
-        <div className="container mx-auto px-6">
-          <div className="h-px bg-border/40"></div>
-        </div>
-
-        {/* Why LA Strategic Hub */}
-        <section className="py-32 md:py-40">
-          <div className="container mx-auto px-6 md:px-12 max-w-6xl">
-            <h2 className="text-5xl md:text-6xl font-light text-center mb-20 text-foreground">
-              Why Los Angeles Is One of the Most Important 3PL Hubs in the U.S.
-            </h2>
-            
-            <div className="grid md:grid-cols-3 gap-12 md:gap-16">
-              <div className="space-y-6 text-center group">
-                <div className="flex justify-center mb-8">
-                  <Package className="w-12 h-12 text-primary stroke-[1]" />
+        {/* SECTION 2: LA Advantage Horizontal Feature Row */}
+        <section className="py-20 bg-white border-y border-border/10">
+          <div className="container mx-auto px-6 md:px-12 max-w-7xl">
+            <div className="grid md:grid-cols-3 gap-0 divide-x divide-border/10">
+              <div className="px-8 md:px-16 py-8 space-y-4 text-center">
+                <div className="flex justify-center mb-6">
+                  <Package className="w-10 h-10 text-primary stroke-[1]" />
                 </div>
-                <h3 className="text-2xl font-light text-foreground">Port Proximity</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="text-xl font-semibold text-foreground">Port Proximity</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">
                   Immediate access to Port of Los Angeles and Port of Long Beach with faster inbound container processing
                 </p>
               </div>
 
-              <div className="space-y-6 text-center group">
-                <div className="flex justify-center mb-8">
-                  <Truck className="w-12 h-12 text-primary stroke-[1]" />
+              <div className="px-8 md:px-16 py-8 space-y-4 text-center">
+                <div className="flex justify-center mb-6">
+                  <Truck className="w-10 h-10 text-primary stroke-[1]" />
                 </div>
-                <h3 className="text-2xl font-light text-foreground">Carrier Hub</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Proximity to USPS, UPS, FedEx major hubs with reduced lead time for replenishment and cross-docking
+                <h3 className="text-xl font-semibold text-foreground">Carrier Hub</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  Proximity to USPS, UPS, FedEx major hubs with reduced lead time for replenishment
                 </p>
               </div>
 
-              <div className="space-y-6 text-center group">
-                <div className="flex justify-center mb-8">
-                  <TrendingUp className="w-12 h-12 text-primary stroke-[1]" />
+              <div className="px-8 md:px-16 py-8 space-y-4 text-center">
+                <div className="flex justify-center mb-6">
+                  <Zap className="w-10 h-10 text-primary stroke-[1]" />
                 </div>
-                <h3 className="text-2xl font-light text-foreground">West Coast Distribution</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Optimized for West Coast distribution with faster delivery speed ideal for brands manufacturing overseas
+                <h3 className="text-xl font-semibold text-foreground">West Coast Distribution</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  Strategic positioning for 1 to 2 day delivery across California and western states
                 </p>
               </div>
             </div>
