@@ -43,62 +43,70 @@ const ValueProposition = () => {
   return (
     <section className="py-24 bg-gradient-to-b from-background via-muted/20 to-background">
       <div className="container mx-auto px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-5 gap-12 items-start">
-            {/* Left: Large Bold Headline (40%) */}
-            <div className="lg:col-span-2">
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground mb-6">
-                Why E-Commerce Brands Choose Westfield
-              </h2>
-              
-              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                Expert 3PL and fulfillment services for online brands throughout Los Angeles and Southern California.
-              </p>
+        <div className="max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold leading-tight text-foreground mb-6">
+              Why E-Commerce Brands Choose Westfield
+            </h2>
+            
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              Expert 3PL and fulfillment services for online brands throughout Los Angeles and Southern California.
+            </p>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-1 w-12 bg-primary"></div>
-                  <span className="text-sm font-semibold text-primary">100+ Brands Trust Us</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-1 w-12 bg-secondary"></div>
-                  <span className="text-sm font-semibold text-secondary">2M+ Orders Fulfilled</span>
-                </div>
+            <div className="flex items-center justify-center gap-8 mt-8">
+              <div className="flex items-center gap-3">
+                <div className="h-1 w-12 bg-primary"></div>
+                <span className="text-sm font-semibold text-primary">100+ Brands Trust Us</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="h-1 w-12 bg-secondary"></div>
+                <span className="text-sm font-semibold text-secondary">2M+ Orders Fulfilled</span>
               </div>
             </div>
+          </div>
 
-            {/* Right: Benefits Grid (60%) */}
-            <div className="lg:col-span-3">
-              <div className="grid md:grid-cols-2 gap-6">
-                {benefits.map((benefit, index) => {
-                  const Icon = benefit.icon;
-                  return (
-                    <div 
-                      key={index}
-                      className="group relative bg-gradient-to-br from-card to-card/50 border border-border/50 rounded-2xl p-8 hover:shadow-2xl hover:border-primary/30 transition-all duration-300 hover:-translate-y-1"
-                    >
-                      <div className="absolute top-6 right-6 text-4xl font-bold text-primary/5 group-hover:text-primary/10 transition-colors">
-                        {String(index + 1).padStart(2, '0')}
-                      </div>
-                      
-                      <Icon className="w-14 h-14 text-primary mb-6 group-hover:scale-110 transition-transform" />
-                      
-                      <h3 className="text-2xl font-bold mb-3 text-card-foreground">
-                        {benefit.title}
-                      </h3>
-                      
-                      <p className="text-muted-foreground leading-relaxed mb-4">
-                        {benefit.description}
-                      </p>
-
-                      <div className="mt-4 pt-4 border-t border-border/50">
-                        <span className="text-sm font-bold text-primary">{benefit.stat}</span>
-                      </div>
+          {/* Benefits List - Premium Horizontal Layout */}
+          <div className="space-y-0">
+            {benefits.map((benefit, index) => {
+              const Icon = benefit.icon;
+              return (
+                <div 
+                  key={index}
+                  className="group flex items-start gap-8 py-10 border-b border-border/20 hover:border-primary/30 transition-all duration-300"
+                >
+                  {/* Left: Number + Icon */}
+                  <div className="flex items-center gap-6 flex-shrink-0">
+                    <span className="text-5xl font-bold text-primary/10 group-hover:text-primary/20 transition-colors w-16 text-right">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <div className="w-16 h-16 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center transition-all duration-300">
+                      <Icon className="w-8 h-8 text-primary group-hover:scale-110 transition-transform duration-300" />
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+                  </div>
+                  
+                  {/* Middle: Content */}
+                  <div className="flex-1 pt-2">
+                    <h3 className="text-2xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
+                      {benefit.title}
+                    </h3>
+                    
+                    <p className="text-muted-foreground leading-relaxed text-base">
+                      {benefit.description}
+                    </p>
+                  </div>
+
+                  {/* Right: Stat Badge */}
+                  <div className="text-right flex-shrink-0 pt-2">
+                    <div className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-primary/5 group-hover:bg-primary/10 transition-colors duration-300">
+                      <span className="text-sm font-bold text-primary whitespace-nowrap">
+                        {benefit.stat}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
