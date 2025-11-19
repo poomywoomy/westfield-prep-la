@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Download, CheckCircle } from "lucide-react";
+import { FileText, CheckCircle2, Loader2 } from "lucide-react";
 
 const LeadMagnet = () => {
   const [email, setEmail] = useState("");
@@ -22,52 +22,47 @@ const LeadMagnet = () => {
     setLoading(true);
 
     try {
-      // Store lead in database
-      const { error } = await supabase
-        .from('lead_magnet_downloads')
-        .insert({
-          email,
-          full_name: fullName,
-          guide_type: 'fulfillment_partner_guide'
-        });
+      const { data, error } = await supabase.functions.invoke('process-lead-magnet', {
+        body: { email, fullName }
+      });
 
       if (error) throw error;
 
-      toast.success("Success! Check your email for the download link.");
+      toast.success("Success! Check your email for the download link.", {
+        duration: 5000,
+        icon: <CheckCircle2 className="w-5 h-5" />
+      });
+      
       setEmail("");
       setFullName("");
     } catch (error: any) {
       console.error("Error:", error);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(error.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const checklist = [
-    "15 questions to ask before signing with a fulfillment partner",
-    "Pricing models explained (so you don't get surprised)",
-    "Red flags to watch for",
-    "How to evaluate turnaround times and accuracy",
-    "Onboarding checklist"
-  ];
-
   return (
-    <section className="py-24 bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/10">
+    <section className="py-24 bg-gradient-to-br from-primary/10 via-background to-primary/5">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Guide Info */}
             <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
-                Free Guide: Choosing the Right Fulfillment Partner
+              <div className="inline-block px-4 py-2 bg-primary/10 rounded-full mb-4">
+                <span className="text-primary font-semibold text-sm">FREE DOWNLOAD</span>
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
+                The Complete Guide to Choosing a Fulfillment Partner
               </h2>
               
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                Not sure what to look for in a 3PL? Download our comprehensive guide covering:
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Everything you need to know before outsourcing your e-commerce logistics. No fluff, just actionable insights.
               </p>
 
-              <ul className="space-y-3 mb-8">
+              <div className="space-y-4 pt-4">
                 {[
                   "15 questions to ask before signing with a fulfillment partner",
                   "Pricing models explained (so you don't get surprised)",
@@ -75,61 +70,102 @@ const LeadMagnet = () => {
                   "How to evaluate turnaround times and accuracy",
                   "Onboarding checklist"
                 ].map((item, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className="text-primary mt-1">✓</span>
-                    <span className="text-muted-foreground">{item}</span>
-                  </li>
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="text-foreground/80 leading-relaxed">{item}</span>
+                  </div>
                 ))}
-              </ul>
+              </div>
 
-              {/* Mock PDF Image */}
-              <div className="bg-card border border-border rounded-lg p-6 flex items-center justify-center">
-                <Download className="w-16 h-16 text-primary/30" />
+              {/* PDF Mockup */}
+              <div className="relative mt-8 p-8 bg-gradient-to-br from-card via-card to-primary/5 border border-border rounded-2xl shadow-xl">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-primary/20 rounded-xl flex items-center justify-center">
+                    <FileText className="w-10 h-10 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-foreground">50+ Pages</p>
+                    <p className="text-sm text-muted-foreground">Comprehensive Guide (PDF)</p>
+                  </div>
+                </div>
+                <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                  FREE
+                </div>
               </div>
             </div>
 
             {/* Right: Email Capture Form */}
-            <div className="bg-card border border-border rounded-xl p-8 shadow-lg">
-              <form onSubmit={handleDownload} className="space-y-6">
-                <div>
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="John Doe"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                    className="mt-2"
-                  />
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl blur-3xl"></div>
+              <div className="relative bg-card border-2 border-border rounded-2xl p-8 md:p-10 shadow-2xl">
+                <div className="mb-6 text-center">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
+                    Get Your Free Copy
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Instant access. No credit card required.
+                  </p>
                 </div>
 
-                <div>
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="mt-2"
-                  />
-                </div>
+                <form onSubmit={handleDownload} className="space-y-5">
+                  <div>
+                    <Label htmlFor="fullName" className="text-sm font-medium">
+                      Full Name *
+                    </Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                      disabled={loading}
+                      className="mt-2 h-12 text-base"
+                    />
+                  </div>
 
-                <Button 
-                  type="submit" 
-                  size="lg"
-                  disabled={loading}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                >
-                  {loading ? "Sending..." : "Download Free Guide"}
-                </Button>
+                  <div>
+                    <Label htmlFor="email" className="text-sm font-medium">
+                      Email Address *
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      disabled={loading}
+                      className="mt-2 h-12 text-base"
+                    />
+                  </div>
 
-                <p className="text-xs text-muted-foreground text-center">
-                  We respect your privacy. Unsubscribe anytime.
-                </p>
-              </form>
+                  <Button 
+                    type="submit" 
+                    size="lg"
+                    disabled={loading}
+                    className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Sending to your email...
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="w-5 h-5 mr-2" />
+                        Download Free Guide
+                      </>
+                    )}
+                  </Button>
+
+                  <p className="text-xs text-muted-foreground text-center pt-2">
+                    🔒 We respect your privacy. Unsubscribe anytime.
+                  </p>
+                </form>
+              </div>
             </div>
           </div>
         </div>
