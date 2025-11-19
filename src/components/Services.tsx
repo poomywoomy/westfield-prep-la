@@ -191,39 +191,128 @@ const services = [
 const Services = () => {
   const [selectedService, setSelectedService] = useState<typeof services[0] | null>(null);
 
+  const goToContact = () => {
+    window.location.href = "/contact";
+  };
+
   return (
     <>
-      <section id="services" className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Premium 3PL Services in Los Angeles</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Full-service fulfillment solutions for DTC brands, Amazon sellers, and multi-channel e-commerce businesses
-            </p>
+      <section id="services" className="py-20 bg-gradient-to-b from-background to-muted/30">
+        {/* Header Section with Gradient Background */}
+        <div className="bg-gradient-to-br from-primary via-primary/95 to-secondary py-16 mb-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+                Complete Fulfillment Solutions
+              </h2>
+              <p className="text-xl text-white/90 leading-relaxed">
+                From receiving to shipping, we handle every aspect of your e-commerce logistics so you can focus on growing your brand.
+              </p>
+            </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Services Grid */}
+        <div className="container mx-auto px-4 mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {services.map((service, index) => {
               const Icon = service.icon;
               return (
-                <Card 
-                  key={index} 
-                  className="border-border hover:shadow-lg transition-all cursor-pointer hover:border-primary/40"
+                <Card
+                  key={index}
+                  className="group cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border-2 hover:border-primary/50 bg-card relative overflow-hidden"
                   onClick={() => setSelectedService(service)}
                 >
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-secondary" />
+                  {/* Gradient Border on Hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-secondary/0 to-primary/0 group-hover:from-primary/10 group-hover:via-secondary/10 group-hover:to-primary/10 transition-all duration-300" />
+                  
+                  <CardContent className="pt-8 pb-6 relative z-10">
+                    <div className="flex flex-col items-center text-center space-y-4">
+                      <div className="p-4 rounded-full bg-gradient-to-br from-secondary/20 to-primary/20 group-hover:from-secondary/30 group-hover:to-primary/30 transition-all">
+                        <Icon className="w-10 h-10 text-primary group-hover:scale-110 transition-transform" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
+                          {service.title}
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed mb-4">
+                          {service.description}
+                        </p>
+                        <span className="inline-flex items-center text-primary font-semibold group-hover:gap-2 transition-all">
+                          Learn More
+                          <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-semibold text-primary mb-2">{service.title}</h3>
-                    <p className="text-muted-foreground mb-3">{service.description}</p>
-                    <button className="text-sm font-medium text-primary hover:underline">
-                      Learn More →
-                    </button>
                   </CardContent>
                 </Card>
               );
             })}
+          </div>
+        </div>
+
+        {/* Premium Footer CTA Section */}
+        <div className="bg-gradient-to-br from-primary via-primary/95 to-secondary py-20 relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute top-10 right-10 w-64 h-64 bg-secondary/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 left-10 w-64 h-64 bg-accent/20 rounded-full blur-3xl" />
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-5xl mx-auto text-center">
+              <h3 className="text-4xl md:text-5xl font-bold text-white mb-8">
+                Ready to Scale Your Fulfillment?
+              </h3>
+              
+              <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
+                Join 100+ brands who trust us with their fulfillment. Get started with no setup fees, no minimums, and transparent pricing.
+              </p>
+
+              {/* Benefits Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+                <div className="flex items-center justify-center gap-3 text-white">
+                  <span className="text-secondary text-2xl font-bold">✓</span>
+                  <span className="font-semibold">No Setup Fees</span>
+                </div>
+                <div className="flex items-center justify-center gap-3 text-white">
+                  <span className="text-secondary text-2xl font-bold">✓</span>
+                  <span className="font-semibold">Same-Day Receiving</span>
+                </div>
+                <div className="flex items-center justify-center gap-3 text-white">
+                  <span className="text-secondary text-2xl font-bold">✓</span>
+                  <span className="font-semibold">Dedicated Support</span>
+                </div>
+                <div className="flex items-center justify-center gap-3 text-white">
+                  <span className="text-secondary text-2xl font-bold">✓</span>
+                  <span className="font-semibold">Transparent Pricing</span>
+                </div>
+                <div className="flex items-center justify-center gap-3 text-white">
+                  <span className="text-secondary text-2xl font-bold">✓</span>
+                  <span className="font-semibold">24-48hr Turnaround</span>
+                </div>
+                <div className="flex items-center justify-center gap-3 text-white">
+                  <span className="text-secondary text-2xl font-bold">✓</span>
+                  <span className="font-semibold">No Minimums Required</span>
+                </div>
+              </div>
+
+              {/* Large CTA Button */}
+              <button
+                onClick={goToContact}
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-xl px-12 py-6 font-bold rounded-lg shadow-2xl hover:scale-105 transition-all inline-flex items-center gap-3 group"
+              >
+                Get Your Free Fulfillment Audit
+                <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Trust Line */}
+              <p className="text-white/70 mt-8 text-sm">
+                Trusted by 100+ brands • 2M+ orders fulfilled • 99.8% accuracy rate
+              </p>
+            </div>
           </div>
         </div>
       </section>
