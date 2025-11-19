@@ -32,7 +32,7 @@ const ThreePLLosAngeles = () => {
         <Header />
         
         {/* SECTION 1: Premium Editorial Hero */}
-        <section className="relative pt-48 md:pt-56 pb-32 md:pb-40 bg-white">
+        <section className="relative pt-48 md:pt-56 pb-20 md:pb-24 bg-white">
           <div className="container mx-auto px-6 md:px-12 max-w-4xl">
             <div className="space-y-12 text-left">
               <h1 className="text-6xl md:text-7xl lg:text-[72px] font-extralight tracking-tight text-foreground leading-[1.1] mb-8">
@@ -50,12 +50,11 @@ const ThreePLLosAngeles = () => {
                 </p>
               </div>
             </div>
-            <div className="mt-12 pt-12 border-t border-border/40 max-w-2xl mx-auto"></div>
           </div>
         </section>
 
         {/* SECTION 2: LA Advantage Horizontal Feature Row */}
-        <section className="py-20 bg-white border-y border-border/10">
+        <section className="py-12 bg-white border-y border-border/10">
           <div className="container mx-auto px-6 md:px-12 max-w-7xl">
             <div className="grid md:grid-cols-3 gap-0 divide-x divide-border/10">
               <div className="px-8 md:px-16 py-8 space-y-4 text-center">
