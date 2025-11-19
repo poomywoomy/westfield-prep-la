@@ -17,6 +17,10 @@ const TikTokShopFulfillment = lazy(() => import("./pages/TikTokShopFulfillment")
 const KittingBundling = lazy(() => import("./pages/KittingBundling"));
 const LabelingCompliance = lazy(() => import("./pages/LabelingCompliance"));
 const StorageWarehousing = lazy(() => import("./pages/StorageWarehousing"));
+const OrderFulfillment = lazy(() => import("./pages/OrderFulfillment"));
+const InventoryManagement = lazy(() => import("./pages/InventoryManagement"));
+const ReceivingInspection = lazy(() => import("./pages/ReceivingInspection"));
+const ReturnsProcessing = lazy(() => import("./pages/ReturnsProcessing"));
 const TOS = lazy(() => import("./pages/TOS"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const ThankYou = lazy(() => import("./pages/ThankYou"));
@@ -69,6 +73,10 @@ const App = () => {
               <Route path="/kitting-bundling" element={<KittingBundling />} />
               <Route path="/labeling-fnsku" element={<LabelingCompliance />} />
               <Route path="/storage-warehousing" element={<StorageWarehousing />} />
+              <Route path="/order-fulfillment" element={<OrderFulfillment />} />
+              <Route path="/inventory-management" element={<InventoryManagement />} />
+              <Route path="/receiving-inspection" element={<ReceivingInspection />} />
+              <Route path="/returns-processing" element={<ReturnsProcessing />} />
               
               {/* Legacy Redirects */}
               <Route path="/services" element={<ShopifyFulfillment />} />
