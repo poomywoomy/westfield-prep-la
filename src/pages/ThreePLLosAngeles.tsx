@@ -103,7 +103,7 @@ const ThreePLLosAngeles = () => {
               
               {/* Subtitle/Value Prop */}
               <p className="text-xl md:text-2xl text-muted-foreground/90 font-light leading-relaxed max-w-3xl mx-auto">
-                Premium fulfillment center for fast-growing e-commerce brands. Same-day receiving, precise inventory handling, and seamless Shopify integration—all from a strategic LA location near major ports.
+                Los Angeles's trusted 3PL partner for growing online brands. Expert order fulfillment, real-time inventory tracking, and strategic West Coast distribution.
               </p>
               
               {/* CTA Button */}
@@ -120,8 +120,17 @@ const ThreePLLosAngeles = () => {
           </div>
         </section>
 
+        {/* Transitional Context Paragraph */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-6 md:px-12 max-w-4xl">
+            <p className="text-lg md:text-xl text-center text-muted-foreground leading-relaxed">
+              A Los Angeles 3PL brings speed, structure, and proximity to one of the world's busiest logistics ecosystems. From same-day container receiving to 2-day West Coast delivery, our fulfillment center positions your brand where it needs to be.
+            </p>
+          </div>
+        </section>
+
         {/* SECTION 2: LA Advantage Horizontal Feature Row */}
-        <section className="py-12 bg-white border-y border-border/10">
+        <section className="py-16 bg-white border-y border-border/10">
           <div className="container mx-auto px-6 md:px-12 max-w-7xl">
             <div className="grid md:grid-cols-3 gap-0 divide-x divide-border/10">
               <div className="px-8 md:px-16 py-8 space-y-4 text-center">
@@ -289,45 +298,45 @@ const ThreePLLosAngeles = () => {
         </section>
 
         {/* Section 5: Multi-Row Capabilities Grid */}
-        <section className="py-32 bg-background">
+        <section className="py-40 bg-background">
           <div className="container mx-auto px-4 max-w-7xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-16">
-              <div className="space-y-3 border-b border-border pb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-16 gap-y-20">
+              <div className="space-y-4 border-b border-border pb-10">
                 <h4 className="text-xl font-bold">DTC & Lifestyle Brands</h4>
                 <p className="text-sm text-muted-foreground">Direct-to-consumer growth</p>
                 <p className="text-base leading-relaxed">Brands needing fast order turnaround and clean packaging</p>
               </div>
-              <div className="space-y-3 border-b border-border pb-8">
+              <div className="space-y-4 border-b border-border pb-10">
                 <h4 className="text-xl font-bold">Beauty, Skincare, Cosmetics</h4>
                 <p className="text-sm text-muted-foreground">Temperature-sensitive products</p>
                 <p className="text-base leading-relaxed">Climate-controlled storage with product segregation</p>
               </div>
-              <div className="space-y-3 border-b border-border pb-8">
+              <div className="space-y-4 border-b border-border pb-10">
                 <h4 className="text-xl font-bold">Apparel & Accessories</h4>
                 <p className="text-sm text-muted-foreground">Fashion and seasonal goods</p>
                 <p className="text-base leading-relaxed">Quick restocking and multi-channel distribution</p>
               </div>
-              <div className="space-y-3 border-b border-border pb-8">
+              <div className="space-y-4 border-b border-border pb-10">
                 <h4 className="text-xl font-bold">Wellness & Supplement Brands</h4>
                 <p className="text-sm text-muted-foreground">Health-focused products</p>
                 <p className="text-base leading-relaxed">Compliance-ready handling and lot tracking</p>
               </div>
-              <div className="space-y-3 border-b border-border pb-8">
+              <div className="space-y-4 border-b border-border pb-10">
                 <h4 className="text-xl font-bold">TikTok Shop Creators</h4>
                 <p className="text-sm text-muted-foreground">High-velocity social commerce</p>
                 <p className="text-base leading-relaxed">Rapid fulfillment for viral product launches</p>
               </div>
-              <div className="space-y-3 border-b border-border pb-8">
+              <div className="space-y-4 border-b border-border pb-10">
                 <h4 className="text-xl font-bold">Influencer-Led Launches</h4>
                 <p className="text-sm text-muted-foreground">Creator-driven brands</p>
                 <p className="text-base leading-relaxed">Flexible fulfillment for launch campaigns</p>
               </div>
-              <div className="space-y-3 border-b border-border pb-8">
+              <div className="space-y-4 border-b border-border pb-10">
                 <h4 className="text-xl font-bold">West Coast Focused Brands</h4>
                 <p className="text-sm text-muted-foreground">Regional distribution priority</p>
                 <p className="text-base leading-relaxed">1 to 2 day delivery across California</p>
               </div>
-              <div className="space-y-3 border-b border-border pb-8">
+              <div className="space-y-4 border-b border-border pb-10">
                 <h4 className="text-xl font-bold">Amazon FBA Prep</h4>
                 <p className="text-sm text-muted-foreground">FBA-bound inventory</p>
                 <p className="text-base leading-relaxed">Professional prep, labeling, and shipment creation</p>
@@ -337,7 +346,7 @@ const ThreePLLosAngeles = () => {
         </section>
 
         {/* Section 6: Blueprint Line Graphic Section */}
-        <section className="py-32 bg-muted/20 relative overflow-hidden">
+        <section className="pt-40 pb-32 bg-muted/20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-5" style={{
             backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 49px, hsl(var(--border)) 49px, hsl(var(--border)) 50px), repeating-linear-gradient(90deg, transparent, transparent 49px, hsl(var(--border)) 49px, hsl(var(--border)) 50px)`
           }} />
