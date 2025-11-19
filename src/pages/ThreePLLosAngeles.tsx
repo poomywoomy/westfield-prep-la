@@ -96,338 +96,333 @@ const ThreePLLosAngeles = () => {
           <div className="h-px bg-border/40"></div>
         </div>
 
-        {/* Benefits Section */}
-        <section className="py-32 md:py-40">
-          <div className="container mx-auto px-6 md:px-12 max-w-5xl">
-            <h2 className="text-5xl md:text-6xl font-light mb-24 text-foreground">
-              The Benefits of Choosing a 3PL in Los Angeles
-            </h2>
-
-            <div className="space-y-20">
-              <div className="flex gap-12 items-start group">
-                <div className="text-7xl md:text-8xl font-light text-primary/20 min-w-[120px]">01</div>
-                <div className="space-y-4 flex-1">
-                  <h3 className="text-3xl font-light text-foreground">Faster West Coast Delivery Speed</h3>
-                  <p className="text-xl text-muted-foreground leading-relaxed">
-                    Reduce delivery times to California, Oregon, Washington, Nevada, and Arizona.
-                  </p>
-                </div>
+        {/* Section 3: Core LA 3PL Benefits - Alternating Editorial Blocks */}
+        
+        {/* Block A - Secure 3PL Warehouse */}
+        <section className="py-32 bg-background">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div className="space-y-6">
+                <h2 className="text-5xl font-light leading-tight">
+                  Secure, Climate-Controlled Storage Designed for West Coast Brands
+                </h2>
+                <div className="w-20 h-0.5 bg-primary" />
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  A modern 3PL warehouse does far more than hold inventory. It protects your products, organizes your stock intelligently, and maintains the consistency your supply chain depends on. A Los Angeles-based fulfillment center provides climate-controlled storage, dedicated racking zones, and product-specific segregation ensuring your inventory stays in optimal condition from arrival to outbound.
+                </p>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  This creates faster access, safer handling, and a more stable operational flow for brands shipping throughout California and the broader West Coast.
+                </p>
               </div>
-
-              <div className="flex gap-12 items-start group">
-                <div className="text-7xl md:text-8xl font-light text-primary/20 min-w-[120px]">02</div>
-                <div className="space-y-4 flex-1">
-                  <h3 className="text-3xl font-light text-foreground">Same-Day Handling for LA-Based Brands</h3>
-                  <p className="text-xl text-muted-foreground leading-relaxed">
-                    Local brands get true same-day inbound processing and rapid order turnaround.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-12 items-start group">
-                <div className="text-7xl md:text-8xl font-light text-primary/20 min-w-[120px]">03</div>
-                <div className="space-y-4 flex-1">
-                  <h3 className="text-3xl font-light text-foreground">Reduced Shipping Costs</h3>
-                  <p className="text-xl text-muted-foreground leading-relaxed">
-                    Shorter zones mean lower rates for West Coast DTC customers.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-12 items-start group">
-                <div className="text-7xl md:text-8xl font-light text-primary/20 min-w-[120px]">04</div>
-                <div className="space-y-4 flex-1">
-                  <h3 className="text-3xl font-light text-foreground">Access to Major Carriers & Freight Lanes</h3>
-                  <p className="text-xl text-muted-foreground leading-relaxed">
-                    LA provides one of the densest freight ecosystems in the country.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-12 items-start group">
-                <div className="text-7xl md:text-8xl font-light text-primary/20 min-w-[120px]">05</div>
-                <div className="space-y-4 flex-1">
-                  <h3 className="text-3xl font-light text-foreground">Ideal for TikTok Shop, Shopify & Influencer Fulfillment</h3>
-                  <p className="text-xl text-muted-foreground leading-relaxed">
-                    Brands doing content production in LA get quicker logistics support.
-                  </p>
-                </div>
-              </div>
+              <div className="h-96 rounded-lg bg-gradient-to-br from-blue-50 to-gray-50" />
             </div>
           </div>
         </section>
 
-        {/* Divider - 60% width */}
-        <div className="container mx-auto px-6 flex justify-center py-20">
-          <div className="h-px bg-border/40 w-3/5"></div>
-        </div>
+        <div className="w-full h-px bg-border" />
 
-        {/* Who It's For Section */}
-        <section className="py-32 md:py-40 bg-muted/30">
-          <div className="container mx-auto px-6 md:px-12 max-w-6xl">
-            <h2 className="text-5xl md:text-6xl font-light mb-24 text-foreground">
-              Who a Los Angeles 3PL Is Ideal For
-            </h2>
-
-            <div className="grid md:grid-cols-2 gap-20">
-              <div className="space-y-8">
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-light text-foreground">DTC & lifestyle brands</h3>
-                  <h3 className="text-2xl font-light text-foreground">Beauty, skincare & cosmetics</h3>
-                  <h3 className="text-2xl font-light text-foreground">Apparel & accessories</h3>
-                  <h3 className="text-2xl font-light text-foreground">Wellness & supplement brands</h3>
-                  <h3 className="text-2xl font-light text-foreground">TikTok Shop creators</h3>
-                  <h3 className="text-2xl font-light text-foreground">Influencer-led product launches</h3>
-                  <h3 className="text-2xl font-light text-foreground">Brands with West Coast majority customers</h3>
-                </div>
-              </div>
-
-              <div className="space-y-6 flex flex-col justify-center">
-                <p className="text-xl text-muted-foreground leading-relaxed">Reduces lead time</p>
-                <p className="text-xl text-muted-foreground leading-relaxed">Improves customer satisfaction</p>
-                <p className="text-xl text-muted-foreground leading-relaxed">Strengthens brand logistics reliability</p>
-                <p className="text-xl text-muted-foreground leading-relaxed">Improves margins through zone optimization</p>
-                <p className="text-xl text-muted-foreground leading-relaxed">Supports higher order volume with regional advantage</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Divider */}
-        <div className="container mx-auto px-6">
-          <div className="h-px bg-border/40"></div>
-        </div>
-
-        {/* LA Logistics Advantages */}
-        <section className="py-32 md:py-40">
-          <div className="container mx-auto px-6 md:px-12 max-w-5xl">
-            <h2 className="text-5xl md:text-6xl font-light mb-24 text-foreground">
-              Understanding Los Angeles Logistics Advantages
-            </h2>
-
-            <div className="space-y-12">
-              <div className="flex items-start gap-8 group">
-                <Zap className="w-8 h-8 text-primary stroke-[1] mt-2 flex-shrink-0" />
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Proximity to LAX air freight terminals
+        {/* Block B - Enhanced Inventory Control (REVERSED) */}
+        <section className="py-32 bg-background">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div className="h-96 rounded-lg bg-gradient-to-br from-gray-50 to-blue-50 order-2 md:order-1" />
+              <div className="space-y-6 order-1 md:order-2">
+                <h2 className="text-5xl font-light leading-tight">
+                  Streamlined Inventory Management With Real-Time Visibility
+                </h2>
+                <div className="w-20 h-0.5 bg-primary" />
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Partnering with a 3PL in Los Angeles brings structure and transparency to your inventory movement. Advanced tracking systems monitor every SKU, update stock levels automatically, and provide location accuracy down to the bin.
                 </p>
-              </div>
-
-              <div className="flex items-start gap-8 group">
-                <Zap className="w-8 h-8 text-primary stroke-[1] mt-2 flex-shrink-0" />
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Near the largest USPS distribution hub on the West Coast
-                </p>
-              </div>
-
-              <div className="flex items-start gap-8 group">
-                <Zap className="w-8 h-8 text-primary stroke-[1] mt-2 flex-shrink-0" />
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Dense courier network for same-day LA/OC/SFV delivery
-                </p>
-              </div>
-
-              <div className="flex items-start gap-8 group">
-                <Zap className="w-8 h-8 text-primary stroke-[1] mt-2 flex-shrink-0" />
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Warehouse cluster in Commerce, Vernon, Torrance, Gardena
-                </p>
-              </div>
-
-              <div className="flex items-start gap-8 group">
-                <Zap className="w-8 h-8 text-primary stroke-[1] mt-2 flex-shrink-0" />
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Low-latency restock routes to Amazon FCs like ONT8, LGB8, SNA4
+                <p className="text-lg font-medium">This helps your team:</p>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <span>Identify trends in slow-moving and high-velocity SKUs</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <span>Prevent costly oversells and stockouts</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <span>Maintain accurate counts across all sales channels</span>
+                  </li>
+                </ul>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  With a professional 3PL, you eliminate manual errors and gain a clear, real-time view of your product flow.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Divider - 40% width left aligned */}
-        <div className="container mx-auto px-6 py-20">
-          <div className="h-px bg-border/40 w-2/5"></div>
-        </div>
+        <div className="w-full h-px bg-border" />
 
-        {/* LA vs Non-LA Comparison */}
-        <section className="py-32 md:py-40 bg-muted/30">
-          <div className="container mx-auto px-6 md:px-12 max-w-6xl">
-            <h2 className="text-5xl md:text-6xl font-light mb-24 text-foreground">
+        {/* Block C - Shipping & Distribution */}
+        <section className="py-32 bg-background">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div className="space-y-6">
+                <h2 className="text-5xl font-light leading-tight">
+                  Fast, Reliable Distribution Across LA, California, and Nationwide
+                </h2>
+                <div className="w-20 h-0.5 bg-primary" />
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  A third-party logistics partner ensures your shipments move efficiently across multiple routes whether you're fulfilling DTC orders, sending wholesale replenishments, or distributing bulk shipments.
+                </p>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Los Angeles is one of the strongest shipping hubs in the country, giving brands access to:
+                </p>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <span>Distributed networks for faster regional delivery</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <span>Optimized carrier selection (UPS, FedEx, USPS, carriers local to LA)</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <span>Multiple outbound strategies to support DTC, retail, and B2B</span>
+                  </li>
+                </ul>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  A professional 3PL coordinates every step so your orders leave accurately, on time, and without operational friction.
+                </p>
+              </div>
+              <div className="h-96 rounded-lg bg-gradient-to-br from-blue-50 via-gray-50 to-blue-100 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-10 left-10 w-32 h-32 border-2 border-primary rounded-full" />
+                  <div className="absolute bottom-10 right-10 w-24 h-24 bg-primary rounded-lg rotate-45" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 4: Floating Divider */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="w-3/5 mx-auto h-px bg-border" />
+          </div>
+        </section>
+
+        {/* Section 5: Multi-Row Capabilities Grid */}
+        <section className="py-32 bg-background">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-16">
+              <div className="space-y-3 border-b border-border pb-8">
+                <h4 className="text-xl font-bold">DTC & Lifestyle Brands</h4>
+                <p className="text-sm text-muted-foreground">Direct-to-consumer growth</p>
+                <p className="text-base leading-relaxed">Brands needing fast order turnaround and clean packaging</p>
+              </div>
+              <div className="space-y-3 border-b border-border pb-8">
+                <h4 className="text-xl font-bold">Beauty, Skincare, Cosmetics</h4>
+                <p className="text-sm text-muted-foreground">Temperature-sensitive products</p>
+                <p className="text-base leading-relaxed">Climate-controlled storage with product segregation</p>
+              </div>
+              <div className="space-y-3 border-b border-border pb-8">
+                <h4 className="text-xl font-bold">Apparel & Accessories</h4>
+                <p className="text-sm text-muted-foreground">Fashion and seasonal goods</p>
+                <p className="text-base leading-relaxed">Quick restocking and multi-channel distribution</p>
+              </div>
+              <div className="space-y-3 border-b border-border pb-8">
+                <h4 className="text-xl font-bold">Wellness & Supplement Brands</h4>
+                <p className="text-sm text-muted-foreground">Health-focused products</p>
+                <p className="text-base leading-relaxed">Compliance-ready handling and lot tracking</p>
+              </div>
+              <div className="space-y-3 border-b border-border pb-8">
+                <h4 className="text-xl font-bold">TikTok Shop Creators</h4>
+                <p className="text-sm text-muted-foreground">High-velocity social commerce</p>
+                <p className="text-base leading-relaxed">Rapid fulfillment for viral product launches</p>
+              </div>
+              <div className="space-y-3 border-b border-border pb-8">
+                <h4 className="text-xl font-bold">Influencer-Led Launches</h4>
+                <p className="text-sm text-muted-foreground">Creator-driven brands</p>
+                <p className="text-base leading-relaxed">Flexible fulfillment for launch campaigns</p>
+              </div>
+              <div className="space-y-3 border-b border-border pb-8">
+                <h4 className="text-xl font-bold">West Coast Focused Brands</h4>
+                <p className="text-sm text-muted-foreground">Regional distribution priority</p>
+                <p className="text-base leading-relaxed">1 to 2 day delivery across California</p>
+              </div>
+              <div className="space-y-3 border-b border-border pb-8">
+                <h4 className="text-xl font-bold">Amazon FBA Prep</h4>
+                <p className="text-sm text-muted-foreground">FBA-bound inventory</p>
+                <p className="text-base leading-relaxed">Professional prep, labeling, and shipment creation</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 6: Blueprint Line Graphic Section */}
+        <section className="py-32 bg-muted/20 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-5" style={{
+            backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 49px, hsl(var(--border)) 49px, hsl(var(--border)) 50px), repeating-linear-gradient(90deg, transparent, transparent 49px, hsl(var(--border)) 49px, hsl(var(--border)) 50px)`
+          }} />
+          <div className="container mx-auto px-4 max-w-5xl relative z-10">
+            <h2 className="text-5xl font-light text-center mb-12">
+              How a 3PL Streamlines Your Logistics in LA
+            </h2>
+            <div className="space-y-8 text-center">
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-4xl mx-auto">
+                Los Angeles provides infrastructure that most logistics markets cannot match. LAX air freight terminals handle international shipments daily. The USPS distribution hub in City of Industry processes millions of parcels weekly. A dense courier network ensures same-day and next-day pickup across the metro area.
+              </p>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-4xl mx-auto">
+                Warehouse clusters in Commerce, Vernon, Torrance, and Gardena create low-latency restock routes to Amazon fulfillment centers like ONT8, LGB8, and SNA4. For brands shipping West Coast inventory or managing FBA prep, LA provides the operational clarity and speed required to scale without friction.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 7: Horizontal Scrolling Use Cases Strip */}
+        <section className="py-24 bg-background overflow-hidden">
+          <div className="flex gap-0 overflow-x-auto scrollbar-hide snap-x snap-mandatory" style={{ scrollBehavior: 'smooth' }}>
+            {[
+              {
+                title: "Scaling DTC Brands",
+                description: "Brands experiencing rapid growth need fulfillment infrastructure that scales without delays. A Los Angeles 3PL provides the capacity, speed, and operational consistency required to handle high order volumes."
+              },
+              {
+                title: "West Coast Distribution",
+                description: "Shipping from Los Angeles positions your inventory closer to California, Nevada, Arizona, and Oregon customers with 1 to 2 day transit zones and lower shipping costs."
+              },
+              {
+                title: "Port Proximity Benefits",
+                description: "Direct access to LA and Long Beach ports reduces container processing time and accelerates inventory availability. This creates faster restocking cycles and more predictable supply chain flow."
+              },
+              {
+                title: "Influencer & Content Creator Support",
+                description: "LA-based creators and influencer-led brands benefit from local fulfillment with same-day handling, flexible packaging, and rapid response to viral product launches."
+              }
+            ].map((useCase, index) => (
+              <div key={index} className="min-w-[400px] px-12 py-16 border-r border-border snap-center">
+                <h3 className="text-2xl font-bold mb-4">{useCase.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{useCase.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Section 8: Big LA Warehouse Visual Section */}
+        <section className="relative py-40 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800" />
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="container mx-auto px-4 max-w-7xl relative z-10">
+            <h2 className="text-5xl md:text-6xl font-bold text-white text-center mb-4">
               Los Angeles vs Non-Los Angeles 3PLs
             </h2>
-
-            <div className="space-y-1">
-              {/* Header */}
-              <div className="grid grid-cols-3 gap-8 pb-8 border-b-2 border-border">
-                <div className="text-xl font-light text-muted-foreground">Feature</div>
-                <div className="text-xl font-light text-foreground">LA 3PL</div>
-                <div className="text-xl font-light text-muted-foreground">Non-LA 3PL</div>
-              </div>
-
-              {/* Rows */}
-              <div className="grid grid-cols-3 gap-8 py-8 border-b border-border/40">
-                <div className="text-lg text-muted-foreground">Access to Ports</div>
-                <div className="text-lg text-foreground">Direct proximity</div>
-                <div className="text-lg text-muted-foreground">Slower inbound movement</div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-8 py-8 border-b border-border/40">
-                <div className="text-lg text-muted-foreground">West Coast Delivery Speed</div>
-                <div className="text-lg text-foreground">1–2 days</div>
-                <div className="text-lg text-muted-foreground">3–5 days</div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-8 py-8 border-b border-border/40">
-                <div className="text-lg text-muted-foreground">Container to Shelf Time</div>
-                <div className="text-lg text-foreground">Short</div>
-                <div className="text-lg text-muted-foreground">Long</div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-8 py-8 border-b border-border/40">
-                <div className="text-lg text-muted-foreground">Carrier Access</div>
-                <div className="text-lg text-foreground">Dense network</div>
-                <div className="text-lg text-muted-foreground">Limited</div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-8 py-8">
-                <div className="text-lg text-muted-foreground">Ideal for DTC Brands</div>
-                <div className="text-lg text-foreground">Yes</div>
-                <div className="text-lg text-muted-foreground">Mixed</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Divider */}
-        <div className="container mx-auto px-6">
-          <div className="h-px bg-border/40"></div>
-        </div>
-
-        {/* Why Brands Choose LA */}
-        <section className="py-32 md:py-40">
-          <div className="container mx-auto px-6 md:px-12 max-w-5xl">
-            <h2 className="text-5xl md:text-6xl font-light mb-24 text-foreground">
-              Why Brands Choose Los Angeles for Fulfillment
-            </h2>
-
-            <div className="space-y-10">
-              <div className="flex items-start gap-6">
-                <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Shorter transit zones
-                </p>
-              </div>
-
-              <div className="flex items-start gap-6">
-                <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  High daily order processing capacity
-                </p>
-              </div>
-
-              <div className="flex items-start gap-6">
-                <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Better access to influencer ecosystem (LA content creators)
-                </p>
-              </div>
-
-              <div className="flex items-start gap-6">
-                <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Faster restocks for California Amazon FCs
-                </p>
-              </div>
-
-              <div className="flex items-start gap-6">
-                <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Ideal for luxury, beauty & lifestyle brands
-                </p>
-              </div>
-
-              <div className="flex items-start gap-6">
-                <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                <p className="text-2xl text-muted-foreground font-light leading-relaxed">
-                  Frequent freight schedules from Asia → LA ports
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Divider - 20% opacity darker */}
-        <div className="container mx-auto px-6 py-20">
-          <div className="h-px bg-border/60"></div>
-        </div>
-
-        {/* Final SEO Footer Content Block */}
-        <section className="py-32 md:py-40 bg-background">
-          <div className="container mx-auto px-6 md:px-12 max-w-4xl">
-            <h3 className="text-3xl md:text-4xl font-light mb-12 text-foreground leading-relaxed">
-              3PL Services for Los Angeles, Santa Monica, Beverly Hills, Culver City, Pasadena, Glendale, Burbank, and the Greater Los Angeles Area
-            </h3>
-
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              Our Los Angeles County fulfillment center provides comprehensive LA fulfillment services for modern DTC operations. Strategically positioned in the heart of West Coast logistics, we deliver same-day handling and e-commerce distribution excellence for brands across the Greater Los Angeles Area. With direct access to major freight routes and local warehouse support, we enable fast-growing brands to optimize their supply chain and accelerate delivery times throughout Southern California.
+            <p className="text-lg text-white/60 text-center mb-16">
+              Why location matters for e-commerce fulfillment
             </p>
+            <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold text-white mb-6">LA 3PL</h3>
+                {[
+                  "Direct port proximity",
+                  "1 to 2 days West Coast delivery",
+                  "Short container to shelf time",
+                  "Dense carrier network",
+                  "Ideal for DTC brands",
+                  "Lower shipping costs for CA customers"
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start gap-3 text-white">
+                    <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold text-white mb-6">Non-LA 3PL</h3>
+                {[
+                  "Slower inbound movement",
+                  "3 to 5 days delivery",
+                  "Long container processing",
+                  "Limited carrier access",
+                  "Mixed suitability",
+                  "Higher costs for West Coast"
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start gap-3 text-white/60">
+                    <X className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* Premium Footer Section - Dark */}
-        <section className="bg-foreground text-background py-20">
-          <div className="container mx-auto px-6 md:px-12 max-w-6xl">
+        {/* Section 9: Final Summary Section */}
+        <section className="py-32 bg-background">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <h2 className="text-5xl font-light text-center mb-4">
+              Why Brands Choose a 3PL in Los Angeles
+            </h2>
+            <div className="w-24 h-1 bg-primary mx-auto mb-16" />
+            <div className="space-y-0">
+              {[
+                "Shorter transit zones for California and West Coast customers",
+                "High daily order processing capacity with same-day handling",
+                "Better access to influencer ecosystem and creator partnerships",
+                "Faster restocks for California Amazon fulfillment centers",
+                "Ideal for luxury, beauty, and lifestyle brand positioning",
+                "Frequent freight schedules from Asia to LA ports"
+              ].map((reason, index) => (
+                <div key={index} className="py-5 border-b border-border">
+                  <p className="text-lg text-center">{reason}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Section 10: Bottom Minimal CTA */}
+        <section className="py-32 bg-background">
+          <div className="container mx-auto px-4 max-w-3xl text-center">
+            <p className="text-lg text-muted-foreground mb-4">
+              Explore more about fulfillment, logistics, and 3PL operations in Los Angeles.
+            </p>
+            <Link to="/why-choose-us" className="inline-flex items-center gap-2 text-primary hover:underline">
+              Learn more about our services
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </section>
+
+        {/* Premium Footer */}
+        <footer className="bg-gray-900 text-white py-16">
+          <div className="container mx-auto px-4 max-w-7xl">
             <div className="grid md:grid-cols-3 gap-12">
               <div>
-                <h4 className="text-sm font-light mb-6 opacity-60">Services</h4>
-                <div className="space-y-3">
-                  <Link to="/amazon-fba-prep" className="block text-sm hover:opacity-70 transition-opacity">
-                    Amazon FBA Prep
-                  </Link>
-                  <Link to="/shopify-fulfillment" className="block text-sm hover:opacity-70 transition-opacity">
-                    Shopify Fulfillment
-                  </Link>
-                  <Link to="/storage-warehousing" className="block text-sm hover:opacity-70 transition-opacity">
-                    Storage & Warehousing
-                  </Link>
-                  <Link to="/kitting-bundling" className="block text-sm hover:opacity-70 transition-opacity">
-                    Kitting & Bundling
-                  </Link>
-                </div>
+                <h3 className="text-xl font-bold mb-6">Services</h3>
+                <ul className="space-y-3">
+                  <li><Link to="/amazon-fba-prep" className="hover:text-primary transition-colors">Amazon FBA Prep</Link></li>
+                  <li><Link to="/shopify-fulfillment" className="hover:text-primary transition-colors">Shopify Fulfillment</Link></li>
+                  <li><Link to="/storage-warehousing" className="hover:text-primary transition-colors">Storage & Warehousing</Link></li>
+                  <li><Link to="/labeling-compliance" className="hover:text-primary transition-colors">Labeling & Compliance</Link></li>
+                </ul>
               </div>
-
               <div>
-                <h4 className="text-sm font-light mb-6 opacity-60">Company</h4>
-                <div className="space-y-3">
-                  <Link to="/why-choose-us" className="block text-sm hover:opacity-70 transition-opacity">
-                    Why Choose Us
-                  </Link>
-                  <Link to="/testimonials" className="block text-sm hover:opacity-70 transition-opacity">
-                    Testimonials
-                  </Link>
-                  <Link to="/pricing" className="block text-sm hover:opacity-70 transition-opacity">
-                    Pricing
-                  </Link>
-                  <Link to="/contact" className="block text-sm hover:opacity-70 transition-opacity">
-                    Contact
-                  </Link>
-                </div>
+                <h3 className="text-xl font-bold mb-6">Company</h3>
+                <ul className="space-y-3">
+                  <li><Link to="/why-choose-us" className="hover:text-primary transition-colors">Why Choose Us</Link></li>
+                  <li><Link to="/pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
+                  <li><Link to="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
+                </ul>
               </div>
-
               <div>
-                <h4 className="text-sm font-light mb-6 opacity-60">Resources</h4>
-                <div className="space-y-3">
-                  <Link to="/blog" className="block text-sm hover:opacity-70 transition-opacity">
-                    Blog
-                  </Link>
-                  <Link to="/faq" className="block text-sm hover:opacity-70 transition-opacity">
-                    FAQ
-                  </Link>
-                </div>
+                <h3 className="text-xl font-bold mb-6">Resources</h3>
+                <ul className="space-y-3">
+                  <li><Link to="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
+                  <li><Link to="/faq" className="hover:text-primary transition-colors">FAQ</Link></li>
+                  <li><Link to="/testimonials" className="hover:text-primary transition-colors">Testimonials</Link></li>
+                </ul>
               </div>
             </div>
           </div>
-        </section>
+        </footer>
 
         <Footer />
       </div>
