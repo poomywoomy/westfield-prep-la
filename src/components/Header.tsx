@@ -76,103 +76,6 @@ const Header = () => {
               Home
             </Link>
 
-            {/* Services Dropdown */}
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-base font-medium">
-                    Services
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4">
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/amazon-fba-prep"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Amazon FBA Prep</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Complete FBA preparation and shipment services
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/shopify-fulfillment"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Shopify Fulfillment</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Direct Shopify store integration and fulfillment
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/tiktok-shop-fulfillment"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">TikTok Shop Fulfillment</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Fast fulfillment for TikTok Shop orders
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/storage-warehousing"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Storage & Warehousing</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Secure inventory storage in Los Angeles
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/kitting-bundling"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Kitting & Bundling</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Custom product bundling and kitting services
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/labeling-compliance"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Labeling & Compliance</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              FBA labeling and compliance services
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
-            <Link to="/sales-channels" className="text-foreground hover:text-primary transition-colors font-medium text-base">
-              Sales Channels
-            </Link>
-
             {/* About Dropdown */}
             <NavigationMenu>
               <NavigationMenuList>
@@ -248,7 +151,7 @@ const Header = () => {
               size="lg"
               className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold px-8"
             >
-              Get a Free Quote
+              Get a Quote
             </Button>
           </div>
 
