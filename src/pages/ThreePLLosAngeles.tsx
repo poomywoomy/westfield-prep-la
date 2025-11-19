@@ -35,7 +35,7 @@ const ThreePLLosAngeles = () => {
         <section className="relative pt-48 md:pt-56 pb-20 md:pb-24 bg-white">
           <div className="container mx-auto px-6 md:px-12 max-w-4xl">
             <div className="space-y-12 text-left">
-              <h1 className="text-6xl md:text-7xl lg:text-[72px] font-extralight tracking-tight text-foreground leading-[1.1] mb-8">
+              <h1 className="text-6xl md:text-7xl lg:text-[72px] font-light tracking-wide text-foreground leading-[1.1] mb-8 border-l-4 border-primary pl-6 shadow-sm">
                 3PL in Los Angeles
               </h1>
               <p className="text-2xl md:text-3xl text-muted-foreground/80 font-light leading-relaxed max-w-3xl">
@@ -113,7 +113,13 @@ const ThreePLLosAngeles = () => {
                   This creates faster access, safer handling, and a more stable operational flow for brands shipping throughout California and the broader West Coast.
                 </p>
               </div>
-              <div className="h-96 rounded-lg bg-gradient-to-br from-blue-50 to-gray-50" />
+                <div className="h-96 rounded-lg overflow-hidden shadow-lg">
+                  <img 
+                    src="/blog-images/3pl-warehouse-storage-la.jpg"
+                    alt="Modern climate-controlled 3PL warehouse in Los Angeles with organized pallet racking and secure storage for e-commerce inventory"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
             </div>
           </div>
         </section>
@@ -124,7 +130,13 @@ const ThreePLLosAngeles = () => {
         <section className="py-32 bg-background">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="grid md:grid-cols-2 gap-16 items-center">
-              <div className="h-96 rounded-lg bg-gradient-to-br from-gray-50 to-blue-50 order-2 md:order-1" />
+                <div className="h-96 rounded-lg overflow-hidden shadow-lg order-2 md:order-1">
+                  <img 
+                    src="/blog-images/inventory-management-barcode-scanning.jpg"
+                    alt="Warehouse worker using barcode scanner for real-time inventory management and SKU tracking in Los Angeles 3PL facility"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               <div className="space-y-6 order-1 md:order-2">
                 <h2 className="text-5xl font-light leading-tight">
                   Streamlined Inventory Management With Real-Time Visibility
@@ -191,11 +203,12 @@ const ThreePLLosAngeles = () => {
                   A professional 3PL coordinates every step so your orders leave accurately, on time, and without operational friction.
                 </p>
               </div>
-              <div className="h-96 rounded-lg bg-gradient-to-br from-blue-50 via-gray-50 to-blue-100 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
-                  <div className="absolute top-10 left-10 w-32 h-32 border-2 border-primary rounded-full" />
-                  <div className="absolute bottom-10 right-10 w-24 h-24 bg-primary rounded-lg rotate-45" />
-                </div>
+              <div className="h-96 rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/blog-images/shipping-distribution-loading-dock.jpg"
+                  alt="Aerial view of Los Angeles 3PL loading dock with trucks for fast distribution across California and nationwide shipping"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>
