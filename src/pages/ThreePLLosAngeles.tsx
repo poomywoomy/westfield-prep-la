@@ -34,14 +34,14 @@ const ThreePLLosAngeles = () => {
         {/* SECTION 1: Premium Editorial Hero */}
         <section className="relative pt-48 md:pt-56 pb-32 md:pb-40 bg-white">
           <div className="container mx-auto px-6 md:px-12 max-w-4xl">
-            <div className="space-y-8 text-left">
-              <h1 className="text-6xl md:text-7xl lg:text-[72px] font-extralight tracking-tight text-foreground leading-[1.1] mb-6">
+            <div className="space-y-12 text-left">
+              <h1 className="text-6xl md:text-7xl lg:text-[72px] font-extralight tracking-tight text-foreground leading-[1.1] mb-8">
                 3PL in Los Angeles
               </h1>
               <p className="text-2xl md:text-3xl text-muted-foreground/80 font-light leading-relaxed max-w-3xl">
                 3PL Fulfillment in Los Angeles for Fast-Growing E-Commerce Brands
               </p>
-              <div className="pt-6 space-y-6">
+              <div className="pt-12 space-y-6">
                 <h2 className="text-xl md:text-2xl font-semibold text-foreground">
                   3PL Services in Los Angeles: Modern Logistics for High-Velocity Brands
                 </h2>
@@ -390,39 +390,6 @@ const ThreePLLosAngeles = () => {
             </Link>
           </div>
         </section>
-
-        {/* Premium Footer */}
-        <footer className="bg-gray-900 text-white py-16">
-          <div className="container mx-auto px-4 max-w-7xl">
-            <div className="grid md:grid-cols-3 gap-12">
-              <div>
-                <h3 className="text-xl font-bold mb-6">Services</h3>
-                <ul className="space-y-3">
-                  <li><Link to="/amazon-fba-prep" className="hover:text-primary transition-colors">Amazon FBA Prep</Link></li>
-                  <li><Link to="/shopify-fulfillment" className="hover:text-primary transition-colors">Shopify Fulfillment</Link></li>
-                  <li><Link to="/storage-warehousing" className="hover:text-primary transition-colors">Storage & Warehousing</Link></li>
-                  <li><Link to="/labeling-compliance" className="hover:text-primary transition-colors">Labeling & Compliance</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold mb-6">Company</h3>
-                <ul className="space-y-3">
-                  <li><Link to="/why-choose-us" className="hover:text-primary transition-colors">Why Choose Us</Link></li>
-                  <li><Link to="/pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
-                  <li><Link to="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold mb-6">Resources</h3>
-                <ul className="space-y-3">
-                  <li><Link to="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
-                  <li><Link to="/faq" className="hover:text-primary transition-colors">FAQ</Link></li>
-                  <li><Link to="/testimonials" className="hover:text-primary transition-colors">Testimonials</Link></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </footer>
 
         <Footer />
       </div>
