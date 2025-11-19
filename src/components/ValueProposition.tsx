@@ -1,47 +1,37 @@
 import { Package, DollarSign, MapPin, TrendingUp, CheckCircle, Users } from "lucide-react";
-
 const ValueProposition = () => {
-  const benefits = [
-    {
-      icon: Package,
-      title: "Fast Turnaround",
-      description: "Orders processed in 24-48 hours. Same-day receiving available.",
-      stat: "24-48hr"
-    },
-    {
-      icon: DollarSign,
-      title: "Transparent Pricing",
-      description: "No hidden fees. Clear per-item pricing you can calculate upfront.",
-      stat: "No Hidden Fees"
-    },
-    {
-      icon: MapPin,
-      title: "Strategic Location",
-      description: "Near Port of LA for lower import costs. Fast West Coast distribution.",
-      stat: "LA Based"
-    },
-    {
-      icon: TrendingUp,
-      title: "Built to Scale",
-      description: "No minimums. We grow with you from 50 to 5,000+ orders/month.",
-      stat: "No Minimums"
-    },
-    {
-      icon: CheckCircle,
-      title: "Quality-Focused",
-      description: "Experienced fulfillment specialists who treat your products like their own.",
-      stat: "99.8% Accuracy"
-    },
-    {
-      icon: Users,
-      title: "Dedicated Support",
-      description: "Direct communication with your account team. Fast response times.",
-      stat: "< 2hr Response"
-    }
-  ];
-
-  return (
-    <section className="py-24 bg-gradient-to-b from-background via-muted/20 to-background">
+  const benefits = [{
+    icon: Package,
+    title: "Fast Turnaround",
+    description: "Orders processed in 24-48 hours. Same-day receiving available.",
+    stat: "24-48hr"
+  }, {
+    icon: DollarSign,
+    title: "Transparent Pricing",
+    description: "No hidden fees. Clear per-item pricing you can calculate upfront.",
+    stat: "No Hidden Fees"
+  }, {
+    icon: MapPin,
+    title: "Strategic Location",
+    description: "Near Port of LA for lower import costs. Fast West Coast distribution.",
+    stat: "LA Based"
+  }, {
+    icon: TrendingUp,
+    title: "Built to Scale",
+    description: "No minimums. We grow with you from 50 to 5,000+ orders/month.",
+    stat: "No Minimums"
+  }, {
+    icon: CheckCircle,
+    title: "Quality-Focused",
+    description: "Experienced fulfillment specialists who treat your products like their own.",
+    stat: "99.8% Accuracy"
+  }, {
+    icon: Users,
+    title: "Dedicated Support",
+    description: "Direct communication with your account team. Fast response times.",
+    stat: "< 2hr Response"
+  }];
+  return <section className="py-24 bg-gradient-to-b from-background via-muted/20 to-background">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
@@ -61,7 +51,7 @@ const ValueProposition = () => {
               </div>
               <div className="flex items-center gap-3">
                 <div className="h-1 w-12 bg-secondary"></div>
-                <span className="text-sm font-semibold text-secondary">2M+ Orders Fulfilled</span>
+                <span className="text-sm font-semibold text-secondary">2M+ Orders Fulfilled this Year    </span>
               </div>
             </div>
           </div>
@@ -69,12 +59,8 @@ const ValueProposition = () => {
           {/* Benefits List - Premium Horizontal Layout */}
           <div className="space-y-0">
             {benefits.map((benefit, index) => {
-              const Icon = benefit.icon;
-              return (
-                <div 
-                  key={index}
-                  className="group flex items-start gap-8 py-10 border-b border-border/20 hover:border-primary/30 transition-all duration-300"
-                >
+            const Icon = benefit.icon;
+            return <div key={index} className="group flex items-start gap-8 py-10 border-b border-border/20 hover:border-primary/30 transition-all duration-300">
                   {/* Left: Number + Icon */}
                   <div className="flex items-center gap-6 flex-shrink-0">
                     <span className="text-5xl font-bold text-primary/10 group-hover:text-primary/20 transition-colors w-16 text-right">
@@ -104,14 +90,11 @@ const ValueProposition = () => {
                       </span>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                </div>;
+          })}
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default ValueProposition;
