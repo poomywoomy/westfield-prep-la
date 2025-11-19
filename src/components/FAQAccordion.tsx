@@ -9,7 +9,7 @@ const FAQAccordion = () => {
   const faqs = [
     {
       question: "Do you have minimum order requirements?",
-      answer: "No, we don't require monthly minimums. Whether you're fulfilling 50 orders or 5,000+ orders per month, we can support your business. Our pricing scales with your volume, so you only pay for what you use."
+      answer: "No, we don't require monthly minimums. Whether you're fulfilling 50 orders or 50,000+ orders per month, we can support your business. Our pricing scales with your volume, so you only pay for what you use."
     },
     {
       question: "What's your order turnaround time?",
