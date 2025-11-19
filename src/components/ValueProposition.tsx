@@ -56,42 +56,43 @@ const ValueProposition = () => {
             </div>
           </div>
 
-          {/* Benefits List - Premium Horizontal Layout */}
-          <div className="space-y-0">
+          {/* Benefits Grid - Card Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => {
-            const Icon = benefit.icon;
-            return <div key={index} className="group flex items-start gap-8 py-10 border-b border-border/20 hover:border-primary/30 transition-all duration-300">
-                  {/* Left: Number + Icon */}
-                  <div className="flex items-center gap-6 flex-shrink-0">
-                    <span className="text-5xl font-bold text-primary/10 group-hover:text-primary/20 transition-colors w-16 text-right">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <div className="w-16 h-16 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center transition-all duration-300">
-                      <Icon className="w-8 h-8 text-primary group-hover:scale-110 transition-transform duration-300" />
+              const Icon = benefit.icon;
+              return (
+                <div 
+                  key={index} 
+                  className="group relative bg-card border border-border rounded-xl p-8 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+                >
+                  {/* Top: Icon */}
+                  <div className="mb-6">
+                    <div className="w-14 h-14 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center transition-all duration-300">
+                      <Icon className="w-7 h-7 text-primary group-hover:scale-110 transition-transform duration-300" />
                     </div>
                   </div>
                   
-                  {/* Middle: Content */}
-                  <div className="flex-1 pt-2">
-                    <h3 className="text-2xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
-                      {benefit.title}
-                    </h3>
-                    
-                    <p className="text-muted-foreground leading-relaxed text-base">
-                      {benefit.description}
-                    </p>
-                  </div>
+                  {/* Title */}
+                  <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
+                    {benefit.title}
+                  </h3>
+                  
+                  {/* Description */}
+                  <p className="text-muted-foreground leading-relaxed text-sm mb-6">
+                    {benefit.description}
+                  </p>
 
-                  {/* Right: Stat Badge */}
-                  <div className="text-right flex-shrink-0 pt-2">
-                    <div className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-primary/5 group-hover:bg-primary/10 transition-colors duration-300">
-                      <span className="text-sm font-bold text-primary whitespace-nowrap">
+                  {/* Bottom: Stat Badge */}
+                  <div className="pt-4 border-t border-border/50">
+                    <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-primary/5 group-hover:bg-primary/10 transition-colors duration-300">
+                      <span className="text-xs font-bold text-primary whitespace-nowrap">
                         {benefit.stat}
                       </span>
                     </div>
                   </div>
-                </div>;
-          })}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
