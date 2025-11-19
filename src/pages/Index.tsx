@@ -61,16 +61,16 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Los Angeles 3PL and Shopify Fulfillment Center</title>
-        <meta name="description" content="LA's leading Shopify 3PL for fast e-commerce fulfillment. Same-day receiving, expert order processing, and no minimums. Get your free fulfillment audit." />
+        <title>Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner | Westfield Prep Center</title>
+        <meta name="description" content="Professional 3PL services in Los Angeles. Same-day receiving, 24-48hr turnaround, transparent pricing, and no minimums. Trusted by 100+ brands with 2M+ orders fulfilled." />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.placename" content="Los Angeles, California" />
         <meta name="geo.position" content="34.0522;-118.2437" />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content="Los Angeles 3PL and Shopify Fulfillment Center" />
-        <meta property="og:description" content="LA's leading Shopify 3PL for fast e-commerce fulfillment. Same-day receiving, expert order processing, and no minimums. Get your free fulfillment audit." />
+        <meta property="og:title" content="Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner" />
+        <meta property="og:description" content="Professional 3PL services in Los Angeles. Same-day receiving, 24-48hr turnaround, transparent pricing, and no minimums. Trusted by 100+ brands with 2M+ orders fulfilled." />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
         <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
         <meta property="og:type" content="website" />
