@@ -1,13 +1,10 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { ChevronDown } from "lucide-react";
 
 const FAQAccordion = () => {
   const navigate = useNavigate();
+  const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
   const faqs = [
     {
@@ -41,31 +38,77 @@ const FAQAccordion = () => {
   ];
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-24 bg-gradient-to-b from-background to-muted/30">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-foreground">
-            Frequently Asked Questions
-          </h2>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Everything you need to know about working with Westfield Prep Center
+            </p>
+          </div>
 
-          <Accordion type="single" collapsible className="space-y-4">
-            {faqs.map((faq, index) => (
-              <AccordionItem 
-                key={index} 
-                value={`item-${index}`}
-                className="bg-card border border-border rounded-lg px-6"
-              >
-                <AccordionTrigger className="text-left hover:no-underline">
-                  <span className="font-semibold text-card-foreground">
-                    {faq.question}
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <div className="grid lg:grid-cols-5 gap-12">
+            <div className="lg:col-span-2 space-y-4">
+              {faqs.map((faq, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveIndex(activeIndex === index ? null : index)}
+                  className={`w-full text-left p-6 rounded-2xl border-2 transition-all ${
+                    activeIndex === index
+                      ? 'bg-primary text-primary-foreground border-primary shadow-xl'
+                      : 'bg-card border-border hover:border-primary/50 hover:shadow-lg'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <span className={`text-2xl font-bold ${
+                        activeIndex === index ? 'text-primary-foreground/60' : 'text-primary/40'
+                      }`}>
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <span className={`font-bold text-lg ${
+                        activeIndex === index ? 'text-primary-foreground' : 'text-card-foreground'
+                      }`}>
+                        {faq.question}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      className={`flex-shrink-0 w-6 h-6 transition-transform ${
+                        activeIndex === index ? 'rotate-180 text-primary-foreground' : 'text-muted-foreground'
+                      }`}
+                    />
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="lg:col-span-3">
+              {activeIndex !== null && (
+                <div className="sticky top-32 bg-gradient-to-br from-card to-card/50 border-2 border-border rounded-3xl p-12 shadow-2xl animate-fade-in">
+                  <div className="text-6xl font-bold text-primary/10 mb-6">
+                    {String(activeIndex + 1).padStart(2, '0')}
+                  </div>
+                  <h3 className="text-3xl font-bold mb-6 text-foreground">
+                    {faqs[activeIndex].question}
+                  </h3>
+                  <p className="text-xl text-muted-foreground leading-relaxed">
+                    {faqs[activeIndex].answer}
+                  </p>
+                </div>
+              )}
+
+              {activeIndex === null && (
+                <div className="sticky top-32 bg-gradient-to-br from-muted/50 to-muted/30 border-2 border-dashed border-border rounded-3xl p-12 flex items-center justify-center h-96">
+                  <p className="text-2xl text-muted-foreground text-center">
+                    Click a question to see the answer
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="text-center mt-10">
             <button 

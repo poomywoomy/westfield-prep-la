@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Download } from "lucide-react";
+import { Download, CheckCircle } from "lucide-react";
 
 const LeadMagnet = () => {
   const [email, setEmail] = useState("");
@@ -44,11 +44,19 @@ const LeadMagnet = () => {
     }
   };
 
+  const checklist = [
+    "15 questions to ask before signing with a fulfillment partner",
+    "Pricing models explained (so you don't get surprised)",
+    "Red flags to watch for",
+    "How to evaluate turnaround times and accuracy",
+    "Onboarding checklist"
+  ];
+
   return (
-    <section className="py-20 bg-muted/50">
+    <section className="py-24 bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/10">
       <div className="container mx-auto px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-5 gap-12 items-center">
             {/* Left: Guide Info */}
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">

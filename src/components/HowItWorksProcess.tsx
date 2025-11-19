@@ -8,80 +8,101 @@ const HowItWorksProcess = () => {
   const steps = [
     {
       icon: Package,
+      number: "01",
       title: "RECEIVE",
-      description: "Ship your inventory to our LA warehouse. Same-day receiving."
+      description: "Ship your inventory to our LA warehouse. Same-day receiving with complete photo documentation and ASN verification."
     },
     {
       icon: Database,
+      number: "02",
       title: "STORE",
-      description: "We organize and track your stock in real-time. You always know what's in stock."
+      description: "We organize and track your stock in real-time. Strategic pallet placement and bin organization for fast picking."
     },
     {
       icon: PackageCheck,
+      number: "03",
       title: "FULFILL",
-      description: "When orders come in, we pick products within 24-48 hours."
+      description: "When orders come in, we pick products within 24-48 hours. Quality checks ensure accuracy before packing."
     },
     {
       icon: Truck,
+      number: "04",
       title: "SHIP",
-      description: "We pack with care and ship via the best carrier for speed & cost."
+      description: "We pack with care and ship via the best carrier for speed & cost. Tracking updates sent automatically."
     }
   ];
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-24 bg-gradient-to-b from-background to-muted/30">
       <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 text-foreground">
-            Simple, Streamlined Fulfillment Process
-          </h2>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+              Simple, Streamlined Fulfillment Process
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              From receiving to shipping, we handle every step with precision and speed
+            </p>
+          </div>
 
-          {/* 4-Step Visual Process */}
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
+          {/* Horizontal Timeline */}
+          <div className="space-y-12">
             {steps.map((step, index) => {
               const Icon = step.icon;
+              const isEven = index % 2 === 0;
+              
               return (
                 <div key={index} className="relative">
-                  {/* Connector Line (hidden on last step) */}
-                  {index < steps.length - 1 && (
-                    <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-0.5 bg-primary/30 z-0" />
-                  )}
-                  
-                  <div className="relative bg-card border border-border rounded-xl p-6 text-center hover:shadow-lg transition-all z-10">
-                    <div className="bg-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon className="w-10 h-10 text-primary" />
+                  <div className={`grid lg:grid-cols-2 gap-12 items-center ${!isEven ? 'lg:grid-flow-dense' : ''}`}>
+                    {/* Number & Content */}
+                    <div className={`${!isEven ? 'lg:col-start-2' : ''} space-y-6`}>
+                      <div className="flex items-center gap-6">
+                        <span className="text-8xl md:text-9xl font-bold text-primary/10 leading-none">
+                          {step.number}
+                        </span>
+                        <div className="bg-primary/10 p-6 rounded-2xl">
+                          <Icon className="w-12 h-12 text-primary" />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-3xl md:text-4xl font-bold mb-4 text-card-foreground">
+                          {step.title}
+                        </h3>
+                        <p className="text-lg text-muted-foreground leading-relaxed">
+                          {step.description}
+                        </p>
+                      </div>
                     </div>
-                    
-                    <div className="text-sm font-bold text-primary mb-2">
-                      STEP {index + 1}
+
+                    {/* Visual Element */}
+                    <div className={`${!isEven ? 'lg:col-start-1 lg:row-start-1' : ''}`}>
+                      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-3xl p-12 border border-border/50 h-64 flex items-center justify-center">
+                        <div className="text-center">
+                          <Icon className="w-24 h-24 text-primary/20 mx-auto mb-4" />
+                          <span className="text-6xl font-bold text-primary/10">{step.number}</span>
+                        </div>
+                      </div>
                     </div>
-                    
-                    <h3 className="text-xl font-bold mb-3 text-card-foreground">
-                      {step.title}
-                    </h3>
-                    
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {step.description}
-                    </p>
                   </div>
+
+                  {/* Connector Line (except last) */}
+                  {index < steps.length - 1 && (
+                    <div className="hidden lg:flex justify-center my-8">
+                      <div className="h-24 w-1 bg-gradient-to-b from-primary to-primary/20"></div>
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
 
-          {/* Explanatory Paragraph */}
-          <div className="bg-card border border-border rounded-xl p-8 mb-8">
-            <p className="text-muted-foreground leading-relaxed text-center max-w-4xl mx-auto">
-              Getting started with Westfield is straightforward. Send your inventory to our Los Angeles fulfillment center - we'll receive it same-day and add it to your account. As orders come in from your store, we automatically receive them, pick the products, pack them securely, and ship to your customers. You'll have full visibility into inventory levels, order status, and tracking information throughout the process. Whether you're on Shopify, Amazon, WooCommerce, or another platform, our team handles the logistics while you focus on sales.
-            </p>
-          </div>
-
           {/* CTA */}
-          <div className="text-center">
+          <div className="text-center mt-16">
             <Button 
               size="lg"
               onClick={() => navigate("/contact")}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-12 py-8 text-xl font-bold"
             >
               Schedule Your Onboarding Call
             </Button>
