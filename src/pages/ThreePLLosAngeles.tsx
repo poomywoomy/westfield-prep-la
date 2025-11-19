@@ -32,7 +32,7 @@ const ThreePLLosAngeles = () => {
         <Header />
         
         {/* SECTION 1: Premium Editorial Hero */}
-        <section className="relative py-32 md:py-40 bg-white">
+        <section className="relative pt-48 md:pt-56 pb-32 md:pb-40 bg-white">
           <div className="container mx-auto px-6 md:px-12 max-w-4xl">
             <div className="space-y-8 text-left">
               <h1 className="text-6xl md:text-7xl lg:text-[72px] font-extralight tracking-tight text-foreground leading-[1.1] mb-6">
