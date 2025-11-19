@@ -35,11 +35,11 @@ const FinalCTA = () => {
               <span>1.818.935.5478</span>
             </a>
             <a 
-              href="mailto:hello@westfieldprepcenter.com"
+              href="mailto:info@westfieldprepcenter.com"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <Mail className="w-5 h-5" />
-              <span>hello@westfieldprepcenter.com</span>
+              <span>info@westfieldprepcenter.com</span>
             </a>
           </div>
 

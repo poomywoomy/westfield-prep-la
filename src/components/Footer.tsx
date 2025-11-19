@@ -64,12 +64,12 @@ const Footer = () => {
                   <span className="text-sm">+1 (818) 935-5478</span>
                 </a>
                 <a
-                  href="mailto:hello@westfieldprepcenter.com"
+                  href="mailto:info@westfieldprepcenter.com"
                   className="flex items-start gap-3 hover:text-secondary transition-colors group"
                   aria-label="Email Westfield Prep Center"
                 >
                   <Mail className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">hello@westfieldprepcenter.com</span>
+                  <span className="text-sm">info@westfieldprepcenter.com</span>
                 </a>
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
@@ -82,24 +82,6 @@ const Footer = () => {
             <div className="space-y-4">
               <h4 className="text-lg font-semibold mb-4">Services</h4>
               <div className="space-y-2">
-                <Link
-                  to="/shopify-fulfillment"
-                  className="block text-sm text-white/80 hover:text-secondary transition-colors relative group"
-                >
-                  <span className="relative">
-                    Shopify Fulfillment
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
-                  </span>
-                </Link>
-                <Link
-                  to="/amazon-fba-prep"
-                  className="block text-sm text-white/80 hover:text-secondary transition-colors relative group"
-                >
-                  <span className="relative">
-                    Amazon FBA Prep
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
-                  </span>
-                </Link>
                 <Link
                   to="/services"
                   className="block text-sm text-white/80 hover:text-secondary transition-colors relative group"
