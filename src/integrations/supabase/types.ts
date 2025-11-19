@@ -1331,6 +1331,33 @@ export type Database = {
           },
         ]
       }
+      lead_magnet_downloads: {
+        Row: {
+          created_at: string
+          download_date: string
+          email: string
+          full_name: string
+          guide_type: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          download_date?: string
+          email: string
+          full_name: string
+          guide_type?: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          download_date?: string
+          email?: string
+          full_name?: string
+          guide_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           client_id: string | null
