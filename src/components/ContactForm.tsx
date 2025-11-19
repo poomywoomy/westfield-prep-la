@@ -166,7 +166,7 @@ const ContactForm = () => {
     <section id="contact" className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Get Your Free Quote</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Get Your Quote</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Tell us about your business and get your custom quote within 24 hours
           </p>
@@ -363,7 +363,7 @@ const ContactForm = () => {
               disabled={isSubmitting}
               className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold text-lg py-6"
             >
-              {isSubmitting ? "Submitting..." : "Get Custom Quote"}
+              {isSubmitting ? "Submitting..." : "Get Quote"}
             </Button>
           </form>
         </div>

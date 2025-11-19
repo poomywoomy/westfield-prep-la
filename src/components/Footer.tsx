@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             {/* Main Footer Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
             {/* Company Info */}
             <div className="space-y-4">
               <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
@@ -133,6 +133,49 @@ const Footer = () => {
                 >
                   <span className="relative">
                     Storage & Warehousing
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Sales Channels */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold mb-4">Sales Channels</h4>
+              <div className="space-y-2">
+                <Link
+                  to="/shopify-fulfillment"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors relative group"
+                >
+                  <span className="relative">
+                    Shopify
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+                <Link
+                  to="/amazon-fba-prep"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors relative group"
+                >
+                  <span className="relative">
+                    Amazon FBA
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+                <Link
+                  to="/tiktok-shop-fulfillment"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors relative group"
+                >
+                  <span className="relative">
+                    TikTok Shop
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+                <Link
+                  to="/sales-channels"
+                  className="block text-sm text-white/80 hover:text-secondary transition-colors relative group"
+                >
+                  <span className="relative">
+                    All Channels
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>

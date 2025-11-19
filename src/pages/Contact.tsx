@@ -26,7 +26,7 @@ const Contact = () => {
       <div className="min-h-screen bg-background">
         <Header />
 
-        <main>
+        <main className="pt-32">
           <ContactForm />
         </main>
 
