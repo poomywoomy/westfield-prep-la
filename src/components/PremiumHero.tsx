@@ -39,54 +39,57 @@ const PremiumHero = () => {
   };
 
   return (
-    <section className="relative min-h-[85vh] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#f8f8f9] to-[#f0f0f2]">
+    <section className="relative min-h-[85vh] w-full flex items-center justify-center overflow-hidden bg-[#F7F8F9]">
       {/* Soft gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.03] blur-3xl" />
+      <div 
+        className="absolute inset-0 bg-gradient-to-b from-black/[0.04] via-transparent to-transparent" 
+        style={{ backgroundSize: '100% 70%', backgroundRepeat: 'no-repeat' }} 
+      />
 
       {/* Floating Geometric Shapes */}
       <div className="absolute inset-0 overflow-hidden">
         <ElegantShape
           delay={0.3}
-          width={600}
-          height={140}
+          width={750}
+          height={175}
           rotate={12}
-          gradient="from-primary/[0.10]"
+          gradient="from-primary/[0.22]"
           className="left-[-10%] md:left-[-5%] top-[15%] md:top-[20%]"
         />
 
         <ElegantShape
           delay={0.5}
-          width={500}
-          height={120}
+          width={625}
+          height={150}
           rotate={-15}
-          gradient="from-secondary/[0.10]"
+          gradient="from-secondary/[0.22]"
           className="right-[-5%] md:right-[0%] top-[70%] md:top-[75%]"
         />
 
         <ElegantShape
           delay={0.4}
-          width={300}
-          height={80}
+          width={375}
+          height={100}
           rotate={-8}
-          gradient="from-primary/[0.12]"
+          gradient="from-primary/[0.24]"
           className="left-[5%] md:left-[10%] bottom-[5%] md:bottom-[10%]"
         />
 
         <ElegantShape
           delay={0.6}
-          width={200}
-          height={60}
+          width={250}
+          height={75}
           rotate={20}
-          gradient="from-secondary/[0.08]"
+          gradient="from-secondary/[0.20]"
           className="right-[15%] md:right-[20%] top-[10%] md:top-[15%]"
         />
 
         <ElegantShape
           delay={0.7}
-          width={150}
-          height={40}
+          width={190}
+          height={50}
           rotate={-25}
-          gradient="from-primary/[0.08]"
+          gradient="from-primary/[0.20]"
           className="left-[20%] md:left-[25%] top-[5%] md:top-[10%]"
         />
       </div>
