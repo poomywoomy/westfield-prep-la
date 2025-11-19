@@ -1,20 +1,23 @@
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ShoppingBag, ShoppingCart, Store, Music, Package, Building2, Palette, Hammer } from "lucide-react";
 
 const PlatformCompatibility = () => {
   const navigate = useNavigate();
 
   const ecommercePlatforms = [
-    { name: "Shopify", logo: "🛍️", strength: "Primary" },
-    { name: "WooCommerce", logo: "🛒", strength: "Full" },
-    { name: "BigCommerce", logo: "🏪", strength: "Full" },
-    { name: "TikTok Shop", logo: "🎵", strength: "Growing" },
+    { name: "Shopify", icon: ShoppingBag, strength: "Primary Integration" },
+    { name: "WooCommerce", icon: ShoppingCart, strength: "Full Support" },
+    { name: "BigCommerce", icon: Store, strength: "Full Support" },
+    { name: "TikTok Shop", icon: Music, strength: "Growing Platform" },
   ];
 
   const marketplaces = [
-    { name: "Amazon", logo: "📦", strength: "FBA/FBM" },
-    { name: "Walmart", logo: "🏬", strength: "Full" },
-    { name: "Etsy", logo: "🎨", strength: "Full" },
-    { name: "eBay", logo: "🔨", strength: "Full" }
+    { name: "Amazon", icon: Package, strength: "FBA Specialist" },
+    { name: "Walmart", icon: Building2, strength: "Full Integration" },
+    { name: "Etsy", icon: Palette, strength: "Handmade Focus" },
+    { name: "eBay", icon: Hammer, strength: "Multi-Channel" },
   ];
 
   return (
@@ -23,10 +26,10 @@ const PlatformCompatibility = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Works With Every Platform
+              Seamlessly Integrates With Every Platform You Sell On
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Seamless integration with all major e-commerce platforms and marketplaces. Your orders flow automatically to our warehouse.
+              Connect your store in minutes. Orders flow automatically to our warehouse for fast, accurate fulfillment.
             </p>
           </div>
 
@@ -41,7 +44,9 @@ const PlatformCompatibility = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   
-                  <div className="text-7xl mb-4 group-hover:scale-110 transition-transform relative z-10">{platform.logo}</div>
+                  <div className="mb-4 flex justify-center relative z-10">
+                    <platform.icon className="w-16 h-16 text-primary group-hover:scale-110 transition-transform" />
+                  </div>
                   <div className="text-center font-bold text-xl text-card-foreground mb-2 relative z-10">
                     {platform.name}
                   </div>
@@ -64,7 +69,9 @@ const PlatformCompatibility = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/0 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   
-                  <div className="text-7xl mb-4 group-hover:scale-110 transition-transform relative z-10">{platform.logo}</div>
+                  <div className="mb-4 flex justify-center relative z-10">
+                    <platform.icon className="w-16 h-16 text-secondary group-hover:scale-110 transition-transform" />
+                  </div>
                   <div className="text-center font-bold text-xl text-card-foreground mb-2 relative z-10">
                     {platform.name}
                   </div>

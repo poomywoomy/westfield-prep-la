@@ -28,11 +28,11 @@ const FinalCTA = () => {
           {/* Alternative Contact Options */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
             <a 
-              href="tel:+1234567890" 
+              href="tel:+18189355478" 
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <Phone className="w-5 h-5" />
-              <span>(XXX) XXX-XXXX</span>
+              <span>1.818.935.5478</span>
             </a>
             <a 
               href="mailto:hello@westfieldprepcenter.com"

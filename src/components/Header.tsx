@@ -71,7 +71,7 @@ const Header = () => {
             />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-10">
+          <nav className="hidden lg:flex items-center gap-6">
             <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium text-base">
               Home
             </Link>

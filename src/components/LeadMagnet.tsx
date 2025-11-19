@@ -56,9 +56,9 @@ const LeadMagnet = () => {
     <section className="py-24 bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/10">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-5 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Guide Info */}
-            <div>
+            <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
                 Free Guide: Choosing the Right Fulfillment Partner
               </h2>
