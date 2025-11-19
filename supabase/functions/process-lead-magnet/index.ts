@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "jsr:@supabase/supabase-js@2";
-import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
@@ -25,7 +24,6 @@ const handler = async (req: Request): Promise<Response> => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
     
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const resend = new Resend(resendApiKey);
 
     // Parse and validate request body
     const body = await req.json();
@@ -157,16 +155,27 @@ const handler = async (req: Request): Promise<Response> => {
 </html>
     `;
 
-    const { error: userEmailError } = await resend.emails.send({
-      from: "Westfield Prep Center <hello@resend.dev>", // Replace with your verified domain
-      to: [email],
-      subject: "Your Complete Fulfillment Partner Guide is Ready 📦",
-      html: userEmailHtml,
+    // Send email to user with PDF using Resend API
+    const userEmailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${resendApiKey}`,
+      },
+      body: JSON.stringify({
+        from: "Westfield Prep Center <info@westfieldprepcenter.com>",
+        to: [email],
+        subject: "Your Complete Fulfillment Partner Guide is Ready 📦",
+        html: userEmailHtml,
+      }),
     });
 
-    if (userEmailError) {
-      console.error("User email error:", userEmailError);
+    if (!userEmailResponse.ok) {
+      const errorData = await userEmailResponse.text();
+      console.error("User email error:", userEmailResponse.status, errorData);
       // Don't fail the request if email fails - lead is already stored
+    } else {
+      console.log("User email sent successfully to:", email);
     }
 
     // Send notification to admin
@@ -211,12 +220,27 @@ const handler = async (req: Request): Promise<Response> => {
 </html>
     `;
 
-    await resend.emails.send({
-      from: "Westfield Leads <hello@resend.dev>", // Replace with your verified domain
-      to: ["hello@westfieldprepcenter.com"], // Replace with your admin email
-      subject: `New Lead: ${fullName} downloaded Fulfillment Guide`,
-      html: adminEmailHtml,
+    // Send notification to admin using Resend API
+    const adminEmailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${resendApiKey}`,
+      },
+      body: JSON.stringify({
+        from: "Westfield Leads <info@westfieldprepcenter.com>",
+        to: ["info@westfieldprepcenter.com"],
+        subject: `New Lead: ${fullName} downloaded Fulfillment Guide`,
+        html: adminEmailHtml,
+      }),
     });
+
+    if (!adminEmailResponse.ok) {
+      const errorData = await adminEmailResponse.text();
+      console.error("Admin notification error:", adminEmailResponse.status, errorData);
+    } else {
+      console.log("Admin notification sent successfully");
+    }
 
     console.log(`Lead magnet processed successfully for ${email}`);
 
