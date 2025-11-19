@@ -3,15 +3,69 @@ import { Link } from "react-router-dom";
 import { generateMetaTags } from "@/utils/seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Package, Truck, Zap, Check, X, ArrowRight } from "lucide-react";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import StructuredData from "@/components/StructuredData";
+import { Button } from "@/components/ui/button";
+import { MapPin, Package, Truck, Zap, Check, X, ArrowRight } from "lucide-react";
 
 const ThreePLLosAngeles = () => {
   const meta = generateMetaTags(
     "3PL Los Angeles | Premium Fulfillment Center in Los Angeles",
-    "Strategic Los Angeles 3PL fulfillment center for fast-growing e-commerce brands. Port proximity, same-day handling, West Coast distribution excellence.",
+    "Premium Los Angeles 3PL for fast Shopify fulfillment, same-day receiving, and precise inventory handling. Scale your brand with a reliable LA-based logistics partner.",
     "/3pl-los-angeles",
     "/la-port-logistics.jpg"
   );
+
+  const serviceData = {
+    serviceType: "LogisticsService",
+    name: "Los Angeles 3PL Fulfillment Services",
+    description: "Premium third-party logistics (3PL) services in Los Angeles including Shopify fulfillment, Amazon FBA prep, same-day receiving, inventory management, and multi-channel order processing for e-commerce brands.",
+    features: [
+      "Shopify Fulfillment",
+      "Same-Day Receiving",
+      "Inventory Management",
+      "Multi-Channel Order Processing",
+      "Amazon FBA Prep",
+      "West Coast Distribution",
+      "Real-Time Inventory Tracking",
+      "Custom Packaging & Kitting"
+    ]
+  };
+
+  const faqData = [
+    { 
+      question: "What makes a Los Angeles 3PL better than other locations?", 
+      answer: "Los Angeles 3PL centers offer strategic port proximity (15 minutes from LA/Long Beach ports), access to major carrier hubs, and optimal West Coast distribution. This means faster receiving, lower shipping costs to California customers, and 2-day ground delivery across the western United States." 
+    },
+    { 
+      question: "How quickly can you receive inventory at your LA facility?", 
+      answer: "We offer same-day container processing for shipments received before 2PM PST. Most domestic freight is processed and inventoried within 24 hours of arrival at our Los Angeles warehouse." 
+    },
+    { 
+      question: "Do you integrate with Shopify stores?", 
+      answer: "Yes, we offer seamless Shopify integration with real-time inventory syncing, automatic order imports, and instant tracking number updates. Our system supports multi-location inventory and custom fulfillment rules." 
+    },
+    { 
+      question: "What's your coverage area from Los Angeles?", 
+      answer: "From our LA location, we provide 2-day ground shipping to all West Coast states, 3-day to Mountain states, and 4-5 day coast-to-coast. We also offer expedited air shipping for time-sensitive orders." 
+    },
+    { 
+      question: "Can you handle Amazon FBA prep from your LA warehouse?", 
+      answer: "Yes, we provide full Amazon FBA prep services including FNSKU labeling, polybagging, bubble wrap, carton prep, and direct shipment to Amazon fulfillment centers. We're experienced with all Amazon compliance requirements." 
+    },
+    { 
+      question: "What types of businesses do you work with?", 
+      answer: "We serve DTC brands, Shopify merchants, Amazon FBA sellers, multi-channel retailers, and subscription box companies. Our clients range from startups to established brands shipping 1,000+ orders per month." 
+    },
+    { 
+      question: "How does pricing work for 3PL services in LA?", 
+      answer: "Our pricing is customized based on your volume, storage needs, and service requirements. We offer transparent per-unit receiving fees, monthly storage fees, and per-order fulfillment fees. Contact us for a detailed quote." 
+    },
+    { 
+      question: "Do you offer real-time inventory visibility?", 
+      answer: "Yes, our client portal provides 24/7 access to real-time inventory levels, order status, shipment tracking, and detailed analytics. You can manage your inventory from anywhere with full transparency." 
+    }
+  ];
 
   return (
     <>
@@ -27,27 +81,40 @@ const ThreePLLosAngeles = () => {
         <meta name="twitter:description" content={meta.twitterDescription} />
         <meta name="twitter:image" content={meta.twitterImage} />
       </Helmet>
+      <StructuredData type="organization" />
+      <StructuredData type="service" data={serviceData} />
+      <StructuredData type="faq" data={faqData} />
 
       <div className="min-h-screen bg-background">
         <Header />
+        <Breadcrumbs items={[{ label: "3PL Los Angeles", path: "/3pl-los-angeles" }]} />
         
-        {/* SECTION 1: Premium Editorial Hero */}
-        <section className="relative pt-48 md:pt-56 pb-20 md:pb-24 bg-white">
-          <div className="container mx-auto px-6 md:px-12 max-w-4xl">
-            <div className="space-y-12 text-left">
-              <h1 className="text-6xl md:text-7xl lg:text-[72px] font-light tracking-wide text-foreground leading-[1.1] mb-8 border-l-4 border-primary pl-6 shadow-sm">
-                3PL in Los Angeles
-              </h1>
-              <p className="text-2xl md:text-3xl text-muted-foreground/80 font-light leading-relaxed max-w-3xl">
-                3PL Fulfillment in Los Angeles for Fast-Growing E-Commerce Brands
+        {/* Hero Section */}
+        <section className="relative pt-32 md:pt-40 pb-16 md:pb-20 bg-gradient-to-b from-white via-gray-50/50 to-white">
+          <div className="container mx-auto px-6 md:px-12 max-w-5xl">
+            <div className="space-y-8 text-center">
+              {/* Icon + H1 */}
+              <div className="flex items-center justify-center gap-4">
+                <MapPin className="w-12 h-12 text-primary flex-shrink-0" />
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-wide text-foreground leading-[1.1] border-l-4 border-primary pl-6 shadow-sm">
+                  3PL in Los Angeles
+                </h1>
+              </div>
+              
+              {/* Subtitle/Value Prop */}
+              <p className="text-xl md:text-2xl text-muted-foreground/90 font-light leading-relaxed max-w-3xl mx-auto">
+                Premium fulfillment center for fast-growing e-commerce brands. Same-day receiving, precise inventory handling, and seamless Shopify integration—all from a strategic LA location near major ports.
               </p>
-              <div className="pt-12 space-y-6">
-                <h2 className="text-xl md:text-2xl font-semibold text-foreground">
-                  3PL Services in Los Angeles: Modern Logistics for High-Velocity Brands
-                </h2>
-                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                  Los Angeles is one of the most competitive logistics markets in the country, and growing brands need more than a basic warehouse to scale. A top-tier Los Angeles 3PL gives you the infrastructure, speed, and operational clarity required to keep products moving without bottlenecks, delays, or guesswork. Whether you're fulfilling DTC orders or distributing bulk shipments across multiple channels, partnering with the right LA fulfillment provider positions your business to grow faster and operate with far fewer headaches.
-                </p>
+              
+              {/* CTA Button */}
+              <div className="pt-4">
+                <Button 
+                  size="lg" 
+                  className="text-lg px-8 py-6"
+                  onClick={() => window.location.href = '/contact'}
+                >
+                  Get Your Quote
+                </Button>
               </div>
             </div>
           </div>
