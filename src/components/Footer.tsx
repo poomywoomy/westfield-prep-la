@@ -11,9 +11,9 @@ const Footer = () => {
             {/* Company Info */}
             <div className="space-y-4">
               <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
-              <p className="text-sm text-white/80 leading-relaxed">
+              <h1 className="text-sm text-white/80 leading-relaxed font-normal">
                 Los Angeles Shopify prep center serving e-commerce businesses nationwide
-              </p>
+              </h1>
               <div className="pt-2">
                 <p className="text-sm text-secondary font-semibold">Open 7 Days a Week</p>
                 <p className="text-sm text-white/90">8am - 5pm PT</p>
@@ -64,12 +64,12 @@ const Footer = () => {
                   <span className="text-sm">+1 (818) 935-5478</span>
                 </a>
                 <a
-                  href="mailto:info@westfieldprepcenter.com"
+                  href="mailto:hello@westfieldprepcenter.com"
                   className="flex items-start gap-3 hover:text-secondary transition-colors group"
                   aria-label="Email Westfield Prep Center"
                 >
                   <Mail className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">info@westfieldprepcenter.com</span>
+                  <span className="text-sm">hello@westfieldprepcenter.com</span>
                 </a>
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />

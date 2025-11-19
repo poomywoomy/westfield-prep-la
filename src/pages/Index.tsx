@@ -85,7 +85,8 @@ const Index = () => {
       <StructuredData type="website" />
       <StructuredData type="faq" data={faqData} />
       <div className="min-h-screen">
-        <Header />
+      <Header />
+      <div className="pt-32">
         <Hero />
         
         {/* Phase 3: Value Proposition */}
@@ -136,9 +137,10 @@ const Index = () => {
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-64 w-full" /></div>}>
           <Compliance />
         </Suspense>
-        
-        <Footer />
       </div>
+      </div>
+        
+      <Footer />
     </>
   );
 };
