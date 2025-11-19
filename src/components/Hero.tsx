@@ -10,10 +10,11 @@ const Hero = () => {
     navigate("/contact");
   };
 
-  const stats = [
-    { value: "2pm PST", label: "Same-Day Cutoff" },
-    { value: "100%", label: "Photo-Proof QC" },
-    { value: "< 24hr", label: "Average Turnaround" },
+  const trustBadges = [
+    { icon: "✓", label: "Same-Day Receiving" },
+    { icon: "✓", label: "24-48hr Turnaround" },
+    { icon: "✓", label: "No Minimums" },
+    { icon: "✓", label: "2M+ Orders Fulfilled" },
   ];
 
   return (
@@ -55,20 +56,20 @@ const Hero = () => {
             {/* Left Content */}
             <div className="text-left animate-fade-in">
               <h2 className="text-2xl md:text-3xl mb-4 text-white/95 font-semibold">
-                Grow Faster with Fulfillment That Scales with You
+                Complete Fulfillment & 3PL Services
               </h2>
               
               <p className="text-xl md:text-2xl mb-8 text-white/90 font-light leading-relaxed">
-                Westfield Prep Center helps sellers deliver and scale faster. Every order is documented, every brand is protected.
+                Fast order processing, transparent pricing, and reliable logistics for growing online brands. Same-day receiving. 24-48 hour turnaround. No minimums.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <Button
                   onClick={goToContact}
                   size="lg"
                   className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-7 font-bold shadow-2xl hover:scale-105 transition-all group"
                 >
-                  Get a Quote
+                  Get Free Fulfillment Audit
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button
@@ -81,16 +82,21 @@ const Hero = () => {
                 </Button>
               </div>
 
-              {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/20">
-                {stats.map((stat, index) => (
-                  <div key={index} className="text-left">
-                    <div className="text-2xl md:text-3xl font-bold text-secondary mb-1">
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-white/80">
-                      {stat.label}
-                    </div>
+              {/* Social Proof Line */}
+              <p className="text-white/80 text-sm mb-10 italic">
+                Trusted by 100+ e-commerce brands across California
+              </p>
+
+              {/* Trust Badges Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-white/20">
+                {trustBadges.map((badge, index) => (
+                  <div key={index} className="text-left flex items-start gap-2">
+                    <span className="text-secondary text-xl font-bold flex-shrink-0">
+                      {badge.icon}
+                    </span>
+                    <span className="text-sm text-white/90 font-medium leading-tight">
+                      {badge.label}
+                    </span>
                   </div>
                 ))}
               </div>
