@@ -56,24 +56,24 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Los Angeles 3PL | Multi-Channel Fulfillment for Shopify, Amazon & TikTok</title>
-        <meta name="description" content="Professional Los Angeles 3PL offering same-day shipping, B2B fulfillment, and storage for Shopify, Amazon FBA, TikTok Shop, and all sales channels. Fast turnaround nationwide." />
+        <title>Los Angeles 3PL and Shopify Fulfillment Center</title>
+        <meta name="description" content="LA's leading Shopify 3PL for fast e-commerce fulfillment. Same-day receiving, expert order processing, and no minimums. Get your free fulfillment audit." />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.placename" content="Los Angeles, California" />
         <meta name="geo.position" content="34.0522;-118.2437" />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content="Los Angeles 3PL | Multi-Channel Fulfillment for Shopify, Amazon & TikTok" />
-        <meta property="og:description" content="Professional Los Angeles 3PL offering same-day shipping, B2B fulfillment, and storage for Shopify, Amazon FBA, TikTok Shop, and all sales channels. Fast turnaround nationwide." />
+        <meta property="og:title" content="Los Angeles 3PL and Shopify Fulfillment Center" />
+        <meta property="og:description" content="LA's leading Shopify 3PL for fast e-commerce fulfillment. Same-day receiving, expert order processing, and no minimums. Get your free fulfillment audit." />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
         <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
         <meta property="og:type" content="website" />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Los Angeles 3PL | Multi-Channel Fulfillment for Shopify, Amazon & TikTok" />
-        <meta name="twitter:description" content="Professional Los Angeles 3PL offering same-day shipping, B2B fulfillment, and storage for Shopify, Amazon FBA, TikTok Shop, and all sales channels." />
+        <meta name="twitter:title" content="Los Angeles 3PL and Shopify Fulfillment Center" />
+        <meta name="twitter:description" content="LA's leading Shopify 3PL for fast e-commerce fulfillment. Same-day receiving, expert order processing, and no minimums. Get your free fulfillment audit." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="organization" />
