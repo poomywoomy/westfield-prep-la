@@ -10,10 +10,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Lazy load below-the-fold components
-const WhyChooseUs = lazy(() => import("@/components/WhyChooseUs"));
-const LocationShowcase = lazy(() => import("@/components/LocationShowcase"));
+const ValueProposition = lazy(() => import("@/components/ValueProposition"));
 const Services = lazy(() => import("@/components/Services"));
+const HowItWorksProcess = lazy(() => import("@/components/HowItWorksProcess"));
+const PlatformCompatibility = lazy(() => import("@/components/PlatformCompatibility"));
 const Reviews = lazy(() => import("@/components/Reviews"));
+const LocationShowcase = lazy(() => import("@/components/LocationShowcase"));
+const LeadMagnet = lazy(() => import("@/components/LeadMagnet"));
+const FAQAccordion = lazy(() => import("@/components/FAQAccordion"));
+const FinalCTA = lazy(() => import("@/components/FinalCTA"));
 const Compliance = lazy(() => import("@/components/Compliance"));
 
 const Index = () => {
@@ -83,38 +88,51 @@ const Index = () => {
         <Header />
         <Hero />
         
+        {/* Phase 3: Value Proposition */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <WhyChooseUs />
+          <ValueProposition />
         </Suspense>
         
-        {/* Location-Specific Content Section */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <LocationShowcase />
-        </Suspense>
-        
+        {/* Phase 4: Services Overview */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
           <Services />
         </Suspense>
         
+        {/* Phase 5: How It Works */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <HowItWorksProcess />
+        </Suspense>
+        
+        {/* Phase 6: Platform Compatibility */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <PlatformCompatibility />
+        </Suspense>
+        
+        {/* Phase 7: Testimonials */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
           <Reviews />
         </Suspense>
-      
-        {/* Pricing CTA Section */}
-        <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to Scale Your Fulfillment?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Get a custom quote tailored to your business needs
-            </p>
-            <Button size="lg" onClick={() => navigate("/contact")}>
-              Get Your Free Quote
-            </Button>
-          </div>
-        </section>
-      
+        
+        {/* Phase 8: LA Location */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <LocationShowcase />
+        </Suspense>
+        
+        {/* Phase 9: Lead Magnet */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <LeadMagnet />
+        </Suspense>
+        
+        {/* Phase 10: FAQ */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <FAQAccordion />
+        </Suspense>
+        
+        {/* Phase 11: Final CTA */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <FinalCTA />
+        </Suspense>
+        
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-64 w-full" /></div>}>
           <Compliance />
         </Suspense>

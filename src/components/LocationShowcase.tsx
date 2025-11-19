@@ -7,13 +7,12 @@ const LocationShowcase = () => {
     <section className="py-16 bg-gradient-to-b from-muted/20 to-background">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
-              Los Angeles Prep Center: Professional Fulfillment Nationwide
+              Strategically Located in Los Angeles
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-5">
-              Professional Amazon FBA prep and Shopify fulfillment from Los Angeles, California. Serving all 50 states with fast 2-day shipping to major markets
+              Our Los Angeles fulfillment center is positioned near the Port of LA and major shipping hubs, giving your business a strategic logistics advantage.
             </p>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-border/50">
               <MapPin className="h-4 w-4 text-primary" />
@@ -147,6 +146,44 @@ const LocationShowcase = () => {
               </Card>
             </TabsContent>
           </Tabs>
+
+          {/* Service Areas Section */}
+          <div className="mt-12 bg-card border border-border rounded-xl p-8">
+            <h3 className="text-2xl font-bold mb-6 text-center text-foreground">
+              Service Areas
+            </h3>
+            
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-6">
+              <div>
+                <h4 className="font-semibold text-lg mb-3 text-card-foreground">For Importers:</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  Products arriving from Asia can move directly from port to our warehouse, reducing drayage costs and transit time.
+                </p>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-lg mb-3 text-card-foreground">For Fast Shipping:</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  Ground shipping reaches 90% of the West Coast in 1-2 days, and we offer competitive rates to the East Coast and nationwide.
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-muted/30 rounded-lg p-6">
+              <h4 className="font-semibold mb-3 text-card-foreground">Primary Service Areas:</h4>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-muted-foreground">
+                <div>• Los Angeles County</div>
+                <div>• Orange County</div>
+                <div>• Riverside County</div>
+                <div>• San Bernardino County</div>
+                <div>• Ventura County</div>
+                <div>• San Diego County</div>
+              </div>
+              <p className="mt-4 text-center text-muted-foreground italic">
+                We also serve e-commerce brands nationwide from our LA facility.
+              </p>
+            </div>
+          </div>
 
           {/* Footer */}
           <div className="text-center mt-8">
