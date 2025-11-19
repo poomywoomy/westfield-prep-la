@@ -2,7 +2,7 @@ import { useEffect, useMemo, lazy, Suspense } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
+import PremiumHero from "@/components/PremiumHero";
 import { Button } from "@/components/ui/button";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
@@ -87,7 +87,7 @@ const Index = () => {
       <div className="min-h-screen">
       <Header />
       <div className="pt-32">
-        <Hero />
+        <PremiumHero />
         
         {/* Phase 3: Value Proposition */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
