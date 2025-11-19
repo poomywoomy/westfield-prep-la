@@ -10,10 +10,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Lazy load below-the-fold components
+const PlatformCompatibility = lazy(() => import("@/components/PlatformCompatibility"));
 const ValueProposition = lazy(() => import("@/components/ValueProposition"));
 const Services = lazy(() => import("@/components/Services"));
 const HowItWorksProcess = lazy(() => import("@/components/HowItWorksProcess"));
-const PlatformCompatibility = lazy(() => import("@/components/PlatformCompatibility"));
 const Reviews = lazy(() => import("@/components/Reviews"));
 const LocationShowcase = lazy(() => import("@/components/LocationShowcase"));
 const LeadMagnet = lazy(() => import("@/components/LeadMagnet"));
