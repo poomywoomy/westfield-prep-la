@@ -1,14 +1,19 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Linkedin, Instagram, Twitter } from "lucide-react";
+import logo from "@/assets/westfield-logo-original.jpg";
 const Footer = () => {
-  return <footer className="bg-primary text-white py-16">
+  return <footer className="bg-primary text-white py-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             {/* Main Footer Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-16 mb-12">
             {/* Company Info */}
             <div className="space-y-4">
-              <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
+              <img 
+                src={logo} 
+                alt="Westfield Prep Center Logo" 
+                className="h-14 w-auto object-contain mb-4" 
+              />
               <h1 className="text-sm text-white/80 leading-relaxed font-normal">
                 Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner
               </h1>
