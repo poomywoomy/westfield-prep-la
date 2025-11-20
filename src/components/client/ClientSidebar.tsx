@@ -71,7 +71,6 @@ export const ClientSidebar = ({ activeTab, onTabChange, clientName, onLogout }: 
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">{clientName}</p>
-            <p className="text-xs text-gray-500">Premium Client</p>
           </div>
         </div>
         
