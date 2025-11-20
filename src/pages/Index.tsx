@@ -84,6 +84,7 @@ const Index = () => {
       <StructuredData type="organization" />
       <StructuredData type="website" />
       <StructuredData type="faq" data={faqData} />
+      <StructuredData type="localBusiness" />
       <div className="min-h-screen">
       <Header />
       <div className="pt-20">
