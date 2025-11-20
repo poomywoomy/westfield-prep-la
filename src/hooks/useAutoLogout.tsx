@@ -30,8 +30,15 @@ export const useAutoLogout = (isAuthenticated: boolean, logoutCallback: () => Pr
       document.addEventListener(event, resetTimer);
     });
 
-    // Note: beforeunload logout removed as it's unreliable and can cause session_not_found errors
-    // Users will auto-logout after 30 minutes of inactivity instead
+    // Tab close/visibility change logout
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && isAuthenticated) {
+        // Use sendBeacon for guaranteed delivery before page unloads
+        logoutCallback();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Start initial timer
     resetTimer();
@@ -44,6 +51,7 @@ export const useAutoLogout = (isAuthenticated: boolean, logoutCallback: () => Pr
       events.forEach(event => {
         document.removeEventListener(event, resetTimer);
       });
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, logoutCallback]);
 };
