@@ -31,8 +31,8 @@ const PremiumHero = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 1,
-        delay: 0.5 + i * 0.2,
+        duration: 0.6,
+        delay: 0.5 + i * 0.1,
         ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number],
       },
     }),
@@ -46,10 +46,10 @@ const PremiumHero = () => {
         style={{ backgroundSize: '100% 70%', backgroundRepeat: 'no-repeat' }} 
       />
 
-      {/* Floating Geometric Shapes */}
+      {/* Floating Geometric Shapes - Optimized */}
       <div className="absolute inset-0 overflow-hidden">
         <ElegantShape
-          delay={0.3}
+          delay={0.2}
           width={750}
           height={175}
           rotate={12}
@@ -58,7 +58,7 @@ const PremiumHero = () => {
         />
 
         <ElegantShape
-          delay={0.5}
+          delay={0.3}
           width={625}
           height={150}
           rotate={-15}
@@ -73,24 +73,6 @@ const PremiumHero = () => {
           rotate={-8}
           gradient="from-primary/[0.24]"
           className="left-[5%] md:left-[10%] bottom-[5%] md:bottom-[10%]"
-        />
-
-        <ElegantShape
-          delay={0.6}
-          width={250}
-          height={75}
-          rotate={20}
-          gradient="from-secondary/[0.20]"
-          className="right-[15%] md:right-[20%] top-[10%] md:top-[15%]"
-        />
-
-        <ElegantShape
-          delay={0.7}
-          width={190}
-          height={50}
-          rotate={-25}
-          gradient="from-primary/[0.20]"
-          className="left-[20%] md:left-[25%] top-[5%] md:top-[10%]"
         />
       </div>
 
