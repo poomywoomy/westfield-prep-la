@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { sanitizeString } from "../_shared/input-sanitizer.ts";
+import { isDisposableEmail, validateHoneypot } from "../_shared/security-utils.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -93,6 +94,36 @@ const handler = async (req: Request): Promise<Response> => {
     };
     
     const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, packagingRequirements, timeline, comments, recipientEmail } = sanitizedData;
+    
+    // Honeypot validation (check before rate limiting to avoid wasting resources)
+    if (!validateHoneypot(body.honeypot)) {
+      console.warn('Honeypot triggered for contact form:', req.headers.get('x-forwarded-for'));
+      // Return success to avoid revealing detection
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: "Thank you for contacting us! We'll get back to you soon."
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
+    }
+    
+    // Disposable email detection
+    if (isDisposableEmail(email)) {
+      console.warn('Disposable email detected:', email);
+      return new Response(
+        JSON.stringify({ 
+          error: "Please use a valid business email address. Disposable email addresses are not allowed."
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
     
     // Rate limiting check (5 submissions per hour per IP)
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
