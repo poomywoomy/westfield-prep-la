@@ -130,3 +130,28 @@ All colors MUST be HSL.
 html {
   scroll-behavior: smooth;
 }
+
+@layer components {
+  /* Blog link styling - explicit class for dynamically injected HTML */
+  .blog-link {
+    color: hsl(var(--blog-orange));
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+  }
+  
+  .blog-link:hover {
+    text-decoration: underline;
+    color: hsl(28 100% 45%); /* Slightly darker orange on hover */
+  }
+  
+  .blog-link:visited {
+    color: hsl(28 90% 45%); /* Slightly muted orange for visited links */
+  }
+  
+  .blog-link:focus {
+    outline: 2px solid hsl(var(--blog-orange));
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}

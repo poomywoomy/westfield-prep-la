@@ -45,6 +45,63 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
     console.warn('⚠️ DOMPurify removed', linksBeforeSanitize - linksAfterSanitize, 'links!');
   }
   
+  // Post-process: Add blog-link class to all anchor tags
+  const withStyledLinks = enhancedHtml.replace(
+    /<a\s+([^>]*?)>/gi,
+    (match, attributes) => {
+      // Check if class attribute exists
+      if (/class\s*=\s*["']([^"']*)["']/i.test(attributes)) {
+        // Add blog-link to existing class
+        return match.replace(
+          /class\s*=\s*["']([^"']*)["']/i,
+          (classMatch, existingClasses) => {
+            const classes = existingClasses.trim();
+            return classes.includes('blog-link') 
+              ? classMatch 
+              : `class="${classes} blog-link"`;
+          }
+        );
+      } else {
+        // Add new class attribute
+        return `<a ${attributes} class="blog-link">`;
+      }
+    }
+  );
+  
+  // Post-process: Ensure external links open in new tab with security attributes
+  const finalHtml = withStyledLinks.replace(
+    /<a\s+([^>]*?href\s*=\s*["'](https?:\/\/[^"']+)["'][^>]*?)>/gi,
+    (match, attributes, href) => {
+      // Check if it's an external link (not starting with / or #)
+      const isExternal = /^https?:\/\//i.test(href);
+      
+      if (isExternal) {
+        let updatedAttrs = attributes;
+        
+        // Add target="_blank" if not present
+        if (!/target\s*=/i.test(updatedAttrs)) {
+          updatedAttrs += ' target="_blank"';
+        }
+        
+        // Add rel="noopener noreferrer" if not present
+        if (!/rel\s*=/i.test(updatedAttrs)) {
+          updatedAttrs += ' rel="noopener noreferrer"';
+        } else if (!/noopener/i.test(updatedAttrs)) {
+          updatedAttrs = updatedAttrs.replace(
+            /rel\s*=\s*["']([^"']*)["']/i,
+            (relMatch, relValue) => `rel="${relValue} noopener noreferrer"`
+          );
+        }
+        
+        return `<a ${updatedAttrs}>`;
+      }
+      
+      return match;
+    }
+  );
+  
+  console.log('✅ Post-processed links with blog-link class');
+  
   return (
     <div
       className="prose prose-lg max-w-none animate-fade-in
@@ -80,7 +137,7 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
         [&>details>summary~*]:p-4 [&>details>summary~*]:text-[hsl(var(--blog-gray-blue))]
         [&_hr]:border-[hsl(var(--blog-orange))]/20 [&_hr]:my-8
       "
-      dangerouslySetInnerHTML={{ __html: enhancedHtml }}
+      dangerouslySetInnerHTML={{ __html: finalHtml }}
     />
   );
 };
