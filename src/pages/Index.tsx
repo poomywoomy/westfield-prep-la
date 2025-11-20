@@ -86,7 +86,7 @@ const Index = () => {
       <StructuredData type="faq" data={faqData} />
       <div className="min-h-screen">
       <Header />
-      <div className="pt-32">
+      <div className="pt-20">
         <PremiumHero />
         
         {/* Phase 3: Value Proposition */}
