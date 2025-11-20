@@ -28,12 +28,11 @@ export const ClientSidebar = ({ activeTab, onTabChange, clientName, onLogout }: 
     <aside className="w-64 h-full bg-white border-r border-gray-200 flex flex-col hidden md:flex">
       {/* Logo */}
       <div className="h-20 flex items-center px-8 border-b border-gray-100">
-        <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20 mr-3">
-          <span className="font-bold text-white text-sm">W</span>
-        </div>
-        <span className="text-xl font-bold tracking-tight text-gray-900">
-          Westfield<span className="text-orange-600">Prep</span>
-        </span>
+        <img 
+          src="/westfield-logo.png" 
+          alt="Westfield Prep Center" 
+          className="h-10 w-auto"
+        />
       </div>
 
       {/* Navigation */}

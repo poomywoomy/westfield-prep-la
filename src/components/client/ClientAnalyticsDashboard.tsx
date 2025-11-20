@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useClientIssues } from "@/hooks/useClientIssues";
 import { DamagedItemReviewDialog } from "./DamagedItemReviewDialog";
 import { MissingItemReviewDialog } from "./MissingItemReviewDialog";
@@ -7,9 +8,13 @@ import { SimpleMetricCard } from "./SimpleMetricCard";
 import { OrderVolumeChart } from "./OrderVolumeChart";
 import { OperationalAlertsPanel } from "./OperationalAlertsPanel";
 import { QuickActionsPanel } from "./QuickActionsPanel";
-import { Package, Truck, AlertCircle, RotateCcw } from "lucide-react";
+import { RequestShipmentDialog } from "./RequestShipmentDialog";
+import { ContactSupportDialog } from "./ContactSupportDialog";
+import { ClientASNFormDialog } from "./ClientASNFormDialog";
+import { Package, Truck, AlertCircle, FileText } from "lucide-react";
 import { startOfDay, endOfDay, subDays } from "date-fns";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { useExpectedASNCount } from "@/hooks/useExpectedASNCount";
 
 interface ClientAnalyticsDashboardProps {
   clientId: string;
@@ -18,6 +23,26 @@ interface ClientAnalyticsDashboardProps {
 export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardProps) => {
   const [selectedIssue, setSelectedIssue] = useState<any>(null);
   const [dialogType, setDialogType] = useState<"damaged" | "missing" | "sku" | null>(null);
+  const [showRequestShipment, setShowRequestShipment] = useState(false);
+  const [showContactSupport, setShowContactSupport] = useState(false);
+  const [showAddASN, setShowAddASN] = useState(false);
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
+
+  useEffect(() => {
+    const fetchClientInfo = async () => {
+      const { data } = await supabase
+        .from("clients")
+        .select("email, phone_number")
+        .eq("id", clientId)
+        .single();
+      if (data) {
+        setClientEmail(data.email);
+        setClientPhone(data.phone_number);
+      }
+    };
+    fetchClientInfo();
+  }, [clientId]);
 
   const todayRange = useMemo(() => {
     const now = new Date();
@@ -33,6 +58,7 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
   const returnIssues = useClientIssues(clientId, "return");
   const todayData = useAnalytics(clientId, todayRange);
   const yesterdayData = useAnalytics(clientId, yesterdayRange);
+  const expectedASNCount = useExpectedASNCount(clientId);
 
   const lowStockIssues = useMemo(() => 
     todayData.data?.lowStock.map(item => ({
@@ -76,7 +102,7 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <SimpleMetricCard
-          title="Total Orders"
+          title="Sold Today"
           value={todayData.data?.orders || 0}
           icon={Package}
           trend={calculateTrend(todayData.data?.orders || 0, yesterdayData.data?.orders || 0)}
@@ -97,11 +123,11 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
           iconColor="text-amber-600"
         />
         <SimpleMetricCard
-          title="Returns Active"
-          value={returnIssues.totalCount}
-          icon={RotateCcw}
+          title="Expected ASNs"
+          value={expectedASNCount.count}
+          icon={FileText}
           trend="0%"
-          iconColor="text-red-600"
+          iconColor="text-blue-600"
         />
       </div>
 
@@ -116,7 +142,11 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
             onReviewClick={handleReviewIssue}
           />
         </div>
-        <QuickActionsPanel />
+        <QuickActionsPanel
+          onCreateShipment={() => setShowRequestShipment(true)}
+          onCreateASN={() => setShowAddASN(true)}
+          onContactSupport={() => setShowContactSupport(true)}
+        />
       </div>
 
       {dialogType === "damaged" && selectedIssue && (
@@ -143,6 +173,30 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
           clientId={clientId}
         />
       )}
+
+      <RequestShipmentDialog
+        open={showRequestShipment}
+        onOpenChange={setShowRequestShipment}
+        clientId={clientId}
+      />
+
+      <ContactSupportDialog
+        open={showContactSupport}
+        onOpenChange={setShowContactSupport}
+        clientId={clientId}
+        clientEmail={clientEmail}
+        clientPhone={clientPhone}
+      />
+
+      <ClientASNFormDialog
+        open={showAddASN}
+        onOpenChange={setShowAddASN}
+        clientId={clientId}
+        onSuccess={() => {
+          setShowAddASN(false);
+          expectedASNCount.refetch();
+        }}
+      />
     </>
   );
 };
