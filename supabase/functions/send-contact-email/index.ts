@@ -75,7 +75,23 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
     
-    const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data;
+    
+    // Sanitize all user inputs to prevent XSS attacks
+    const sanitizedData = {
+      name: sanitizeString(validationResult.data.name),
+      email: sanitizeString(validationResult.data.email),
+      phone: sanitizeString(validationResult.data.phone),
+      business: sanitizeString(validationResult.data.business),
+      unitsPerMonth: sanitizeString(validationResult.data.unitsPerMonth),
+      skuCount: sanitizeString(validationResult.data.skuCount),
+      marketplaces: validationResult.data.marketplaces.map((m: string) => sanitizeString(m)),
+      packagingRequirements: sanitizeString(validationResult.data.packagingRequirements),
+      timeline: sanitizeString(validationResult.data.timeline),
+      comments: validationResult.data.comments ? sanitizeString(validationResult.data.comments) : undefined,
+      recipientEmail: sanitizeString(validationResult.data.recipientEmail)
+    };
+    
+    const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, packagingRequirements, timeline, comments, recipientEmail } = sanitizedData;
     
     // Rate limiting check (5 submissions per hour per IP)
     const supabase = createClient(supabaseUrl, supabaseServiceKey);

@@ -30,7 +30,14 @@ const issueCategories = [
 
 const supportTicketSchema = z.object({
   issue_category: z.string().min(1, "Please select an issue category"),
-  issue_description: z.string().trim().min(10, "Please provide at least 10 characters").max(2000, "Maximum 2000 characters"),
+  issue_description: z.string()
+    .trim()
+    .min(10, "Please provide at least 10 characters")
+    .max(2000, "Maximum 2000 characters")
+    .refine(
+      (val) => !/<script|<iframe|onerror|onclick|javascript:/i.test(val),
+      "Invalid characters detected in description"
+    ),
   preferred_contact_method: z.enum(["email", "phone"]),
   contact_email: z.string().email().optional(),
   contact_phone: z.string().optional(),
