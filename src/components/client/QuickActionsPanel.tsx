@@ -5,9 +5,10 @@ import { FilePlus, PlusCircle, LifeBuoy } from "lucide-react";
 interface QuickActionsPanelProps {
   onCreateShipment?: () => void;
   onCreateASN?: () => void;
+  onContactSupport?: () => void;
 }
 
-export const QuickActionsPanel = ({ onCreateShipment, onCreateASN }: QuickActionsPanelProps) => {
+export const QuickActionsPanel = ({ onCreateShipment, onCreateASN, onContactSupport }: QuickActionsPanelProps) => {
   return (
     <Card className="bg-white border border-gray-200 rounded-2xl p-6 relative overflow-hidden shadow-sm">
       {/* Decorative Glow */}
@@ -35,7 +36,7 @@ export const QuickActionsPanel = ({ onCreateShipment, onCreateASN }: QuickAction
 
         <Button
           variant="outline"
-          onClick={() => (window.location.href = "/contact")}
+          onClick={onContactSupport}
           className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 text-gray-700 p-3 rounded-xl font-medium transition-all shadow-sm"
         >
           <LifeBuoy size={18} className="text-gray-400" />

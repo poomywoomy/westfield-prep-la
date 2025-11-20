@@ -25,6 +25,8 @@ const BlogTab = lazy(() => import("@/components/admin/BlogTab").then(m => ({ def
 const DiscrepanciesTab = lazy(() => import("@/components/admin/DiscrepanciesTab").then(m => ({ default: m.DiscrepanciesTab })));
 const OrdersTab = lazy(() => import("@/components/admin/OrdersTab").then(m => ({ default: m.OrdersTab })));
 const ShipmentsTab = lazy(() => import("@/components/admin/ShipmentsTab").then(m => ({ default: m.ShipmentsTab })));
+const ShipmentRequestsTab = lazy(() => import("@/components/admin/ShipmentRequestsTab").then(m => ({ default: m.ShipmentRequestsTab })));
+const SupportTicketsTab = lazy(() => import("@/components/admin/SupportTicketsTab").then(m => ({ default: m.SupportTicketsTab })));
 
 const AdminDashboard = () => {
   const { user, role, loading, logout } = useAuth();
