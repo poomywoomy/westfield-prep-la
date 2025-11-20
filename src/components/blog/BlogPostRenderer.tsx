@@ -15,6 +15,10 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
     '<img loading="lazy" '
   );
   
+  // Debug: Count links before sanitization
+  const linksBeforeSanitize = (htmlWithLazyLoad.match(/<a\s+[^>]*href/gi) || []).length;
+  console.log('🔗 Links BEFORE DOMPurify:', linksBeforeSanitize);
+  
   // Sanitize HTML to prevent XSS attacks (defense-in-depth)
   const enhancedHtml = DOMPurify.sanitize(htmlWithLazyLoad, {
     ALLOWED_TAGS: [
@@ -25,8 +29,21 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
       'table', 'thead', 'tbody', 'tr', 'th', 'td',
       'details', 'summary', 'div'
     ],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'loading', 'open', 'target', 'rel']
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'loading', 'open', 'target', 'rel'],
+    ADD_ATTR: ['target', 'rel'], // Explicitly add these attributes
+    KEEP_CONTENT: true, // Keep content even if tag is removed
+    ALLOW_DATA_ATTR: false,
+    RETURN_DOM: false, // Return string, not DOM
+    RETURN_DOM_FRAGMENT: false
   });
+  
+  // Debug: Count links after sanitization
+  const linksAfterSanitize = (enhancedHtml.match(/<a\s+[^>]*href/gi) || []).length;
+  console.log('🔗 Links AFTER DOMPurify:', linksAfterSanitize);
+  
+  if (linksBeforeSanitize !== linksAfterSanitize) {
+    console.warn('⚠️ DOMPurify removed', linksBeforeSanitize - linksAfterSanitize, 'links!');
+  }
   
   return (
     <div
