@@ -56,6 +56,7 @@ export const ContactSupportDialog = ({
   const [contactMethod, setContactMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState(clientEmail);
   const [phone, setPhone] = useState(clientPhone);
+  const [honeypot, setHoneypot] = useState(""); // Bot detection
   const { toast } = useToast();
 
   useEffect(() => {
@@ -107,6 +108,7 @@ export const ContactSupportDialog = ({
             preferred_contact_method: validatedData.preferred_contact_method,
             contact_email: contactMethod === "email" ? email : null,
             contact_phone: contactMethod === "phone" ? phone : null,
+            honeypot: honeypot, // Bot detection
           },
         }
       );
@@ -223,6 +225,18 @@ export const ContactSupportDialog = ({
               />
             </div>
           )}
+          
+          {/* Honeypot field - hidden from users, filled by bots */}
+          <Input
+            type="text"
+            name="website"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            className="absolute left-[-9999px]"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+          />
         </div>
 
         <DialogFooter>

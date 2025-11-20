@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { sanitizeString } from '../_shared/input-sanitizer.ts';
+import { checkRateLimit, validateHoneypot } from '../_shared/security-utils.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,8 +17,38 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+    // Get client IP for rate limiting
+    const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
+    
+    // Rate limiting: 3 support tickets per hour per IP
+    const rateLimitKey = `support_ticket:${clientIp}`;
+    const rateLimit = await checkRateLimit(supabaseUrl, supabaseServiceKey, rateLimitKey, 3, 60);
+    
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Too many support ticket submissions. Please try again later.' }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Sanitize all inputs to prevent XSS
     const rawData = await req.json();
+    
+    // Honeypot validation
+    if (!validateHoneypot(rawData.honeypot)) {
+      console.warn('Honeypot triggered for support ticket:', clientIp);
+      // Return success to avoid revealing detection
+      return new Response(
+        JSON.stringify({ success: true, message: "Support ticket received" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
+    }
     
     const sanitizedData = {
       ticket_id: sanitizeString(rawData.ticket_id),
