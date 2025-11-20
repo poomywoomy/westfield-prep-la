@@ -23,7 +23,7 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
       'code', 'pre', 'img', 'blockquote',
       'strong', 'em', 'br', 'hr',
       'table', 'thead', 'tbody', 'tr', 'th', 'td',
-      'details', 'summary'
+      'details', 'summary', 'div'
     ],
     ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'loading', 'open', 'target', 'rel']
   });
