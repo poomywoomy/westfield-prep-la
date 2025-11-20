@@ -11,9 +11,9 @@ const GoogleAnalytics = () => {
     if (!user) {
       // Defer GA loading until after page interactive
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => setShouldLoad(true), { timeout: 2000 });
+        requestIdleCallback(() => setShouldLoad(true), { timeout: 3000 });
       } else {
-        setTimeout(() => setShouldLoad(true), 2000);
+        setTimeout(() => setShouldLoad(true), 3000);
       }
     }
   }, [user]);
