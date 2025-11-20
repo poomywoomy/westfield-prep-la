@@ -92,3 +92,6 @@ verify_jwt = true
 
 [functions.shopify-reconcile-inventory-bulk]
 verify_jwt = true
+
+[functions.log-audit-event]
+verify_jwt = true
