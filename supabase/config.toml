@@ -1,5 +1,14 @@
 project_id = "gqnvkecmxjijrxhggcro"
 
+[functions.validate-file-upload]
+verify_jwt = true
+
+[functions.cleanup-oauth-states]
+verify_jwt = false
+
+[[functions.cleanup-oauth-states.schedule]]
+cron = "0 3 * * *"
+
 [functions.import-blog-post]
 verify_jwt = true
 
