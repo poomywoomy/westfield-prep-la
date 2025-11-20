@@ -6,8 +6,8 @@ interface BlogPostRendererProps {
 }
 
 export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
-  // Convert markdown to HTML before rendering
-  const htmlContent = parseMarkdown(content);
+  // Content is already HTML, no need to parse markdown
+  const htmlContent = content;
   
   // Add lazy loading to all images
   const htmlWithLazyLoad = htmlContent.replace(
