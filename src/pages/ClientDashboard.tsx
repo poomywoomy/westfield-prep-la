@@ -1,17 +1,12 @@
 import { useEffect, useState, lazy, Suspense } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, LogOut, Settings, ChevronDown, Package, Activity } from "lucide-react";
-import westfieldLogo from "@/assets/westfield-logo.png";
+import { Search, Bell } from "lucide-react";
 import { sanitizeError } from "@/lib/errorHandler";
 import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
+import { ClientSidebar } from "@/components/client/ClientSidebar";
 import type { Database } from "@/integrations/supabase/types";
 
 // Lazy load tab components for better performance
@@ -30,6 +25,7 @@ const ClientDashboard = () => {
   const [clientName, setClientName] = useState<string>("");
   const [clientId, setClientId] = useState<string>("");
   const [showSKUDialog, setShowSKUDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("analytics");
 
 
   useEffect(() => {
@@ -185,7 +181,7 @@ const ClientDashboard = () => {
 
           {activeTab === "asns" && (
             <Suspense fallback={<div className="flex justify-center items-center h-64">Loading ASNs...</div>}>
-              <ClientASNsTab />
+              <ClientASNsTab clientId={clientId} />
             </Suspense>
           )}
 
@@ -203,29 +199,23 @@ const ClientDashboard = () => {
 
           {activeTab === "billing" && (
             <Suspense fallback={<div className="flex justify-center items-center h-64">Loading billing...</div>}>
-              <ClientBillingTab clientId={clientId} />
+              <ClientBillingTab />
             </Suspense>
           )}
 
-      <SKUFormDialog 
-        open={showSKUDialog}
-        onClose={() => setShowSKUDialog(false)}
-        sku={null}
-        clients={[]}
-        isClientView={true}
-        presetClientId={clientId}
-      />
-        </div>
-      </main>
-
-      {/* SKU Dialog */}
       {showSKUDialog && (
-        <SKUFormDialog
+        <SKUFormDialog 
           open={showSKUDialog}
           onClose={() => setShowSKUDialog(false)}
           sku={null}
+          clients={[]}
+          isClientView={true}
+          presetClientId={clientId}
         />
       )}
+        </div>
+      </main>
+
     </div>
   );
 };
