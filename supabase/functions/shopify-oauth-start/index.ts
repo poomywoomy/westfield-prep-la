@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify authentication (JWT verified by Supabase)
+    // Verify authentication using centralized middleware
     const { user, supabase } = await requireAuth(req);
     
     const { shop } = await req.json();

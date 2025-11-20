@@ -273,10 +273,20 @@ export const ClientASNFormDialog = ({
                     <Input
                       type="number"
                       min="1"
+                      max="100000"
                       value={line.expected_units}
-                      onChange={(e) =>
-                        updateLine(index, "expected_units", parseInt(e.target.value) || 1)
-                      }
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value) || 1;
+                        if (value > 100000) {
+                          toast({
+                            title: "Invalid Quantity",
+                            description: "Maximum quantity is 100,000 units",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        updateLine(index, "expected_units", value);
+                      }}
                       placeholder="Qty"
                     />
                   </div>

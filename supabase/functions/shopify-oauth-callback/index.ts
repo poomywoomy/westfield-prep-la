@@ -56,12 +56,12 @@ Deno.serve(async (req) => {
       throw new Error('Missing required OAuth parameters');
     }
 
-    // Validate state parameter to prevent session hijacking
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    );
+    // Verify authentication using centralized middleware
+    const { user, supabase } = await requireAuth(req);
 
+    console.log('OAuth callback authenticated for user:', user.id);
+
+    // Validate state parameter to prevent session hijacking
     const { data: stateRecord, error: stateError } = await supabase
       .from('oauth_states')
       .select('user_id, expires_at, frontend_origin')
@@ -81,12 +81,17 @@ Deno.serve(async (req) => {
       throw new Error('OAuth state expired');
     }
 
-    const userId = stateRecord.user_id;
+    // Verify state matches authenticated user
+    if (stateRecord.user_id !== user.id) {
+      console.error('State user mismatch - potential attack');
+      await supabase.from('oauth_states').delete().eq('state', state);
+      throw new Error('Invalid OAuth state');
+    }
 
     // Clean up used state
     await supabase.from('oauth_states').delete().eq('state', state);
 
-    console.log('State validated for user:', userId);
+    console.log('State validated for user:', user.id);
 
     const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
     const clientSecret = Deno.env.get('SHOPIFY_CLIENT_SECRET');
@@ -118,7 +123,7 @@ Deno.serve(async (req) => {
     const { data: client } = await supabase
       .from('clients')
       .select('id')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .single();
 
     if (!client) {
