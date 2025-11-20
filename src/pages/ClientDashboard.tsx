@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Bell } from "lucide-react";
+import { Bell } from "lucide-react";
+import { GlobalSearch } from "@/components/client/GlobalSearch";
 import { sanitizeError } from "@/lib/errorHandler";
 import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
 import { ClientSidebar } from "@/components/client/ClientSidebar";
@@ -144,12 +145,10 @@ const ClientDashboard = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                placeholder="Search orders, ASNs, SKUs..."
-                className="bg-gray-100 border border-gray-200 rounded-full py-2 pl-10 pr-4 text-sm text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white transition-all w-64"
+            <div className="flex-1 max-w-md hidden md:block">
+              <GlobalSearch 
+                clientId={clientId} 
+                onNavigate={(tab) => setActiveTab(tab)} 
               />
             </div>
             <button className="relative p-2 text-gray-500 hover:text-orange-600 transition-colors">

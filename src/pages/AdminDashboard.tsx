@@ -196,6 +196,18 @@ const AdminDashboard = () => {
               <DocumentGeneratorTab />
             </Suspense>
           </TabsContent>
+
+          <TabsContent value="shipment-requests">
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ShipmentRequestsTab />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="support-tickets">
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <SupportTicketsTab />
+            </Suspense>
+          </TabsContent>
         </Tabs>
 
         {/* Floating Action Button */}
