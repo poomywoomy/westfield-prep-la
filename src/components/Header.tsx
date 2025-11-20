@@ -54,8 +54,8 @@ const Header = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 border-b ${
         isScrolled 
-          ? "bg-black/60 backdrop-blur-xl border-white/10 py-3" 
-          : "bg-transparent border-transparent py-5"
+          ? "bg-black/60 backdrop-blur-xl border-white/10 py-2" 
+          : "bg-transparent border-transparent py-3"
       }`}
       style={{ transform: 'translateZ(0)' }}
     >
@@ -76,21 +76,21 @@ const Header = () => {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-6">
-            <Link to="/" className="text-gray-300 hover:text-white transition-colors font-medium text-base relative group">
-              Home
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full"></span>
+            <Link to="/" className="text-gray-200 hover:text-white transition-colors font-medium text-base relative group">
+              <span className="relative z-10">Home</span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full z-0"></span>
             </Link>
             
-            <Link to="/3pl-los-angeles" className="text-gray-300 hover:text-white transition-colors font-medium text-base relative group">
-              3PL Los Angeles
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full"></span>
+            <Link to="/3pl-los-angeles" className="text-gray-200 hover:text-white transition-colors font-medium text-base relative group">
+              <span className="relative z-10">3PL Los Angeles</span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full z-0"></span>
             </Link>
 
             {/* About Dropdown */}
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-base font-medium text-gray-300 hover:text-white">
+                  <NavigationMenuTrigger className="text-base font-medium text-gray-200 hover:text-white bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">
                     About
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -99,7 +99,7 @@ const Header = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/why-choose-us"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-orange-500/10 text-gray-300 hover:text-white"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-orange-500/10 text-gray-200 hover:text-white"
                           >
                             <div className="text-sm font-medium leading-none">Why Choose Us</div>
                             <p className="line-clamp-2 text-sm leading-snug text-gray-400">
@@ -112,7 +112,7 @@ const Header = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/testimonials"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-orange-500/10 text-gray-300 hover:text-white"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-orange-500/10 text-gray-200 hover:text-white"
                           >
                             <div className="text-sm font-medium leading-none">Testimonials</div>
                             <p className="line-clamp-2 text-sm leading-snug text-gray-400">
@@ -127,13 +127,13 @@ const Header = () => {
               </NavigationMenuList>
             </NavigationMenu>
 
-            <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors font-medium text-base relative group">
-              Pricing
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full"></span>
+            <Link to="/pricing" className="text-gray-200 hover:text-white transition-colors font-medium text-base relative group">
+              <span className="relative z-10">Pricing</span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full z-0"></span>
             </Link>
-            <Link to="/blog" className="text-gray-300 hover:text-white transition-colors font-medium text-base relative group">
-              Blog
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full"></span>
+            <Link to="/blog" className="text-gray-200 hover:text-white transition-colors font-medium text-base relative group">
+              <span className="relative z-10">Blog</span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full z-0"></span>
             </Link>
           </nav>
 
@@ -177,42 +177,42 @@ const Header = () => {
           <div className="flex flex-col p-6 gap-4">
             <Link 
               to="/" 
-              className="text-lg font-medium text-gray-300 hover:text-orange-500 transition-colors"
+              className="text-lg font-medium text-gray-200 hover:text-orange-500 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link 
               to="/3pl-los-angeles" 
-              className="text-lg font-medium text-gray-300 hover:text-orange-500 transition-colors"
+              className="text-lg font-medium text-gray-200 hover:text-orange-500 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               3PL Los Angeles
             </Link>
             <Link 
               to="/why-choose-us" 
-              className="text-lg font-medium text-gray-300 hover:text-orange-500 transition-colors pl-4"
+              className="text-lg font-medium text-gray-200 hover:text-orange-500 transition-colors pl-4"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Why Choose Us
             </Link>
             <Link 
               to="/testimonials" 
-              className="text-lg font-medium text-gray-300 hover:text-orange-500 transition-colors pl-4"
+              className="text-lg font-medium text-gray-200 hover:text-orange-500 transition-colors pl-4"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Testimonials
             </Link>
             <Link 
               to="/pricing" 
-              className="text-lg font-medium text-gray-300 hover:text-orange-500 transition-colors"
+              className="text-lg font-medium text-gray-200 hover:text-orange-500 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Pricing
             </Link>
             <Link 
               to="/blog" 
-              className="text-lg font-medium text-gray-300 hover:text-orange-500 transition-colors"
+              className="text-lg font-medium text-gray-200 hover:text-orange-500 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Blog
