@@ -138,13 +138,9 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
       {dialogType === "sku" && selectedIssue && (
         <SKUDetailDialog
           open={true}
-          onClose={handleCloseDialog}
-          sku={{
-            id: selectedIssue.sku_id,
-            client_sku: selectedIssue.client_sku,
-            title: selectedIssue.title,
-            image_url: selectedIssue.image_url,
-          }}
+          onOpenChange={(open) => !open && handleCloseDialog()}
+          skuId={selectedIssue.sku_id}
+          clientId={clientId}
         />
       )}
     </>
