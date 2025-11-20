@@ -191,61 +191,6 @@ export function BlogPostSchema({
     totalTime: `PT${readingTimeMinutes}M`
   } : null;
 
-  // Explicit FAQ schema for specific posts
-  const getExplicitFAQSchema = () => {
-    if (slug === 'shopify-3pl-los-angeles') {
-      return {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What is a Shopify 3PL?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "A Shopify 3PL is a fulfillment partner that stores inventory, processes orders, ships packages, and integrates directly with Shopify for real-time syncing of orders, tracking, and inventory updates."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Why choose a Los Angeles Shopify 3PL?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Los Angeles provides unmatched logistics advantages including proximity to the Port of LA and Long Beach, fast West Coast delivery, access to UPS, FedEx, and USPS hubs, and lower inbound freight costs."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How fast is fulfillment?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Most Shopify-native 3PLs in Los Angeles fulfill orders within 24 to 48 hours with same-day carrier drop-offs and fast first scans."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Do you support bundles and kits?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes. Westfield supports Shopify bundles, multi-SKU kits, subscription box builds, and custom-branded packaging workflows."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Do you offer same-day receiving?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes. Inventory arriving before cutoff is received, inspected, and synced to Shopify the same day."
-            }
-          }
-        ]
-      };
-    }
-    return null;
-  };
-
-  const explicitFAQSchema = getExplicitFAQSchema();
-
   return (
     <Helmet>
       <script type="application/ld+json">
@@ -262,11 +207,6 @@ export function BlogPostSchema({
       {howToSchema && (
         <script type="application/ld+json">
           {JSON.stringify(howToSchema)}
-        </script>
-      )}
-      {explicitFAQSchema && (
-        <script type="application/ld+json">
-          {JSON.stringify(explicitFAQSchema)}
         </script>
       )}
     </Helmet>

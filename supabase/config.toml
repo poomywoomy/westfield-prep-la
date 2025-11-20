@@ -1,14 +1,5 @@
 project_id = "gqnvkecmxjijrxhggcro"
 
-[functions.validate-file-upload]
-verify_jwt = true
-
-[functions.cleanup-oauth-states]
-verify_jwt = false
-
-[[functions.cleanup-oauth-states.schedule]]
-cron = "0 3 * * *"
-
 [functions.import-blog-post]
 verify_jwt = true
 
@@ -24,9 +15,6 @@ verify_jwt = false
 [functions.send-password-reset]
 verify_jwt = false
 
-[functions.send-support-ticket-email]
-verify_jwt = false
-
 [functions.change-password]
 verify_jwt = true
 
@@ -34,10 +22,10 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.shopify-oauth-start]
-verify_jwt = true
+verify_jwt = false
 
 [functions.shopify-oauth-callback]
-verify_jwt = true
+verify_jwt = false
 
 [functions.shopify-sync-products]
 verify_jwt = true
@@ -91,7 +79,4 @@ cron = "0 2 * * *"
 verify_jwt = true
 
 [functions.shopify-reconcile-inventory-bulk]
-verify_jwt = true
-
-[functions.log-audit-event]
 verify_jwt = true

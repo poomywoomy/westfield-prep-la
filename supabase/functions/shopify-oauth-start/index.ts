@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,31 +11,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Create Supabase client with user's auth token
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    );
-
-    // Verify authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      console.error('Authentication failed:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    
     const { shop } = await req.json();
 
-    console.log('Starting OAuth flow for shop:', shop, 'User:', user.id);
+    console.log('Starting OAuth flow for shop:', shop);
 
     if (!shop) {
       console.error('No shop domain provided');
@@ -45,33 +23,35 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Validate and sanitize frontend origin against allowlist
-    const allowedOrigins = [
-      Deno.env.get('FRONTEND_URL'),
-      'http://localhost:5173',
-      'http://localhost:8080',
-      '.lovableproject.com',
-    ];
+    // Capture frontend origin for redirect after OAuth
+    const frontendOrigin = req.headers.get('Referer') || req.headers.get('Origin') || '';
+    const origin = frontendOrigin ? new URL(frontendOrigin).origin : '';
     
-    const referer = req.headers.get('Referer') || req.headers.get('Origin') || '';
-    let origin = '';
+    console.log('Captured frontend origin:', origin);
+
+    // Get authenticated user for state validation
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     
-    if (referer) {
-      try {
-        const refererUrl = new URL(referer);
-        const isAllowed = allowedOrigins.some(allowed => 
-          allowed && (refererUrl.origin === allowed || refererUrl.hostname.endsWith(allowed))
-        );
-        
-        if (isAllowed) {
-          origin = refererUrl.origin;
-          console.log('Validated frontend origin:', origin);
-        } else {
-          console.warn('Unrecognized origin:', refererUrl.origin);
-        }
-      } catch (e) {
-        console.error('Invalid referer URL:', e);
-      }
+    if (userError || !user) {
+      console.error('Failed to authenticate user:', userError);
+      return new Response(
+        JSON.stringify({ error: 'Authentication failed' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
@@ -119,15 +99,9 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Error starting OAuth:', error);
-    
-    // Return generic error message to client
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const statusCode = errorMessage.includes('Authentication') ? 401 : 
-                       errorMessage.includes('required') ? 400 : 500;
-    
     return new Response(
-      JSON.stringify({ error: errorMessage || 'Failed to start OAuth flow' }),
-      { status: statusCode, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: 'Failed to start OAuth flow' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

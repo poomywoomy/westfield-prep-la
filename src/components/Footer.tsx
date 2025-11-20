@@ -1,19 +1,14 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Linkedin, Instagram, Twitter } from "lucide-react";
-import logo from "@/assets/westfield-logo-original.jpg";
 const Footer = () => {
-  return <footer className="bg-primary text-white py-20">
+  return <footer className="bg-primary text-white py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             {/* Main Footer Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-16 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
             {/* Company Info */}
             <div className="space-y-4">
-              <img 
-                src={logo} 
-                alt="Westfield Prep Center Logo" 
-                className="h-14 w-auto object-contain mb-4" 
-              />
+              <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
               <h1 className="text-sm text-white/80 leading-relaxed font-normal">
                 Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner
               </h1>
@@ -92,31 +87,6 @@ const Footer = () => {
                 <Link to="/storage-warehousing" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
                     Storage & Warehousing
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
-                  </span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Resources */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold mb-4">Resources</h4>
-              <div className="space-y-2">
-                <Link to="/shopify-3pl-los-angeles" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
-                  <span className="relative">
-                    Shopify 3PL Guide
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
-                  </span>
-                </Link>
-                <Link to="/blog" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
-                  <span className="relative">
-                    Blog
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
-                  </span>
-                </Link>
-                <Link to="/faq" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
-                  <span className="relative">
-                    FAQ
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>

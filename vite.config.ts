@@ -62,25 +62,13 @@ export default defineConfig(({ mode }) => ({
           'charts': ['recharts'],
           
           // Date & Time
-          'date': ['date-fns', 'date-fns-tz', 'react-day-picker'],
-          
-          // Animations
-          'animations': ['framer-motion'],
-          
-          // Blog
-          'blog': ['marked', 'dompurify', 'highlight.js']
+          'date': ['date-fns', 'date-fns-tz', 'react-day-picker']
         },
       },
     },
     chunkSizeWarningLimit: 1000,
     cssCodeSplit: true,
-    minify: mode === 'production' ? 'terser' : 'esbuild',
-    terserOptions: mode === 'production' ? {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    } : undefined,
+    minify: 'esbuild',
     sourcemap: mode === 'development',
     target: 'es2020',
   },

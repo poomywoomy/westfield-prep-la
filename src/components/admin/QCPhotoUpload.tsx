@@ -29,20 +29,6 @@ export function QCPhotoUpload({ lineId, asnNumber, clientId, onPhotosUploaded, e
   }, [photos]);
 
   const uploadPhoto = async (file: File) => {
-    // Server-side validation (critical security check)
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const { data: validationData, error: validationError } = await supabase.functions
-      .invoke('validate-file-upload', {
-        body: formData,
-      });
-
-    if (validationError || !validationData?.valid) {
-      console.error('Server validation failed:', validationError || validationData?.error);
-      throw new Error(validationData?.error || 'File validation failed');
-    }
-
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `${asnNumber}/${lineId}/${fileName}`;
@@ -87,8 +73,8 @@ export function QCPhotoUpload({ lineId, asnNumber, clientId, onPhotosUploaded, e
         toast.error(`${file.name} is not an image file`);
         return false;
       }
-      if (file.size > 20 * 1024 * 1024) {
-        toast.error(`${file.name} is too large (max 20MB)`);
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 10MB)`);
         return false;
       }
       return true;
@@ -197,7 +183,7 @@ export function QCPhotoUpload({ lineId, asnNumber, clientId, onPhotosUploaded, e
               {uploading ? 'Uploading...' : 'Drop images here or click to browse'}
             </span>
             <p className="text-muted-foreground mt-1">
-              PNG, JPG, WEBP, GIF up to 20MB
+              PNG, JPG up to 10MB
             </p>
           </div>
         </div>

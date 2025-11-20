@@ -102,53 +102,28 @@ const BlogPost = () => {
   return (
     <>
       <Helmet>
-        <title>
-          {post.slug === 'shopify-3pl-los-angeles' 
-            ? 'Shopify 3PL Los Angeles | Fast Shopify Fulfillment Center - Westfield'
-            : `${post.title} | Westfield Prep Center Blog`
-          }
-        </title>
+        <title>{post.title} | Westfield Prep Center Blog</title>
         <meta name="description" content={post.meta_description || post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
         <link rel="canonical" href={`https://westfieldprepcenter.com/blog/${post.slug}`} />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content={
-          post.slug === 'shopify-3pl-los-angeles'
-            ? 'Shopify 3PL Los Angeles | Fast Fulfillment Center - Westfield'
-            : post.title
-        } />
-        <meta property="og:description" content={
-          post.slug === 'shopify-3pl-los-angeles'
-            ? 'Westfield is a Shopify-native 3PL in Los Angeles offering fast, accurate fulfillment, real-time syncing, and same-day receiving for growing Shopify brands.'
-            : (post.meta_description || post.excerpt || "")
-        } />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.meta_description || post.excerpt || ""} />
         <meta property="og:url" content={`https://westfieldprepcenter.com/blog/${post.slug}`} />
-        {post.slug === 'shopify-3pl-los-angeles' ? (
-          <meta property="og:image" content="https://westfieldprepcenter.com/images/shopify-3pl-la.jpg" />
-        ) : post.cover_image_url ? (
+        {post.cover_image_url && (
           <meta property="og:image" content={post.cover_image_url.startsWith('http') ? post.cover_image_url : `${window.location.origin}${post.cover_image_url}`} />
-        ) : null}
+        )}
         <meta property="og:type" content="article" />
         {post.published_at && <meta property="article:published_time" content={post.published_at} />}
         {post.category && <meta property="article:section" content={post.category} />}
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={
-          post.slug === 'shopify-3pl-los-angeles'
-            ? 'Shopify 3PL Los Angeles | Fast Fulfillment Center - Westfield'
-            : post.title
-        } />
-        <meta name="twitter:description" content={
-          post.slug === 'shopify-3pl-los-angeles'
-            ? 'Westfield is a Shopify-native 3PL in Los Angeles offering fast, accurate fulfillment, real-time syncing, and same-day receiving for growing Shopify brands.'
-            : (post.meta_description || post.excerpt || `Read ${post.title} on Westfield Prep Center blog`)
-        } />
-        {post.slug === 'shopify-3pl-los-angeles' ? (
-          <meta name="twitter:image" content="https://westfieldprepcenter.com/images/shopify-3pl-la.jpg" />
-        ) : post.cover_image_url ? (
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.meta_description || post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
+        {post.cover_image_url && (
           <meta name="twitter:image" content={post.cover_image_url.startsWith('http') ? post.cover_image_url : `${window.location.origin}${post.cover_image_url}`} />
-        ) : null}
+        )}
       </Helmet>
 
       {/* Enhanced 2025-compliant JSON-LD Schema for Google Rich Results */}

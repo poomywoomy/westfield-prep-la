@@ -262,18 +262,16 @@ export function EnhancedOrderFulfillmentDialog({
               console.error(`Failed to sync inventory for SKU ${sku.client_sku}:`, lastError);
               
               // Log failed push to audit log
-              await supabase.functions.invoke('log-audit-event', {
-                body: {
-                  user_id: clientId,
-                  action: 'shopify_inventory_push_failed',
-                  table_name: 'inventory_ledger',
-                  record_id: sku.id,
-                  new_data: {
-                    error: lastError instanceof Error ? lastError.message : JSON.stringify(lastError),
-                    order_id: order.shopify_order_id,
-                    attempt: 'final'
-                  }
-                }
+              await supabase.from('audit_log').insert({
+                user_id: clientId,
+                action: 'shopify_inventory_push_failed',
+                table_name: 'inventory_ledger',
+                record_id: sku.id,
+                new_data: { 
+                  error: lastError instanceof Error ? lastError.message : JSON.stringify(lastError),
+                  order_id: order.shopify_order_id,
+                  attempt: 'final'
+                },
               });
             }
           } else {

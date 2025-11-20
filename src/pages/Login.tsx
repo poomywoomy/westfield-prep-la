@@ -23,7 +23,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
-  const [resetHoneypot, setResetHoneypot] = useState(""); // Bot detection
   const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -153,16 +152,14 @@ const Login = () => {
           )
         ).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
 
-        await supabase.functions.invoke('log-audit-event', {
-          body: {
-            action: 'FAILED_LOGIN',
-            table_name: 'auth.users',
-            new_data: {
-              email,
-              error_message: 'Authentication failed',
-              timestamp: new Date().toISOString(),
-              user_agent_hash: userAgentHash,
-            }
+        await supabase.from('audit_log').insert({
+          action: 'FAILED_LOGIN',
+          table_name: 'auth.users',
+          new_data: {
+            email,
+            error_message: 'Authentication failed', // Generic message to prevent info leakage
+            timestamp: new Date().toISOString(),
+            user_agent_hash: userAgentHash, // Hashed instead of raw user agent
           }
         });
       } catch (logError) {
@@ -215,7 +212,6 @@ const Login = () => {
         body: {
           email: resetEmail,
           redirectUrl: redirectUrl,
-          honeypot: resetHoneypot, // Bot detection
         },
       });
 
@@ -345,19 +341,6 @@ const Login = () => {
                   disabled={resetLoading}
                 />
               </div>
-              
-              {/* Honeypot field - hidden from users, filled by bots */}
-              <Input
-                type="text"
-                name="website"
-                value={resetHoneypot}
-                onChange={(e) => setResetHoneypot(e.target.value)}
-                className="absolute left-[-9999px]"
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-              />
-              
               <Button
                 type="submit"
                 className="w-full"

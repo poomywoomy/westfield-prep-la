@@ -63,12 +63,9 @@ export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, auth
   const titleNumber = extractNumber(title);
   const effectiveImageUrl = imageError || !coverImageUrl ? undefined : coverImageUrl;
   
-  // Conditional routing for pillar pages
-  const linkPath = slug === 'shopify-3pl-los-angeles' ? `/shopify-3pl-los-angeles` : `/blog/${slug}`;
-  
   if (isFeatured) {
     return (
-      <Link to={linkPath} className="group relative block bg-white rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_25px_80px_-15px_rgba(0,0,0,0.3)] transition-all duration-700 ease-out hover:-translate-y-3 border-2 border-[hsl(var(--border))]">
+      <Link to={`/blog/${slug}`} className="group relative block bg-white rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_25px_80px_-15px_rgba(0,0,0,0.3)] transition-all duration-700 ease-out hover:-translate-y-3 border-2 border-[hsl(var(--border))]">
         {effectiveImageUrl ? (
           <div className="relative h-[480px] overflow-hidden">
             <AspectRatio ratio={16/9} className="h-full">
@@ -114,7 +111,7 @@ export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, auth
   }
 
   return (
-    <Link to={linkPath} className="group relative block bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] transition-all duration-500 ease-out hover:-translate-y-2 border border-[hsl(var(--border))]">
+    <Link to={`/blog/${slug}`} className="group relative block bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] transition-all duration-500 ease-out hover:-translate-y-2 border border-[hsl(var(--border))]">
       {variant === 'accent-border' && <div className="absolute top-0 left-0 right-0 h-1 transition-all duration-300 group-hover:h-1.5 z-20" style={{ backgroundColor: categoryColor }} />}
       {variant === 'side-accent' && <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b transition-all duration-300 group-hover:w-2 z-20" style={{ backgroundImage: `linear-gradient(to bottom, ${categoryColor}, transparent)` }} />}
       {effectiveImageUrl ? (

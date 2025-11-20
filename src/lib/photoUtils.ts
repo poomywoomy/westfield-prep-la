@@ -26,11 +26,11 @@ export async function resignPhotoUrl(urlOrPath: string): Promise<string> {
     }
   }
 
-  // Generate a fresh signed URL (5 minutes expiry for better security)
+  // Generate a fresh signed URL (1 hour expiry)
   try {
     const { data, error } = await supabase.storage
       .from('qc-images')
-      .createSignedUrl(storagePath, 300); // Reduced from 1 hour to 5 minutes
+      .createSignedUrl(storagePath, 3600);
 
     if (error) throw error;
     return data.signedUrl;

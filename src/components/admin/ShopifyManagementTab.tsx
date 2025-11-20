@@ -233,13 +233,11 @@ export function ShopifyManagementTab() {
     }
 
     // Audit log
-    await supabase.functions.invoke('log-audit-event', {
-      body: {
-        action: 'shopify_manual_sync',
-        table_name: 'shopify_stores',
-        record_id: clientId,
-        new_data: { action: 'manual_sync', timestamp: new Date().toISOString() }
-      }
+    await supabase.from('audit_log').insert({
+      action: 'shopify_manual_sync',
+      table_name: 'shopify_stores',
+      record_id: clientId,
+      new_data: { action: 'manual_sync', timestamp: new Date().toISOString() }
     });
     
     return data;
@@ -336,17 +334,15 @@ export function ShopifyManagementTab() {
       if (error) throw error;
 
       // Audit log
-      await supabase.functions.invoke('log-audit-event', {
-        body: {
-          action: 'shopify_test_connection',
-          table_name: 'shopify_stores',
-          record_id: clientId,
-          new_data: { 
-            action: 'test_connection',
-            store_domain: storeDomain,
-            result: data?.connected ? 'success' : 'failed',
-            timestamp: new Date().toISOString()
-          }
+      await supabase.from('audit_log').insert({
+        action: 'shopify_test_connection',
+        table_name: 'shopify_stores',
+        record_id: clientId,
+        new_data: { 
+          action: 'test_connection',
+          store_domain: storeDomain,
+          result: data?.connected ? 'success' : 'failed',
+          timestamp: new Date().toISOString() 
         }
       });
 
@@ -385,17 +381,15 @@ export function ShopifyManagementTab() {
       if (error) throw error;
 
       // Audit log
-      await supabase.functions.invoke('log-audit-event', {
-        body: {
-          action: 'shopify_disconnect',
-          table_name: 'shopify_stores',
-          record_id: clientId,
-          new_data: { 
-            action: 'disconnect_store',
-            store_domain: storeDomain,
-            delete_products: deleteProducts,
-            timestamp: new Date().toISOString() 
-          }
+      await supabase.from('audit_log').insert({
+        action: 'shopify_disconnect',
+        table_name: 'shopify_stores',
+        record_id: clientId,
+        new_data: { 
+          action: 'disconnect_store',
+          store_domain: storeDomain,
+          delete_products: deleteProducts,
+          timestamp: new Date().toISOString() 
         }
       });
 

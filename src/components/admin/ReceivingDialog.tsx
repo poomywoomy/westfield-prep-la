@@ -22,11 +22,11 @@ type ASNLine = Database["public"]["Tables"]["asn_lines"]["Row"];
 type SKU = Database["public"]["Tables"]["skus"]["Row"];
 
 const receivingLineSchema = z.object({
-  received_units: z.number().int().min(0).max(100000, "Cannot exceed 100,000 units"),
-  normal_units: z.number().int().min(0).max(100000, "Cannot exceed 100,000 units"),
-  damaged_units: z.number().int().min(0).max(100000, "Cannot exceed 100,000 units"),
-  quarantined_units: z.number().int().min(0).max(100000, "Cannot exceed 100,000 units"),
-  missing_units: z.number().int().min(0).max(100000, "Cannot exceed 100,000 units"),
+  received_units: z.number().int().min(0).max(1000000),
+  normal_units: z.number().int().min(0).max(1000000),
+  damaged_units: z.number().int().min(0).max(1000000),
+  quarantined_units: z.number().int().min(0).max(1000000),
+  missing_units: z.number().int().min(0).max(1000000),
   lot_number: z.string().trim().max(100).nullable().optional(),
   expiry_date: z.string().nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),

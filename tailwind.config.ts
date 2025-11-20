@@ -88,25 +88,7 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
-      typography: {
-        DEFAULT: {
-          css: {
-            '--tw-prose-links': 'hsl(28 100% 50%)',
-            a: {
-              color: 'hsl(28 100% 50%)',
-              textDecoration: 'none',
-              fontWeight: '500',
-              '&:hover': {
-                textDecoration: 'underline',
-              },
-            },
-          },
-        },
-      },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    require("@tailwindcss/typography"),
-  ],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Phone, ChevronDown, Menu, X, ArrowRight } from "lucide-react";
+import { Phone, ChevronDown } from "lucide-react";
 import logo from "@/assets/westfield-logo-original.jpg";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -15,26 +15,16 @@ import {
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, role } = useAuth();
   const isHomePage = location.pathname === "/";
 
   useEffect(() => {
-    let ticking = false;
-    
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 10);
-          ticking = false;
-        });
-        ticking = true;
-      }
+      setIsScrolled(window.scrollY > 10);
     };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -61,12 +51,9 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 border-b ${
-        isScrolled 
-          ? "bg-white/95 backdrop-blur-sm shadow-sm border-gray-200 py-1.5" 
-          : "bg-white/90 backdrop-blur-sm border-gray-100 py-2"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? "bg-background shadow-md h-24" : "bg-background/95 backdrop-blur-sm h-28"
       }`}
-      style={{ transform: 'translateZ(0)' }}
     >
       <div className="container mx-auto px-4 h-full">
         <div className="flex items-center justify-between h-full gap-10">
@@ -85,33 +72,31 @@ const Header = () => {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-6">
-            <Link to="/" className="text-[#2A2A2A] hover:text-[#000000]/80 transition-colors font-medium text-base relative group">
-              <span className="relative z-10">Home</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#1A1A1A] transition-all duration-300 group-hover:w-full z-0"></span>
+            <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium text-base">
+              Home
             </Link>
             
-            <Link to="/3pl-los-angeles" className="text-[#2A2A2A] hover:text-[#000000]/80 transition-colors font-medium text-base relative group">
-              <span className="relative z-10">3PL Los Angeles</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#1A1A1A] transition-all duration-300 group-hover:w-full z-0"></span>
+            <Link to="/3pl-los-angeles" className="text-foreground hover:text-primary transition-colors font-medium text-base">
+              3PL Los Angeles
             </Link>
 
             {/* About Dropdown */}
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-base font-medium text-[#2A2A2A] hover:text-[#000000]/80 bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">
+                  <NavigationMenuTrigger className="text-base font-medium">
                     About
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[300px] gap-3 p-4 bg-white backdrop-blur-sm border border-gray-200 shadow-lg">
+                    <ul className="grid w-[300px] gap-3 p-4">
                       <li>
                         <NavigationMenuLink asChild>
                           <Link
                             to="/why-choose-us"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 text-[#2A2A2A] hover:text-[#000000]/80"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                           >
                             <div className="text-sm font-medium leading-none">Why Choose Us</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-gray-600">
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                               Discover what sets us apart
                             </p>
                           </Link>
@@ -121,10 +106,10 @@ const Header = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/testimonials"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 text-[#2A2A2A] hover:text-[#000000]/80"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                           >
                             <div className="text-sm font-medium leading-none">Testimonials</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-gray-600">
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                               What our clients say about us
                             </p>
                           </Link>
@@ -136,108 +121,48 @@ const Header = () => {
               </NavigationMenuList>
             </NavigationMenu>
 
-            <Link to="/pricing" className="text-[#2A2A2A] hover:text-[#000000]/80 transition-colors font-medium text-base relative group">
-              <span className="relative z-10">Pricing</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#1A1A1A] transition-all duration-300 group-hover:w-full z-0"></span>
+            <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium text-base">
+              Pricing
             </Link>
-            <Link to="/blog" className="text-[#2A2A2A] hover:text-[#000000]/80 transition-colors font-medium text-base relative group">
-              <span className="relative z-10">Blog</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#1A1A1A] transition-all duration-300 group-hover:w-full z-0"></span>
+            <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium text-base">
+              Blog
             </Link>
           </nav>
 
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden xl:flex items-center gap-6">
             <a 
               href="tel:+18189355478" 
-              className="flex items-center gap-2 text-orange-500 hover:text-amber-500 transition-all group hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]"
+              className="flex items-center gap-2 text-primary hover:text-secondary transition-colors group"
             >
               <Phone className="h-5 w-5 group-hover:scale-110 transition-transform" />
               <span className="font-bold text-base">1.818.935.5478</span>
             </a>
-            <button
+            <Button
               onClick={() => navigate("/contact")}
-              className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 shadow-[0_0_20px_rgba(249,115,22,0.3)] hover:shadow-[0_0_30px_rgba(249,115,22,0.6)] hover:-translate-y-0.5"
+              size="lg"
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold px-8"
             >
               Get a Quote
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
 
           <div className="flex lg:hidden items-center gap-3">
             <a 
               href="tel:+18189355478" 
-              className="text-orange-500 hover:text-amber-500 transition-colors"
+              className="flex items-center gap-1 text-primary hover:text-secondary transition-colors"
             >
               <Phone className="h-5 w-5" />
             </a>
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-[#2A2A2A] hover:text-[#000000]/80 transition-colors"
+            <Button
+              onClick={() => navigate("/contact")}
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+              size="sm"
             >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+              Get Quote
+            </Button>
           </div>
         </div>
       </div>
-
-      {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg animate-in slide-in-from-top-5">
-          <div className="flex flex-col p-6 gap-4">
-            <Link 
-              to="/" 
-              className="text-lg font-medium text-[#2A2A2A] hover:text-[#000000]/80 transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link 
-              to="/3pl-los-angeles" 
-              className="text-lg font-medium text-[#2A2A2A] hover:text-[#000000]/80 transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              3PL Los Angeles
-            </Link>
-            <Link 
-              to="/why-choose-us" 
-              className="text-lg font-medium text-[#2A2A2A] hover:text-[#000000]/80 transition-colors pl-4"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Why Choose Us
-            </Link>
-            <Link 
-              to="/testimonials" 
-              className="text-lg font-medium text-[#2A2A2A] hover:text-[#000000]/80 transition-colors pl-4"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Testimonials
-            </Link>
-            <Link 
-              to="/pricing" 
-              className="text-lg font-medium text-[#2A2A2A] hover:text-[#000000]/80 transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Pricing
-            </Link>
-            <Link 
-              to="/blog" 
-              className="text-lg font-medium text-[#2A2A2A] hover:text-[#000000]/80 transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Blog
-            </Link>
-            <button
-              onClick={() => { 
-                navigate("/contact"); 
-                setIsMobileMenuOpen(false); 
-              }}
-              className="mt-4 w-full text-center bg-gradient-to-r from-orange-600 to-amber-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-orange-500/20"
-            >
-              Get a Quote
-            </button>
-          </div>
-        </div>
-      )}
     </header>
   );
 };

@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 import { shopifyGraphQL } from '../_shared/shopify-graphql.ts';
 
 const corsHeaders = {
@@ -55,28 +55,12 @@ Deno.serve(async (req) => {
       throw new Error('Missing required OAuth parameters');
     }
 
-    // Create Supabase client with user's auth token
+    // Validate state parameter to prevent session hijacking
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    // Verify authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      console.error('Authentication failed:', authError);
-      throw new Error('Authentication required');
-    }
-
-    console.log('OAuth callback authenticated for user:', user.id);
-
-    // Validate state parameter to prevent session hijacking
     const { data: stateRecord, error: stateError } = await supabase
       .from('oauth_states')
       .select('user_id, expires_at, frontend_origin')
@@ -96,17 +80,12 @@ Deno.serve(async (req) => {
       throw new Error('OAuth state expired');
     }
 
-    // Verify state matches authenticated user
-    if (stateRecord.user_id !== user.id) {
-      console.error('State user mismatch - potential attack');
-      await supabase.from('oauth_states').delete().eq('state', state);
-      throw new Error('Invalid OAuth state');
-    }
+    const userId = stateRecord.user_id;
 
     // Clean up used state
     await supabase.from('oauth_states').delete().eq('state', state);
 
-    console.log('State validated for user:', user.id);
+    console.log('State validated for user:', userId);
 
     const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
     const clientSecret = Deno.env.get('SHOPIFY_CLIENT_SECRET');
@@ -138,11 +117,11 @@ Deno.serve(async (req) => {
     const { data: client } = await supabase
       .from('clients')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (!client) {
-      console.error('No client profile found for user:', user.id);
+      console.error('No client profile found for user:', userId);
       throw new Error('Client profile not found');
     }
 
