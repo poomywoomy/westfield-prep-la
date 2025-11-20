@@ -50,16 +50,16 @@ serve(async (req) => {
     }
 
     // Password strength validation (server-side enforcement)
-    if (newPassword.length < 8) {
+    if (newPassword.length < 12) {
       return new Response(
-        JSON.stringify({ error: 'Password must be at least 8 characters long' }),
+        JSON.stringify({ error: 'Password must be at least 12 characters long' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newPassword)) {
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/.test(newPassword)) {
       return new Response(
-        JSON.stringify({ error: 'Password must contain uppercase, lowercase, and numbers' }),
+        JSON.stringify({ error: 'Password must contain uppercase, lowercase, number, and special character' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -109,6 +109,19 @@ serve(async (req) => {
         JSON.stringify({ error: 'Failed to update password' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Revoke all sessions globally after password change
+    const { error: signOutError } = await supabaseAdmin.auth.admin.signOut(
+      user.id,
+      'global'
+    );
+
+    if (signOutError) {
+      console.error('Failed to revoke sessions:', signOutError);
+      // Log but don't fail - password was changed successfully
+    } else {
+      console.log(`All sessions revoked for user ${user.id} after password change`);
     }
 
     // Log password change to audit log
