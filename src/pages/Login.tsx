@@ -153,14 +153,16 @@ const Login = () => {
           )
         ).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
 
-        await supabase.from('audit_log').insert({
-          action: 'FAILED_LOGIN',
-          table_name: 'auth.users',
-          new_data: {
-            email,
-            error_message: 'Authentication failed', // Generic message to prevent info leakage
-            timestamp: new Date().toISOString(),
-            user_agent_hash: userAgentHash, // Hashed instead of raw user agent
+        await supabase.functions.invoke('log-audit-event', {
+          body: {
+            action: 'FAILED_LOGIN',
+            table_name: 'auth.users',
+            new_data: {
+              email,
+              error_message: 'Authentication failed',
+              timestamp: new Date().toISOString(),
+              user_agent_hash: userAgentHash,
+            }
           }
         });
       } catch (logError) {

@@ -90,14 +90,16 @@ export function ShopifyWebhooksDialog({ open, onOpenChange, clientId, clientName
       if (error) throw error;
 
       // Audit log
-      await supabase.from('audit_log').insert({
-        action: 'shopify_webhook_register',
-        table_name: 'shopify_webhooks',
-        record_id: clientId,
-        new_data: { 
-          action: 'register_webhook',
-          topic: selectedTopic,
-          timestamp: new Date().toISOString() 
+      await supabase.functions.invoke('log-audit-event', {
+        body: {
+          action: 'shopify_webhook_register',
+          table_name: 'shopify_webhooks',
+          record_id: clientId,
+          new_data: { 
+            action: 'register_webhook',
+            topic: selectedTopic,
+            timestamp: new Date().toISOString()
+          }
         }
       });
 
@@ -132,15 +134,17 @@ export function ShopifyWebhooksDialog({ open, onOpenChange, clientId, clientName
       if (error) throw error;
 
       // Audit log
-      await supabase.from('audit_log').insert({
-        action: 'shopify_webhook_delete',
-        table_name: 'shopify_webhooks',
-        record_id: webhookId,
-        old_data: { 
-          action: 'delete_webhook',
-          topic: topic,
-          client_id: clientId,
-          timestamp: new Date().toISOString() 
+      await supabase.functions.invoke('log-audit-event', {
+        body: {
+          action: 'shopify_webhook_delete',
+          table_name: 'shopify_webhooks',
+          record_id: webhookId,
+          old_data: { 
+            action: 'delete_webhook',
+            topic: topic,
+            client_id: clientId,
+            timestamp: new Date().toISOString() 
+          }
         }
       });
 

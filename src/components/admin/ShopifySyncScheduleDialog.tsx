@@ -90,15 +90,17 @@ export function ShopifySyncScheduleDialog({ open, onOpenChange, clientId, client
       if (error) throw error;
 
       // Log the override
-      await supabase.from('audit_log').insert({
-        action: 'SHOPIFY_SYNC_SCHEDULE_OVERRIDE',
-        table_name: 'shopify_sync_config',
-        record_id: clientId,
-        new_data: {
-          auto_sync_enabled: autoSyncEnabled,
-          sync_frequency: frequency,
-          reason: overrideReason,
-        },
+      await supabase.functions.invoke('log-audit-event', {
+        body: {
+          action: 'SHOPIFY_SYNC_SCHEDULE_OVERRIDE',
+          table_name: 'shopify_sync_config',
+          record_id: clientId,
+          new_data: {
+            auto_sync_enabled: autoSyncEnabled,
+            sync_frequency: frequency,
+            reason: overrideReason,
+          }
+        }
       });
 
       toast({
