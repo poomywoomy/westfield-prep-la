@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 
 interface StructuredDataProps {
-  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact" | "collectionPage" | "itemList";
+  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact" | "collectionPage" | "itemList" | "localBusiness";
   data?: any;
 }
 
@@ -344,6 +344,35 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
             }
           }
         }))
+      };
+    }
+
+    // LocalBusiness schema (global)
+    if (type === "localBusiness") {
+      return {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Westfield Prep Center",
+        "image": `${baseUrl}/images/warehouse-exterior.jpg`,
+        "description": "Westfield Prep Center is a Shopify-native 3PL in Los Angeles providing same-day receiving, real-time syncing, and 24 to 48 hour fulfillment for DTC and Shopify brands.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "1801 Flower Ave Office 2",
+          "addressLocality": "Duarte",
+          "addressRegion": "CA",
+          "postalCode": "91010",
+          "addressCountry": "US"
+        },
+        "url": baseUrl,
+        "telephone": "+1-818-935-5478",
+        "openingHours": "Mo-Fr 08:00-17:00",
+        "priceRange": "$$",
+        "areaServed": ["United States"],
+        "sameAs": [
+          "https://www.linkedin.com/company/westfield-prep-center/?viewAsMember=true",
+          "https://www.instagram.com/westfieldprepcenter/",
+          "https://x.com/Westfield3PL"
+        ]
       };
     }
 
