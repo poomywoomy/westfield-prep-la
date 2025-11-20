@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { sanitizeString } from '../_shared/input-sanitizer.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,6 +16,19 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+    // Sanitize all inputs to prevent XSS
+    const rawData = await req.json();
+    
+    const sanitizedData = {
+      ticket_id: sanitizeString(rawData.ticket_id),
+      client_id: rawData.client_id, // UUID, no sanitization needed
+      issue_category: sanitizeString(rawData.issue_category),
+      issue_description: sanitizeString(rawData.issue_description),
+      preferred_contact_method: sanitizeString(rawData.preferred_contact_method),
+      contact_email: rawData.contact_email ? sanitizeString(rawData.contact_email) : undefined,
+      contact_phone: rawData.contact_phone ? sanitizeString(rawData.contact_phone) : undefined,
+    };
+    
     const {
       ticket_id,
       client_id,
@@ -23,7 +37,7 @@ const handler = async (req: Request): Promise<Response> => {
       preferred_contact_method,
       contact_email,
       contact_phone,
-    } = await req.json();
+    } = sanitizedData;
 
     // Get client details using REST API
     const clientResponse = await fetch(

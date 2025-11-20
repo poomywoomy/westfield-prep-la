@@ -1,6 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 import { requireAuth } from '../_shared/auth-middleware.ts';
-import { sanitizeError } from '../../../src/lib/errorHandler.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
