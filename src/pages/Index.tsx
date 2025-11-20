@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // Lazy load below-the-fold components
 const PlatformCompatibility = lazy(() => import("@/components/PlatformCompatibility"));
-const ValueProposition = lazy(() => import("@/components/ValueProposition"));
+import ValueProposition from "@/components/ValueProposition";
 const Services = lazy(() => import("@/components/Services"));
 const HowItWorksProcess = lazy(() => import("@/components/HowItWorksProcess"));
 const Reviews = lazy(() => import("@/components/Reviews"));
@@ -90,9 +90,7 @@ const Index = () => {
         <PremiumHero />
         
         {/* Phase 3: Value Proposition */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <ValueProposition />
-        </Suspense>
+        <ValueProposition />
         
         {/* Phase 4: Services Overview */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
