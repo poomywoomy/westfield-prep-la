@@ -43,15 +43,6 @@ export const QuickActionsPanel = ({ onCreateShipment, onCreateASN }: QuickAction
         </Button>
       </div>
 
-      {/* Helper Text */}
-      <div className="mt-6 text-center">
-        <p className="text-xs text-gray-500">
-          Need help with bulk uploads?{" "}
-          <a href="#" className="text-orange-600 hover:underline">
-            Download templates
-          </a>
-        </p>
-      </div>
     </Card>
   );
 };
