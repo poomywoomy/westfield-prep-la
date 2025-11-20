@@ -91,9 +91,9 @@ export default {
       typography: {
         DEFAULT: {
           css: {
-            '--tw-prose-links': 'hsl(28, 100%, 50%)',
+            '--tw-prose-links': 'hsl(28 100% 50%)',
             a: {
-              color: 'hsl(28, 100%, 50%)',
+              color: 'hsl(28 100% 50%)',
               textDecoration: 'none',
               fontWeight: '500',
               '&:hover': {
