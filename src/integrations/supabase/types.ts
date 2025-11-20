@@ -2119,6 +2119,106 @@ export type Database = {
           },
         ]
       }
+      shipment_request_lines: {
+        Row: {
+          created_at: string
+          id: string
+          quantity: number
+          request_id: string
+          sku_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quantity: number
+          request_id: string
+          sku_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quantity?: number
+          request_id?: string
+          sku_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_request_lines_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipment_request_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "shipment_request_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "shipment_request_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipment_requests: {
+        Row: {
+          admin_notes: string | null
+          client_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          processed_at: string | null
+          processed_by: string | null
+          requested_ship_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          client_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_ship_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          client_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_ship_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_requests_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipment_template_lines: {
         Row: {
           created_at: string
@@ -2653,6 +2753,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "skus_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          admin_notes: string | null
+          client_id: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          issue_category: string
+          issue_description: string
+          preferred_contact_method: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          client_id: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          issue_category: string
+          issue_description: string
+          preferred_contact_method: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          client_id?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          issue_category?: string
+          issue_description?: string
+          preferred_contact_method?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
