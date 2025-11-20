@@ -121,133 +121,91 @@ const ClientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="flex h-screen bg-gray-50 text-gray-900 font-sans overflow-hidden">
+      {/* Sidebar */}
+      <ClientSidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        clientName={clientName}
+        onLogout={logout}
+      />
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col h-full overflow-y-auto relative">
+        {/* Header */}
+        <header className="h-20 px-8 flex items-center justify-between border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-30">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              {activeTab === "analytics" && "Overview"}
+              {activeTab === "products" && "Products"}
+              {activeTab === "orders" && "Orders"}
+              {activeTab === "asns" && "ASNs"}
+              {activeTab === "shipments" && "Shipments"}
+              {activeTab === "activity" && "Activity Log"}
+              {activeTab === "billing" && "Billing"}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">Welcome back, {clientName}</p>
+          </div>
+
           <div className="flex items-center gap-4">
-            <Link to="/client/dashboard">
-              <img src={westfieldLogo} alt="Westfield Logo" className="h-10 cursor-pointer" />
-            </Link>
-            <h1 className="text-2xl font-bold">Client Portal</h1>
+            <div className="relative hidden md:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search orders, ASNs, SKUs..."
+                className="bg-gray-100 border border-gray-200 rounded-full py-2 pl-10 pr-4 text-sm text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white transition-all w-64"
+              />
+            </div>
+            <button className="relative p-2 text-gray-500 hover:text-orange-600 transition-colors">
+              <Bell size={20} />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-orange-500 rounded-full border border-white" />
+            </button>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <Settings className="mr-2 h-4 w-4" />
-                Account
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate("/client/settings")}>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
+        </header>
 
-      <main className="container mx-auto px-4 py-8">
-        {clientName && (
-          <div className="mb-8 bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-lg p-8">
-            <h2 className="text-4xl font-bold mb-2">
-              Welcome back, {clientName}
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Track your prep center performance and inventory in real-time
-            </p>
-          </div>
-        )}
-        
-        <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid grid-cols-7 w-full">
-            <TabsTrigger value="analytics">
-              <Activity className="mr-2 h-4 w-4" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="products">
-              <Package className="mr-2 h-4 w-4" />
-              Products
-            </TabsTrigger>
-            <TabsTrigger value="orders">
-              <Package className="mr-2 h-4 w-4" />
-              Orders
-            </TabsTrigger>
-            <TabsTrigger value="asns">
-              <Package className="mr-2 h-4 w-4" />
-              ASNs
-            </TabsTrigger>
-            <TabsTrigger value="shipments">
-              <Package className="mr-2 h-4 w-4" />
-              Shipments
-            </TabsTrigger>
-            <TabsTrigger value="activity">
-              <Activity className="mr-2 h-4 w-4" />
-              Activity Log
-            </TabsTrigger>
-            <TabsTrigger value="billing">
-              <DollarSign className="mr-2 h-4 w-4" />
-              Billing
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="analytics" forceMount className="data-[state=inactive]:hidden">
-            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+        {/* Scrollable Content */}
+        <div className="p-8 space-y-8">
+          {activeTab === "analytics" && (
+            <Suspense fallback={<div className="flex justify-center items-center h-64">Loading analytics...</div>}>
               <ClientAnalyticsDashboard clientId={clientId} />
             </Suspense>
-          </TabsContent>
+          )}
 
-          <TabsContent value="products" forceMount className="data-[state=inactive]:hidden">
-            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
-              <div className="space-y-4">
-                <div className="flex justify-end">
-                  <Button onClick={() => setShowSKUDialog(true)}>
-                    <Package className="mr-2 h-4 w-4" />
-                    Create SKU
-                  </Button>
-                </div>
-                <ClientProductsTab />
-              </div>
+          {activeTab === "products" && (
+            <Suspense fallback={<div className="flex justify-center items-center h-64">Loading products...</div>}>
+              <ClientProductsTab />
             </Suspense>
-          </TabsContent>
+          )}
 
-          <TabsContent value="orders" forceMount className="data-[state=inactive]:hidden">
-            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+          {activeTab === "orders" && (
+            <Suspense fallback={<div className="flex justify-center items-center h-64">Loading orders...</div>}>
               <ClientOrdersTab />
             </Suspense>
-          </TabsContent>
+          )}
 
-          <TabsContent value="asns" forceMount className="data-[state=inactive]:hidden">
-            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
-              <ClientASNsTab clientId={clientId} />
+          {activeTab === "asns" && (
+            <Suspense fallback={<div className="flex justify-center items-center h-64">Loading ASNs...</div>}>
+              <ClientASNsTab />
             </Suspense>
-          </TabsContent>
+          )}
 
-          <TabsContent value="shipments" forceMount className="data-[state=inactive]:hidden">
-            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+          {activeTab === "shipments" && (
+            <Suspense fallback={<div className="flex justify-center items-center h-64">Loading shipments...</div>}>
               <ClientShipmentsTab />
             </Suspense>
-          </TabsContent>
+          )}
 
-          <TabsContent value="activity" forceMount className="data-[state=inactive]:hidden">
-            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+          {activeTab === "activity" && (
+            <Suspense fallback={<div className="flex justify-center items-center h-64">Loading activity...</div>}>
               <ClientInventoryActivityLog clientId={clientId} />
             </Suspense>
-          </TabsContent>
+          )}
 
-          <TabsContent value="billing" forceMount className="data-[state=inactive]:hidden">
-            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
-              <ClientBillingTab />
+          {activeTab === "billing" && (
+            <Suspense fallback={<div className="flex justify-center items-center h-64">Loading billing...</div>}>
+              <ClientBillingTab clientId={clientId} />
             </Suspense>
-          </TabsContent>
-        </Tabs>
-      </main>
+          )}
 
       <SKUFormDialog 
         open={showSKUDialog}
@@ -257,6 +215,17 @@ const ClientDashboard = () => {
         isClientView={true}
         presetClientId={clientId}
       />
+        </div>
+      </main>
+
+      {/* SKU Dialog */}
+      {showSKUDialog && (
+        <SKUFormDialog
+          open={showSKUDialog}
+          onClose={() => setShowSKUDialog(false)}
+          sku={null}
+        />
+      )}
     </div>
   );
 };
