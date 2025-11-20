@@ -1,4 +1,4 @@
-import { Users, FileText, DollarSign, Package, AlertTriangle, Store, ShoppingCart, PenSquare, FileSignature, History, Activity } from "lucide-react";
+import { Users, FileText, DollarSign, Package, AlertTriangle, Store, ShoppingCart, PenSquare, FileSignature, History, Activity, Truck, MessageSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +29,8 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount }: Ap
     { id: "inventory", label: "Inventory", icon: Package },
     { id: "discrepancies", label: "Discrepancies", icon: AlertTriangle, badge: discrepancyCount },
     { id: "shipments", label: "Shipments", icon: Package },
+    { id: "shipment-requests", label: "Shipment Requests", icon: Truck },
+    { id: "support-tickets", label: "Support Tickets", icon: MessageSquare },
     { id: "shopify", label: "Shopify", icon: Store },
     { id: "health", label: "Sync Health", icon: Activity },
     { id: "orders", label: "Orders", icon: ShoppingCart },
