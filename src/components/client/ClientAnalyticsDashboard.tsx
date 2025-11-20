@@ -1,18 +1,14 @@
 import { useState, useMemo } from "react";
-import { PeriodMetricsCard } from "./PeriodMetricsCard";
-import { IssuesCard } from "./IssuesCard";
 import { useClientIssues } from "@/hooks/useClientIssues";
 import { DamagedItemReviewDialog } from "./DamagedItemReviewDialog";
 import { MissingItemReviewDialog } from "./MissingItemReviewDialog";
 import { SKUDetailDialog } from "./SKUDetailDialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
-import { getDateRange } from "@/hooks/useAnalytics";
-import { startOfDay, endOfDay, subDays, startOfMonth, format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { SimpleMetricCard } from "./SimpleMetricCard";
+import { OrderVolumeChart } from "./OrderVolumeChart";
+import { OperationalAlertsPanel } from "./OperationalAlertsPanel";
+import { QuickActionsPanel } from "./QuickActionsPanel";
+import { Package, Truck, AlertCircle, RotateCcw } from "lucide-react";
+import { startOfDay, endOfDay, subDays } from "date-fns";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface ClientAnalyticsDashboardProps {
@@ -20,67 +16,24 @@ interface ClientAnalyticsDashboardProps {
 }
 
 export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardProps) => {
-  const [customPeriod, setCustomPeriod] = useState("ytd");
-  const [customDateRange, setCustomDateRange] = useState<{ from?: Date; to?: Date }>();
   const [selectedIssue, setSelectedIssue] = useState<any>(null);
   const [dialogType, setDialogType] = useState<"damaged" | "missing" | "sku" | null>(null);
 
-  // Stabilize date ranges with useMemo to prevent re-render loops
-  // Use local date to match admin side and prevent timezone issues
   const todayRange = useMemo(() => {
     const now = new Date();
-    return { 
-      start: startOfDay(now), 
-      end: endOfDay(now) 
-    };
+    return { start: startOfDay(now), end: endOfDay(now) };
   }, []);
   
   const yesterdayRange = useMemo(() => {
     const yesterday = subDays(new Date(), 1);
-    return { 
-      start: startOfDay(yesterday), 
-      end: endOfDay(yesterday) 
-    };
+    return { start: startOfDay(yesterday), end: endOfDay(yesterday) };
   }, []);
-  
-  const mtdRange = useMemo(() => ({ 
-    start: startOfMonth(new Date()), 
-    end: endOfDay(new Date()) 
-  }), []);
 
-  // Custom period - memoized to prevent unnecessary re-fetches
-  const customRange = useMemo(() => {
-    if (customPeriod === "custom" && customDateRange?.from && customDateRange?.to) {
-      return { start: startOfDay(customDateRange.from), end: endOfDay(customDateRange.to) };
-    }
-    return getDateRange(customPeriod);
-  }, [customPeriod, customDateRange]);
-
-  const getPeriodLabel = (preset: string) => {
-    if (preset === "custom" && customDateRange?.from && customDateRange?.to) {
-      return `${format(customDateRange.from, "MMM d")} - ${format(customDateRange.to, "MMM d")}`;
-    }
-    switch (preset) {
-      case "last7": return "Last 7 Days";
-      case "last30": return "Last 30 Days";
-      case "last90": return "Last 90 Days";
-      case "ytd": return "Year to Date";
-      case "custom": return "Custom Range";
-      default: return "Year to Date";
-    }
-  };
-
-  // Fetch issues
   const shipmentIssues = useClientIssues(clientId, "receiving");
   const returnIssues = useClientIssues(clientId, "return");
-  
-  // Fetch analytics data once for all cards (massive performance improvement)
   const todayData = useAnalytics(clientId, todayRange);
   const yesterdayData = useAnalytics(clientId, yesterdayRange);
-  const mtdData = useAnalytics(clientId, mtdRange);
-  const customData = useAnalytics(clientId, customRange);
 
-  // Use today's data for low stock issues
   const lowStockIssues = useMemo(() => 
     todayData.data?.lowStock.map(item => ({
       id: item.sku_id,
@@ -96,6 +49,12 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
     })) || [], 
     [todayData.data?.lowStock, clientId]
   );
+
+  const calculateTrend = (current: number, previous: number) => {
+    if (previous === 0) return current > 0 ? "+100%" : "0%";
+    const change = ((current - previous) / previous) * 100;
+    return change > 0 ? `+${change.toFixed(1)}%` : `${change.toFixed(1)}%`;
+  };
 
   const handleReviewIssue = (issue: any) => {
     setSelectedIssue(issue);
@@ -114,171 +73,80 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
   };
 
   return (
-    <div className="space-y-6">
-      {/* Period selector for custom card */}
-      <div className="flex justify-end gap-2">
-        <Select value={customPeriod} onValueChange={setCustomPeriod}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Select period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="last7">Last 7 Days</SelectItem>
-            <SelectItem value="last30">Last 30 Days</SelectItem>
-            <SelectItem value="last90">Last 90 Days</SelectItem>
-            <SelectItem value="ytd">Year to Date</SelectItem>
-            <SelectItem value="custom">Custom Range</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {customPeriod === "custom" && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("w-64 justify-start text-left font-normal")}>
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {customDateRange?.from ? (
-                  customDateRange.to ? (
-                    <>
-                      {format(customDateRange.from, "LLL dd, y")} - {format(customDateRange.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(customDateRange.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Pick a date range</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={customDateRange?.from}
-                selected={customDateRange as any}
-                onSelect={setCustomDateRange as any}
-                numberOfMonths={2}
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        )}
-      </div>
-
-      {/* Four period cards - pass data as props to avoid duplicate fetches */}
+    <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <PeriodMetricsCard
-          period="Today"
-          dateRange={todayRange}
-          data={todayData.data}
-          loading={todayData.loading}
-          colorScheme="blue"
+        <SimpleMetricCard
+          title="Total Orders"
+          value={todayData.data?.orders || 0}
+          icon={Package}
+          trend={calculateTrend(todayData.data?.orders || 0, yesterdayData.data?.orders || 0)}
+          iconColor="text-orange-600"
         />
-        <PeriodMetricsCard
-          period="Yesterday"
-          dateRange={yesterdayRange}
-          data={yesterdayData.data}
-          loading={yesterdayData.loading}
-          colorScheme="teal"
+        <SimpleMetricCard
+          title="Shipped Today"
+          value={todayData.data?.unitsShipped || 0}
+          icon={Truck}
+          trend={calculateTrend(todayData.data?.unitsShipped || 0, yesterdayData.data?.unitsShipped || 0)}
+          iconColor="text-green-600"
         />
-        <PeriodMetricsCard
-          period="Month to Date"
-          dateRange={mtdRange}
-          data={mtdData.data}
-          loading={mtdData.loading}
-          colorScheme="cyan"
+        <SimpleMetricCard
+          title="Pending Action"
+          value={shipmentIssues.totalCount + returnIssues.totalCount}
+          icon={AlertCircle}
+          trend="0%"
+          iconColor="text-amber-600"
         />
-        <PeriodMetricsCard
-          period={getPeriodLabel(customPeriod)}
-          dateRange={customRange}
-          data={customData.data}
-          loading={customData.loading}
-          colorScheme="purple"
-          isCustomizable
-        />
-      </div>
-
-      {/* Issue cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <IssuesCard
-          title="Shipment Discrepancies"
-          icon="shipment"
-          issues={shipmentIssues.issues}
-          damagedCount={shipmentIssues.damagedCount}
-          missingCount={shipmentIssues.missingCount}
-          loading={shipmentIssues.loading}
-          borderColor="red"
-          iconColor="red"
-          onReviewClick={handleReviewIssue}
-        />
-        <IssuesCard
-          title="Return Issues"
-          icon="return"
-          issues={returnIssues.issues}
-          damagedCount={returnIssues.damagedCount}
-          missingCount={returnIssues.missingCount}
-          loading={returnIssues.loading}
-          borderColor="red"
-          iconColor="red"
-          onReviewClick={handleReviewIssue}
-        />
-        <IssuesCard
-          title="Low Stock Alerts"
-          icon="stock"
-          issues={lowStockIssues}
-          damagedCount={0}
-          missingCount={0}
-          loading={todayData.loading}
-          borderColor="orange"
-          iconColor="orange"
-          onReviewClick={handleReviewIssue}
+        <SimpleMetricCard
+          title="Returns Active"
+          value={returnIssues.totalCount}
+          icon={RotateCcw}
+          trend="0%"
+          iconColor="text-red-600"
         />
       </div>
 
-      {/* Review Dialogs */}
+      <OrderVolumeChart clientId={clientId} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <OperationalAlertsPanel
+            shipmentIssues={shipmentIssues}
+            returnIssues={returnIssues}
+            lowStockIssues={lowStockIssues}
+            onReviewClick={handleReviewIssue}
+          />
+        </div>
+        <QuickActionsPanel />
+      </div>
+
       {dialogType === "damaged" && selectedIssue && (
         <DamagedItemReviewDialog
           open={true}
-          onOpenChange={(open) => !open && handleCloseDialog()}
-          discrepancy={{
-            id: selectedIssue.id,
-            client_id: selectedIssue.client_id,
-            sku_id: selectedIssue.sku_id,
-            asn_id: selectedIssue.asn_id,
-            asn_number: selectedIssue.asn_number || "",
-            client_sku: selectedIssue.client_sku || "",
-            title: selectedIssue.title || "",
-            damaged_qty: selectedIssue.quantity,
-            image_url: selectedIssue.image_url,
-            qc_photo_urls: selectedIssue.qc_photo_urls,
-          }}
-          onSuccess={handleCloseDialog}
+          onOpenChange={handleCloseDialog}
+          discrepancy={selectedIssue}
         />
       )}
+
       {dialogType === "missing" && selectedIssue && (
         <MissingItemReviewDialog
           open={true}
-          onOpenChange={(open) => !open && handleCloseDialog()}
-          discrepancy={{
-            id: selectedIssue.id,
-            client_id: selectedIssue.client_id,
-            sku_id: selectedIssue.sku_id,
-            asn_id: selectedIssue.asn_id,
-            asn_number: selectedIssue.asn_number || "",
-            client_sku: selectedIssue.client_sku || "",
-            title: selectedIssue.title || "",
-            missing_qty: selectedIssue.quantity,
-            image_url: selectedIssue.image_url,
-          }}
-          onSuccess={handleCloseDialog}
+          onOpenChange={handleCloseDialog}
+          discrepancy={selectedIssue}
         />
       )}
+
       {dialogType === "sku" && selectedIssue && (
         <SKUDetailDialog
           open={true}
-          onOpenChange={(open) => !open && handleCloseDialog()}
-          skuId={selectedIssue.sku_id}
-          clientId={clientId}
+          onClose={handleCloseDialog}
+          sku={{
+            id: selectedIssue.sku_id,
+            client_sku: selectedIssue.client_sku,
+            title: selectedIssue.title,
+            image_url: selectedIssue.image_url,
+          }}
         />
       )}
-    </div>
+    </>
   );
 };
