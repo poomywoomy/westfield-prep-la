@@ -218,10 +218,20 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId }: RequestS
                     <Input
                       type="number"
                       min="1"
+                      max="100000"
                       value={line.quantity}
-                      onChange={(e) =>
-                        updateLine(index, "quantity", parseInt(e.target.value) || 1)
-                      }
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value) || 1;
+                        if (value > 100000) {
+                          toast({
+                            title: "Invalid Quantity",
+                            description: "Maximum quantity is 100,000 units",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        updateLine(index, "quantity", value);
+                      }}
                       placeholder="Qty"
                     />
                   </div>
