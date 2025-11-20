@@ -25,7 +25,7 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
       'table', 'thead', 'tbody', 'tr', 'th', 'td',
       'details', 'summary'
     ],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'loading', 'open']
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'loading', 'open', 'target', 'rel']
   });
   
   return (
