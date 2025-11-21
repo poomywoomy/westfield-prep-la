@@ -99,7 +99,7 @@ export const TableOfContents = ({ content }: TableOfContentsProps) => {
                   : "text-muted-foreground hover:text-primary hover:bg-muted/50"
               )}
             >
-              {extractNumber(heading.text)}
+              {heading.text}
             </button>
           </li>
         ))}
