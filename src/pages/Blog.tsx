@@ -78,6 +78,19 @@ const Blog = () => {
         <title>Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield</title>
         <meta name="description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
         <link rel="canonical" href="https://westfieldprepcenter.com/blog" />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content="Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield" />
+        <meta property="og:description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
+        <meta property="og:url" content="https://westfieldprepcenter.com/blog" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield" />
+        <meta name="twitter:description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
+        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="collectionPage" data={{ posts: posts.slice(0, 10) }} />
 

@@ -193,6 +193,9 @@ export function BlogPostSchema({
 
   return (
     <Helmet>
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta property="og:type" content="article" />
+      
       <script type="application/ld+json">
         {JSON.stringify(schema)}
       </script>
