@@ -7,7 +7,8 @@ export const generateMetaTags = (
   title: string,
   description: string,
   path: string,
-  imageUrl?: string
+  imageUrl?: string,
+  type: 'website' | 'article' = 'website'
 ) => {
   const canonicalUrl = getCanonicalUrl(path);
   const defaultImage = "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png";
@@ -20,6 +21,8 @@ export const generateMetaTags = (
     ogDescription: description,
     ogUrl: canonicalUrl,
     ogImage: imageUrl || defaultImage,
+    ogType: type,
+    twitterCard: 'summary_large_image',
     twitterTitle: title,
     twitterDescription: description,
     twitterImage: imageUrl || defaultImage

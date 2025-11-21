@@ -25,6 +25,9 @@ const FAQ = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  const pageTitle = "Frequently Asked Questions | Westfield Prep Center";
+  const pageDescription = "Get answers to common questions about Amazon FBA prep, Shopify fulfillment, storage, shipping, and our Los Angeles prep center services.";
+
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate("/");
@@ -498,9 +501,19 @@ const FAQ = () => {
         <title>Comprehensive FAQ - Westfield Prep Center | Shopify, Amazon FBA & TikTok Shop</title>
         <meta name="description" content="Get answers to 90+ questions about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, pricing, shipping, and e-commerce operations in Los Angeles." />
         <link rel="canonical" href="https://westfieldprepcenter.com/faq" />
+        
+        {/* Open Graph tags */}
         <meta property="og:title" content="Comprehensive FAQ - Westfield Prep Center" />
         <meta property="og:description" content="Get answers to 90+ questions about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, pricing, shipping, and e-commerce operations." />
         <meta property="og:url" content="https://westfieldprepcenter.com/faq" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Comprehensive FAQ - Westfield Prep Center" />
+        <meta name="twitter:description" content="Get answers to 90+ questions about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, pricing, shipping, and e-commerce operations." />
+        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData 
         type="faq" 
