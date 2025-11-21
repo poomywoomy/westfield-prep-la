@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import StructuredData from "@/components/StructuredData";
+import { generateMetaTags } from "@/utils/seo";
 
 const InventoryManagement = () => {
   const navigate = useNavigate();
@@ -15,6 +16,12 @@ const InventoryManagement = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const meta = generateMetaTags(
+    "Inventory Management Services | Real-Time Tracking | Westfield Prep Center",
+    "Professional inventory management in Los Angeles. Real-time sync, smart alerts, detailed analytics, and secure storage. Never stock out again.",
+    "/inventory-management"
+  );
 
   const serviceData = {
     "@context": "https://schema.org",
@@ -78,9 +85,18 @@ const InventoryManagement = () => {
   return (
     <>
       <Helmet>
-        <title>Inventory Management Services Los Angeles | Real-Time Tracking</title>
-        <meta name="description" content="Professional inventory management in LA. Real-time WMS, automated alerts, 99.9% accuracy. Track your stock levels 24/7 with our advanced system." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/inventory-management" />
+        <title>{meta.title}</title>
+        <meta name="description" content={meta.description} />
+        <link rel="canonical" href={meta.canonical} />
+        <meta property="og:title" content={meta.ogTitle} />
+        <meta property="og:description" content={meta.ogDescription} />
+        <meta property="og:url" content={meta.ogUrl} />
+        <meta property="og:image" content={meta.ogImage} />
+        <meta property="og:type" content={meta.ogType} />
+        <meta name="twitter:card" content={meta.twitterCard} />
+        <meta name="twitter:title" content={meta.twitterTitle} />
+        <meta name="twitter:description" content={meta.twitterDescription} />
+        <meta name="twitter:image" content={meta.twitterImage} />
       </Helmet>
 
       <StructuredData type="service" data={serviceData} />

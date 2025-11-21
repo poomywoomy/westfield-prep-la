@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import StructuredData from "@/components/StructuredData";
+import { generateMetaTags } from "@/utils/seo";
 
 const ReturnsProcessing = () => {
   const navigate = useNavigate();
@@ -15,6 +16,12 @@ const ReturnsProcessing = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const meta = generateMetaTags(
+    "Returns Processing Services | Restocking & Inspection | Westfield Prep Center",
+    "Professional returns processing in Los Angeles. Quick inspection, restocking, refurbishment, and detailed reporting. Turn returns into revenue.",
+    "/returns-processing"
+  );
 
   const serviceData = {
     "@context": "https://schema.org",
@@ -78,9 +85,18 @@ const ReturnsProcessing = () => {
   return (
     <>
       <Helmet>
-        <title>Returns Processing Services Los Angeles | Returns Management</title>
-        <meta name="description" content="Professional returns processing in LA. Fast inspection, restocking, and reporting. Handle Amazon FBA returns, customer returns, and reverse logistics efficiently." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/returns-processing" />
+        <title>{meta.title}</title>
+        <meta name="description" content={meta.description} />
+        <link rel="canonical" href={meta.canonical} />
+        <meta property="og:title" content={meta.ogTitle} />
+        <meta property="og:description" content={meta.ogDescription} />
+        <meta property="og:url" content={meta.ogUrl} />
+        <meta property="og:image" content={meta.ogImage} />
+        <meta property="og:type" content={meta.ogType} />
+        <meta name="twitter:card" content={meta.twitterCard} />
+        <meta name="twitter:title" content={meta.twitterTitle} />
+        <meta name="twitter:description" content={meta.twitterDescription} />
+        <meta name="twitter:image" content={meta.twitterImage} />
       </Helmet>
 
       <StructuredData type="service" data={serviceData} />
