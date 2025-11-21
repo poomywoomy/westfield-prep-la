@@ -15,6 +15,7 @@ import { TableOfContents } from "@/components/blog/TableOfContents";
 import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { AuthorBio } from "@/components/blog/AuthorBio";
 import { ShareButtons } from "@/components/blog/ShareButtons";
+import { parseMarkdown } from "@/lib/markdownParser";
 
 // Blog post page component
 interface BlogPost {
@@ -38,12 +39,20 @@ const BlogPost = () => {
   const navigate = useNavigate();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+  const [htmlContent, setHtmlContent] = useState<string>("");
 
   useEffect(() => {
     if (slug) {
       fetchPost();
     }
   }, [slug]);
+
+  // Parse markdown content to HTML
+  useEffect(() => {
+    if (post?.content) {
+      setHtmlContent(parseMarkdown(post.content));
+    }
+  }, [post?.content]);
 
   // Track view count
   useEffect(() => {
@@ -241,7 +250,7 @@ const BlogPost = () => {
                       </div>
                     )}
 
-                    <BlogPostRenderer content={post.content || ""} />
+                    <BlogPostRenderer content={htmlContent} />
 
                     {/* Author Bio */}
                     <AuthorBio 
@@ -269,7 +278,7 @@ const BlogPost = () => {
 
                   {/* Sidebar with Table of Contents */}
                   <aside className="lg:col-span-4">
-                    <TableOfContents content={post.content || ""} />
+                    <TableOfContents content={htmlContent} />
                   </aside>
                 </div>
               </div>
