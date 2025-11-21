@@ -2578,6 +2578,7 @@ export type Database = {
           alias_value: string
           created_at: string
           id: string
+          last_shopify_sync_at: string | null
           sku_id: string
         }
         Insert: {
@@ -2585,6 +2586,7 @@ export type Database = {
           alias_value: string
           created_at?: string
           id?: string
+          last_shopify_sync_at?: string | null
           sku_id: string
         }
         Update: {
@@ -2592,6 +2594,7 @@ export type Database = {
           alias_value?: string
           created_at?: string
           id?: string
+          last_shopify_sync_at?: string | null
           sku_id?: string
         }
         Relationships: [
@@ -3117,6 +3120,7 @@ export type Database = {
         | "TRANSFER"
         | "RESERVE"
         | "RELEASE"
+        | "SALE_RESTOCK"
       line_status: "awaiting" | "in_progress" | "ready" | "shipped"
       prep_status: "awaiting" | "in_progress" | "ready"
       quote_status: "draft" | "active" | "replaced" | "archived"
@@ -3274,6 +3278,7 @@ export const Constants = {
         "TRANSFER",
         "RESERVE",
         "RELEASE",
+        "SALE_RESTOCK",
       ],
       line_status: ["awaiting", "in_progress", "ready", "shipped"],
       prep_status: ["awaiting", "in_progress", "ready"],
