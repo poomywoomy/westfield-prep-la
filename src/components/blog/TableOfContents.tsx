@@ -59,6 +59,12 @@ export const TableOfContents = ({ content }: TableOfContentsProps) => {
 
   if (headings.length === 0) return null;
 
+  // Extract just the number from heading text (e.g., "1." or "2.1")
+  const extractNumber = (text: string): string => {
+    const match = text.match(/^(\d+\.?\d*)/);
+    return match ? match[1] : text;
+  };
+
   const scrollToHeading = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -77,28 +83,23 @@ export const TableOfContents = ({ content }: TableOfContentsProps) => {
 
   return (
     <nav className="sticky top-24 bg-card border rounded-lg p-6 shadow-sm">
-      <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground mb-4">
+      <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-6">
         Table of Contents
       </h3>
-      <ul className="space-y-2">
+      <ul className="space-y-1">
         {headings.map((heading) => (
-          <li
-            key={heading.id}
-            className={cn(
-              "text-sm transition-colors",
-              heading.level === 3 && "pl-4"
-            )}
-          >
+          <li key={heading.id}>
             <button
               onClick={() => scrollToHeading(heading.id)}
               className={cn(
-                "text-left hover:text-primary transition-colors w-full",
+                "w-full text-left py-2 px-4 rounded-md transition-all duration-200",
+                "font-bold text-2xl hover:scale-105",
                 activeId === heading.id
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground"
+                  ? "text-primary border-l-4 border-primary bg-primary/5"
+                  : "text-muted-foreground hover:text-primary hover:bg-muted/50"
               )}
             >
-              {heading.text}
+              {extractNumber(heading.text)}
             </button>
           </li>
         ))}
