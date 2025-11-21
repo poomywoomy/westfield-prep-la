@@ -19,7 +19,7 @@ export const TableOfContents = ({ content }: TableOfContentsProps) => {
     // Parse headings from HTML content
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
-    const headingElements = doc.querySelectorAll("h2, h3");
+    const headingElements = doc.querySelectorAll("h2");
     
     const parsedHeadings: Heading[] = Array.from(headingElements).map((heading, index) => {
       const id = `heading-${index}`;
@@ -47,7 +47,7 @@ export const TableOfContents = ({ content }: TableOfContentsProps) => {
 
     // Add IDs to actual headings in the DOM and observe them
     setTimeout(() => {
-      const actualHeadings = document.querySelectorAll("article h2, article h3");
+      const actualHeadings = document.querySelectorAll("article h2");
       actualHeadings.forEach((heading, index) => {
         heading.id = `heading-${index}`;
         observer.observe(heading);
