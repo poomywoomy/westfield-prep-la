@@ -84,6 +84,44 @@ const Index = () => {
       <StructuredData type="organization" />
       <StructuredData type="website" />
       <StructuredData type="faq" data={faqData} />
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "Westfield Prep Center",
+          "image": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Los Angeles",
+            "addressRegion": "CA",
+            "addressCountry": "US"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "34.0522",
+            "longitude": "-118.2437"
+          },
+          "url": "https://westfieldprepcenter.com",
+          "telephone": "+1-555-123-4567",
+          "priceRange": "$$",
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "opens": "08:00",
+            "closes": "17:00"
+          },
+          "areaServed": {
+            "@type": "GeoCircle",
+            "geoMidpoint": {
+              "@type": "GeoCoordinates",
+              "latitude": "34.0522",
+              "longitude": "-118.2437"
+            },
+            "geoRadius": "50000"
+          },
+          "serviceType": ["3PL Services", "Order Fulfillment", "Amazon FBA Prep", "Shopify Fulfillment", "Inventory Management"]
+        })}
+      </script>
       <div className="min-h-screen">
       <Header />
       <div className="pt-32">
