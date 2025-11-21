@@ -92,10 +92,10 @@ export const TableOfContents = ({ content }: TableOfContentsProps) => {
             <button
               onClick={() => scrollToHeading(heading.id)}
               className={cn(
-                "w-full text-left py-2 px-4 rounded-md transition-all duration-200",
-                "font-bold text-2xl hover:scale-105",
+                "w-full text-left py-1.5 px-3 rounded-md transition-colors duration-200",
+                "text-sm font-medium",
                 activeId === heading.id
-                  ? "text-primary border-l-4 border-primary bg-primary/5"
+                  ? "text-primary border-l-2 border-primary bg-primary/5"
                   : "text-muted-foreground hover:text-primary hover:bg-muted/50"
               )}
             >
