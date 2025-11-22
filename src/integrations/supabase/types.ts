@@ -1140,6 +1140,95 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_audit_log: {
+        Row: {
+          app_inventory: number
+          audit_timestamp: string
+          audit_type: string
+          auto_correction_attempted: boolean | null
+          auto_correction_success: boolean | null
+          client_id: string
+          created_at: string
+          difference: number
+          id: string
+          inventory_item_id: string
+          location_id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          shopify_inventory: number
+          sku_id: string
+          status: string
+        }
+        Insert: {
+          app_inventory: number
+          audit_timestamp?: string
+          audit_type?: string
+          auto_correction_attempted?: boolean | null
+          auto_correction_success?: boolean | null
+          client_id: string
+          created_at?: string
+          difference: number
+          id?: string
+          inventory_item_id: string
+          location_id: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          shopify_inventory: number
+          sku_id: string
+          status?: string
+        }
+        Update: {
+          app_inventory?: number
+          audit_timestamp?: string
+          audit_type?: string
+          auto_correction_attempted?: boolean | null
+          auto_correction_success?: boolean | null
+          client_id?: string
+          created_at?: string
+          difference?: number
+          id?: string
+          inventory_item_id?: string
+          location_id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          shopify_inventory?: number
+          sku_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_audit_log_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_audit_log_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "inventory_audit_log_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "inventory_audit_log_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_ledger: {
         Row: {
           client_id: string
@@ -2486,10 +2575,13 @@ export type Database = {
       }
       shopify_sync_config: {
         Row: {
+          auto_correct_discrepancies: boolean | null
           auto_sync_enabled: boolean
           client_id: string
           created_at: string
           id: string
+          inventory_audit_enabled: boolean | null
+          inventory_audit_frequency: string | null
           last_sync_at: string | null
           last_sync_product_count: number | null
           last_sync_status: string | null
@@ -2498,10 +2590,13 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          auto_correct_discrepancies?: boolean | null
           auto_sync_enabled?: boolean
           client_id: string
           created_at?: string
           id?: string
+          inventory_audit_enabled?: boolean | null
+          inventory_audit_frequency?: string | null
           last_sync_at?: string | null
           last_sync_product_count?: number | null
           last_sync_status?: string | null
@@ -2510,10 +2605,13 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          auto_correct_discrepancies?: boolean | null
           auto_sync_enabled?: boolean
           client_id?: string
           created_at?: string
           id?: string
+          inventory_audit_enabled?: boolean | null
+          inventory_audit_frequency?: string | null
           last_sync_at?: string | null
           last_sync_product_count?: number | null
           last_sync_status?: string | null
@@ -2823,6 +2921,8 @@ export type Database = {
         Row: {
           client_id: string
           created_at: string
+          discrepancies_corrected: number | null
+          discrepancies_found: number | null
           duration_ms: number | null
           error_message: string | null
           id: string
@@ -2831,10 +2931,13 @@ export type Database = {
           status: string
           sync_type: string
           triggered_by: string | null
+          validation_errors: Json | null
         }
         Insert: {
           client_id: string
           created_at?: string
+          discrepancies_corrected?: number | null
+          discrepancies_found?: number | null
           duration_ms?: number | null
           error_message?: string | null
           id?: string
@@ -2843,10 +2946,13 @@ export type Database = {
           status?: string
           sync_type: string
           triggered_by?: string | null
+          validation_errors?: Json | null
         }
         Update: {
           client_id?: string
           created_at?: string
+          discrepancies_corrected?: number | null
+          discrepancies_found?: number | null
           duration_ms?: number | null
           error_message?: string | null
           id?: string
@@ -2855,6 +2961,7 @@ export type Database = {
           status?: string
           sync_type?: string
           triggered_by?: string | null
+          validation_errors?: Json | null
         }
         Relationships: [
           {

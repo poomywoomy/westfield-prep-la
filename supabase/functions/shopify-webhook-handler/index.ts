@@ -99,7 +99,12 @@ Deno.serve(async (req) => {
       } else if (topic === 'inventory_levels/update') {
         await handleInventoryWebhook(supabase, store.client_id, payload);
       } else if (topic.startsWith('orders/')) {
-        await handleOrderWebhook(supabase, store.client_id, topic, payload);
+        // PHASE 1: Handle order cancellations to restore inventory
+        if (topic === 'orders/cancelled') {
+          await handleOrderCancellation(supabase, store.client_id, payload);
+        } else {
+          await handleOrderWebhook(supabase, store.client_id, topic, payload);
+        }
       } else if (topic === 'fulfillment_orders/order_routing_complete') {
         await handleFulfillmentOrderWebhook(supabase, store.client_id, payload);
       } else if (topic.startsWith('returns/')) {
@@ -470,6 +475,107 @@ async function handleFulfillmentOrderWebhook(
     console.error('[Fulfillment] Update failed:', error);
   } else {
     console.log(`[Fulfillment] Updated order ${fulfillmentOrder.order_id}`);
+  }
+}
+
+async function handleOrderCancellation(
+  supabase: any,
+  clientId: string,
+  order: any
+) {
+  const shopifyOrderId = order.id.toString();
+  console.log(`[Order Cancellation] Processing cancellation for order ${shopifyOrderId}`);
+
+  // Check if this order was previously decremented
+  const { data: existingDecrements } = await supabase
+    .from('inventory_ledger')
+    .select('sku_id, qty_delta')
+    .eq('client_id', clientId)
+    .eq('shopify_order_id', shopifyOrderId)
+    .eq('transaction_type', 'SALE_DECREMENT');
+
+  if (!existingDecrements || existingDecrements.length === 0) {
+    console.log(`[Order Cancellation] No previous decrements found for order ${shopifyOrderId}`);
+    return;
+  }
+
+  // Check if already restored (idempotency)
+  const { data: existingRestoration } = await supabase
+    .from('inventory_ledger')
+    .select('id')
+    .eq('client_id', clientId)
+    .eq('shopify_order_id', shopifyOrderId)
+    .eq('transaction_type', 'CANCELLATION_INCREMENT')
+    .limit(1)
+    .maybeSingle();
+
+  if (existingRestoration) {
+    console.log(`[Order Cancellation] Order ${shopifyOrderId} already restored, skipping`);
+    return;
+  }
+
+  // Get location
+  const { data: location } = await supabase
+    .from('locations')
+    .select('id')
+    .eq('client_id', clientId)
+    .eq('code', 'MAIN')
+    .maybeSingle();
+
+  if (!location) {
+    console.error(`[Order Cancellation] No MAIN location found for client ${clientId}`);
+    return;
+  }
+
+  // Restore inventory (reverse the decrements)
+  const restorationEntries = existingDecrements.map((decrement: any) => ({
+    client_id: clientId,
+    sku_id: decrement.sku_id,
+    location_id: location.id,
+    qty_delta: Math.abs(decrement.qty_delta), // Positive to restore
+    transaction_type: 'CANCELLATION_INCREMENT',
+    source_type: 'webhook',
+    source_ref: null,
+    shopify_order_id: shopifyOrderId,
+    notes: `Restored from cancelled order ${order.name}`,
+    user_id: null,
+  }));
+
+  const { error: insertError } = await supabase
+    .from('inventory_ledger')
+    .insert(restorationEntries);
+
+  if (insertError) {
+    console.error('[Order Cancellation] Failed to restore inventory:', insertError);
+    throw insertError;
+  }
+
+  console.log(`[Order Cancellation] ✓ Restored ${restorationEntries.length} items for order ${shopifyOrderId}`);
+
+  // Push updated inventory to Shopify for each SKU
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  
+  for (const entry of restorationEntries) {
+    try {
+      const response = await fetch(`${supabaseUrl}/functions/v1/shopify-push-inventory-single`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify({
+          client_id: clientId,
+          sku_id: entry.sku_id,
+        }),
+      });
+      
+      if (!response.ok) {
+        console.error(`[Order Cancellation] Failed to sync SKU ${entry.sku_id} to Shopify`);
+      }
+    } catch (syncError) {
+      console.error(`[Order Cancellation] Error syncing to Shopify:`, syncError);
+    }
   }
 }
 

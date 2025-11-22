@@ -31,6 +31,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount }: Ap
     { id: "shipments", label: "Shipments", icon: Package },
     { id: "shopify", label: "Shopify", icon: Store },
     { id: "health", label: "Sync Health", icon: Activity },
+    { id: "audit", label: "Inventory Audit", icon: Activity },
     { id: "orders", label: "Orders", icon: ShoppingCart },
     { id: "blog", label: "Blog", icon: PenSquare },
     { id: "documents", label: "Documents", icon: FileSignature },

@@ -21,6 +21,7 @@ const DocumentGeneratorTab = lazy(() => import("@/components/admin/DocumentGener
 const ShopifyManagementTab = lazy(() => import("@/components/admin/ShopifyManagementTab").then(m => ({ default: m.ShopifyManagementTab })));
 const ShopifySyncHealthDashboard = lazy(() => import("@/components/admin/ShopifySyncHealthDashboard").then(m => ({ default: m.ShopifySyncHealthDashboard })));
 const InventoryTab = lazy(() => import("@/components/admin/InventoryTab").then(m => ({ default: m.InventoryTab })));
+const InventoryAuditTab = lazy(() => import("@/components/admin/InventoryAuditTab").then(m => ({ default: m.InventoryAuditTab })));
 const BlogTab = lazy(() => import("@/components/admin/BlogTab").then(m => ({ default: m.BlogTab })));
 const DiscrepanciesTab = lazy(() => import("@/components/admin/DiscrepanciesTab").then(m => ({ default: m.DiscrepanciesTab })));
 const OrdersTab = lazy(() => import("@/components/admin/OrdersTab").then(m => ({ default: m.OrdersTab })));
@@ -174,6 +175,12 @@ const AdminDashboard = () => {
           <TabsContent value="health">
             <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
               <ShopifySyncHealthDashboard />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="audit">
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <InventoryAuditTab />
             </Suspense>
           </TabsContent>
 
