@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     console.log(`[Inventory Audit] Starting ${audit_type} audit${client_id ? ` for client ${client_id}` : ' for all clients'}`);
 
     // Get clients to audit
-    let clientsToAudit = [];
+    let clientsToAudit: Array<{ id: string; company_name: string; auto_correct?: boolean }> = [];
     if (client_id) {
       const { data: singleClient } = await supabase
         .from('clients')
@@ -241,7 +241,7 @@ Deno.serve(async (req) => {
           company_name: client.company_name,
           skus_checked: skusChecked,
           discrepancies_found: discrepancies.length,
-          auto_corrected: autoCorrect ? discrepancies.length : 0,
+          auto_corrected: client.auto_correct ? discrepancies.length : 0,
         });
 
       } catch (clientError) {

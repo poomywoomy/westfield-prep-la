@@ -177,7 +177,8 @@ Deno.serve(async (req) => {
         }
       }
     } catch (locationError) {
-      validationReport.errors.push(`Failed to validate location: ${locationError.message}`);
+      const errorMessage = locationError instanceof Error ? locationError.message : String(locationError);
+      validationReport.errors.push(`Failed to validate location: ${errorMessage}`);
       validationReport.checks.location_exists_shopify = 'ERROR';
     }
 
@@ -215,7 +216,8 @@ Deno.serve(async (req) => {
           }
         }
       } catch (itemError) {
-        validationReport.errors.push(`Failed to validate inventory item: ${itemError.message}`);
+        const errorMessage = itemError instanceof Error ? itemError.message : String(itemError);
+        validationReport.errors.push(`Failed to validate inventory item: ${errorMessage}`);
         validationReport.checks.inventory_item_exists_shopify = 'ERROR';
       }
     }
@@ -254,7 +256,8 @@ Deno.serve(async (req) => {
           validationReport.checks.shopify_inventory = 'NOT_FOUND';
         }
       } catch (inventoryError) {
-        validationReport.warnings.push(`Failed to fetch Shopify inventory: ${inventoryError.message}`);
+        const errorMessage = inventoryError instanceof Error ? inventoryError.message : String(inventoryError);
+        validationReport.warnings.push(`Failed to fetch Shopify inventory: ${errorMessage}`);
         validationReport.checks.shopify_inventory = 'ERROR';
       }
     }
