@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShoppingCart, Package, ArrowDownToLine, Undo2, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import { ShoppingCart, Package, ArrowDownToLine, DollarSign, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DateRange {
   start: Date;
@@ -63,6 +64,33 @@ export const PeriodMetricsCard = ({
   colorScheme,
 }: PeriodMetricsCardProps) => {
   const [expanded, setExpanded] = useState(false);
+  const [invoiceTotal, setInvoiceTotal] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchInvoiceTotal = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: client } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (client) {
+        const { data: bill } = await supabase
+          .from('bills')
+          .select('amount_due_cents')
+          .eq('client_id', client.id)
+          .eq('status', 'open')
+          .maybeSingle();
+
+        setInvoiceTotal((bill?.amount_due_cents || 0) / 100);
+      }
+    };
+
+    fetchInvoiceTotal();
+  }, []);
 
   if (loading) {
     return (
@@ -149,33 +177,35 @@ export const PeriodMetricsCard = ({
             <p className="text-3xl font-bold">{metrics.unitsReceived.toLocaleString()}</p>
           </div>
 
-          {/* Units Returned */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-white/90">
-              <Undo2 className="h-4 w-4" />
-              <span className="text-xs font-medium">Returned</span>
-            </div>
-            <p className="text-3xl font-bold">{metrics.unitsReturned.toLocaleString()}</p>
-          </div>
-
-          {/* Receiving Discrepancies */}
+          {/* Pending Action */}
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-white/90">
               <AlertTriangle className="h-4 w-4" />
-              <span className="text-xs font-medium">Receiving Issues</span>
+              <span className="text-xs font-medium">Pending Action</span>
             </div>
-            <p className="text-3xl font-bold">{metrics.receivingDiscrepancies.count}</p>
-            <p className="text-xs text-white/70">{metrics.receivingDiscrepancies.total} units</p>
+            <p className="text-3xl font-bold">
+              {data.discrepancies.total + data.lowStock.length}
+            </p>
+            <p className="text-xs text-white/70">Issues requiring review</p>
           </div>
 
-          {/* Return Discrepancies */}
+          {/* Units Shipped */}
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-white/90">
-              <AlertTriangle className="h-4 w-4" />
-              <span className="text-xs font-medium">Return Issues</span>
+              <Package className="h-4 w-4" />
+              <span className="text-xs font-medium">Units Shipped</span>
             </div>
-            <p className="text-3xl font-bold">{metrics.returnDiscrepancies.count}</p>
-            <p className="text-xs text-white/70">{metrics.returnDiscrepancies.total} units</p>
+            <p className="text-3xl font-bold">{metrics.unitsSold.toLocaleString()}</p>
+          </div>
+
+          {/* Current Invoice Total */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-white/90">
+              <DollarSign className="h-4 w-4" />
+              <span className="text-xs font-medium">Current Invoice</span>
+            </div>
+            <p className="text-3xl font-bold">${invoiceTotal.toFixed(2)}</p>
+            <p className="text-xs text-white/70">Amount due</p>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { Users, FileText, DollarSign, Package, AlertTriangle, Store, ShoppingCart, PenSquare, FileSignature, History, Activity } from "lucide-react";
+import { Users, FileText, DollarSign, Package, AlertTriangle, Store, ShoppingCart, PenSquare, FileSignature, History, Activity, Truck, LifeBuoy } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,16 +11,26 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
+import { usePendingShipmentRequestsCount } from "@/hooks/useShipmentRequests";
+import { useOpenSupportTicketsCount } from "@/hooks/useSupportTickets";
 
 interface AppSidebarAdminProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   discrepancyCount: number;
+  shipmentRequestsCount?: number;
+  supportTicketsCount?: number;
 }
 
-export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount }: AppSidebarAdminProps) {
+export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount, shipmentRequestsCount: propShipmentCount, supportTicketsCount: propSupportCount }: AppSidebarAdminProps) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  
+  const { data: fetchedShipmentCount = 0 } = usePendingShipmentRequestsCount();
+  const { data: fetchedSupportCount = 0 } = useOpenSupportTicketsCount();
+  
+  const shipmentRequestsCount = propShipmentCount ?? fetchedShipmentCount;
+  const supportTicketsCount = propSupportCount ?? fetchedSupportCount;
 
   const menuItems = [
     { id: "clients", label: "Clients", icon: Users },
@@ -33,6 +43,8 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount }: Ap
     { id: "health", label: "Sync Health", icon: Activity },
     { id: "audit", label: "Inventory Audit", icon: Activity },
     { id: "orders", label: "Orders", icon: ShoppingCart },
+    { id: "shipment-requests", label: "Shipment Requests", icon: Truck, badge: shipmentRequestsCount },
+    { id: "support-tickets", label: "Support Tickets", icon: LifeBuoy, badge: supportTicketsCount },
     { id: "blog", label: "Blog", icon: PenSquare },
     { id: "documents", label: "Documents", icon: FileSignature },
   ];

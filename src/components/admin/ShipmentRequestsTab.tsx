@@ -152,3 +152,5 @@ export const ShipmentRequestsTab = () => {
     </Card>
   );
 };
+
+export default ShipmentRequestsTab;

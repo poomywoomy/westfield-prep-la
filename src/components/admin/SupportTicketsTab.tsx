@@ -141,3 +141,5 @@ export const SupportTicketsTab = () => {
     </Card>
   );
 };
+
+export default SupportTicketsTab;

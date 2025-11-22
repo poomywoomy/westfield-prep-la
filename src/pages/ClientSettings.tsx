@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, User, Store } from "lucide-react";
+import { ArrowLeft, User, Store, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import ClientShopifyTab from "@/components/client/ClientShopifyTab";
 
@@ -41,10 +42,14 @@ const ClientSettings = () => {
     }
   }, [user]);
 
+  const [locationId, setLocationId] = useState<string>("");
+  const [validating, setValidating] = useState(false);
+  const [locationStatus, setLocationStatus] = useState<any>(null);
+
   const fetchClientData = async () => {
     const { data, error } = await supabase
       .from("clients")
-      .select("id, first_name, last_name, company_name, email, phone_number, default_low_stock_threshold")
+      .select("id, first_name, last_name, company_name, email, phone_number, default_low_stock_threshold, shopify_location_id")
       .eq("user_id", user?.id)
       .single();
 
@@ -55,6 +60,7 @@ const ClientSettings = () => {
       setCompanyName(data.company_name || "");
       setPhoneNumber(data.phone_number || "");
       setLowStockThreshold(data.default_low_stock_threshold || 10);
+      setLocationId(data.shopify_location_id || "");
       setHasSetPassword(true);
     }
   };
@@ -89,6 +95,65 @@ const ClientSettings = () => {
         description: "Profile updated successfully",
       });
       fetchClientData();
+    }
+  };
+
+  const validateLocation = async () => {
+    if (!locationId) {
+      toast({
+        title: "Error",
+        description: "Please enter a location ID first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setValidating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('shopify-validate-location', {
+        body: { client_id: clientData.id, location_id: locationId }
+      });
+
+      if (error) throw error;
+      setLocationStatus(data);
+
+      toast({
+        title: data.valid ? "Valid Location" : "Invalid Location",
+        description: data.valid ? data.location_name : data.error,
+        variant: data.valid ? "default" : "destructive",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Validation Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      setLocationStatus({ valid: false, error: error.message });
+    } finally {
+      setValidating(false);
+    }
+  };
+
+  const saveLocationId = async () => {
+    try {
+      const { error } = await supabase
+        .from('clients')
+        .update({ shopify_location_id: locationId || null })
+        .eq('id', clientData.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Location ID saved successfully",
+      });
+      setLocationStatus(null);
+    } catch (error: any) {
+      toast({
+        title: "Save Failed",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -327,6 +392,74 @@ const ClientSettings = () => {
                   {isUpdating ? "Updating..." : "Update Password"}
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Shopify Integration Settings</CardTitle>
+              <CardDescription>
+                Configure your Shopify location for accurate inventory sync
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="shopify_location_id">
+                  Shopify Location ID
+                  <span className="text-muted-foreground ml-2">(Optional)</span>
+                </Label>
+
+                <div className="flex gap-2">
+                  <Input
+                    id="shopify_location_id"
+                    value={locationId}
+                    onChange={(e) => setLocationId(e.target.value)}
+                    placeholder="Auto-selected if empty"
+                    className="flex-1"
+                  />
+                  <Button 
+                    variant="outline"
+                    onClick={validateLocation}
+                    disabled={validating || !locationId}
+                  >
+                    {validating ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Validate"
+                    )}
+                  </Button>
+                </div>
+
+                {locationStatus && (
+                  <Alert className={locationStatus.valid ? "border-green-500 bg-green-50 dark:bg-green-950" : "border-red-500 bg-red-50 dark:bg-red-950"}>
+                    <AlertDescription className="flex items-center gap-2">
+                      {locationStatus.valid ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <span className="text-green-900 dark:text-green-100">
+                            Valid: {locationStatus.location_name}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="h-4 w-4 text-red-600" />
+                          <span className="text-red-900 dark:text-red-100">{locationStatus.error}</span>
+                        </>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <p className="text-sm text-muted-foreground">
+                  Leave empty to auto-select your store's primary fulfillment location. 
+                  If Westfield Prep is your 3PL warehouse, create a separate Shopify 
+                  location and enter its ID here for accurate inventory sync.
+                </p>
+              </div>
+
+              <Button onClick={saveLocationId}>
+                Save Location Settings
+              </Button>
             </CardContent>
           </Card>
 

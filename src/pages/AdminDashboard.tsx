@@ -11,6 +11,8 @@ import { LogOut, Settings, ChevronDown, Scan } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import { QuickScanModal } from "@/components/admin/QuickScanModal";
 import { usePendingDiscrepancyCount } from "@/hooks/usePendingDiscrepancyCount";
+import { usePendingShipmentRequestsCount } from "@/hooks/useShipmentRequests";
+import { useOpenSupportTicketsCount } from "@/hooks/useSupportTickets";
 import { AppSidebarAdmin } from "@/components/app-sidebar-admin";
 
 // Lazy load tab components for better performance
@@ -26,6 +28,8 @@ const BlogTab = lazy(() => import("@/components/admin/BlogTab").then(m => ({ def
 const DiscrepanciesTab = lazy(() => import("@/components/admin/DiscrepanciesTab").then(m => ({ default: m.DiscrepanciesTab })));
 const OrdersTab = lazy(() => import("@/components/admin/OrdersTab").then(m => ({ default: m.OrdersTab })));
 const ShipmentsTab = lazy(() => import("@/components/admin/ShipmentsTab").then(m => ({ default: m.ShipmentsTab })));
+const ShipmentRequestsTab = lazy(() => import("@/components/admin/ShipmentRequestsTab"));
+const SupportTicketsTab = lazy(() => import("@/components/admin/SupportTicketsTab"));
 
 const AdminDashboard = () => {
   const { user, role, loading, logout } = useAuth();
@@ -34,6 +38,8 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("clients");
   const [showQuickScan, setShowQuickScan] = useState(false);
   const { count: discrepancyCount } = usePendingDiscrepancyCount();
+  const { data: shipmentRequestsCount = 0 } = usePendingShipmentRequestsCount();
+  const { data: supportTicketsCount = 0 } = useOpenSupportTicketsCount();
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -99,10 +105,12 @@ const AdminDashboard = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebarAdmin 
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          discrepancyCount={discrepancyCount}
-        />
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              discrepancyCount={discrepancyCount}
+              shipmentRequestsCount={shipmentRequestsCount}
+              supportTicketsCount={supportTicketsCount}
+            />
         
         <div className="flex-1 flex flex-col">
           <header className="border-b border-border bg-card">
@@ -209,6 +217,18 @@ const AdminDashboard = () => {
           <TabsContent value="documents">
             <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
               <DocumentGeneratorTab />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="shipment-requests">
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <ShipmentRequestsTab />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="support-tickets">
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <SupportTicketsTab />
             </Suspense>
           </TabsContent>
         </Tabs>
