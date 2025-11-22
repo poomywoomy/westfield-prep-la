@@ -41,8 +41,8 @@ export const OrderVolumeChart = ({ clientId }: OrderVolumeChartProps) => {
       const step = Math.floor(currentData.length / 15);
       return currentData.filter((_, i) => i % (step || 1) === 0).map(d => d.name);
     } else if (timeframe === '90days' && currentData.length > 0) {
-      // Show ~12 evenly spaced ticks
-      const step = Math.floor(currentData.length / 12);
+      // Show ~30 evenly spaced date markers
+      const step = Math.floor(currentData.length / 30);
       return currentData.filter((_, i) => i % (step || 1) === 0).map(d => d.name);
     }
     return undefined; // Auto for other timeframes

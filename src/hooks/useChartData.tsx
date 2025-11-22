@@ -119,6 +119,8 @@ export const useChartData = (clientId: string, timeframe: TimeframeType) => {
           let label = '';
           if (timeframe === '7days') {
             label = format(date, 'EEE'); // Mon, Tue, etc.
+          } else if (timeframe === '90days') {
+            label = format(date, 'MMM d'); // Aug 1, Aug 10, etc.
           } else if (timeframe === 'mtd') {
             label = format(date, 'd'); // 1, 2, 3, etc.
           } else {
