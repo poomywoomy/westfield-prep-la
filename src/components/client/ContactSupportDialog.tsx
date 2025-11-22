@@ -20,6 +20,7 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [issueType, setIssueType] = useState("");
+  const [otherIssueText, setOtherIssueText] = useState("");
   const [contactMethod, setContactMethod] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -53,6 +54,7 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
 
   const resetForm = () => {
     setIssueType("");
+    setOtherIssueText("");
     setContactMethod("");
     setMessage("");
   };
@@ -67,34 +69,57 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
       return;
     }
 
+    if (issueType === "other" && !otherIssueText.trim()) {
+      toast({
+        title: "Please Specify Issue Type",
+        description: "Please describe the type of issue",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSubmitting(true);
     try {
-      // Call existing send-contact-email edge function
-      const { error } = await supabase.functions.invoke('send-contact-email', {
+      // Create support ticket in database
+      const { data: ticket, error: ticketError } = await supabase
+        .from('support_tickets')
+        .insert({
+          client_id: clientId,
+          issue_category: issueType === "other" ? otherIssueText : issueType,
+          preferred_contact_method: contactMethod,
+          contact_email: email,
+          contact_phone: phone,
+          issue_description: message,
+          status: 'open'
+        })
+        .select()
+        .single();
+
+      if (ticketError) throw ticketError;
+
+      // Send email notification
+      const issueLabel = issueType === "other" ? otherIssueText : issueType;
+      await supabase.functions.invoke('send-contact-email', {
         body: {
-          clientId,
-          clientEmail: email,
-          clientPhone: phone,
-          issueType,
-          contactMethod,
-          message,
-          to: 'admin@westfieldprepcenter.com'
+          name: email,
+          email: email,
+          phone: phone,
+          message: `Issue Type: ${issueLabel}\nPreferred Contact: ${contactMethod}\n\n${message}`,
+          subject: `Support Ticket: ${issueLabel}`
         }
       });
 
-      if (error) throw error;
-
-      setTicketId("ticket-" + Date.now());
+      setTicketId(ticket.id);
       toast({ 
-        title: "Message Sent Successfully", 
-        description: "Your message has been sent to admin@westfieldprepcenter.com" 
+        title: "Support Ticket Created", 
+        description: "We'll respond shortly via your preferred contact method." 
       });
       onSuccess();
       setTimeout(() => onOpenChange(false), 2000);
     } catch (error: any) {
-      console.error("Error sending message:", error);
+      console.error("Error submitting ticket:", error);
       toast({
-        title: "Failed to Send Message",
+        title: "Failed to Submit Ticket",
         description: error.message || "Please try again later",
         variant: "destructive",
       });
@@ -125,12 +150,22 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input value={email} disabled className="bg-muted" />
+                  <Label>Email *</Label>
+                  <Input 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)}
+                    readOnly 
+                    className="bg-muted cursor-not-allowed" 
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>Phone</Label>
-                  <Input value={phone} disabled className="bg-muted" />
+                  <Label>Phone *</Label>
+                  <Input 
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)}
+                    readOnly 
+                    className="bg-muted cursor-not-allowed" 
+                  />
                 </div>
               </div>
 
@@ -141,18 +176,26 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
                     <SelectValue placeholder="Select issue type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="technical">Technical Issue</SelectItem>
-                    <SelectItem value="asn">ASN / Receiving</SelectItem>
-                    <SelectItem value="integration">Integration</SelectItem>
-                    <SelectItem value="sku">SKU Management</SelectItem>
-                    <SelectItem value="returns">Returns</SelectItem>
-                    <SelectItem value="discrepancies">Discrepancies</SelectItem>
-                    <SelectItem value="shipping">Shipping</SelectItem>
-                    <SelectItem value="shipment_creation">Shipment Creation</SelectItem>
-                    <SelectItem value="billing">Billing</SelectItem>
+                    <SelectItem value="Technical">Technical</SelectItem>
+                    <SelectItem value="ASN">ASN</SelectItem>
+                    <SelectItem value="Integration">Integration</SelectItem>
+                    <SelectItem value="SKU">SKU</SelectItem>
+                    <SelectItem value="Returns">Returns</SelectItem>
+                    <SelectItem value="Discrepancies">Discrepancies</SelectItem>
+                    <SelectItem value="Shipping">Shipping</SelectItem>
+                    <SelectItem value="Shipment Creation">Shipment Creation</SelectItem>
+                    <SelectItem value="Billing">Billing</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
+                {issueType === "other" && (
+                  <Input
+                    placeholder="Please specify issue type"
+                    value={otherIssueText}
+                    onChange={(e) => setOtherIssueText(e.target.value)}
+                    className="mt-2"
+                  />
+                )}
               </div>
 
               <div className="space-y-2">
@@ -162,9 +205,9 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
                     <SelectValue placeholder="Select contact method" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="email">Email</SelectItem>
-                    <SelectItem value="phone">Phone call</SelectItem>
-                    <SelectItem value="text">Text message</SelectItem>
+                    <SelectItem value="Email">Email</SelectItem>
+                    <SelectItem value="Phone">Phone</SelectItem>
+                    <SelectItem value="Text Message">Text Message</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

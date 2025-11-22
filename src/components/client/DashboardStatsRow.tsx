@@ -27,12 +27,24 @@ export const DashboardStatsRow = ({ salesToday, shippedToday, pendingAction, loa
       if (client) {
         const { data: bill } = await supabase
           .from('bills')
-          .select('amount_due_cents')
+          .select('id, subtotal_cents')
           .eq('client_id', client.id)
           .eq('status', 'open')
           .maybeSingle();
           
-        setInvoiceTotal((bill?.amount_due_cents || 0) / 100);
+        if (bill) {
+          // Get payments for this bill - SAME LOGIC as ClientBillingTab
+          const { data: payments } = await supabase
+            .from('payments')
+            .select('amount_cents')
+            .eq('bill_id', bill.id);
+          
+          const totalPayments = (payments || []).reduce((sum, p) => sum + p.amount_cents, 0);
+          const outstanding = bill.subtotal_cents - totalPayments;
+          setInvoiceTotal(outstanding / 100);
+        } else {
+          setInvoiceTotal(0);
+        }
       }
     };
     
