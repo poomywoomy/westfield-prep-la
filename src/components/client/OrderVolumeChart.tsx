@@ -3,38 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useChartData } from "@/hooks/useChartData";
+import { Loader2 } from "lucide-react";
 
 type Dataset = 'orderVolume' | 'unitsReceived' | 'unitsShipped';
-
-const chartDatasets = {
-  orderVolume: [
-    { name: 'Mon', value: 24 },
-    { name: 'Tue', value: 45 },
-    { name: 'Wed', value: 32 },
-    { name: 'Thu', value: 58 },
-    { name: 'Fri', value: 67 },
-    { name: 'Sat', value: 43 },
-    { name: 'Sun', value: 38 }
-  ],
-  unitsReceived: [
-    { name: 'Mon', value: 150 },
-    { name: 'Tue', value: 220 },
-    { name: 'Wed', value: 180 },
-    { name: 'Thu', value: 290 },
-    { name: 'Fri', value: 340 },
-    { name: 'Sat', value: 210 },
-    { name: 'Sun', value: 190 }
-  ],
-  unitsShipped: [
-    { name: 'Mon', value: 120 },
-    { name: 'Tue', value: 180 },
-    { name: 'Wed', value: 165 },
-    { name: 'Thu', value: 245 },
-    { name: 'Fri', value: 298 },
-    { name: 'Sat', value: 175 },
-    { name: 'Sun', value: 156 }
-  ]
-};
 
 const datasetLabels = {
   orderVolume: 'Order Volume',
@@ -42,18 +14,25 @@ const datasetLabels = {
   unitsShipped: 'Units Shipped'
 };
 
-export const OrderVolumeChart = () => {
-  const [activeDataset, setActiveDataset] = useState<Dataset>('orderVolume');
-  const [timePeriod, setTimePeriod] = useState('7days');
+interface OrderVolumeChartProps {
+  clientId: string;
+}
 
-  const currentData = chartDatasets[activeDataset];
+export const OrderVolumeChart = ({ clientId }: OrderVolumeChartProps) => {
+  const [activeDataset, setActiveDataset] = useState<Dataset>('orderVolume');
+  const [timePeriod, setTimePeriod] = useState<'7days' | '30days'>('7days');
+  
+  const days = timePeriod === '7days' ? 7 : 30;
+  const { data, loading } = useChartData(clientId, days);
+
+  const currentData = data?.[activeDataset] || [];
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Performance Metrics</CardTitle>
-          <Select value={timePeriod} onValueChange={setTimePeriod}>
+          <Select value={timePeriod} onValueChange={(value: '7days' | '30days') => setTimePeriod(value)}>
             <SelectTrigger className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
@@ -94,9 +73,14 @@ export const OrderVolumeChart = () => {
         </div>
 
         {/* Chart */}
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={currentData}>
+        {loading ? (
+          <div className="h-[300px] flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={currentData}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
@@ -132,9 +116,10 @@ export const OrderVolumeChart = () => {
             </AreaChart>
           </ResponsiveContainer>
         </div>
+        )}
 
         <p className="text-sm text-muted-foreground text-center">
-          Showing {datasetLabels[activeDataset]} for the last 7 days
+          Showing {datasetLabels[activeDataset]} for the last {days} days
         </p>
       </CardContent>
     </Card>

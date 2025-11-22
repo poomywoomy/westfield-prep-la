@@ -20,6 +20,7 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [issueType, setIssueType] = useState("");
+  const [contactMethod, setContactMethod] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [ticketId, setTicketId] = useState<string | null>(null);
@@ -52,32 +53,54 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
 
   const resetForm = () => {
     setIssueType("");
+    setContactMethod("");
     setMessage("");
   };
 
   const handleSubmit = async () => {
-    if (!issueType || !message.trim()) {
+    if (!issueType || !message.trim() || !contactMethod) {
       toast({
         title: "Required Fields Missing",
-        description: "Please select issue type and enter a message",
+        description: "Please fill in all required fields",
         variant: "destructive",
       });
       return;
     }
 
     setSubmitting(true);
-    
-    // UI-only mode - simulate submission without database insert
-    setTimeout(() => {
-      setTicketId("mock-ticket-id");
+    try {
+      // Call existing send-contact-email edge function
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: {
+          clientId,
+          clientEmail: email,
+          clientPhone: phone,
+          issueType,
+          contactMethod,
+          message,
+          to: 'admin@westfieldprepcenter.com'
+        }
+      });
+
+      if (error) throw error;
+
+      setTicketId("ticket-" + Date.now());
       toast({ 
-        title: "Message Sent", 
-        description: "Your message will be sent to admin@westfieldprepcenter.com" 
+        title: "Message Sent Successfully", 
+        description: "Your message has been sent to admin@westfieldprepcenter.com" 
       });
       onSuccess();
-      setSubmitting(false);
       setTimeout(() => onOpenChange(false), 2000);
-    }, 500);
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Failed to Send Message",
+        description: error.message || "Please try again later",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -128,6 +151,20 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
                     <SelectItem value="shipment_creation">Shipment Creation</SelectItem>
                     <SelectItem value="billing">Billing</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contactMethod">Preferred Contact Method *</Label>
+                <Select value={contactMethod} onValueChange={setContactMethod}>
+                  <SelectTrigger id="contactMethod">
+                    <SelectValue placeholder="Select contact method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="email">Email</SelectItem>
+                    <SelectItem value="phone">Phone call</SelectItem>
+                    <SelectItem value="text">Text message</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -41,27 +41,59 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  // Mock SKUs - No database queries
-  const mockSkus: SKU[] = [
-    { id: "1", client_sku: "SKU-001", title: "Sample Item A", image_url: null, available: 50 },
-    { id: "2", client_sku: "SKU-002", title: "Sample Item B", image_url: null, available: 30 },
-    { id: "3", client_sku: "SKU-003", title: "Sample Item C", image_url: null, available: 75 },
-    { id: "4", client_sku: "SKU-004", title: "Sample Item D", image_url: null, available: 100 },
-    { id: "5", client_sku: "SKU-005", title: "Sample Item E", image_url: null, available: 25 }
-  ];
-
   useEffect(() => {
     if (open && clientId) {
-      // Load mock SKUs immediately
-      setLoading(true);
-      setTimeout(() => {
-        setSKUs(mockSkus);
-        setLoading(false);
-      }, 300); // Simulate loading
+      fetchRealSKUs();
     } else {
       resetForm();
     }
   }, [open, clientId]);
+
+  const fetchRealSKUs = async () => {
+    setLoading(true);
+    try {
+      // Query inventory_summary view with SKU details
+      const { data, error } = await supabase
+        .from("inventory_summary")
+        .select(`
+          sku_id,
+          client_sku,
+          available,
+          skus (
+            id,
+            client_sku,
+            title,
+            image_url
+          )
+        `)
+        .eq("client_id", clientId)
+        .gt("available", 0) // Only show SKUs with inventory
+        .order("client_sku", { ascending: true });
+
+      if (error) throw error;
+
+      // Transform data to match SKU interface
+      const transformedSkus: SKU[] = (data || []).map((item: any) => ({
+        id: item.sku_id,
+        client_sku: item.skus?.client_sku || item.client_sku,
+        title: item.skus?.title || "Unknown Product",
+        image_url: item.skus?.image_url || null,
+        available: item.available
+      }));
+
+      setSKUs(transformedSkus);
+    } catch (error: any) {
+      console.error("Error fetching SKUs:", error);
+      toast({
+        title: "Error Loading SKUs",
+        description: error.message,
+        variant: "destructive",
+      });
+      setSKUs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const resetForm = () => {
     setPlatform("");
