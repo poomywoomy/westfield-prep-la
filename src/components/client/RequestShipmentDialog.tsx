@@ -33,6 +33,7 @@ interface SelectedSKU {
 
 export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess }: RequestShipmentDialogProps) => {
   const [platform, setPlatform] = useState<string>("");
+  const [otherPlatform, setOtherPlatform] = useState("");
   const [notes, setNotes] = useState("");
   const [skus, setSKUs] = useState<SKU[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,34 +53,41 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
   const fetchRealSKUs = async () => {
     setLoading(true);
     try {
-      // Query inventory_summary view with SKU details
-      const { data, error } = await supabase
+      // Query inventory_summary and skus separately, then join manually
+      const { data: inventoryData, error: invError } = await supabase
         .from("inventory_summary")
-        .select(`
-          sku_id,
-          client_sku,
-          available,
-          skus (
-            id,
-            client_sku,
-            title,
-            image_url
-          )
-        `)
+        .select("sku_id, client_sku, available")
         .eq("client_id", clientId)
-        .gt("available", 0) // Only show SKUs with inventory
-        .order("client_sku", { ascending: true });
+        .gt("available", 0);
 
-      if (error) throw error;
+      if (invError) throw invError;
 
-      // Transform data to match SKU interface
-      const transformedSkus: SKU[] = (data || []).map((item: any) => ({
-        id: item.sku_id,
-        client_sku: item.skus?.client_sku || item.client_sku,
-        title: item.skus?.title || "Unknown Product",
-        image_url: item.skus?.image_url || null,
-        available: item.available
-      }));
+      const skuIds = (inventoryData || []).map(item => item.sku_id);
+      
+      if (skuIds.length === 0) {
+        setSKUs([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data: skusData, error: skusError } = await supabase
+        .from("skus")
+        .select("id, client_sku, title, image_url")
+        .in("id", skuIds);
+
+      if (skusError) throw skusError;
+
+      // Manually join the data
+      const transformedSkus: SKU[] = (inventoryData || []).map((invItem: any) => {
+        const skuData = (skusData || []).find((s: any) => s.id === invItem.sku_id);
+        return {
+          id: invItem.sku_id,
+          client_sku: skuData?.client_sku || invItem.client_sku,
+          title: skuData?.title || "Unknown Product",
+          image_url: skuData?.image_url || null,
+          available: invItem.available
+        };
+      }).sort((a, b) => a.client_sku.localeCompare(b.client_sku));
 
       setSKUs(transformedSkus);
     } catch (error: any) {
@@ -97,6 +105,7 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
 
   const resetForm = () => {
     setPlatform("");
+    setOtherPlatform("");
     setNotes("");
     setSearchQuery("");
     setQuantities({});
@@ -123,6 +132,15 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
       return;
     }
 
+    if (platform === "other" && !otherPlatform.trim()) {
+      toast({
+        title: "Platform Name Required",
+        description: "Please specify the platform name",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const selectedSkus = Object.entries(quantities)
       .filter(([_, qty]) => qty > 0)
       .map(([sku_id, quantity]) => ({ sku_id, quantity }));
@@ -138,12 +156,13 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
 
     setSubmitting(true);
     try {
+      const platformName = platform === "other" ? otherPlatform : platform;
       const { data: request, error: requestError } = await supabase
         .from("shipment_requests")
         .insert({
           client_id: clientId,
           requested_ship_date: new Date().toISOString().split('T')[0],
-          notes: `Platform: ${platform}\n\n${notes || ''}`.trim(),
+          notes: `Platform: ${platformName}\n\n${notes || ''}`.trim(),
           status: "pending",
         })
         .select()
@@ -166,7 +185,7 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
 
       toast({
         title: "Request Submitted",
-        description: `Your shipment request for ${platform} has been submitted. Admin will review shortly.`,
+        description: `Your shipment request for ${platformName} has been submitted. Admin will review shortly.`,
       });
 
       onSuccess();
@@ -212,6 +231,14 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
+            {platform === "other" && (
+              <Input
+                placeholder="Enter platform name"
+                value={otherPlatform}
+                onChange={(e) => setOtherPlatform(e.target.value)}
+                className="mt-2"
+              />
+            )}
           </div>
 
           {/* SKU Selection */}

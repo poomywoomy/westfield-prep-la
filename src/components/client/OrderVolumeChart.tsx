@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { useChartData } from "@/hooks/useChartData";
+import { useChartData, TimeframeType } from "@/hooks/useChartData";
 import { Loader2 } from "lucide-react";
 
 type Dataset = 'orderVolume' | 'unitsReceived' | 'unitsShipped';
@@ -14,31 +14,55 @@ const datasetLabels = {
   unitsShipped: 'Units Shipped'
 };
 
+const timeframeLabels = {
+  '7days': 'Last 7 Days',
+  '30days': 'Last 30 Days',
+  '90days': 'Last 90 Days',
+  'mtd': 'Month-to-Date',
+  'ytd': 'Year-to-Date'
+};
+
 interface OrderVolumeChartProps {
   clientId: string;
 }
 
 export const OrderVolumeChart = ({ clientId }: OrderVolumeChartProps) => {
   const [activeDataset, setActiveDataset] = useState<Dataset>('orderVolume');
-  const [timePeriod, setTimePeriod] = useState<'7days' | '30days'>('7days');
+  const [timeframe, setTimeframe] = useState<TimeframeType>('7days');
   
-  const days = timePeriod === '7days' ? 7 : 30;
-  const { data, loading } = useChartData(clientId, days);
+  const { data, loading } = useChartData(clientId, timeframe);
 
   const currentData = data?.[activeDataset] || [];
+  
+  // Calculate tick interval for 30 and 90 day views
+  const getXAxisTicks = () => {
+    if (timeframe === '30days' && currentData.length > 0) {
+      // Show ~15 evenly spaced ticks
+      const step = Math.floor(currentData.length / 15);
+      return currentData.filter((_, i) => i % (step || 1) === 0).map(d => d.name);
+    } else if (timeframe === '90days' && currentData.length > 0) {
+      // Show ~12 evenly spaced ticks
+      const step = Math.floor(currentData.length / 12);
+      return currentData.filter((_, i) => i % (step || 1) === 0).map(d => d.name);
+    }
+    return undefined; // Auto for other timeframes
+  };
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Performance Metrics</CardTitle>
-          <Select value={timePeriod} onValueChange={(value: '7days' | '30days') => setTimePeriod(value)}>
-            <SelectTrigger className="w-[140px]">
+          <Select value={timeframe} onValueChange={(value: TimeframeType) => setTimeframe(value)}>
+            <SelectTrigger className="w-[160px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="7days">Last 7 Days</SelectItem>
               <SelectItem value="30days">Last 30 Days</SelectItem>
+              <SelectItem value="90days">Last 90 Days</SelectItem>
+              <SelectItem value="mtd">Month-to-Date</SelectItem>
+              <SelectItem value="ytd">Year-to-Date</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -92,6 +116,7 @@ export const OrderVolumeChart = ({ clientId }: OrderVolumeChartProps) => {
                 dataKey="name" 
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
+                ticks={getXAxisTicks()}
               />
               <YAxis 
                 stroke="hsl(var(--muted-foreground))"
@@ -119,7 +144,7 @@ export const OrderVolumeChart = ({ clientId }: OrderVolumeChartProps) => {
         )}
 
         <p className="text-sm text-muted-foreground text-center">
-          Showing {datasetLabels[activeDataset]} for the last {days} days
+          Showing {datasetLabels[activeDataset]} - {timeframeLabels[timeframe]}
         </p>
       </CardContent>
     </Card>
