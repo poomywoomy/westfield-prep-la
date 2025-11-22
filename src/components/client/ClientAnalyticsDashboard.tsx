@@ -1,6 +1,4 @@
 import { useState, useMemo } from "react";
-import { PeriodMetricsCard } from "./PeriodMetricsCard";
-import { IssuesCard } from "./IssuesCard";
 import { useClientIssues } from "@/hooks/useClientIssues";
 import { DamagedItemReviewDialog } from "./DamagedItemReviewDialog";
 import { MissingItemReviewDialog } from "./MissingItemReviewDialog";
@@ -9,14 +7,9 @@ import { QuickActionsCard } from "./QuickActionsCard";
 import { RequestShipmentDialog } from "./RequestShipmentDialog";
 import { ContactSupportDialog } from "./ContactSupportDialog";
 import { ASNFormDialog } from "@/components/admin/ASNFormDialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
-import { getDateRange } from "@/hooks/useAnalytics";
-import { startOfDay, endOfDay, subDays, startOfMonth, format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { DashboardStatsRow } from "./DashboardStatsRow";
+import { OperationalAlertsPanel } from "./OperationalAlertsPanel";
+import { startOfDay, endOfDay } from "date-fns";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface ClientAnalyticsDashboardProps {
@@ -24,16 +17,13 @@ interface ClientAnalyticsDashboardProps {
 }
 
 export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardProps) => {
-  const [customPeriod, setCustomPeriod] = useState("ytd");
-  const [customDateRange, setCustomDateRange] = useState<{ from?: Date; to?: Date }>();
   const [selectedIssue, setSelectedIssue] = useState<any>(null);
   const [dialogType, setDialogType] = useState<"damaged" | "missing" | "sku" | null>(null);
   const [showASNDialog, setShowASNDialog] = useState(false);
   const [showShipmentRequestDialog, setShowShipmentRequestDialog] = useState(false);
   const [showSupportDialog, setShowSupportDialog] = useState(false);
 
-  // Stabilize date ranges with useMemo to prevent re-render loops
-  // Use local date to match admin side and prevent timezone issues
+  // Today's date range for analytics
   const todayRange = useMemo(() => {
     const now = new Date();
     return { 
@@ -41,51 +31,13 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
       end: endOfDay(now) 
     };
   }, []);
-  
-  const yesterdayRange = useMemo(() => {
-    const yesterday = subDays(new Date(), 1);
-    return { 
-      start: startOfDay(yesterday), 
-      end: endOfDay(yesterday) 
-    };
-  }, []);
-  
-  const mtdRange = useMemo(() => ({ 
-    start: startOfMonth(new Date()), 
-    end: endOfDay(new Date()) 
-  }), []);
-
-  // Custom period - memoized to prevent unnecessary re-fetches
-  const customRange = useMemo(() => {
-    if (customPeriod === "custom" && customDateRange?.from && customDateRange?.to) {
-      return { start: startOfDay(customDateRange.from), end: endOfDay(customDateRange.to) };
-    }
-    return getDateRange(customPeriod);
-  }, [customPeriod, customDateRange]);
-
-  const getPeriodLabel = (preset: string) => {
-    if (preset === "custom" && customDateRange?.from && customDateRange?.to) {
-      return `${format(customDateRange.from, "MMM d")} - ${format(customDateRange.to, "MMM d")}`;
-    }
-    switch (preset) {
-      case "last7": return "Last 7 Days";
-      case "last30": return "Last 30 Days";
-      case "last90": return "Last 90 Days";
-      case "ytd": return "Year to Date";
-      case "custom": return "Custom Range";
-      default: return "Year to Date";
-    }
-  };
 
   // Fetch issues
   const shipmentIssues = useClientIssues(clientId, "receiving");
   const returnIssues = useClientIssues(clientId, "return");
   
-  // Fetch analytics data once for all cards (massive performance improvement)
+  // Fetch today's analytics data
   const todayData = useAnalytics(clientId, todayRange);
-  const yesterdayData = useAnalytics(clientId, yesterdayRange);
-  const mtdData = useAnalytics(clientId, mtdRange);
-  const customData = useAnalytics(clientId, customRange);
 
   // Use today's data for low stock issues
   const lowStockIssues = useMemo(() => 
@@ -120,131 +72,41 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
     returnIssues.refetch();
   };
 
+  // Calculate total pending actions
+  const totalPendingActions = useMemo(() => 
+    shipmentIssues.issues.length + returnIssues.issues.length + lowStockIssues.length,
+    [shipmentIssues.issues.length, returnIssues.issues.length, lowStockIssues.length]
+  );
+
   return (
     <div className="space-y-6">
-      {/* Quick Actions Card */}
-      <QuickActionsCard 
-        onAddASN={() => setShowASNDialog(true)}
-        onRequestShipment={() => setShowShipmentRequestDialog(true)}
-        onContactSupport={() => setShowSupportDialog(true)}
+      {/* Simple Stats Row */}
+      <DashboardStatsRow 
+        salesToday={todayData.data?.orders || 0}
+        shippedToday={todayData.data?.unitsShipped || 0}
+        pendingAction={totalPendingActions}
+        loading={todayData.loading}
       />
 
-      {/* Period selector for custom card */}
-      <div className="flex justify-end gap-2">
-        <Select value={customPeriod} onValueChange={setCustomPeriod}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Select period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="last7">Last 7 Days</SelectItem>
-            <SelectItem value="last30">Last 30 Days</SelectItem>
-            <SelectItem value="last90">Last 90 Days</SelectItem>
-            <SelectItem value="ytd">Year to Date</SelectItem>
-            <SelectItem value="custom">Custom Range</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {customPeriod === "custom" && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("w-64 justify-start text-left font-normal")}>
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {customDateRange?.from ? (
-                  customDateRange.to ? (
-                    <>
-                      {format(customDateRange.from, "LLL dd, y")} - {format(customDateRange.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(customDateRange.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Pick a date range</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={customDateRange?.from}
-                selected={customDateRange as any}
-                onSelect={setCustomDateRange as any}
-                numberOfMonths={2}
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        )}
-      </div>
-
-      {/* Four period cards - pass data as props to avoid duplicate fetches */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <PeriodMetricsCard
-          period="Today"
-          dateRange={todayRange}
-          data={todayData.data}
-          loading={todayData.loading}
-          colorScheme="blue"
-        />
-        <PeriodMetricsCard
-          period="Yesterday"
-          dateRange={yesterdayRange}
-          data={yesterdayData.data}
-          loading={yesterdayData.loading}
-          colorScheme="teal"
-        />
-        <PeriodMetricsCard
-          period="Month to Date"
-          dateRange={mtdRange}
-          data={mtdData.data}
-          loading={mtdData.loading}
-          colorScheme="cyan"
-        />
-        <PeriodMetricsCard
-          period={getPeriodLabel(customPeriod)}
-          dateRange={customRange}
-          data={customData.data}
-          loading={customData.loading}
-          colorScheme="purple"
-          isCustomizable
-        />
-      </div>
-
-      {/* Issue cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <IssuesCard
-          title="Shipment Discrepancies"
-          icon="shipment"
-          issues={shipmentIssues.issues}
-          damagedCount={shipmentIssues.damagedCount}
-          missingCount={shipmentIssues.missingCount}
-          loading={shipmentIssues.loading}
-          borderColor="red"
-          iconColor="red"
-          onReviewClick={handleReviewIssue}
-        />
-        <IssuesCard
-          title="Return Issues"
-          icon="return"
-          issues={returnIssues.issues}
-          damagedCount={returnIssues.damagedCount}
-          missingCount={returnIssues.missingCount}
-          loading={returnIssues.loading}
-          borderColor="red"
-          iconColor="red"
-          onReviewClick={handleReviewIssue}
-        />
-        <IssuesCard
-          title="Low Stock Alerts"
-          icon="stock"
-          issues={lowStockIssues}
-          damagedCount={0}
-          missingCount={0}
-          loading={todayData.loading}
-          borderColor="orange"
-          iconColor="orange"
-          onReviewClick={handleReviewIssue}
-        />
+      {/* Bottom Grid: Operational Alerts (2/3) + Quick Actions (1/3) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <OperationalAlertsPanel 
+            discrepancies={shipmentIssues.issues}
+            returns={returnIssues.issues}
+            lowStock={lowStockIssues}
+            onReviewClick={handleReviewIssue}
+            loading={shipmentIssues.loading || returnIssues.loading || todayData.loading}
+          />
+        </div>
+        
+        <div>
+          <QuickActionsCard 
+            onAddASN={() => setShowASNDialog(true)}
+            onRequestShipment={() => setShowShipmentRequestDialog(true)}
+            onContactSupport={() => setShowSupportDialog(true)}
+          />
+        </div>
       </div>
 
       {/* Review Dialogs */}
