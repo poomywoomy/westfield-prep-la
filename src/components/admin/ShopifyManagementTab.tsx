@@ -21,6 +21,15 @@ import { ShopifyWebhooksDialog } from "./ShopifyWebhooksDialog";
 import { ShopifySyncScheduleDialog } from "./ShopifySyncScheduleDialog";
 import { format } from "date-fns";
 
+// Listen for tab navigation events
+if (typeof window !== 'undefined') {
+  window.addEventListener('navigate-to-tab', (event: any) => {
+    const tab = event.detail;
+    // This will be caught by parent AdminDashboard component
+    window.dispatchEvent(new CustomEvent('admin-tab-change', { detail: tab }));
+  });
+}
+
 interface ShopifyStore {
   id: string;
   shop_domain: string;
@@ -132,9 +141,19 @@ export function ShopifyManagementTab() {
       })
       .subscribe();
 
+    // Listen for tab change events from child components
+    const handleTabChange = (event: any) => {
+      const newTab = event.detail;
+      // Scroll to top and let parent handle tab change
+      window.scrollTo(0, 0);
+    };
+    
+    window.addEventListener('admin-tab-change', handleTabChange);
+
     return () => {
       supabase.removeChannel(storesChannel);
       supabase.removeChannel(syncLogsChannel);
+      window.removeEventListener('admin-tab-change', handleTabChange);
     };
   }, []);
 
@@ -853,7 +872,7 @@ export function ShopifyManagementTab() {
             </AlertDescription>
           </Alert>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Activate Location Inventory</CardTitle>
@@ -972,6 +991,27 @@ export function ShopifyManagementTab() {
                   ) : (
                     'Fix Now'
                   )}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Inventory Audit</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Run comprehensive audit to detect and log all inventory mismatches.
+                </p>
+                <Button
+                  onClick={() => {
+                    // Navigate to audit tab
+                    window.dispatchEvent(new CustomEvent('navigate-to-tab', { detail: 'audit' }));
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  View Audit Dashboard
                 </Button>
               </CardContent>
             </Card>

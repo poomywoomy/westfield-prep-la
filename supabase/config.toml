@@ -80,3 +80,33 @@ verify_jwt = true
 
 [functions.shopify-reconcile-inventory-bulk]
 verify_jwt = true
+
+[functions.shopify-inventory-audit]
+verify_jwt = true
+
+[[functions.shopify-inventory-audit.schedule]]
+cron = "0 2 * * *"
+
+[functions.shopify-validate-sku-mapping]
+verify_jwt = true
+
+[functions.shopify-backfill-variant-aliases]
+verify_jwt = true
+
+[functions.shopify-sync-locations]
+verify_jwt = true
+
+[functions.shopify-fulfill-order]
+verify_jwt = true
+
+[functions.barcode-lookup]
+verify_jwt = true
+
+[functions.create-client]
+verify_jwt = true
+
+[functions.send-welcome-email]
+verify_jwt = true
+
+[functions.process-lead-magnet]
+verify_jwt = false
