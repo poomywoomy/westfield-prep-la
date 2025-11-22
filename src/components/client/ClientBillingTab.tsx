@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Download, Lock, DollarSign, Wallet } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
+import { formatDateRange } from "@/lib/dateFormatters";
 
 const ClientBillingTab = () => {
   const { user } = useAuth();
@@ -169,7 +170,8 @@ const ClientBillingTab = () => {
       doc.setFont("helvetica", "bold");
       doc.text("Statement Period:", 20, yPos);
       doc.setFont("helvetica", "normal");
-      doc.text(`${new Date(bill.statement_start_date).toLocaleDateString()} - ${new Date(bill.statement_end_date).toLocaleDateString()}`, 70, yPos);
+      const periodText = formatDateRange(bill.statement_start_date, bill.statement_end_date) || "N/A";
+      doc.text(periodText, 70, yPos);
       yPos += 10;
     }
 
@@ -335,9 +337,7 @@ const ClientBillingTab = () => {
             <CardTitle>Current Billing Statement</CardTitle>
             <CardDescription className="flex items-center gap-2 mt-1">
               {bill.statement_start_date && bill.statement_end_date ? (
-                <>
-                  {new Date(bill.statement_start_date).toLocaleDateString()} - {new Date(bill.statement_end_date).toLocaleDateString()}
-                </>
+                formatDateRange(bill.statement_start_date, bill.statement_end_date)
               ) : (
                 new Date(bill.billing_month).toLocaleDateString("en-US", { month: "long", year: "numeric" })
               )}
