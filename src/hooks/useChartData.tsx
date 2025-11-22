@@ -38,7 +38,7 @@ export const useChartData = (clientId: string, timeframe: TimeframeType) => {
           break;
         case 'mtd':
           startDate = startOfMonth(endDate);
-          days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+          days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
           break;
         case 'ytd':
           startDate = startOfYear(endDate);
