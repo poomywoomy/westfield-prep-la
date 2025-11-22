@@ -122,9 +122,9 @@ export const useChartData = (clientId: string, timeframe: TimeframeType) => {
           } else if (timeframe === '90days') {
             label = format(date, 'MMM d'); // Aug 1, Aug 10, etc.
           } else if (timeframe === 'mtd') {
-            label = format(date, 'd'); // 1, 2, 3, etc.
+            label = format(date, 'MMM d'); // Nov 1, Nov 3, etc.
           } else {
-            label = format(date, 'd'); // Just the day number
+            label = format(date, 'MMM d'); // Oct 23, Oct 26, etc.
           }
 
           const ordersCount = ordersData?.filter(o => {
