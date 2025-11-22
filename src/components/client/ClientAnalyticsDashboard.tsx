@@ -9,6 +9,7 @@ import { ContactSupportDialog } from "./ContactSupportDialog";
 import { ASNFormDialog } from "@/components/admin/ASNFormDialog";
 import { DashboardStatsRow } from "./DashboardStatsRow";
 import { OperationalAlertsPanel } from "./OperationalAlertsPanel";
+import { OrderVolumeChart } from "./OrderVolumeChart";
 import { startOfDay, endOfDay } from "date-fns";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
@@ -87,6 +88,9 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
         pendingAction={totalPendingActions}
         loading={todayData.loading}
       />
+
+      {/* Chart Panel with Dataset Switching */}
+      <OrderVolumeChart />
 
       {/* Bottom Grid: Operational Alerts (2/3) + Quick Actions (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

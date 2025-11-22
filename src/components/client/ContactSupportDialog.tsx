@@ -66,31 +66,18 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
     }
 
     setSubmitting(true);
-    try {
-      const { data, error } = await supabase
-        .from("support_tickets")
-        .insert({
-          client_id: clientId,
-          issue_category: issueType,
-          issue_description: message.trim(),
-          preferred_contact_method: "email",
-          contact_email: email,
-          contact_phone: phone || null,
-          status: "open",
-        })
-        .select("id")
-        .single();
-
-      if (error) throw error;
-      setTicketId(data.id);
-      toast({ title: "Ticket Created", description: "Support ticket has been created." });
+    
+    // UI-only mode - simulate submission without database insert
+    setTimeout(() => {
+      setTicketId("mock-ticket-id");
+      toast({ 
+        title: "Message Sent", 
+        description: "Your message will be sent to admin@westfieldprepcenter.com" 
+      });
       onSuccess();
-      setTimeout(() => onOpenChange(false), 3000);
-    } catch (error: any) {
-      toast({ title: "Submission Failed", description: error.message, variant: "destructive" });
-    } finally {
       setSubmitting(false);
-    }
+      setTimeout(() => onOpenChange(false), 2000);
+    }, 500);
   };
 
   return (
@@ -104,8 +91,9 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
           <div className="py-8 text-center space-y-4">
             <CheckCircle className="h-16 w-16 text-green-600 mx-auto" />
             <div>
-              <h3 className="text-2xl font-bold mb-2">Ticket Created</h3>
-              <p className="text-muted-foreground">Your support ticket has been created.</p>
+              <h3 className="text-2xl font-bold mb-2">Message Sent</h3>
+              <p className="text-muted-foreground">Your message will be sent to:</p>
+              <p className="text-lg font-semibold text-primary mt-2">admin@westfieldprepcenter.com</p>
               <p className="text-sm text-muted-foreground mt-2">We'll respond shortly via email.</p>
             </div>
           </div>

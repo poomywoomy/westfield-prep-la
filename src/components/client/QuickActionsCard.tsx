@@ -48,16 +48,6 @@ export const QuickActionsCard = ({
           <LifeBuoy size={18} className="text-muted-foreground" />
           Contact Support
         </Button>
-        
-        {/* Helper Text */}
-        <div className="mt-4 text-center">
-          <p className="text-xs text-muted-foreground">
-            Need help with bulk uploads?{" "}
-            <a href="#" className="text-orange-600 hover:underline">
-              Download templates
-            </a>
-          </p>
-        </div>
       </CardContent>
     </Card>
   );

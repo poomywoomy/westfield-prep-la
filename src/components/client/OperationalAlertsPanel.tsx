@@ -106,11 +106,6 @@ export const OperationalAlertsPanel = ({
               </table>
             )}
           </div>
-          <div className="px-6 py-4 border-t bg-muted/50">
-            <button className="text-xs text-orange-600 hover:text-orange-700 font-medium uppercase tracking-wider">
-              View All Discrepancies
-            </button>
-          </div>
         </TabsContent>
 
         <TabsContent value="returns" className="m-0">
@@ -152,11 +147,6 @@ export const OperationalAlertsPanel = ({
               </table>
             )}
           </div>
-          <div className="px-6 py-4 border-t bg-muted/50">
-            <button className="text-xs text-orange-600 hover:text-orange-700 font-medium uppercase tracking-wider">
-              View All Returns
-            </button>
-          </div>
         </TabsContent>
 
         <TabsContent value="lowStock" className="m-0">
@@ -197,11 +187,6 @@ export const OperationalAlertsPanel = ({
                 </tbody>
               </table>
             )}
-          </div>
-          <div className="px-6 py-4 border-t bg-muted/50">
-            <button className="text-xs text-orange-600 hover:text-orange-700 font-medium uppercase tracking-wider">
-              View All Low Stock
-            </button>
           </div>
         </TabsContent>
       </Tabs>
