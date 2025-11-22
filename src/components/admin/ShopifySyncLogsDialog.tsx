@@ -18,6 +18,8 @@ interface SyncLog {
   duration_ms: number | null;
   error_message: string | null;
   triggered_by: string | null;
+  location_id_used: string | null;
+  location_source: string | null;
 }
 
 interface ShopifySyncLogsDialogProps {
@@ -87,13 +89,15 @@ export function ShopifySyncLogsDialog({ open, onOpenChange, clientId, clientName
   };
 
   const exportToCSV = () => {
-    const headers = ['Date', 'Type', 'Status', 'Products Synced', 'Duration (s)', 'Error'];
+    const headers = ['Date', 'Type', 'Status', 'Products Synced', 'Duration (s)', 'Location ID', 'Location Source', 'Error'];
     const rows = logs.map(log => [
       format(new Date(log.created_at), 'yyyy-MM-dd HH:mm:ss'),
       log.sync_type,
       log.status,
       log.products_synced,
       log.duration_ms ? (log.duration_ms / 1000).toFixed(2) : 'N/A',
+      log.location_id_used || 'N/A',
+      log.location_source || 'N/A',
       log.error_message || '',
     ]);
 
@@ -184,13 +188,14 @@ export function ShopifySyncLogsDialog({ open, onOpenChange, clientId, clientName
                 <TableHead>Status</TableHead>
                 <TableHead>Products</TableHead>
                 <TableHead>Duration</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {logs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
                     No sync logs found
                   </TableCell>
                 </TableRow>
@@ -205,6 +210,18 @@ export function ShopifySyncLogsDialog({ open, onOpenChange, clientId, clientName
                     <TableCell>{log.products_synced}</TableCell>
                     <TableCell>
                       {log.duration_ms ? `${(log.duration_ms / 1000).toFixed(2)}s` : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="text-sm font-mono">
+                          {log.location_id_used || 'N/A'}
+                        </div>
+                        {log.location_source && (
+                          <Badge variant={log.location_source === 'manual' ? 'default' : 'secondary'} className="text-xs">
+                            {log.location_source === 'manual' ? '📍 Manual' : '🤖 Auto'}
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       {log.status === 'failed' && (

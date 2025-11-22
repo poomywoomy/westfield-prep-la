@@ -521,6 +521,13 @@ Deno.serve(async (req) => {
 
         // Update sync log
         if (logEntry) {
+          // Get location info for logging
+          const { data: clientData } = await supabase
+            .from('clients')
+            .select('shopify_location_id')
+            .eq('id', config.client_id)
+            .single();
+
           await supabase
             .from('sync_logs')
             .update({
@@ -528,7 +535,9 @@ Deno.serve(async (req) => {
               products_synced: productsSynced,
               duration_ms: duration,
               discrepancies_found: inventoryDiscrepancies.length,
-              discrepancies_corrected: inventoryDiscrepancies.length, // All attempted via auto-push
+              discrepancies_corrected: inventoryDiscrepancies.length,
+              location_id_used: clientData?.shopify_location_id || null,
+              location_source: clientData?.shopify_location_id ? 'manual' : 'auto_selected',
               error_message: inventoryDiscrepancies.length > 0 
                 ? `${inventoryDiscrepancies.length} inventory discrepancies found and corrected` 
                 : null,

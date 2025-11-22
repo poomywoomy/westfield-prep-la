@@ -270,6 +270,8 @@ Deno.serve(async (req) => {
       duration_ms: durationMs,
       discrepancies_found: totalDiscrepancies,
       discrepancies_corrected: totalCorrected,
+      location_id_used: null,
+      location_source: 'unknown',
     });
 
     return new Response(

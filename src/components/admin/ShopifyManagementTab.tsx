@@ -38,6 +38,7 @@ interface ShopifyStore {
   client_id: string;
   clients: {
     company_name: string;
+    shopify_location_id: string | null;
   };
   shopify_sync_config?: {
     auto_sync_enabled: boolean;
@@ -163,7 +164,7 @@ export function ShopifyManagementTab() {
         .from("shopify_stores")
         .select(`
           *,
-          clients!inner(company_name)
+          clients!inner(company_name, shopify_location_id)
         `)
         .order("connected_at", { ascending: false });
 
@@ -676,6 +677,16 @@ export function ShopifyManagementTab() {
         </Card>
       </div>
 
+      {/* Location Management Info */}
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          <strong>Shopify Location Management:</strong> Each client can optionally specify a Shopify location ID for inventory sync. 
+          If not specified, the system automatically uses the store's primary active fulfillment location. 
+          Edit a client via the Clients tab to manually set their location ID.
+        </AlertDescription>
+      </Alert>
+
       {/* Stores Table */}
       <Card>
         <CardHeader>
@@ -727,6 +738,7 @@ export function ShopifyManagementTab() {
                   <TableHead>Client</TableHead>
                   <TableHead>Store Domain</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Location</TableHead>
                   <TableHead>Auto-Sync</TableHead>
                   <TableHead>Products</TableHead>
                   <TableHead>Last Sync</TableHead>
@@ -736,7 +748,7 @@ export function ShopifyManagementTab() {
               <TableBody>
                 {filteredStores.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
                       No stores connected
                     </TableCell>
                   </TableRow>
@@ -749,6 +761,20 @@ export function ShopifyManagementTab() {
                         <Badge variant={store.is_active ? "default" : "secondary"} className={store.is_active ? "bg-green-500 hover:bg-green-600 text-white" : ""}>
                           {store.is_active ? "Active" : "Inactive"}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {store.clients.shopify_location_id ? (
+                          <div className="space-y-1">
+                            <Badge variant="outline" className="font-mono text-xs">
+                              {store.clients.shopify_location_id}
+                            </Badge>
+                            <div className="text-xs text-muted-foreground">Manual</div>
+                          </div>
+                        ) : (
+                          <Badge variant="secondary" className="text-xs">
+                            Auto-Selected
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell>
                         {store.shopify_sync_config?.auto_sync_enabled ? (

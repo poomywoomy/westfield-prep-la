@@ -110,3 +110,6 @@ verify_jwt = true
 
 [functions.process-lead-magnet]
 verify_jwt = false
+
+[functions.shopify-validate-location]
+verify_jwt = true
