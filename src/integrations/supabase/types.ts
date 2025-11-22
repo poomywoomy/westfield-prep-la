@@ -2926,6 +2926,8 @@ export type Database = {
           duration_ms: number | null
           error_message: string | null
           id: string
+          location_id_used: string | null
+          location_source: string | null
           metadata: Json | null
           products_synced: number | null
           status: string
@@ -2941,6 +2943,8 @@ export type Database = {
           duration_ms?: number | null
           error_message?: string | null
           id?: string
+          location_id_used?: string | null
+          location_source?: string | null
           metadata?: Json | null
           products_synced?: number | null
           status?: string
@@ -2956,6 +2960,8 @@ export type Database = {
           duration_ms?: number | null
           error_message?: string | null
           id?: string
+          location_id_used?: string | null
+          location_source?: string | null
           metadata?: Json | null
           products_synced?: number | null
           status?: string

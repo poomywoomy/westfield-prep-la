@@ -275,7 +275,9 @@ Deno.serve(async (req) => {
       products_synced: 1,
       duration_ms: durationMs,
       discrepancies_found: 0,
-      discrepancies_corrected: 1, // This function is called to correct discrepancies
+      discrepancies_corrected: 1,
+      location_id_used: locationId,
+      location_source: client?.shopify_location_id ? 'manual' : 'auto_selected',
     });
 
     console.log(`✓ Synced ${sku.client_sku} to Shopify: ${currentQty} units (${durationMs}ms)`);
