@@ -41,52 +41,27 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
+  // Mock SKUs - No database queries
+  const mockSkus: SKU[] = [
+    { id: "1", client_sku: "SKU-001", title: "Sample Item A", image_url: null, available: 50 },
+    { id: "2", client_sku: "SKU-002", title: "Sample Item B", image_url: null, available: 30 },
+    { id: "3", client_sku: "SKU-003", title: "Sample Item C", image_url: null, available: 75 },
+    { id: "4", client_sku: "SKU-004", title: "Sample Item D", image_url: null, available: 100 },
+    { id: "5", client_sku: "SKU-005", title: "Sample Item E", image_url: null, available: 25 }
+  ];
+
   useEffect(() => {
     if (open && clientId) {
-      fetchSKUs();
+      // Load mock SKUs immediately
+      setLoading(true);
+      setTimeout(() => {
+        setSKUs(mockSkus);
+        setLoading(false);
+      }, 300); // Simulate loading
     } else {
       resetForm();
     }
   }, [open, clientId]);
-
-  const fetchSKUs = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("skus")
-        .select(`
-          id,
-          client_sku,
-          title,
-          image_url,
-          inventory_summary!inner(available)
-        `)
-        .eq("client_id", clientId)
-        .eq("status", "active")
-        .gt("inventory_summary.available", 0)
-        .order("client_sku");
-
-      if (error) throw error;
-
-      const formattedSKUs: SKU[] = (data || []).map((sku: any) => ({
-        id: sku.id,
-        client_sku: sku.client_sku,
-        title: sku.title,
-        image_url: sku.image_url,
-        available: sku.inventory_summary?.available || 0,
-      }));
-
-      setSKUs(formattedSKUs);
-    } catch (error: any) {
-      toast({
-        title: "Error Loading SKUs",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const resetForm = () => {
     setPlatform("");
