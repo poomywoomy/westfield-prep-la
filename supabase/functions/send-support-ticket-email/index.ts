@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,11 +38,17 @@ const handler = async (req: Request): Promise<Response> => {
     const displayIssueType = issueType === "other" ? otherIssueText : issueType;
 
     // Send email to admin
-    const adminEmailResponse = await resend.emails.send({
-      from: "Westfield Prep Center <hello@westfieldprepcenter.com>",
-      to: ["info@westfieldprepcenter.com"],
-      subject: `🎫 Support Ticket: ${displayIssueType} - ${clientName}`,
-      html: `
+    const adminEmailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Westfield Prep Center <hello@westfieldprepcenter.com>",
+        to: ["info@westfieldprepcenter.com"],
+        subject: `🎫 Support Ticket: ${displayIssueType} - ${clientName}`,
+        html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">New Support Ticket</h2>
           
@@ -71,9 +76,13 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         </div>
       `,
+      }),
     });
 
-    if (!adminEmailResponse.id) {
+    const adminEmailData = await adminEmailResponse.json();
+
+    if (!adminEmailResponse.ok || !adminEmailData.id) {
+      console.error("Admin email failed:", adminEmailData);
       throw new Error("Failed to send admin notification email");
     }
 
@@ -82,11 +91,17 @@ const handler = async (req: Request): Promise<Response> => {
     let clientEmailId = null;
     
     try {
-      const clientEmailResponse = await resend.emails.send({
-        from: "Westfield Prep Center <hello@westfieldprepcenter.com>",
-        to: [email],
-        subject: `Support Ticket Received - ${displayIssueType}`,
-        html: `
+      const clientEmailResponse = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "Westfield Prep Center <hello@westfieldprepcenter.com>",
+          to: [email],
+          subject: `Support Ticket Received - ${displayIssueType}`,
+          html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #2563eb;">Thank You for Contacting Westfield Prep Center</h2>
             
@@ -123,21 +138,24 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
           </div>
         `,
+        }),
       });
 
-      if (clientEmailResponse.id) {
+      const clientEmailData = await clientEmailResponse.json();
+
+      if (clientEmailResponse.ok && clientEmailData.id) {
         clientEmailSent = true;
-        clientEmailId = clientEmailResponse.id;
+        clientEmailId = clientEmailData.id;
         console.log("Client confirmation email sent successfully");
       } else {
-        console.warn("Client confirmation email failed - no ID returned");
+        console.warn("Client confirmation email failed:", clientEmailData);
       }
     } catch (clientEmailError) {
       console.error("Client confirmation email failed:", clientEmailError);
     }
 
     console.log("Support ticket emails processed:", {
-      adminEmail: adminEmailResponse.id,
+      adminEmail: adminEmailData.id,
       clientEmail: clientEmailId,
       adminSent: true,
       clientSent: clientEmailSent
@@ -148,7 +166,7 @@ const handler = async (req: Request): Promise<Response> => {
         success: true,
         adminEmailSent: true,
         clientEmailSent,
-        adminEmailId: adminEmailResponse.id,
+        adminEmailId: adminEmailData.id,
         clientEmailId
       }),
       {
