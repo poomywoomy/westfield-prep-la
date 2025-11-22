@@ -3228,6 +3228,7 @@ export type Database = {
         | "RESERVE"
         | "RELEASE"
         | "SALE_RESTOCK"
+        | "CANCELLATION_INCREMENT"
       line_status: "awaiting" | "in_progress" | "ready" | "shipped"
       prep_status: "awaiting" | "in_progress" | "ready"
       quote_status: "draft" | "active" | "replaced" | "archived"
@@ -3386,6 +3387,7 @@ export const Constants = {
         "RESERVE",
         "RELEASE",
         "SALE_RESTOCK",
+        "CANCELLATION_INCREMENT",
       ],
       line_status: ["awaiting", "in_progress", "ready", "shipped"],
       prep_status: ["awaiting", "in_progress", "ready"],

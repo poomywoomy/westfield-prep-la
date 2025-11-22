@@ -12,6 +12,7 @@ import { DollarSign, LogOut, Settings, ChevronDown, Package, Activity } from "lu
 import westfieldLogo from "@/assets/westfield-logo.png";
 import { sanitizeError } from "@/lib/errorHandler";
 import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
+import { InventoryDiscrepancyAlert } from "@/components/client/InventoryDiscrepancyAlert";
 import type { Database } from "@/integrations/supabase/types";
 
 // Lazy load tab components for better performance
@@ -199,7 +200,10 @@ const ClientDashboard = () => {
 
           <TabsContent value="analytics" forceMount className="data-[state=inactive]:hidden">
             <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
-              <ClientAnalyticsDashboard clientId={clientId} />
+              <div className="space-y-6">
+                <InventoryDiscrepancyAlert />
+                <ClientAnalyticsDashboard clientId={clientId} />
+              </div>
             </Suspense>
           </TabsContent>
 

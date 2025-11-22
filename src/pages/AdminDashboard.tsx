@@ -44,7 +44,17 @@ const AdminDashboard = () => {
     };
     
     window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    
+    // Listen for tab navigation from child components
+    const handleTabChange = (event: any) => {
+      setActiveTab(event.detail);
+    };
+    window.addEventListener('admin-tab-change', handleTabChange);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+      window.removeEventListener('admin-tab-change', handleTabChange);
+    };
   }, []);
 
 

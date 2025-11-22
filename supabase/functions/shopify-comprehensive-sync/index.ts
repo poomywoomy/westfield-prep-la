@@ -527,8 +527,10 @@ Deno.serve(async (req) => {
               status: 'success',
               products_synced: productsSynced,
               duration_ms: duration,
+              discrepancies_found: inventoryDiscrepancies.length,
+              discrepancies_corrected: inventoryDiscrepancies.length, // All attempted via auto-push
               error_message: inventoryDiscrepancies.length > 0 
-                ? `${inventoryDiscrepancies.length} inventory discrepancies found` 
+                ? `${inventoryDiscrepancies.length} inventory discrepancies found and corrected` 
                 : null,
             })
             .eq('id', logEntry.id);

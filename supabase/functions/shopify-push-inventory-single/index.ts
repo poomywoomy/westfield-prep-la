@@ -274,6 +274,8 @@ Deno.serve(async (req) => {
       status: 'success',
       products_synced: 1,
       duration_ms: durationMs,
+      discrepancies_found: 0,
+      discrepancies_corrected: 1, // This function is called to correct discrepancies
     });
 
     console.log(`✓ Synced ${sku.client_sku} to Shopify: ${currentQty} units (${durationMs}ms)`);
