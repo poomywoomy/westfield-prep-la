@@ -127,6 +127,96 @@ Deno.serve(async (req) => {
 
     const inventoryItemId = alias.alias_value;
 
+    // PHASE 3: Validate inventory_item_id exists in Shopify
+    try {
+      const validationQuery = `
+        query {
+          inventoryItem(id: "gid://shopify/InventoryItem/${inventoryItemId}") {
+            id
+            tracked
+          }
+        }
+      `;
+      
+      const validationResult = await shopifyGraphQL(
+        store.shop_domain,
+        store.access_token,
+        validationQuery
+      );
+
+      if (!validationResult.inventoryItem) {
+        throw new Error(`inventory_item_id ${inventoryItemId} not found in Shopify`);
+      }
+
+      if (!validationResult.inventoryItem.tracked) {
+        console.log(`⚠️  inventory_item_id ${inventoryItemId} is not tracked in Shopify`);
+      }
+    } catch (validationError) {
+      const errorMsg = validationError instanceof Error ? validationError.message : 'Validation failed';
+      console.error(`❌ Validation failed for ${sku.client_sku}:`, errorMsg);
+      
+      // Log to sync_logs with validation error
+      await supabase.from('sync_logs').insert({
+        client_id,
+        sync_type: 'inventory_push_single',
+        status: 'failed',
+        products_synced: 0,
+        duration_ms: Date.now() - startTime,
+        error_message: `Validation error: ${errorMsg}`,
+        validation_errors: { inventory_item_id: inventoryItemId, error: errorMsg },
+      });
+
+      return new Response(
+        JSON.stringify({ success: false, error: `Validation failed: ${errorMsg}` }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      );
+    }
+
+    // PHASE 3: Validate location_id exists in Shopify
+    try {
+      const locationValidationQuery = `
+        query {
+          location(id: "gid://shopify/Location/${locationId}") {
+            id
+            name
+            isActive
+          }
+        }
+      `;
+      
+      const locationResult = await shopifyGraphQL(
+        store.shop_domain,
+        store.access_token,
+        locationValidationQuery
+      );
+
+      if (!locationResult.location) {
+        throw new Error(`location_id ${locationId} not found in Shopify`);
+      }
+
+      if (!locationResult.location.isActive) {
+        console.log(`⚠️  location_id ${locationId} is inactive in Shopify`);
+      }
+    } catch (locationError) {
+      const errorMsg = locationError instanceof Error ? locationError.message : 'Location validation failed';
+      console.error(`❌ Location validation failed:`, errorMsg);
+      
+      await supabase.from('sync_logs').insert({
+        client_id,
+        sync_type: 'inventory_push_single',
+        status: 'failed',
+        products_synced: 0,
+        duration_ms: Date.now() - startTime,
+        error_message: `Location validation error: ${errorMsg}`,
+        validation_errors: { location_id: locationId, error: errorMsg },
+      });
+
+      return new Response(
+        JSON.stringify({ success: false, error: `Location validation failed: ${errorMsg}` }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      );
+    }
+
     // Calculate current inventory from ledger
     const { data: ledgerEntries } = await supabase
       .from('inventory_ledger')

@@ -401,17 +401,20 @@ async function reconcileInventory(supabase: any, clientId: string, store: any) {
 
         if (!success) {
           console.error(`❌ Failed to correct ${clientSku} after ${MAX_RETRIES} attempts:`, lastError);
-          // Audit log for admin review
-          await supabase.from('audit_log').insert({
-            action: 'INVENTORY_RECONCILIATION_FAILED',
-            table_name: 'inventory_ledger',
-            record_id: disc.sku_id,
-            new_data: { 
-              error: lastError,
-              sku: clientSku,
-              shopify_qty: disc.shopify_qty,
-              app_qty: disc.app_qty,
-            }
+          // Log to inventory_audit_log for tracking
+          await supabase.from('inventory_audit_log').insert({
+            client_id: clientId,
+            sku_id: disc.sku_id,
+            app_inventory: disc.app_qty,
+            shopify_inventory: disc.shopify_qty,
+            difference: disc.shopify_qty - disc.app_qty,
+            inventory_item_id: 'unknown',
+            location_id: 'unknown',
+            status: 'pending',
+            auto_correction_attempted: true,
+            auto_correction_success: false,
+            audit_type: 'post_sync',
+            resolution_notes: `Auto-correction failed: ${lastError}`,
           });
         }
       } catch (err) {
