@@ -90,7 +90,7 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
       />
 
       {/* Chart Panel with Dataset Switching */}
-      <OrderVolumeChart />
+      <OrderVolumeChart clientId={clientId} />
 
       {/* Bottom Grid: Operational Alerts (2/3) + Quick Actions (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

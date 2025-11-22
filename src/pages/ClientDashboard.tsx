@@ -127,10 +127,9 @@ const ClientDashboard = () => {
       {/* Left Sidebar */}
       <aside className="w-64 border-r bg-card flex flex-col">
         {/* Logo */}
-        <div className="p-6 border-b">
-          <Link to="/client/dashboard" className="flex items-center gap-2">
-            <img src={westfieldLogo} alt="Westfield Logo" className="h-8" />
-            <span className="font-bold text-lg">NexusPL</span>
+        <div className="p-6 border-b flex items-center justify-center">
+          <Link to="/client/dashboard">
+            <img src={westfieldLogo} alt="Westfield Logo" className="h-16 w-auto" />
           </Link>
         </div>
 
@@ -204,7 +203,6 @@ const ClientDashboard = () => {
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm truncate">{clientName || 'Client'}</p>
-              <p className="text-xs text-muted-foreground">Premium Client</p>
             </div>
           </div>
           
