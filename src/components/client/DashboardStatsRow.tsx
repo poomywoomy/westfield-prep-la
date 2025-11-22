@@ -25,23 +25,34 @@ export const DashboardStatsRow = ({ salesToday, shippedToday, pendingAction, loa
         .single();
         
       if (client) {
-        const { data: bill } = await supabase
-          .from('bills')
-          .select('id, subtotal_cents')
-          .eq('client_id', client.id)
-          .eq('status', 'open')
-          .maybeSingle();
-          
-        if (bill) {
-          // Get payments for this bill - SAME LOGIC as ClientBillingTab
-          const { data: payments } = await supabase
-            .from('payments')
-            .select('amount_cents')
-            .eq('bill_id', bill.id);
-          
-          const totalPayments = (payments || []).reduce((sum, p) => sum + p.amount_cents, 0);
-          const outstanding = bill.subtotal_cents - totalPayments;
-          setInvoiceTotal(outstanding / 100);
+      const { data: bill } = await supabase
+        .from('bills')
+        .select('id')
+        .eq('client_id', client.id)
+        .eq('status', 'open')
+        .maybeSingle();
+        
+      if (bill) {
+        // Fetch bill items to calculate subtotal (SAME AS ClientBillingTab)
+        const { data: billItems } = await supabase
+          .from('bill_items')
+          .select('qty_decimal, unit_price_cents')
+          .eq('bill_id', bill.id);
+        
+        // Calculate subtotal from line items
+        const subtotal = (billItems || []).reduce((sum, item) => {
+          return sum + (Number(item.qty_decimal) * item.unit_price_cents);
+        }, 0);
+        
+        // Get payments for this bill
+        const { data: payments } = await supabase
+          .from('payments')
+          .select('amount_cents')
+          .eq('bill_id', bill.id);
+        
+        const totalPayments = (payments || []).reduce((sum, p) => sum + p.amount_cents, 0);
+        const outstanding = subtotal - totalPayments;
+        setInvoiceTotal(outstanding / 100);
         } else {
           setInvoiceTotal(0);
         }
