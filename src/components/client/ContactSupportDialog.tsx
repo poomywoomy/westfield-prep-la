@@ -80,6 +80,13 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
 
     setSubmitting(true);
     try {
+      // Get client company name
+      const { data: clientData } = await supabase
+        .from('clients')
+        .select('company_name')
+        .eq('id', clientId)
+        .single();
+
       // Create support ticket in database
       const { data: ticket, error: ticketError } = await supabase
         .from('support_tickets')
@@ -97,23 +104,35 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
 
       if (ticketError) throw ticketError;
 
-      // Send email notification
-      const issueLabel = issueType === "other" ? otherIssueText : issueType;
-      await supabase.functions.invoke('send-contact-email', {
+      // Send email notification using new edge function
+      const { data: emailResult, error: emailError } = await supabase.functions.invoke('send-support-ticket-email', {
         body: {
-          name: email,
+          clientId: clientId,
+          clientName: clientData?.company_name || 'Client',
           email: email,
           phone: phone,
-          message: `Issue Type: ${issueLabel}\nPreferred Contact: ${contactMethod}\n\n${message}`,
-          subject: `Support Ticket: ${issueLabel}`
+          issueType: issueType,
+          preferredContactMethod: contactMethod,
+          message: message,
+          otherIssueText: issueType === "other" ? otherIssueText : undefined
         }
       });
 
+      if (emailError || !emailResult?.success) {
+        console.error("Email delivery failed:", emailError || emailResult);
+        toast({
+          title: "Ticket Created (Email Failed)",
+          description: "Your ticket was saved but email notification failed. We'll still process your request.",
+          variant: "destructive",
+        });
+      } else {
+        toast({ 
+          title: "Support Ticket Created", 
+          description: "We'll respond shortly via your preferred contact method." 
+        });
+      }
+
       setTicketId(ticket.id);
-      toast({ 
-        title: "Support Ticket Created", 
-        description: "We'll respond shortly via your preferred contact method." 
-      });
       onSuccess();
       setTimeout(() => onOpenChange(false), 2000);
     } catch (error: any) {
@@ -154,8 +173,6 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
                   <Input 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)}
-                    readOnly 
-                    className="bg-muted cursor-not-allowed" 
                   />
                 </div>
                 <div className="space-y-2">
@@ -163,8 +180,6 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
                   <Input 
                     value={phone} 
                     onChange={(e) => setPhone(e.target.value)}
-                    readOnly 
-                    className="bg-muted cursor-not-allowed" 
                   />
                 </div>
               </div>

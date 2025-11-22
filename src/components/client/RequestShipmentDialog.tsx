@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,12 +35,19 @@ interface SelectedSKU {
 export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess }: RequestShipmentDialogProps) => {
   const [platform, setPlatform] = useState<string>("");
   const [otherPlatform, setOtherPlatform] = useState("");
+  const [shipmentDate, setShipmentDate] = useState("");
   const [notes, setNotes] = useState("");
   const [skus, setSKUs] = useState<SKU[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [overRequestWarning, setOverRequestWarning] = useState<{
+    skuId: string;
+    skuName: string;
+    requested: number;
+    available: number;
+  } | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -106,15 +114,29 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
   const resetForm = () => {
     setPlatform("");
     setOtherPlatform("");
+    setShipmentDate("");
     setNotes("");
     setSearchQuery("");
     setQuantities({});
     setSKUs([]);
+    setOverRequestWarning(null);
   };
 
   const handleQuantityChange = (skuId: string, value: string) => {
     const qty = parseInt(value) || 0;
     if (qty < 0) return;
+    
+    const sku = skus.find(s => s.id === skuId);
+    
+    // Show warning if quantity exceeds available
+    if (sku && qty > sku.available) {
+      setOverRequestWarning({
+        skuId,
+        skuName: sku.client_sku,
+        requested: qty,
+        available: sku.available
+      });
+    }
     
     setQuantities(prev => ({
       ...prev,
@@ -141,6 +163,15 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
       return;
     }
 
+    if (!shipmentDate) {
+      toast({
+        title: "Shipment Date Required",
+        description: "Please select a shipment date",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const selectedSkus = Object.entries(quantities)
       .filter(([_, qty]) => qty > 0)
       .map(([sku_id, quantity]) => ({ sku_id, quantity }));
@@ -161,7 +192,7 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
         .from("shipment_requests")
         .insert({
           client_id: clientId,
-          requested_ship_date: new Date().toISOString().split('T')[0],
+          requested_ship_date: shipmentDate,
           notes: `Platform: ${platformName}\n\n${notes || ''}`.trim(),
           status: "pending",
         })
@@ -239,6 +270,18 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
                 className="mt-2"
               />
             )}
+          </div>
+
+          {/* Shipment Date */}
+          <div className="space-y-2">
+            <Label htmlFor="shipmentDate">Shipment Date *</Label>
+            <Input
+              id="shipmentDate"
+              type="date"
+              value={shipmentDate}
+              onChange={(e) => setShipmentDate(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+            />
           </div>
 
           {/* SKU Selection */}
@@ -354,6 +397,42 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Over-Request Warning Dialog */}
+      <AlertDialog open={!!overRequestWarning} onOpenChange={() => setOverRequestWarning(null)}>
+        <AlertDialogContent>
+          <AlertDialogTitle>Quantity Exceeds Available Inventory</AlertDialogTitle>
+          <AlertDialogDescription className="space-y-2">
+            <p>
+              You requested <strong>{overRequestWarning?.requested}</strong> units of{" "}
+              <strong>{overRequestWarning?.skuName}</strong>, but only{" "}
+              <strong>{overRequestWarning?.available}</strong> are available.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Are you sure you want to proceed?
+            </p>
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (overRequestWarning) {
+                  setQuantities(prev => ({
+                    ...prev,
+                    [overRequestWarning.skuId]: overRequestWarning.available
+                  }));
+                }
+                setOverRequestWarning(null);
+              }}
+            >
+              Modify Request
+            </Button>
+            <AlertDialogAction onClick={() => setOverRequestWarning(null)}>
+              Proceed Anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 };
