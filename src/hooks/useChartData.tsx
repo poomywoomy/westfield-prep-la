@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfDay, subDays, format, startOfMonth, startOfYear, endOfDay } from "date-fns";
+import { startOfDay, subDays, addDays, format, startOfMonth, startOfYear, endOfDay } from "date-fns";
 
 export type TimeframeType = '7days' | '30days' | '90days' | 'mtd' | 'ytd';
 
@@ -111,7 +111,7 @@ export const useChartData = (clientId: string, timeframe: TimeframeType) => {
       } else {
         // Daily grouping
         for (let i = 0; i < days; i++) {
-          const date = subDays(endDate, days - 1 - i);
+          const date = addDays(startDate, i);
           const dayStart = startOfDay(date);
           const dayEnd = new Date(dayStart);
           dayEnd.setHours(23, 59, 59, 999);
