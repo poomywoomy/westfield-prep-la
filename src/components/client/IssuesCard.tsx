@@ -3,6 +3,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, ChevronUp, Package, AlertTriangle, PackageX, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Issue {
@@ -132,8 +133,7 @@ export const IssuesCard = ({
           {issues.map((issue) => (
             <div
               key={issue.id}
-              onClick={() => onReviewClick(issue)}
-              className="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+              className="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
             >
               <div className="h-16 w-16 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden flex-shrink-0">
                 {issue.image_url ? (
@@ -168,7 +168,13 @@ export const IssuesCard = ({
                   )}
                 </div>
               </div>
-              <ChevronDown className="h-5 w-5 text-gray-400 transform -rotate-90" />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onReviewClick(issue)}
+              >
+                Resolve
+              </Button>
             </div>
           ))}
         </CollapsibleContent>

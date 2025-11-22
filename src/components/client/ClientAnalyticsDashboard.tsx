@@ -5,6 +5,10 @@ import { useClientIssues } from "@/hooks/useClientIssues";
 import { DamagedItemReviewDialog } from "./DamagedItemReviewDialog";
 import { MissingItemReviewDialog } from "./MissingItemReviewDialog";
 import { SKUDetailDialog } from "./SKUDetailDialog";
+import { QuickActionsCard } from "./QuickActionsCard";
+import { RequestShipmentDialog } from "./RequestShipmentDialog";
+import { ContactSupportDialog } from "./ContactSupportDialog";
+import { ASNFormDialog } from "@/components/admin/ASNFormDialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -24,6 +28,9 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
   const [customDateRange, setCustomDateRange] = useState<{ from?: Date; to?: Date }>();
   const [selectedIssue, setSelectedIssue] = useState<any>(null);
   const [dialogType, setDialogType] = useState<"damaged" | "missing" | "sku" | null>(null);
+  const [showASNDialog, setShowASNDialog] = useState(false);
+  const [showShipmentRequestDialog, setShowShipmentRequestDialog] = useState(false);
+  const [showSupportDialog, setShowSupportDialog] = useState(false);
 
   // Stabilize date ranges with useMemo to prevent re-render loops
   // Use local date to match admin side and prevent timezone issues
@@ -115,6 +122,13 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
 
   return (
     <div className="space-y-6">
+      {/* Quick Actions Card */}
+      <QuickActionsCard 
+        onAddASN={() => setShowASNDialog(true)}
+        onRequestShipment={() => setShowShipmentRequestDialog(true)}
+        onContactSupport={() => setShowSupportDialog(true)}
+      />
+
       {/* Period selector for custom card */}
       <div className="flex justify-end gap-2">
         <Select value={customPeriod} onValueChange={setCustomPeriod}>
@@ -279,6 +293,32 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
           clientId={clientId}
         />
       )}
+
+      <ASNFormDialog 
+        open={showASNDialog}
+        onOpenChange={setShowASNDialog}
+        onSuccess={() => {
+          setShowASNDialog(false);
+        }}
+      />
+      
+      <RequestShipmentDialog 
+        open={showShipmentRequestDialog}
+        onOpenChange={setShowShipmentRequestDialog}
+        clientId={clientId}
+        onSuccess={() => {
+          setShowShipmentRequestDialog(false);
+        }}
+      />
+      
+      <ContactSupportDialog 
+        open={showSupportDialog}
+        onOpenChange={setShowSupportDialog}
+        clientId={clientId}
+        onSuccess={() => {
+          setShowSupportDialog(false);
+        }}
+      />
     </div>
   );
 };
