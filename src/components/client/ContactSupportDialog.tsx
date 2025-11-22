@@ -118,18 +118,43 @@ export const ContactSupportDialog = ({ open, onOpenChange, clientId, onSuccess }
         }
       });
 
-      if (emailError || !emailResult?.success) {
-        console.error("Email delivery failed:", emailError || emailResult);
+      if (emailError) {
+        console.error("Email delivery error:", emailError);
         toast({
           title: "Ticket Created (Email Failed)",
           description: "Your ticket was saved but email notification failed. We'll still process your request.",
           variant: "destructive",
         });
       } else {
-        toast({ 
-          title: "Support Ticket Created", 
-          description: "We'll respond shortly via your preferred contact method." 
-        });
+        const adminSent = emailResult?.adminEmailSent;
+        const clientSent = emailResult?.clientEmailSent;
+
+        if (!adminSent && !clientSent) {
+          toast({
+            title: "Ticket Created (Both Emails Failed)",
+            description: "Your ticket was saved but email notifications failed. We'll still process your request.",
+            variant: "destructive",
+          });
+        } else if (adminSent && !clientSent) {
+          // Yellow warning (non-blocking)
+          toast({
+            title: "Ticket Created",
+            description: "Your ticket was created, but confirmation email could not be delivered.",
+            className: "bg-yellow-50 border-yellow-200 text-yellow-900",
+          });
+        } else if (!adminSent && clientSent) {
+          toast({
+            title: "Ticket Created (Admin Email Failed)",
+            description: "You received confirmation but admin notification failed.",
+            variant: "destructive",
+          });
+        } else {
+          // Both succeeded
+          toast({
+            title: "Support Ticket Created",
+            description: "We'll respond shortly via your preferred contact method."
+          });
+        }
       }
 
       setTicketId(ticket.id);

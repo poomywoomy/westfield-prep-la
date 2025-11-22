@@ -78,63 +78,78 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Send confirmation to client
-    const clientEmailResponse = await resend.emails.send({
-      from: "Westfield Prep Center <hello@westfieldprepcenter.com>",
-      to: [email],
-      subject: `Support Ticket Received - ${displayIssueType}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb;">Thank You for Contacting Westfield Prep Center</h2>
-          
-          <p>Hi there,</p>
-          
-          <p>We've received your support ticket and our team will respond shortly via <strong>${preferredContactMethod.toLowerCase()}</strong>.</p>
+    let clientEmailSent = false;
+    let clientEmailId = null;
+    
+    try {
+      const clientEmailResponse = await resend.emails.send({
+        from: "Westfield Prep Center <hello@westfieldprepcenter.com>",
+        to: [email],
+        subject: `Support Ticket Received - ${displayIssueType}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2563eb;">Thank You for Contacting Westfield Prep Center</h2>
+            
+            <p>Hi there,</p>
+            
+            <p>We've received your support ticket and our team will respond shortly via <strong>${preferredContactMethod.toLowerCase()}</strong>.</p>
 
-          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">Your Ticket Details</h3>
-            <p><strong>Issue Type:</strong> ${displayIssueType}</p>
-            <p><strong>Preferred Contact:</strong> ${preferredContactMethod}</p>
+            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin-top: 0;">Your Ticket Details</h3>
+              <p><strong>Issue Type:</strong> ${displayIssueType}</p>
+              <p><strong>Preferred Contact:</strong> ${preferredContactMethod}</p>
+            </div>
+
+            <div style="background: #fff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px;">
+              <h3 style="margin-top: 0;">Your Message</h3>
+              <p style="white-space: pre-wrap;">${message}</p>
+            </div>
+
+            <div style="margin-top: 30px;">
+              <p><strong>What happens next?</strong></p>
+              <ul style="line-height: 1.8;">
+                <li>Our support team will review your request</li>
+                <li>We'll contact you via ${preferredContactMethod.toLowerCase()} within 24 hours</li>
+                <li>You can track this ticket in your dashboard</li>
+              </ul>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; font-size: 14px; margin: 0;">
+                Best regards,<br>
+                <strong>Westfield Prep Center Team</strong><br>
+                Los Angeles, CA
+              </p>
+            </div>
           </div>
+        `,
+      });
 
-          <div style="background: #fff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px;">
-            <h3 style="margin-top: 0;">Your Message</h3>
-            <p style="white-space: pre-wrap;">${message}</p>
-          </div>
-
-          <div style="margin-top: 30px;">
-            <p><strong>What happens next?</strong></p>
-            <ul style="line-height: 1.8;">
-              <li>Our support team will review your request</li>
-              <li>We'll contact you via ${preferredContactMethod.toLowerCase()} within 24 hours</li>
-              <li>You can track this ticket in your dashboard</li>
-            </ul>
-          </div>
-
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-            <p style="color: #6b7280; font-size: 14px; margin: 0;">
-              Best regards,<br>
-              <strong>Westfield Prep Center Team</strong><br>
-              Los Angeles, CA
-            </p>
-          </div>
-        </div>
-      `,
-    });
-
-    if (!clientEmailResponse.id) {
-      console.warn("Client confirmation email failed to send");
+      if (clientEmailResponse.id) {
+        clientEmailSent = true;
+        clientEmailId = clientEmailResponse.id;
+        console.log("Client confirmation email sent successfully");
+      } else {
+        console.warn("Client confirmation email failed - no ID returned");
+      }
+    } catch (clientEmailError) {
+      console.error("Client confirmation email failed:", clientEmailError);
     }
 
-    console.log("Support ticket emails sent successfully:", {
+    console.log("Support ticket emails processed:", {
       adminEmail: adminEmailResponse.id,
-      clientEmail: clientEmailResponse.id
+      clientEmail: clientEmailId,
+      adminSent: true,
+      clientSent: clientEmailSent
     });
 
     return new Response(
       JSON.stringify({ 
         success: true,
+        adminEmailSent: true,
+        clientEmailSent,
         adminEmailId: adminEmailResponse.id,
-        clientEmailId: clientEmailResponse.id
+        clientEmailId
       }),
       {
         status: 200,
