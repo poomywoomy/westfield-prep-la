@@ -1,14 +1,15 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { RotateCcw, Search, PackageX, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import StructuredData from "@/components/StructuredData";
 import { generateMetaTags } from "@/utils/seo";
+import { RotateCcw, ArrowRight, DollarSign, TrendingUp } from "lucide-react";
+import { MetricCounter } from "@/components/ui/metric-counter";
 
 const ReturnsProcessing = () => {
   const navigate = useNavigate();
@@ -18,21 +19,20 @@ const ReturnsProcessing = () => {
   }, []);
 
   const meta = generateMetaTags(
-    "Returns Processing Services | Restocking & Inspection | Westfield Prep Center",
-    "Professional returns processing in Los Angeles. Quick inspection, restocking, refurbishment, and detailed reporting. Turn returns into revenue.",
+    "Returns Processing Services | Reverse Logistics Los Angeles",
+    "Efficient returns processing in Los Angeles. 24h inspection, restocking, value recovery. Amazon FBA returns, customer returns, warranty claims.",
     "/returns-processing"
   );
 
   const serviceData = {
     "@context": "https://schema.org",
     "@type": "Service",
-    "name": "Returns Processing Services Los Angeles",
+    "name": "Returns Processing Services",
+    "description": "Professional returns processing and reverse logistics",
     "provider": {
       "@type": "Organization",
       "name": "Westfield Prep Center"
-    },
-    "description": "Professional returns processing and management in Los Angeles. Fast inspection, restocking, and disposition of returned items with full reporting.",
-    "areaServed": "Los Angeles, CA"
+    }
   };
 
   const faqData = {
@@ -41,42 +41,10 @@ const ReturnsProcessing = () => {
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "How do you handle customer returns?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "We receive, inspect, and categorize each return within 24 hours. Items are either restocked as sellable, set aside for rework, or marked as unsellable based on condition."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Can you process Amazon FBA returns?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, we specialize in processing Amazon FBA returns. We inspect returned items and can prep them for re-shipment to Amazon or handle disposal."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Do you provide returns analytics?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Absolutely. You get detailed reporting on return rates, reasons, and product conditions to help identify quality issues or problem SKUs."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What happens to damaged returns?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Damaged items are photographed, documented, and segregated. We can dispose of them, return them to you, or attempt rework based on your instructions."
-        }
-      },
-      {
-        "@type": "Question",
         "name": "How fast do you process returns?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Most returns are inspected and processed within 24-48 hours of arrival. You receive immediate notifications with photos and disposition decisions."
+          "text": "Most returns are inspected and processed within 24 hours of arrival with immediate photo documentation and reporting."
         }
       }
     ]
@@ -88,247 +56,121 @@ const ReturnsProcessing = () => {
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
         <link rel="canonical" href={meta.canonical} />
-        <meta property="og:title" content={meta.ogTitle} />
-        <meta property="og:description" content={meta.ogDescription} />
-        <meta property="og:url" content={meta.ogUrl} />
-        <meta property="og:image" content={meta.ogImage} />
-        <meta property="og:type" content={meta.ogType} />
-        <meta name="twitter:card" content={meta.twitterCard} />
-        <meta name="twitter:title" content={meta.twitterTitle} />
-        <meta name="twitter:description" content={meta.twitterDescription} />
-        <meta name="twitter:image" content={meta.twitterImage} />
       </Helmet>
 
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
-      
-      <Header />
-      <Breadcrumbs items={[{ label: "Returns Processing", path: "/returns-processing" }]} />
 
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-        {/* Hero Section */}
-        <section className="pt-20 pb-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="inline-block p-3 bg-primary/10 rounded-2xl mb-6">
-                <RotateCcw className="w-12 h-12 text-primary" />
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <Breadcrumbs items={[{ label: "Returns Processing", path: "/returns-processing" }]} />
+
+        {/* Hero Section - DARK MODE with Ruby Accent Beam */}
+        <section className="relative bg-gray-900 text-white py-20 md:py-24">
+          {/* Red accent beam */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-full bg-gradient-to-b from-[hsl(350,89%,60%)] to-transparent opacity-50" />
+          
+          <div className="container relative z-10">
+            <div className="max-w-5xl mx-auto text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">
                 Efficient Returns Processing
               </h1>
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Turn returns from a headache into an opportunity. We inspect, restock, and report on every 
-                returned item so you can recover value and improve your operations.
+              <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+                Turn returns from cost center to revenue recovery. Fast inspection, smart sorting, and maximum value recovery on every returned item.
               </p>
-              <Button 
-                size="lg" 
-                onClick={() => navigate("/contact")}
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
-              >
-                Get a Free Quote
-              </Button>
-            </div>
-          </div>
-        </section>
 
-        {/* Services Grid */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Complete Returns Management</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <RotateCcw className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Returns Receiving</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Accept returns directly at our facility from customers or marketplaces
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <Search className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Condition Inspection</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Thorough inspection with photo documentation of returned items
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <RefreshCw className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Restocking</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Quick reintegration of sellable items back into your inventory
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <PackageX className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Disposition</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Proper handling of unsellable items including disposal or return
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Process Timeline */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">How We Process Returns</h2>
-              <div className="grid md:grid-cols-4 gap-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    1
-                  </div>
-                  <h3 className="font-semibold mb-2">Receive</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Returns arrive at our warehouse and are logged immediately
+              {/* Circular KPI ring showing processing time */}
+              <div className="relative w-40 h-40 md:w-48 md:h-48 mx-auto">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="50%" cy="50%" r="35%" fill="none" 
+                          stroke="rgba(239, 68, 68, 0.2)" strokeWidth="8" />
+                  <circle cx="50%" cy="50%" r="35%" fill="none" 
+                          stroke="rgb(239, 68, 68)" strokeWidth="8"
+                          strokeDasharray="553" strokeDashoffset="138"
+                          className="transition-all duration-1000" />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <p className="text-4xl md:text-5xl font-bold text-[hsl(350,89%,60%)]">
+                    <MetricCounter value={24} suffix="h" />
                   </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    2
-                  </div>
-                  <h3 className="font-semibold mb-2">Inspect</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Detailed condition check with photos and notes
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    3
-                  </div>
-                  <h3 className="font-semibold mb-2">Sort</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Categorize as sellable, rework, or unsellable
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    4
-                  </div>
-                  <h3 className="font-semibold mb-2">Process</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Restock sellable items or handle per your instructions
-                  </p>
+                  <p className="text-xs md:text-sm text-gray-400 mt-1">Avg Processing</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Benefits */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Returns Solutions We Handle</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-3">Customer Returns</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Direct-to-consumer returns from your website or marketplace sales
+        {/* Unique Stat Cards - Circular Rings, Timeline Arrows */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {/* Circular Ring Card 1 */}
+              <Card className="p-8 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                <div className="relative w-32 h-32 mx-auto mb-4">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="50%" cy="50%" r="45%" fill="none" stroke="hsl(0, 0%, 90%)" strokeWidth="6" />
+                    <circle cx="50%" cy="50%" r="45%" fill="none" stroke="hsl(350, 89%, 60%)" strokeWidth="6"
+                            strokeDasharray="251" strokeDashoffset="63" className="transition-all duration-1000" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <p className="text-2xl md:text-3xl font-bold text-[hsl(350,89%,60%)]">
+                      <MetricCounter value={85} suffix="%" />
                     </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <RotateCcw className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Shopify returns</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <RotateCcw className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Website returns</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <RotateCcw className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Multi-channel returns</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+                <p className="font-semibold">Recovery Rate</p>
+                <p className="text-sm text-muted-foreground mt-2">Value recovered from returns</p>
+              </Card>
 
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-3">Amazon FBA Returns</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Inspection and reprocessing of items returned from Amazon warehouses
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <Search className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>FBA removal orders</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Search className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Customer return inspections</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Search className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Re-prep for FBA</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
+              {/* Timeline Arrow Card */}
+              <Card className="p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                <div className="flex items-center justify-between mb-4">
+                  {["Receive", "Inspect", "Sort", "Restock"].map((step, idx) => (
+                    <div key={idx} className="flex items-center">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" 
+                           style={{ backgroundColor: 'hsl(350, 89%, 60%, 0.2)', color: 'hsl(350, 89%, 60%)' }}>
+                        {idx + 1}
+                      </div>
+                      {idx < 3 && <ArrowRight className="w-4 h-4 mx-1 text-[hsl(350,89%,60%)]" />}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-3xl md:text-4xl font-bold text-[hsl(350,89%,60%)] mb-2">
+                  <MetricCounter value={4} />
+                </p>
+                <p className="font-semibold">Step Process</p>
+                <p className="text-sm text-muted-foreground mt-2">Streamlined reverse logistics</p>
+              </Card>
 
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-3">Warranty Returns</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Special handling for defective or warranty-covered merchandise
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <PackageX className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Defect documentation</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <PackageX className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Manufacturer returns</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <PackageX className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>RMA processing</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
+              {/* Reverse-Flow Process Card */}
+              <Card className="p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                <RotateCcw className="w-10 h-10 md:w-12 md:h-12 mb-4 mx-auto text-[hsl(350,89%,60%)]" />
+                <p className="text-3xl md:text-4xl font-bold text-[hsl(350,89%,60%)] mb-2">
+                  <MetricCounter value={72} suffix="h" />
+                </p>
+                <p className="font-semibold">Max Turnaround</p>
+                <p className="text-sm text-muted-foreground mt-2">From arrival to restocked</p>
+              </Card>
             </div>
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-              <div className="space-y-6">
-                {faqData.mainEntity.map((faq, index) => (
-                  <Card key={index}>
-                    <CardContent className="pt-6">
-                      <h3 className="font-semibold mb-2">{faq.name}</h3>
-                      <p className="text-sm text-muted-foreground">{faq.acceptedAnswer.text}</p>
+        {/* Condition Grading System */}
+        <section className="py-20">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Condition Grading System</h2>
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { grade: "New", color: "hsl(142, 76%, 36%)" },
+                  { grade: "Like New", color: "hsl(160, 84%, 39%)" },
+                  { grade: "Good", color: "hsl(43, 96%, 56%)" },
+                  { grade: "Salvage", color: "hsl(350, 89%, 60%)" }
+                ].map((item, idx) => (
+                  <Card key={idx} className="text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <CardContent className="p-6">
+                      <div className="w-12 h-12 mx-auto mb-3 rounded-full" style={{ backgroundColor: item.color }} />
+                      <p className="font-bold">{item.grade}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -337,29 +179,66 @@ const ReturnsProcessing = () => {
           </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="py-20 bg-gradient-to-br from-primary to-primary/80">
-          <div className="container mx-auto px-4 text-center">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                Streamline Your Returns Today
-              </h2>
-              <p className="text-xl text-white/90 mb-8">
-                Stop losing money on mishandled returns. Let us recover maximum value from every returned item.
-              </p>
-              <Button 
-                size="lg" 
-                onClick={() => navigate("/contact")}
-                className="bg-white text-primary hover:bg-white/90 px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
-              >
-                Get Started Today
-              </Button>
+        {/* ROI Cards */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Value Recovery Metrics</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <Card className="p-8 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <DollarSign className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-[hsl(350,89%,60%)]" />
+                <p className="text-5xl md:text-6xl font-bold text-[hsl(350,89%,60%)]">
+                  <MetricCounter value={87} prefix="$" suffix="K" />
+                </p>
+                <p className="text-muted-foreground mt-2">Avg Monthly Value Recovery</p>
+              </Card>
+
+              <Card className="p-8 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <TrendingUp className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-[hsl(350,89%,60%)]" />
+                <p className="text-5xl md:text-6xl font-bold text-[hsl(350,89%,60%)]">
+                  <MetricCounter value={92} suffix="%" />
+                </p>
+                <p className="text-muted-foreground mt-2">Resellable Rate</p>
+              </Card>
             </div>
           </div>
         </section>
-      </div>
 
-      <Footer />
+        {/* FAQ */}
+        <section className="py-20">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            <div className="max-w-3xl mx-auto space-y-6">
+              {faqData.mainEntity.map((faq, index) => (
+                <Card key={index}>
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold mb-2">{faq.name}</h3>
+                    <p className="text-sm text-muted-foreground">{faq.acceptedAnswer.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="py-20 bg-gradient-to-r from-[hsl(350,89%,60%)]/10 via-[hsl(350,89%,60%)]/5 to-[hsl(350,89%,60%)]/10">
+          <div className="container text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Streamline Your Returns Today</h2>
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Stop losing money on mishandled returns. Recover maximum value from every item.
+            </p>
+            <Button 
+              size="lg" 
+              onClick={() => navigate("/contact")}
+              style={{ backgroundColor: 'hsl(350, 89%, 60%)', color: 'white' }}
+            >
+              Get Started
+            </Button>
+          </div>
+        </section>
+
+        <Footer />
+      </div>
     </>
   );
 };

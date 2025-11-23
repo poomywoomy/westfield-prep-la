@@ -2,15 +2,20 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Warehouse, Shield, Package, CheckCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import StructuredData from "@/components/StructuredData";
+import { Warehouse, Shield, Thermometer, BarChart3, CheckCircle } from "lucide-react";
+import { MetricCounter } from "@/components/ui/metric-counter";
 
 const StorageWarehousing = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const serviceData = {
     serviceType: "WarehouseService",
@@ -22,33 +27,17 @@ const StorageWarehousing = () => {
   const faqData = [
     {
       question: "What types of storage options do you offer?",
-      answer: "We offer pallet storage, bin storage, and custom shelving solutions. All storage is in a climate-controlled, 24/7 monitored facility with insurance coverage included."
+      answer: "We offer pallet storage, bin storage, and custom shelving solutions in a climate-controlled, 24/7 monitored facility."
     },
     {
       question: "How is storage pricing calculated?",
-      answer: "Storage is priced per pallet per month or per cubic foot for bin storage. We offer flexible terms with no long-term commitments required."
-    },
-    {
-      question: "Can I access my inventory anytime?",
-      answer: "Yes. We offer same-day access to your inventory during business hours (8am-5pm PT, 7 days a week). Advance notice is appreciated for large retrievals."
-    },
-    {
-      question: "Do you offer cycle counting services?",
-      answer: "Yes. We perform regular cycle counts to ensure inventory accuracy and provide detailed reports for your accounting and forecasting."
-    },
-    {
-      question: "Can you store hazmat products?",
-      answer: "Yes, we are certified to store hazmat products. Additional documentation and fees may apply depending on the hazard class."
+      answer: "Storage is priced per pallet per month or per cubic foot for bin storage with flexible terms and no long-term commitments."
     },
     {
       question: "What security measures protect my inventory?",
-      answer: "Our facility features 24/7 video surveillance, restricted access controls, insurance coverage, and regular security audits to protect your inventory."
+      answer: "24/7 video surveillance, restricted access controls, insurance coverage, and regular security audits protect your inventory."
     }
   ];
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <>
@@ -56,19 +45,6 @@ const StorageWarehousing = () => {
         <title>Storage & Warehousing | Westfield Prep Center</title>
         <meta name="description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
         <link rel="canonical" href="https://westfieldprepcenter.com/storage-warehousing" />
-        
-        {/* Open Graph tags */}
-        <meta property="og:title" content="Storage & Warehousing | Westfield Prep Center" />
-        <meta property="og:description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
-        <meta property="og:url" content="https://westfieldprepcenter.com/storage-warehousing" />
-        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-        <meta property="og:type" content="website" />
-        
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Storage & Warehousing | Westfield Prep Center" />
-        <meta name="twitter:description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
-        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
@@ -76,168 +52,200 @@ const StorageWarehousing = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <Breadcrumbs items={[{ label: "Storage & Warehousing", path: "/storage-warehousing" }]} />
-        
-        <main className="flex-1">
-          {/* Hero Section */}
-          <section className="bg-gradient-to-br from-primary/10 to-primary/5 py-20 mt-16">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto text-center">
-                <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                  Storage & Warehousing
-                </h1>
-                <p className="text-xl text-muted-foreground mb-8">
-                  Secure racking, pallet storage, lot control, and cycle counts.
-                </p>
-                <Button size="lg" onClick={() => navigate("/contact")}>
-                  Get a Quote
-                </Button>
-              </div>
-            </div>
-          </section>
 
-          {/* Services Grid */}
-          <section className="py-16 bg-background">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Storage Services</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
-                  <CardHeader>
-                    <Warehouse className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Secure Racking</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Climate-controlled warehouse with organized racking systems.</p>
-                  </CardContent>
-                </Card>
+        {/* Hero Section - DARK MODE with Cyan Glow */}
+        <section className="relative py-20 md:py-24 bg-gray-900 text-white overflow-hidden">
+          {/* Dark warehouse photo overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 opacity-95" />
+          
+          {/* Cyan glow line at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[hsl(192,60%,55%)] to-transparent animate-glow" />
 
-                <Card>
-                  <CardHeader>
-                    <Package className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Pallet Storage</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Long-term and short-term pallet storage with easy access.</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <Shield className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Lot Control</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Batch and lot tracking for compliance and traceability.</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CheckCircle className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Cycle Counts</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Regular inventory audits to ensure accuracy and accountability.</p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </section>
-
-          {/* Features */}
-          <section className="py-16 bg-muted/30">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Warehouse Features</h2>
-              <div className="max-w-3xl mx-auto grid md:grid-cols-2 gap-6">
-                {[
-                  "24/7 security monitoring",
-                  "Climate-controlled environment",
-                  "Insurance coverage included",
-                  "Real-time inventory tracking",
-                  "Flexible storage terms",
-                  "Dedicated account management",
-                  "Photo documentation",
-                  "Forklift and pallet jack access",
-                  "FIFO/FEFO inventory rotation",
-                  "Hazmat storage certified",
-                  "Receiving and inspection",
-                  "Same-day access to inventory",
-                ].map((feature, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <CheckCircle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
-                    <p className="text-lg">{feature}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Pricing */}
-          <section className="py-16 bg-background">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Flexible Storage Pricing</h2>
-              <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Pallet Storage</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold mb-2">Custom</p>
-                    <p className="text-muted-foreground mb-4">Per pallet per month</p>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li>• Standard pallet size</li>
-                      <li>• Climate-controlled</li>
-                      <li>• Insurance included</li>
-                      <li>• Monthly billing</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Bin Storage</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold mb-2">Custom</p>
-                    <p className="text-muted-foreground mb-4">Per bin per month</p>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li>• Small item storage</li>
-                      <li>• Organized racking</li>
-                      <li>• Quick access</li>
-                      <li>• Scalable capacity</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 border-primary">
-                  <CardHeader>
-                    <CardTitle>Custom Solutions</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold mb-2">Let's Talk</p>
-                    <p className="text-muted-foreground mb-4">Volume discounts available</p>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li>• High-volume storage</li>
-                      <li>• Dedicated space</li>
-                      <li>• Custom configurations</li>
-                      <li>• Negotiated rates</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </section>
-
-          {/* CTA */}
-          <section className="py-16 bg-primary text-primary-foreground">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold mb-4">Need Secure Storage?</h2>
-              <p className="text-xl mb-8 opacity-90">Get a custom storage quote today.</p>
-              <Button size="lg" variant="secondary" onClick={() => navigate("/contact")}>
-                Get a Quote
+          <div className="container relative z-10">
+            <div className="max-w-5xl mx-auto">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                Storage & Warehousing
+              </h1>
+              <p className="text-xl md:text-2xl mb-8" style={{ color: 'hsl(192, 60%, 55%)' }}>
+                Secure. Scalable. Climate-Controlled.
+              </p>
+              <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-3xl">
+                Industrial-grade storage with 24/7 security, climate control, and flexible terms. From single pallets to dedicated space.
+              </p>
+              <Button 
+                size="lg" 
+                onClick={() => navigate("/contact")}
+                style={{ backgroundColor: 'hsl(192, 60%, 55%)', color: 'white' }}
+              >
+                Get Storage Quote
               </Button>
             </div>
-          </section>
-        </main>
+          </div>
+        </section>
+
+        {/* Large Metric Tiles (3D Depth) */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {/* 3D Shadow Tile 1 */}
+              <Card className="relative transition-all duration-300 hover:-translate-y-2"
+                    style={{
+                      boxShadow: `
+                        0 1px 3px rgba(0,0,0,0.12),
+                        0 4px 6px rgba(0,0,0,0.1),
+                        0 8px 12px rgba(73, 169, 191, 0.15)
+                      `
+                    }}>
+                <CardContent className="p-8 text-center">
+                  <Warehouse className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4" style={{ color: 'hsl(192, 60%, 55%)' }} />
+                  <p className="text-4xl md:text-5xl font-bold mb-2" style={{ color: 'hsl(192, 60%, 55%)' }}>
+                    <MetricCounter value={50000} suffix="+" />
+                  </p>
+                  <p className="text-muted-foreground">Sq Ft Facility</p>
+                </CardContent>
+              </Card>
+
+              {/* Temperature/Humidity Sensor Card */}
+              <Card className="relative transition-all duration-300 hover:-translate-y-2"
+                    style={{
+                      boxShadow: `
+                        0 1px 3px rgba(0,0,0,0.12),
+                        0 4px 6px rgba(0,0,0,0.1),
+                        0 8px 12px rgba(73, 169, 191, 0.15)
+                      `
+                    }}>
+                <CardContent className="p-8 text-center">
+                  <Thermometer className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4" style={{ color: 'hsl(192, 60%, 55%)' }} />
+                  <p className="text-4xl md:text-5xl font-bold mb-2" style={{ color: 'hsl(192, 60%, 55%)' }}>
+                    <MetricCounter value={72} suffix="°F" />
+                  </p>
+                  <p className="text-muted-foreground">Climate Controlled</p>
+                  <div className="mt-4 flex justify-center">
+                    <div className="relative w-20 h-20">
+                      <svg className="w-full h-full transform -rotate-90">
+                        <circle cx="50%" cy="50%" r="35%" fill="none" stroke="hsl(210, 20%, 90%)" strokeWidth="4" />
+                        <circle cx="50%" cy="50%" r="35%" fill="none" stroke="hsl(192, 60%, 55%)" strokeWidth="4"
+                                strokeDasharray="126" strokeDashoffset="31" />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <p className="text-sm font-bold" style={{ color: 'hsl(192, 60%, 55%)' }}>75%</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Storage Capacity Card */}
+              <Card className="relative transition-all duration-300 hover:-translate-y-2"
+                    style={{
+                      boxShadow: `
+                        0 1px 3px rgba(0,0,0,0.12),
+                        0 4px 6px rgba(0,0,0,0.1),
+                        0 8px 12px rgba(73, 169, 191, 0.15)
+                      `
+                    }}>
+                <CardContent className="p-8 text-center">
+                  <BarChart3 className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4" style={{ color: 'hsl(192, 60%, 55%)' }} />
+                  <p className="text-4xl md:text-5xl font-bold mb-2" style={{ color: 'hsl(192, 60%, 55%)' }}>
+                    <MetricCounter value={75} suffix="%" />
+                  </p>
+                  <p className="text-muted-foreground mb-4">Utilized</p>
+                  <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-1000" 
+                         style={{ width: '75%', backgroundColor: 'hsl(192, 60%, 55%)' }} />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Security Infrastructure */}
+        <section className="py-20">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Security Infrastructure</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {[
+                { icon: Shield, label: "24/7 CCTV" },
+                { icon: Shield, label: "Access Control" },
+                { icon: Shield, label: "Insurance Coverage" },
+                { icon: Shield, label: "Security Audits" }
+              ].map((item, idx) => (
+                <Card key={idx} className="text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <CardContent className="p-6 md:p-8">
+                    <div className="w-14 h-14 md:w-16 md:h-16 mx-auto mb-4 rounded-full flex items-center justify-center" 
+                         style={{ backgroundColor: 'hsl(192, 60%, 55%, 0.1)' }}>
+                      <item.icon className="w-7 h-7 md:w-8 md:h-8" style={{ color: 'hsl(192, 60%, 55%)' }} />
+                    </div>
+                    <p className="font-semibold">{item.label}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Warehouse Features */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Warehouse Features</h2>
+            <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                "24/7 security monitoring",
+                "Climate-controlled environment",
+                "Insurance coverage included",
+                "Real-time inventory tracking",
+                "Flexible storage terms",
+                "Dedicated account management",
+                "Photo documentation",
+                "Forklift and pallet jack access",
+                "FIFO/FEFO inventory rotation",
+                "Hazmat storage certified",
+                "Receiving and inspection",
+                "Same-day access to inventory"
+              ].map((feature, idx) => (
+                <div key={idx} className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 mt-1" style={{ color: 'hsl(192, 60%, 55%)' }} />
+                  <p className="text-base md:text-lg">{feature}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="py-20">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            <div className="max-w-3xl mx-auto space-y-6">
+              {faqData.map((faq, index) => (
+                <Card key={index}>
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold mb-2">{faq.question}</h3>
+                    <p className="text-sm text-muted-foreground">{faq.answer}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="py-16 md:py-20 bg-gradient-to-r from-[hsl(192,60%,55%)]/10 via-[hsl(192,60%,55%)]/5 to-[hsl(192,60%,55%)]/10">
+          <div className="container text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Need Secure Storage?</h2>
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Get a custom storage quote tailored to your needs
+            </p>
+            <Button 
+              size="lg" 
+              onClick={() => navigate("/contact")}
+              style={{ backgroundColor: 'hsl(192, 60%, 55%)', color: 'white' }}
+            >
+              Get a Quote
+            </Button>
+          </div>
+        </section>
 
         <Footer />
       </div>
