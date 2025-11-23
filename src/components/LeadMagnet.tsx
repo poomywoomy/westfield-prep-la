@@ -44,7 +44,7 @@ const LeadMagnet = () => {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-br from-primary/10 via-background to-primary/5">
+    <section id="quote-form" className="py-24 bg-gradient-to-br from-primary/10 via-background to-primary/5">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -146,7 +146,7 @@ const LeadMagnet = () => {
                     type="submit" 
                     size="lg"
                     disabled={loading}
-                    className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
+                    className="w-full h-12 text-base font-semibold bg-secondary hover:bg-secondary/90 text-white shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
                   >
                     {loading ? (
                       <>
@@ -162,7 +162,7 @@ const LeadMagnet = () => {
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center pt-2">
-                    🔒 We respect your privacy. Unsubscribe anytime.
+                    🔒 We respect your privacy. Your information will never be shared with third parties.
                   </p>
                 </form>
               </div>

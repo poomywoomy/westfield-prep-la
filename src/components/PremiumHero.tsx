@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Clock, Award, TrendingUp, Circle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, CheckCircle, Clock, DollarSign, Package } from "lucide-react";
 import { motion } from "framer-motion";
 
 const PremiumHero = () => {
@@ -10,175 +10,121 @@ const PremiumHero = () => {
     navigate("/contact");
   };
 
-  const stats = [
-    { value: "2M+", label: "Orders Fulfilled" },
-    { value: "100+", label: "Active Clients" },
-    { value: "99.8%", label: "Accuracy Rate" },
-    { value: "15+", label: "Years in Business" },
-  ];
-
   const trustBadges = [
-    { icon: Shield, text: "Same-Day Receiving" },
-    { icon: Clock, text: "24-48hr Turnaround" },
-    { icon: Award, text: "No Minimums" },
-    { icon: TrendingUp, text: "100% Transparent Pricing" },
+    { icon: Clock, text: "Same-Day Receiving" },
+    { icon: CheckCircle, text: "24-48hr Turnaround" },
+    { icon: DollarSign, text: "No Minimums" },
+    { icon: Package, text: "100% Transparent Pricing" },
   ];
 
   const fadeUpVariants = {
     hidden: { opacity: 0, y: 30 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 1,
-        delay: 0.5 + i * 0.2,
-        ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number],
-      },
-    }),
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
-    <section className="relative min-h-[85vh] w-full flex items-center overflow-hidden bg-white">
-      {/* Content */}
-      <div className="container mx-auto px-4 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
+    <section className="relative min-h-[85vh] w-full flex items-center overflow-hidden bg-gradient-to-br from-primary via-primary to-primary/90">
+      {/* Warehouse Background Image with Overlay */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/landing/warehouse-exterior.jpg"
+          alt="Los Angeles 3PL warehouse exterior with trucks and loading docks — Westfield Prep Center"
+          className="w-full h-full object-cover"
+          loading="eager"
+          fetchPriority="high"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[rgba(10,10,35,0.3)] to-[rgba(10,10,35,0.6)]" />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* LEFT SIDE - Content */}
-          <div className="space-y-6 md:space-y-8">
-            {/* Top Badge */}
-            <motion.div
-              custom={0}
-              variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/20"
-            >
-              <Circle className="h-2 w-2 fill-primary" />
-              <span className="text-sm text-muted-foreground tracking-wide font-medium">
-                Los Angeles 3PL
-              </span>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.15,
+                  delayChildren: 0.3,
+                },
+              },
+            }}
+            className="space-y-8"
+          >
+            {/* Los Angeles 3PL Badge */}
+            <motion.div variants={fadeUpVariants} className="inline-flex">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
+                <div className="h-2 w-2 rounded-full bg-secondary animate-pulse" />
+                <span className="text-sm text-white font-medium">
+                  Los Angeles 3PL
+                </span>
+              </div>
             </motion.div>
 
-            {/* Main Headline */}
-            <motion.div
-              custom={1}
+            {/* H1 Headline */}
+            <motion.h1
               variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white"
             >
-              <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                <span className="text-foreground">Los Angeles's Premier</span>
-                <br />
-                <span className="bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
-                  E-Commerce Fulfillment & 3PL Partner
-                </span>
-              </h1>
-            </motion.div>
+              LA's Premier E-Commerce Fulfillment & 3PL Partner
+            </motion.h1>
 
             {/* Subheadline */}
-            <motion.div
-              custom={2}
+            <motion.p
               variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
+              className="text-lg md:text-xl text-white/90 leading-relaxed"
             >
-              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                Fast order processing, transparent pricing, and reliable logistics for growing online brands.
-              </p>
-            </motion.div>
-
-            {/* Trust Badges */}
-            <motion.div
-              custom={3}
-              variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
-              className="flex flex-wrap gap-4"
-            >
-              {trustBadges.map((badge, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors"
-                >
-                  <badge.icon className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-semibold text-foreground">{badge.text}</span>
-                </motion.div>
-              ))}
-            </motion.div>
+              2M+ orders fulfilled for fast-growing eCommerce brands.
+            </motion.p>
 
             {/* CTAs */}
             <motion.div
-              custom={4}
               variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
               className="flex flex-col sm:flex-row gap-4"
             >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={goToContact}
-                  size="lg"
-                  className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-10 py-7 font-bold shadow-lg group w-full sm:w-auto"
-                >
-                  Get Free Fulfillment Audit
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={() => navigate("/pricing")}
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-primary/30 hover:bg-primary/10 text-foreground text-lg px-10 py-7 font-semibold w-full sm:w-auto"
-                >
-                  View Pricing
-                </Button>
-              </motion.div>
+              <Button
+                onClick={goToContact}
+                size="lg"
+                className="bg-secondary hover:bg-secondary/90 text-white font-semibold transition-all hover:scale-[1.02]"
+              >
+                Get Free Fulfillment Audit
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <Button
+                onClick={() => navigate("/pricing")}
+                size="lg"
+                variant="outline"
+                className="border-white/80 text-white hover:bg-white/10 hover:text-white font-semibold transition-all hover:scale-[1.02]"
+              >
+                View Pricing
+              </Button>
             </motion.div>
 
-            {/* Stats Grid - Desktop shows on mobile too */}
+            {/* Trust Badges Row */}
             <motion.div
-              custom={5}
               variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-2 gap-4 pt-6"
+              className="flex flex-wrap gap-3"
             >
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ y: -5 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-center p-4 bg-card border border-border rounded-lg hover:border-primary/50 transition-all hover:shadow-lg"
-                >
-                  <div className="text-3xl font-bold text-primary mb-2">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground font-medium">{stat.label}</div>
-                </motion.div>
-              ))}
+              {trustBadges.map((badge, index) => {
+                const Icon = badge.icon;
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg"
+                  >
+                    <Icon className="w-4 h-4 text-secondary" />
+                    <span className="text-xs md:text-sm font-medium text-white">
+                      {badge.text}
+                    </span>
+                  </div>
+                );
+              })}
             </motion.div>
-          </div>
-
-          {/* RIGHT SIDE - Warehouse Image */}
-          <motion.div
-            custom={6}
-            variants={fadeUpVariants}
-            initial="hidden"
-            animate="visible"
-            className="relative"
-          >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border">
-              <img
-                src="/warehouse-exterior-la.jpg"
-                alt="Los Angeles 3PL warehouse exterior with trucks — Westfield Prep Center"
-                className="w-full h-auto object-cover"
-                loading="eager"
-                fetchPriority="high"
-              />
-              {/* Subtle gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none" />
-            </div>
           </motion.div>
+
+          {/* RIGHT SIDE - Image (visible on desktop only, image is background) */}
+          <div className="hidden lg:block" />
         </div>
       </div>
     </section>

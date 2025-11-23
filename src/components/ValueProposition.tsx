@@ -61,19 +61,19 @@ const ValueProposition = () => {
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon;
               return (
-                <div 
+              <div 
                   key={index} 
-                  className="group relative bg-card border border-border rounded-xl p-8 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+                  className="group relative bg-card border border-border rounded-xl p-8 hover:border-secondary/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                 >
                   {/* Top: Icon */}
                   <div className="mb-6">
-                    <div className="w-14 h-14 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center transition-all duration-300">
-                      <Icon className="w-7 h-7 text-primary group-hover:scale-110 transition-transform duration-300" />
+                    <div className="w-14 h-14 rounded-full bg-secondary/5 group-hover:bg-secondary/10 flex items-center justify-center transition-all duration-300">
+                      <Icon className="w-7 h-7 text-secondary group-hover:scale-110 transition-transform duration-300" />
                     </div>
                   </div>
                   
                   {/* Title */}
-                  <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
+                  <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-secondary transition-colors duration-300">
                     {benefit.title}
                   </h3>
                   
@@ -84,8 +84,8 @@ const ValueProposition = () => {
 
                   {/* Bottom: Stat Badge */}
                   <div className="pt-4 border-t border-border/50">
-                    <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-primary/5 group-hover:bg-primary/10 transition-colors duration-300">
-                      <span className="text-xs font-bold text-primary whitespace-nowrap">
+                    <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-secondary/5 group-hover:bg-secondary/10 transition-colors duration-300">
+                      <span className="text-xs font-bold text-secondary whitespace-nowrap">
                         {benefit.stat}
                       </span>
                     </div>
