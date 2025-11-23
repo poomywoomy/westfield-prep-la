@@ -180,7 +180,7 @@ const ReturnsProcessing = () => {
             {/* 5-Step Workflow Cards */}
             <div className="max-w-6xl mx-auto relative">
               {/* Connection Lines (hidden on mobile) */}
-              <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(350,89%,60%)]/20 via-[hsl(350,89%,60%)]/50 to-[hsl(350,89%,60%)]/20 -translate-y-1/2 pointer-events-none" />
+              <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(350,89%,60%)]/20 via-[hsl(350,89%,60%)]/50 to-[hsl(350,89%,60%)]/20 -translate-y-1/2 pointer-events-none z-0" />
               
               <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative z-10">
                 {[
@@ -221,7 +221,7 @@ const ReturnsProcessing = () => {
                   return (
                     <Card 
                       key={item.step}
-                      className={`p-6 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
+                      className={`relative bg-white p-6 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
                         item.highlight ? 'border-2 border-[hsl(350,89%,60%)]/50 bg-[hsl(350,89%,60%)]/5' : ''
                       }`}
                     >
