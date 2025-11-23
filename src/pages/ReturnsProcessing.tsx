@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import StructuredData from "@/components/StructuredData";
 import { generateMetaTags } from "@/utils/seo";
-import { RotateCcw, ArrowRight, DollarSign, TrendingUp } from "lucide-react";
+import { RotateCcw, ArrowRight, DollarSign, TrendingUp, PackageCheck, Camera, ClipboardCheck, GitBranch, CheckCircle2, XCircle } from "lucide-react";
 import { MetricCounter } from "@/components/ui/metric-counter";
 
 const ReturnsProcessing = () => {
@@ -20,7 +20,7 @@ const ReturnsProcessing = () => {
 
   const meta = generateMetaTags(
     "Returns Processing Services | Reverse Logistics Los Angeles",
-    "Efficient returns processing in Los Angeles. 24h inspection, restocking, value recovery. Amazon FBA returns, customer returns, warranty claims.",
+    "Efficient returns processing in Los Angeles. 5h inspection, restocking, value recovery. Amazon FBA returns, customer returns, warranty claims.",
     "/returns-processing"
   );
 
@@ -44,7 +44,7 @@ const ReturnsProcessing = () => {
         "name": "How fast do you process returns?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Most returns are inspected and processed within 24 hours of arrival with immediate photo documentation and reporting."
+          "text": "Most returns are inspected and processed within 5 hours of arrival with immediate photo documentation and reporting."
         }
       }
     ]
@@ -146,7 +146,7 @@ const ReturnsProcessing = () => {
               <Card className="p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
                 <RotateCcw className="w-10 h-10 md:w-12 md:h-12 mb-4 mx-auto text-[hsl(350,89%,60%)]" />
                 <p className="text-3xl md:text-4xl font-bold text-[hsl(350,89%,60%)] mb-2">
-                  <MetricCounter value={72} suffix="h" />
+                  <MetricCounter value={24} suffix="h" />
                 </p>
                 <p className="font-semibold">Max Turnaround</p>
                 <p className="text-sm text-muted-foreground mt-2">From arrival to restocked</p>
@@ -155,25 +155,124 @@ const ReturnsProcessing = () => {
           </div>
         </section>
 
-        {/* Condition Grading System */}
-        <section className="py-20">
+        {/* Returns Processing Workflow */}
+        <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
           <div className="container">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Condition Grading System</h2>
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              Returns Processing Workflow
+            </h2>
+            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+              Every return follows our proven 5-step process for maximum value recovery
+            </p>
+
+            {/* Return Types */}
+            <div className="flex flex-wrap gap-3 justify-center mb-16">
+              {["Customer Returns", "FBA Returns", "Damaged in Transit", "Quality Issues"].map((type, idx) => (
+                <span 
+                  key={idx}
+                  className="px-4 py-2 bg-[hsl(350,89%,60%)]/10 text-[hsl(350,89%,60%)] rounded-full text-sm font-medium border border-[hsl(350,89%,60%)]/20"
+                >
+                  {type}
+                </span>
+              ))}
+            </div>
+
+            {/* 5-Step Workflow Cards */}
+            <div className="max-w-6xl mx-auto relative">
+              {/* Connection Lines (hidden on mobile) */}
+              <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(350,89%,60%)]/20 via-[hsl(350,89%,60%)]/50 to-[hsl(350,89%,60%)]/20 -translate-y-1/2 pointer-events-none" />
+              
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative z-10">
                 {[
-                  { grade: "New", color: "hsl(142, 76%, 36%)" },
-                  { grade: "Like New", color: "hsl(160, 84%, 39%)" },
-                  { grade: "Good", color: "hsl(43, 96%, 56%)" },
-                  { grade: "Salvage", color: "hsl(350, 89%, 60%)" }
-                ].map((item, idx) => (
-                  <Card key={idx} className="text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                    <CardContent className="p-6">
-                      <div className="w-12 h-12 mx-auto mb-3 rounded-full" style={{ backgroundColor: item.color }} />
-                      <p className="font-bold">{item.grade}</p>
-                    </CardContent>
+                  {
+                    step: 1,
+                    icon: PackageCheck,
+                    title: "Return Received",
+                    desc: "Items logged, quantities verified, added to receiving location"
+                  },
+                  {
+                    step: 2,
+                    icon: Camera,
+                    title: "QC Photo Documentation",
+                    desc: "Mandatory photos uploaded for transparency (30-day retention)",
+                    highlight: true
+                  },
+                  {
+                    step: 3,
+                    icon: ClipboardCheck,
+                    title: "Quality Inspection",
+                    desc: "Physical inspection, damage assessment, functionality testing"
+                  },
+                  {
+                    step: 4,
+                    icon: GitBranch,
+                    title: "Condition Decision",
+                    desc: "Resellable → Available | Damaged → Damaged location",
+                    split: true
+                  },
+                  {
+                    step: 5,
+                    icon: CheckCircle2,
+                    title: "Final Disposition",
+                    desc: "Resellable items restocked, damaged items flagged"
+                  }
+                ].map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <Card 
+                      key={item.step}
+                      className={`p-6 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
+                        item.highlight ? 'border-2 border-[hsl(350,89%,60%)]/50 bg-[hsl(350,89%,60%)]/5' : ''
+                      }`}
+                    >
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[hsl(350,89%,60%)]/10 flex items-center justify-center">
+                        <IconComponent className="w-8 h-8 text-[hsl(350,89%,60%)]" />
+                      </div>
+                      <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-[hsl(350,89%,60%)] text-white flex items-center justify-center font-bold">
+                        {item.step}
+                      </div>
+                      <h3 className="font-bold mb-2">{item.title}</h3>
+                      <p className="text-xs text-muted-foreground">{item.desc}</p>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {/* Two-Path Visualization at Step 4 */}
+              <div className="mt-12 max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Green Path - Resellable */}
+                  <Card className="p-6 border-2 border-green-500/50 bg-green-50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <CheckCircle2 className="w-8 h-8 text-green-600" />
+                      <h3 className="font-bold text-green-800">Resellable Items</h3>
+                    </div>
+                    <p className="text-sm text-green-700 mb-4">
+                      Items pass QC inspection and are restocked to available inventory for resale
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 bg-green-600 text-white rounded-full text-xs font-medium">qc_pass</span>
+                      <ArrowRight className="w-4 h-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-800">Available Inventory</span>
+                    </div>
                   </Card>
-                ))}
+
+                  {/* Red Path - Damaged */}
+                  <Card className="p-6 border-2 border-red-500/50 bg-red-50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <XCircle className="w-8 h-8 text-red-600" />
+                      <h3 className="font-bold text-red-800">Damaged Items</h3>
+                    </div>
+                    <p className="text-sm text-red-700 mb-4">
+                      Items fail QC inspection and are moved to damaged inventory for disposal or repair
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 bg-red-600 text-white rounded-full text-xs font-medium">qc_fail</span>
+                      <ArrowRight className="w-4 h-4 text-red-600" />
+                      <span className="text-sm font-medium text-red-800">Damaged Inventory</span>
+                    </div>
+                  </Card>
+                </div>
               </div>
             </div>
           </div>
