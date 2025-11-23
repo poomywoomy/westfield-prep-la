@@ -5,7 +5,7 @@ const Footer = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             {/* Main Footer Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12 mb-12">
             {/* Company Info */}
             <div className="space-y-4">
               <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
@@ -33,15 +33,15 @@ const Footer = () => {
 
             {/* Contact Info */}
             <div className="space-y-4">
-              <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
-              <div className="space-y-3">
+              <h4 className="text-lg font-semibold mb-6">Contact Us</h4>
+              <div className="space-y-4">
                 <a href="tel:+18189355478" className="flex items-start gap-3 hover:text-secondary transition-colors group" aria-label="Call Westfield Prep Center">
                   <Phone className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">+1 (818) 935-5478</span>
+                  <span className="text-sm break-words">+1 (818) 935-5478</span>
                 </a>
                 <a href="mailto:info@westfieldprepcenter.com" className="flex items-start gap-3 hover:text-secondary transition-colors group" aria-label="Email Westfield Prep Center">
                   <Mail className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">info@westfieldprepcenter.com</span>
+                  <span className="text-sm break-words">info@westfieldprepcenter.com</span>
                 </a>
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
