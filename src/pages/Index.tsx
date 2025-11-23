@@ -64,9 +64,11 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>3PL Los Angeles • Shopify Fulfillment Partner • Westfield Prep</title>
-        <meta name="description" content="Fast, reliable 3PL in Los Angeles specializing in Shopify fulfillment, same-day receiving, 24-48h turnaround, no minimums, and transparent pricing. Perfect for D2C & scaling ecommerce brands." />
+        <title>Los Angeles 3PL Fulfillment | Shopify Fulfillment Center | Westfield Prep Center</title>
+        <meta name="description" content="LA's top-rated 3PL and Shopify fulfillment center offering same-day receiving, transparent pricing, and 2M+ orders fulfilled. Located in Los Angeles, CA." />
+        <meta name="keywords" content="3pl los angeles, los angeles 3pl, shopify 3pl, 3pl fulfillment los angeles, ecommerce fulfillment los angeles, 3pl warehouse la, california 3pl, shopify fulfillment center los angeles" />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
+        <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.placename" content="Duarte, California" />
         <meta name="geo.position" content="34.2147;-117.9773" />
@@ -75,17 +77,17 @@ const Index = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
         <meta property="og:site_name" content="Westfield Prep Center" />
-        <meta property="og:title" content="Los Angeles 3PL & Shopify Fulfillment Partner" />
-        <meta property="og:description" content="Trusted LA 3PL for D2C brands. Same-day receiving, fast turnaround, and transparent pricing." />
-        <meta property="og:image" content="https://westfieldprepcenter.com/landing/warehouse-exterior.jpg" />
+        <meta property="og:title" content="Los Angeles 3PL Fulfillment | Shopify Fulfillment Center | Westfield Prep Center" />
+        <meta property="og:description" content="LA's top-rated 3PL and Shopify fulfillment center offering same-day receiving, transparent pricing, and 2M+ orders fulfilled. Located in Los Angeles, CA." />
+        <meta property="og:image" content="https://westfieldprepcenter.com/warehouse-exterior-la.jpg" />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@westfieldprep" />
         <meta name="twitter:creator" content="@westfieldprep" />
-        <meta name="twitter:title" content="LA 3PL for Shopify & D2C Brands" />
-        <meta name="twitter:description" content="Fast Shopify fulfillment in Los Angeles. Same-day receiving, 24-48h turnaround, no minimums." />
-        <meta name="twitter:image" content="https://westfieldprepcenter.com/landing/warehouse-exterior.jpg" />
+        <meta name="twitter:title" content="Los Angeles 3PL Fulfillment | Shopify Fulfillment Center | Westfield Prep Center" />
+        <meta name="twitter:description" content="LA's top-rated 3PL and Shopify fulfillment center offering same-day receiving, transparent pricing, and 2M+ orders fulfilled." />
+        <meta name="twitter:image" content="https://westfieldprepcenter.com/warehouse-exterior-la.jpg" />
       </Helmet>
       <StructuredData type="organization" />
       <StructuredData type="website" />
@@ -95,7 +97,7 @@ const Index = () => {
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
           "name": "Westfield Prep Center",
-          "image": "https://westfieldprepcenter.com/landing/warehouse-exterior.jpg",
+          "image": "https://westfieldprepcenter.com/warehouse-exterior-la.jpg",
           "address": {
             "@type": "PostalAddress",
             "streetAddress": "1801 Flower Ave Office 2",
