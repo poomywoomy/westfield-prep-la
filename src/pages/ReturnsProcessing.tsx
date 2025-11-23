@@ -91,7 +91,7 @@ const ReturnsProcessing = () => {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <p className="text-4xl md:text-5xl font-bold text-[hsl(350,89%,60%)]">
-                    <MetricCounter value={24} suffix="h" />
+                    <MetricCounter value={5} suffix="h" />
                   </p>
                   <p className="text-xs md:text-sm text-gray-400 mt-1">Avg Processing</p>
                 </div>
