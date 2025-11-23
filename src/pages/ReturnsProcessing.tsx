@@ -221,10 +221,15 @@ const ReturnsProcessing = () => {
                   return (
                     <Card 
                       key={item.step}
-                      className={`relative bg-white p-6 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
-                        item.highlight ? 'border-2 border-[hsl(350,89%,60%)]/50 bg-[hsl(350,89%,60%)]/5' : ''
+                      className={`relative bg-white z-20 p-6 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
+                        item.highlight ? 'border-2 border-[hsl(350,89%,60%)]/50' : ''
                       }`}
                     >
+                      {/* Tinted background layer for highlighted cards */}
+                      {item.highlight && (
+                        <div className="absolute inset-0 bg-[hsl(350,89%,60%)]/5 rounded-lg pointer-events-none -z-10" />
+                      )}
+                      
                       <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[hsl(350,89%,60%)]/10 flex items-center justify-center">
                         <IconComponent className="w-8 h-8 text-[hsl(350,89%,60%)]" />
                       </div>
