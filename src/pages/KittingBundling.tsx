@@ -123,7 +123,7 @@ const KittingBundling = () => {
                     <Package className="w-7 h-7 md:w-8 md:h-8" style={{ color: 'hsl(160, 84%, 39%)' }} />
                   </div>
                   <p className="text-3xl md:text-4xl font-bold mb-2" style={{ color: 'hsl(160, 84%, 39%)' }}>
-                    <MetricCounter value={3} suffix="+" />
+                    <MetricCounter value={2} suffix="+" />
                   </p>
                   <p className="font-semibold mb-1">Multi-SKU Kits</p>
                   <p className="text-sm text-muted-foreground">Items per bundle</p>
