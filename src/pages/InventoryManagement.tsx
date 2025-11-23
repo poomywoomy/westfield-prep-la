@@ -1,14 +1,15 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Database, TrendingUp, Shield, Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import StructuredData from "@/components/StructuredData";
 import { generateMetaTags } from "@/utils/seo";
+import { BarChart3, TrendingUp, Package, AlertCircle, CheckCircle } from "lucide-react";
+import { MetricCounter } from "@/components/ui/metric-counter";
 
 const InventoryManagement = () => {
   const navigate = useNavigate();
@@ -18,21 +19,20 @@ const InventoryManagement = () => {
   }, []);
 
   const meta = generateMetaTags(
-    "Inventory Management Services | Real-Time Tracking | Westfield Prep Center",
-    "Professional inventory management in Los Angeles. Real-time sync, smart alerts, detailed analytics, and secure storage. Never stock out again.",
+    "Inventory Management Services | Real-Time Tracking Los Angeles",
+    "Real-time inventory management with cycle counts, analytics, and barcode tracking. $2.4M+ inventory under management in Los Angeles.",
     "/inventory-management"
   );
 
   const serviceData = {
     "@context": "https://schema.org",
     "@type": "Service",
-    "name": "Inventory Management Services Los Angeles",
+    "name": "Inventory Management Services",
+    "description": "Real-time inventory tracking and management with advanced analytics",
     "provider": {
       "@type": "Organization",
       "name": "Westfield Prep Center"
-    },
-    "description": "Real-time inventory tracking and management in Los Angeles. Advanced WMS with live updates, low-stock alerts, and multi-location support.",
-    "areaServed": "Los Angeles, CA"
+    }
   };
 
   const faqData = {
@@ -41,42 +41,18 @@ const InventoryManagement = () => {
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "How do you track my inventory?",
+        "name": "How often do you perform cycle counts?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "We use a cloud-based Warehouse Management System (WMS) with barcode scanning for real-time tracking. You can view your inventory levels 24/7 through our online portal."
+          "text": "We perform daily cycle counts on high-velocity SKUs and monthly counts on all inventory."
         }
       },
       {
         "@type": "Question",
-        "name": "Do you provide low-stock alerts?",
+        "name": "Can I see my inventory in real-time?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, our system automatically sends notifications when inventory reaches your custom threshold levels, helping you avoid stockouts."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Can you manage inventory for multiple SKUs?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Absolutely. We manage thousands of SKUs for clients across multiple product categories with full traceability and lot tracking."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How accurate is your inventory tracking?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "We maintain 99.9% inventory accuracy through regular cycle counts, barcode verification, and automated reconciliation processes."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Do you offer inventory reporting?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, you get access to detailed inventory reports including stock levels, movement history, velocity analysis, and aging reports."
+          "text": "Yes, our WMS provides real-time inventory visibility 24/7 through your client dashboard."
         }
       }
     ]
@@ -88,278 +64,246 @@ const InventoryManagement = () => {
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
         <link rel="canonical" href={meta.canonical} />
-        <meta property="og:title" content={meta.ogTitle} />
-        <meta property="og:description" content={meta.ogDescription} />
-        <meta property="og:url" content={meta.ogUrl} />
-        <meta property="og:image" content={meta.ogImage} />
-        <meta property="og:type" content={meta.ogType} />
-        <meta name="twitter:card" content={meta.twitterCard} />
-        <meta name="twitter:title" content={meta.twitterTitle} />
-        <meta name="twitter:description" content={meta.twitterDescription} />
-        <meta name="twitter:image" content={meta.twitterImage} />
       </Helmet>
 
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
-      
-      <Header />
-      <Breadcrumbs items={[{ label: "Inventory Management", path: "/inventory-management" }]} />
 
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-        {/* Hero Section */}
-        <section className="pt-20 pb-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="inline-block p-3 bg-primary/10 rounded-2xl mb-6">
-                <Database className="w-12 h-12 text-primary" />
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <Breadcrumbs items={[{ label: "Inventory Management", path: "/inventory-management" }]} />
+
+        {/* Hero Section - Warehouse Grid Pattern with Amber */}
+        <section className="relative py-20">
+          {/* Grid Pattern Background */}
+          <div className="absolute inset-0 opacity-5 overflow-hidden">
+            <div className="grid grid-cols-12 gap-4 h-full">
+              {[...Array(120)].map((_, i) => (
+                <div key={i} className="border border-[hsl(43,96%,56%)]" />
+              ))}
+            </div>
+          </div>
+
+          <div className="container relative z-10">
+            <div className="max-w-5xl mx-auto">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 relative">
                 Real-Time Inventory Control
+                <span className="block h-1 w-24 bg-[hsl(43,96%,56%)] mt-4" />
               </h1>
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Know exactly what you have, where it is, and when to reorder. Our advanced WMS gives you 
-                complete visibility and control over your inventory 24/7.
+              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl">
+                Data-driven inventory management with cycle counts, analytics, and automated reorder alerts. Never run out of stock again.
               </p>
-              <Button 
-                size="lg" 
-                onClick={() => navigate("/contact")}
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+
+              {/* Hero Stat Card */}
+              <div className="mt-12 bg-gradient-to-br from-[hsl(43,96%,56%)]/10 to-[hsl(43,96%,56%)]/5 p-6 md:p-8 rounded-2xl border border-[hsl(43,96%,56%)]/20 animate-slide-up">
+                <p className="text-sm font-medium mb-2" style={{ color: 'hsl(43, 80%, 40%)' }}>Real-Time Inventory Value</p>
+                <p className="text-5xl md:text-7xl font-bold animate-count-up" style={{ color: 'hsl(43, 96%, 56%)' }}>
+                  <MetricCounter value={2.4} prefix="$" suffix="M+" />
+                </p>
+                <p className="text-muted-foreground mt-2">Across 500+ client SKUs</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Angular Geometric Stat Cards */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {/* Angular Card 1 - Clipped Corners */}
+              <Card 
+                className="relative overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+                style={{ 
+                  clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%)',
+                  borderColor: 'hsl(43, 96%, 56%)'
+                }}
               >
-                Get a Free Quote
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Grid */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Advanced Inventory Features</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <Database className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Real-Time Sync</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Instant inventory updates across all your sales channels automatically
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <Bell className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Smart Alerts</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Automated notifications for low stock, reorder points, and anomalies
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <TrendingUp className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Analytics</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Velocity reports, aging analysis, and demand forecasting tools
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <Shield className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Security</h3>
-                    <p className="text-sm text-muted-foreground">
-                      24/7 monitored facility with insurance coverage and access controls
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Process Timeline */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
-              <div className="grid md:grid-cols-4 gap-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    1
-                  </div>
-                  <h3 className="font-semibold mb-2">Receive</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Every unit scanned and logged into our WMS upon arrival
+                <CardContent className="p-8">
+                  <Package className="w-10 h-10 md:w-12 md:h-12 mb-4" style={{ color: 'hsl(43, 96%, 56%)' }} />
+                  <p className="text-3xl md:text-4xl font-bold mb-2" style={{ color: 'hsl(43, 96%, 56%)' }}>
+                    <MetricCounter value={10000} suffix="+" />
                   </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    2
+                  <p className="text-muted-foreground">SKUs Tracked</p>
+                  {/* Mini bar chart built-in */}
+                  <div className="mt-4 space-y-2">
+                    {[85, 65, 92].map((width, i) => (
+                      <div key={i} className="h-1.5 rounded-full transition-all duration-1000" style={{ width: `${width}%`, backgroundColor: 'hsl(43, 96%, 56%)' }} />
+                    ))}
                   </div>
-                  <h3 className="font-semibold mb-2">Store</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Organized in our LA warehouse with location tracking
-                  </p>
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    3
-                  </div>
-                  <h3 className="font-semibold mb-2">Monitor</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Real-time tracking with automated reorder alerts
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    4
-                  </div>
-                  <h3 className="font-semibold mb-2">Report</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Access detailed analytics and inventory insights anytime
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Benefits */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Why Choose Our Inventory Management</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-3">Never Stock Out</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Automated low-stock alerts and reorder recommendations keep you ahead of demand
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <TrendingUp className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Demand forecasting</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <TrendingUp className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Reorder point alerts</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <TrendingUp className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Safety stock calculations</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-3">Total Visibility</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      See your entire inventory in real-time from anywhere in the world
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <Database className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Live stock levels</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Database className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Movement history</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Database className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Location tracking</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-3">Reduce Costs</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Optimize your inventory levels and reduce carrying costs significantly
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <Shield className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Minimize dead stock</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Shield className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Reduce overstock</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Shield className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Better cash flow</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-              <div className="space-y-6">
-                {faqData.mainEntity.map((faq, index) => (
-                  <Card key={index}>
-                    <CardContent className="pt-6">
-                      <h3 className="font-semibold mb-2">{faq.name}</h3>
-                      <p className="text-sm text-muted-foreground">{faq.acceptedAnswer.text}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA */}
-        <section className="py-20 bg-gradient-to-br from-primary to-primary/80">
-          <div className="container mx-auto px-4 text-center">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                Take Control of Your Inventory Today
-              </h2>
-              <p className="text-xl text-white/90 mb-8">
-                Stop worrying about stock levels. Let our advanced system handle the tracking while you focus on sales.
-              </p>
-              <Button 
-                size="lg" 
-                onClick={() => navigate("/contact")}
-                className="bg-white text-primary hover:bg-white/90 px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+              {/* Angular Card 2 - Clipped Corners with Mini Bar Chart */}
+              <Card 
+                className="relative overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+                style={{ 
+                  clipPath: 'polygon(20px 0, 100% 0, 100% 100%, 0 100%, 0 20px)',
+                  borderColor: 'hsl(43, 96%, 56%)'
+                }}
               >
-                Get Started Today
-              </Button>
+                <CardContent className="p-8">
+                  <CheckCircle className="w-10 h-10 md:w-12 md:h-12 mb-4" style={{ color: 'hsl(43, 96%, 56%)' }} />
+                  <p className="text-3xl md:text-4xl font-bold mb-2" style={{ color: 'hsl(43, 96%, 56%)' }}>
+                    <MetricCounter value={99.9} suffix="%" />
+                  </p>
+                  <p className="text-muted-foreground">Accuracy Rate</p>
+                  {/* Horizontal bar showing accuracy */}
+                  <div className="mt-4 h-3 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-1000" style={{ width: '99.9%', backgroundColor: 'hsl(43, 96%, 56%)' }} />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Angular Card 3 - Heavy Numeric Focus */}
+              <Card 
+                className="relative overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+                style={{ 
+                  clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%)',
+                  borderColor: 'hsl(43, 96%, 56%)'
+                }}
+              >
+                <CardContent className="p-8">
+                  <TrendingUp className="w-10 h-10 md:w-12 md:h-12 mb-4" style={{ color: 'hsl(43, 96%, 56%)' }} />
+                  <p className="text-3xl md:text-4xl font-bold mb-2 relative">
+                    Real-Time
+                    <span className="absolute -bottom-1 left-0 w-16 h-0.5" style={{ backgroundColor: 'hsl(43, 96%, 56%)' }} />
+                  </p>
+                  <p className="text-muted-foreground">Sync Updates</p>
+                  <p className="text-sm mt-4 font-mono" style={{ color: 'hsl(43, 80%, 40%)' }}>
+                    Updated every 60 seconds
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
+
+        {/* Smart Inventory Tracking - Stacked Cards */}
+        <section className="py-20">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Smart Inventory Tracking</h2>
+            <div className="max-w-4xl mx-auto space-y-6">
+              {[
+                { icon: BarChart3, title: "Real-Time Dashboard", desc: "Live inventory levels across all locations" },
+                { icon: AlertCircle, title: "Low Stock Alerts", desc: "Automated notifications before you run out" },
+                { icon: TrendingUp, title: "Demand Forecasting", desc: "Predictive analytics for optimal stock levels" },
+                { icon: CheckCircle, title: "Cycle Count Automation", desc: "Daily counts on high-velocity SKUs" }
+              ].map((item, idx) => (
+                <Card key={idx} className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: 'hsl(43, 96%, 56%)' }} />
+                  <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center gap-6">
+                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'hsl(43, 96%, 56%, 0.1)' }}>
+                      <item.icon className="w-7 h-7 md:w-8 md:h-8" style={{ color: 'hsl(43, 96%, 56%)' }} />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg md:text-xl font-semibold mb-2">{item.title}</h3>
+                      <p className="text-muted-foreground">{item.desc}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Cycle Count Automation - Numbered Steps */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Cycle Count Automation</h2>
+            <div className="max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-6">
+              {[
+                { num: "1", label: "Schedule" },
+                { num: "2", label: "Scan" },
+                { num: "3", label: "Verify" },
+                { num: "4", label: "Adjust" },
+                { num: "5", label: "Report" }
+              ].map((step, idx) => (
+                <div key={idx} className="text-center">
+                  <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full flex items-center justify-center border-4 font-bold text-xl md:text-2xl transition-all duration-300 hover:scale-110" 
+                       style={{ borderColor: 'hsl(43, 96%, 56%)', color: 'hsl(43, 96%, 56%)' }}>
+                    {step.num}
+                  </div>
+                  <p className="font-semibold text-sm md:text-base">{step.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SKU Leaderboard - Table Style */}
+        <section className="py-20">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Top Performing SKUs</h2>
+            <Card className="max-w-5xl mx-auto overflow-hidden">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead style={{ backgroundColor: 'hsl(43, 96%, 56%, 0.1)' }}>
+                      <tr>
+                        <th className="px-4 md:px-6 py-4 text-left font-semibold">Rank</th>
+                        <th className="px-4 md:px-6 py-4 text-left font-semibold">SKU</th>
+                        <th className="px-4 md:px-6 py-4 text-left font-semibold">Velocity</th>
+                        <th className="px-4 md:px-6 py-4 text-left font-semibold">Stock Level</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { rank: "🥇", sku: "SKU-1234", velocity: "150/day", stock: "High" },
+                        { rank: "🥈", sku: "SKU-5678", velocity: "120/day", stock: "Medium" },
+                        { rank: "🥉", sku: "SKU-9012", velocity: "95/day", stock: "High" }
+                      ].map((row, idx) => (
+                        <tr key={idx} className="border-t hover:bg-muted/50 transition-colors">
+                          <td className="px-4 md:px-6 py-4 text-xl md:text-2xl">{row.rank}</td>
+                          <td className="px-4 md:px-6 py-4 font-mono font-semibold text-sm md:text-base">{row.sku}</td>
+                          <td className="px-4 md:px-6 py-4 text-sm md:text-base" style={{ color: 'hsl(43, 96%, 56%)' }}>{row.velocity}</td>
+                          <td className="px-4 md:px-6 py-4">
+                            <span className="px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium" 
+                                  style={{ backgroundColor: 'hsl(43, 96%, 56%, 0.2)', color: 'hsl(43, 80%, 40%)' }}>
+                              {row.stock}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            <div className="max-w-3xl mx-auto space-y-6">
+              {faqData.mainEntity.map((faq, index) => (
+                <Card key={index}>
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold mb-2">{faq.name}</h3>
+                    <p className="text-sm text-muted-foreground">{faq.acceptedAnswer.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="py-20 bg-gradient-to-r from-[hsl(43,96%,56%)]/10 via-[hsl(43,96%,56%)]/5 to-[hsl(43,96%,56%)]/10">
+          <div className="container text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Take Control of Your Inventory</h2>
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Real-time visibility, automated counts, and predictive analytics
+            </p>
+            <Button size="lg" onClick={() => navigate("/contact")}>
+              Schedule a Demo
+            </Button>
+          </div>
+        </section>
+
+        <Footer />
       </div>
-
-      <Footer />
     </>
   );
 };

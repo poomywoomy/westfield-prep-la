@@ -2,15 +2,20 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, Gift, Camera, CheckCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import StructuredData from "@/components/StructuredData";
+import { Plus, ArrowRight, Package, Gift, CheckCircle } from "lucide-react";
+import { MetricCounter } from "@/components/ui/metric-counter";
 
 const KittingBundling = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const serviceData = {
     serviceType: "Service",
@@ -22,33 +27,17 @@ const KittingBundling = () => {
   const faqData = [
     {
       question: "What types of kitting services do you offer?",
-      answer: "We offer multi-SKU kits, gift sets, promotional bundles, subscription box assembly, influencer PR boxes, and custom branded packaging. All kits include photo-proof QC documentation."
+      answer: "We offer multi-SKU kits, gift sets, promotional bundles, subscription box assembly, influencer PR boxes, and custom branded packaging."
     },
     {
-      question: "How long does it take to assemble kits?",
-      answer: "Standard kit assembly typically takes 1-3 business days depending on complexity and volume. Rush assembly is available for urgent needs."
-    },
-    {
-      question: "Can you handle branded packaging materials?",
-      answer: "Yes! We can incorporate your branded materials including tissue paper, ribbons, stickers, inserts, and custom boxes into your kits."
+      question: "How long does kit assembly take?",
+      answer: "Standard kit assembly takes 1-3 business days depending on complexity and volume. Rush assembly is available for urgent needs."
     },
     {
       question: "Do you provide photos of completed kits?",
-      answer: "Absolutely. Every kit is photographed during QC to ensure accuracy. Photos are available in your client dashboard for verification."
-    },
-    {
-      question: "What's the minimum order quantity for kitting?",
-      answer: "We don't have a strict minimum, but kitting is most cost-effective for orders of 50+ units. Contact us to discuss your specific needs."
-    },
-    {
-      question: "Can you create new SKUs for assembled kits?",
-      answer: "Yes. We assign new SKU labels to completed kits and integrate them into your inventory system for easy fulfillment tracking."
+      answer: "Yes. Every kit is photographed during QC to ensure accuracy. Photos are available in your dashboard for verification."
     }
   ];
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <>
@@ -56,19 +45,6 @@ const KittingBundling = () => {
         <title>Kitting & Bundling Services | Westfield Prep Center</title>
         <meta name="description" content="Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands." />
         <link rel="canonical" href="https://westfieldprepcenter.com/kitting-bundling" />
-        
-        {/* Open Graph tags */}
-        <meta property="og:title" content="Kitting & Bundling Services | Westfield Prep Center" />
-        <meta property="og:description" content="Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands." />
-        <meta property="og:url" content="https://westfieldprepcenter.com/kitting-bundling" />
-        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-        <meta property="og:type" content="website" />
-        
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Kitting & Bundling Services | Westfield Prep Center" />
-        <meta name="twitter:description" content="Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands." />
-        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
@@ -76,138 +52,185 @@ const KittingBundling = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <Breadcrumbs items={[{ label: "Kitting & Bundling", path: "/kitting-bundling" }]} />
-        
-        <main className="flex-1">
-          {/* Hero Section */}
-          <section className="bg-gradient-to-br from-primary/10 to-primary/5 py-20 mt-16">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto text-center">
-                <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                  Kitting & Bundling Services
-                </h1>
-                <p className="text-xl text-muted-foreground mb-8">
-                  Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC.
-                </p>
-                <Button size="lg" onClick={() => navigate("/contact")}>
+
+        {/* Hero Section - Organic Shapes with Emerald */}
+        <section className="relative py-20 bg-gradient-to-br from-[hsl(160,84%,39%)]/5 via-background to-background overflow-hidden">
+          {/* Organic soft shapes background */}
+          <div className="absolute inset-0 opacity-20">
+            <svg className="w-full h-full">
+              <circle cx="10%" cy="20%" r="100" fill="url(#emerald-gradient)" />
+              <circle cx="80%" cy="60%" r="150" fill="url(#emerald-gradient)" />
+              <circle cx="50%" cy="80%" r="120" fill="url(#emerald-gradient)" />
+              <defs>
+                <radialGradient id="emerald-gradient">
+                  <stop offset="0%" stopColor="rgb(16, 185, 129)" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="rgb(16, 185, 129)" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+
+          <div className="container relative z-10">
+            <div className="max-w-5xl mx-auto">
+              {/* Assembly diagram */}
+              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 mb-8">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-[hsl(160,84%,39%)]/10 border-2 border-[hsl(160,84%,39%)] flex items-center justify-center">
+                  <Package className="w-6 h-6 md:w-8 md:h-8 text-[hsl(160,84%,39%)]" />
+                </div>
+                <Plus className="w-6 h-6 md:w-8 md:h-8 text-[hsl(160,84%,39%)]" />
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-[hsl(160,84%,39%)]/10 border-2 border-[hsl(160,84%,39%)] flex items-center justify-center">
+                  <Package className="w-6 h-6 md:w-8 md:h-8 text-[hsl(160,84%,39%)]" />
+                </div>
+                <ArrowRight className="w-6 h-6 md:w-8 md:h-8 text-[hsl(160,84%,39%)]" />
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-[hsl(160,84%,39%)] border-2 border-[hsl(160,84%,39%)] flex items-center justify-center">
+                  <Gift className="w-8 h-8 md:w-10 md:h-10 text-white" />
+                </div>
+              </div>
+
+              <h1 className="text-4xl md:text-6xl font-bold text-center mb-6">
+                Kitting & Bundling Services
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground text-center mb-8 max-w-3xl mx-auto">
+                Multi-SKU kits, gift sets, and promotional bundles assembled with precision. Photo-proof QC on every kit.
+              </p>
+              <div className="text-center">
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate("/contact")}
+                  style={{ backgroundColor: 'hsl(160, 84%, 39%)', color: 'white' }}
+                >
                   Get a Quote
                 </Button>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Services Grid */}
-          <section className="py-16 bg-background">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Kitting Services</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
-                  <CardHeader>
-                    <Package className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Multi-SKU Kits</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Combine multiple products into single SKUs for streamlined fulfillment.</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <Gift className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Gift Sets</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Premium gift packaging with ribbons, tissue paper, and branded materials.</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <Package className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Promotional Bundles</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Seasonal bundles and promotional sets for marketing campaigns.</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <Camera className="h-10 w-10 text-primary mb-2" />
-                    <CardTitle>Photo-Proof QC</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Every kit documented with photos to ensure accuracy and quality.</p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </section>
-
-          {/* Process */}
-          <section className="py-16 bg-muted/30">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Our Kitting Process</h2>
-              <div className="max-w-4xl mx-auto space-y-6">
-                {[
-                  { step: 1, title: "Receive Components", desc: "All kit components received, inspected, and verified" },
-                  { step: 2, title: "Assemble Kits", desc: "Products assembled per your specifications with branded materials" },
-                  { step: 3, title: "Quality Check", desc: "Each kit inspected and photographed for accuracy" },
-                  { step: 4, title: "Package & Label", desc: "Kits packaged with new SKU labels for your inventory system" },
-                  { step: 5, title: "Store & Ship", desc: "Ready-to-ship kits stored and fulfilled on-demand" },
-                ].map((item) => (
-                  <Card key={item.step}>
-                    <CardHeader>
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-                          {item.step}
-                        </div>
-                        <CardTitle>{item.title}</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">{item.desc}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Use Cases */}
-          <section className="py-16 bg-background">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Common Kitting Use Cases</h2>
-              <div className="max-w-3xl mx-auto grid md:grid-cols-2 gap-6">
-                {[
-                  "Subscription box assembly",
-                  "Holiday gift sets",
-                  "Product sample kits",
-                  "Influencer PR boxes",
-                  "Promotional bundles",
-                  "New customer welcome kits",
-                  "Loyalty program rewards",
-                  "Event swag bags",
-                ].map((useCase, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <CheckCircle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
-                    <p className="text-lg">{useCase}</p>
+        {/* Puzzle-Piece Modular Cards */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Kit Assembly Options</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {/* Puzzle Piece Card 1 */}
+              <Card className="relative overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+                    style={{ 
+                      borderColor: 'hsl(160, 84%, 39%)',
+                      clipPath: 'polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 0 100%)'
+                    }}>
+                <CardContent className="p-8 text-center">
+                  <div className="w-14 h-14 md:w-16 md:h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" 
+                       style={{ backgroundColor: 'hsl(160, 84%, 39%, 0.1)' }}>
+                    <Package className="w-7 h-7 md:w-8 md:h-8" style={{ color: 'hsl(160, 84%, 39%)' }} />
                   </div>
-                ))}
-              </div>
-            </div>
-          </section>
+                  <p className="text-3xl md:text-4xl font-bold mb-2" style={{ color: 'hsl(160, 84%, 39%)' }}>
+                    <MetricCounter value={3} suffix="+" />
+                  </p>
+                  <p className="font-semibold mb-1">Multi-SKU Kits</p>
+                  <p className="text-sm text-muted-foreground">Items per bundle</p>
+                </CardContent>
+              </Card>
 
-          {/* CTA */}
-          <section className="py-16 bg-primary text-primary-foreground">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold mb-4">Ready to Create Custom Kits?</h2>
-              <p className="text-xl mb-8 opacity-90">Let's discuss your kitting needs.</p>
-              <Button size="lg" variant="secondary" onClick={() => navigate("/contact")}>
-                Get a Quote
-              </Button>
+              {/* Puzzle Piece Card 2 - Component Breakdown */}
+              <Card className="relative overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+                    style={{ 
+                      borderColor: 'hsl(160, 84%, 39%)',
+                      clipPath: 'polygon(30px 0, 100% 0, 100% 100%, 0 100%, 0 30px)'
+                    }}>
+                <CardContent className="p-8 text-center">
+                  <div className="flex justify-center gap-2 mb-4">
+                    <div className="w-6 h-6 rounded border-2" style={{ borderColor: 'hsl(160, 84%, 39%)' }} />
+                    <div className="w-6 h-6 rounded border-2" style={{ borderColor: 'hsl(160, 84%, 39%)' }} />
+                    <ArrowRight className="w-6 h-6" style={{ color: 'hsl(160, 84%, 39%)' }} />
+                    <div className="w-8 h-8 rounded" style={{ backgroundColor: 'hsl(160, 84%, 39%)' }} />
+                  </div>
+                  <p className="text-3xl md:text-4xl font-bold mb-2" style={{ color: 'hsl(160, 84%, 39%)' }}>
+                    <MetricCounter value={5} />
+                  </p>
+                  <p className="font-semibold mb-1">Min/Kit</p>
+                  <p className="text-sm text-muted-foreground">Assembly time</p>
+                </CardContent>
+              </Card>
+
+              {/* Before/After Efficiency Card */}
+              <Card className="relative overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+                    style={{ 
+                      borderColor: 'hsl(160, 84%, 39%)',
+                      clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%)'
+                    }}>
+                <CardContent className="p-0">
+                  <div className="p-6 border-b-2" style={{ borderColor: 'hsl(160, 84%, 39%, 0.3)' }}>
+                    <p className="text-sm text-muted-foreground mb-1">Before</p>
+                    <p className="text-2xl font-bold text-muted-foreground line-through">30 min</p>
+                  </div>
+                  <div className="p-6" style={{ backgroundColor: 'hsl(160, 84%, 39%, 0.05)' }}>
+                    <p className="text-sm mb-1" style={{ color: 'hsl(160, 70%, 30%)' }}>After</p>
+                    <p className="text-3xl md:text-4xl font-bold" style={{ color: 'hsl(160, 84%, 39%)' }}>
+                      <MetricCounter value={5} suffix=" min" />
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </section>
-        </main>
+          </div>
+        </section>
+
+        {/* Use Cases */}
+        <section className="py-20">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Common Kitting Use Cases</h2>
+            <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                "Subscription box assembly",
+                "Holiday gift sets",
+                "Product sample kits",
+                "Influencer PR boxes",
+                "Promotional bundles",
+                "New customer welcome kits",
+                "Loyalty program rewards",
+                "Event swag bags"
+              ].map((useCase, idx) => (
+                <div key={idx} className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 mt-1" style={{ color: 'hsl(160, 84%, 39%)' }} />
+                  <p className="text-base md:text-lg">{useCase}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            <div className="max-w-3xl mx-auto space-y-6">
+              {faqData.map((faq, index) => (
+                <Card key={index}>
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold mb-2">{faq.question}</h3>
+                    <p className="text-sm text-muted-foreground">{faq.answer}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="py-16 md:py-20 bg-gradient-to-r from-[hsl(160,84%,39%)]/10 via-[hsl(160,84%,39%)]/5 to-[hsl(160,84%,39%)]/10">
+          <div className="container text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Create Custom Kits?</h2>
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Let's discuss your kitting needs and create something special
+            </p>
+            <Button 
+              size="lg" 
+              onClick={() => navigate("/contact")}
+              style={{ backgroundColor: 'hsl(160, 84%, 39%)', color: 'white' }}
+            >
+              Get a Quote
+            </Button>
+          </div>
+        </section>
 
         <Footer />
       </div>

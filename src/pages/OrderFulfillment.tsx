@@ -1,14 +1,15 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Package, CheckCircle2, Zap, BarChart3 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import StructuredData from "@/components/StructuredData";
 import { generateMetaTags } from "@/utils/seo";
+import { Package, Zap, Target, Clock, ShoppingCart, Store } from "lucide-react";
+import { MetricCounter } from "@/components/ui/metric-counter";
 
 const OrderFulfillment = () => {
   const navigate = useNavigate();
@@ -18,20 +19,20 @@ const OrderFulfillment = () => {
   }, []);
 
   const meta = generateMetaTags(
-    "Order Fulfillment Services | Pick, Pack & Ship | Westfield Prep Center",
-    "Expert e-commerce order fulfillment in Los Angeles. Pick & pack, same-day processing, quality control, and real-time tracking. Perfect for growing brands.",
+    "Order Fulfillment Services Los Angeles | Same-Day Processing",
+    "Lightning-fast order fulfillment in Los Angeles. Same-day processing, 99.8% accuracy, real-time tracking. Shopify, Amazon, TikTok Shop integration.",
     "/order-fulfillment"
   );
 
   const serviceData = {
     "@context": "https://schema.org",
     "@type": "Service",
-    "name": "Order Fulfillment Services Los Angeles",
+    "name": "Order Fulfillment Services",
+    "description": "Professional order fulfillment with same-day processing and real-time tracking",
     "provider": {
       "@type": "Organization",
       "name": "Westfield Prep Center"
     },
-    "description": "Professional order fulfillment services in Los Angeles. Fast, accurate pick and pack with same-day shipping capabilities.",
     "areaServed": "Los Angeles, CA"
   };
 
@@ -41,42 +42,26 @@ const OrderFulfillment = () => {
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "What is order fulfillment?",
+        "name": "What is your order cutoff time?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Order fulfillment is the complete process of receiving, processing, and delivering orders to customers. This includes inventory storage, picking, packing, shipping, and returns management."
+          "text": "Orders received by 2 PM PST ship same day. We process orders 6 days per week."
         }
       },
       {
         "@type": "Question",
-        "name": "How fast can you fulfill orders?",
+        "name": "What platforms do you integrate with?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "We process orders received by 2 PM PT the same day. Orders ship within 24 hours of receipt, with tracking information provided immediately."
+          "text": "We integrate with Shopify, Amazon Seller Central, TikTok Shop, Walmart Marketplace, and custom API solutions."
         }
       },
       {
         "@type": "Question",
-        "name": "Do you integrate with my e-commerce platform?",
+        "name": "Do you provide order tracking?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, we integrate seamlessly with Shopify, Amazon, TikTok Shop, and other major e-commerce platforms for automated order processing."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What are your fulfillment accuracy rates?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "We maintain a 99.8% order accuracy rate through our quality control processes and barcode scanning technology."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Can you handle custom packaging?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, we offer custom packaging solutions including branded boxes, inserts, and special handling requirements for your orders."
+          "text": "Yes, real-time tracking is automatically sent to customers via email and synced to your sales platform."
         }
       }
     ]
@@ -92,274 +77,207 @@ const OrderFulfillment = () => {
         <meta property="og:description" content={meta.ogDescription} />
         <meta property="og:url" content={meta.ogUrl} />
         <meta property="og:image" content={meta.ogImage} />
-        <meta property="og:type" content={meta.ogType} />
-        <meta name="twitter:card" content={meta.twitterCard} />
-        <meta name="twitter:title" content={meta.twitterTitle} />
-        <meta name="twitter:description" content={meta.twitterDescription} />
-        <meta name="twitter:image" content={meta.twitterImage} />
       </Helmet>
 
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
-      
-      <Header />
-      <Breadcrumbs items={[{ label: "Order Fulfillment", path: "/order-fulfillment" }]} />
 
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-        {/* Hero Section */}
-        <section className="pt-20 pb-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="inline-block p-3 bg-primary/10 rounded-2xl mb-6">
-                <Package className="w-12 h-12 text-primary" />
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <Breadcrumbs items={[{ label: "Order Fulfillment", path: "/order-fulfillment" }]} />
+
+        {/* Hero Section - Frosted Glass with Teal Accent */}
+        <section className="relative overflow-hidden py-20 bg-gradient-to-br from-[hsl(180,75%,50%)]/5 via-background to-background">
+          <div className="absolute inset-0 bg-gradient-to-br from-[hsl(180,75%,50%)]/10 to-transparent" />
+          
+          <div className="container relative z-10">
+            <div className="max-w-5xl mx-auto backdrop-blur-xl bg-card/80 rounded-3xl p-8 md:p-12 shadow-2xl border border-[hsl(180,75%,50%)]/20 animate-float">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 relative">
                 Lightning-Fast Order Fulfillment
+                <span className="absolute -bottom-2 left-0 w-32 h-1 bg-gradient-to-r from-[hsl(180,75%,50%)] to-transparent animate-glow" />
               </h1>
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Get your orders out the door faster with our same-day processing and 99.8% accuracy rate. 
-                We handle everything from pick & pack to shipping so you can focus on growing your business.
+              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl">
+                Same-day processing, 99.8% accuracy, real-time tracking. Integrated with Shopify, Amazon, and TikTok Shop for seamless fulfillment at scale.
               </p>
               <Button 
                 size="lg" 
                 onClick={() => navigate("/contact")}
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+                className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
               >
-                Get a Free Quote
+                Get Started Today
               </Button>
             </div>
-          </div>
-        </section>
 
-        {/* Services Grid */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Complete Fulfillment Solutions</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <Package className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Pick & Pack</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Efficient order picking with barcode scanning and multi-item order accuracy
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <Zap className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Same-Day Processing</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Orders by 2 PM PT ship same day. No delays, no excuses
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <CheckCircle2 className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Quality Control</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Double-check verification process ensures 99.8% accuracy on every order
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <BarChart3 className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">Real-Time Tracking</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Live inventory updates and shipping notifications for complete visibility
-                    </p>
-                  </CardContent>
-                </Card>
+            {/* Unique Stat Cards - 3 Different Shapes */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 max-w-5xl mx-auto">
+              {/* Diamond KPI Card */}
+              <div className="relative h-64 flex items-center justify-center">
+                <div className="absolute inset-0 rotate-45 bg-gradient-to-br from-card to-[hsl(180,75%,50%)]/10 rounded-3xl border-2 border-[hsl(180,75%,50%)] shadow-lg shadow-[hsl(180,75%,50%)]/20 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2" />
+                <div className="relative z-10 text-center">
+                  <p className="text-4xl md:text-5xl font-bold text-[hsl(180,75%,50%)] animate-count-up">
+                    <MetricCounter value={99.8} suffix="%" />
+                  </p>
+                  <p className="text-sm font-medium text-foreground mt-2">Accuracy Rate</p>
+                </div>
               </div>
+
+              {/* Vertical Pill Card */}
+              <Card className="h-80 bg-gradient-to-b from-card to-[hsl(180,75%,50%)]/5 border-[hsl(180,75%,50%)]/30 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                <CardContent className="p-8 flex flex-col items-center justify-center h-full">
+                  <Clock className="w-12 md:w-16 h-12 md:h-16 text-[hsl(180,75%,50%)] mb-4" />
+                  <p className="text-5xl md:text-6xl font-bold text-[hsl(180,75%,50%)] animate-count-up">
+                    <MetricCounter value={24} suffix="h" />
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-4 text-center">Average Processing Time</p>
+                </CardContent>
+              </Card>
+
+              {/* Split Dual-Stat Card */}
+              <Card className="h-64 border-[hsl(180,75%,50%)]/30 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                <CardContent className="p-0 h-full flex flex-col">
+                  <div className="flex-1 flex flex-col items-center justify-center border-b-2 border-[hsl(180,75%,50%)]">
+                    <p className="text-2xl md:text-3xl font-bold text-foreground">2PM Cutoff</p>
+                    <p className="text-sm text-muted-foreground mt-2">PST Daily</p>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center justify-center bg-[hsl(180,75%,50%)]/5">
+                    <p className="text-2xl md:text-3xl font-bold text-[hsl(180,75%,50%)]">Same Day</p>
+                    <p className="text-sm text-muted-foreground mt-2">Ship Guarantee</p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
 
-        {/* Process Timeline */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Our Fulfillment Process</h2>
-              <div className="grid md:grid-cols-4 gap-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    1
-                  </div>
-                  <h3 className="font-semibold mb-2">Order Received</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Automatic order import from your platform into our system
-                  </p>
-                </div>
+        {/* Real-Time Fulfillment Workflow */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <div className="text-center mb-16 animate-slide-up">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Real-Time Fulfillment Workflow</h2>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                Automated order processing from click to ship in under 24 hours
+              </p>
+            </div>
 
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    2
-                  </div>
-                  <h3 className="font-semibold mb-2">Pick Items</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Barcode scanning ensures the right items every time
-                  </p>
+            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[
+                { step: "1", icon: ShoppingCart, title: "Order Received", desc: "Auto-synced from platform" },
+                { step: "2", icon: Package, title: "Pick & Pack", desc: "QC checked & packaged" },
+                { step: "3", icon: Target, title: "Label & Ship", desc: "Carrier pickup same day" },
+                { step: "4", icon: Zap, title: "Tracking Sent", desc: "Customer notified instantly" }
+              ].map((item, idx) => (
+                <div key={idx} className="relative">
+                  <Card className="p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-[hsl(180,75%,50%)]/10 flex items-center justify-center">
+                      <item.icon className="w-6 h-6 text-[hsl(180,75%,50%)]" />
+                    </div>
+                    <div className="w-8 h-8 mx-auto mb-3 rounded-full bg-[hsl(180,75%,50%)] text-white flex items-center justify-center font-bold">
+                      {item.step}
+                    </div>
+                    <h3 className="font-semibold mb-2">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  </Card>
+                  {idx < 3 && (
+                    <div className="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-[hsl(180,75%,50%)]/30" />
+                  )}
                 </div>
-
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    3
-                  </div>
-                  <h3 className="font-semibold mb-2">Pack & Label</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Professional packaging with shipping labels printed and applied
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    4
-                  </div>
-                  <h3 className="font-semibold mb-2">Ship Out</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Carrier pickup and tracking number sent to customer
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Use Cases */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Perfect For</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-3">E-Commerce Brands</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Scale your Shopify, WooCommerce, or custom store without hiring a warehouse team
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Multi-channel order sync</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Custom packaging options</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Returns processing</span>
-                      </li>
-                    </ul>
-                  </CardContent>
+        {/* Speed & Accuracy Metrics */}
+        <section className="py-20">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Speed & Accuracy at Scale</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {[
+                { metric: "10000", suffix: "+", label: "Orders/Month", bar: 85 },
+                { metric: "99.8", suffix: "%", label: "Accuracy Rate", bar: 99 },
+                { metric: "4.5", suffix: "h", label: "Avg Processing", bar: 75 }
+              ].map((item, idx) => (
+                <Card key={idx} className="p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <p className="text-4xl md:text-5xl font-bold text-[hsl(180,75%,50%)] mb-2">
+                    <MetricCounter value={parseFloat(item.metric)} suffix={item.suffix} />
+                  </p>
+                  <p className="text-muted-foreground mb-4">{item.label}</p>
+                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-[hsl(180,75%,50%)] to-[hsl(180,75%,40%)] transition-all duration-1000"
+                      style={{ width: `${item.bar}%` }}
+                    />
+                  </div>
                 </Card>
+              ))}
+            </div>
+          </div>
+        </section>
 
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-3">Amazon Sellers</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Fulfill Merchant Fulfilled Network orders faster than FBA
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>2-day shipping capabilities</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Lower fulfillment fees</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Buy Box advantages</span>
-                      </li>
-                    </ul>
-                  </CardContent>
+        {/* Integrations Grid */}
+        <section className="py-20 bg-muted/30">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Platform Integrations</h2>
+            <p className="text-lg md:text-xl text-muted-foreground text-center mb-16 max-w-2xl mx-auto">
+              Seamlessly connected to your favorite e-commerce platforms
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {[
+                { name: "Shopify", icon: Store },
+                { name: "Amazon", icon: Package },
+                { name: "TikTok Shop", icon: Zap },
+                { name: "Walmart", icon: ShoppingCart },
+                { name: "Custom API", icon: Target },
+                { name: "More...", icon: Package }
+              ].map((platform, idx) => (
+                <Card key={idx} className="p-6 md:p-8 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-[hsl(180,75%,50%)]">
+                  <platform.icon className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4 text-[hsl(180,75%,50%)]" />
+                  <p className="font-semibold">{platform.name}</p>
                 </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-3">Growing Startups</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Professional fulfillment from day one without massive upfront costs
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>No order minimums</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Pay only for what you use</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Scale as you grow</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* FAQ Section */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-              <div className="space-y-6">
-                {faqData.mainEntity.map((faq, index) => (
-                  <Card key={index}>
-                    <CardContent className="pt-6">
-                      <h3 className="font-semibold mb-2">{faq.name}</h3>
-                      <p className="text-sm text-muted-foreground">{faq.acceptedAnswer.text}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+        <section className="py-20">
+          <div className="container">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            <div className="max-w-3xl mx-auto space-y-6">
+              {faqData.mainEntity.map((faq, index) => (
+                <Card key={index}>
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold mb-2">{faq.name}</h3>
+                    <p className="text-sm text-muted-foreground">{faq.acceptedAnswer.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="py-20 bg-gradient-to-br from-primary to-primary/80">
-          <div className="container mx-auto px-4 text-center">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                Ready to Speed Up Your Fulfillment?
-              </h2>
-              <p className="text-xl text-white/90 mb-8">
-                Let's discuss how our order fulfillment services can help you ship faster and grow bigger.
-              </p>
-              <Button 
-                size="lg" 
-                onClick={() => navigate("/contact")}
-                className="bg-white text-primary hover:bg-white/90 px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
-              >
-                Get Started Today
-              </Button>
-            </div>
+        {/* Teal CTA Banner */}
+        <section className="py-20 bg-gradient-to-r from-[hsl(180,75%,50%)]/10 via-[hsl(180,75%,50%)]/5 to-[hsl(180,75%,50%)]/10">
+          <div className="container">
+            <Card className="max-w-4xl mx-auto border-2 border-[hsl(180,75%,50%)] shadow-[0_0_40px_rgba(77,208,225,0.3)] animate-glow">
+              <CardContent className="p-8 md:p-12 text-center">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Scale Your Fulfillment?</h2>
+                <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                  Join 500+ brands shipping faster with Westfield Prep Center
+                </p>
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate("/contact")}
+                  className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                >
+                  Get Your Custom Quote
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </section>
+
+        <Footer />
       </div>
-
-      <Footer />
     </>
   );
 };
