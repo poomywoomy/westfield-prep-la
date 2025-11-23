@@ -8,26 +8,31 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Amazon-inspired color palette */
+    /* Westfield Prep Center Color System */
+    --midnight-navy: 210 100% 7%;        /* #0A0A23 */
+    --fulfillment-orange: 28 100% 50%;   /* #FF7A00 */
+    --graphite-gray: 0 0% 30%;           /* #4D4D4D */
+    --secondary-bg: 0 0% 96%;            /* #F5F5F7 */
+    
     --background: 0 0% 100%;
-    --foreground: 210 30% 12%;
+    --foreground: var(--midnight-navy);
 
     --card: 0 0% 100%;
-    --card-foreground: 210 30% 12%;
+    --card-foreground: var(--midnight-navy);
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 30% 12%;
+    --popover-foreground: var(--midnight-navy);
 
-    /* Deep Navy - Amazon inspired */
-    --primary: 210 30% 12%;
+    /* Primary Colors */
+    --primary: var(--midnight-navy);
     --primary-foreground: 0 0% 100%;
 
-    /* Bright Orange - Amazon inspired */
-    --secondary: 28 100% 50%;
+    /* Secondary/Accent Colors */
+    --secondary: var(--fulfillment-orange);
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 210 10% 45%;
+    --muted: var(--secondary-bg);
+    --muted-foreground: var(--graphite-gray);
 
     --accent: 210 20% 94%;
     --accent-foreground: 210 30% 12%;

@@ -4,21 +4,30 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const LocationShowcase = () => {
   return (
-    <section className="py-16 bg-gradient-to-b from-muted/20 to-background">
+    <section className="py-24 bg-gradient-to-b from-muted/20 to-background">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
               Strategically Located in Los Angeles
             </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-5">
-              Our Los Angeles fulfillment center is positioned near the Port of LA and major shipping hubs, giving your business a strategic logistics advantage.
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              15+ years serving eCommerce brands with 2M+ orders fulfilled. Our Duarte, CA warehouse offers Port of LA proximity and fast West Coast distribution.
             </p>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-border/50">
-              <MapPin className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Los Angeles, California</span>
-              <span className="text-xs text-muted-foreground">• Nationwide E-Commerce Fulfillment</span>
-            </div>
+          </div>
+
+          {/* Google Maps Embed */}
+          <div className="mb-12 rounded-xl overflow-hidden border border-border shadow-lg">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3301.7729299999997!2d-117.9795!3d34.2147!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2dd7f7f7f7f7f%3A0x7f7f7f7f7f7f7f7f!2s1801%20Flower%20Ave%20Office%202%2C%20Duarte%2C%20CA%2091010!5e0!3m2!1sen!2sus!4v1234567890"
+              width="100%"
+              height="400"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Westfield Prep Center Location - 1801 Flower Ave Office 2, Duarte, CA 91010"
+            />
           </div>
 
           {/* Interactive Tabs */}

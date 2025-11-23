@@ -20,6 +20,9 @@ const LeadMagnet = lazy(() => import("@/components/LeadMagnet"));
 const FAQAccordion = lazy(() => import("@/components/FAQAccordion"));
 const FinalCTA = lazy(() => import("@/components/FinalCTA"));
 const Compliance = lazy(() => import("@/components/Compliance"));
+const StatsStrip = lazy(() => import("@/components/StatsStrip"));
+const BlogPreview = lazy(() => import("@/components/BlogPreview"));
+const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA"));
 
 const Index = () => {
   const { user, role, loading } = useAuth();
@@ -74,7 +77,7 @@ const Index = () => {
         <meta property="og:site_name" content="Westfield Prep Center" />
         <meta property="og:title" content="Los Angeles 3PL & Shopify Fulfillment Partner" />
         <meta property="og:description" content="Trusted LA 3PL for D2C brands. Same-day receiving, fast turnaround, and transparent pricing." />
-        <meta property="og:image" content="https://westfieldprepcenter.com/warehouse-exterior-la.jpg" />
+        <meta property="og:image" content="https://westfieldprepcenter.com/landing/warehouse-exterior.jpg" />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -82,7 +85,7 @@ const Index = () => {
         <meta name="twitter:creator" content="@westfieldprep" />
         <meta name="twitter:title" content="LA 3PL for Shopify & D2C Brands" />
         <meta name="twitter:description" content="Fast Shopify fulfillment in Los Angeles. Same-day receiving, 24-48h turnaround, no minimums." />
-        <meta name="twitter:image" content="https://westfieldprepcenter.com/warehouse-exterior-la.jpg" />
+        <meta name="twitter:image" content="https://westfieldprepcenter.com/landing/warehouse-exterior.jpg" />
       </Helmet>
       <StructuredData type="organization" />
       <StructuredData type="website" />
@@ -92,7 +95,7 @@ const Index = () => {
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
           "name": "Westfield Prep Center",
-          "image": "https://westfieldprepcenter.com/warehouse-exterior-la.jpg",
+          "image": "https://westfieldprepcenter.com/landing/warehouse-exterior.jpg",
           "address": {
             "@type": "PostalAddress",
             "streetAddress": "1801 Flower Ave Office 2",
@@ -118,10 +121,38 @@ const Index = () => {
           "description": "Los Angeles 3PL specializing in Shopify fulfillment, ecommerce logistics, same-day receiving, and 24-48h turnaround."
         })}
       </script>
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LogisticsService",
+          "name": "Westfield Prep Center 3PL Services",
+          "provider": {
+            "@type": "Organization",
+            "name": "Westfield Prep Center"
+          },
+          "areaServed": {
+            "@type": "City",
+            "name": "Los Angeles"
+          },
+          "serviceType": [
+            "3PL Services",
+            "Order Fulfillment",
+            "Shopify Fulfillment",
+            "Amazon FBA Prep",
+            "Inventory Management",
+            "E-commerce Logistics"
+          ]
+        })}
+      </script>
       <div className="min-h-screen">
       <Header />
       <div className="pt-32">
         <PremiumHero />
+        
+        {/* Stats Strip - NEW */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-64 w-full" /></div>}>
+          <StatsStrip />
+        </Suspense>
         
         {/* Phase 3: Value Proposition */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
@@ -153,6 +184,11 @@ const Index = () => {
           <LocationShowcase />
         </Suspense>
         
+        {/* Blog Preview - NEW */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <BlogPreview />
+        </Suspense>
+        
         {/* Phase 9: Lead Magnet */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
           <LeadMagnet />
@@ -170,6 +206,11 @@ const Index = () => {
         
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-64 w-full" /></div>}>
           <Compliance />
+        </Suspense>
+        
+        {/* Sticky Mobile CTA - NEW */}
+        <Suspense fallback={null}>
+          <StickyMobileCTA />
         </Suspense>
       </div>
       </div>
