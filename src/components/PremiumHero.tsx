@@ -26,16 +26,13 @@ const PremiumHero = () => {
     <section className="relative min-h-[85vh] w-full overflow-hidden">
       {/* Background Warehouse Image */}
       <div className="absolute inset-0 z-0">
-        <picture>
-          <source srcSet="/hero-warehouse-optimized.webp" type="image/webp" />
-          <img
-            src="/warehouse-exterior-la.jpg"
-            alt="Los Angeles 3PL warehouse exterior with trucks and loading docks — Westfield Prep Center"
-            className="w-full h-full object-cover object-center"
-            loading="eager"
-            fetchPriority="high"
-          />
-        </picture>
+        <img
+          src="/warehouse-hero-bg.jpg"
+          alt="Modern Los Angeles 3PL warehouse facility with trucks at loading docks and palm trees — Westfield Prep Center"
+          className="w-full h-full object-cover object-center"
+          loading="eager"
+          fetchPriority="high"
+        />
       </div>
 
       {/* White-to-Transparent Gradient Overlay */}
