@@ -5,7 +5,7 @@ const Footer = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             {/* Main Footer Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-28 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-32 xl:gap-40 mb-12">
             {/* Company Info */}
             <div className="space-y-4">
               <h3 className="text-xl font-bold mb-4">Westfield Prep Center</h3>
@@ -32,9 +32,9 @@ const Footer = () => {
             </div>
 
             {/* Contact Info */}
-            <div className="space-y-4">
+            <div className="space-y-4 pr-6 min-w-[200px]">
               <h4 className="text-lg font-semibold mb-6">Contact Us</h4>
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <a href="tel:+18189355478" className="flex items-start gap-3 hover:text-secondary transition-colors group" aria-label="Call Westfield Prep Center">
                   <Phone className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
                   <span className="text-sm break-words">+1 (818) 935-5478</span>
@@ -50,9 +50,9 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Services */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold mb-4">Services</h4>
+        {/* Services */}
+        <div className="space-y-4 min-w-[200px]">
+          <h4 className="text-lg font-semibold mb-4">Services</h4>
               <div className="space-y-2">
                 <Link to="/order-fulfillment" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
@@ -93,9 +93,9 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Sales Channels */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold mb-4">Sales Channels</h4>
+        {/* Sales Channels */}
+        <div className="space-y-4 min-w-[200px]">
+          <h4 className="text-lg font-semibold mb-4">Sales Channels</h4>
               <div className="space-y-2">
                 <Link to="/shopify-fulfillment" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
@@ -124,9 +124,9 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+        {/* Quick Links */}
+        <div className="space-y-4 min-w-[200px]">
+          <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <div className="space-y-2">
                 <Link to="/testimonials" className="block text-sm text-white/80 hover:text-secondary transition-colors">
                   Testimonials
