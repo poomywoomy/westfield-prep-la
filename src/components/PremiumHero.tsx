@@ -28,18 +28,20 @@ const PremiumHero = () => {
       <div className="absolute inset-0 z-0">
         <img
           src="/warehouse-hero-bg.jpg"
-          alt="Modern Los Angeles 3PL warehouse facility with trucks at loading docks and palm trees — Westfield Prep Center"
+          alt="Los Angeles 3PL warehouse exterior with trucks — Westfield Prep Center"
+          width="1920"
+          height="1080"
           className="w-full h-full object-cover object-center"
           loading="eager"
           fetchPriority="high"
         />
       </div>
 
-      {/* White-to-Transparent Gradient Overlay */}
+      {/* Dark Gradient Overlay */}
       <div 
         className="absolute inset-0 z-10"
         style={{
-          background: 'linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 30%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.3) 70%, rgba(255, 255, 255, 0) 100%)'
+          background: 'linear-gradient(to bottom, rgba(10, 10, 35, 0.6), rgba(10, 10, 35, 0.9))'
         }}
       />
 
@@ -60,9 +62,9 @@ const PremiumHero = () => {
         >
           {/* Los Angeles 3PL Badge */}
           <motion.div variants={fadeUpVariants} className="inline-flex">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F5F5F7] border border-[#0A0A23]/20">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
               <div className="h-2 w-2 rounded-full bg-[#FF7A00] animate-pulse" />
-              <span className="text-sm text-[#0A0A23] font-medium">
+              <span className="text-sm text-white font-medium">
                 Los Angeles 3PL
               </span>
             </div>
@@ -71,7 +73,7 @@ const PremiumHero = () => {
           {/* H1 Headline */}
           <motion.h1
             variants={fadeUpVariants}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-[#0A0A23]"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white"
           >
             LA's Premier E-Commerce Fulfillment & 3PL Partner
           </motion.h1>
@@ -79,7 +81,7 @@ const PremiumHero = () => {
           {/* Subheadline */}
           <motion.p
             variants={fadeUpVariants}
-            className="text-lg md:text-xl text-[#4D4D4D] leading-relaxed"
+            className="text-lg md:text-xl text-white/90 leading-relaxed"
           >
             2M+ orders fulfilled for fast-growing eCommerce brands.
           </motion.p>
@@ -117,10 +119,10 @@ const PremiumHero = () => {
               return (
                 <div
                   key={index}
-                  className="flex items-center gap-2 px-3 py-2 bg-[#F5F5F7] border border-[#0A0A23]/20 rounded-lg"
+                  className="flex items-center gap-2 px-3 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg"
                 >
                   <Icon className="w-4 h-4 text-[#FF7A00]" />
-                  <span className="text-xs md:text-sm font-medium text-[#0A0A23]">
+                  <span className="text-xs md:text-sm font-medium text-white">
                     {badge.text}
                   </span>
                 </div>
