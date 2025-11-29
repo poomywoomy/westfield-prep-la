@@ -38,7 +38,7 @@ const Reviews = () => {
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-3 mb-6">
               <div className="flex">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-8 h-8 fill-yellow-400 text-yellow-400" />)}
+                {[...Array(5)].map((_, i) => <Star key={i} className="w-8 h-8 fill-yellow-400 text-yellow-400" aria-hidden="true" />)}
               </div>
               <span className="text-4xl font-bold">5.0</span>
             </div>
@@ -51,7 +51,7 @@ const Reviews = () => {
           {/* Featured Large Testimonial */}
           <div className="mb-12 bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-border rounded-3xl p-12 md:p-16 shadow-2xl">
             <div className="flex mb-6">
-              {[...Array(featuredReview.rating)].map((_, i) => <Star key={i} className="w-10 h-10 fill-yellow-400 text-yellow-400" />)}
+              {[...Array(featuredReview.rating)].map((_, i) => <Star key={i} className="w-10 h-10 fill-yellow-400 text-yellow-400" aria-hidden="true" />)}
             </div>
             
             <blockquote className="text-3xl md:text-4xl font-bold text-foreground mb-8 leading-relaxed">
@@ -75,7 +75,7 @@ const Reviews = () => {
             {otherReviews.map((review, index) => <Card key={index} className="hover:shadow-xl transition-all hover:-translate-y-1 border-2">
                 <CardContent className="pt-8">
                   <div className="flex mb-4">
-                    {[...Array(review.rating)].map((_, i) => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
+                    {[...Array(review.rating)].map((_, i) => <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" aria-hidden="true" />)}
                   </div>
                   <p className="text-muted-foreground mb-6 italic leading-relaxed text-lg">"{review.text}"</p>
                   <div className="border-t border-border pt-4">
