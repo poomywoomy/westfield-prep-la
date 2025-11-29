@@ -92,60 +92,6 @@ const Index = () => {
       <StructuredData type="organization" />
       <StructuredData type="website" />
       <StructuredData type="faq" data={faqData} />
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          "name": "Westfield Prep Center",
-          "image": "https://westfieldprepcenter.com/warehouse-exterior-la.jpg",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "1801 Flower Ave Office 2",
-            "addressLocality": "Duarte",
-            "addressRegion": "CA",
-            "postalCode": "91010",
-            "addressCountry": "US"
-          },
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": "34.2147",
-            "longitude": "-117.9773"
-          },
-          "url": "https://westfieldprepcenter.com",
-          "telephone": "+1-818-935-5478",
-          "priceRange": "$$",
-          "openingHours": "Mo-Su 08:00-17:00",
-          "sameAs": [
-            "https://www.instagram.com/westfieldprepcenter",
-            "https://www.linkedin.com/company/westfield-prep-center"
-          ],
-          "areaServed": "Los Angeles",
-          "description": "Los Angeles 3PL specializing in Shopify fulfillment, ecommerce logistics, same-day receiving, and 24-48h turnaround."
-        })}
-      </script>
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "LogisticsService",
-          "name": "Westfield Prep Center 3PL Services",
-          "provider": {
-            "@type": "Organization",
-            "name": "Westfield Prep Center"
-          },
-          "areaServed": {
-            "@type": "City",
-            "name": "Los Angeles"
-          },
-          "serviceType": [
-            "3PL Services",
-            "Order Fulfillment",
-            "Shopify Fulfillment",
-            "Amazon FBA Prep",
-            "Inventory Management",
-            "E-commerce Logistics"
-          ]
-        })}
-      </script>
       <div className="min-h-screen">
       <Header />
       <div className="pt-32">

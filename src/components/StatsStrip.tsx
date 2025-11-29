@@ -58,7 +58,7 @@ const StatsStrip = () => {
               >
                 <div className="flex flex-col items-center text-center space-y-3">
                   <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <Icon className="w-6 h-6 text-secondary" />
+                    <Icon className="w-6 h-6 text-secondary" aria-hidden="true" />
                   </div>
                   <div className="text-3xl md:text-4xl font-bold text-primary">
                     {hasAnimated ? (

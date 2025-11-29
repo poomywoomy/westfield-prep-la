@@ -69,7 +69,7 @@ export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, auth
         {effectiveImageUrl ? (
           <div className="relative h-[480px] overflow-hidden">
             <AspectRatio ratio={16/9} className="h-full">
-              <img src={effectiveImageUrl} alt={`${title} - Westfield Prep Center blog cover image`} className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} loading="eager" onLoad={() => setImageLoaded(true)} onError={() => setImageError(true)} />
+              <img src={effectiveImageUrl} alt={`${title} - Westfield Prep Center blog cover image`} width="1200" height="675" className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} loading="eager" onLoad={() => setImageLoaded(true)} onError={() => setImageError(true)} />
               {!imageLoaded && <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
               <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '4px 4px' }} />
@@ -117,7 +117,7 @@ export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, auth
       {effectiveImageUrl ? (
         <div className="relative overflow-hidden">
           <AspectRatio ratio={4/3}>
-            <img src={effectiveImageUrl} alt={`${title} - Westfield Prep Center blog cover image`} className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.04] ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" decoding="async" onLoad={() => setImageLoaded(true)} onError={() => setImageError(true)} />
+            <img src={effectiveImageUrl} alt={`${title} - Westfield Prep Center blog cover image`} width="800" height="600" className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.04] ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" decoding="async" onLoad={() => setImageLoaded(true)} onError={() => setImageError(true)} />
             {!imageLoaded && <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: variant === 'side-accent' ? 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)' : 'repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.1) 8px, rgba(255,255,255,0.1) 16px)', backgroundSize: variant === 'side-accent' ? '4px 4px' : 'auto' }} />

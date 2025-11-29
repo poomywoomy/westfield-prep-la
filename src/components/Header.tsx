@@ -54,6 +54,7 @@ const Header = () => {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? "bg-background shadow-md h-24" : "bg-background/95 backdrop-blur-sm h-28"
       }`}
+      style={{ willChange: 'height' }}
     >
       <div className="container mx-auto px-4 h-full">
         <div className="flex items-center justify-between h-full gap-10">
