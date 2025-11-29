@@ -9,11 +9,13 @@ const Footer = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 mb-12">
             {/* Company Info */}
             <div className="space-y-4 min-w-[220px]">
-              <img 
-                src={westfieldLogo} 
-                alt="Westfield Prep Center" 
-                className="h-10 w-auto mb-4"
-              />
+              <div className="bg-white/95 rounded-md px-3 py-2 w-fit mb-4">
+                <img 
+                  src={westfieldLogo} 
+                  alt="Westfield Prep Center" 
+                  className="h-8 w-auto"
+                />
+              </div>
               <h1 className="text-sm text-white/80 leading-relaxed font-normal">
                 Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner
               </h1>
