@@ -12,6 +12,18 @@ const leadMagnetSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters")
 });
 
+// Helper function to escape HTML to prevent XSS in emails
+const escapeHtml = (text: string): string => {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, (char) => map[char]);
+};
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -43,6 +55,9 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const { fullName, email } = validationResult.data;
+    
+    // Escape HTML to prevent XSS in emails
+    const safeFullName = escapeHtml(fullName);
 
     // Check if email already downloaded recently (within last hour to prevent spam)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -109,7 +124,7 @@ const handler = async (req: Request): Promise<Response> => {
     </div>
     
     <div class="content">
-      <p>Hi ${fullName},</p>
+      <p>Hi ${safeFullName},</p>
       
       <p>Thank you for downloading <strong>"The Complete Guide to Choosing a Fulfillment Partner"</strong>!</p>
       
@@ -202,7 +217,7 @@ const handler = async (req: Request): Promise<Response> => {
       <p>A new lead has downloaded the Fulfillment Partner Guide:</p>
       
       <div class="info-box">
-        <p><span class="label">Name:</span> ${fullName}</p>
+        <p><span class="label">Name:</span> ${safeFullName}</p>
         <p><span class="label">Email:</span> ${email}</p>
         <p><span class="label">Guide:</span> Complete Fulfillment Partner Guide</p>
         <p><span class="label">Downloaded:</span> ${new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })} PT</p>
@@ -230,7 +245,7 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Westfield Leads <info@westfieldprepcenter.com>",
         to: ["info@westfieldprepcenter.com"],
-        subject: `New Lead: ${fullName} downloaded Fulfillment Guide`,
+        subject: `New Lead: ${safeFullName} downloaded Fulfillment Guide`,
         html: adminEmailHtml,
       }),
     });
