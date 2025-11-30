@@ -35,6 +35,7 @@ interface SelectedSKU {
 export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess }: RequestShipmentDialogProps) => {
   const [platform, setPlatform] = useState<string>("");
   const [otherPlatform, setOtherPlatform] = useState("");
+  const [shipmentType, setShipmentType] = useState<string>("carton");
   const [shipmentDate, setShipmentDate] = useState("");
   const [notes, setNotes] = useState("");
   const [skus, setSKUs] = useState<SKU[]>([]);
@@ -114,6 +115,7 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
   const resetForm = () => {
     setPlatform("");
     setOtherPlatform("");
+    setShipmentType("carton");
     setShipmentDate("");
     setNotes("");
     setSearchQuery("");
@@ -187,13 +189,15 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
 
     setSubmitting(true);
     try {
-      const platformName = platform === "other" ? otherPlatform : platform;
       const { data: request, error: requestError } = await supabase
         .from("shipment_requests")
         .insert({
           client_id: clientId,
           requested_ship_date: shipmentDate,
-          notes: `Platform: ${platformName}\n\n${notes || ''}`.trim(),
+          marketplace: platform === "other" ? "other" : platform,
+          marketplace_other: platform === "other" ? otherPlatform : null,
+          shipment_type: shipmentType,
+          notes: notes || null,
           status: "pending",
         })
         .select()
@@ -214,6 +218,7 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
 
       if (linesError) throw linesError;
 
+      const platformName = platform === "other" ? otherPlatform : platform;
       toast({
         title: "Request Submitted",
         description: `Your shipment request for ${platformName} has been submitted. Admin will review shortly.`,
@@ -270,6 +275,20 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
                 className="mt-2"
               />
             )}
+          </div>
+
+          {/* Shipment Type */}
+          <div className="space-y-2">
+            <Label htmlFor="shipmentType">Shipment Type *</Label>
+            <Select value={shipmentType} onValueChange={setShipmentType}>
+              <SelectTrigger id="shipmentType">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="carton">Carton</SelectItem>
+                <SelectItem value="pallet">Pallet</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Shipment Date */}
@@ -375,7 +394,7 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
             <div className="p-4 bg-muted rounded-lg space-y-1">
               <p className="text-sm font-medium">Request Summary</p>
               <p className="text-sm text-muted-foreground">
-                {selectedCount} SKU{selectedCount !== 1 ? 's' : ''} • {totalUnits} total units
+                {selectedCount} SKU{selectedCount !== 1 ? 's' : ''} • {totalUnits} total units • {shipmentType === "carton" ? "Carton" : "Pallet"} shipment
               </p>
             </div>
           )}

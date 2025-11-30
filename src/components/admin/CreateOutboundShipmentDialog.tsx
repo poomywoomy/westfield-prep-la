@@ -39,7 +39,20 @@ interface SKULine {
   allocations: Record<string, number>; // box_id -> quantity
 }
 
-export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => {
+interface PrefillData {
+  clientId: string;
+  skuLines: Array<{ sku_id: string; quantity: number; client_sku?: string; title?: string }>;
+  marketplace?: string;
+  notes?: string;
+}
+
+interface CreateOutboundShipmentDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  prefillData?: PrefillData | null;
+}
+
+export const CreateOutboundShipmentDialog = ({ open, onOpenChange, prefillData }: CreateOutboundShipmentDialogProps) => {
   const [currentPhase, setCurrentPhase] = useState(1);
   const [selectedClient, setSelectedClient] = useState("");
   const [splitType, setSplitType] = useState<"amazon_optimized" | "minimal_split">("amazon_optimized");
@@ -52,6 +65,39 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange }: { open: boo
   const { data: clients } = useClients();
   const { data: availableSKUs } = useSKUs(selectedClient);
   const queryClient = useQueryClient();
+
+  // Handle prefill data
+  useEffect(() => {
+    if (open && prefillData) {
+      setSelectedClient(prefillData.clientId);
+      setNotes(prefillData.notes || "");
+      
+      // Prefill SKUs with quantities
+      const prefillSKUs = async () => {
+        const skuData = await Promise.all(
+          prefillData.skuLines.map(async (line) => {
+            const { data: summary } = await supabase
+              .from("inventory_summary")
+              .select("available")
+              .eq("sku_id", line.sku_id)
+              .maybeSingle();
+            
+            return {
+              sku_id: line.sku_id,
+              quantity: line.quantity,
+              client_sku: line.client_sku || "",
+              title: line.title || "",
+              available: summary?.available || 0,
+              allocations: {},
+            };
+          })
+        );
+        setSkus(skuData);
+      };
+      
+      prefillSKUs();
+    }
+  }, [open, prefillData]);
 
   // Initialize boxes when split type changes
   useEffect(() => {
