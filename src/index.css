@@ -54,6 +54,11 @@ All colors MUST be HSL.
     --shopify-accent: 220 90% 96%;
     --shopify-border: 220 25% 88%;
 
+    /* Shopify Page-Specific Colors */
+    --shopify-page-primary: 220 13% 17%;     /* #1F2937 */
+    --shopify-page-accent: 25 95% 53%;        /* #F97316 */
+    --shopify-page-light: 210 20% 98%;        /* #F9FAFB */
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;

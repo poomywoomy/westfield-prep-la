@@ -36,12 +36,12 @@ const StickyMobileCTA = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
-      <div className="bg-secondary shadow-lg border-t border-secondary-foreground/10">
+      <div className="bg-[hsl(var(--shopify-page-accent))] shadow-lg border-t border-white/10">
         <div className="container mx-auto px-4 py-3">
           <Button
             onClick={() => navigate("/contact")}
             size="lg"
-            className="w-full bg-white text-secondary hover:bg-white/90 font-semibold shadow-md"
+            className="w-full bg-white text-[hsl(var(--shopify-page-accent))] hover:bg-white/90 font-semibold shadow-md"
           >
             Get a Quote
             <ArrowRight className="ml-2 w-5 h-5" />
