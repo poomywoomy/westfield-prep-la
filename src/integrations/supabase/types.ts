@@ -2267,10 +2267,13 @@ export type Database = {
           client_id: string
           created_at: string
           id: string
+          marketplace: string | null
+          marketplace_other: string | null
           notes: string | null
           processed_at: string | null
           processed_by: string | null
           requested_ship_date: string
+          shipment_type: string | null
           status: string
           updated_at: string
         }
@@ -2279,10 +2282,13 @@ export type Database = {
           client_id: string
           created_at?: string
           id?: string
+          marketplace?: string | null
+          marketplace_other?: string | null
           notes?: string | null
           processed_at?: string | null
           processed_by?: string | null
           requested_ship_date: string
+          shipment_type?: string | null
           status?: string
           updated_at?: string
         }
@@ -2291,10 +2297,13 @@ export type Database = {
           client_id?: string
           created_at?: string
           id?: string
+          marketplace?: string | null
+          marketplace_other?: string | null
           notes?: string | null
           processed_at?: string | null
           processed_by?: string | null
           requested_ship_date?: string
+          shipment_type?: string | null
           status?: string
           updated_at?: string
         }

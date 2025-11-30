@@ -1,9 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export const useSupportTickets = (clientId?: string) => {
+interface UseSupportTicketsOptions {
+  statusFilter?: string[];
+  categoryFilter?: string;
+  clientFilter?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export const useSupportTickets = (options?: UseSupportTicketsOptions) => {
   return useQuery({
-    queryKey: ["support-tickets", clientId],
+    queryKey: ["support-tickets", options],
     queryFn: async () => {
       let query = supabase
         .from("support_tickets")
@@ -11,10 +19,27 @@ export const useSupportTickets = (clientId?: string) => {
           *,
           clients(company_name, email, phone_number)
         `)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: true }); // Oldest first
 
-      if (clientId) {
-        query = query.eq("client_id", clientId);
+      // Apply filters
+      if (options?.statusFilter && options.statusFilter.length > 0) {
+        query = query.in("status", options.statusFilter);
+      }
+
+      if (options?.categoryFilter) {
+        query = query.eq("issue_category", options.categoryFilter);
+      }
+
+      if (options?.clientFilter) {
+        query = query.eq("client_id", options.clientFilter);
+      }
+
+      if (options?.dateFrom) {
+        query = query.gte("created_at", options.dateFrom);
+      }
+
+      if (options?.dateTo) {
+        query = query.lte("created_at", options.dateTo);
       }
 
       const { data, error } = await query;
