@@ -26,9 +26,9 @@ const statusConfig = {
 export const ShipmentRequestsTab = () => {
   // Filter states
   const [statusFilter, setStatusFilter] = useState<string[]>(["pending", "in_progress"]); // Hide completed/cancelled by default
-  const [clientFilter, setClientFilter] = useState<string>("");
-  const [marketplaceFilter, setMarketplaceFilter] = useState<string>("");
-  const [shipmentTypeFilter, setShipmentTypeFilter] = useState<string>("");
+  const [clientFilter, setClientFilter] = useState<string>("all");
+  const [marketplaceFilter, setMarketplaceFilter] = useState<string>("all");
+  const [shipmentTypeFilter, setShipmentTypeFilter] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
 
@@ -51,9 +51,9 @@ export const ShipmentRequestsTab = () => {
     
     return allRequests.filter((req: any) => {
       if (statusFilter.length > 0 && !statusFilter.includes(req.status)) return false;
-      if (clientFilter && req.client_id !== clientFilter) return false;
-      if (marketplaceFilter && req.marketplace !== marketplaceFilter) return false;
-      if (shipmentTypeFilter && req.shipment_type !== shipmentTypeFilter) return false;
+      if (clientFilter && clientFilter !== "all" && req.client_id !== clientFilter) return false;
+      if (marketplaceFilter && marketplaceFilter !== "all" && req.marketplace !== marketplaceFilter) return false;
+      if (shipmentTypeFilter && shipmentTypeFilter !== "all" && req.shipment_type !== shipmentTypeFilter) return false;
       if (dateFrom && new Date(req.created_at) < new Date(dateFrom)) return false;
       if (dateTo && new Date(req.created_at) > new Date(dateTo)) return false;
       return true;
@@ -199,7 +199,7 @@ export const ShipmentRequestsTab = () => {
                       <SelectValue placeholder="All clients" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Clients</SelectItem>
+                      <SelectItem value="all">All Clients</SelectItem>
                       {clients?.map((client) => (
                         <SelectItem key={client.id} value={client.id}>
                           {client.company_name}
@@ -217,7 +217,7 @@ export const ShipmentRequestsTab = () => {
                       <SelectValue placeholder="All platforms" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Platforms</SelectItem>
+                      <SelectItem value="all">All Platforms</SelectItem>
                       <SelectItem value="amazon">Amazon FBA</SelectItem>
                       <SelectItem value="walmart">Walmart WFS</SelectItem>
                       <SelectItem value="tiktok">TikTok Shop</SelectItem>
@@ -234,7 +234,7 @@ export const ShipmentRequestsTab = () => {
                       <SelectValue placeholder="All types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Types</SelectItem>
+                      <SelectItem value="all">All Types</SelectItem>
                       <SelectItem value="carton">Carton</SelectItem>
                       <SelectItem value="pallet">Pallet</SelectItem>
                     </SelectContent>

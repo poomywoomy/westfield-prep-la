@@ -34,16 +34,16 @@ const issueCategories = [
 export const SupportTicketsTab = () => {
   // Filter states
   const [statusFilter, setStatusFilter] = useState<string[]>(["open", "in_progress", "resolved"]); // Hide closed by default
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
-  const [clientFilter, setClientFilter] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [clientFilter, setClientFilter] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
 
   const { data: clients } = useClients();
   const { data: tickets, isLoading } = useSupportTickets({
     statusFilter,
-    categoryFilter: categoryFilter || undefined,
-    clientFilter: clientFilter || undefined,
+    categoryFilter: categoryFilter === "all" ? undefined : categoryFilter,
+    clientFilter: clientFilter === "all" ? undefined : clientFilter,
     dateFrom: dateFrom || undefined,
     dateTo: dateTo || undefined,
   });
@@ -163,7 +163,7 @@ export const SupportTicketsTab = () => {
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     {issueCategories.map((cat) => (
                       <SelectItem key={cat} value={cat}>
                         {cat.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -181,7 +181,7 @@ export const SupportTicketsTab = () => {
                     <SelectValue placeholder="All clients" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Clients</SelectItem>
+                    <SelectItem value="all">All Clients</SelectItem>
                     {clients?.map((client) => (
                       <SelectItem key={client.id} value={client.id}>
                         {client.company_name}
