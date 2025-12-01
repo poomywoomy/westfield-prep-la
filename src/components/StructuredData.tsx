@@ -20,14 +20,6 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
           name: "Westfield Prep Center",
           telephone: "+1-818-935-5478",
           email: "info@westfieldprepcenter.com",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "6320 Canoga Ave, Suite 1500",
-            addressLocality: "Woodland Hills",
-            addressRegion: "CA",
-            postalCode: "91367",
-            addressCountry: "US"
-          },
           openingHoursSpecification: {
             "@type": "OpeningHoursSpecification",
             dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
