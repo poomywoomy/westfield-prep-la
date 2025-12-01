@@ -6,7 +6,7 @@ const DOCUMENT_CONTENT = {
     title: "CLIENT SERVICE AGREEMENT (CSA)",
     content: `This Client Service Agreement ("Agreement") is entered into by and between:
 
-Sathatham LLC dba Westfield Prep Center, a California limited liability company with its principal place of business located at 1801 Flower Ave, Duarte, CA 91010, hereinafter referred to as "Service Provider," "Westfield," or "Company", and the undersigned client, hereinafter referred to as "Client."
+Sathatham LLC dba Westfield Prep Center, a California limited liability company with its principal place of business located in Los Angeles, CA, hereinafter referred to as "Service Provider," "Westfield," or "Company", and the undersigned client, hereinafter referred to as "Client."
 
 Collectively, the Company and Client may be referred to as the "Parties" and individually as a "Party."
 
@@ -107,7 +107,7 @@ IN WITNESS WHEREOF, the Parties have executed this Agreement as of the dates set
 
 SERVICE PROVIDER:
 Sathatham LLC dba Westfield Prep Center
-1801 Flower Ave, Duarte, CA 91010
+Los Angeles, CA
 Email: info@westfieldprepcenter.com
 Phone: (818) 935-5478`
   },
@@ -205,7 +205,7 @@ IN WITNESS WHEREOF, the Parties acknowledge and accept these Terms and Condition
 
 SERVICE PROVIDER:
 Sathatham LLC dba Westfield Prep Center
-1801 Flower Ave, Duarte, CA 91010
+Los Angeles, CA
 info@westfieldprepcenter.com
 (818) 935-5478`
   },
@@ -213,7 +213,7 @@ info@westfieldprepcenter.com
     title: "EXHIBIT B — LIABILITY WAIVER AND HOLD HARMLESS AGREEMENT",
     content: `This Liability Waiver and Hold Harmless Agreement ("Agreement") is entered into as of the Effective Date of the Client Service Agreement by and between:
 
-Sathatham LLC dba Westfield Prep Center, a California limited liability company, with its principal place of business located at 1801 Flower Ave, Duarte, CA 91010 (hereinafter referred to as "Westfield" or "Service Provider"), and the undersigned client ("Client"), individually and collectively referred to as the "Parties."
+Sathatham LLC dba Westfield Prep Center, a California limited liability company, with its principal place of business located in Los Angeles, CA (hereinafter referred to as "Westfield" or "Service Provider"), and the undersigned client ("Client"), individually and collectively referred to as the "Parties."
 
 1. PURPOSE AND SCOPE
 
@@ -296,7 +296,7 @@ Executed as of the same Effective Date as the Client Service Agreement.
 
 SERVICE PROVIDER:
 Sathatham LLC dba Westfield Prep Center
-1801 Flower Ave, Duarte, CA 91010
+Los Angeles, CA
 info@westfieldprepcenter.com
 (818) 935-5478`
   }

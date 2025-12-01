@@ -159,7 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     <div class="footer">
       <p>© 2025 Westfield Prep Center. All rights reserved.</p>
-      <p>1801 Flower Ave Office 2, Duarte, CA 91010</p>
+      <p>Los Angeles, CA</p>
       <p style="margin-top: 10px;">
         <a href="https://westfieldprepcenter.com" style="color: #0A66C2; margin: 0 10px;">Website</a> | 
         <a href="mailto:hello@westfieldprepcenter.com" style="color: #0A66C2; margin: 0 10px;">Contact</a>

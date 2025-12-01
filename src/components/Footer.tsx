@@ -6,7 +6,7 @@ const Footer = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             {/* Main Footer Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-20 xl:gap-24 mb-12">
             {/* Company Info */}
             <div className="space-y-4 min-w-[220px]">
               <div className="bg-white/95 rounded-md px-3 py-2 w-fit mb-4">
@@ -41,9 +41,9 @@ const Footer = () => {
             </div>
 
             {/* Contact Info */}
-            <div className="space-y-4 pr-6 min-w-[200px]">
+            <div className="space-y-4 pr-8 min-w-[200px]">
               <h4 className="text-lg font-semibold mb-6">Contact Us</h4>
-              <div className="space-y-5">
+              <div className="space-y-6">
                 <a href="tel:+18189355478" className="flex items-start gap-3 hover:text-secondary transition-colors group" aria-label="Call Westfield Prep Center">
                   <Phone className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
                   <span className="text-sm break-words">+1 (818) 935-5478</span>
@@ -52,10 +52,6 @@ const Footer = () => {
                   <Mail className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
                   <span className="text-sm break-words">info@westfieldprepcenter.com</span>
                 </a>
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">1801 Flower Ave Office 2<br />Duarte, CA 91010</span>
-                </div>
               </div>
             </div>
 

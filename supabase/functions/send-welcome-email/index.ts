@@ -151,7 +151,7 @@ const handler = async (req: Request): Promise<Response> => {
                             Professional 3PL fulfillment services for businesses of all sizes.
                           </p>
                           <p style="margin: 10px 0 0 0; font-size: 12px; color: #a0aec0; text-align: center;">
-                            1801 Flower Ave Office 2, Duarte, CA 91010
+                            Los Angeles, CA
                           </p>
                         </td>
                       </tr>
