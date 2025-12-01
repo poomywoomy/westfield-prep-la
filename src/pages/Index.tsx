@@ -70,8 +70,7 @@ const Index = () => {
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
         <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
         <meta name="geo.region" content="US-CA" />
-        <meta name="geo.placename" content="Duarte, California" />
-        <meta name="geo.position" content="34.2147;-117.9773" />
+        <meta name="geo.position" content="34.0522;-118.2437" />
         
         {/* Open Graph tags */}
         <meta property="og:type" content="website" />

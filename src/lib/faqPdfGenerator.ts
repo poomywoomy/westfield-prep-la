@@ -299,16 +299,8 @@ const faqCategories = [
     title: "Location & Logistics",
     questions: [
       {
-        question: "Where is your warehouse located?",
-        answer: "Our warehouse is located at 1801 Flower Ave Office 2, Duarte, CA 91010, strategically positioned in Los Angeles County for fast access to major West Coast ports and distribution networks."
-      },
-      {
         question: "Why is your Los Angeles location advantageous?",
         answer: "Being in Los Angeles gives us proximity to the Ports of Los Angeles and Long Beach (the largest port complex in the Western Hemisphere), enabling faster receiving of imported goods and cost-effective shipping to Amazon FBA centers and customers across the West Coast."
-      },
-      {
-        question: "Do you have multiple warehouse locations?",
-        answer: "Currently, we operate from our Duarte, CA location. This single-facility approach allows us to maintain our boutique, high-touch service model while keeping costs competitive for our clients."
       },
       {
         question: "Can you ship to Amazon fulfillment centers nationwide?",
@@ -466,8 +458,7 @@ export const generateFAQPDF = (): void => {
   doc.setFontSize(11);
   doc.setTextColor(60, 60, 60);
   doc.text('Phone: (818) 935-5478', pageWidth / 2, 190, { align: 'center' });
-  doc.text('Address: 1801 Flower Ave Office 2, Duarte, CA 91010', pageWidth / 2, 200, { align: 'center' });
-  doc.text('www.westfieldprepcenter.com', pageWidth / 2, 210, { align: 'center' });
+  doc.text('www.westfieldprepcenter.com', pageWidth / 2, 200, { align: 'center' });
 
   addFooter();
 

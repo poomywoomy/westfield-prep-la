@@ -354,7 +354,7 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange, prefillData }
           shipment_split_type: splitType,
           destination_type: "amazon_fba",
           shipment_status: "shipped",
-          ship_from_address: "1801 Flower Ave Office 2, Duarte, CA 91010",
+          ship_from_address: "Los Angeles, CA",
           total_units: totalUnits,
           total_boxes: boxes.length,
           notes: notes,

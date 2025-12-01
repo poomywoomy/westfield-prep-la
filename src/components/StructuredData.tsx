@@ -54,20 +54,11 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         telephone: "+18189355478",
         email: "info@westfieldprepcenter.com",
         priceRange: "$$",
-        address: {
-          "@type": "PostalAddress",
-          streetAddress: "1801 Flower Ave Office 2",
-          addressLocality: "Duarte",
-          addressRegion: "CA",
-          postalCode: "91010",
-          addressCountry: "US"
-        },
         geo: {
           "@type": "GeoCoordinates",
           latitude: "34.0522",
           longitude: "-118.2437"
         },
-        hasMap: "https://www.google.com/maps/place/1801+Flower+Ave,+Duarte,+CA+91010",
         openingHoursSpecification: [
           {
             "@type": "OpeningHoursSpecification",

@@ -130,11 +130,11 @@ Most LA prep centers offer transparent, volume-based pricing. Contact providers 
 - Access to shipping carriers
 - Networking with other e-commerce sellers
 
-### Duarte, CA Advantages
-- Strategic Los Angeles location
-- Easy freeway access
-- Close to major shipping hubs
-- Lower costs than downtown LA
+### Los Angeles Location Advantages
+- Strategic positioning for West Coast distribution
+- Easy freeway access to major shipping routes
+- Close to major shipping hubs and airports
+- Established logistics infrastructure
 
 ### Future-Proof Location
 - Growing e-commerce market in SoCal
@@ -182,7 +182,7 @@ Most LA prep centers offer transparent, volume-based pricing. Contact providers 
 - Recap the 5 key benefits: Port proximity, West Coast shipping, cost efficiency, local support, strategic location
 - Los Angeles prep centers offer unique advantages for scaling e-commerce businesses
 - Location matters: Proximity to ports and West Coast markets drives speed and savings
-- Call-to-action: "Experience the LA advantage. Get a quote from Westfield Prep Center in Duarte, CA."
+- Call-to-action: "Experience the LA advantage. Get a quote from Westfield Prep Center in Los Angeles."
 
 ---
 
