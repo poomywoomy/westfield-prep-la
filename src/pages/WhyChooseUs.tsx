@@ -315,7 +315,7 @@ const WhyChooseUs = () => {
                     <CardTitle className="text-xl">Strategic LA Location</CardTitle>
                   </CardHeader>
                   <CardContent>
-                     <p className="text-muted-foreground leading-relaxed">Duarte, CA location means easy access to LA/Long Beach ports and fast West Coast shipping.</p>
+                     <p className="text-muted-foreground leading-relaxed">Los Angeles location means easy access to LA/Long Beach ports and fast West Coast shipping.</p>
                    </CardContent>
                  </Card>
                </div>

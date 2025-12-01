@@ -202,7 +202,7 @@ LA proximity to ports can save days and hundreds of dollars per shipment.
 - Recap: Choosing the right Los Angeles FBA prep center ensures compliance, speed, and cost savings
 - Key factors: Amazon expertise, photo documentation, same-day processing, LA location, transparent pricing
 - Los Angeles advantages: Port proximity, West Coast Amazon FCs, fast turnaround
-- Call-to-action: "Find an LA FBA prep center you can trust. Get a quote from Westfield Prep Center in Duarte, CA."
+- Call-to-action: "Find an LA FBA prep center you can trust. Get a quote from Westfield Prep Center in Los Angeles."
 
 ---
 
