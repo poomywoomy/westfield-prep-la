@@ -686,6 +686,7 @@ export type Database = {
           company_name: string
           contact_name: string
           created_at: string
+          custom_marketplaces: string[] | null
           default_low_stock_threshold: number | null
           deposit_balance_cents: number
           email: string
@@ -723,6 +724,7 @@ export type Database = {
           company_name: string
           contact_name: string
           created_at?: string
+          custom_marketplaces?: string[] | null
           default_low_stock_threshold?: number | null
           deposit_balance_cents?: number
           email: string
@@ -760,6 +762,7 @@ export type Database = {
           company_name?: string
           contact_name?: string
           created_at?: string
+          custom_marketplaces?: string[] | null
           default_low_stock_threshold?: number | null
           deposit_balance_cents?: number
           email?: string
@@ -1736,8 +1739,11 @@ export type Database = {
           created_by: string | null
           destination_type: Database["public"]["Enums"]["destination_type"]
           id: string
+          marketplace: string | null
+          marketplace_other: string | null
           notes: string | null
           ship_from_address: string
+          shipment_format: string | null
           shipment_number: string
           shipment_split_type: Database["public"]["Enums"]["shipment_split_type"]
           shipment_status: Database["public"]["Enums"]["shipment_status"]
@@ -1752,8 +1758,11 @@ export type Database = {
           created_by?: string | null
           destination_type?: Database["public"]["Enums"]["destination_type"]
           id?: string
+          marketplace?: string | null
+          marketplace_other?: string | null
           notes?: string | null
           ship_from_address?: string
+          shipment_format?: string | null
           shipment_number: string
           shipment_split_type?: Database["public"]["Enums"]["shipment_split_type"]
           shipment_status?: Database["public"]["Enums"]["shipment_status"]
@@ -1768,8 +1777,11 @@ export type Database = {
           created_by?: string | null
           destination_type?: Database["public"]["Enums"]["destination_type"]
           id?: string
+          marketplace?: string | null
+          marketplace_other?: string | null
           notes?: string | null
           ship_from_address?: string
+          shipment_format?: string | null
           shipment_number?: string
           shipment_split_type?: Database["public"]["Enums"]["shipment_split_type"]
           shipment_status?: Database["public"]["Enums"]["shipment_status"]
