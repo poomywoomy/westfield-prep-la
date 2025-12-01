@@ -352,7 +352,7 @@ Use this scorecard to evaluate 3-5 LA prep centers:
   - Don't choose based on price alone
   - Test with small shipment before committing
   - LA location offers unique advantages (port proximity, West Coast shipping)
-- Call-to-action: "Ready to find your perfect prep center partner? Get a quote from Westfield Prep Center in Duarte, CA."
+- Call-to-action: "Ready to find your perfect prep center partner? Get a quote from Westfield Prep Center in Los Angeles."
 
 ---
 
