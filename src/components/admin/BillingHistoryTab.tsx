@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useClients } from "@/hooks/useClients";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Download, RefreshCw } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { RefreshCw, X } from "lucide-react";
 import { BillView } from "./BillView";
 import { formatDateRange, formatDate } from "@/lib/dateFormatters";
 import type { Database } from "@/integrations/supabase/types";
@@ -25,9 +27,13 @@ export const BillingHistoryTab = () => {
   const [filteredBills, setFilteredBills] = useState<BillWithClient[]>([]);
   const [selectedBill, setSelectedBill] = useState<BillWithClient | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [yearFilter, setYearFilter] = useState<string>("all");
+  const [monthFilter, setMonthFilter] = useState<string>("all");
+  const [clientFilter, setClientFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { data: clients } = useClients();
 
   useEffect(() => {
     fetchBills();
@@ -35,7 +41,35 @@ export const BillingHistoryTab = () => {
 
   useEffect(() => {
     filterBills();
-  }, [bills, statusFilter, searchTerm]);
+  }, [bills, statusFilter, yearFilter, monthFilter, clientFilter, searchTerm]);
+
+  // Extract available years from bills
+  const availableYears = useMemo(() => {
+    const years = new Set<string>();
+    bills.forEach(bill => {
+      const year = new Date(bill.billing_month).getFullYear().toString();
+      years.add(year);
+    });
+    return Array.from(years).sort((a, b) => parseInt(b) - parseInt(a)); // Descending
+  }, [bills]);
+
+  // Extract available months for selected year
+  const availableMonths = useMemo(() => {
+    if (yearFilter === "all") return [];
+    const months = new Set<string>();
+    bills.forEach(bill => {
+      const date = new Date(bill.billing_month);
+      if (date.getFullYear().toString() === yearFilter) {
+        months.add((date.getMonth() + 1).toString().padStart(2, '0'));
+      }
+    });
+    return Array.from(months).sort((a, b) => parseInt(b) - parseInt(a)); // Descending
+  }, [bills, yearFilter]);
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
   const fetchBills = async () => {
     try {
@@ -67,6 +101,27 @@ export const BillingHistoryTab = () => {
     // Status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter(b => b.status === statusFilter);
+    }
+
+    // Year filter
+    if (yearFilter !== "all") {
+      filtered = filtered.filter(b => {
+        const year = new Date(b.billing_month).getFullYear().toString();
+        return year === yearFilter;
+      });
+    }
+
+    // Month filter (only applies if year is selected)
+    if (yearFilter !== "all" && monthFilter !== "all") {
+      filtered = filtered.filter(b => {
+        const month = (new Date(b.billing_month).getMonth() + 1).toString().padStart(2, '0');
+        return month === monthFilter;
+      });
+    }
+
+    // Client filter
+    if (clientFilter !== "all") {
+      filtered = filtered.filter(b => b.client_id === clientFilter);
     }
 
     // Search filter
@@ -109,6 +164,16 @@ export const BillingHistoryTab = () => {
     }
   };
 
+  const clearFilters = () => {
+    setStatusFilter("all");
+    setYearFilter("all");
+    setMonthFilter("all");
+    setClientFilter("all");
+    setSearchTerm("");
+  };
+
+  const hasActiveFilters = statusFilter !== "all" || yearFilter !== "all" || monthFilter !== "all" || clientFilter !== "all" || searchTerm;
+
   const formatCurrency = (cents: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -123,6 +188,13 @@ export const BillingHistoryTab = () => {
     return <Badge variant="secondary">Closed</Badge>;
   };
 
+  // Reset month filter when year changes
+  useEffect(() => {
+    if (yearFilter === "all") {
+      setMonthFilter("all");
+    }
+  }, [yearFilter]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -135,41 +207,127 @@ export const BillingHistoryTab = () => {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Bill History</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Bill History ({filteredBills.length})</span>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                <X className="h-4 w-4 mr-1" />
+                Clear Filters
+              </Button>
+            )}
+          </CardTitle>
           <CardDescription>
             View and manage all bills across all clients
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Filters */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by client name, label, or date..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Bills</SelectItem>
-                <SelectItem value="open">Open Bills</SelectItem>
-                <SelectItem value="closed">Closed Bills</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" size="icon" onClick={fetchBills}>
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
+          <Card className="bg-muted/50">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                {/* Search */}
+                <div className="space-y-2 lg:col-span-2">
+                  <Label className="text-xs">Search</Label>
+                  <Input
+                    placeholder="Search by client, label, or date..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+
+                {/* Year Filter */}
+                <div className="space-y-2">
+                  <Label className="text-xs">Year</Label>
+                  <Select value={yearFilter} onValueChange={setYearFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All years" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Years</SelectItem>
+                      {availableYears.map((year) => (
+                        <SelectItem key={year} value={year}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Month Filter */}
+                <div className="space-y-2">
+                  <Label className="text-xs">Month</Label>
+                  <Select 
+                    value={monthFilter} 
+                    onValueChange={setMonthFilter}
+                    disabled={yearFilter === "all"}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={yearFilter === "all" ? "Select year first" : "All months"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Months</SelectItem>
+                      {availableMonths.map((month) => (
+                        <SelectItem key={month} value={month}>
+                          {monthNames[parseInt(month) - 1]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Client Filter */}
+                <div className="space-y-2">
+                  <Label className="text-xs">Client</Label>
+                  <Select value={clientFilter} onValueChange={setClientFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All clients" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Clients</SelectItem>
+                      {clients?.map((client) => (
+                        <SelectItem key={client.id} value={client.id}>
+                          {client.company_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Status Filter */}
+                <div className="space-y-2">
+                  <Label className="text-xs">Status</Label>
+                  <div className="flex gap-2">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Bills</SelectItem>
+                        <SelectItem value="open">Open Bills</SelectItem>
+                        <SelectItem value="closed">Closed Bills</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button variant="outline" size="icon" onClick={fetchBills}>
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Bills Table */}
           {filteredBills.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              No bills found matching your filters.
-            </p>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted/30 rounded-lg">
+              <p className="text-muted-foreground">
+                No bills found matching your filters.
+              </p>
+              {hasActiveFilters && (
+                <Button variant="outline" onClick={clearFilters} className="mt-4">
+                  Clear Filters
+                </Button>
+              )}
+            </div>
           ) : (
             <div className="rounded-md border">
               <Table>
@@ -240,6 +398,9 @@ export const BillingHistoryTab = () => {
       {/* Bill View Dialog */}
       <Dialog open={!!selectedBill} onOpenChange={(open) => !open && setSelectedBill(null)}>
         <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+          <DialogTitle className="sr-only">
+            Bill Details - {selectedBill?.client?.company_name}
+          </DialogTitle>
           {selectedBill && (
             <BillView
               bill={selectedBill}

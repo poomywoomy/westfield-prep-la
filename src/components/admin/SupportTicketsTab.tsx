@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useSupportTickets } from "@/hooks/useSupportTickets";
 import { useClients } from "@/hooks/useClients";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,15 +10,15 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTimePT } from "@/lib/dateFormatters";
-import { Loader2, LifeBuoy, ChevronDown, ChevronUp, AlertCircle, Clock, CheckCircle, XCircle, Filter, X, Mail, Phone } from "lucide-react";
+import { Loader2, LifeBuoy, ChevronDown, ChevronUp, AlertCircle, Clock, CheckCircle, X, Mail, Phone } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useQueryClient } from "@tanstack/react-query";
 
+// Updated status config - removed "resolved", now: open -> in_progress -> closed
 const statusConfig = {
   open: { label: "Open", icon: AlertCircle, className: "bg-red-100 text-red-800 border-red-200" },
   in_progress: { label: "In Progress", icon: Clock, className: "bg-blue-100 text-blue-800 border-blue-200" },
-  resolved: { label: "Resolved", icon: CheckCircle, className: "bg-green-100 text-green-800 border-green-200" },
-  closed: { label: "Closed", icon: XCircle, className: "bg-gray-100 text-gray-800 border-gray-200" },
+  closed: { label: "Closed", icon: CheckCircle, className: "bg-gray-100 text-gray-800 border-gray-200" },
 };
 
 const issueCategories = [
@@ -32,8 +32,8 @@ const issueCategories = [
 ];
 
 export const SupportTicketsTab = () => {
-  // Filter states
-  const [statusFilter, setStatusFilter] = useState<string[]>(["open", "in_progress", "resolved"]); // Hide closed by default
+  // Filter states - updated to only include open, in_progress (hide closed by default)
+  const [statusFilter, setStatusFilter] = useState<string[]>(["open", "in_progress"]);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [clientFilter, setClientFilter] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState<string>("");
@@ -57,14 +57,14 @@ export const SupportTicketsTab = () => {
     setUpdatingTicket(ticketId);
     try {
       const updateData: any = { status: newStatus, updated_at: new Date().toISOString() };
-      if (newStatus === "resolved" || newStatus === "closed") {
+      if (newStatus === "closed") {
         updateData.resolved_at = new Date().toISOString();
       }
 
       const { error } = await supabase.from("support_tickets").update(updateData).eq("id", ticketId);
       if (error) throw error;
 
-      toast({ title: "Status Updated", description: `Ticket marked as ${statusConfig[newStatus as keyof typeof statusConfig].label}` });
+      toast({ title: "Status Updated", description: `Ticket marked as ${statusConfig[newStatus as keyof typeof statusConfig]?.label || newStatus}` });
       queryClient.invalidateQueries({ queryKey: ["support-tickets"] });
       queryClient.invalidateQueries({ queryKey: ["support-tickets-count"] });
     } catch (error: any) {
@@ -75,14 +75,14 @@ export const SupportTicketsTab = () => {
   };
 
   const clearFilters = () => {
-    setStatusFilter(["open", "in_progress", "resolved"]);
-    setCategoryFilter("");
-    setClientFilter("");
+    setStatusFilter(["open", "in_progress"]);
+    setCategoryFilter("all");
+    setClientFilter("all");
     setDateFrom("");
     setDateTo("");
   };
 
-  const hasActiveFilters = statusFilter.length !== 3 || categoryFilter || clientFilter || dateFrom || dateTo;
+  const hasActiveFilters = statusFilter.length !== 2 || categoryFilter !== "all" || clientFilter !== "all" || dateFrom || dateTo;
 
   if (isLoading) {
     return (
@@ -92,30 +92,11 @@ export const SupportTicketsTab = () => {
     );
   }
 
-  if (!tickets || tickets.length === 0) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center p-12">
-          <LifeBuoy className="h-16 w-16 text-muted-foreground mb-4 opacity-50" />
-          <h3 className="text-lg font-semibold mb-2">No Support Tickets</h3>
-          <p className="text-muted-foreground">
-            {hasActiveFilters ? "No tickets match the current filters." : "No tickets submitted yet."}
-          </p>
-          {hasActiveFilters && (
-            <Button variant="outline" onClick={clearFilters} className="mt-4">
-              Clear Filters
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>Support Tickets ({tickets.length})</span>
+          <span>Support Tickets ({tickets?.length || 0})</span>
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={clearFilters}>
               <X className="h-4 w-4 mr-1" />
@@ -125,7 +106,7 @@ export const SupportTicketsTab = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Filters */}
+        {/* Filters - ALWAYS VISIBLE */}
         <Card className="bg-muted/50">
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -136,11 +117,11 @@ export const SupportTicketsTab = () => {
                   value={statusFilter.join(",")}
                   onValueChange={(v) => {
                     if (v === "all") {
-                      setStatusFilter(["open", "in_progress", "resolved", "closed"]);
+                      setStatusFilter(["open", "in_progress", "closed"]);
                     } else if (v === "closed_only") {
                       setStatusFilter(["closed"]);
                     } else {
-                      setStatusFilter(["open", "in_progress", "resolved"]);
+                      setStatusFilter(["open", "in_progress"]);
                     }
                   }}
                 >
@@ -148,7 +129,7 @@ export const SupportTicketsTab = () => {
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="open,in_progress,resolved">Active (No Closed)</SelectItem>
+                    <SelectItem value="open,in_progress">Active (Open & In Progress)</SelectItem>
                     <SelectItem value="closed_only">Closed Only</SelectItem>
                     <SelectItem value="all">All Statuses</SelectItem>
                   </SelectContent>
@@ -215,81 +196,97 @@ export const SupportTicketsTab = () => {
           </CardContent>
         </Card>
 
-        {/* Tickets List */}
-        <div className="space-y-2">
-          {tickets.map((ticket: any) => {
-            const StatusIcon = statusConfig[ticket.status as keyof typeof statusConfig].icon;
-            const isExpanded = expandedTicket === ticket.id;
-            
-            return (
-              <Collapsible key={ticket.id} open={isExpanded} onOpenChange={(open) => setExpandedTicket(open ? ticket.id : null)}>
-                <Card>
-                  <CollapsibleTrigger asChild>
-                    <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-accent/50">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="p-2 bg-muted rounded-lg">
-                          <LifeBuoy className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-mono text-sm">#{ticket.id.slice(0, 8)}</span>
-                            <Badge variant="destructive" className="uppercase font-bold">
-                              {ticket.issue_category.replace(/_/g, " ")}
-                            </Badge>
-                            <Badge variant="outline" className="gap-1">
-                              {ticket.preferred_contact_method === "email" ? (
-                                <><Mail className="h-3 w-3" /> Email</>
-                              ) : (
-                                <><Phone className="h-3 w-3" /> Phone</>
-                              )}
-                            </Badge>
+        {/* Empty State or Tickets List */}
+        {!tickets || tickets.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 bg-muted/30 rounded-lg">
+            <LifeBuoy className="h-16 w-16 text-muted-foreground mb-4 opacity-50" />
+            <h3 className="text-lg font-semibold mb-2">No Support Tickets</h3>
+            <p className="text-muted-foreground">
+              {hasActiveFilters ? "No tickets match the current filters." : "No tickets submitted yet."}
+            </p>
+            {hasActiveFilters && (
+              <Button variant="outline" onClick={clearFilters} className="mt-4">
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {tickets.map((ticket: any) => {
+              const StatusIcon = statusConfig[ticket.status as keyof typeof statusConfig]?.icon || AlertCircle;
+              const statusClass = statusConfig[ticket.status as keyof typeof statusConfig]?.className || "bg-gray-100 text-gray-800";
+              const statusLabel = statusConfig[ticket.status as keyof typeof statusConfig]?.label || ticket.status;
+              const isExpanded = expandedTicket === ticket.id;
+              
+              return (
+                <Collapsible key={ticket.id} open={isExpanded} onOpenChange={(open) => setExpandedTicket(open ? ticket.id : null)}>
+                  <Card>
+                    <CollapsibleTrigger asChild>
+                      <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-accent/50">
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className="p-2 bg-muted rounded-lg">
+                            <LifeBuoy className="h-5 w-5 text-primary" />
                           </div>
-                          <p className="font-medium">{ticket.clients?.company_name}</p>
-                          <p className="text-sm text-muted-foreground">{formatDateTimePT(ticket.created_at)}</p>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-mono text-sm">#{ticket.id.slice(0, 8)}</span>
+                              <Badge variant="destructive" className="uppercase font-bold">
+                                {ticket.issue_category.replace(/_/g, " ")}
+                              </Badge>
+                              <Badge variant="outline" className="gap-1">
+                                {ticket.preferred_contact_method === "email" ? (
+                                  <><Mail className="h-3 w-3" /> Email</>
+                                ) : (
+                                  <><Phone className="h-3 w-3" /> Phone</>
+                                )}
+                              </Badge>
+                            </div>
+                            <p className="font-medium">{ticket.clients?.company_name}</p>
+                            <p className="text-sm text-muted-foreground">{formatDateTimePT(ticket.created_at)}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Badge className={statusClass}>
+                            <StatusIcon className="h-3 w-3 mr-1" />
+                            {statusLabel}
+                          </Badge>
+                          {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Badge className={statusConfig[ticket.status as keyof typeof statusConfig].className}>
-                          <StatusIcon className="h-3 w-3 mr-1" />
-                          {statusConfig[ticket.status as keyof typeof statusConfig].label}
-                        </Badge>
-                        {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                      </div>
-                    </div>
-                  </CollapsibleTrigger>
+                    </CollapsibleTrigger>
 
-                  <CollapsibleContent>
-                    <div className="border-t p-4 space-y-4 bg-muted/30">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div><span className="text-muted-foreground">Email:</span> <span className="font-medium">{ticket.contact_email || ticket.clients?.email}</span></div>
-                        <div><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{ticket.contact_phone || "N/A"}</span></div>
-                      </div>
+                    <CollapsibleContent>
+                      <div className="border-t p-4 space-y-4 bg-muted/30">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div><span className="text-muted-foreground">Email:</span> <span className="font-medium">{ticket.contact_email || ticket.clients?.email}</span></div>
+                          <div><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{ticket.contact_phone || "N/A"}</span></div>
+                        </div>
 
-                      <div className="space-y-2">
-                        <h5 className="text-sm font-semibold">Description</h5>
-                        <div className="bg-background p-4 rounded-lg border whitespace-pre-wrap text-sm">{ticket.issue_description}</div>
-                      </div>
+                        <div className="space-y-2">
+                          <h5 className="text-sm font-semibold">Description</h5>
+                          <div className="bg-background p-4 rounded-lg border whitespace-pre-wrap text-sm">{ticket.issue_description}</div>
+                        </div>
 
-                      <div className="flex items-center gap-2">
-                        <Label className="text-xs">Status</Label>
-                        <Select value={ticket.status} onValueChange={(v) => handleStatusUpdate(ticket.id, v)} disabled={updatingTicket === ticket.id}>
-                          <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="open">Open</SelectItem>
-                            <SelectItem value="in_progress">In Progress</SelectItem>
-                            <SelectItem value="resolved">Resolved</SelectItem>
-                            <SelectItem value="closed">Closed</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {updatingTicket === ticket.id && <Loader2 className="h-4 w-4 animate-spin" />}
+                        <div className="flex items-center gap-2">
+                          <Label className="text-xs">Status</Label>
+                          <Select value={ticket.status} onValueChange={(v) => handleStatusUpdate(ticket.id, v)} disabled={updatingTicket === ticket.id}>
+                            <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="open">Open</SelectItem>
+                              <SelectItem value="in_progress">In Progress</SelectItem>
+                              <SelectItem value="closed">Closed</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {updatingTicket === ticket.id && <Loader2 className="h-4 w-4 animate-spin" />}
+                        </div>
                       </div>
-                    </div>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
-            );
-          })}
-        </div>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
