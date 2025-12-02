@@ -6,6 +6,19 @@ import { ExternalLink, Package, Box, Truck } from "lucide-react";
 import { format } from "date-fns";
 import { getTrackingUrl } from "@/lib/trackingUrls";
 
+// Helper to format destination types with proper capitalization
+function formatDestination(destination: string): string {
+  const normalizations: Record<string, string> = {
+    'amazon_fba': 'Amazon FBA',
+    'walmart_wfs': 'Walmart WFS',
+    'direct_to_customer': 'Direct to Customer',
+    'shopify': 'Shopify',
+    'tiktok_shop': 'TikTok Shop',
+  };
+  const key = destination?.toLowerCase().replace(/\s+/g, '_');
+  return normalizations[key] || destination?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || '-';
+}
+
 interface ShipmentDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -50,7 +63,7 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipmentId }: Shipmen
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Destination</p>
-              <p className="capitalize">{shipment.destination_type.replace('_', ' ')}</p>
+              <p>{formatDestination(shipment.destination_type)}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Split Type</p>

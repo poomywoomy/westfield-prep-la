@@ -13,6 +13,19 @@ import { ShipmentDetailDialog } from "@/components/admin/ShipmentDetailDialog";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { format, parseISO, startOfDay, endOfDay } from "date-fns";
 
+// Helper to format destination types with proper capitalization
+function formatDestination(destination: string): string {
+  const normalizations: Record<string, string> = {
+    'amazon_fba': 'Amazon FBA',
+    'walmart_wfs': 'Walmart WFS',
+    'direct_to_customer': 'Direct to Customer',
+    'shopify': 'Shopify',
+    'tiktok_shop': 'TikTok Shop',
+  };
+  const key = destination?.toLowerCase().replace(/\s+/g, '_');
+  return normalizations[key] || destination?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || '-';
+}
+
 export const ClientShipmentsTab = () => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -216,7 +229,7 @@ export const ClientShipmentsTab = () => {
                     <TableCell className="font-mono">{shipment.shipment_number}</TableCell>
                     <TableCell>{shipment.shipped_at ? format(new Date(shipment.shipped_at), "MMM d, yyyy") : "-"}</TableCell>
                     <TableCell className="capitalize">{displayMarketplace || "-"}</TableCell>
-                    <TableCell className="capitalize">{shipment.destination_type.replace('_', ' ')}</TableCell>
+                    <TableCell>{formatDestination(shipment.destination_type)}</TableCell>
                     <TableCell>{shipment.total_units}</TableCell>
                     <TableCell>{shipment.total_boxes}</TableCell>
                     <TableCell>

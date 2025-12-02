@@ -98,7 +98,7 @@ function getASNStatusWithDiscrepancy(
   });
 
   if (hasUnresolvedDiscrepancy) {
-    return { label: "Closed w/ Discrepancy", className: "bg-green-500 text-white" };
+    return { label: "Closed w/ Discrepancy", className: "bg-emerald-600/60 text-white" };
   }
 
   // No discrepancies - dark green "Closed"
@@ -254,11 +254,10 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
           </div>
         ) : (
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="skus">SKUs</TabsTrigger>
               <TabsTrigger value="photos">QC Photos</TabsTrigger>
-              <TabsTrigger value="returns">Returns</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4">
@@ -416,50 +415,6 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
                         </CardContent>
                       </Card>
                     ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="returns">
-              {returns.length === 0 ? (
-                <div className="text-center py-12">
-                  <RotateCcw className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No returns found</p>
-                </div>
-              ) : (
-                <div className="border rounded-lg overflow-x-auto">
-                  <Table className="min-w-[800px]">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Return ID</TableHead>
-                        <TableHead>Order #</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Reason</TableHead>
-                        <TableHead className="text-right">Expected Qty</TableHead>
-                        <TableHead className="text-right">Processed Qty</TableHead>
-                        <TableHead>Date</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {returns.map((ret) => (
-                        <TableRow key={ret.id}>
-                          <TableCell className="font-mono text-xs">
-                            {ret.shopify_return_id}
-                          </TableCell>
-                          <TableCell>{ret.order_number || "-"}</TableCell>
-                          <TableCell>{getReturnStatusBadge(ret.status)}</TableCell>
-                          <TableCell className="text-sm">{ret.return_reason || "-"}</TableCell>
-                          <TableCell className="text-right">{ret.expected_qty || 0}</TableCell>
-                          <TableCell className="text-right">{ret.processed_qty || 0}</TableCell>
-                          <TableCell className="text-muted-foreground text-sm">
-                            {ret.created_at_shopify 
-                              ? format(new Date(ret.created_at_shopify), "MMM d, yyyy")
-                              : format(new Date(ret.synced_at), "MMM d, yyyy")}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
                 </div>
               )}
             </TabsContent>

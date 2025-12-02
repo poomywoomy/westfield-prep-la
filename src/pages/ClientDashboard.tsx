@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Home, Package, ShoppingCart, FileText, Truck, Activity, DollarSign, 
-  Settings, LogOut 
+  Settings, LogOut, RotateCcw 
 } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import { SKUFormDialog } from "@/components/admin/SKUFormDialog";
@@ -23,6 +23,7 @@ const ClientShipmentsTab = lazy(() => import("@/components/client/ClientShipment
 const ClientInventoryActivityLog = lazy(() => import("@/components/client/ClientInventoryActivityLog").then(m => ({ default: m.ClientInventoryActivityLog })));
 const ClientAnalyticsDashboard = lazy(() => import("@/components/client/ClientAnalyticsDashboard").then(m => ({ default: m.ClientAnalyticsDashboard })));
 const ClientASNsTab = lazy(() => import("@/components/client/ClientASNsTab").then(m => ({ default: m.ClientASNsTab })));
+const ClientReturnsTab = lazy(() => import("@/components/client/ClientReturnsTab").then(m => ({ default: m.ClientReturnsTab })));
 
 const ClientDashboard = () => {
   const { user, role, loading, logout } = useAuth();
@@ -136,16 +137,16 @@ const ClientDashboard = () => {
   return (
     <div className="min-h-screen bg-background flex w-full">
       {/* Left Sidebar */}
-      <aside className="w-64 border-r bg-card flex flex-col">
+      <aside className="w-64 border-r bg-card flex flex-col h-screen">
         {/* Logo */}
-        <div className="p-6 border-b flex items-center justify-center">
+        <div className="p-6 border-b flex items-center justify-center flex-shrink-0">
           <Link to="/client/dashboard">
             <img src={westfieldLogo} alt="Westfield Logo" className="h-16 w-auto" />
           </Link>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           <Button
             variant="ghost"
             className={`w-full justify-start gap-3 ${activeTab === 'analytics' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
@@ -182,6 +183,14 @@ const ClientDashboard = () => {
           </Button>
           <Button
             variant="ghost"
+            className={`w-full justify-start gap-3 ${activeTab === 'returns' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
+            onClick={() => setActiveTab('returns')}
+          >
+            <RotateCcw className="h-5 w-5" />
+            Returns
+          </Button>
+          <Button
+            variant="ghost"
             className={`w-full justify-start gap-3 ${activeTab === 'shipments' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
             onClick={() => setActiveTab('shipments')}
           >
@@ -207,7 +216,7 @@ const ClientDashboard = () => {
         </nav>
 
         {/* User Profile Section */}
-        <div className="p-4 border-t space-y-3">
+        <div className="p-4 border-t space-y-3 flex-shrink-0">
           <div className="flex items-center gap-3 mb-3">
             <Avatar>
               <AvatarFallback className="bg-primary text-primary-foreground">
@@ -258,6 +267,7 @@ const ClientDashboard = () => {
               <TabsTrigger value="products">Products</TabsTrigger>
               <TabsTrigger value="orders">Orders</TabsTrigger>
               <TabsTrigger value="asns">ASNs</TabsTrigger>
+              <TabsTrigger value="returns">Returns</TabsTrigger>
               <TabsTrigger value="shipments">Shipments</TabsTrigger>
               <TabsTrigger value="activity">Activity</TabsTrigger>
               <TabsTrigger value="billing">Billing</TabsTrigger>
@@ -295,6 +305,12 @@ const ClientDashboard = () => {
             <TabsContent value="asns" forceMount className="data-[state=inactive]:hidden">
               <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
                 <ClientASNsTab clientId={clientId} />
+              </Suspense>
+            </TabsContent>
+
+            <TabsContent value="returns" forceMount className="data-[state=inactive]:hidden">
+              <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                <ClientReturnsTab clientId={clientId} />
               </Suspense>
             </TabsContent>
 
