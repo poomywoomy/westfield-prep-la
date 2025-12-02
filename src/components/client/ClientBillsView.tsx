@@ -58,11 +58,11 @@ const ClientBillsView = () => {
       if (clientError) throw clientError;
       setClientData(client);
 
+      // Fetch all bills (open and closed) so clients can view their billing history
       const { data: billsData, error: billsError } = await supabase
         .from("bills")
         .select("*")
         .eq("client_id", client.id)
-        .eq("status", "open")
         .order("created_at", { ascending: false });
 
       if (billsError) throw billsError;
