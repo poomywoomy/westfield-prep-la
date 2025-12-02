@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Download } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
@@ -242,9 +242,7 @@ const ClientBillsView = () => {
                     )}
                   </div>
                   <div className="text-right">
-                    <Badge variant={bill.status === "closed" ? "secondary" : "default"} className="text-xs">
-                      {bill.status}
-                    </Badge>
+                    <StatusBadge status={bill.status} className="text-xs" />
                   </div>
                 </div>
               </div>
