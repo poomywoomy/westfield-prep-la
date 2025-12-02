@@ -42,6 +42,7 @@ interface PrefillData {
   requestId?: string;
   skuLines: Array<{ sku_id: string; quantity: number; client_sku?: string; title?: string }>;
   marketplace?: string;
+  shipmentFormat?: string;
   notes?: string;
 }
 
@@ -109,6 +110,14 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange, prefillData }
         } else {
           setMarketplace("other");
           setMarketplaceOther(prefillData.marketplace);
+        }
+      }
+      
+      // Prefill shipment format if provided
+      if (prefillData.shipmentFormat) {
+        const validFormats = ["carton", "pallet", "unsure"];
+        if (validFormats.includes(prefillData.shipmentFormat.toLowerCase())) {
+          setShipmentFormat(prefillData.shipmentFormat.toLowerCase() as ShipmentFormatType);
         }
       }
       

@@ -107,6 +107,7 @@ export const ShipmentRequestsTab = () => {
           title: line.skus?.title,
         })),
         marketplace: request.marketplace === "other" ? request.marketplace_other : request.marketplace,
+        shipmentFormat: request.shipment_type || "carton",
         notes: request.notes || "",
       });
       setShipmentDialogOpen(true);

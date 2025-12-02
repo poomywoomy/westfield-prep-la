@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { Download } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Download, ChevronDown, ChevronRight, FileText } from "lucide-react";
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 import { formatDateRange } from "@/lib/dateFormatters";
@@ -81,6 +82,46 @@ const ClientBillsView = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Group bills by year and month
+  const groupedBills = useMemo(() => {
+    const openBills = bills.filter(b => b.status === 'open');
+    const closedBills = bills.filter(b => b.status !== 'open');
+    
+    const grouped: Record<number, Record<number, typeof bills>> = {};
+    
+    closedBills.forEach(bill => {
+      const date = new Date(bill.billing_month);
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      
+      if (!grouped[year]) grouped[year] = {};
+      if (!grouped[year][month]) grouped[year][month] = [];
+      grouped[year][month].push(bill);
+    });
+    
+    // Sort years descending
+    const sortedYears = Object.keys(grouped)
+      .map(Number)
+      .sort((a, b) => b - a);
+    
+    return { openBills, closedBills: grouped, sortedYears };
+  }, [bills]);
+
+  const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set());
+
+  const toggleYear = (year: number) => {
+    setExpandedYears(prev => {
+      const next = new Set(prev);
+      if (next.has(year)) next.delete(year);
+      else next.add(year);
+      return next;
+    });
+  };
+
+  const getMonthName = (month: number) => {
+    return new Date(2000, month, 1).toLocaleDateString('en-US', { month: 'long' });
   };
 
   const fetchBillDetails = async (billId: string) => {
@@ -218,35 +259,97 @@ const ClientBillsView = () => {
           <CardTitle>Bill History</CardTitle>
           <CardDescription>Your billing statements</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-4">
           {bills.length === 0 ? (
             <p className="text-muted-foreground text-center py-4">No bills yet</p>
           ) : (
-            bills.map((bill) => (
-              <div
-                key={bill.id}
-                onClick={() => handleBillSelect(bill)}
-                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                  selectedBill?.id === bill.id ? "bg-primary/5 border-primary" : "hover:bg-accent"
-                }`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="font-semibold text-sm">
-                      {bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-                    </div>
-                    {bill.statement_start_date && bill.statement_end_date && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {formatDateRange(bill.statement_start_date, bill.statement_end_date)}
+            <>
+              {/* Current/Open Bills */}
+              {groupedBills.openBills.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-primary">Current Bills</h4>
+                  {groupedBills.openBills.map((bill) => (
+                    <div
+                      key={bill.id}
+                      onClick={() => handleBillSelect(bill)}
+                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        selectedBill?.id === bill.id ? "bg-primary/5 border-primary" : "hover:bg-accent"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="font-semibold text-sm">
+                            {bill.label || new Date(bill.billing_month).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                          </div>
+                          {bill.statement_start_date && bill.statement_end_date && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {formatDateRange(bill.statement_start_date, bill.statement_end_date)}
+                            </div>
+                          )}
+                        </div>
+                        <StatusBadge status={bill.status} className="text-xs" />
                       </div>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <StatusBadge status={bill.status} className="text-xs" />
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))
+              )}
+
+              {/* Past Bills - Grouped by Year/Month */}
+              {groupedBills.sortedYears.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Past Bills
+                  </h4>
+                  {groupedBills.sortedYears.map((year) => (
+                    <Collapsible
+                      key={year}
+                      open={expandedYears.has(year)}
+                      onOpenChange={() => toggleYear(year)}
+                    >
+                      <CollapsibleTrigger className="w-full">
+                        <div className="flex items-center justify-between p-2 rounded-lg hover:bg-accent cursor-pointer">
+                          <span className="font-medium">{year}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {Object.values(groupedBills.closedBills[year]).flat().length} bills
+                            </span>
+                            {expandedYears.has(year) ? (
+                              <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4" />
+                            )}
+                          </div>
+                        </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-1 pl-2">
+                        {Object.keys(groupedBills.closedBills[year])
+                          .map(Number)
+                          .sort((a, b) => b - a)
+                          .map((month) => (
+                            <div key={month} className="space-y-1">
+                              {groupedBills.closedBills[year][month].map((bill) => (
+                                <div
+                                  key={bill.id}
+                                  onClick={() => handleBillSelect(bill)}
+                                  className={`p-2 border rounded-lg cursor-pointer transition-colors text-sm ${
+                                    selectedBill?.id === bill.id ? "bg-primary/5 border-primary" : "hover:bg-accent"
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span>{bill.label || getMonthName(month)}</span>
+                                    <StatusBadge status={bill.status} className="text-xs" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
