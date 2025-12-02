@@ -106,7 +106,7 @@ export const ShipmentRequestsTab = () => {
           client_sku: line.skus?.client_sku,
           title: line.skus?.title,
         })),
-        marketplace: request.marketplace_other || request.marketplace,
+        marketplace: request.marketplace === "other" ? request.marketplace_other : request.marketplace,
         notes: request.notes || "",
       });
       setShipmentDialogOpen(true);

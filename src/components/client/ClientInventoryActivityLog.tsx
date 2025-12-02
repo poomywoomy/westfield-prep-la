@@ -13,7 +13,7 @@ import { startOfDay, endOfDay, subDays, format } from "date-fns";
 interface ActivityLogEntry {
   id: string;
   timestamp: string;
-  type: 'receiving_started' | 'issue_detected' | 'receiving_completed' | 'receiving_paused' | 'adjustment' | 'sold' | 'transfer' | 'return' | 'low_stock' | 'discrepancy_created' | 'discrepancy_resolved';
+  type: 'receiving_started' | 'issue_detected' | 'receiving_completed' | 'receiving_paused' | 'adjustment' | 'sold' | 'transfer' | 'return' | 'low_stock' | 'discrepancy_created' | 'discrepancy_resolved' | 'shipped';
   asnNumber?: string;
   skuCode?: string;
   message: string;
@@ -60,7 +60,7 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
       // Fetch inventory adjustments including returns
       const { data: adjustments, error: adjError } = await supabase
         .from('inventory_ledger')
-        .select('id, ts, qty_delta, reason_code, notes, transaction_type, skus(client_sku, title)')
+        .select('id, ts, qty_delta, reason_code, notes, transaction_type, source_type, skus(client_sku, title)')
         .eq('client_id', clientId)
         .in('transaction_type', ['ADJUSTMENT_PLUS', 'ADJUSTMENT_MINUS', 'SALE_DECREMENT', 'TRANSFER', 'RETURN'])
         .order('ts', { ascending: false });
@@ -119,12 +119,17 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
       // Add adjustment events
       adjustments?.forEach(adj => {
         const sku = adj.skus as any;
+        const adjRecord = adj as any;
         let type: ActivityLogEntry['type'];
         let message: string;
 
         if (adj.transaction_type === 'RETURN') {
           type = 'return';
           message = `Return processed: ${adj.qty_delta} units of ${sku?.client_sku || 'SKU'} - ${adj.notes || 'good condition'}`;
+        } else if (adj.transaction_type === 'SALE_DECREMENT' && adjRecord.source_type === 'outbound_shipment') {
+          // This is a shipment, not a sale
+          type = 'shipped';
+          message = `Shipped ${Math.abs(adj.qty_delta)} units of ${sku?.client_sku || 'SKU'}`;
         } else if (adj.transaction_type === 'SALE_DECREMENT' || adj.reason_code === 'sold') {
           type = 'sold';
           message = `Sold ${Math.abs(adj.qty_delta)} units of ${sku?.client_sku || 'SKU'}`;

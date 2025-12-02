@@ -26,14 +26,14 @@ export const useAuth = () => {
         }
       });
       
-      // Force redirect to homepage
-      window.location.replace('/');
+      // Force redirect to login page
+      window.location.replace('/login');
     } catch (error) {
       if (import.meta.env.DEV) {
         console.error('Logout error:', error);
       }
       // Even if there's an error, force redirect
-      window.location.replace('/');
+      window.location.replace('/login');
     }
   }, []);
 

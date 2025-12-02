@@ -141,7 +141,8 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange, prefillData }
 
   // Initialize boxes when split type or format changes
   useEffect(() => {
-    if (splitType === "amazon_optimized" && boxes.length === 0 && marketplace === "amazon") {
+    if (marketplace === "amazon" && splitType === "amazon_optimized") {
+      // Auto-generate 5 boxes for Amazon Optimized Split
       const initialBoxes: Box[] = Array.from({ length: 5 }, (_, i) => ({
         id: `box-${i + 1}`,
         box_number: i + 1,
@@ -155,22 +156,20 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange, prefillData }
         fba_destination_fc: "",
       }));
       setBoxes(initialBoxes);
-    } else if (splitType === "minimal_split" || marketplace !== "amazon") {
-      if (boxes.length === 0) {
-        // Add at least one box/pallet for non-Amazon or minimal split
-        setBoxes([{
-          id: `box-1`,
-          box_number: 1,
-          weight_lbs: "",
-          length_in: "",
-          width_in: "",
-          height_in: "",
-          tracking_number: "",
-          carrier: "",
-          fba_shipment_id: "",
-          fba_destination_fc: "",
-        }]);
-      }
+    } else if (marketplace && (splitType === "minimal_split" || marketplace !== "amazon")) {
+      // Add at least one box/pallet for non-Amazon or minimal split
+      setBoxes([{
+        id: `box-1`,
+        box_number: 1,
+        weight_lbs: "",
+        length_in: "",
+        width_in: "",
+        height_in: "",
+        tracking_number: "",
+        carrier: "",
+        fba_shipment_id: "",
+        fba_destination_fc: "",
+      }]);
     }
   }, [splitType, marketplace]);
 
