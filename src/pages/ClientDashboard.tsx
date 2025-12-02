@@ -16,7 +16,7 @@ import { InventoryDiscrepancyAlert } from "@/components/client/InventoryDiscrepa
 import type { Database } from "@/integrations/supabase/types";
 
 // Lazy load tab components for better performance
-const ClientBillingTab = lazy(() => import("@/components/client/ClientBillingTab"));
+const ClientBillsView = lazy(() => import("@/components/client/ClientBillsView"));
 const ClientProductsTab = lazy(() => import("@/components/client/ClientProductsTab"));
 const ClientOrdersTab = lazy(() => import("@/components/client/ClientOrdersTab"));
 const ClientShipmentsTab = lazy(() => import("@/components/client/ClientShipmentsTab").then(m => ({ default: m.ClientShipmentsTab })));
@@ -32,6 +32,7 @@ const ClientDashboard = () => {
   const [clientId, setClientId] = useState<string>("");
   const [showSKUDialog, setShowSKUDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("analytics");
+  const [hasShopifyStore, setHasShopifyStore] = useState(false);
 
 
   useEffect(() => {
@@ -64,6 +65,16 @@ const ClientDashboard = () => {
       if (!error && data) {
         setClientId(data.id);
         setClientName(data.contact_name);
+        
+        // Check if client has active Shopify store
+        const { data: shopifyStore } = await supabase
+          .from("shopify_stores")
+          .select("id")
+          .eq("client_id", data.id)
+          .eq("is_active", true)
+          .maybeSingle();
+        
+        setHasShopifyStore(!!shopifyStore);
         
         // Only update status once on first login using localStorage flag
         const statusUpdateKey = `client_status_updated_${user?.id}`;
@@ -151,14 +162,16 @@ const ClientDashboard = () => {
             <Package className="h-5 w-5" />
             Products
           </Button>
-          <Button
-            variant="ghost"
-            className={`w-full justify-start gap-3 ${activeTab === 'orders' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
-            onClick={() => setActiveTab('orders')}
-          >
-            <ShoppingCart className="h-5 w-5" />
-            Orders
-          </Button>
+          {hasShopifyStore && (
+            <Button
+              variant="ghost"
+              className={`w-full justify-start gap-3 ${activeTab === 'orders' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
+              onClick={() => setActiveTab('orders')}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              Orders
+            </Button>
+          )}
           <Button
             variant="ghost"
             className={`w-full justify-start gap-3 ${activeTab === 'asns' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
@@ -299,7 +312,7 @@ const ClientDashboard = () => {
 
             <TabsContent value="billing" forceMount className="data-[state=inactive]:hidden">
               <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
-                <ClientBillingTab />
+                <ClientBillsView />
               </Suspense>
             </TabsContent>
           </Tabs>

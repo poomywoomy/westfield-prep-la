@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Package, AlertCircle } from "lucide-react";
+import { Loader2, Package, AlertCircle, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { resignPhotoUrls } from "@/lib/photoUtils";
@@ -24,6 +24,7 @@ interface ASNHeader {
   notes: string | null;
   carrier: string | null;
   tracking_number: string | null;
+  client_id: string;
 }
 
 interface ASNLine {
@@ -55,12 +56,62 @@ interface Discrepancy {
   } | null;
 }
 
+interface ShopifyReturn {
+  id: string;
+  shopify_return_id: string;
+  order_number: string | null;
+  status: string;
+  return_reason: string | null;
+  expected_qty: number | null;
+  processed_qty: number | null;
+  created_at_shopify: string | null;
+  synced_at: string;
+}
+
+// Helper function to determine ASN status with discrepancy logic
+function getASNStatusWithDiscrepancy(
+  status: string,
+  discrepancies: Discrepancy[]
+): { label: string; className: string } {
+  // If not closed, return normal status
+  if (status !== 'closed') {
+    const statusMap: Record<string, { label: string; className: string }> = {
+      issue: { label: "Issue", className: "bg-destructive text-destructive-foreground" },
+      not_received: { label: "Waiting", className: "bg-background text-foreground border border-border" },
+      receiving: { label: "Receiving", className: "bg-orange-500 text-white" },
+      received: { label: "Received", className: "bg-muted text-muted-foreground" },
+    };
+    return statusMap[status] || { label: status.replace(/_/g, " "), className: "bg-muted text-muted-foreground" };
+  }
+
+  // Check for discrepancies that warrant "Closed w/ Discrepancy" status
+  const hasUnresolvedDiscrepancy = discrepancies.some((disc) => {
+    // Missing items are always a discrepancy
+    if (disc.discrepancy_type === 'missing') {
+      return true;
+    }
+    // Damaged items NOT marked as "return_to_inventory" (sellable) are discrepancies
+    if (disc.discrepancy_type === 'damaged' && disc.decision !== 'return_to_inventory') {
+      return true;
+    }
+    return false;
+  });
+
+  if (hasUnresolvedDiscrepancy) {
+    return { label: "Closed w/ Discrepancy", className: "bg-green-500 text-white" };
+  }
+
+  // No discrepancies - dark green "Closed"
+  return { label: "Closed", className: "bg-green-700 text-white" };
+}
+
 export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDetailDialogProps) {
   const [loading, setLoading] = useState(true);
   const [header, setHeader] = useState<ASNHeader | null>(null);
   const [lines, setLines] = useState<ASNLine[]>([]);
   const [discrepancies, setDiscrepancies] = useState<Discrepancy[]>([]);
   const [displayPhotos, setDisplayPhotos] = useState<string[]>([]);
+  const [returns, setReturns] = useState<ShopifyReturn[]>([]);
 
   useEffect(() => {
     if (open && asnId) {
@@ -74,7 +125,7 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
       // Fetch ASN header
       const { data: headerData, error: headerError } = await supabase
         .from("asn_headers")
-        .select("asn_number, status, eta, received_at, created_at, notes, carrier, tracking_number")
+        .select("asn_number, status, eta, received_at, created_at, notes, carrier, tracking_number, client_id")
         .eq("id", asnId)
         .single();
 
@@ -119,6 +170,20 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
       if (discError) throw discError;
       setDiscrepancies(discData || []);
 
+      // Fetch returns for this client
+      if (headerData?.client_id) {
+        const { data: returnsData, error: returnsError } = await supabase
+          .from("shopify_returns")
+          .select("id, shopify_return_id, order_number, status, return_reason, expected_qty, processed_qty, created_at_shopify, synced_at")
+          .eq("client_id", headerData.client_id)
+          .order("synced_at", { ascending: false })
+          .limit(50);
+
+        if (!returnsError && returnsData) {
+          setReturns(returnsData);
+        }
+      }
+
       // Collect and re-sign all photos
       const allPhotos: string[] = [];
       (discData || []).forEach((disc) => {
@@ -139,16 +204,8 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
   };
 
   const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { label: string; className: string }> = {
-      issue: { label: "Issue", className: "bg-destructive text-destructive-foreground" },
-      closed: { label: "Closed", className: "bg-green-600 text-white" },
-      not_received: { label: "Waiting", className: "bg-background text-foreground border border-border" },
-      receiving: { label: "Receiving", className: "bg-orange-500 text-white" },
-      received: { label: "Received", className: "bg-muted text-muted-foreground" },
-    };
-    
-    const config = statusMap[status] || { label: status.replace(/_/g, " "), className: "bg-muted text-muted-foreground" };
-    return <Badge className={config.className}>{config.label}</Badge>;
+    const statusConfig = getASNStatusWithDiscrepancy(status, discrepancies);
+    return <Badge className={statusConfig.className}>{statusConfig.label}</Badge>;
   };
 
   const getLineStatus = (line: ASNLine) => {
@@ -163,9 +220,21 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
     return <Badge variant="outline">Partial</Badge>;
   };
 
+  const getReturnStatusBadge = (status: string) => {
+    const statusMap: Record<string, { label: string; className: string }> = {
+      requested: { label: "Requested", className: "bg-yellow-500 text-white" },
+      approved: { label: "Approved", className: "bg-blue-500 text-white" },
+      declined: { label: "Declined", className: "bg-destructive text-destructive-foreground" },
+      returned: { label: "Returned", className: "bg-green-600 text-white" },
+      closed: { label: "Closed", className: "bg-muted text-muted-foreground" },
+    };
+    const config = statusMap[status?.toLowerCase()] || { label: status || "Unknown", className: "bg-muted text-muted-foreground" };
+    return <Badge className={config.className}>{config.label}</Badge>;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
@@ -185,10 +254,11 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
           </div>
         ) : (
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="skus">SKUs</TabsTrigger>
               <TabsTrigger value="photos">QC Photos</TabsTrigger>
+              <TabsTrigger value="returns">Returns</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4">
@@ -245,28 +315,28 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
                   <p className="text-muted-foreground">No SKUs in this ASN</p>
                 </div>
               ) : (
-                <div className="border rounded-lg overflow-hidden">
-                  <Table>
+                <div className="border rounded-lg overflow-x-auto">
+                  <Table className="min-w-[900px]">
                     <TableHeader>
                       <TableRow>
-                        <TableHead>SKU</TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead className="text-right">Expected</TableHead>
-                        <TableHead className="text-right">Received</TableHead>
-                        <TableHead className="text-right">Normal</TableHead>
-                        <TableHead className="text-right">Damaged</TableHead>
-                        <TableHead className="text-right">Missing</TableHead>
-                        <TableHead className="text-right">Quarantined</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className="w-[120px]">SKU</TableHead>
+                        <TableHead className="min-w-[150px]">Title</TableHead>
+                        <TableHead className="text-right w-[80px]">Expected</TableHead>
+                        <TableHead className="text-right w-[80px]">Received</TableHead>
+                        <TableHead className="text-right w-[70px]">Normal</TableHead>
+                        <TableHead className="text-right w-[70px]">Damaged</TableHead>
+                        <TableHead className="text-right w-[70px]">Missing</TableHead>
+                        <TableHead className="text-right w-[90px]">Quarantined</TableHead>
+                        <TableHead className="w-[100px]">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {lines.map((line) => (
                         <TableRow key={line.id}>
-                          <TableCell className="font-mono text-sm">
+                          <TableCell className="font-mono text-xs">
                             {line.skus?.client_sku || "N/A"}
                           </TableCell>
-                          <TableCell>{line.skus?.title || "Unknown"}</TableCell>
+                          <TableCell className="text-sm">{line.skus?.title || "Unknown"}</TableCell>
                           <TableCell className="text-right">{line.expected_units}</TableCell>
                           <TableCell className="text-right">{line.received_units || 0}</TableCell>
                           <TableCell className="text-right">{line.normal_units || 0}</TableCell>
@@ -346,6 +416,50 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
                         </CardContent>
                       </Card>
                     ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="returns">
+              {returns.length === 0 ? (
+                <div className="text-center py-12">
+                  <RotateCcw className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No returns found</p>
+                </div>
+              ) : (
+                <div className="border rounded-lg overflow-x-auto">
+                  <Table className="min-w-[800px]">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Return ID</TableHead>
+                        <TableHead>Order #</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Reason</TableHead>
+                        <TableHead className="text-right">Expected Qty</TableHead>
+                        <TableHead className="text-right">Processed Qty</TableHead>
+                        <TableHead>Date</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {returns.map((ret) => (
+                        <TableRow key={ret.id}>
+                          <TableCell className="font-mono text-xs">
+                            {ret.shopify_return_id}
+                          </TableCell>
+                          <TableCell>{ret.order_number || "-"}</TableCell>
+                          <TableCell>{getReturnStatusBadge(ret.status)}</TableCell>
+                          <TableCell className="text-sm">{ret.return_reason || "-"}</TableCell>
+                          <TableCell className="text-right">{ret.expected_qty || 0}</TableCell>
+                          <TableCell className="text-right">{ret.processed_qty || 0}</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">
+                            {ret.created_at_shopify 
+                              ? format(new Date(ret.created_at_shopify), "MMM d, yyyy")
+                              : format(new Date(ret.synced_at), "MMM d, yyyy")}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               )}
             </TabsContent>

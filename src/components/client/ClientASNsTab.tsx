@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useASNs } from "@/hooks/useASNs";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Package, Loader2, Eye } from "lucide-react";
 import { ClientASNDetailDialog } from "./ClientASNDetailDialog";
@@ -12,20 +13,82 @@ interface ClientASNsTabProps {
   clientId: string;
 }
 
-export function ClientASNsTab({ clientId }: ClientASNsTabProps) {
-  const { data: asns, isLoading } = useASNs(clientId);
-  const [selectedASNId, setSelectedASNId] = useState<string | null>(null);
+interface DiscrepancyInfo {
+  asnId: string;
+  hasDiscrepancy: boolean;
+}
 
-  const getStatusBadge = (status: string) => {
+// Helper function to determine ASN status with discrepancy logic
+function getASNStatusConfig(
+  status: string,
+  hasDiscrepancy: boolean
+): { label: string; className: string } {
+  // If not closed, return normal status
+  if (status !== 'closed') {
     const statusMap: Record<string, { label: string; className: string }> = {
       issue: { label: "Issue", className: "bg-destructive text-destructive-foreground" },
-      closed: { label: "Closed", className: "bg-green-600 text-white" },
       not_received: { label: "Waiting", className: "bg-background text-foreground border border-border" },
       receiving: { label: "Receiving", className: "bg-orange-500 text-white" },
       received: { label: "Received", className: "bg-muted text-muted-foreground" },
     };
-    
-    const config = statusMap[status] || { label: status.replace(/_/g, " "), className: "bg-muted text-muted-foreground" };
+    return statusMap[status] || { label: status.replace(/_/g, " "), className: "bg-muted text-muted-foreground" };
+  }
+
+  // Closed with discrepancy
+  if (hasDiscrepancy) {
+    return { label: "Closed w/ Discrepancy", className: "bg-green-500 text-white" };
+  }
+
+  // No discrepancies - dark green "Closed"
+  return { label: "Closed", className: "bg-green-700 text-white" };
+}
+
+export function ClientASNsTab({ clientId }: ClientASNsTabProps) {
+  const { data: asns, isLoading } = useASNs(clientId);
+  const [selectedASNId, setSelectedASNId] = useState<string | null>(null);
+  const [discrepancyMap, setDiscrepancyMap] = useState<Record<string, boolean>>({});
+
+  // Fetch discrepancy info for all closed ASNs
+  useEffect(() => {
+    if (!asns || asns.length === 0) return;
+
+    const closedAsnIds = asns
+      .filter((asn) => asn.status === 'closed')
+      .map((asn) => asn.id);
+
+    if (closedAsnIds.length === 0) return;
+
+    const fetchDiscrepancies = async () => {
+      const { data, error } = await supabase
+        .from("damaged_item_decisions")
+        .select("asn_id, discrepancy_type, decision")
+        .in("asn_id", closedAsnIds);
+
+      if (error || !data) return;
+
+      // Build a map of ASN ID to whether it has real discrepancies
+      const map: Record<string, boolean> = {};
+      
+      data.forEach((disc) => {
+        // Missing items are always a discrepancy
+        if (disc.discrepancy_type === 'missing') {
+          map[disc.asn_id] = true;
+        }
+        // Damaged items NOT marked as "return_to_inventory" (sellable) are discrepancies
+        if (disc.discrepancy_type === 'damaged' && disc.decision !== 'return_to_inventory') {
+          map[disc.asn_id] = true;
+        }
+      });
+
+      setDiscrepancyMap(map);
+    };
+
+    fetchDiscrepancies();
+  }, [asns]);
+
+  const getStatusBadge = (status: string, asnId: string) => {
+    const hasDiscrepancy = discrepancyMap[asnId] || false;
+    const config = getASNStatusConfig(status || "not_received", hasDiscrepancy);
     return <Badge className={config.className}>{config.label}</Badge>;
   };
 
@@ -74,7 +137,7 @@ export function ClientASNsTab({ clientId }: ClientASNsTabProps) {
               {asns.map((asn) => (
                 <TableRow key={asn.id}>
                   <TableCell className="font-medium">#{asn.asn_number}</TableCell>
-                  <TableCell>{getStatusBadge(asn.status || "not_received")}</TableCell>
+                  <TableCell>{getStatusBadge(asn.status || "not_received", asn.id)}</TableCell>
                   <TableCell>{asn.carrier || "-"}</TableCell>
                   <TableCell className="font-mono text-sm">{asn.tracking_number || "-"}</TableCell>
                   <TableCell>

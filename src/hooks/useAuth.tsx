@@ -11,35 +11,31 @@ export const useAuth = () => {
   const isLoggingOut = useRef(false);
 
   const logout = useCallback(async () => {
-    // Prevent double logout
+    // Prevent double logout - set immediately at start
     if (isLoggingOut.current) return;
     isLoggingOut.current = true;
     
-    try {
-      // Clear React state first
-      setSession(null);
-      setUser(null);
-      setRole(null);
-      
-      // Sign out from Supabase
-      await supabase.auth.signOut({ scope: 'global' });
-      
-      // Clear all Supabase tokens from localStorage
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('sb-')) {
-          localStorage.removeItem(key);
-        }
-      });
-      
-      // Force redirect to login page
-      window.location.replace('/login');
-    } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Logout error:', error);
+    // Clear all Supabase tokens from localStorage FIRST (synchronous)
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-')) {
+        localStorage.removeItem(key);
       }
-      // Even if there's an error, force redirect
-      window.location.replace('/login');
+    });
+    
+    // Clear React state immediately
+    setSession(null);
+    setUser(null);
+    setRole(null);
+    
+    try {
+      // Sign out from Supabase (non-blocking)
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch (error) {
+      // Ignore errors - we're already clearing state
     }
+    
+    // Single redirect - use replace to prevent back navigation
+    window.location.replace('/login');
   }, []);
 
   // Auto-logout on 30 minutes inactivity
@@ -49,8 +45,19 @@ export const useAuth = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // Skip processing if logging out to prevent double render
-        if (isLoggingOut.current) return;
+        // Skip ALL processing if logging out to prevent any state updates
+        if (isLoggingOut.current) {
+          return;
+        }
+        
+        // Handle sign out event
+        if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+          setRole(null);
+          setLoading(false);
+          return;
+        }
         
         setSession(session);
         setUser(session?.user ?? null);
