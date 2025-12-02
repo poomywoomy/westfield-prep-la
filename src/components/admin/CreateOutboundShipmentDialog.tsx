@@ -39,6 +39,7 @@ interface SKULine {
 
 interface PrefillData {
   clientId: string;
+  requestId?: string;
   skuLines: Array<{ sku_id: string; quantity: number; client_sku?: string; title?: string }>;
   marketplace?: string;
   notes?: string;
@@ -411,6 +412,7 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange, prefillData }
         marketplace: marketplace,
         marketplace_other: marketplace === "other" ? marketplaceOther : null,
         shipment_format: shipmentFormat || "carton",
+        shipment_request_id: prefillData?.requestId || null,
       } as any;
 
       const { data: shipment, error: shipmentError } = await supabase
@@ -508,9 +510,26 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange, prefillData }
         await Promise.all(syncPromises);
       }
 
+      // Auto-complete the shipment request if this shipment was created from one
+      if (prefillData?.requestId) {
+        const { error: requestUpdateError } = await supabase
+          .from("shipment_requests")
+          .update({ 
+            status: "completed",
+            processed_at: new Date().toISOString(),
+            processed_by: user.user?.id
+          })
+          .eq("id", prefillData.requestId);
+
+        if (requestUpdateError) {
+          console.error("Failed to update shipment request status:", requestUpdateError);
+        }
+      }
+
       toast.success(`Shipment ${shipmentNumber} created and shipped!`);
       queryClient.invalidateQueries({ queryKey: ["outbound-shipments"] });
       queryClient.invalidateQueries({ queryKey: ["shipment-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["shipment-requests-count"] });
       onOpenChange(false);
       resetForm();
     } catch (error: any) {

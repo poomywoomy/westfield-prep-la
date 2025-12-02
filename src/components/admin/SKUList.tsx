@@ -20,6 +20,7 @@ interface SKUWithMetrics extends SKU {
   available: number;
   received_this_month: number;
   sold_this_month: number;
+  shipped_this_month: number;
   expected: number;
   discrepancies: number;
 }
@@ -105,15 +106,27 @@ export const SKUList = () => {
 
         const receivedThisMonth = receivedData?.reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0;
 
-        // Get sold this month from inventory_ledger
+        // Get sold this month from inventory_ledger (Shopify orders - SALE_DECREMENT without outbound_shipment source)
         const { data: soldData } = await supabase
           .from("inventory_ledger")
-          .select("qty_delta")
+          .select("qty_delta, source_type")
           .eq("sku_id", sku.id)
-          .in("transaction_type", ["SALE_DECREMENT"])
+          .eq("transaction_type", "SALE_DECREMENT")
+          .neq("source_type", "outbound_shipment")
           .gte("ts", startOfMonth.toISOString());
 
         const soldThisMonth = Math.abs(soldData?.reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0);
+
+        // Get shipped this month from inventory_ledger (outbound shipments only)
+        const { data: shippedData } = await supabase
+          .from("inventory_ledger")
+          .select("qty_delta")
+          .eq("sku_id", sku.id)
+          .eq("transaction_type", "SALE_DECREMENT")
+          .eq("source_type", "outbound_shipment")
+          .gte("ts", startOfMonth.toISOString());
+
+        const shippedThisMonth = Math.abs(shippedData?.reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0);
 
         // Get expected from ASN lines (only truly pending ASNs)
         const { data: asnData } = await supabase
@@ -141,6 +154,7 @@ export const SKUList = () => {
           available: summaryData?.available || 0,
           received_this_month: receivedThisMonth,
           sold_this_month: soldThisMonth,
+          shipped_this_month: shippedThisMonth,
           expected,
           discrepancies,
         };
@@ -185,6 +199,7 @@ export const SKUList = () => {
         case "discrepancies-high": return b.discrepancies - a.discrepancies;
         case "received-high": return b.received_this_month - a.received_this_month;
         case "sold-high": return b.sold_this_month - a.sold_this_month;
+        case "shipped-high": return b.shipped_this_month - a.shipped_this_month;
         case "sku-alpha": return a.client_sku.localeCompare(b.client_sku);
         default: return 0; // Keep original order
       }
@@ -219,6 +234,7 @@ export const SKUList = () => {
               <SelectItem value="discrepancies-high">Discrepancies (High → Low)</SelectItem>
               <SelectItem value="received-high">Received (High → Low)</SelectItem>
               <SelectItem value="sold-high">Sold (High → Low)</SelectItem>
+              <SelectItem value="shipped-high">Shipped (High → Low)</SelectItem>
               <SelectItem value="sku-alpha">SKU (A → Z)</SelectItem>
             </SelectContent>
           </Select>
@@ -275,6 +291,7 @@ export const SKUList = () => {
               <TableHead className="text-right">Available</TableHead>
               <TableHead className="text-right">Received (Month)</TableHead>
               <TableHead className="text-right">Sold (Month)</TableHead>
+              <TableHead className="text-right">Shipped (Month)</TableHead>
               <TableHead className="text-right">Expected</TableHead>
               <TableHead className="text-right">Discrepancies</TableHead>
               <TableHead>Status</TableHead>
@@ -284,13 +301,13 @@ export const SKUList = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-muted-foreground">
+                <TableCell colSpan={10} className="text-center text-muted-foreground">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : filteredAndSortedSKUs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-muted-foreground">
+                <TableCell colSpan={10} className="text-center text-muted-foreground">
                   No SKUs found
                 </TableCell>
               </TableRow>
@@ -314,6 +331,7 @@ export const SKUList = () => {
                   <TableCell className="text-right">{sku.available}</TableCell>
                   <TableCell className="text-right">{sku.received_this_month}</TableCell>
                   <TableCell className="text-right">{sku.sold_this_month}</TableCell>
+                  <TableCell className="text-right">{sku.shipped_this_month}</TableCell>
                   <TableCell className="text-right">{sku.expected}</TableCell>
                   <TableCell className="text-right">
                     {sku.discrepancies > 0 ? (

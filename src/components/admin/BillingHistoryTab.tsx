@@ -43,24 +43,26 @@ export const BillingHistoryTab = () => {
     filterBills();
   }, [bills, statusFilter, yearFilter, monthFilter, clientFilter, searchTerm]);
 
-  // Extract available years from bills
+  // Extract available years from bills - parse date string directly to avoid timezone issues
   const availableYears = useMemo(() => {
     const years = new Set<string>();
     bills.forEach(bill => {
-      const year = new Date(bill.billing_month).getFullYear().toString();
+      // billing_month is stored as 'YYYY-MM-DD', parse directly to avoid timezone shifts
+      const year = bill.billing_month.split('-')[0];
       years.add(year);
     });
     return Array.from(years).sort((a, b) => parseInt(b) - parseInt(a)); // Descending
   }, [bills]);
 
-  // Extract available months for selected year
+  // Extract available months for selected year - parse date string directly
   const availableMonths = useMemo(() => {
     if (yearFilter === "all") return [];
     const months = new Set<string>();
     bills.forEach(bill => {
-      const date = new Date(bill.billing_month);
-      if (date.getFullYear().toString() === yearFilter) {
-        months.add((date.getMonth() + 1).toString().padStart(2, '0'));
+      // billing_month is 'YYYY-MM-DD', extract year and month directly
+      const [year, month] = bill.billing_month.split('-');
+      if (year === yearFilter) {
+        months.add(month);
       }
     });
     return Array.from(months).sort((a, b) => parseInt(b) - parseInt(a)); // Descending
@@ -103,18 +105,18 @@ export const BillingHistoryTab = () => {
       filtered = filtered.filter(b => b.status === statusFilter);
     }
 
-    // Year filter
+    // Year filter - parse date string directly to avoid timezone issues
     if (yearFilter !== "all") {
       filtered = filtered.filter(b => {
-        const year = new Date(b.billing_month).getFullYear().toString();
+        const year = b.billing_month.split('-')[0];
         return year === yearFilter;
       });
     }
 
-    // Month filter (only applies if year is selected)
+    // Month filter (only applies if year is selected) - parse date string directly
     if (yearFilter !== "all" && monthFilter !== "all") {
       filtered = filtered.filter(b => {
-        const month = (new Date(b.billing_month).getMonth() + 1).toString().padStart(2, '0');
+        const month = b.billing_month.split('-')[1];
         return month === monthFilter;
       });
     }
@@ -130,7 +132,7 @@ export const BillingHistoryTab = () => {
       filtered = filtered.filter(b => 
         b.client.company_name.toLowerCase().includes(term) ||
         b.label?.toLowerCase().includes(term) ||
-        new Date(b.billing_month).toLocaleDateString().includes(term)
+        b.billing_month.includes(term)
       );
     }
 

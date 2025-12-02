@@ -1745,6 +1745,7 @@ export type Database = {
           ship_from_address: string
           shipment_format: string | null
           shipment_number: string
+          shipment_request_id: string | null
           shipment_split_type: Database["public"]["Enums"]["shipment_split_type"]
           shipment_status: Database["public"]["Enums"]["shipment_status"]
           shipped_at: string | null
@@ -1764,6 +1765,7 @@ export type Database = {
           ship_from_address?: string
           shipment_format?: string | null
           shipment_number: string
+          shipment_request_id?: string | null
           shipment_split_type?: Database["public"]["Enums"]["shipment_split_type"]
           shipment_status?: Database["public"]["Enums"]["shipment_status"]
           shipped_at?: string | null
@@ -1783,6 +1785,7 @@ export type Database = {
           ship_from_address?: string
           shipment_format?: string | null
           shipment_number?: string
+          shipment_request_id?: string | null
           shipment_split_type?: Database["public"]["Enums"]["shipment_split_type"]
           shipment_status?: Database["public"]["Enums"]["shipment_status"]
           shipped_at?: string | null
@@ -1796,6 +1799,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outbound_shipments_shipment_request_id_fkey"
+            columns: ["shipment_request_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_requests"
             referencedColumns: ["id"]
           },
         ]

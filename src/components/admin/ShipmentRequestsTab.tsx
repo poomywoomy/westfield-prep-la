@@ -99,6 +99,7 @@ export const ShipmentRequestsTab = () => {
     if (lines.data) {
       setPrefillData({
         clientId: request.client_id,
+        requestId: request.id,
         skuLines: lines.data.map((line: any) => ({
           sku_id: line.sku_id,
           quantity: line.quantity,
