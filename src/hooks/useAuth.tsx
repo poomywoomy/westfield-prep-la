@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useAutoLogout } from "./useAutoLogout";
@@ -8,8 +8,13 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<"admin" | "client" | null>(null);
+  const isLoggingOut = useRef(false);
 
   const logout = useCallback(async () => {
+    // Prevent double logout
+    if (isLoggingOut.current) return;
+    isLoggingOut.current = true;
+    
     try {
       // Clear React state first
       setSession(null);
@@ -44,6 +49,9 @@ export const useAuth = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        // Skip processing if logging out to prevent double render
+        if (isLoggingOut.current) return;
+        
         setSession(session);
         setUser(session?.user ?? null);
         

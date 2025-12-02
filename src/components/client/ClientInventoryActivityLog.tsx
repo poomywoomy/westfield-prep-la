@@ -222,7 +222,8 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
     if (filterType !== "all") {
       const typeMap: Record<string, ActivityLogEntry['type'][]> = {
         received: ['receiving_started', 'receiving_completed'],
-        shipped: ['sold', 'transfer'],
+        shipped: ['shipped'],
+        sold: ['sold', 'transfer'],
         returns: ['return'],
         discrepancies: ['issue_detected', 'discrepancy_created', 'discrepancy_resolved'],
         adjustments: ['adjustment'],
@@ -265,6 +266,7 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
               <SelectItem value="all">All Activity</SelectItem>
               <SelectItem value="received">Received</SelectItem>
               <SelectItem value="shipped">Shipped</SelectItem>
+              <SelectItem value="sold">Sold</SelectItem>
               <SelectItem value="returns">Returns</SelectItem>
               <SelectItem value="discrepancies">Discrepancies</SelectItem>
               <SelectItem value="adjustments">Adjustments</SelectItem>

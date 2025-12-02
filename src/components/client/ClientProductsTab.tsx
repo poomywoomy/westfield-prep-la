@@ -114,7 +114,7 @@ export default function ClientProductsTab() {
         .select('*')
         .eq('client_id', client.id);
 
-      // Get sold this month for each SKU
+      // Get sold/shipped this month for each SKU
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
       startOfMonth.setHours(0, 0, 0, 0);
@@ -122,15 +122,23 @@ export default function ClientProductsTab() {
       const productsWithMetrics = await Promise.all((skuData || []).map(async (sku) => {
         const inventory = (inventoryData || []).find(inv => inv.sku_id === sku.id);
         
-        // Get sold this month
-        const { data: soldData } = await supabase
+        // Get all SALE_DECREMENT transactions this month
+        const { data: decrementData } = await supabase
           .from("inventory_ledger")
-          .select("qty_delta")
+          .select("qty_delta, source_type")
           .eq("sku_id", sku.id)
           .in("transaction_type", ["SALE_DECREMENT"])
           .gte("ts", startOfMonth.toISOString());
 
-        const soldThisMonth = Math.abs(soldData?.reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0);
+        // Separate shipped (outbound_shipment) from sold (other sales)
+        const shippedThisMonth = Math.abs(
+          decrementData?.filter(entry => entry.source_type === 'outbound_shipment')
+            .reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0
+        );
+        const soldThisMonth = Math.abs(
+          decrementData?.filter(entry => entry.source_type !== 'outbound_shipment')
+            .reduce((sum, entry) => sum + (entry.qty_delta || 0), 0) || 0
+        );
 
         return {
           ...sku,
@@ -138,6 +146,7 @@ export default function ClientProductsTab() {
           available: inventory?.available || 0,
           reserved: inventory?.reserved || 0,
           sold_this_month: soldThisMonth,
+          shipped_this_month: shippedThisMonth,
         };
       }));
 
@@ -182,7 +191,7 @@ export default function ClientProductsTab() {
   };
 
   const exportToCSV = () => {
-    const headers = ['SKU', 'Product Name', 'Brand', 'On Hand', 'Available', 'Reserved', 'Notes'];
+    const headers = ['SKU', 'Product Name', 'Brand', 'On Hand', 'Available', 'Reserved', 'Sold (Month)', 'Shipped (Month)', 'Notes'];
     const rows = filteredProducts.map(p => [
       p.client_sku,
       p.title || '',
@@ -190,6 +199,8 @@ export default function ClientProductsTab() {
       p.on_hand || 0,
       p.available || 0,
       p.reserved || 0,
+      p.sold_this_month || 0,
+      p.shipped_this_month || 0,
       p.notes || '',
     ]);
 
@@ -301,13 +312,14 @@ export default function ClientProductsTab() {
                   <TableHead className="text-right">Available</TableHead>
                   <TableHead className="text-right">Reserved</TableHead>
                   <TableHead className="text-right">Sold (Month)</TableHead>
+                  <TableHead className="text-right">Shipped (Month)</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredProducts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
                       No products found
                     </TableCell>
                   </TableRow>
@@ -334,6 +346,7 @@ export default function ClientProductsTab() {
                       <TableCell className="text-right font-medium text-green-600">{product.available}</TableCell>
                       <TableCell className="text-right font-medium text-amber-600">{product.reserved}</TableCell>
                       <TableCell className="text-right font-medium text-blue-600">{product.sold_this_month}</TableCell>
+                      <TableCell className="text-right font-medium text-purple-600">{product.shipped_this_month}</TableCell>
                       <TableCell>
                         <Badge 
                           variant={product.status === "active" ? "default" : "secondary"}
