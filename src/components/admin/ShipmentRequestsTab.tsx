@@ -141,9 +141,9 @@ export const ShipmentRequestsTab = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Filters - ALWAYS VISIBLE */}
-          <Card className="bg-muted/50 overflow-hidden">
-            <CardContent className="pt-6 pb-4 px-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <Card className="bg-muted/50">
+            <CardContent className="pt-6 pb-4 px-4 overflow-x-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 min-w-0">
                 {/* Status Filter */}
                 <div className="space-y-1.5">
                   <Label className="text-xs">Status</Label>
@@ -221,20 +221,20 @@ export const ShipmentRequestsTab = () => {
                 </div>
 
                 {/* Date Range */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 min-w-0">
                   <Label className="text-xs">Date Range</Label>
                   <div className="flex gap-1.5">
                     <Input
                       type="date"
                       value={dateFrom}
                       onChange={(e) => setDateFrom(e.target.value)}
-                      className="text-xs h-9 px-2"
+                      className="text-xs h-9 px-2 min-w-[110px]"
                     />
                     <Input
                       type="date"
                       value={dateTo}
                       onChange={(e) => setDateTo(e.target.value)}
-                      className="text-xs h-9 px-2"
+                      className="text-xs h-9 px-2 min-w-[110px]"
                     />
                   </div>
                 </div>
