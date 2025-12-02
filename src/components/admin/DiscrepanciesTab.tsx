@@ -6,7 +6,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DiscrepancyActionsDialog } from "./DiscrepancyActionsDialog";
+import { ReceiveReturnDialog } from "./ReceiveReturnDialog";
 import { format } from "date-fns";
+import { RotateCcw, Package, Plus } from "lucide-react";
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -17,6 +19,8 @@ export const DiscrepanciesTab = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDiscrepancy, setSelectedDiscrepancy] = useState<any>(null);
   const [actionsDialogOpen, setActionsDialogOpen] = useState(false);
+  const [receiveReturnDialogOpen, setReceiveReturnDialogOpen] = useState(false);
+  const [receiveRemovalDialogOpen, setReceiveRemovalDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -102,13 +106,34 @@ export const DiscrepanciesTab = () => {
     }
   };
 
+  const getSourceTypeBadge = (sourceType: string | null) => {
+    if (sourceType === "return") {
+      return <Badge variant="outline" className="bg-orange-100 text-orange-700">Return</Badge>;
+    } else if (sourceType === "adjustment") {
+      return <Badge variant="outline" className="bg-purple-100 text-purple-700">Adjustment</Badge>;
+    }
+    return <Badge variant="outline">Receiving</Badge>;
+  };
+
   const discrepancies = activeTab === "active" ? activeDiscrepancies : historyDiscrepancies;
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Discrepancy Management</h2>
-        <p className="text-sm text-muted-foreground">Review and manage inventory discrepancies</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Discrepancy Management</h2>
+          <p className="text-sm text-muted-foreground">Review and manage inventory discrepancies</p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => setReceiveReturnDialogOpen(true)} variant="outline">
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Receive Return
+          </Button>
+          <Button onClick={() => setReceiveRemovalDialogOpen(true)} variant="outline">
+            <Package className="h-4 w-4 mr-2" />
+            Receive Removal Order
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "active" | "history")}>
@@ -123,6 +148,7 @@ export const DiscrepanciesTab = () => {
               <TableRow>
                 <TableHead>Client</TableHead>
                 <TableHead>SKU</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead>Status</TableHead>
@@ -133,11 +159,11 @@ export const DiscrepanciesTab = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                  <TableCell colSpan={8} className="text-center">Loading...</TableCell>
                 </TableRow>
               ) : discrepancies.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center text-muted-foreground">
                     No active discrepancies
                   </TableCell>
                 </TableRow>
@@ -146,6 +172,7 @@ export const DiscrepanciesTab = () => {
                   <TableRow key={disc.id}>
                     <TableCell className="font-medium">{disc.company_name}</TableCell>
                     <TableCell>{disc.client_sku}</TableCell>
+                    <TableCell>{getSourceTypeBadge(disc.source_type)}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{capitalize(disc.discrepancy_type)}</Badge>
                     </TableCell>
@@ -179,6 +206,7 @@ export const DiscrepanciesTab = () => {
               <TableRow>
                 <TableHead>Client</TableHead>
                 <TableHead>SKU</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead>Status</TableHead>
@@ -189,11 +217,11 @@ export const DiscrepanciesTab = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                  <TableCell colSpan={8} className="text-center">Loading...</TableCell>
                 </TableRow>
               ) : discrepancies.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center text-muted-foreground">
                     No discrepancy history
                   </TableCell>
                 </TableRow>
@@ -202,6 +230,7 @@ export const DiscrepanciesTab = () => {
                   <TableRow key={disc.id}>
                     <TableCell className="font-medium">{disc.company_name}</TableCell>
                     <TableCell>{disc.client_sku}</TableCell>
+                    <TableCell>{getSourceTypeBadge(disc.source_type)}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{capitalize(disc.discrepancy_type)}</Badge>
                     </TableCell>
@@ -240,6 +269,20 @@ export const DiscrepanciesTab = () => {
           onSuccess={fetchDiscrepancies}
         />
       )}
+
+      <ReceiveReturnDialog
+        open={receiveReturnDialogOpen}
+        onOpenChange={setReceiveReturnDialogOpen}
+        onSuccess={fetchDiscrepancies}
+        type="return"
+      />
+
+      <ReceiveReturnDialog
+        open={receiveRemovalDialogOpen}
+        onOpenChange={setReceiveRemovalDialogOpen}
+        onSuccess={fetchDiscrepancies}
+        type="removal_order"
+      />
     </div>
   );
 };

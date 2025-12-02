@@ -2189,6 +2189,124 @@ export type Database = {
         }
         Relationships: []
       }
+      removal_order_lines: {
+        Row: {
+          admin_notes: string | null
+          client_notes: string | null
+          created_at: string
+          decision: string | null
+          expected_qty: number
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          received_qty: number
+          removal_order_id: string
+          sku_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          client_notes?: string | null
+          created_at?: string
+          decision?: string | null
+          expected_qty?: number
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          received_qty?: number
+          removal_order_id: string
+          sku_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          client_notes?: string | null
+          created_at?: string
+          decision?: string | null
+          expected_qty?: number
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          received_qty?: number
+          removal_order_id?: string
+          sku_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "removal_order_lines_removal_order_id_fkey"
+            columns: ["removal_order_id"]
+            isOneToOne: false
+            referencedRelation: "removal_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "removal_order_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "removal_order_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary_complete"
+            referencedColumns: ["sku_id"]
+          },
+          {
+            foreignKeyName: "removal_order_lines_sku_id_fkey"
+            columns: ["sku_id"]
+            isOneToOne: false
+            referencedRelation: "skus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      removal_orders: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          qc_photo_urls: string[] | null
+          received_at: string
+          received_by: string | null
+          removal_order_number: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          qc_photo_urls?: string[] | null
+          received_at?: string
+          received_by?: string | null
+          removal_order_number: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          qc_photo_urls?: string[] | null
+          received_at?: string
+          received_by?: string | null
+          removal_order_number?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "removal_orders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_jobs: {
         Row: {
           client_id: string
@@ -3212,6 +3330,10 @@ export type Database = {
       clear_password_expiration: { Args: never; Returns: undefined }
       delete_own_client_account: { Args: never; Returns: Json }
       generate_asn_number: { Args: { p_client_id: string }; Returns: string }
+      generate_removal_order_number: {
+        Args: { p_client_id: string }
+        Returns: string
+      }
       generate_shipment_number: {
         Args: { p_client_id: string }
         Returns: string

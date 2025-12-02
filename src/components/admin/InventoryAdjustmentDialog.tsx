@@ -8,27 +8,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Camera, X, Scan, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { Camera, X, Scan, DollarSign, PackageX, AlertTriangle } from "lucide-react";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { playSuccessSound, playErrorSound } from "@/lib/soundEffects";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { ScannerStatus } from "@/components/ScannerStatus";
 import { ScannerHelpDialog } from "@/components/admin/ScannerHelpDialog";
+import { validateImageFile } from "@/lib/fileValidation";
 
 const adjustmentSchema = z.object({
   client_id: z.string().uuid(),
   sku_id: z.string().uuid(),
   location_id: z.string().uuid(),
   qty_delta: z.number().int().min(-1000000).max(1000000).refine(val => val !== 0, "Adjustment quantity cannot be zero"),
-  reason_code: z.enum(['damage', 'rework', 'correction', 'return', 'sold', 'sent_to_amazon', 'sent_to_walmart', 'sent_to_tiktok', 'other']),
-  notes: z.string().trim().min(1, "Notes are required").max(1000),
-  lot_number: z.string().trim().max(100).nullable().optional(),
-  expiry_date: z.date().nullable().optional(),
-  mark_as_damaged: z.boolean().optional(),
+  action_type: z.enum(['sale', 'lost', 'damaged']),
+  notes: z.string().trim().max(1000).optional(),
 });
 
 interface InventoryAdjustmentDialogProps {
@@ -38,14 +33,40 @@ interface InventoryAdjustmentDialogProps {
   prefilledClientId?: string;
 }
 
-interface BatchItem {
-  sku_id: string;
-  sku_code: string;
-  title: string;
-  qty_delta: number;
-  location_id: string;
-  notes: string;
-}
+type ActionType = 'sale' | 'lost' | 'damaged';
+
+const ACTION_CONFIG: Record<ActionType, { 
+  label: string; 
+  icon: React.ReactNode; 
+  description: string;
+  requiresPhoto: boolean;
+  requiresClientReview: boolean;
+  discrepancyType?: 'missing' | 'damaged';
+}> = {
+  sale: {
+    label: "Sale",
+    icon: <DollarSign className="h-5 w-5" />,
+    description: "Direct inventory deduction for a sale",
+    requiresPhoto: false,
+    requiresClientReview: false,
+  },
+  lost: {
+    label: "Lost Product",
+    icon: <PackageX className="h-5 w-5" />,
+    description: "Product is missing/lost - sent for client review",
+    requiresPhoto: false,
+    requiresClientReview: true,
+    discrepancyType: 'missing',
+  },
+  damaged: {
+    label: "Damaged Product",
+    icon: <AlertTriangle className="h-5 w-5" />,
+    description: "Product is damaged - photo required, sent for client review",
+    requiresPhoto: true,
+    requiresClientReview: true,
+    discrepancyType: 'damaged',
+  },
+};
 
 export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefilledClientId }: InventoryAdjustmentDialogProps) => {
   const [clients, setClients] = useState<any[]>([]);
@@ -53,22 +74,16 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
   const [locations, setLocations] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [scannerActive, setScannerActive] = useState(false);
-  const [batchMode, setBatchMode] = useState(false);
-  const [batchItems, setBatchItems] = useState<BatchItem[]>([]);
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
-  const [currentInventory, setCurrentInventory] = useState<{ qty: number; location: string } | null>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [formData, setFormData] = useState({
     client_id: "",
     sku_id: "",
     location_id: "",
     qty_delta: "",
-    reason_code: "damage",
+    action_type: "" as ActionType | "",
     notes: "",
-    lot_number: "",
-    expiry_date: null as Date | null,
-    mark_as_damaged: false,
   });
   const { toast } = useToast();
 
@@ -76,7 +91,6 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
     if (open) {
       fetchClients();
       fetchLocations();
-      // Set prefilled client ID if provided
       if (prefilledClientId) {
         setFormData(prev => ({ ...prev, client_id: prefilledClientId }));
       }
@@ -117,25 +131,85 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
       .order("name");
     setLocations(data || []);
     
-    // Auto-select Main Warehouse if available
     const mainWarehouse = data?.find(loc => loc.code === 'MAIN' || loc.name.toLowerCase().includes('main'));
     if (mainWarehouse && !formData.location_id) {
       setFormData(prev => ({ ...prev, location_id: mainWarehouse.id }));
     }
   };
 
+  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles: File[] = [];
+    
+    files.forEach(file => {
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        toast({ title: "Invalid File", description: validation.error, variant: "destructive" });
+        return;
+      }
+      validFiles.push(file);
+    });
+
+    setPhotos([...photos, ...validFiles]);
+    
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos(photos.filter((_, i) => i !== index));
+    setPhotoPreviews(photoPreviews.filter((_, i) => i !== index));
+  };
+
+  const uploadPhotos = async (clientId: string, referenceId: string): Promise<string[]> => {
+    const uploadedUrls: string[] = [];
+    
+    for (const file of photos) {
+      const timestamp = Date.now();
+      const filePath = `${clientId}/adjustment/${referenceId}/${timestamp}_${file.name}`;
+      
+      const { error } = await supabase.storage
+        .from("qc-images")
+        .upload(filePath, file);
+      
+      if (error) {
+        console.error("Upload error:", error);
+        continue;
+      }
+      
+      uploadedUrls.push(filePath);
+    }
+    
+    return uploadedUrls;
+  };
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
 
-      // Parse and validate qty_delta
       const qtyDelta = parseInt(formData.qty_delta, 10);
-      if (isNaN(qtyDelta)) {
-        toast({
-          title: "Invalid Quantity",
-          description: "Please enter a valid quantity adjustment.",
-          variant: "destructive",
-        });
+      if (isNaN(qtyDelta) || qtyDelta === 0) {
+        toast({ title: "Invalid Quantity", description: "Please enter a valid quantity.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.action_type) {
+        toast({ title: "Select Action", description: "Please select an action type.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
+      const actionConfig = ACTION_CONFIG[formData.action_type];
+
+      // Validate photo requirement for damaged
+      if (actionConfig.requiresPhoto && photos.length === 0) {
+        toast({ title: "Photos Required", description: "Please upload at least one QC photo for damaged products.", variant: "destructive" });
         setLoading(false);
         return;
       }
@@ -145,67 +219,44 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
         sku_id: formData.sku_id,
         location_id: formData.location_id,
         qty_delta: qtyDelta,
-        reason_code: formData.reason_code,
-        notes: formData.notes,
-        lot_number: formData.lot_number || null,
-        expiry_date: formData.expiry_date || null,
-        mark_as_damaged: formData.mark_as_damaged,
+        action_type: formData.action_type,
+        notes: formData.notes || undefined,
       });
 
-      // All adjustments now use standard ADJUSTMENT_PLUS/ADJUSTMENT_MINUS
-      const transactionType = validated.qty_delta > 0 ? "ADJUSTMENT_PLUS" : "ADJUSTMENT_MINUS";
-      
-      const { data: ledgerData, error } = await supabase.from("inventory_ledger").insert({
-        client_id: validated.client_id,
-        sku_id: validated.sku_id,
-        location_id: validated.location_id,
-        qty_delta: validated.qty_delta,
-        transaction_type: transactionType,
-        reason_code: validated.reason_code,
-        notes: validated.notes,
-        lot_number: validated.lot_number,
-        expiry_date: validated.expiry_date ? format(validated.expiry_date, "yyyy-MM-dd") : null,
-      } as any).select();
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (error) throw error;
+      if (formData.action_type === 'sale') {
+        // Direct inventory deduction for sale
+        const transactionType = qtyDelta > 0 ? "ADJUSTMENT_PLUS" : "SALE_DECREMENT";
+        
+        const { error } = await supabase.from("inventory_ledger").insert({
+          client_id: validated.client_id,
+          sku_id: validated.sku_id,
+          location_id: validated.location_id,
+          qty_delta: qtyDelta,
+          transaction_type: transactionType,
+          reason_code: 'sold',
+          notes: validated.notes || 'Sale adjustment',
+        } as any);
 
-      // Sync to Shopify immediately with error handling
-      const { data: syncData, error: syncError } = await supabase.functions.invoke(
-        'shopify-push-inventory-single',
-        { body: { client_id: validated.client_id, sku_id: validated.sku_id } }
-      );
-      
-      if (syncError) {
-        console.error('Shopify sync error:', syncError);
-        toast({
-          variant: 'destructive',
-          title: 'Shopify sync failed',
-          description: syncError.message || 'Failed to update Shopify inventory'
+        if (error) throw error;
+
+        // Sync to Shopify
+        await supabase.functions.invoke('shopify-push-inventory-single', {
+          body: { client_id: validated.client_id, sku_id: validated.sku_id }
         });
-      } else if (syncData?.success === false) {
-        console.warn('Shopify sync incomplete:', syncData.message);
+
         toast({
-          variant: 'default',
-          title: 'Shopify not updated',
-          description: syncData.message || 'SKU not mapped to Shopify'
+          title: "Sale Recorded",
+          description: `Inventory adjusted by ${qtyDelta > 0 ? '+' : ''}${qtyDelta} units`,
         });
-      }
 
-      // Handle damaged return workflow
-      if (validated.reason_code === 'return' && validated.mark_as_damaged && ledgerData) {
-        // Get client info for ASN number
-        const { data: clientData } = await supabase
-          .from("clients")
-          .select("company_name")
-          .eq("id", validated.client_id)
-          .single();
+      } else {
+        // Lost or Damaged - create entry for client review
+        // First create ASN header
+        const { data: asnNumberData } = await supabase.rpc('generate_asn_number', { p_client_id: validated.client_id });
+        const asnNumber = asnNumberData || `ADJ-${Date.now()}`;
 
-        // Generate ASN number
-        const dateStr = format(new Date(), "yyyyMMdd");
-        const clientCode = clientData?.company_name.substring(0, 3).toUpperCase() || "CLT";
-        const asnNumber = `RTN-${clientCode}-${dateStr}-${Math.floor(Math.random() * 1000)}`;
-
-        // Create ASN header
         const { data: asnData, error: asnError } = await supabase
           .from("asn_headers")
           .insert({
@@ -213,47 +264,52 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
             asn_number: asnNumber,
             status: 'issue',
             received_at: new Date().toISOString(),
-            notes: `Auto-created from damaged return adjustment. Linked to adjustment: ${ledgerData[0].id}`,
+            received_by: user?.id,
+            notes: `Inventory adjustment - ${actionConfig.label}. ${validated.notes || ''}`,
           })
           .select()
           .single();
 
         if (asnError) throw asnError;
 
+        // Upload photos if any
+        let photoUrls: string[] = [];
+        if (photos.length > 0) {
+          photoUrls = await uploadPhotos(validated.client_id, asnData.id);
+        }
+
         // Create ASN line
-        const { error: lineError } = await supabase
-          .from("asn_lines")
-          .insert({
-            asn_id: asnData.id,
-            sku_id: validated.sku_id,
-            expected_units: Math.abs(validated.qty_delta),
-            received_units: Math.abs(validated.qty_delta),
-            damaged_units: Math.abs(validated.qty_delta),
-            notes: validated.notes,
-          });
+        await supabase.from("asn_lines").insert({
+          asn_id: asnData.id,
+          sku_id: validated.sku_id,
+          expected_units: Math.abs(qtyDelta),
+          received_units: Math.abs(qtyDelta),
+          damaged_units: actionConfig.discrepancyType === 'damaged' ? Math.abs(qtyDelta) : 0,
+          missing_units: actionConfig.discrepancyType === 'missing' ? Math.abs(qtyDelta) : 0,
+        });
 
-        if (lineError) throw lineError;
-
-        // Create damaged item decision for client review
+        // Create damaged_item_decision for client review
         const { error: decisionError } = await supabase
           .from("damaged_item_decisions")
           .insert({
             client_id: validated.client_id,
             asn_id: asnData.id,
             sku_id: validated.sku_id,
-            quantity: Math.abs(validated.qty_delta),
-            discrepancy_type: 'damaged',
+            quantity: Math.abs(qtyDelta),
+            discrepancy_type: actionConfig.discrepancyType!,
+            source_type: 'adjustment',
             status: 'pending',
-            admin_notes: 'Damaged return marked during inventory adjustment',
+            qc_photo_urls: photoUrls.length > 0 ? photoUrls : null,
+            admin_notes: validated.notes || `${actionConfig.label} reported via inventory adjustment`,
           });
 
         if (decisionError) throw decisionError;
-      }
 
-      toast({
-        title: "Adjustment recorded",
-        description: `Inventory adjusted by ${validated.qty_delta > 0 ? '+' : ''}${validated.qty_delta} units`,
-      });
+        toast({
+          title: `${actionConfig.label} Reported`,
+          description: `${Math.abs(qtyDelta)} units sent for client review`,
+        });
+      }
 
       onSuccess();
       onOpenChange(false);
@@ -277,17 +333,12 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
     }
 
     const { data } = await supabase.functions.invoke('barcode-lookup', {
-      body: {
-        barcode,
-        client_id: formData.client_id,
-        context: 'adjustment'
-      }
+      body: { barcode, client_id: formData.client_id, context: 'adjustment' }
     });
 
     if (data?.found && data.type.startsWith('product_')) {
       const sku = data.data.sku || data.data;
       setFormData({ ...formData, sku_id: sku.id, location_id: data.data.location_id || formData.location_id });
-      setCurrentInventory({ qty: data.data.current_qty || 0, location: data.data.location_id || '' });
       playSuccessSound();
       toast({ title: "SKU Found", description: `${sku.client_sku} - ${sku.title}` });
     } else {
@@ -296,170 +347,60 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
     }
   };
 
-  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setPhotos([...photos, ...files]);
-    
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreviews(prev => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const removePhoto = (index: number) => {
-    setPhotos(photos.filter((_, i) => i !== index));
-    setPhotoPreviews(photoPreviews.filter((_, i) => i !== index));
-  };
-
-  const addToBatch = () => {
-    if (!formData.sku_id) return;
-    
-    const sku = skus.find(s => s.id === formData.sku_id);
-    if (!sku) return;
-
-    setBatchItems([...batchItems, {
-      sku_id: formData.sku_id,
-      sku_code: sku.client_sku,
-      title: sku.title,
-      qty_delta: parseInt(formData.qty_delta) || 0,
-      location_id: formData.location_id,
-      notes: formData.notes
-    }]);
-
-    // Reset for next scan
-    setFormData({ ...formData, sku_id: "", qty_delta: "", notes: "" });
-    setCurrentInventory(null);
-    toast({ title: "Added to batch", description: `${sku.client_sku} queued` });
-  };
-
-  const removeBatchItem = (index: number) => {
-    setBatchItems(batchItems.filter((_, i) => i !== index));
-  };
-
-  const submitBatchAdjustments = async () => {
-    if (batchItems.length === 0) return;
-    
-    setLoading(true);
-    try {
-      const entries = batchItems.map(item => ({
-        client_id: formData.client_id,
-        sku_id: item.sku_id,
-        location_id: item.location_id,
-        qty_delta: item.qty_delta,
-        transaction_type: (item.qty_delta > 0 ? "ADJUSTMENT_PLUS" : "ADJUSTMENT_MINUS") as "ADJUSTMENT_PLUS" | "ADJUSTMENT_MINUS",
-        reason_code: formData.reason_code,
-        notes: item.notes,
-        lot_number: formData.lot_number || null,
-        expiry_date: formData.expiry_date ? format(formData.expiry_date, "yyyy-MM-dd") : null,
-      }));
-
-      const { error } = await supabase.from("inventory_ledger").insert(entries);
-      if (error) throw error;
-
-      // Sync all unique SKUs to Shopify in parallel with error handling
-      const uniqueSkus = [...new Set(batchItems.map(item => item.sku_id))];
-      console.log(`Syncing ${uniqueSkus.length} SKUs to Shopify...`);
-      
-      const syncResults = await Promise.all(
-        uniqueSkus.map(async (skuId) => {
-          const { data, error } = await supabase.functions.invoke(
-            'shopify-push-inventory-single',
-            { body: { client_id: formData.client_id, sku_id: skuId } }
-          );
-          
-          if (error) {
-            console.error(`Shopify sync error for SKU ${skuId}:`, error);
-            return { skuId, success: false, error: error.message };
-          } else if (data?.success === false) {
-            console.warn(`Shopify sync incomplete for SKU ${skuId}:`, data.message);
-            return { skuId, success: false, message: data.message };
-          }
-          return { skuId, success: true };
-        })
-      );
-
-      const failedSyncs = syncResults.filter(r => !r.success);
-      if (failedSyncs.length > 0) {
-        toast({
-          variant: 'default',
-          title: 'Some Shopify syncs failed',
-          description: `${failedSyncs.length} of ${uniqueSkus.length} SKUs failed to sync to Shopify`
-        });
-      }
-
-      toast({ title: "Batch complete", description: `${batchItems.length} adjustments recorded` });
-      setBatchItems([]);
-      onSuccess();
-      onOpenChange(false);
-      resetForm();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const applyPreset = (preset: 'damage' | 'sold' | 'return' | 'sent_to_amazon') => {
-    setFormData({ ...formData, reason_code: preset });
-    toast({ title: `${preset.replace('_', ' ')} mode activated` });
-  };
-
   const resetForm = () => {
     setFormData({
       client_id: "",
       sku_id: "",
       location_id: "",
       qty_delta: "",
-      reason_code: "damage",
+      action_type: "",
       notes: "",
-      lot_number: "",
-      expiry_date: null,
-      mark_as_damaged: false,
     });
-    setBatchMode(false);
-    setBatchItems([]);
     setPhotos([]);
     setPhotoPreviews([]);
-    setCurrentInventory(null);
     setScannerActive(false);
   };
 
-  const showPhotoCapture = formData.reason_code === 'damage';
+  const selectedActionConfig = formData.action_type ? ACTION_CONFIG[formData.action_type] : null;
+  const showPhotoUpload = selectedActionConfig?.requiresPhoto;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Record Inventory Adjustment</DialogTitle>
+          <DialogTitle>Inventory Adjustment</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Quick Presets */}
-          <div className="flex gap-2 p-3 bg-muted/30 rounded-lg flex-wrap">
-            <Button variant="outline" size="sm" onClick={() => applyPreset('damage')}>
-              📸 Damage Report
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => applyPreset('sold')}>
-              💰 Sale
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => applyPreset('return')}>
-              ↩️ Return
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => applyPreset('sent_to_amazon')}>
-              📦 Sent to Amazon
-            </Button>
-          </div>
-
-          {/* Batch Mode Toggle */}
-          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-            <div className="flex items-center gap-2">
-              <Switch checked={batchMode} onCheckedChange={setBatchMode} />
-              <Label>Batch Mode (scan multiple items)</Label>
+          {/* Action Type Selection */}
+          <div className="space-y-2">
+            <Label>Action Type *</Label>
+            <div className="grid grid-cols-3 gap-3">
+              {(Object.entries(ACTION_CONFIG) as [ActionType, typeof ACTION_CONFIG[ActionType]][]).map(([key, config]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, action_type: key })}
+                  className={`p-4 rounded-lg border-2 text-left transition-all ${
+                    formData.action_type === key 
+                      ? "border-primary bg-primary/5" 
+                      : "border-muted hover:border-muted-foreground/50"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    {config.icon}
+                    <span className="font-medium">{config.label}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{config.description}</p>
+                  {config.requiresClientReview && (
+                    <Badge variant="outline" className="mt-2 text-xs">Client Review</Badge>
+                  )}
+                  {config.requiresPhoto && (
+                    <Badge variant="secondary" className="mt-2 ml-1 text-xs">Photo Required</Badge>
+                  )}
+                </button>
+              ))}
             </div>
-            {batchMode && <Badge variant="secondary">{batchItems.length} items queued</Badge>}
           </div>
 
           {/* Scanner Section */}
@@ -481,188 +422,137 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
                   onClick={() => setScannerActive(!scannerActive)}
                 >
                   <Scan className="mr-2 h-4 w-4" />
-                  {scannerActive ? "Pause Scanner" : "Start Scanner"}
+                  {scannerActive ? "Pause" : "Start"}
                 </Button>
               </div>
             </div>
             {scannerActive && (
-              <BarcodeScanner
-                mode="keyboard"
-                onScan={handleBarcodeScan}
-                onError={(error) => toast({ title: "Scan error", description: error, variant: "destructive" })}
-                placeholder="Scan product barcode..."
-                continuous={batchMode}
-              />
-            )}
-            {currentInventory && (
-              <div className="p-2 bg-primary/10 rounded text-sm">
-                Current inventory: <strong>{currentInventory.qty} units</strong>
-              </div>
+              <BarcodeScanner mode="keyboard" onScan={handleBarcodeScan} />
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="client">Client *</Label>
-              <Select
-                value={formData.client_id}
-                onValueChange={(value) => {
-                  setFormData({ ...formData, client_id: value, sku_id: "" });
-                }}
-              >
-                <SelectTrigger id="client">
-                  <SelectValue placeholder="Select client" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map((client) => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.company_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="sku">SKU *</Label>
-              <Select
-                value={formData.sku_id}
-                onValueChange={(value) => setFormData({ ...formData, sku_id: value })}
-                disabled={!formData.client_id}
-              >
-                <SelectTrigger id="sku">
-                  <SelectValue placeholder={formData.client_id ? "Select SKU" : "Select client first"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {skus.map((sku) => (
-                    <SelectItem key={sku.id} value={sku.id}>
-                      {sku.client_sku} - {sku.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
+          {/* Client Selection */}
           <div className="space-y-2">
-            <Label htmlFor="qty_delta">Adjustment Quantity *</Label>
-            <Input
-              id="qty_delta"
-              type="number"
-              placeholder="e.g., +50 or -25"
-              value={formData.qty_delta}
-              onChange={(e) => setFormData({ ...formData, qty_delta: e.target.value })}
-            />
-            <p className="text-xs text-muted-foreground">
-              Use + for additions, - for reductions
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="reason_code">Reason Code *</Label>
+            <Label>Client *</Label>
             <Select
-              value={formData.reason_code}
-              onValueChange={(value) => setFormData({ ...formData, reason_code: value })}
+              value={formData.client_id}
+              onValueChange={(value) => setFormData({ ...formData, client_id: value, sku_id: "" })}
             >
-              <SelectTrigger id="reason_code">
-                <SelectValue />
+              <SelectTrigger>
+                <SelectValue placeholder="Select client" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="damage">Damage</SelectItem>
-                <SelectItem value="rework">Rework</SelectItem>
-                <SelectItem value="correction">Correction</SelectItem>
-                <SelectItem value="return">Return</SelectItem>
-                <SelectItem value="sold">Sold</SelectItem>
-                <SelectItem value="sent_to_amazon">Sent to Amazon</SelectItem>
-                <SelectItem value="sent_to_walmart">Sent to Walmart</SelectItem>
-                <SelectItem value="sent_to_tiktok">Sent to TikTok</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                {clients.map((client) => (
+                  <SelectItem key={client.id} value={client.id}>
+                    {client.company_name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* SKU Selection */}
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes *</Label>
+            <Label>SKU *</Label>
+            <Select
+              value={formData.sku_id}
+              onValueChange={(value) => setFormData({ ...formData, sku_id: value })}
+              disabled={!formData.client_id}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={formData.client_id ? "Select SKU" : "Select client first"} />
+              </SelectTrigger>
+              <SelectContent>
+                {skus.map((sku) => (
+                  <SelectItem key={sku.id} value={sku.id}>
+                    {sku.client_sku} - {sku.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Location Selection */}
+          <div className="space-y-2">
+            <Label>Location *</Label>
+            <Select
+              value={formData.location_id}
+              onValueChange={(value) => setFormData({ ...formData, location_id: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                {locations.map((loc) => (
+                  <SelectItem key={loc.id} value={loc.id}>
+                    {loc.name} ({loc.code})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Quantity */}
+          <div className="space-y-2">
+            <Label>Quantity *</Label>
+            <Input
+              type="number"
+              placeholder="Enter quantity (negative for deductions)"
+              value={formData.qty_delta}
+              onChange={(e) => setFormData({ ...formData, qty_delta: e.target.value })}
+            />
+            <p className="text-xs text-muted-foreground">
+              Use negative numbers for deductions (e.g., -5)
+            </p>
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label>Notes {formData.action_type !== 'sale' && "(Optional)"}</Label>
             <Textarea
-              id="notes"
-              placeholder="Explain the reason for this adjustment..."
+              placeholder="Additional details..."
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              rows={3}
-              maxLength={1000}
+              rows={2}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* Photo Upload - Only for Damaged */}
+          {showPhotoUpload && (
             <div className="space-y-2">
-              <Label htmlFor="lot_number">Lot Number (Optional)</Label>
-              <Input
-                id="lot_number"
-                placeholder="Enter lot number"
-                value={formData.lot_number}
-                onChange={(e) => setFormData({ ...formData, lot_number: e.target.value })}
-                maxLength={100}
-              />
-            </div>
+              <div className="bg-orange-50 border border-orange-200 p-3 rounded-lg">
+                <p className="text-sm font-medium text-orange-800">⚠️ QC Photos Required</p>
+                <p className="text-xs text-orange-700">Upload at least one photo to proceed</p>
+              </div>
 
-            <div className="space-y-2">
-              <Label>Expiry Date (Optional)</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.expiry_date ? format(formData.expiry_date, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={formData.expiry_date || undefined}
-                    onSelect={(date) => setFormData({ ...formData, expiry_date: date || null })}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-
-          {/* Photo Evidence for Damage/Shrink */}
-          {showPhotoCapture && (
-            <div className="space-y-2 p-3 border-2 border-dashed rounded-lg">
-              <Label>Photo Evidence</Label>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => document.getElementById('photo-input')?.click()}
-                >
-                  <Camera className="mr-2 h-4 w-4" />
-                  Add Photos
-                </Button>
+              <div className="border-2 border-dashed rounded-lg p-4 text-center">
                 <input
-                  id="photo-input"
                   type="file"
                   accept="image/*"
-                  capture="environment"
                   multiple
-                  className="hidden"
+                  capture="environment"
                   onChange={handlePhotoCapture}
+                  className="hidden"
+                  id="adj-photo-upload"
                 />
-                <span className="text-xs text-muted-foreground">{photos.length} photos attached</span>
+                <label htmlFor="adj-photo-upload" className="cursor-pointer">
+                  <Camera className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">Click to upload photos</p>
+                </label>
               </div>
+
               {photoPreviews.length > 0 && (
-                <div className="grid grid-cols-4 gap-2 mt-2">
-                  {photoPreviews.map((preview, idx) => (
-                    <div key={idx} className="relative group">
-                      <img src={preview} alt={`Photo ${idx + 1}`} className="w-full h-20 object-cover rounded" />
-                      <Button
+                <div className="grid grid-cols-4 gap-2">
+                  {photoPreviews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img src={preview} alt={`Photo ${index + 1}`} className="w-full h-20 object-cover rounded" />
+                      <button
                         type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100"
-                        onClick={() => removePhoto(idx)}
+                        onClick={() => removePhoto(index)}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X className="h-3 w-3" />
-                      </Button>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -670,75 +560,30 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
             </div>
           )}
 
-          {/* Mark as Damaged checkbox for returns */}
-          {formData.reason_code === 'return' && (
-            <div className="flex items-center space-x-2 p-3 border rounded-lg bg-amber-50 dark:bg-amber-950/20">
-              <Switch
-                id="mark-damaged"
-                checked={formData.mark_as_damaged}
-                onCheckedChange={(checked) => setFormData({ ...formData, mark_as_damaged: checked })}
-              />
-              <div className="space-y-1">
-                <Label htmlFor="mark-damaged" className="cursor-pointer font-medium">
-                  Mark as Damaged Return
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  Will create ASN and send for client review
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Batch Items Queue */}
-          {batchMode && batchItems.length > 0 && (
-            <div className="space-y-2 p-3 border rounded-lg bg-muted/20">
-              <Label>Batch Queue ({batchItems.length} items)</Label>
-              <div className="space-y-1 max-h-40 overflow-y-auto">
-                {batchItems.map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 bg-background rounded text-sm">
-                    <span>{item.sku_code} - {item.title}</span>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={item.qty_delta > 0 ? "default" : "destructive"}>
-                        {item.qty_delta > 0 ? '+' : ''}{item.qty_delta}
-                      </Badge>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => removeBatchItem(idx)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* Info Box */}
+          {selectedActionConfig?.requiresClientReview && (
+            <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Note:</strong> This will create a pending item for client review. 
+                Inventory will not be adjusted until the client makes a decision.
+              </p>
             </div>
           )}
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          {batchMode && batchItems.length > 0 ? (
-            <>
-              <Button variant="secondary" onClick={addToBatch} disabled={loading || !formData.sku_id}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add to Batch
-              </Button>
-              <Button onClick={submitBatchAdjustments} disabled={loading}>
-                {loading ? "Submitting..." : `Submit All (${batchItems.length})`}
-              </Button>
-            </>
-          ) : (
-            <Button onClick={handleSubmit} disabled={loading}>
-              {loading ? "Recording..." : "Record Adjustment"}
-            </Button>
-          )}
+          <Button 
+            onClick={handleSubmit} 
+            disabled={loading || !formData.client_id || !formData.sku_id || !formData.location_id || !formData.qty_delta || !formData.action_type}
+          >
+            {loading ? "Processing..." : formData.action_type === 'sale' ? "Record Sale" : "Submit for Review"}
+          </Button>
         </DialogFooter>
       </DialogContent>
+
       <ScannerHelpDialog open={showHelp} onOpenChange={setShowHelp} />
     </Dialog>
   );
