@@ -15,6 +15,19 @@ import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from "date-fns";
 
+// Helper to format destination types with proper capitalization
+function formatDestination(destination: string): string {
+  const normalizations: Record<string, string> = {
+    'amazon_fba': 'Amazon FBA',
+    'walmart_wfs': 'Walmart WFS',
+    'direct_to_customer': 'Direct to Customer',
+    'shopify': 'Shopify',
+    'tiktok_shop': 'TikTok Shop',
+  };
+  const key = destination?.toLowerCase().replace(/\s+/g, '_');
+  return normalizations[key] || destination?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || '-';
+}
+
 export const ShipmentsTab = () => {
   const [selectedClient, setSelectedClient] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -237,7 +250,7 @@ export const ShipmentsTab = () => {
                     <TableCell className="font-mono">{shipment.shipment_number}</TableCell>
                     <TableCell>{(shipment as any).clients?.company_name}</TableCell>
                     <TableCell className="capitalize">{displayMarketplace || "-"}</TableCell>
-                    <TableCell className="capitalize">{shipment.destination_type.replace('_', ' ')}</TableCell>
+                    <TableCell>{formatDestination(shipment.destination_type)}</TableCell>
                     <TableCell>
                       <StatusBadge status={shipment.shipment_status} />
                     </TableCell>
