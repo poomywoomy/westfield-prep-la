@@ -8,14 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
-import { format } from "date-fns";
-import { Camera, X, Scan, DollarSign, PackageX, AlertTriangle } from "lucide-react";
+import { Scan, DollarSign, PackageX, AlertTriangle } from "lucide-react";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { playSuccessSound, playErrorSound } from "@/lib/soundEffects";
 import { Badge } from "@/components/ui/badge";
 import { ScannerStatus } from "@/components/ScannerStatus";
 import { ScannerHelpDialog } from "@/components/admin/ScannerHelpDialog";
-import { validateImageFile } from "@/lib/fileValidation";
+import { DragDropPhotoUpload } from "./DragDropPhotoUpload";
 
 const adjustmentSchema = z.object({
   client_id: z.string().uuid(),
@@ -74,8 +73,7 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
   const [locations, setLocations] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [scannerActive, setScannerActive] = useState(false);
-  const [photos, setPhotos] = useState<File[]>([]);
-  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [photoPaths, setPhotoPaths] = useState<string[]>([]);
   const [showHelp, setShowHelp] = useState(false);
   const [formData, setFormData] = useState({
     client_id: "",
@@ -137,57 +135,6 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
     }
   };
 
-  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const validFiles: File[] = [];
-    
-    files.forEach(file => {
-      const validation = validateImageFile(file);
-      if (!validation.valid) {
-        toast({ title: "Invalid File", description: validation.error, variant: "destructive" });
-        return;
-      }
-      validFiles.push(file);
-    });
-
-    setPhotos([...photos, ...validFiles]);
-    
-    validFiles.forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreviews(prev => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const removePhoto = (index: number) => {
-    setPhotos(photos.filter((_, i) => i !== index));
-    setPhotoPreviews(photoPreviews.filter((_, i) => i !== index));
-  };
-
-  const uploadPhotos = async (clientId: string, referenceId: string): Promise<string[]> => {
-    const uploadedUrls: string[] = [];
-    
-    for (const file of photos) {
-      const timestamp = Date.now();
-      const filePath = `${clientId}/adjustment/${referenceId}/${timestamp}_${file.name}`;
-      
-      const { error } = await supabase.storage
-        .from("qc-images")
-        .upload(filePath, file);
-      
-      if (error) {
-        console.error("Upload error:", error);
-        continue;
-      }
-      
-      uploadedUrls.push(filePath);
-    }
-    
-    return uploadedUrls;
-  };
-
   const handleSubmit = async () => {
     try {
       setLoading(true);
@@ -208,7 +155,7 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
       const actionConfig = ACTION_CONFIG[formData.action_type];
 
       // Validate photo requirement for damaged
-      if (actionConfig.requiresPhoto && photos.length === 0) {
+      if (actionConfig.requiresPhoto && photoPaths.length === 0) {
         toast({ title: "Photos Required", description: "Please upload at least one QC photo for damaged products.", variant: "destructive" });
         setLoading(false);
         return;
@@ -272,12 +219,6 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
 
         if (asnError) throw asnError;
 
-        // Upload photos if any
-        let photoUrls: string[] = [];
-        if (photos.length > 0) {
-          photoUrls = await uploadPhotos(validated.client_id, asnData.id);
-        }
-
         // Create ASN line
         await supabase.from("asn_lines").insert({
           asn_id: asnData.id,
@@ -299,7 +240,7 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
             discrepancy_type: actionConfig.discrepancyType!,
             source_type: 'adjustment',
             status: 'pending',
-            qc_photo_urls: photoUrls.length > 0 ? photoUrls : null,
+            qc_photo_urls: photoPaths.length > 0 ? photoPaths : null,
             admin_notes: validated.notes || `${actionConfig.label} reported via inventory adjustment`,
           });
 
@@ -356,8 +297,7 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
       action_type: "",
       notes: "",
     });
-    setPhotos([]);
-    setPhotoPreviews([]);
+    setPhotoPaths([]);
     setScannerActive(false);
   };
 
@@ -525,38 +465,13 @@ export const InventoryAdjustmentDialog = ({ open, onOpenChange, onSuccess, prefi
                 <p className="text-xs text-orange-700">Upload at least one photo to proceed</p>
               </div>
 
-              <div className="border-2 border-dashed rounded-lg p-4 text-center">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  capture="environment"
-                  onChange={handlePhotoCapture}
-                  className="hidden"
-                  id="adj-photo-upload"
-                />
-                <label htmlFor="adj-photo-upload" className="cursor-pointer">
-                  <Camera className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">Click to upload photos</p>
-                </label>
-              </div>
-
-              {photoPreviews.length > 0 && (
-                <div className="grid grid-cols-4 gap-2">
-                  {photoPreviews.map((preview, index) => (
-                    <div key={index} className="relative group">
-                      <img src={preview} alt={`Photo ${index + 1}`} className="w-full h-20 object-cover rounded" />
-                      <button
-                        type="button"
-                        onClick={() => removePhoto(index)}
-                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <DragDropPhotoUpload
+                clientId={formData.client_id}
+                referenceType="adjustment"
+                onPhotosChange={setPhotoPaths}
+                existingPhotos={photoPaths}
+                required={true}
+              />
             </div>
           )}
 
