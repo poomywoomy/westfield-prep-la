@@ -78,15 +78,22 @@ export type Database = {
           carrier: string | null
           client_id: string
           closed_at: string | null
+          consumer_address: string | null
+          consumer_name: string | null
+          consumer_order_number: string | null
           created_at: string
           created_by: string | null
           eta: string | null
           id: string
+          is_return: boolean | null
           notes: string | null
           received_at: string | null
           received_by: string | null
           resolved_at: string | null
           resolved_by: string | null
+          return_carrier: string | null
+          return_marketplace: string | null
+          return_tracking: string | null
           ship_from: string | null
           status: Database["public"]["Enums"]["asn_status"] | null
           template_id: string | null
@@ -98,15 +105,22 @@ export type Database = {
           carrier?: string | null
           client_id: string
           closed_at?: string | null
+          consumer_address?: string | null
+          consumer_name?: string | null
+          consumer_order_number?: string | null
           created_at?: string
           created_by?: string | null
           eta?: string | null
           id?: string
+          is_return?: boolean | null
           notes?: string | null
           received_at?: string | null
           received_by?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
+          return_carrier?: string | null
+          return_marketplace?: string | null
+          return_tracking?: string | null
           ship_from?: string | null
           status?: Database["public"]["Enums"]["asn_status"] | null
           template_id?: string | null
@@ -118,15 +132,22 @@ export type Database = {
           carrier?: string | null
           client_id?: string
           closed_at?: string | null
+          consumer_address?: string | null
+          consumer_name?: string | null
+          consumer_order_number?: string | null
           created_at?: string
           created_by?: string | null
           eta?: string | null
           id?: string
+          is_return?: boolean | null
           notes?: string | null
           received_at?: string | null
           received_by?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
+          return_carrier?: string | null
+          return_marketplace?: string | null
+          return_tracking?: string | null
           ship_from?: string | null
           status?: Database["public"]["Enums"]["asn_status"] | null
           template_id?: string | null

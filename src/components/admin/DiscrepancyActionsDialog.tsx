@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle2, Package } from "lucide-react";
 import { resignPhotoUrls } from "@/lib/photoUtils";
+import { PhotoLightbox } from "@/components/ui/photo-lightbox";
 
 interface DiscrepancyActionsDialogProps {
   open: boolean;
@@ -42,6 +43,8 @@ export function DiscrepancyActionsDialog({
   const [adminNotes, setAdminNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [displayPhotos, setDisplayPhotos] = useState<string[]>([]);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Re-sign photo URLs when dialog opens
   useEffect(() => {
@@ -214,14 +217,15 @@ export function DiscrepancyActionsDialog({
           {/* QC Photos */}
           {displayPhotos.length > 0 && (
             <div>
-              <Label className="mb-2 block">QC Photos</Label>
+              <Label className="mb-2 block">QC Photos (click to enlarge)</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {displayPhotos.map((url, index) => (
                   <img
                     key={index}
                     src={url}
                     alt={`QC Photo ${index + 1}`}
-                    className="w-full h-32 object-cover rounded border"
+                    className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => { setLightboxIndex(index); setLightboxOpen(true); }}
                   />
                 ))}
               </div>
@@ -329,6 +333,13 @@ export function DiscrepancyActionsDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <PhotoLightbox
+        photos={displayPhotos}
+        initialIndex={lightboxIndex}
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
     </Dialog>
   );
 }

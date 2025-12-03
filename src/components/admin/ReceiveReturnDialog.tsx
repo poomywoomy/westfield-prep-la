@@ -123,7 +123,7 @@ export const ReceiveReturnDialog = ({ open, onOpenChange, onSuccess, type }: Rec
       const { data: { user } } = await supabase.auth.getUser();
 
       if (type === "return") {
-        // Create ASN header for the return
+        // Create ASN header for the return with is_return flag
         const { data: asnNumberData } = await supabase.rpc('generate_asn_number', { p_client_id: formData.client_id });
         const asnNumber = asnNumberData || `RTN-${Date.now()}`;
 
@@ -136,6 +136,7 @@ export const ReceiveReturnDialog = ({ open, onOpenChange, onSuccess, type }: Rec
             received_at: formData.received_date,
             received_by: user?.id,
             notes: `Manual return received. ${formData.notes}`,
+            is_return: true,
           })
           .select()
           .single();
