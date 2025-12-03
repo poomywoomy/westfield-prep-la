@@ -8,9 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { Camera, X, Plus, Trash2, Package, RotateCcw } from "lucide-react";
+import { Plus, Trash2, Package, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { validateImageFile } from "@/lib/fileValidation";
+import { DragDropPhotoUpload } from "./DragDropPhotoUpload";
 
 interface ReceiveReturnDialogProps {
   open: boolean;
@@ -31,8 +31,7 @@ export const ReceiveReturnDialog = ({ open, onOpenChange, onSuccess, type }: Rec
   const [clients, setClients] = useState<any[]>([]);
   const [skus, setSKUs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [photos, setPhotos] = useState<File[]>([]);
-  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [photoPaths, setPhotoPaths] = useState<string[]>([]);
   const [lineItems, setLineItems] = useState<LineItem[]>([]);
   
   const [formData, setFormData] = useState({
@@ -108,59 +107,8 @@ export const ReceiveReturnDialog = ({ open, onOpenChange, onSuccess, type }: Rec
     setLineItems(lineItems.filter(li => li.sku_id !== skuId));
   };
 
-  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const validFiles: File[] = [];
-    
-    files.forEach(file => {
-      const validation = validateImageFile(file);
-      if (!validation.valid) {
-        toast({ title: "Invalid File", description: validation.error, variant: "destructive" });
-        return;
-      }
-      validFiles.push(file);
-    });
-
-    setPhotos([...photos, ...validFiles]);
-    
-    validFiles.forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreviews(prev => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const removePhoto = (index: number) => {
-    setPhotos(photos.filter((_, i) => i !== index));
-    setPhotoPreviews(photoPreviews.filter((_, i) => i !== index));
-  };
-
-  const uploadPhotos = async (clientId: string, referenceId: string): Promise<string[]> => {
-    const uploadedUrls: string[] = [];
-    
-    for (const file of photos) {
-      const timestamp = Date.now();
-      const filePath = `${clientId}/${type}/${referenceId}/${timestamp}_${file.name}`;
-      
-      const { data, error } = await supabase.storage
-        .from("qc-images")
-        .upload(filePath, file);
-      
-      if (error) {
-        console.error("Upload error:", error);
-        continue;
-      }
-      
-      uploadedUrls.push(filePath);
-    }
-    
-    return uploadedUrls;
-  };
-
   const handleSubmit = async () => {
-    if (photos.length === 0) {
+    if (photoPaths.length === 0) {
       toast({ title: "Photos Required", description: "Please upload at least one QC photo", variant: "destructive" });
       return;
     }
@@ -194,9 +142,6 @@ export const ReceiveReturnDialog = ({ open, onOpenChange, onSuccess, type }: Rec
 
         if (asnError) throw asnError;
 
-        // Upload photos
-        const photoUrls = await uploadPhotos(formData.client_id, asnData.id);
-
         // Create ASN lines and damaged_item_decisions for each line item
         for (const item of lineItems) {
           // Create ASN line
@@ -216,7 +161,7 @@ export const ReceiveReturnDialog = ({ open, onOpenChange, onSuccess, type }: Rec
             discrepancy_type: 'damaged',
             source_type: 'return',
             status: 'pending',
-            qc_photo_urls: photoUrls,
+            qc_photo_urls: photoPaths,
             admin_notes: formData.notes,
           });
         }
@@ -242,12 +187,10 @@ export const ReceiveReturnDialog = ({ open, onOpenChange, onSuccess, type }: Rec
 
         if (roError) throw roError;
 
-        // Upload photos and update removal order
-        const photoUrls = await uploadPhotos(formData.client_id, roData.id);
-        
+        // Update removal order with photo paths
         await supabase
           .from("removal_orders")
-          .update({ qc_photo_urls: photoUrls })
+          .update({ qc_photo_urls: photoPaths })
           .eq("id", roData.id);
 
         // Create removal order lines
@@ -284,13 +227,12 @@ export const ReceiveReturnDialog = ({ open, onOpenChange, onSuccess, type }: Rec
       current_quantity: "1",
     });
     setLineItems([]);
-    setPhotos([]);
-    setPhotoPreviews([]);
+    setPhotoPaths([]);
   };
 
   const canProceedStep1 = formData.client_id && lineItems.length > 0;
   const canProceedStep2 = formData.received_date;
-  const canSubmit = photos.length > 0;
+  const canSubmit = photoPaths.length > 0;
 
   const totalQuantity = lineItems.reduce((sum, li) => sum + li.quantity, 0);
 
@@ -447,48 +389,19 @@ export const ReceiveReturnDialog = ({ open, onOpenChange, onSuccess, type }: Rec
 
               <div className="space-y-2">
                 <Label>QC Photos *</Label>
-                <div className="border-2 border-dashed rounded-lg p-6 text-center">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    capture="environment"
-                    onChange={handlePhotoCapture}
-                    className="hidden"
-                    id="photo-upload"
-                  />
-                  <label htmlFor="photo-upload" className="cursor-pointer">
-                    <Camera className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">Click to upload or take photos</p>
-                  </label>
-                </div>
-
-                {photoPreviews.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 mt-3">
-                    {photoPreviews.map((preview, index) => (
-                      <div key={index} className="relative group">
-                        <img src={preview} alt={`Photo ${index + 1}`} className="w-full h-24 object-cover rounded-lg" />
-                        <button
-                          type="button"
-                          onClick={() => removePhoto(index)}
-                          className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <p className="text-xs text-muted-foreground">
-                  {photos.length} photo(s) uploaded
-                </p>
+                <DragDropPhotoUpload
+                  clientId={formData.client_id}
+                  referenceType={type}
+                  onPhotosChange={setPhotoPaths}
+                  existingPhotos={photoPaths}
+                  required={true}
+                />
               </div>
 
               <div className="bg-muted/50 p-3 rounded-lg">
                 <p className="text-sm font-medium mb-2">Final Summary</p>
                 <p className="text-sm text-muted-foreground">
-                  {lineItems.length} SKU(s) • {totalQuantity} units • {photos.length} photo(s)
+                  {lineItems.length} SKU(s) • {totalQuantity} units • {photoPaths.length} photo(s)
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Items will be sent to client for review and decision.

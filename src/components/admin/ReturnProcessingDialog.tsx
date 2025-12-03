@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Upload } from "lucide-react";
+import { DragDropPhotoUpload } from "./DragDropPhotoUpload";
 
 interface ReturnProcessingDialogProps {
   open?: boolean;
@@ -42,7 +42,7 @@ export const ReturnProcessingDialog = ({
   const [damagedQty, setDamagedQty] = useState<number>(0);
   const [missingQty, setMissingQty] = useState<number>(0);
   const [damagedAction, setDamagedAction] = useState<"discard" | "client">("client");
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPaths, setPhotoPaths] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -67,12 +67,11 @@ export const ReturnProcessingDialog = ({
     setDamagedQty(0);
     setMissingQty(0);
     setDamagedAction("client");
-    setPhotoFile(null);
+    setPhotoPaths([]);
   };
 
   const handleExpectedQtyChange = (value: number) => {
     setExpectedQty(value);
-    // Auto-calculate missing
     const missing = value - goodQty - damagedQty;
     setMissingQty(Math.max(0, missing));
   };
@@ -89,29 +88,6 @@ export const ReturnProcessingDialog = ({
     setMissingQty(Math.max(0, missing));
   };
 
-  const uploadPhoto = async (): Promise<string | null> => {
-    if (!photoFile) return null;
-
-    const fileExt = photoFile.name.split(".").pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-    const filePath = `${clientId}/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("adjustment-photos")
-      .upload(filePath, photoFile);
-
-    if (uploadError) {
-      console.error("Photo upload error:", uploadError);
-      return null;
-    }
-
-    const { data: urlData } = supabase.storage
-      .from("adjustment-photos")
-      .getPublicUrl(filePath);
-
-    return urlData.publicUrl;
-  };
-
   const handleSubmit = async () => {
     if (goodQty + damagedQty + missingQty !== expectedQty) {
       toast({
@@ -122,7 +98,7 @@ export const ReturnProcessingDialog = ({
       return;
     }
 
-    if (damagedQty > 0 && damagedAction === "discard" && !photoFile) {
+    if (damagedQty > 0 && damagedAction === "discard" && photoPaths.length === 0) {
       toast({
         title: "Photo Required",
         description: "Photo is required when discarding damaged items",
@@ -216,7 +192,7 @@ export const ReturnProcessingDialog = ({
       // Process damaged units
       if (damagedQty > 0) {
         if (damagedAction === "discard") {
-          const photoUrl = await uploadPhoto();
+          const photoUrl = photoPaths.length > 0 ? photoPaths[0] : null;
           await supabase.from("inventory_ledger").insert({
             client_id: clientId,
             sku_id: skuId,
@@ -236,6 +212,7 @@ export const ReturnProcessingDialog = ({
             discrepancy_type: "damaged",
             source_type: "return",
             status: "pending",
+            qc_photo_urls: photoPaths.length > 0 ? photoPaths : null,
             client_notes: "Return processing - damaged units",
           });
         }
@@ -369,17 +346,14 @@ export const ReturnProcessingDialog = ({
               {damagedAction === "discard" && (
                 <div className="space-y-2">
                   <Label>Photo Evidence (Required) *</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
-                    />
-                    <Upload className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Photo required when discarding damaged items
-                  </p>
+                  <DragDropPhotoUpload
+                    clientId={clientId}
+                    referenceType="return"
+                    onPhotosChange={setPhotoPaths}
+                    existingPhotos={photoPaths}
+                    required={true}
+                    maxPhotos={5}
+                  />
                 </div>
               )}
             </div>
