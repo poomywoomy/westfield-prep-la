@@ -7,14 +7,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Search, Edit, Trash2, Settings, Package, CheckCircle2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Settings, RotateCcw, CheckCircle2, AlertCircle } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { ASNFormDialog } from "./ASNFormDialog";
 import { ReceivingDialog } from "./ReceivingDialog";
 import { TemplateManagementDialog } from "./TemplateManagementDialog";
 import { ResolveIssueDialog } from "./ResolveIssueDialog";
+import { ReturnASNDetailDialog } from "./ReturnASNDetailDialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-type ASN = Database["public"]["Tables"]["asn_headers"]["Row"];
+type ASN = Database["public"]["Tables"]["asn_headers"]["Row"] & {
+  is_return?: boolean;
+  return_marketplace?: string;
+  consumer_order_number?: string;
+};
 type Client = Database["public"]["Tables"]["clients"]["Row"];
 
 export const ASNList = () => {
@@ -32,7 +38,10 @@ export const ASNList = () => {
   const [showTemplates, setShowTemplates] = useState(false);
   const [resolveDialogOpen, setResolveDialogOpen] = useState(false);
   const [asnToResolve, setAsnToResolve] = useState<ASN | null>(null);
+  const [returnDetailDialogOpen, setReturnDetailDialogOpen] = useState(false);
+  const [returnDetailAsnId, setReturnDetailAsnId] = useState<string | null>(null);
   const [qcPhotoAges, setQcPhotoAges] = useState<Map<string, number>>(new Map());
+  const [pendingDecisions, setPendingDecisions] = useState<Map<string, number>>(new Map());
   const { toast } = useToast();
 
   useEffect(() => {
@@ -68,30 +77,38 @@ export const ASNList = () => {
     } else {
       setASNs(data || []);
       
-      // Fetch QC photo ages for all ASNs from damaged_item_decisions
       if (data && data.length > 0) {
         const asnIds = data.map(asn => asn.id);
+        
+        // Fetch QC photo ages and pending decision counts
         const { data: decisions } = await supabase
           .from('damaged_item_decisions')
-          .select('asn_id, created_at')
+          .select('asn_id, created_at, status')
           .in('asn_id', asnIds);
         
         if (decisions) {
           const agesMap = new Map<string, number>();
+          const pendingMap = new Map<string, number>();
           const now = new Date();
           
           decisions.forEach(decision => {
             const decisionDate = new Date(decision.created_at || '');
             const daysSinceCreation = Math.floor((now.getTime() - decisionDate.getTime()) / (1000 * 60 * 60 * 24));
             
-            // Store the oldest photo age for this ASN
+            // Store the oldest photo age
             const currentAge = agesMap.get(decision.asn_id) || 0;
             if (daysSinceCreation > currentAge) {
               agesMap.set(decision.asn_id, daysSinceCreation);
             }
+            
+            // Count pending decisions
+            if (decision.status === 'pending') {
+              pendingMap.set(decision.asn_id, (pendingMap.get(decision.asn_id) || 0) + 1);
+            }
           });
           
           setQcPhotoAges(agesMap);
+          setPendingDecisions(pendingMap);
         }
       }
     }
@@ -104,17 +121,31 @@ export const ASNList = () => {
     (asn.tracking_number && asn.tracking_number.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string, isReturn: boolean) => {
+    if (isReturn) {
+      switch (status) {
+        case "issue": return "bg-orange-500 hover:bg-orange-600 text-white";
+        case "closed": return "bg-orange-700 hover:bg-orange-800 text-white";
+        default: return "bg-orange-400 hover:bg-orange-500 text-white";
+      }
+    }
     switch (status) {
-      case "not_received": return "secondary";
-      case "receiving": return "default";
-      case "closed": return "default";
-      case "issue": return "destructive";
-      default: return "secondary";
+      case "not_received": return "";
+      case "receiving": return "bg-yellow-600 hover:bg-yellow-700 text-white";
+      case "closed": return "bg-green-600 hover:bg-green-700 text-white";
+      case "issue": return "bg-red-600 hover:bg-red-700 text-white";
+      default: return "";
     }
   };
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = (status: string, isReturn: boolean) => {
+    if (isReturn) {
+      switch (status) {
+        case "issue": return "Return - Pending";
+        case "closed": return "Return - Completed";
+        default: return `Return - ${status}`;
+      }
+    }
     switch (status) {
       case "not_received": return "Not Received";
       case "receiving": return "Receiving";
@@ -129,6 +160,11 @@ export const ASNList = () => {
     setCreateDialogOpen(true);
   };
 
+  const handleEditReturn = (asn: ASN) => {
+    setReturnDetailAsnId(asn.id);
+    setReturnDetailDialogOpen(true);
+  };
+
   const handleDelete = (asn: ASN) => {
     setAsnToDelete(asn);
     setDeleteDialogOpen(true);
@@ -138,9 +174,6 @@ export const ASNList = () => {
     if (!asnToDelete) return;
 
     try {
-      // Delete in proper order to handle foreign key constraints
-      
-      // 1. Delete ASN lines first
       const { error: linesError } = await supabase
         .from("asn_lines")
         .delete()
@@ -148,7 +181,6 @@ export const ASNList = () => {
 
       if (linesError) throw linesError;
 
-      // 2. Delete attachments
       const { error: attachmentsError } = await supabase
         .from("attachments")
         .delete()
@@ -157,7 +189,6 @@ export const ASNList = () => {
 
       if (attachmentsError) throw attachmentsError;
 
-      // 3. Delete inventory ledger entries
       const { error: ledgerError } = await supabase
         .from("inventory_ledger")
         .delete()
@@ -166,7 +197,6 @@ export const ASNList = () => {
 
       if (ledgerError) throw ledgerError;
 
-      // 4. Delete damaged item decisions
       const { error: decisionsError } = await supabase
         .from("damaged_item_decisions")
         .delete()
@@ -174,7 +204,6 @@ export const ASNList = () => {
 
       if (decisionsError) throw decisionsError;
 
-      // 5. Finally delete ASN header
       const { error: headerError } = await supabase
         .from("asn_headers")
         .delete()
@@ -201,28 +230,10 @@ export const ASNList = () => {
     }
   };
 
-  const handleMarkAsClosed = async (asn: ASN) => {
-    try {
-      const { error } = await supabase
-        .from("asn_headers")
-        .update({ status: "closed" })
-        .eq("id", asn.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: `ASN ${asn.asn_number} marked as closed`,
-      });
-
-      fetchASNs();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update ASN status",
-        variant: "destructive",
-      });
-    }
+  const canMarkAsResolved = (asn: ASN) => {
+    // Cannot resolve if there are pending client decisions
+    const pendingCount = pendingDecisions.get(asn.id) || 0;
+    return pendingCount === 0;
   };
 
   const handleFormSuccess = () => {
@@ -319,7 +330,7 @@ export const ASNList = () => {
               <TableHead>Tracking</TableHead>
               <TableHead>ETA</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right w-[200px]">Actions</TableHead>
+              <TableHead className="text-right w-[280px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -336,94 +347,135 @@ export const ASNList = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredASNs.map(asn => (
-                <TableRow key={asn.id}>
-                  <TableCell className="font-medium">{asn.asn_number}</TableCell>
-                  <TableCell>
-                    {clients.find(c => c.id === asn.client_id)?.company_name || "-"}
-                  </TableCell>
-                  <TableCell>{asn.carrier || "-"}</TableCell>
-                  <TableCell>{asn.tracking_number || "-"}</TableCell>
-                  <TableCell>
-                    {asn.eta ? new Date(asn.eta).toLocaleDateString() : "-"}
-                    {qcPhotoAges.has(asn.id) && qcPhotoAges.get(asn.id)! >= 25 && (
-                      <div className="mt-1">
-                        <Badge variant="destructive" className="text-xs">
-                          ⚠️ Photos expire in {30 - qcPhotoAges.get(asn.id)!} days
-                        </Badge>
+              filteredASNs.map(asn => {
+                const isReturn = asn.is_return || false;
+                const pendingCount = pendingDecisions.get(asn.id) || 0;
+                
+                return (
+                  <TableRow key={asn.id} className={isReturn ? "bg-orange-50/50" : ""}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {isReturn && <RotateCcw className="h-4 w-4 text-orange-500" />}
+                        {asn.asn_number}
                       </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={getStatusColor(asn.status)}
-                      className={
-                        asn.status === 'receiving' ? 'bg-yellow-600 hover:bg-yellow-700 text-white' :
-                        asn.status === 'closed' ? 'bg-green-600 hover:bg-green-700 text-white' :
-                        asn.status === 'issue' ? 'bg-red-600 hover:bg-red-700 text-white' :
-                        ''
-                      }
-                    >
-                      {getStatusLabel(asn.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {asn.status === "not_received" && (
+                    </TableCell>
+                    <TableCell>
+                      {clients.find(c => c.id === asn.client_id)?.company_name || "-"}
+                    </TableCell>
+                    <TableCell>{asn.carrier || asn.return_carrier || "-"}</TableCell>
+                    <TableCell>{asn.tracking_number || asn.return_tracking || "-"}</TableCell>
+                    <TableCell>
+                      {asn.eta ? new Date(asn.eta).toLocaleDateString() : "-"}
+                      {qcPhotoAges.has(asn.id) && qcPhotoAges.get(asn.id)! >= 25 && (
+                        <div className="mt-1">
+                          <Badge variant="destructive" className="text-xs">
+                            ⚠️ Photos expire in {30 - qcPhotoAges.get(asn.id)!} days
+                          </Badge>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(asn.status || '', isReturn)}>
+                        {getStatusLabel(asn.status || '', isReturn)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {/* Edit button - different for returns */}
+                        {isReturn ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditReturn(asn)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        ) : asn.status === "not_received" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(asn)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEdit(asn)}
+                          onClick={() => handleDelete(asn)}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(asn)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      {asn.status === "issue" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setAsnToResolve(asn);
-                            setResolveDialogOpen(true);
-                          }}
-                        >
-                          <CheckCircle2 className="h-4 w-4 mr-2" />
-                          Mark as Resolved
-                        </Button>
-                      )}
-                      {asn.status !== "closed" ? (
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            setSelectedASN(asn);
-                            setReceivingDialogOpen(true);
-                          }}
-                        >
-                          Receive
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedASN(asn);
-                            setReceivingDialogOpen(true);
-                          }}
-                        >
-                          View
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                        
+                        {/* Mark as Resolved - conditional visibility */}
+                        {asn.status === "issue" && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div>
+                                  {canMarkAsResolved(asn) ? (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setAsnToResolve(asn);
+                                        setResolveDialogOpen(true);
+                                      }}
+                                    >
+                                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                                      Mark as Resolved
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      disabled
+                                      className="text-muted-foreground"
+                                    >
+                                      <AlertCircle className="h-4 w-4 mr-2" />
+                                      {pendingCount} pending
+                                    </Button>
+                                  )}
+                                </div>
+                              </TooltipTrigger>
+                              {!canMarkAsResolved(asn) && (
+                                <TooltipContent>
+                                  <p>Cannot resolve until client handles {pendingCount} pending decision(s)</p>
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                        
+                        {/* Receive/View button */}
+                        {asn.status !== "closed" ? (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedASN(asn);
+                              setReceivingDialogOpen(true);
+                            }}
+                          >
+                            Receive
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedASN(asn);
+                              setReceivingDialogOpen(true);
+                            }}
+                          >
+                            View
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
@@ -440,6 +492,13 @@ export const ASNList = () => {
         asnNumber={asnToResolve?.asn_number || ""}
         open={resolveDialogOpen}
         onOpenChange={setResolveDialogOpen}
+        onSuccess={fetchASNs}
+      />
+
+      <ReturnASNDetailDialog
+        open={returnDetailDialogOpen}
+        onOpenChange={setReturnDetailDialogOpen}
+        asnId={returnDetailAsnId}
         onSuccess={fetchASNs}
       />
     </div>
