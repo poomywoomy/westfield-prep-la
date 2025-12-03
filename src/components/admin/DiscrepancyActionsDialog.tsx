@@ -107,9 +107,13 @@ export function DiscrepancyActionsDialog({
               qty_delta: decision.quantity,
               transaction_type: 'ADJUSTMENT_PLUS',
               reason_code: decision.decision === "sell_as_bstock" ? 'sell_as_bstock' : 'return_to_inventory',
-              source_type: decision.source_type === 'return' ? 'customer_return' : 'receiving',
+              source_type: decision.source_type === 'return' ? 'customer_return' : 
+                           decision.source_type === 'removal_order' ? 'removal_order' : 'receiving',
               source_ref: decision.asn_id || decision.id,
-              notes: `Units ${decision.decision === "sell_as_bstock" ? 'marked for B-stock sale' : 'returned to inventory'} after ${decision.source_type === 'return' ? 'return' : 'receiving'} review. Client decision: ${getDecisionLabel(decision.decision)}. Admin processed by ${user.email}.`,
+              notes: `Units ${decision.decision === "sell_as_bstock" ? 'marked for B-stock sale' : 'returned to inventory'} after ${
+                decision.source_type === 'return' ? 'return' : 
+                decision.source_type === 'removal_order' ? 'removal order' : 'receiving'
+              } review. Client decision: ${getDecisionLabel(decision.decision)}. Admin processed by ${user.email}.`,
             });
           
           if (ledgerError) throw ledgerError;
@@ -163,9 +167,14 @@ export function DiscrepancyActionsDialog({
             {decision.source_type && (
               <Badge 
                 variant="outline" 
-                className={decision.source_type === "return" ? "border-blue-500 text-blue-600 ml-2" : "border-amber-500 text-amber-600 ml-2"}
+                className={
+                  decision.source_type === "return" ? "border-blue-500 text-blue-600 ml-2" : 
+                  decision.source_type === "removal_order" ? "border-purple-500 text-purple-600 ml-2" : 
+                  "border-amber-500 text-amber-600 ml-2"
+                }
               >
-                {decision.source_type === "return" ? "🔄 Return" : "📦 Receiving"}
+                {decision.source_type === "return" ? "🔄 Return" : 
+                 decision.source_type === "removal_order" ? "📤 Removal Order" : "📦 Receiving"}
               </Badge>
             )}
           </DialogTitle>
@@ -186,7 +195,8 @@ export function DiscrepancyActionsDialog({
             )}
             <p className="text-sm font-medium mt-2">Quantity: {decision.quantity} units</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Source: {decision.source_type === "return" ? "Customer Return Processing" : "Inbound Receiving"}
+              Source: {decision.source_type === "return" ? "Customer Return Processing" : 
+                       decision.source_type === "removal_order" ? "Removal Order Processing" : "Inbound Receiving"}
             </p>
           </div>
 
@@ -221,12 +231,17 @@ export function DiscrepancyActionsDialog({
           {/* Action Guidance */}
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm font-medium text-blue-900 mb-2">
-              Next Steps {decision.source_type && `(${decision.source_type === "return" ? "Return" : "Receiving"} Workflow)`}:
+              Next Steps {decision.source_type && `(${
+                decision.source_type === "return" ? "Return" : 
+                decision.source_type === "removal_order" ? "Removal Order" : "Receiving"
+              } Workflow)`}:
             </p>
             {decision.decision === "discard" && (
               <p className="text-sm text-blue-800">
                 {decision.source_type === "return" 
                   ? "• Item returned by customer in damaged condition" 
+                  : decision.source_type === "removal_order"
+                  ? "• Item from removal order in unsellable condition"
                   : "• Item received damaged during inbound shipment"}<br />
                 • Remove items from inventory<br />
                 • Document disposal for records
@@ -236,8 +251,11 @@ export function DiscrepancyActionsDialog({
               <p className="text-sm text-blue-800">
                 {decision.source_type === "return" 
                   ? "• Customer return - cosmetic damage only" 
+                  : decision.source_type === "removal_order"
+                  ? "• Removal order item - sellable as B-stock"
                   : "• Received with minor damage"}<br />
-                • Create new SKU variant for B-stock<br />
+                • {decision.quantity} units will be added to available inventory<br />
+                • Create new SKU variant for B-stock if needed<br />
                 • Adjust pricing and list for sale
               </p>
             )}
@@ -245,8 +263,10 @@ export function DiscrepancyActionsDialog({
               <p className="text-sm text-blue-800">
                 {decision.source_type === "return" 
                   ? "• Customer return - sellable condition" 
+                  : decision.source_type === "removal_order"
+                  ? "• Removal order item - sellable condition"
                   : "• Received in sellable condition"}<br />
-                • Return units to active inventory<br />
+                • {decision.quantity} units will be added to available inventory<br />
                 • Remove from quarantine/damage status
               </p>
             )}
@@ -254,6 +274,8 @@ export function DiscrepancyActionsDialog({
               <p className="text-sm text-blue-800">
                 {decision.source_type === "return" 
                   ? "• Return to original customer" 
+                  : decision.source_type === "removal_order"
+                  ? "• Return removal order items to Amazon/marketplace"
                   : "• Return to supplier/sender"}<br />
                 • Generate return shipping label<br />
                 • Package items for return
@@ -263,6 +285,8 @@ export function DiscrepancyActionsDialog({
               <p className="text-sm text-blue-800">
                 {decision.source_type === "return" 
                   ? "• Customer return - repairable" 
+                  : decision.source_type === "removal_order"
+                  ? "• Removal order item - repairable"
                   : "• Received damaged but repairable"}<br />
                 • Move to rework area<br />
                 • Schedule inspection and repair
@@ -272,9 +296,11 @@ export function DiscrepancyActionsDialog({
               <p className="text-sm text-blue-800">
                 {decision.source_type === "return" 
                   ? "• Customer return - missing items acknowledged" 
+                  : decision.source_type === "removal_order"
+                  ? "• Removal order - missing items acknowledged"
                   : "• Inbound shipment - missing items acknowledged"}<br />
                 • Client has acknowledged the discrepancy<br />
-                • Follow up with carrier/supplier if needed
+                • Follow up with carrier/marketplace if needed
               </p>
             )}
           </div>
