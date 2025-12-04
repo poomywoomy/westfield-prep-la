@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "./button";
+import { createPortal } from "react-dom";
 
 interface PhotoLightboxProps {
   photos: string[];
@@ -39,98 +40,105 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
   const zoomIn = () => setZoom((prev) => Math.min(prev + 0.5, 3));
   const zoomOut = () => setZoom((prev) => Math.max(prev - 0.5, 0.5));
 
-  return (
+  const lightboxContent = (
     <div 
-      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
       onClick={onClose}
     >
-      {/* Close button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-4 right-4 text-white hover:bg-white/20 z-50"
-        onClick={onClose}
-      >
-        <X className="h-6 w-6" />
-      </Button>
-
-      {/* Zoom controls */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-50">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white hover:bg-white/20"
-          onClick={(e) => { e.stopPropagation(); zoomOut(); }}
-        >
-          <ZoomOut className="h-5 w-5" />
-        </Button>
-        <span className="text-white text-sm">{Math.round(zoom * 100)}%</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white hover:bg-white/20"
-          onClick={(e) => { e.stopPropagation(); zoomIn(); }}
-        >
-          <ZoomIn className="h-5 w-5" />
-        </Button>
-      </div>
-
-      {/* Navigation arrows */}
-      {photos.length > 1 && (
-        <>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 z-50"
-            onClick={(e) => { e.stopPropagation(); goToPrev(); }}
-          >
-            <ChevronLeft className="h-8 w-8" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 z-50"
-            onClick={(e) => { e.stopPropagation(); goToNext(); }}
-          >
-            <ChevronRight className="h-8 w-8" />
-          </Button>
-        </>
-      )}
-
-      {/* Image */}
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70" />
+      
+      {/* Modal Container - smaller popup style */}
       <div 
-        className="max-w-[90vw] max-h-[90vh] overflow-auto"
+        className="relative bg-background rounded-lg shadow-2xl max-w-4xl max-h-[85vh] w-full flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <img
-          src={photos[currentIndex]}
-          alt={`Photo ${currentIndex + 1}`}
-          className="transition-transform duration-200"
-          style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
-        />
-      </div>
-
-      {/* Counter */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm z-50">
-        {currentIndex + 1} / {photos.length}
-      </div>
-
-      {/* Thumbnail strip */}
-      {photos.length > 1 && (
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-2 z-50">
-          {photos.map((photo, idx) => (
-            <button
-              key={idx}
-              className={`w-12 h-12 rounded overflow-hidden border-2 transition-all ${
-                idx === currentIndex ? "border-white" : "border-transparent opacity-60 hover:opacity-100"
-              }`}
-              onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
+        {/* Header with close button */}
+        <div className="flex items-center justify-between p-3 border-b">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={zoomOut}
+              disabled={zoom <= 0.5}
             >
-              <img src={photo} alt="" className="w-full h-full object-cover" />
-            </button>
-          ))}
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground min-w-[50px] text-center">{Math.round(zoom * 100)}%</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={zoomIn}
+              disabled={zoom >= 3}
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+          </div>
+          <span className="text-sm text-muted-foreground">
+            {currentIndex + 1} / {photos.length}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="hover:bg-destructive/10"
+          >
+            <X className="h-5 w-5" />
+          </Button>
         </div>
-      )}
+
+        {/* Image Container */}
+        <div className="flex-1 overflow-auto p-4 flex items-center justify-center min-h-[300px]">
+          <img
+            src={photos[currentIndex]}
+            alt={`Photo ${currentIndex + 1}`}
+            className="max-w-full max-h-[60vh] object-contain transition-transform duration-200"
+            style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
+          />
+        </div>
+
+        {/* Navigation arrows */}
+        {photos.length > 1 && (
+          <>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full shadow-lg"
+              onClick={goToPrev}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full shadow-lg"
+              onClick={goToNext}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </>
+        )}
+
+        {/* Thumbnail strip */}
+        {photos.length > 1 && (
+          <div className="border-t p-3 flex gap-2 justify-center overflow-x-auto">
+            {photos.map((photo, idx) => (
+              <button
+                key={idx}
+                className={`w-14 h-14 rounded overflow-hidden border-2 transition-all flex-shrink-0 ${
+                  idx === currentIndex ? "border-primary ring-2 ring-primary/20" : "border-border opacity-60 hover:opacity-100"
+                }`}
+                onClick={() => setCurrentIndex(idx)}
+              >
+                <img src={photo} alt="" className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
+
+  // Use portal to render at document root, escaping all stacking contexts
+  return createPortal(lightboxContent, document.body);
 };

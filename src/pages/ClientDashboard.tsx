@@ -135,9 +135,9 @@ const ClientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex w-full">
-      {/* Left Sidebar */}
-      <aside className="w-64 border-r bg-card flex flex-col h-screen">
+    <div className="min-h-screen bg-background flex w-full overflow-hidden">
+      {/* Left Sidebar - Fixed/Sticky */}
+      <aside className="w-64 border-r bg-card flex flex-col h-screen sticky top-0 flex-shrink-0">
         {/* Logo */}
         <div className="p-6 border-b flex items-center justify-center flex-shrink-0">
           <Link to="/client/dashboard">
