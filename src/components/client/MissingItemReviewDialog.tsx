@@ -37,13 +37,20 @@ export function MissingItemReviewDialog({
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [displayPhotos, setDisplayPhotos] = useState<string[]>([]);
+  const [photosLoading, setPhotosLoading] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Re-sign photo URLs when dialog opens
   useEffect(() => {
     if (discrepancy.qc_photo_urls && open) {
-      resignPhotoUrls(discrepancy.qc_photo_urls).then(setDisplayPhotos);
+      setPhotosLoading(true);
+      resignPhotoUrls(discrepancy.qc_photo_urls)
+        .then(setDisplayPhotos)
+        .finally(() => setPhotosLoading(false));
+    } else {
+      setDisplayPhotos([]);
+      setPhotosLoading(false);
     }
   }, [discrepancy.qc_photo_urls, open]);
 
@@ -121,13 +128,20 @@ export function MissingItemReviewDialog({
           {/* QC Photos Section */}
           <div className="space-y-2">
             <Label>QC Photos (click to enlarge)</Label>
-            {displayPhotos.length > 0 ? (
+            {photosLoading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="w-full h-32 bg-muted rounded animate-pulse" />
+                ))}
+              </div>
+            ) : displayPhotos.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {displayPhotos.map((url, index) => (
                   <img
                     key={index}
                     src={url}
                     alt={`QC Photo ${index + 1}`}
+                    loading="lazy"
                     className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => { setLightboxIndex(index); setLightboxOpen(true); }}
                   />

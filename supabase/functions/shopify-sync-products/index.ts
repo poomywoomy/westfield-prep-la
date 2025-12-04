@@ -22,6 +22,7 @@ const shopifyVariantSchema = z.object({
 const shopifyProductSchema = z.object({
   id: z.union([z.string(), z.number()]),
   title: z.string().max(200),
+  image_url: z.string().nullable().optional(),
   variants: z.array(shopifyVariantSchema).min(1),
 });
 
@@ -39,6 +40,13 @@ async function fetchAllProducts(shopDomain: string, accessToken: string) {
           node {
             id
             title
+            images(first: 1) {
+              edges {
+                node {
+                  url
+                }
+              }
+            }
             variants(first: 100) {
               edges {
                 node {
@@ -69,6 +77,7 @@ async function fetchAllProducts(shopDomain: string, accessToken: string) {
   const products = rawProducts.map((product: any) => ({
     id: product.id.split('/').pop(),
     title: product.title,
+    image_url: product.images?.edges?.[0]?.node?.url || null,
     variants: product.variants.edges.map((v: any) => ({
       id: v.node.id.split('/').pop(),
       inventory_item_id: v.node.inventoryItem.id.split('/').pop(),
@@ -234,6 +243,7 @@ Deno.serve(async (req) => {
           internal_sku: existingSkuMap.get(clientSku) ?? internalSku, // Use existing or fallback
           title,
           unit_cost: variant.price,
+          image_url: product.image_url, // Shopify image overwrites local image
           notes: `Shopify Product ID: ${product.id}, Variant ID: ${variant.id}, Inventory Item ID: ${variant.inventory_item_id}`,
           status: 'active' as const,
         });

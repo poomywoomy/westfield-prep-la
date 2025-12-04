@@ -39,15 +39,20 @@ export function DamagedItemReviewDialog({
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [displayPhotos, setDisplayPhotos] = useState<string[]>([]);
+  const [photosLoading, setPhotosLoading] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Re-sign photo URLs when dialog opens
   useEffect(() => {
     if (open && discrepancy.qc_photo_urls && discrepancy.qc_photo_urls.length > 0) {
-      resignPhotoUrls(discrepancy.qc_photo_urls).then(setDisplayPhotos);
+      setPhotosLoading(true);
+      resignPhotoUrls(discrepancy.qc_photo_urls)
+        .then(setDisplayPhotos)
+        .finally(() => setPhotosLoading(false));
     } else {
       setDisplayPhotos([]);
+      setPhotosLoading(false);
     }
   }, [open, discrepancy.qc_photo_urls]);
 
@@ -133,22 +138,31 @@ export function DamagedItemReviewDialog({
           </div>
 
           {/* QC Photos */}
-          {displayPhotos.length > 0 && (
-            <div>
-              <Label className="mb-2 block">QC Photos (click to enlarge)</Label>
+          <div>
+            <Label className="mb-2 block">QC Photos (click to enlarge)</Label>
+            {photosLoading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="w-full h-32 bg-muted rounded animate-pulse" />
+                ))}
+              </div>
+            ) : displayPhotos.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {displayPhotos.map((url, index) => (
                   <img
                     key={index}
                     src={url}
                     alt={`QC Photo ${index + 1}`}
+                    loading="lazy"
                     className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => { setLightboxIndex(index); setLightboxOpen(true); }}
                   />
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-sm text-muted-foreground">No QC photos available</p>
+            )}
+          </div>
 
           {/* Decision Options */}
           <div>
