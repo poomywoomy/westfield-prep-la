@@ -195,7 +195,7 @@ const ClientDashboard = () => {
             onClick={() => setActiveTab('shipments')}
           >
             <Truck className="h-5 w-5" />
-            Shipments
+            Outbound Shipments
           </Button>
           <Button
             variant="ghost"

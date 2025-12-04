@@ -249,7 +249,7 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle>Request Shipment Creation</DialogTitle>
+          <DialogTitle>Request Outbound Shipment</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 flex-1 overflow-y-auto">

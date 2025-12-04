@@ -296,25 +296,25 @@ export default function ClientProductsTab() {
           )}
 
           <div className="border rounded-lg overflow-x-auto">
-            <Table>
+            <Table className="w-full">
               <TableHeader>
-                <TableRow>
+                <TableRow className="bg-muted/50">
                   <TableHead className="w-12">
                     <Checkbox
                       checked={selectedProducts.size === filteredProducts.length && filteredProducts.length > 0}
                       onCheckedChange={toggleSelectAll}
                     />
                   </TableHead>
-                  <TableHead className="w-14">Image</TableHead>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Brand</TableHead>
-                  <TableHead className="text-right">On Hand</TableHead>
-                  <TableHead className="text-right">Available</TableHead>
-                  <TableHead className="text-right">Reserved</TableHead>
-                  <TableHead className="text-right">Sold (Month)</TableHead>
-                  <TableHead className="text-right">Shipped (Month)</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="w-16">Image</TableHead>
+                  <TableHead className="min-w-[120px]">SKU</TableHead>
+                  <TableHead className="min-w-[180px]">Product Name</TableHead>
+                  <TableHead className="min-w-[100px]">Brand</TableHead>
+                  <TableHead className="text-right min-w-[90px]">On Hand</TableHead>
+                  <TableHead className="text-right min-w-[90px]">Available</TableHead>
+                  <TableHead className="text-right min-w-[90px]">Reserved</TableHead>
+                  <TableHead className="text-right min-w-[100px]">Sold (Month)</TableHead>
+                  <TableHead className="text-right min-w-[110px]">Shipped (Month)</TableHead>
+                  <TableHead className="min-w-[80px]">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -328,40 +328,40 @@ export default function ClientProductsTab() {
                   filteredProducts.map((product) => (
                     <TableRow 
                       key={product.id}
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="cursor-pointer hover:bg-muted/50 h-16"
                       onClick={() => {
                         setSelectedProduct(product);
                         setHistoryDialogOpen(true);
                       }}
                     >
-                      <TableCell onClick={(e) => e.stopPropagation()}>
+                      <TableCell onClick={(e) => e.stopPropagation()} className="py-3">
                         <Checkbox
                           checked={selectedProducts.has(product.id)}
                           onCheckedChange={() => toggleSelectProduct(product.id)}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="py-3">
                         {product.image_url ? (
                           <img 
                             src={product.image_url} 
                             alt={product.title || 'Product'} 
-                            className="w-10 h-10 object-cover rounded border"
+                            className="w-12 h-12 object-cover rounded border"
                           />
                         ) : (
-                          <div className="w-10 h-10 bg-muted rounded border flex items-center justify-center">
-                            <Package className="h-5 w-5 text-muted-foreground" />
+                          <div className="w-12 h-12 bg-muted rounded border flex items-center justify-center">
+                            <Package className="h-6 w-6 text-muted-foreground" />
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="font-mono text-sm">{product.client_sku}</TableCell>
-                      <TableCell>{product.title || '-'}</TableCell>
-                      <TableCell>{product.brand || '-'}</TableCell>
-                      <TableCell className="text-right font-medium">{product.on_hand}</TableCell>
-                      <TableCell className="text-right font-medium text-green-600">{product.available}</TableCell>
-                      <TableCell className="text-right font-medium text-amber-600">{product.reserved}</TableCell>
-                      <TableCell className="text-right font-medium text-blue-600">{product.sold_this_month}</TableCell>
-                      <TableCell className="text-right font-medium text-purple-600">{product.shipped_this_month}</TableCell>
-                      <TableCell>
+                      <TableCell className="font-mono text-sm font-semibold py-3">{product.client_sku}</TableCell>
+                      <TableCell className="py-3">{product.title || '-'}</TableCell>
+                      <TableCell className="py-3">{product.brand || '-'}</TableCell>
+                      <TableCell className="text-right font-semibold text-base py-3">{product.on_hand}</TableCell>
+                      <TableCell className="text-right font-semibold text-base text-green-600 py-3">{product.available}</TableCell>
+                      <TableCell className="text-right font-semibold text-base text-amber-600 py-3">{product.reserved}</TableCell>
+                      <TableCell className="text-right font-semibold text-base text-blue-600 py-3">{product.sold_this_month}</TableCell>
+                      <TableCell className="text-right font-semibold text-base text-purple-600 py-3">{product.shipped_this_month}</TableCell>
+                      <TableCell className="py-3">
                         <Badge 
                           variant={product.status === "active" ? "default" : "secondary"}
                           className={product.status === "active" ? "bg-green-600 hover:bg-green-700 text-white" : ""}

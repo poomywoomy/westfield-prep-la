@@ -28,7 +28,7 @@ export const QuickActionsCard = ({
           className="w-full justify-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white shadow-lg shadow-orange-500/20 transition-all hover:scale-[1.02] group"
         >
           <FilePlus size={18} className="group-hover:rotate-12 transition-transform" />
-          Request Shipment Creation
+          Request Outbound Shipment
         </Button>
         
         <Button 
