@@ -153,9 +153,10 @@ export function DamagedItemReviewDialog({
                     key={index}
                     src={url}
                     alt={`QC Photo ${index + 1}`}
-                    loading="lazy"
+                    loading={index < 2 ? "eager" : "lazy"}
+                    decoding="async"
                     className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => { setLightboxIndex(index); setLightboxOpen(true); }}
+                    onClick={(e) => { e.stopPropagation(); setLightboxIndex(index); setLightboxOpen(true); }}
                   />
                 ))}
               </div>

@@ -108,7 +108,7 @@ export const ClientShipmentsTab = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold flex items-center gap-2">
           <Package className="h-6 w-6" />
-          My Shipments
+          My Outbound Shipments
         </h2>
       </div>
 

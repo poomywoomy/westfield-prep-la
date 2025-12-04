@@ -25,7 +25,9 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
     if (!open) return;
     if (e.key === "Escape") {
       e.stopPropagation();
-      onClose();
+      e.preventDefault();
+      // Use setTimeout to break the event chain and prevent parent modal from closing
+      setTimeout(() => onClose(), 0);
     }
     if (e.key === "ArrowLeft") setCurrentIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
     if (e.key === "ArrowRight") setCurrentIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
@@ -58,12 +60,15 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    onClose();
+    // Use setTimeout to break the event chain
+    setTimeout(() => onClose(), 0);
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onClose();
+    e.preventDefault();
+    // Use setTimeout to break the event chain
+    setTimeout(() => onClose(), 0);
   };
 
   const lightboxContent = (
