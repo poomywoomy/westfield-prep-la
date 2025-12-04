@@ -355,13 +355,13 @@ export const ShipmentRequestsTab = () => {
                             </Select>
                             {updatingStatus === req.id && <Loader2 className="h-4 w-4 animate-spin" />}
                             
-                            {/* Dedicated Create Shipment Button */}
+                            {/* Dedicated Create Outbound Shipment Button */}
                             <Button 
                               onClick={() => handleStartShipmentWorkflow(req)}
                               className="ml-auto"
                             >
                               <Plus className="h-4 w-4 mr-1" />
-                              Create Shipment
+                              Create Outbound Shipment
                             </Button>
                           </div>
                         </div>

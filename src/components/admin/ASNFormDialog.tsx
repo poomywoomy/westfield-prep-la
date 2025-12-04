@@ -687,12 +687,12 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ship_from">Ship From</Label>
+              <Label htmlFor="ship_from">Ship From Location</Label>
               <Input
                 id="ship_from"
                 value={formData.ship_from}
                 onChange={e => setFormData({ ...formData, ship_from: e.target.value })}
-                placeholder="Origin address"
+                placeholder="Location"
                 maxLength={500}
               />
             </div>
@@ -842,68 +842,6 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
             </div>
           </div>
 
-          <div className="border-t pt-4">
-            <Label>QC / Receiving Photos</Label>
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e)}
-              className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                isDragging ? "border-primary bg-primary/5" : "border-border"
-              }`}
-            >
-              <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground mb-2">
-                Drag and drop images here, or click to select
-              </p>
-              <p className="text-xs text-muted-foreground mb-4">
-                JPG, PNG, WebP, GIF, PDF (max 20MB each)
-              </p>
-              <input
-                id="global-file-input"
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
-                multiple
-                className="hidden"
-                onChange={(e) => handleFileInput(e)}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => document.getElementById("global-file-input")?.click()}
-              >
-                Select Files
-              </Button>
-            </div>
-
-            {globalAttachments.length > 0 && (
-              <div className="mt-4 grid grid-cols-4 gap-2">
-                {globalAttachments.map((att, index) => {
-                  const globalIndex = attachments.findIndex(a => a === att);
-                  return (
-                    <div key={globalIndex} className="relative group">
-                      <img
-                        src={att.preview}
-                        alt={att.file.name}
-                        className="w-full h-24 object-cover rounded border"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => removeAttachment(globalIndex)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                      <p className="text-xs truncate mt-1">{att.file.name}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
 
         <DialogFooter>

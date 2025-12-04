@@ -135,9 +135,9 @@ const ClientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex w-full overflow-hidden">
-      {/* Left Sidebar - Fixed/Sticky */}
-      <aside className="w-64 border-r bg-card flex flex-col h-screen sticky top-0 flex-shrink-0">
+    <div className="min-h-screen bg-background flex w-full">
+      {/* Left Sidebar - Fixed position */}
+      <aside className="w-64 border-r bg-card flex flex-col h-screen fixed left-0 top-0 z-40">
         {/* Logo */}
         <div className="p-6 border-b flex items-center justify-center flex-shrink-0">
           <Link to="/client/dashboard">
@@ -251,8 +251,8 @@ const ClientDashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      {/* Main Content - with left margin for fixed sidebar */}
+      <main className="flex-1 ml-64 overflow-auto">
         <div className="container mx-auto p-6">
           {/* Minimized Welcome Banner */}
           {clientName && (

@@ -23,7 +23,10 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!open) return;
-    if (e.key === "Escape") onClose();
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      onClose();
+    }
     if (e.key === "ArrowLeft") setCurrentIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
     if (e.key === "ArrowRight") setCurrentIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
   }, [open, photos.length, onClose]);
@@ -35,27 +38,50 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
 
   if (!open || photos.length === 0) return null;
 
-  const goToPrev = () => setCurrentIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
-  const goToNext = () => setCurrentIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
-  const zoomIn = () => setZoom((prev) => Math.min(prev + 0.5, 3));
-  const zoomOut = () => setZoom((prev) => Math.max(prev - 0.5, 0.5));
+  const goToPrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
+  };
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
+  };
+  const zoomIn = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setZoom((prev) => Math.min(prev + 0.5, 3));
+  };
+  const zoomOut = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setZoom((prev) => Math.max(prev - 0.5, 0.5));
+  };
+
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onClose();
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClose();
+  };
 
   const lightboxContent = (
     <div 
       className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-      onClick={onClose}
+      onClick={handleBackdropClick}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70" />
+      <div className="absolute inset-0 bg-black/80" />
       
-      {/* Modal Container - smaller popup style */}
+      {/* Modal Container - 35% larger */}
       <div 
-        className="relative bg-background rounded-lg shadow-2xl max-w-4xl max-h-[85vh] w-full flex flex-col"
+        className="relative bg-background rounded-lg shadow-2xl max-w-6xl max-h-[92vh] w-full flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with close button */}
-        <div className="flex items-center justify-between p-3 border-b">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
@@ -64,7 +90,7 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
             >
               <ZoomOut className="h-4 w-4" />
             </Button>
-            <span className="text-sm text-muted-foreground min-w-[50px] text-center">{Math.round(zoom * 100)}%</span>
+            <span className="text-sm text-muted-foreground min-w-[60px] text-center">{Math.round(zoom * 100)}%</span>
             <Button
               variant="ghost"
               size="sm"
@@ -78,22 +104,23 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
             {currentIndex + 1} / {photos.length}
           </span>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            onClick={onClose}
-            className="hover:bg-destructive/10"
+            onClick={handleClose}
+            className="hover:bg-destructive hover:text-destructive-foreground"
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
 
-        {/* Image Container */}
-        <div className="flex-1 overflow-auto p-4 flex items-center justify-center min-h-[300px]">
+        {/* Image Container - 35% larger */}
+        <div className="flex-1 overflow-auto p-6 flex items-center justify-center min-h-[400px]">
           <img
             src={photos[currentIndex]}
             alt={`Photo ${currentIndex + 1}`}
-            className="max-w-full max-h-[60vh] object-contain transition-transform duration-200"
+            className="max-w-full max-h-[75vh] object-contain transition-transform duration-200"
             style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
+            onClick={(e) => e.stopPropagation()}
           />
         </div>
 
@@ -103,32 +130,35 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
             <Button
               variant="secondary"
               size="icon"
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full shadow-lg"
+              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full shadow-lg h-12 w-12"
               onClick={goToPrev}
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-6 w-6" />
             </Button>
             <Button
               variant="secondary"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full shadow-lg"
+              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full shadow-lg h-12 w-12"
               onClick={goToNext}
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-6 w-6" />
             </Button>
           </>
         )}
 
-        {/* Thumbnail strip */}
+        {/* Thumbnail strip - larger thumbnails */}
         {photos.length > 1 && (
-          <div className="border-t p-3 flex gap-2 justify-center overflow-x-auto">
+          <div className="border-t p-4 flex gap-3 justify-center overflow-x-auto">
             {photos.map((photo, idx) => (
               <button
                 key={idx}
-                className={`w-14 h-14 rounded overflow-hidden border-2 transition-all flex-shrink-0 ${
-                  idx === currentIndex ? "border-primary ring-2 ring-primary/20" : "border-border opacity-60 hover:opacity-100"
+                className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+                  idx === currentIndex ? "border-primary ring-2 ring-primary/30" : "border-border opacity-60 hover:opacity-100"
                 }`}
-                onClick={() => setCurrentIndex(idx)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentIndex(idx);
+                }}
               >
                 <img src={photo} alt="" className="w-full h-full object-cover" />
               </button>
