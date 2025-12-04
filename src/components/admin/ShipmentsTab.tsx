@@ -112,7 +112,7 @@ export const ShipmentsTab = () => {
         </h2>
         <Button onClick={() => setShowCreateDialog(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Create Shipment
+          Create Outbound Shipment
         </Button>
       </div>
 

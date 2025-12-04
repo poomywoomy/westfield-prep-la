@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Upload, X, Package } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type SKU = Database["public"]["Tables"]["skus"]["Row"];
@@ -24,6 +25,9 @@ interface SKUFormDialogProps {
 
 export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = false, presetClientId }: SKUFormDialogProps) => {
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -44,6 +48,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
     status: "active",
     notes: "",
     low_stock_threshold: "",
+    image_url: "",
   });
 
   useEffect(() => {
@@ -66,7 +71,9 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
         status: sku.status,
         notes: sku.notes || "",
         low_stock_threshold: sku.low_stock_threshold?.toString() || "",
+        image_url: sku.image_url || "",
       });
+      setImagePreview(sku.image_url || null);
     } else {
       setFormData({
         client_id: presetClientId || "",
@@ -86,9 +93,84 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
         status: "active",
         notes: "",
         low_stock_threshold: "",
+        image_url: "",
       });
+      setImagePreview(null);
     }
   }, [sku, open]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a JPG, PNG, WebP, or GIF image",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Maximum file size is 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const clientId = formData.client_id || presetClientId;
+      if (!clientId) {
+        throw new Error("Please select a client first");
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${clientId}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('sku-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('sku-images')
+        .getPublicUrl(fileName);
+
+      setFormData({ ...formData, image_url: publicUrl });
+      setImagePreview(publicUrl);
+      
+      toast({
+        title: "Image uploaded",
+        description: "Product image has been uploaded successfully",
+      });
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload image",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData({ ...formData, image_url: "" });
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,6 +194,7 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
       status: formData.status,
       notes: formData.notes || null,
       low_stock_threshold: formData.low_stock_threshold ? parseInt(formData.low_stock_threshold) : null,
+      image_url: formData.image_url || null,
     };
 
     const { error } = sku
@@ -142,6 +225,58 @@ export const SKUFormDialog = ({ open, onClose, sku, clients, isClientView = fals
           <DialogTitle>{sku ? "Edit SKU" : "Add New SKU"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Product Image Upload */}
+          <div className="space-y-2">
+            <Label>Product Image</Label>
+            <div className="flex items-start gap-4">
+              <div className="w-24 h-24 border rounded-lg overflow-hidden bg-muted flex items-center justify-center relative">
+                {imagePreview ? (
+                  <>
+                    <img
+                      src={imagePreview}
+                      alt="Product"
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6"
+                      onClick={handleRemoveImage}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </>
+                ) : (
+                  <Package className="h-8 w-8 text-muted-foreground" />
+                )}
+              </div>
+              <div className="flex-1 space-y-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="sku-image-upload"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading || (!formData.client_id && !presetClientId)}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {uploading ? "Uploading..." : "Upload Image"}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  JPG, PNG, WebP, GIF (max 10MB). {!formData.client_id && !presetClientId && "Select client first."}
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             {!isClientView && (
               <div className="space-y-2">

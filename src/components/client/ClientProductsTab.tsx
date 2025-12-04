@@ -295,7 +295,7 @@ export default function ClientProductsTab() {
             </div>
           )}
 
-          <div className="border rounded-lg">
+          <div className="border rounded-lg overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -305,6 +305,7 @@ export default function ClientProductsTab() {
                       onCheckedChange={toggleSelectAll}
                     />
                   </TableHead>
+                  <TableHead className="w-14">Image</TableHead>
                   <TableHead>SKU</TableHead>
                   <TableHead>Product Name</TableHead>
                   <TableHead>Brand</TableHead>
@@ -319,7 +320,7 @@ export default function ClientProductsTab() {
               <TableBody>
                 {filteredProducts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
                       No products found
                     </TableCell>
                   </TableRow>
@@ -338,6 +339,19 @@ export default function ClientProductsTab() {
                           checked={selectedProducts.has(product.id)}
                           onCheckedChange={() => toggleSelectProduct(product.id)}
                         />
+                      </TableCell>
+                      <TableCell>
+                        {product.image_url ? (
+                          <img 
+                            src={product.image_url} 
+                            alt={product.title || 'Product'} 
+                            className="w-10 h-10 object-cover rounded border"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-muted rounded border flex items-center justify-center">
+                            <Package className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="font-mono text-sm">{product.client_sku}</TableCell>
                       <TableCell>{product.title || '-'}</TableCell>

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -167,8 +168,8 @@ export function SKUDetailedHistoryDialog({
       RECEIPT: "Received",
       SALE_DECREMENT: "Sold",
       TRANSFER: "Transfer",
-      ADJUSTMENT_PLUS: "Adjustment +",
-      ADJUSTMENT_MINUS: "Adjustment -",
+      ADJUSTMENT_PLUS: "Adj +",
+      ADJUSTMENT_MINUS: "Adj -",
       RETURN: "Return",
       DAMAGED: "Damaged",
       QUARANTINED: "Quarantined",
@@ -222,151 +223,154 @@ export function SKUDetailedHistoryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="pr-8">
-          <DialogTitle>SKU History: {clientSku}</DialogTitle>
-          <div className="flex items-center gap-4 mt-2 flex-wrap">
-            <p className="text-sm text-muted-foreground flex-1 min-w-0">{title}</p>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowSKUEdit(true)}
-              className="gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              Edit SKU
-            </Button>
-            <Select value={timePeriod} onValueChange={(value: TimePeriod) => setTimePeriod(value)}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="yesterday">Yesterday</SelectItem>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-                <SelectItem value="last_month">Last Month</SelectItem>
-                <SelectItem value="3_months">Last 3 Months</SelectItem>
-                <SelectItem value="6_months">Last 6 Months</SelectItem>
-                <SelectItem value="year">This Year</SelectItem>
-              </SelectContent>
-            </Select>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-4 border-b">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="text-lg">{clientSku}</DialogTitle>
+              <p className="text-sm text-muted-foreground truncate">{title}</p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowSKUEdit(true)}
+              >
+                <Edit className="h-4 w-4 mr-1" />
+                Edit
+              </Button>
+              <Select value={timePeriod} onValueChange={(value: TimePeriod) => setTimePeriod(value)}>
+                <SelectTrigger className="w-[140px] h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="today">Today</SelectItem>
+                  <SelectItem value="yesterday">Yesterday</SelectItem>
+                  <SelectItem value="week">This Week</SelectItem>
+                  <SelectItem value="month">This Month</SelectItem>
+                  <SelectItem value="last_month">Last Month</SelectItem>
+                  <SelectItem value="3_months">3 Months</SelectItem>
+                  <SelectItem value="6_months">6 Months</SelectItem>
+                  <SelectItem value="year">This Year</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </DialogHeader>
         
-        {/* Metrics Cards */}
-        <div className="grid grid-cols-3 gap-4 my-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
+        {/* Metrics Cards - Compact 4-column grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-4">
+          <Card className="bg-green-50 border-green-200">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
                 <PackagePlus className="h-4 w-4 text-green-600" />
-                Total Received
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">+{metrics.received}</div>
+                <span className="text-xs font-medium text-green-700">Received</span>
+              </div>
+              <div className="text-xl font-bold text-green-600">+{metrics.received}</div>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
+          <Card className="bg-blue-50 border-blue-200">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
                 <ShoppingCart className="h-4 w-4 text-blue-600" />
-                Total Sold
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{metrics.sold}</div>
+                <span className="text-xs font-medium text-blue-700">Sold</span>
+              </div>
+              <div className="text-xl font-bold text-blue-600">{metrics.sold}</div>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
+          <Card className="bg-amber-50 border-amber-200">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
                 <Package2 className="h-4 w-4 text-amber-600" />
-                Total Returns
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-amber-600">+{metrics.returns}</div>
+                <span className="text-xs font-medium text-amber-700">Returns</span>
+              </div>
+              <div className="text-xl font-bold text-amber-600">+{metrics.returns}</div>
             </CardContent>
           </Card>
           <Card 
-            className="cursor-pointer hover:bg-accent/50 transition-colors" 
+            className="bg-red-50 border-red-200 cursor-pointer hover:bg-red-100 transition-colors" 
             onClick={() => setShowDiscrepancies(true)}
           >
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
                 <AlertCircle className="h-4 w-4 text-red-600" />
-                Discrepancies
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{discrepancyCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">Click to review</p>
+                <span className="text-xs font-medium text-red-700">Issues</span>
+              </div>
+              <div className="text-xl font-bold text-red-600">{discrepancyCount}</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Transaction History Table */}
-        <div className="border rounded-lg overflow-x-auto">
+        {/* Transaction History Table - Compact */}
+        <div className="border rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="whitespace-nowrap">Date</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead className="text-right whitespace-nowrap">Qty Change</TableHead>
-                <TableHead>Reason</TableHead>
-                <TableHead>Notes</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="bg-muted/50">
+                <TableHead className="text-xs py-2">Date</TableHead>
+                <TableHead className="text-xs py-2">Type</TableHead>
+                <TableHead className="text-xs py-2">Location</TableHead>
+                <TableHead className="text-xs py-2 text-right">Qty</TableHead>
+                <TableHead className="text-xs py-2">Reason</TableHead>
+                <TableHead className="text-xs py-2">Notes</TableHead>
+                <TableHead className="text-xs py-2 w-10"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : history.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                     No transactions found for this period
                   </TableCell>
                 </TableRow>
               ) : (
                 history.map((entry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="whitespace-nowrap">
-                      {format(new Date(entry.ts), "MMM d, yyyy h:mm a")}
+                  <TableRow key={entry.id} className="text-sm">
+                    <TableCell className="py-2 text-xs whitespace-nowrap">
+                      {format(new Date(entry.ts), "MMM d, h:mm a")}
                     </TableCell>
-                    <TableCell>
-                      <Badge variant={getTransactionBadgeVariant(entry.transaction_type)}>
+                    <TableCell className="py-2">
+                      <Badge variant={getTransactionBadgeVariant(entry.transaction_type)} className="text-xs px-1.5 py-0">
                         {getTransactionTypeLabel(entry.transaction_type)}
                       </Badge>
                     </TableCell>
-                    <TableCell>{entry.locations?.name || "-"}</TableCell>
-                    <TableCell className={`text-right font-medium ${entry.qty_delta > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <TableCell className="py-2 text-xs">{entry.locations?.name || "-"}</TableCell>
+                    <TableCell className={`py-2 text-right font-medium text-xs ${entry.qty_delta > 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {entry.qty_delta > 0 ? '+' : ''}{entry.qty_delta}
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="py-2 text-xs">
                       {entry.reason_code ? (
-                        <Badge variant="outline" className="text-xs">
-                          {entry.reason_code.replace('_', ' ')}
-                        </Badge>
+                        <span className="text-muted-foreground">{entry.reason_code.replace('_', ' ')}</span>
                       ) : '-'}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
-                      {entry.notes || "-"}
+                    <TableCell className="py-2 text-xs max-w-[150px]">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="truncate block">{entry.notes || "-"}</span>
+                          </TooltipTrigger>
+                          {entry.notes && (
+                            <TooltipContent className="max-w-xs">
+                              <p>{entry.notes}</p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </TooltipProvider>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="py-2">
                       {(entry.transaction_type !== 'RECEIPT') && (
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className="h-7 w-7"
                           onClick={() => handleDeleteEntry(entry.id)}
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
                         </Button>
                       )}
                     </TableCell>
