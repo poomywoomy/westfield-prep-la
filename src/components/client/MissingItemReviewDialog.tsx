@@ -92,108 +92,132 @@ export function MissingItemReviewDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg" onOpenAutoFocus={(e) => e.preventDefault()}>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <PackageX className="h-5 w-5 text-red-600" />
-            Missing Items Report
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent 
+          className="max-w-lg" 
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => {
+            // Prevent parent from closing if lightbox is open
+            if (lightboxOpen) {
+              e.preventDefault();
+            }
+          }}
+          onPointerDownOutside={(e) => {
+            // Prevent parent from closing if lightbox is open
+            if (lightboxOpen) {
+              e.preventDefault();
+            }
+          }}
+          onInteractOutside={(e) => {
+            // Prevent parent from closing if lightbox is open
+            if (lightboxOpen) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <PackageX className="h-5 w-5 text-red-600" />
+              Missing Items Report
+            </DialogTitle>
+          </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Product Info */}
-          <div className="flex gap-4 p-4 border rounded-lg bg-muted/50">
-            {discrepancy.image_url ? (
-              <img
-                src={discrepancy.image_url}
-                alt={discrepancy.title}
-                className="w-20 h-20 object-cover rounded"
-              />
-            ) : (
-              <div className="w-20 h-20 bg-muted rounded flex items-center justify-center">
-                <Package className="h-8 w-8 text-muted-foreground" />
+          <div className="space-y-6">
+            {/* Product Info */}
+            <div className="flex gap-4 p-4 border rounded-lg bg-muted/50">
+              {discrepancy.image_url ? (
+                <img
+                  src={discrepancy.image_url}
+                  alt={discrepancy.title}
+                  className="w-20 h-20 object-cover rounded"
+                />
+              ) : (
+                <div className="w-20 h-20 bg-muted rounded flex items-center justify-center">
+                  <Package className="h-8 w-8 text-muted-foreground" />
+                </div>
+              )}
+              <div className="flex-1">
+                <p className="font-semibold">{discrepancy.title}</p>
+                <p className="text-sm text-muted-foreground">SKU: {discrepancy.client_sku}</p>
+                <p className="text-sm text-muted-foreground">ASN: {discrepancy.asn_number}</p>
+                <p className="text-sm font-medium text-red-600 mt-2">
+                  {discrepancy.missing_qty} units missing
+                </p>
               </div>
-            )}
-            <div className="flex-1">
-              <p className="font-semibold">{discrepancy.title}</p>
-              <p className="text-sm text-muted-foreground">SKU: {discrepancy.client_sku}</p>
-              <p className="text-sm text-muted-foreground">ASN: {discrepancy.asn_number}</p>
-              <p className="text-sm font-medium text-red-600 mt-2">
-                {discrepancy.missing_qty} units missing
+            </div>
+
+            {/* QC Photos Section */}
+            <div className="space-y-2">
+              <Label>QC Photos (click to enlarge)</Label>
+              {photosLoading ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="w-full h-32 bg-muted rounded animate-pulse" />
+                  ))}
+                </div>
+              ) : displayPhotos.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {displayPhotos.map((url, index) => (
+                    <img
+                      key={index}
+                      src={url}
+                      alt={`QC Photo ${index + 1}`}
+                      loading={index < 2 ? "eager" : "lazy"}
+                      decoding="async"
+                      className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={(e) => { e.stopPropagation(); setLightboxIndex(index); setLightboxOpen(true); }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">
+                  No QC photos available for this discrepancy.
+                </div>
+              )}
+            </div>
+
+            {/* Info Message */}
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                These items were expected in the shipment but were not received. 
+                Please acknowledge this discrepancy. Our team will investigate and follow up.
               </p>
+            </div>
+
+            {/* Additional Notes */}
+            <div>
+              <Label htmlFor="notes" className="mb-2 block">
+                Additional Comments (Optional)
+              </Label>
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Any additional information about these missing items..."
+                rows={3}
+              />
             </div>
           </div>
 
-          {/* QC Photos Section */}
-          <div className="space-y-2">
-            <Label>QC Photos (click to enlarge)</Label>
-            {photosLoading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="w-full h-32 bg-muted rounded animate-pulse" />
-                ))}
-              </div>
-            ) : displayPhotos.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {displayPhotos.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`QC Photo ${index + 1}`}
-                    loading={index < 2 ? "eager" : "lazy"}
-                    decoding="async"
-                    className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={(e) => { e.stopPropagation(); setLightboxIndex(index); setLightboxOpen(true); }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                No QC photos available for this discrepancy.
-              </div>
-            )}
-          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+              Cancel
+            </Button>
+            <Button onClick={handleAcknowledge} disabled={loading}>
+              {loading ? "Acknowledging..." : "Acknowledge"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-          {/* Info Message */}
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              These items were expected in the shipment but were not received. 
-              Please acknowledge this discrepancy. Our team will investigate and follow up.
-            </p>
-          </div>
-
-          {/* Additional Notes */}
-          <div>
-            <Label htmlFor="notes" className="mb-2 block">
-              Additional Comments (Optional)
-            </Label>
-            <Textarea
-              id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any additional information about these missing items..."
-              rows={3}
-            />
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-            Cancel
-          </Button>
-          <Button onClick={handleAcknowledge} disabled={loading}>
-            {loading ? "Acknowledging..." : "Acknowledge"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-
+      {/* PhotoLightbox is now a SIBLING outside Dialog for proper event isolation */}
       <PhotoLightbox
         photos={displayPhotos}
         initialIndex={lightboxIndex}
         open={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
       />
-    </Dialog>
+    </>
   );
 }

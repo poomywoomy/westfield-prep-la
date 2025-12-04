@@ -21,22 +21,25 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
     }
   }, [open, initialIndex]);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (!open) return;
-    if (e.key === "Escape") {
-      e.stopPropagation();
-      e.preventDefault();
-      // Use setTimeout to break the event chain and prevent parent modal from closing
-      setTimeout(() => onClose(), 0);
-    }
-    if (e.key === "ArrowLeft") setCurrentIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
-    if (e.key === "ArrowRight") setCurrentIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
-  }, [open, photos.length, onClose]);
-
+  // Use capture phase to intercept events BEFORE Radix Dialog handlers
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+    if (!open) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        e.stopImmediatePropagation(); // Stop ALL other listeners
+        e.preventDefault();
+        onClose();
+      }
+      if (e.key === "ArrowLeft") setCurrentIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
+      if (e.key === "ArrowRight") setCurrentIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
+    };
+    
+    // CAPTURE PHASE: runs before Radix's bubble-phase handlers
+    document.addEventListener("keydown", handleKeyDown, { capture: true });
+    return () => document.removeEventListener("keydown", handleKeyDown, { capture: true });
+  }, [open, photos.length, onClose]);
 
   if (!open || photos.length === 0) return null;
 
@@ -74,10 +77,13 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
   const lightboxContent = (
     <div 
       className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
       onClick={handleBackdropClick}
+      onMouseDown={(e) => e.stopPropagation()}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/80" />
+      <div className="absolute inset-0 bg-black/80" onMouseDown={(e) => e.stopPropagation()} />
       
       {/* Modal Container - 35% larger */}
       <div 
