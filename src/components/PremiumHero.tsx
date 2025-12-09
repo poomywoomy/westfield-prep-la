@@ -18,11 +18,11 @@ const PremiumHero = () => {
   ];
 
   const platformLogos = [
-    { name: "Shopify", icon: "🛍️" },
-    { name: "Amazon", icon: "📦" },
-    { name: "WooCommerce", icon: "🛒" },
-    { name: "NetSuite", icon: "⚡" },
-    { name: "Walmart", icon: "🏪" },
+    { name: "Shopify", color: "bg-[#96BF48]" },
+    { name: "Amazon", color: "bg-[#FF9900]" },
+    { name: "Walmart", color: "bg-[#0071DC]" },
+    { name: "WooCommerce", color: "bg-[#7F54B3]" },
+    { name: "NetSuite", color: "bg-[#125580]" },
   ];
 
   const fadeUpVariants = {
@@ -96,24 +96,24 @@ const PremiumHero = () => {
                 <span className="text-[#FF7A00]">Start Scaling Faster.</span>
               </motion.h1>
 
-              {/* Trust Indicator */}
+              {/* Subheadline - SEO Optimized */}
+              <motion.p
+                variants={fadeUpVariants}
+                className="text-lg md:text-xl text-white/80 leading-relaxed max-w-xl"
+              >
+                LA's Premier E-Commerce Fulfillment & Shopify 3PL Partner. 2M+ orders fulfilled with same-day receiving, same-day turnaround, and plug-and-play integrations with Shopify, Amazon, Walmart, and more.
+              </motion.p>
+
+              {/* Trust Indicator - Below Subheadline */}
               <motion.div 
                 variants={fadeUpVariants}
                 className="flex items-center gap-2"
               >
                 <Star className="w-4 h-4 text-[#FF7A00] fill-[#FF7A00]" />
-                <span className="text-white/70 text-sm font-medium">
-                  Trusted by 100+ fast-scaling ecommerce brands
+                <span className="text-white/70 text-sm font-semibold">
+                  Trusted by 100+ fast-scaling eCommerce brands
                 </span>
               </motion.div>
-
-              {/* Subheadline - Constrained Width */}
-              <motion.p
-                variants={fadeUpVariants}
-                className="text-lg md:text-xl text-white/80 leading-relaxed max-w-xl"
-              >
-                Join 100+ e-commerce brands who've shipped 2M+ orders through LA's most responsive fulfillment team. Same-day receiving, same-day turnaround, and a team that actually picks up the phone.
-              </motion.p>
 
               {/* CTA Buttons - Left Aligned */}
               <motion.div
@@ -169,18 +169,18 @@ const PremiumHero = () => {
                 <p className="text-xs text-white/50 uppercase tracking-widest mb-4 font-medium">
                   Integrated with
                 </p>
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-3">
                   {platformLogos.map((platform, index) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.8 + index * 0.1 }}
-                      whileHover={{ scale: 1.05 }}
-                      className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-default"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      className="flex items-center gap-2 px-4 py-2.5 bg-white/8 backdrop-blur-md border border-white/15 rounded-xl hover:bg-white/12 hover:border-white/25 transition-all duration-300 cursor-default shadow-lg"
                     >
-                      <span className="text-lg opacity-80">{platform.icon}</span>
-                      <span className="text-sm text-white/60 font-medium">{platform.name}</span>
+                      <div className={`w-2.5 h-2.5 rounded-full ${platform.color}`} />
+                      <span className="text-sm text-white/80 font-medium tracking-wide">{platform.name}</span>
                     </motion.div>
                   ))}
                 </div>
