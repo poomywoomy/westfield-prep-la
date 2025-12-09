@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, CheckCircle, Clock, DollarSign, Package } from "lucide-react";
+import { ArrowRight, CheckCircle, Clock, DollarSign, Package, Plug } from "lucide-react";
 import { motion } from "framer-motion";
 
 const PremiumHero = () => {
@@ -15,6 +15,7 @@ const PremiumHero = () => {
     { icon: CheckCircle, text: "24-48hr Turnaround" },
     { icon: DollarSign, text: "No Minimums" },
     { icon: Package, text: "100% Transparent Pricing" },
+    { icon: Plug, text: "Seamless Integrations" },
   ];
 
   const fadeUpVariants = {

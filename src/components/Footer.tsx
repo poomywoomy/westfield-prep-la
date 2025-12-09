@@ -139,6 +139,9 @@ const Footer = () => {
                 <Link to="/why-choose-us" className="block text-sm text-white/80 hover:text-secondary transition-colors">
                   Why Choose Us
                 </Link>
+                <Link to="/integrations" className="block text-sm text-white/80 hover:text-secondary transition-colors">
+                  Integrations & API
+                </Link>
                 <Link to="/faq" className="block text-sm text-white/80 hover:text-secondary transition-colors">
                   FAQ
                 </Link>
