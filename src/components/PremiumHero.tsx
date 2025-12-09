@@ -93,8 +93,16 @@ const PremiumHero = () => {
                 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white tracking-tight"
               >
                 Stop Losing Orders to Slow Fulfillment.{" "}
-                <span className="text-[#FF7A00]">Start Scaling Faster.</span>
+              <span className="text-[#FF7A00]">Start Scaling Faster.</span>
               </motion.h1>
+
+              {/* Success Metric */}
+              <motion.p
+                variants={fadeUpVariants}
+                className="text-sm text-white/60 font-medium tracking-wide"
+              >
+                2M+ orders fulfilled with 99.8% accuracy.
+              </motion.p>
 
               {/* Subheadline - SEO Optimized */}
               <motion.p
