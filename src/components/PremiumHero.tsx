@@ -139,8 +139,7 @@ const PremiumHero = () => {
                 <Button
                   onClick={() => navigate("/pricing")}
                   size="lg"
-                  variant="outline"
-                  className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 font-semibold transition-all duration-300 backdrop-blur-sm"
+                  className="border-2 border-white bg-white text-[#0A0A23] hover:bg-white/90 font-semibold transition-all duration-300 shadow-lg"
                 >
                   View Pricing
                 </Button>
