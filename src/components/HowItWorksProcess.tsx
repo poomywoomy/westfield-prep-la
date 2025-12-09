@@ -11,7 +11,7 @@ const HowItWorksProcess = () => {
       icon: Package,
       number: "01",
       title: "RECEIVE",
-      description: "Ship your inventory to our LA warehouse. Same-day receiving with complete photo documentation and ASN verification.",
+      description: "Ship it to us, we handle the rest. Same-day receiving with complete photo documentation so you know exactly what arrived.",
       stat: "Same Day",
       statLabel: "Processing Time",
       metric: "99.8%",
@@ -21,7 +21,7 @@ const HowItWorksProcess = () => {
       icon: Database,
       number: "02",
       title: "STORE",
-      description: "We organize and track your stock in real-time. Strategic pallet placement and bin organization for fast picking.",
+      description: "Your products, organized and tracked in real-time. Strategic placement means faster picking and fewer errors.",
       stat: "Real-Time",
       statLabel: "Inventory Tracking",
       metric: "50K+",
@@ -31,9 +31,9 @@ const HowItWorksProcess = () => {
       icon: PackageCheck,
       number: "03",
       title: "FULFILL",
-      description: "When orders come in, we pick products within 24-48 hours. Quality checks ensure accuracy before packing.",
-      stat: "24-48 hrs",
-      statLabel: "Pick & Pack Time",
+      description: "When orders hit, we move. Same-day turnaround with quality checks that catch mistakes before customers do.",
+      stat: "Same Day",
+      statLabel: "Turnaround Time",
       metric: "99.9%",
       metricLabel: "Order Accuracy"
     },
@@ -41,7 +41,7 @@ const HowItWorksProcess = () => {
       icon: Truck,
       number: "04",
       title: "SHIP",
-      description: "We pack with care and ship via the best carrier for speed & cost. Tracking updates sent automatically.",
+      description: "Best carrier for speed and cost, automatically selected. Your customers get tracking, you get peace of mind.",
       stat: "2-Day",
       statLabel: "West Coast Delivery",
       metric: "Auto",
@@ -55,10 +55,10 @@ const HowItWorksProcess = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Simple, Streamlined Fulfillment Process
+              How It Actually Works (No Jargon, No Confusion)
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              From receiving to shipping, we handle every step with precision and speed
+              We made fulfillment simple because you've got a brand to build.
             </p>
           </div>
 

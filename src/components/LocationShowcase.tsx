@@ -9,10 +9,10 @@ const LocationShowcase = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
-              Strategically Located in Los Angeles
+              Why Los Angeles? Because Location Is Logistics.
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              15+ years serving eCommerce brands with 2M+ orders fulfilled. Our Los Angeles warehouse offers Port of LA proximity and fast West Coast distribution.
+              15+ years and 2M+ orders later, we know exactly why LA is the smartest place to base your fulfillment. Closer to the port. Faster to the customer. Better for your bottom line.
             </p>
           </div>
 

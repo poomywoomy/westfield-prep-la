@@ -5,37 +5,37 @@ const services = [
   {
     icon: Zap,
     title: "Same-Day Shipping",
-    description: "Orders received before 2PM PST ship the same day. Fast nationwide delivery from our Los Angeles hub.",
+    description: "Order at 10am? Shipped by 3pm. That's the Westfield difference. Fast nationwide delivery from our Los Angeles hub.",
     bestFor: ["DTC Brands", "Time-Sensitive Products", "High-Volume Sellers"]
   },
   {
     icon: Clock,
     title: "Same-Day Check-Ins",
-    description: "Inventory received and processed within 24 hours with complete photo documentation.",
+    description: "Your inventory doesn't sit in limbo. It's checked in, photographed, and ready to sell within 24 hours.",
     bestFor: ["Fast-Moving Inventory", "Product Launches", "Seasonal Restocks"]
   },
   {
     icon: Globe,
     title: "International Shipping",
-    description: "Worldwide fulfillment with customs documentation and global carrier partnerships.",
+    description: "Your products, delivered worldwide. We handle the customs headaches so you don't have to.",
     bestFor: ["Global Brands", "Export Businesses", "Multi-Country Sellers"]
   },
   {
     icon: Building2,
     title: "B2B Fulfillment",
-    description: "Wholesale orders, pallet forwarding, and bulk distribution for business clients.",
+    description: "Pallets, wholesale orders, retail compliance. We speak B2B fluently.",
     bestFor: ["Wholesalers", "Brand Distributors", "Retail Vendors"]
   },
   {
     icon: Users,
     title: "DTC Fulfillment",
-    description: "Direct-to-consumer orders with branded packaging and premium unboxing experiences.",
+    description: "Custom inserts, tissue paper, thank-you cards? We'll make your unboxing experience Instagram-worthy.",
     bestFor: ["Luxury Brands", "Subscription Boxes", "Gift Products"]
   },
   {
     icon: Warehouse,
     title: "Storage & Warehousing",
-    description: "Climate-controlled secure storage with flexible monthly terms in Los Angeles.",
+    description: "Flexible terms, no long-term contracts. Pay for what you use, scale when you're ready.",
     bestFor: ["Seasonal Inventory", "Long-Term Storage", "Overflow Stock"]
   }
 ];
@@ -52,10 +52,10 @@ const Services = () => {
           {/* Header */}
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Fulfillment Solutions
+              Every Fulfillment Scenario, Covered
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              Comprehensive logistics services designed to scale with your business
+              From your first 50 orders to full-scale multi-channel distribution, we've built the playbook.
             </p>
           </div>
 
