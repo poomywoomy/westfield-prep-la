@@ -80,6 +80,10 @@ const Header = () => {
             <Link to="/3pl-los-angeles" className="text-foreground hover:text-primary transition-colors font-medium text-base">
               3PL Los Angeles
             </Link>
+            
+            <Link to="/integrations" className="text-foreground hover:text-primary transition-colors font-medium text-base">
+              Integrations
+            </Link>
 
             {/* About Dropdown */}
             <NavigationMenu>

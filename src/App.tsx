@@ -37,6 +37,7 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const WhyChooseUs = lazy(() => import("./pages/WhyChooseUs"));
 const SalesChannels = lazy(() => import("./pages/SalesChannels"));
 const ThreePLLosAngeles = lazy(() => import("./pages/ThreePLLosAngeles"));
+const Integrations = lazy(() => import("./pages/Integrations"));
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => {
               <Route path="/amazon-fba-prep" element={<AmazonFBAPrep />} />
               <Route path="/tiktok-shop-fulfillment" element={<TikTokShopFulfillment />} />
               <Route path="/sales-channels" element={<SalesChannels />} />
+              <Route path="/integrations" element={<Integrations />} />
               <Route path="/kitting-bundling" element={<KittingBundling />} />
               <Route path="/labeling-fnsku" element={<LabelingCompliance />} />
               <Route path="/storage-warehousing" element={<StorageWarehousing />} />

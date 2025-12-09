@@ -67,6 +67,8 @@ const Pricing = () => {
     { service: "Photo Documentation", description: "Quality control and proof of service" },
     { service: "Inventory Tracking", description: "Real-time dashboard access to your stock" },
     { service: "Multi-Channel Support", description: "Shopify, Amazon, TikTok Shop integration" },
+    { service: "Platform Integrations", description: "Connect ERPs, e-commerce platforms & custom APIs" },
+    { service: "Developer API Access", description: "REST API & webhooks for custom workflows" },
   ];
 
   return (
