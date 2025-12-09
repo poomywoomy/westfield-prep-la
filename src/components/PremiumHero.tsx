@@ -11,11 +11,11 @@ const PremiumHero = () => {
   };
 
   const trustBadges = [
-    { icon: Clock, text: "Same-Day Receiving" },
-    { icon: CheckCircle, text: "24-48hr Turnaround" },
-    { icon: DollarSign, text: "No Minimums" },
-    { icon: Package, text: "100% Transparent Pricing" },
-    { icon: Plug, text: "Seamless Integrations" },
+    { icon: Clock, text: "Same-Day Receiving (Really)" },
+    { icon: CheckCircle, text: "Same-Day Turnaround" },
+    { icon: DollarSign, text: "No Minimums Ever" },
+    { icon: Package, text: "Zero Hidden Fees" },
+    { icon: Plug, text: "Plug & Play Integrations" },
   ];
 
   const fadeUpVariants = {
@@ -76,7 +76,7 @@ const PremiumHero = () => {
             variants={fadeUpVariants}
             className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white"
           >
-            LA's Premier E-Commerce Fulfillment & 3PL Partner
+            Stop Losing Orders to Slow Fulfillment. Start Scaling Faster.
           </motion.h1>
 
           {/* Subheadline */}
@@ -84,7 +84,7 @@ const PremiumHero = () => {
             variants={fadeUpVariants}
             className="text-lg md:text-xl text-white/90 leading-relaxed"
           >
-            2M+ orders fulfilled for fast-growing eCommerce brands.
+            Join 100+ e-commerce brands who've shipped 2M+ orders through LA's most responsive fulfillment team. Same-day receiving, same-day turnaround, and a team that actually picks up the phone.
           </motion.p>
 
           {/* CTAs */}

@@ -10,11 +10,11 @@ const FinalCTA = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Simplify Your Fulfillment?
+            Your Competitors Are Already Shipping Faster. What Are You Waiting For?
           </h2>
           
           <p className="text-xl mb-10 opacity-90 leading-relaxed">
-            Get a free fulfillment audit from our team. We'll analyze your current operations, identify cost-saving opportunities, and show you exactly how Westfield can support your growth. No obligations, no pressure - just expert advice.
+            Get a free fulfillment audit from our team. We'll analyze your current operations, show you where you're leaving money on the table, and map out exactly how Westfield can help you scale. No sales pitch. Just real advice from people who've done this 2 million times.
           </p>
 
           <Button 
@@ -45,7 +45,7 @@ const FinalCTA = () => {
 
           {/* Trust Reinforcement */}
           <p className="text-sm opacity-75">
-            Serving 100+ e-commerce brands | 2M+ orders fulfilled this year | Same-day receiving
+            Trusted by 100+ e-commerce brands | 2M+ orders shipped | Same-day turnaround, every time
           </p>
         </div>
       </div>

@@ -2,33 +2,33 @@ import { Package, DollarSign, MapPin, TrendingUp, CheckCircle, Users } from "luc
 const ValueProposition = () => {
   const benefits = [{
     icon: Package,
-    title: "Fast Turnaround",
-    description: "Orders processed in 24-48 hours. Same-day receiving available.",
-    stat: "24-48hr"
+    title: "Speed That Keeps Customers Happy",
+    description: "Your orders ship same-day. Same-day receiving means your inventory is live and selling faster.",
+    stat: "Same-Day"
   }, {
     icon: DollarSign,
-    title: "Transparent Pricing",
-    description: "No hidden fees. Clear per-item pricing you can calculate upfront.",
-    stat: "No Hidden Fees"
+    title: "No 'Gotcha' Invoices",
+    description: "You'll know exactly what you're paying before you sign. No hidden fees, no surprise charges, no fine print.",
+    stat: "Zero Hidden Fees"
   }, {
     icon: MapPin,
-    title: "Strategic Location",
-    description: "Near Port of LA for lower import costs. Fast West Coast distribution.",
-    stat: "LA Based"
+    title: "The LA Advantage",
+    description: "Minutes from the Port of LA means lower import costs and lightning-fast West Coast distribution.",
+    stat: "Port Adjacent"
   }, {
     icon: TrendingUp,
-    title: "Built to Scale",
-    description: "No minimums. We grow with you from 50 to 5,000+ orders/month.",
+    title: "Grow Without Growing Pains",
+    description: "No minimums. No volume commitments. Whether you're shipping 50 or 5,000+ orders a month, we flex with you.",
     stat: "No Minimums"
   }, {
     icon: CheckCircle,
-    title: "Quality-Focused",
-    description: "Experienced fulfillment specialists who treat your products like their own.",
+    title: "99.8% Accuracy (We Obsess Over It)",
+    description: "Our fulfillment specialists treat your products like their own. One wrong shipment is one too many.",
     stat: "99.8% Accuracy"
   }, {
     icon: Users,
-    title: "Dedicated Support",
-    description: "Direct communication with your account team. Fast response times.",
+    title: "A Team That Actually Responds",
+    description: "< 2hr response times. Direct access to your account team. No ticket queues, no bots, no ghosting.",
     stat: "< 2hr Response"
   }];
   return <section className="py-24 bg-gradient-to-b from-background via-muted/20 to-background">
@@ -37,11 +37,11 @@ const ValueProposition = () => {
           {/* Header */}
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold leading-tight text-foreground mb-6">
-              Why E-Commerce Brands Choose Westfield
+              Why Growing Brands Fire Their Old 3PL and Switch to Westfield
             </h2>
             
             <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              Expert 3PL and fulfillment services for online brands throughout Los Angeles and Southern California.
+              We've heard the horror stories. Missed shipments. Ghost-mode support. Surprise fees. Here's why that doesn't happen here.
             </p>
 
             <div className="flex items-center justify-center gap-8 mt-8">

@@ -21,24 +21,28 @@ const StatsStrip = () => {
       value: 2000000,
       suffix: "+",
       label: "Orders Fulfilled",
+      subtext: "...and counting. Every single one on time."
     },
     {
       icon: Award,
       value: 99.8,
       suffix: "%",
       label: "Accuracy Rate",
+      subtext: "Because close enough isn't good enough."
     },
     {
       icon: TrendingUp,
       value: 15,
       suffix: "+",
       label: "Years in Business",
+      subtext: "We've seen it all. We've solved it all."
     },
     {
       icon: Users,
       value: 100,
       suffix: "+",
       label: "Active Clients",
+      subtext: "Brands that trust us with their reputation."
     },
   ];
 
@@ -75,6 +79,9 @@ const StatsStrip = () => {
                   </div>
                   <div className="text-sm text-muted-foreground font-medium">
                     {stat.label}
+                  </div>
+                  <div className="text-xs text-muted-foreground/70 italic">
+                    {stat.subtext}
                   </div>
                 </div>
               </div>
