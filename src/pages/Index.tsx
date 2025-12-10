@@ -16,7 +16,7 @@ const Services = lazy(() => import("@/components/Services"));
 const HowItWorksProcess = lazy(() => import("@/components/HowItWorksProcess"));
 const Reviews = lazy(() => import("@/components/Reviews"));
 const LocationShowcase = lazy(() => import("@/components/LocationShowcase"));
-const LeadMagnet = lazy(() => import("@/components/LeadMagnet"));
+
 const FAQAccordion = lazy(() => import("@/components/FAQAccordion"));
 const FinalCTA = lazy(() => import("@/components/FinalCTA"));
 const Compliance = lazy(() => import("@/components/Compliance"));
@@ -136,10 +136,6 @@ const Index = () => {
           <BlogPreview />
         </Suspense>
         
-        {/* Phase 9: Lead Magnet */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <LeadMagnet />
-        </Suspense>
         
         {/* Phase 10: FAQ */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
