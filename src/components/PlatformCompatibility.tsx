@@ -17,7 +17,6 @@ const PlatformCompatibility = () => {
     { name: "Amazon", icon: Package, strength: "FBA Specialist" },
     { name: "Walmart", icon: Building2, strength: "Full Integration" },
     { name: "Etsy", icon: Palette, strength: "Handmade Focus" },
-    { name: "Custom API", icon: Code, strength: "Developer-Ready" },
   ];
 
   return (
@@ -80,6 +79,24 @@ const PlatformCompatibility = () => {
                   </div>
                 </div>
               ))}
+              
+              {/* Many More Button */}
+              <button 
+                onClick={() => navigate("/integrations")}
+                className="group relative bg-gradient-to-br from-card via-card/80 to-primary/5 border-2 border-dashed border-primary/50 hover:border-primary rounded-3xl p-8 flex flex-col items-center justify-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                <div className="mb-4 flex justify-center relative z-10">
+                  <Code className="w-16 h-16 text-primary group-hover:scale-110 transition-transform" />
+                </div>
+                <div className="text-center font-bold text-xl text-card-foreground mb-2 relative z-10">
+                  Many More
+                </div>
+                <div className="text-sm text-primary font-semibold relative z-10">
+                  View All →
+                </div>
+              </button>
             </div>
           </div>
 

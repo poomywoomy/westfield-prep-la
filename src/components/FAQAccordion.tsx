@@ -13,7 +13,7 @@ const FAQAccordion = () => {
     },
     {
       question: "What's your order turnaround time?",
-      answer: "We process orders within 24-48 hours of receiving them. Orders placed before 2 PM PST typically ship same-day. Our efficient operations and LA location ensure fast delivery times for your customers."
+      answer: "We process orders within 24 hours of receiving them. Orders placed before 2 PM PST typically ship same-day. Our efficient operations and LA location ensure fast delivery times for your customers."
     },
     {
       question: "What e-commerce platforms do you support?",
