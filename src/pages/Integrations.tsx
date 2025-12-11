@@ -95,7 +95,7 @@ const platformIcons: Record<string, IconType | null> = {
 // Image-based logos for platforms without good react-icons
 const logoImages: Record<string, string> = {
   mystore: "/integration-logos/mystore-logo.jpeg",
-  faire: "/integration-logos/faire-logo.png",
+  faire: "/integration-logos/faire-logo.svg",
 };
 
 // Image-based carrier logos
