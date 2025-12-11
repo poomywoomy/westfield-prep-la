@@ -113,6 +113,13 @@ const carrierLogoImages: Record<string, string> = {
   bring: "/integration-logos/bring-logo.svg",
   canadapost: "/integration-logos/canadapost-logo.png",
   asendia: "/integration-logos/asendia-logo.png",
+  australiapost: "/integration-logos/australiapost-logo.png",
+  startrack: "/integration-logos/australiapost-logo.png",
+  nzcouriers: "/integration-logos/nzcouriers-logo.jpeg",
+  tusk: "/integration-logos/tusk-logo.jpeg",
+  passport: "/integration-logos/passport-logo.jpeg",
+  stallion: "/integration-logos/stallion-logo.png",
+  vesyl: "/integration-logos/vesyl-logo.jpeg",
 };
 
 // Size multipliers for logos with extra whitespace
