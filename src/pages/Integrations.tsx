@@ -998,7 +998,7 @@ const Integrations = () => {
                 Many More Integrations Available
               </div>
               <p className="text-sm text-gray-500 max-w-md">
-                Don't see your platform or carrier? We support 100+ additional integrations 
+                Don't see your platform or carrier? We support many additional integrations 
                 and can build custom connections for enterprise clients.
               </p>
               <Link to="/contact">
