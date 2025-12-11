@@ -62,6 +62,9 @@ const brandColors: Record<string, string> = {
   prestashop: "#DF0067",
   wix: "#0C6EFC",
   mystore: "#1D4ED8",
+  salesforce: "#00A1E0",
+  lightspeed: "#78BE20",
+  shipstation: "#84BD00",
 };
 
 const carrierColors: Record<string, string> = {
@@ -112,157 +115,220 @@ const carrierIcons: Record<string, IconType | null> = {
   deutschepost: SiDeutschepost,
 };
 
-// Top E-Commerce Platforms
-const topPlatforms = [
-  {
-    name: "Shopify",
-    key: "shopify",
-    syncTypes: ["Orders", "Inventory", "Shipping"],
-    connectionType: "Native OAuth",
-    description: "Seamlessly sync your Shopify store with real-time order imports, inventory updates, and automatic tracking.",
-    isHero: true,
-    badge: "Most Popular",
-  },
-  {
-    name: "Shopify Plus",
-    key: "shopifyPlus",
-    syncTypes: ["Orders", "Inventory", "Shipping", "Scripts"],
-    connectionType: "Native OAuth",
-    description: "Enterprise-grade integration with advanced features for high-volume merchants.",
-    badge: "Enterprise",
-  },
-  {
-    name: "Amazon",
-    key: "amazon",
-    syncTypes: ["Orders", "Inventory", "FBA Prep"],
-    connectionType: "Native API",
-    description: "Full Amazon Seller Central integration with FBA prep and inventory sync capabilities.",
-  },
-  {
-    name: "Walmart",
-    key: "walmart",
-    syncTypes: ["Orders", "Inventory", "WFS"],
-    connectionType: "Native API",
-    description: "Connect your Walmart Marketplace with WFS-ready fulfillment support.",
-    badge: "WFS Ready",
-  },
-  {
-    name: "TikTok Shop",
-    key: "tiktok",
-    syncTypes: ["Orders", "Inventory"],
-    connectionType: "Native API",
-    description: "Fulfill TikTok Shop orders with automatic inventory sync and tracking updates.",
-  },
-  {
-    name: "Etsy",
-    key: "etsy",
-    syncTypes: ["Orders", "Inventory"],
-    connectionType: "Native OAuth",
-    description: "Sync your Etsy shop orders and manage inventory across all channels.",
-  },
-  {
-    name: "WooCommerce",
-    key: "woocommerce",
-    syncTypes: ["Orders", "Inventory", "Shipping"],
-    connectionType: "REST API",
-    description: "WordPress WooCommerce integration with webhook support for real-time updates.",
-  },
-  {
-    name: "BigCommerce",
-    key: "bigcommerce",
-    syncTypes: ["Orders", "Inventory"],
-    connectionType: "Native API",
-    description: "Enterprise e-commerce platform integration with full order management.",
-  },
-  {
-    name: "Faire",
-    key: "faire",
-    syncTypes: ["Orders", "Inventory"],
-    connectionType: "Native API",
-    description: "Wholesale marketplace integration for B2B order fulfillment.",
-  },
-  {
-    name: "Magento",
-    key: "magento",
-    syncTypes: ["Orders", "Inventory"],
-    connectionType: "REST API",
-    description: "Adobe Commerce / Magento integration for enterprise merchants.",
-  },
-  {
-    name: "Prestashop",
-    key: "prestashop",
-    syncTypes: ["Orders", "Inventory"],
-    connectionType: "Web Services",
-    description: "European e-commerce platform with multi-language support.",
-  },
-  {
-    name: "Wix",
-    key: "wix",
-    syncTypes: ["Orders", "Inventory"],
-    connectionType: "Native API",
-    description: "Wix eCommerce store integration with automatic order sync.",
-  },
-  {
-    name: "MyStore",
-    key: "mystore",
-    syncTypes: ["Orders", "Inventory"],
-    connectionType: "API",
-    description: "MyStore platform integration for order and inventory management.",
-  },
-];
+// Provider group colors
+const providerColors: Record<string, string> = {
+  native: "#22C55E",
+  orderdesk: "#3B82F6",
+  pipe17: "#8B5CF6",
+  easypost: "#F97316",
+  webshipper: "#F59E0B",
+};
 
-// Shipping carriers grouped by region
+// Platform type definition
+interface Platform {
+  name: string;
+  key: string;
+  syncTypes: string[];
+  connectionType: string;
+  description: string;
+  isHero?: boolean;
+  badge?: string;
+}
+
+// Platforms grouped by connection provider
+const platformGroups: Record<string, { title: string; color: string; platforms: Platform[] }> = {
+  native: {
+    title: "Native Integrations",
+    color: providerColors.native,
+    platforms: [
+      {
+        name: "Shopify",
+        key: "shopify",
+        syncTypes: ["Orders", "Inventory", "Shipping"],
+        connectionType: "Native OAuth",
+        description: "Seamlessly sync your Shopify store with real-time order imports, inventory updates, and automatic tracking.",
+        isHero: true,
+        badge: "Most Popular",
+      },
+      {
+        name: "Shopify Plus",
+        key: "shopifyPlus",
+        syncTypes: ["Orders", "Inventory", "Shipping", "Scripts"],
+        connectionType: "Native OAuth",
+        description: "Enterprise-grade integration with advanced features for high-volume merchants.",
+        badge: "Enterprise",
+      },
+    ],
+  },
+  orderdesk: {
+    title: "Connected via OrderDesk",
+    color: providerColors.orderdesk,
+    platforms: [
+      {
+        name: "Amazon",
+        key: "amazon",
+        syncTypes: ["Orders", "Inventory", "FBA Prep"],
+        connectionType: "via OrderDesk",
+        description: "Full Amazon Seller Central integration with FBA prep and inventory sync capabilities.",
+      },
+      {
+        name: "Walmart",
+        key: "walmart",
+        syncTypes: ["Orders", "Inventory", "WFS"],
+        connectionType: "via OrderDesk",
+        description: "Connect your Walmart Marketplace with WFS-ready fulfillment support.",
+        badge: "WFS Ready",
+      },
+      {
+        name: "TikTok Shop",
+        key: "tiktok",
+        syncTypes: ["Orders", "Inventory"],
+        connectionType: "via OrderDesk",
+        description: "Fulfill TikTok Shop orders with automatic inventory sync and tracking updates.",
+      },
+      {
+        name: "Faire",
+        key: "faire",
+        syncTypes: ["Orders", "Inventory"],
+        connectionType: "via OrderDesk",
+        description: "Wholesale marketplace integration for B2B order fulfillment.",
+      },
+      {
+        name: "ShipStation",
+        key: "shipstation",
+        syncTypes: ["Orders", "Shipping"],
+        connectionType: "via OrderDesk",
+        description: "Multi-carrier shipping platform integration for label printing and tracking.",
+      },
+      {
+        name: "Salesforce",
+        key: "salesforce",
+        syncTypes: ["Orders", "CRM"],
+        connectionType: "via OrderDesk",
+        description: "Enterprise CRM integration for unified customer and order management.",
+      },
+    ],
+  },
+  pipe17: {
+    title: "Connected via Pipe17",
+    color: providerColors.pipe17,
+    platforms: [
+      {
+        name: "Lightspeed",
+        key: "lightspeed",
+        syncTypes: ["Orders", "Inventory", "POS"],
+        connectionType: "via Pipe17",
+        description: "Retail POS and e-commerce platform integration for omnichannel selling.",
+      },
+    ],
+  },
+  other: {
+    title: "Additional Platforms",
+    color: "#6B7280",
+    platforms: [
+      {
+        name: "Etsy",
+        key: "etsy",
+        syncTypes: ["Orders", "Inventory"],
+        connectionType: "REST API",
+        description: "Sync your Etsy shop orders and manage inventory across all channels.",
+      },
+      {
+        name: "WooCommerce",
+        key: "woocommerce",
+        syncTypes: ["Orders", "Inventory", "Shipping"],
+        connectionType: "REST API",
+        description: "WordPress WooCommerce integration with webhook support for real-time updates.",
+      },
+      {
+        name: "BigCommerce",
+        key: "bigcommerce",
+        syncTypes: ["Orders", "Inventory"],
+        connectionType: "REST API",
+        description: "Enterprise e-commerce platform integration with full order management.",
+      },
+      {
+        name: "Magento",
+        key: "magento",
+        syncTypes: ["Orders", "Inventory"],
+        connectionType: "REST API",
+        description: "Adobe Commerce / Magento integration for enterprise merchants.",
+      },
+      {
+        name: "Prestashop",
+        key: "prestashop",
+        syncTypes: ["Orders", "Inventory"],
+        connectionType: "Web Services",
+        description: "European e-commerce platform with multi-language support.",
+      },
+      {
+        name: "Wix",
+        key: "wix",
+        syncTypes: ["Orders", "Inventory"],
+        connectionType: "REST API",
+        description: "Wix eCommerce store integration with automatic order sync.",
+      },
+      {
+        name: "MyStore",
+        key: "mystore",
+        syncTypes: ["Orders", "Inventory"],
+        connectionType: "API",
+        description: "MyStore platform integration for order and inventory management.",
+      },
+    ],
+  },
+};
+
+// Flatten all platforms for lookup
+const allPlatforms = Object.values(platformGroups).flatMap(group => group.platforms);
+
+// Shipping carriers grouped by connection provider
 const carrierGroups = {
-  global: {
-    title: "Global Carriers",
+  easypost: {
+    title: "Connected via EasyPost & eHub",
+    provider: "EasyPost",
+    providerColor: "#F97316",
     carriers: [
       { name: "DHL", key: "dhl", color: "#FFCC00" },
       { name: "FedEx", key: "fedex", color: "#4D148C" },
       { name: "UPS", key: "ups", color: "#351C15" },
-    ],
-  },
-  us: {
-    title: "US Carriers",
-    carriers: [
       { name: "USPS", key: "usps", color: "#004B87" },
-      { name: "Pitney Bowes", key: "pitneybowes", color: "#E4002B" },
-      { name: "Tusk Logistics", key: "tusk", color: "#1E3A5F" },
       { name: "eHub", key: "ehub", color: "#00B4D8" },
-      { name: "Buku Ship", key: "buku", color: "#FF6B35" },
-      { name: "uShip", key: "uship", color: "#00A651" },
-      { name: "Vesyl", key: "vesyl", color: "#6366F1" },
+      { name: "Pitney Bowes", key: "pitneybowes", color: "#E4002B" },
     ],
   },
-  canada: {
-    title: "Canada",
+  webshipper: {
+    title: "Connected via WebShipper",
+    provider: "WebShipper",
+    providerColor: "#F59E0B",
+    carriers: [
+      { name: "Deutsche Post", key: "deutschepost", color: "#FFCC00" },
+      { name: "Asendia", key: "asendia", color: "#E4002B" },
+      { name: "Postnord", key: "postnord", color: "#00A3E0" },
+      { name: "Bring", key: "bring", color: "#7BC144" },
+    ],
+  },
+  regional: {
+    title: "Regional Carriers",
+    provider: null,
+    providerColor: "#6B7280",
     carriers: [
       { name: "Canada Post", key: "canadapost", color: "#E4002B" },
       { name: "Stallion Express", key: "stallion", color: "#2C5234" },
-    ],
-  },
-  apac: {
-    title: "APAC",
-    carriers: [
       { name: "Australia Post", key: "australiapost", color: "#E4002B" },
       { name: "StarTrack", key: "startrack", color: "#E4002B" },
       { name: "NZ Couriers", key: "nzcouriers", color: "#00529B" },
     ],
   },
-  europe: {
-    title: "Europe",
-    carriers: [
-      { name: "Deutsche Post", key: "deutschepost", color: "#FFCC00" },
-      { name: "Postnord", key: "postnord", color: "#00A3E0" },
-      { name: "Asendia", key: "asendia", color: "#E4002B" },
-      { name: "Bring", key: "bring", color: "#7BC144" },
-    ],
-  },
   multiCarrier: {
     title: "Multi-Carrier Tools",
+    provider: null,
+    providerColor: "#8B5CF6",
     carriers: [
-      { name: "ShipStation", key: "shipstation", color: "#84BD00" },
-      { name: "Easypost", key: "easypost", color: "#0066FF" },
-      { name: "Webshipper", key: "webshipper", color: "#FF6B00" },
+      { name: "Tusk Logistics", key: "tusk", color: "#1E3A5F" },
+      { name: "Buku Ship", key: "buku", color: "#FF6B35" },
+      { name: "uShip", key: "uship", color: "#00A651" },
+      { name: "Vesyl", key: "vesyl", color: "#6366F1" },
       { name: "Passport Shipping", key: "passport", color: "#1E40AF" },
       { name: "FlavorCloud", key: "flavorcloud", color: "#FF4081" },
     ],
@@ -437,9 +503,11 @@ const HeroBrandLogos = () => {
 const PlatformCard = ({ 
   platform, 
   onClick,
+  providerColor,
 }: { 
-  platform: typeof topPlatforms[0]; 
+  platform: Platform; 
   onClick: () => void;
+  providerColor?: string;
 }) => {
   const isHero = platform.isHero;
   const color = brandColors[platform.key] || "#6366F1";
@@ -572,7 +640,7 @@ const CarrierCard = ({ carrier }: { carrier: { name: string; key: string; color:
 };
 
 const Integrations = () => {
-  const [selectedPlatform, setSelectedPlatform] = useState<typeof topPlatforms[0] | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
   const [showFloatingCTA, setShowFloatingCTA] = useState(false);
 
   useEffect(() => {
@@ -657,7 +725,7 @@ const Integrations = () => {
         </div>
       </section>
 
-      {/* Top E-Commerce Integrations */}
+      {/* E-Commerce Integrations - Grouped by Provider */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <motion.div
@@ -671,32 +739,62 @@ const Integrations = () => {
               variants={fadeUpVariants}
               className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
             >
-              Top E-Commerce Integrations
+              E-Commerce Integrations
             </motion.h2>
             <motion.p 
               variants={fadeUpVariants}
               className="text-lg text-gray-600 max-w-2xl mx-auto"
             >
-              Connect your online store in minutes. We natively integrate with all major e-commerce platforms 
-              to sync orders, inventory, and fulfillment status in real-time.
+              Connect your online store in minutes. We integrate with major e-commerce platforms 
+              through native connections and trusted middleware partners.
             </motion.p>
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={staggerContainer}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
-          >
-            {topPlatforms.map((platform) => (
-              <PlatformCard
-                key={platform.name}
-                platform={platform}
-                onClick={() => setSelectedPlatform(platform)}
-              />
+          {/* Platform Groups */}
+          <div className="space-y-16">
+            {Object.entries(platformGroups).map(([groupKey, group]) => (
+              <motion.div
+                key={groupKey}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+                variants={staggerContainer}
+              >
+                {/* Group Header */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div 
+                    className="p-2 rounded-lg"
+                    style={{ backgroundColor: `${group.color}20` }}
+                  >
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: group.color }}
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">{group.title}</h3>
+                  <div className="flex-1 h-px bg-gray-200" />
+                  <span className="text-sm text-gray-500 font-medium">
+                    {group.platforms.length} {group.platforms.length === 1 ? 'platform' : 'platforms'}
+                  </span>
+                </div>
+
+                {/* Platform Grid */}
+                <motion.div 
+                  variants={staggerContainer}
+                  className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+                >
+                  {group.platforms.map((platform) => (
+                    <PlatformCard
+                      key={platform.name}
+                      platform={platform}
+                      providerColor={group.color}
+                      onClick={() => setSelectedPlatform(platform)}
+                    />
+                  ))}
+                </motion.div>
+              </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -835,8 +933,14 @@ const Integrations = () => {
                 variants={staggerContainer}
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Globe className="w-5 h-5 text-primary" />
+                  <div 
+                    className="p-2 rounded-lg"
+                    style={{ backgroundColor: `${group.providerColor}20` }}
+                  >
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: group.providerColor }}
+                    />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900">{group.title}</h3>
                   <div className="flex-1 h-px bg-gray-200" />
