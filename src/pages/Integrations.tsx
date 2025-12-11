@@ -685,12 +685,112 @@ const Integrations = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>E-Commerce Integrations | Shopify, Amazon, Walmart & More | Westfield Prep Center</title>
+        <title>Shopify & Amazon Integrations | Los Angeles 3PL | Westfield</title>
         <meta
           name="description"
-          content="Connect your e-commerce store in minutes. Native integrations with Shopify, Amazon, Walmart, TikTok Shop, and 24+ shipping carriers. No code required."
+          content="Connect Shopify, Amazon, Walmart & TikTok Shop in minutes. Real-time order sync, inventory management & 24+ carrier integrations. No developers needed."
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/integrations" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="Shopify & Amazon Integrations | Los Angeles 3PL" />
+        <meta property="og:description" content="Connect Shopify, Amazon, Walmart & TikTok Shop in minutes. Real-time order sync, inventory management & 24+ carrier integrations." />
+        <meta property="og:url" content="https://westfieldprepcenter.com/integrations" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://westfieldprepcenter.com/warehouse-hero-bg.jpg" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Shopify & Amazon Integrations | Los Angeles 3PL" />
+        <meta name="twitter:description" content="Connect Shopify, Amazon, Walmart & TikTok Shop in minutes. Real-time order sync & 24+ carrier integrations." />
+        <meta name="twitter:image" content="https://westfieldprepcenter.com/warehouse-hero-bg.jpg" />
+        
+        {/* Combined JSON-LD Schema: ItemList + FAQPage */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebPage",
+                "@id": "https://westfieldprepcenter.com/integrations",
+                "name": "E-Commerce Integrations",
+                "description": "Connect Shopify, Amazon, Walmart & TikTok Shop in minutes. Real-time order sync, inventory management & 24+ carrier integrations.",
+                "url": "https://westfieldprepcenter.com/integrations",
+                "isPartOf": {
+                  "@type": "WebSite",
+                  "name": "Westfield Prep Center",
+                  "url": "https://westfieldprepcenter.com"
+                },
+                "breadcrumb": {
+                  "@type": "BreadcrumbList",
+                  "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://westfieldprepcenter.com" },
+                    { "@type": "ListItem", "position": 2, "name": "Integrations", "item": "https://westfieldprepcenter.com/integrations" }
+                  ]
+                }
+              },
+              {
+                "@type": "ItemList",
+                "name": "E-Commerce & Fulfillment Integrations",
+                "description": "Los Angeles 3PL integrations for Shopify fulfillment, Amazon FBA, and multi-channel ecommerce",
+                "numberOfItems": 14,
+                "itemListElement": [
+                  { "@type": "ListItem", "position": 1, "name": "Shopify", "description": "Real-time order sync, inventory management, and automated fulfillment for Shopify stores" },
+                  { "@type": "ListItem", "position": 2, "name": "Amazon", "description": "FBA prep, seller fulfilled, and multi-channel Amazon integration" },
+                  { "@type": "ListItem", "position": 3, "name": "Walmart", "description": "Walmart Marketplace and WFS integration with automated order processing" },
+                  { "@type": "ListItem", "position": 4, "name": "TikTok Shop", "description": "TikTok Shop fulfillment with real-time inventory sync" },
+                  { "@type": "ListItem", "position": 5, "name": "eBay", "description": "eBay marketplace integration for order and inventory management" },
+                  { "@type": "ListItem", "position": 6, "name": "Etsy", "description": "Etsy seller integration with automated order fulfillment" },
+                  { "@type": "ListItem", "position": 7, "name": "WooCommerce", "description": "WooCommerce plugin for seamless WordPress store fulfillment" },
+                  { "@type": "ListItem", "position": 8, "name": "ShipStation", "description": "ShipStation integration for multi-carrier shipping automation" },
+                  { "@type": "ListItem", "position": 9, "name": "Shippo", "description": "Shippo API integration for shipping rate comparison" },
+                  { "@type": "ListItem", "position": 10, "name": "EasyPost", "description": "EasyPost integration for enterprise shipping solutions" },
+                  { "@type": "ListItem", "position": 11, "name": "Packiyo", "description": "Packiyo WMS integration for warehouse management" },
+                  { "@type": "ListItem", "position": 12, "name": "CRSTL", "description": "CRSTL integration for EDI and retail compliance" },
+                  { "@type": "ListItem", "position": 13, "name": "Lumi", "description": "Lumi integration for custom packaging fulfillment" },
+                  { "@type": "ListItem", "position": 14, "name": "Rabot", "description": "Rabot integration for inventory optimization" }
+                ]
+              },
+              {
+                "@type": "FAQPage",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "How do Shopify integrations work with Westfield Prep Center?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Our Shopify integration connects directly to your store via OAuth. Once connected, orders automatically sync in real-time, inventory updates push to Shopify within minutes, and tracking numbers are uploaded automatically when orders ship. Setup takes less than 10 minutes with no coding required."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Do you support real-time order syncing?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Yes, all our e-commerce integrations support real-time order syncing via webhooks. When a customer places an order on your store, it appears in our system within seconds. Inventory levels sync bidirectionally, so your store always shows accurate stock counts."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "What marketplaces and platforms can connect to Westfield?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "We integrate with Shopify, Amazon (FBA and Seller Fulfilled), Walmart, TikTok Shop, eBay, Etsy, WooCommerce, BigCommerce, Magento, and more. We also connect with shipping platforms like ShipStation, Shippo, and EasyPost, plus 24+ carriers including FedEx, UPS, USPS, and DHL."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Do I need a developer to set up integrations?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "No developer needed. Our integrations are plug-and-play with guided setup. Simply authenticate your store, configure your preferences, and start syncing. Most clients complete setup in under 10 minutes. Our team is available to help if you need assistance."
+                    }
+                  }
+                ]
+              }
+            ]
+          })}
+        </script>
       </Helmet>
 
       <Header />
