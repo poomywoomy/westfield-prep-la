@@ -473,7 +473,7 @@ const PlatformCard = ({
 
       {/* Badge */}
       {platform.badge && (
-        <div className="absolute -top-0 left-4 z-10">
+        <div className="absolute top-0 left-4 z-20">
           <div
             className="flex items-center gap-1 text-white text-xs px-3 py-1.5 rounded-b-lg shadow-lg font-medium"
             style={{ backgroundColor: color }}
@@ -488,8 +488,9 @@ const PlatformCard = ({
         {/* Logo/Icon Area - clean white background */}
         <div 
           className={`
-            rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 bg-white shadow-sm border border-gray-100
+            rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 bg-white shadow-sm border border-gray-100
             ${isHero ? 'w-24 h-24' : 'w-14 h-14'}
+            ${platform.badge ? 'mt-6 mb-4' : 'mb-4'}
           `}
         >
           <PlatformIcon 
