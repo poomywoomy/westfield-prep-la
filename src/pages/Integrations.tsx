@@ -99,11 +99,15 @@ const platformIcons: Record<string, IconType | null> = {
 const logoImages: Record<string, string> = {
   mystore: "/integration-logos/mystore-logo.jpeg",
   faire: "/integration-logos/faire-logo.png",
+  salesforce: "/integration-logos/salesforce-logo.jpeg",
+  lightspeed: "/integration-logos/lightspeed-logo.svg",
+  shipstation: "/integration-logos/shipstation-logo.png",
 };
 
 // Image-based carrier logos
 const carrierLogoImages: Record<string, string> = {
   uship: "/integration-logos/uship-logo.png",
+  ehub: "/integration-logos/ehub-logo.jpeg",
 };
 
 // Carrier icon mapping
