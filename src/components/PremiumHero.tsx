@@ -34,15 +34,18 @@ const PremiumHero = () => {
     <section className="relative min-h-[90vh] w-full overflow-hidden">
       {/* Background Warehouse Image */}
       <div className="absolute inset-0 z-0">
-        <img
-          src="/warehouse-hero-bg.jpg"
-          alt="Los Angeles 3PL warehouse exterior with trucks — Westfield Prep Center"
-          width="1920"
-          height="1080"
-          className="w-full h-full object-cover object-center"
-          loading="eager"
-          fetchPriority="high"
-        />
+        <picture>
+          <source srcSet="/hero-warehouse-optimized.webp" type="image/webp" />
+          <img
+            src="/warehouse-hero-bg.jpg"
+            alt="Los Angeles 3PL warehouse exterior with trucks — Westfield Prep Center"
+            width="1920"
+            height="1080"
+            className="w-full h-full object-cover object-center"
+            loading="eager"
+            fetchPriority="high"
+          />
+        </picture>
       </div>
 
       {/* Multi-layer Gradient Overlay */}

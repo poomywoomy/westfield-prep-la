@@ -39,7 +39,17 @@ const SalesChannels = lazy(() => import("./pages/SalesChannels"));
 const ThreePLLosAngeles = lazy(() => import("./pages/ThreePLLosAngeles"));
 const Integrations = lazy(() => import("./pages/Integrations"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes - reduce refetches
+      gcTime: 30 * 60 * 1000, // 30 minutes - keep cache longer
+      refetchOnWindowFocus: false, // Don't refetch on tab switch
+      retry: 1, // Single retry instead of 3
+      refetchOnReconnect: 'always',
+    },
+  },
+});
 
 const App = () => {
   return (
