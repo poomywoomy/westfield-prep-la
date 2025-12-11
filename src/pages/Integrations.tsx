@@ -108,6 +108,16 @@ const logoImages: Record<string, string> = {
 const carrierLogoImages: Record<string, string> = {
   uship: "/integration-logos/uship-logo.png",
   ehub: "/integration-logos/ehub-logo.jpeg",
+  pitneybowes: "/integration-logos/pitneybowes-logo.svg",
+  postnord: "/integration-logos/postnord-logo.svg",
+  bring: "/integration-logos/bring-logo.svg",
+  canadapost: "/integration-logos/canadapost-logo.png",
+  asendia: "/integration-logos/asendia-logo.png",
+};
+
+// Size multipliers for logos with extra whitespace
+const logoSizeMultiplier: Record<string, number> = {
+  salesforce: 1.5,
 };
 
 // Carrier icon mapping
@@ -376,12 +386,15 @@ const PlatformIcon = ({
   // Check for image-based logo first
   const logoImage = logoImages[platformKey];
   if (logoImage) {
+    // Apply size multiplier for logos with whitespace
+    const multiplier = logoSizeMultiplier[platformKey] || 1;
+    const adjustedSize = size * multiplier;
     return (
       <img 
         src={logoImage} 
         alt={platformKey} 
         className="object-contain rounded"
-        style={{ width: size, height: size }}
+        style={{ width: adjustedSize, height: adjustedSize }}
       />
     );
   }
