@@ -8,7 +8,6 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  ShoppingCart,
   Package,
   Truck,
   ArrowRight,
@@ -19,6 +18,7 @@ import {
   MessageSquare,
   ChevronRight,
   Sparkles,
+  ShoppingCart,
 } from "lucide-react";
 import {
   Dialog,
@@ -27,6 +27,23 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+// Brand icons from react-icons
+import {
+  SiShopify,
+  SiAmazon,
+  SiWalmart,
+  SiTiktok,
+  SiEtsy,
+  SiWoo,
+  SiBigcommerce,
+  SiMagento,
+  SiPrestashop,
+  SiWix,
+  SiDhl,
+  SiFedex,
+  SiUps,
+} from "react-icons/si";
+import { IconType } from "react-icons";
 
 // Brand colors for platforms
 const brandColors: Record<string, string> = {
@@ -34,7 +51,7 @@ const brandColors: Record<string, string> = {
   shopifyPlus: "#5E8E3E",
   amazon: "#FF9900",
   walmart: "#0071CE",
-  tiktok: "#00F2EA",
+  tiktok: "#000000",
   etsy: "#F1641E",
   woocommerce: "#7F54B3",
   bigcommerce: "#121118",
@@ -54,6 +71,30 @@ const carrierColors: Record<string, string> = {
   canadapost: "#E4002B",
   australiapost: "#E4002B",
   deutschepost: "#FFCC00",
+};
+
+// Platform icon mapping
+const platformIcons: Record<string, IconType | null> = {
+  shopify: SiShopify,
+  shopifyPlus: SiShopify,
+  amazon: SiAmazon,
+  walmart: SiWalmart,
+  tiktok: SiTiktok,
+  etsy: SiEtsy,
+  woocommerce: SiWoo,
+  bigcommerce: SiBigcommerce,
+  faire: null, // No icon, use text fallback
+  magento: SiMagento,
+  prestashop: SiPrestashop,
+  wix: SiWix,
+  mystore: null, // No icon, use text fallback
+};
+
+// Carrier icon mapping
+const carrierIcons: Record<string, IconType | null> = {
+  dhl: SiDhl,
+  fedex: SiFedex,
+  ups: SiUps,
 };
 
 // Top E-Commerce Platforms
@@ -160,55 +201,55 @@ const carrierGroups = {
   global: {
     title: "Global Carriers",
     carriers: [
-      { name: "DHL", color: "#FFCC00" },
-      { name: "FedEx", color: "#4D148C" },
-      { name: "UPS", color: "#351C15" },
+      { name: "DHL", key: "dhl", color: "#FFCC00" },
+      { name: "FedEx", key: "fedex", color: "#4D148C" },
+      { name: "UPS", key: "ups", color: "#351C15" },
     ],
   },
   us: {
     title: "US Carriers",
     carriers: [
-      { name: "USPS", color: "#004B87" },
-      { name: "Pitney Bowes", color: "#E4002B" },
-      { name: "Tusk Logistics", color: "#1E3A5F" },
-      { name: "eHub", color: "#00B4D8" },
-      { name: "Buku Ship", color: "#FF6B35" },
-      { name: "uShip", color: "#00A651" },
-      { name: "Vesyl", color: "#6366F1" },
+      { name: "USPS", key: "usps", color: "#004B87" },
+      { name: "Pitney Bowes", key: "pitneybowes", color: "#E4002B" },
+      { name: "Tusk Logistics", key: "tusk", color: "#1E3A5F" },
+      { name: "eHub", key: "ehub", color: "#00B4D8" },
+      { name: "Buku Ship", key: "buku", color: "#FF6B35" },
+      { name: "uShip", key: "uship", color: "#00A651" },
+      { name: "Vesyl", key: "vesyl", color: "#6366F1" },
     ],
   },
   canada: {
     title: "Canada",
     carriers: [
-      { name: "Canada Post", color: "#E4002B" },
-      { name: "Stallion Express", color: "#2C5234" },
+      { name: "Canada Post", key: "canadapost", color: "#E4002B" },
+      { name: "Stallion Express", key: "stallion", color: "#2C5234" },
     ],
   },
   apac: {
     title: "APAC",
     carriers: [
-      { name: "Australia Post", color: "#E4002B" },
-      { name: "StarTrack", color: "#E4002B" },
-      { name: "NZ Couriers", color: "#00529B" },
+      { name: "Australia Post", key: "australiapost", color: "#E4002B" },
+      { name: "StarTrack", key: "startrack", color: "#E4002B" },
+      { name: "NZ Couriers", key: "nzcouriers", color: "#00529B" },
     ],
   },
   europe: {
     title: "Europe",
     carriers: [
-      { name: "Deutsche Post", color: "#FFCC00" },
-      { name: "Postnord", color: "#00A3E0" },
-      { name: "Asendia", color: "#E4002B" },
-      { name: "Bring", color: "#7BC144" },
+      { name: "Deutsche Post", key: "deutschepost", color: "#FFCC00" },
+      { name: "Postnord", key: "postnord", color: "#00A3E0" },
+      { name: "Asendia", key: "asendia", color: "#E4002B" },
+      { name: "Bring", key: "bring", color: "#7BC144" },
     ],
   },
   multiCarrier: {
     title: "Multi-Carrier Tools",
     carriers: [
-      { name: "ShipStation", color: "#84BD00" },
-      { name: "Easypost", color: "#0066FF" },
-      { name: "Webshipper", color: "#FF6B00" },
-      { name: "Passport Shipping", color: "#1E40AF" },
-      { name: "FlavorCloud", color: "#FF4081" },
+      { name: "ShipStation", key: "shipstation", color: "#84BD00" },
+      { name: "Easypost", key: "easypost", color: "#0066FF" },
+      { name: "Webshipper", key: "webshipper", color: "#FF6B00" },
+      { name: "Passport Shipping", key: "passport", color: "#1E40AF" },
+      { name: "FlavorCloud", key: "flavorcloud", color: "#FF4081" },
     ],
   },
 };
@@ -237,15 +278,81 @@ const cardVariants = {
   },
 };
 
+// Render platform icon with fallback
+const PlatformIcon = ({ 
+  platformKey, 
+  size = 24, 
+  color 
+}: { 
+  platformKey: string; 
+  size?: number; 
+  color: string 
+}) => {
+  const Icon = platformIcons[platformKey];
+  
+  if (Icon) {
+    return <Icon size={size} color={color} />;
+  }
+  
+  // Text fallback for platforms without icons
+  const initials = platformKey.slice(0, 2).toUpperCase();
+  return (
+    <span 
+      className="font-bold"
+      style={{ 
+        color, 
+        fontSize: size * 0.5,
+        lineHeight: 1
+      }}
+    >
+      {initials}
+    </span>
+  );
+};
+
+// Render carrier icon with fallback
+const CarrierIcon = ({ 
+  carrierKey, 
+  carrierName,
+  size = 20, 
+  color 
+}: { 
+  carrierKey: string; 
+  carrierName: string;
+  size?: number; 
+  color: string 
+}) => {
+  const Icon = carrierIcons[carrierKey];
+  
+  if (Icon) {
+    return <Icon size={size} color={color} />;
+  }
+  
+  // Text fallback for carriers without icons
+  const initials = carrierName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  return (
+    <span 
+      className="font-bold"
+      style={{ 
+        color, 
+        fontSize: size * 0.6,
+        lineHeight: 1
+      }}
+    >
+      {initials}
+    </span>
+  );
+};
+
 // Hero floating brand logos
 const HeroBrandLogos = () => {
   const brands = [
-    { name: "Shopify", color: brandColors.shopify },
-    { name: "Amazon", color: brandColors.amazon },
-    { name: "Walmart", color: brandColors.walmart },
-    { name: "FedEx", color: carrierColors.fedex },
-    { name: "UPS", color: carrierColors.ups },
-    { name: "DHL", color: carrierColors.dhl },
+    { name: "Shopify", key: "shopify", color: brandColors.shopify },
+    { name: "Amazon", key: "amazon", color: brandColors.amazon },
+    { name: "Walmart", key: "walmart", color: brandColors.walmart },
+    { name: "FedEx", key: "fedex", color: carrierColors.fedex },
+    { name: "UPS", key: "ups", color: carrierColors.ups },
+    { name: "DHL", key: "dhl", color: carrierColors.dhl },
   ];
 
   return (
@@ -255,19 +362,28 @@ const HeroBrandLogos = () => {
       variants={staggerContainer}
       className="flex flex-wrap justify-center gap-3 mt-8"
     >
-      {brands.map((brand, index) => (
-        <motion.div
-          key={brand.name}
-          variants={cardVariants}
-          className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center gap-2 hover:bg-white/20 transition-colors"
-        >
-          <div 
-            className="w-3 h-3 rounded-full" 
-            style={{ backgroundColor: brand.color }}
-          />
-          <span className="text-white/90 text-sm font-medium">{brand.name}</span>
-        </motion.div>
-      ))}
+      {brands.map((brand) => {
+        const isPlatform = platformIcons[brand.key] !== undefined;
+        const Icon = isPlatform ? platformIcons[brand.key] : carrierIcons[brand.key];
+        
+        return (
+          <motion.div
+            key={brand.name}
+            variants={cardVariants}
+            className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center gap-2 hover:bg-white/20 transition-colors"
+          >
+            {Icon ? (
+              <Icon size={16} color={brand.color} />
+            ) : (
+              <div 
+                className="w-4 h-4 rounded-full" 
+                style={{ backgroundColor: brand.color }}
+              />
+            )}
+            <span className="text-white/90 text-sm font-medium">{brand.name}</span>
+          </motion.div>
+        );
+      })}
     </motion.div>
   );
 };
@@ -332,9 +448,10 @@ const PlatformCard = ({
           `}
           style={{ backgroundColor: `${color}15` }}
         >
-          <ShoppingCart 
-            className={isHero ? 'w-10 h-10' : 'w-6 h-6'} 
-            style={{ color }}
+          <PlatformIcon 
+            platformKey={platform.key}
+            size={isHero ? 40 : 24}
+            color={color}
           />
         </div>
 
@@ -387,7 +504,7 @@ const PlatformCard = ({
 };
 
 // Carrier Card Component
-const CarrierCard = ({ carrier }: { carrier: { name: string; color: string } }) => (
+const CarrierCard = ({ carrier }: { carrier: { name: string; key: string; color: string } }) => (
   <motion.div
     variants={cardVariants}
     whileHover={{ scale: 1.05, y: -4 }}
@@ -397,7 +514,12 @@ const CarrierCard = ({ carrier }: { carrier: { name: string; color: string } }) 
       className="w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
       style={{ backgroundColor: `${carrier.color}20` }}
     >
-      <Truck className="w-5 h-5" style={{ color: carrier.color }} />
+      <CarrierIcon 
+        carrierKey={carrier.key}
+        carrierName={carrier.name}
+        size={20}
+        color={carrier.color}
+      />
     </div>
     <span className="font-medium text-gray-800 text-sm">{carrier.name}</span>
   </motion.div>
@@ -726,10 +848,19 @@ const Integrations = () => {
               <div className="mt-8 pt-8 border-t border-gray-200">
                 <p className="text-sm text-gray-500 mb-4">Trusted by fast-scaling e-commerce brands</p>
                 <div className="flex flex-wrap gap-6">
-                  {["Shopify", "Amazon", "Walmart", "TikTok Shop"].map((brand) => (
-                    <div key={brand} className="flex items-center gap-2 text-gray-400 hover:text-gray-600 transition-colors">
-                      <Check className="w-4 h-4 text-green-500" />
-                      <span className="text-sm font-medium">{brand}</span>
+                  {[
+                    { name: "Shopify", key: "shopify" },
+                    { name: "Amazon", key: "amazon" },
+                    { name: "Walmart", key: "walmart" },
+                    { name: "TikTok Shop", key: "tiktok" },
+                  ].map((brand) => (
+                    <div key={brand.name} className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
+                      <PlatformIcon 
+                        platformKey={brand.key}
+                        size={16}
+                        color={brandColors[brand.key]}
+                      />
+                      <span className="text-sm font-medium">{brand.name}</span>
                     </div>
                   ))}
                 </div>
@@ -828,9 +959,10 @@ const Integrations = () => {
                     className="w-14 h-14 rounded-xl flex items-center justify-center"
                     style={{ backgroundColor: `${brandColors[selectedPlatform.key]}15` }}
                   >
-                    <ShoppingCart 
-                      className="w-7 h-7" 
-                      style={{ color: brandColors[selectedPlatform.key] }}
+                    <PlatformIcon 
+                      platformKey={selectedPlatform.key}
+                      size={28}
+                      color={brandColors[selectedPlatform.key]}
                     />
                   </div>
                   <div>
