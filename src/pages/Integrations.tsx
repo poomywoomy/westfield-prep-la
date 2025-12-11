@@ -42,35 +42,37 @@ import {
   SiDhl,
   SiFedex,
   SiUps,
+  SiUsps,
+  SiDeutschepost,
 } from "react-icons/si";
 import { IconType } from "react-icons";
 
-// Brand colors for platforms
+// Brand colors for platforms - darker, more vibrant
 const brandColors: Record<string, string> = {
-  shopify: "#95BF47",
-  shopifyPlus: "#5E8E3E",
+  shopify: "#5E8E3E",
+  shopifyPlus: "#3D6B29",
   amazon: "#FF9900",
-  walmart: "#0071CE",
+  walmart: "#0057A0",
   tiktok: "#000000",
-  etsy: "#F1641E",
-  woocommerce: "#7F54B3",
+  etsy: "#D5581D",
+  woocommerce: "#674399",
   bigcommerce: "#121118",
-  faire: "#000000",
-  magento: "#F46F25",
+  faire: "#1A1A1A",
+  magento: "#EE672F",
   prestashop: "#DF0067",
   wix: "#0C6EFC",
-  mystore: "#2563EB",
+  mystore: "#1D4ED8",
 };
 
 const carrierColors: Record<string, string> = {
-  dhl: "#FFCC00",
+  dhl: "#D40511",
   fedex: "#4D148C",
   ups: "#351C15",
   usps: "#004B87",
-  shipstation: "#84BD00",
+  shipstation: "#5A9A00",
   canadapost: "#E4002B",
   australiapost: "#E4002B",
-  deutschepost: "#FFCC00",
+  deutschepost: "#D40511",
 };
 
 // Platform icon mapping
@@ -83,11 +85,11 @@ const platformIcons: Record<string, IconType | null> = {
   etsy: SiEtsy,
   woocommerce: SiWoo,
   bigcommerce: SiBigcommerce,
-  faire: null, // No icon, use text fallback
+  faire: null,
   magento: SiMagento,
   prestashop: SiPrestashop,
   wix: SiWix,
-  mystore: null, // No icon, use text fallback
+  mystore: null,
 };
 
 // Carrier icon mapping
@@ -95,6 +97,8 @@ const carrierIcons: Record<string, IconType | null> = {
   dhl: SiDhl,
   fedex: SiFedex,
   ups: SiUps,
+  usps: SiUsps,
+  deutschepost: SiDeutschepost,
 };
 
 // Top E-Commerce Platforms
@@ -278,15 +282,17 @@ const cardVariants = {
   },
 };
 
-// Render platform icon with fallback
+// Render platform icon with fallback - solid colored background for text fallbacks
 const PlatformIcon = ({ 
   platformKey, 
   size = 24, 
-  color 
+  color,
+  showFallbackBg = false
 }: { 
   platformKey: string; 
   size?: number; 
-  color: string 
+  color: string;
+  showFallbackBg?: boolean;
 }) => {
   const Icon = platformIcons[platformKey];
   
@@ -294,8 +300,23 @@ const PlatformIcon = ({
     return <Icon size={size} color={color} />;
   }
   
-  // Text fallback for platforms without icons
+  // Text fallback with solid colored background and white text
   const initials = platformKey.slice(0, 2).toUpperCase();
+  if (showFallbackBg) {
+    return (
+      <div 
+        className="rounded-lg flex items-center justify-center font-bold text-white"
+        style={{ 
+          backgroundColor: color,
+          width: size,
+          height: size,
+          fontSize: size * 0.4,
+        }}
+      >
+        {initials}
+      </div>
+    );
+  }
   return (
     <span 
       className="font-bold"
@@ -310,17 +331,19 @@ const PlatformIcon = ({
   );
 };
 
-// Render carrier icon with fallback
+// Render carrier icon with fallback - solid colored background for text fallbacks
 const CarrierIcon = ({ 
   carrierKey, 
   carrierName,
   size = 20, 
-  color 
+  color,
+  showFallbackBg = false
 }: { 
   carrierKey: string; 
   carrierName: string;
   size?: number; 
-  color: string 
+  color: string;
+  showFallbackBg?: boolean;
 }) => {
   const Icon = carrierIcons[carrierKey];
   
@@ -328,8 +351,23 @@ const CarrierIcon = ({
     return <Icon size={size} color={color} />;
   }
   
-  // Text fallback for carriers without icons
+  // Text fallback with solid colored background and white text
   const initials = carrierName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  if (showFallbackBg) {
+    return (
+      <div 
+        className="rounded-md flex items-center justify-center font-bold text-white"
+        style={{ 
+          backgroundColor: color,
+          width: size,
+          height: size,
+          fontSize: size * 0.45,
+        }}
+      >
+        {initials}
+      </div>
+    );
+  }
   return (
     <span 
       className="font-bold"
@@ -440,18 +478,19 @@ const PlatformCard = ({
       )}
 
       <div className={`relative z-10 ${isHero ? 'p-8' : 'p-5'}`}>
-        {/* Logo/Icon Area */}
+        {/* Logo/Icon Area - darker background */}
         <div 
           className={`
             rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110
             ${isHero ? 'w-20 h-20' : 'w-12 h-12'}
           `}
-          style={{ backgroundColor: `${color}15` }}
+          style={{ backgroundColor: `${color}30` }}
         >
           <PlatformIcon 
             platformKey={platform.key}
             size={isHero ? 40 : 24}
             color={color}
+            showFallbackBg={!platformIcons[platform.key]}
           />
         </div>
 
@@ -467,14 +506,14 @@ const PlatformCard = ({
           </p>
         )}
 
-        {/* Sync Type Pills */}
+        {/* Sync Type Pills - stronger colors */}
         <div className="flex flex-wrap gap-1.5">
           {platform.syncTypes.slice(0, isHero ? 4 : 2).map((sync) => (
             <span
               key={sync}
-              className="text-xs px-2 py-1 rounded-full font-medium"
+              className="text-xs px-2 py-1 rounded-full font-semibold"
               style={{ 
-                backgroundColor: `${color}10`,
+                backgroundColor: `${color}25`,
                 color: color
               }}
             >
@@ -482,7 +521,7 @@ const PlatformCard = ({
             </span>
           ))}
           {!isHero && platform.syncTypes.length > 2 && (
-            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-500">
+            <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600 font-medium">
               +{platform.syncTypes.length - 2}
             </span>
           )}
@@ -503,27 +542,31 @@ const PlatformCard = ({
   );
 };
 
-// Carrier Card Component
-const CarrierCard = ({ carrier }: { carrier: { name: string; key: string; color: string } }) => (
-  <motion.div
-    variants={cardVariants}
-    whileHover={{ scale: 1.05, y: -4 }}
-    className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-  >
-    <div 
-      className="w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
-      style={{ backgroundColor: `${carrier.color}20` }}
+// Carrier Card Component - darker backgrounds
+const CarrierCard = ({ carrier }: { carrier: { name: string; key: string; color: string } }) => {
+  const hasIcon = carrierIcons[carrier.key];
+  return (
+    <motion.div
+      variants={cardVariants}
+      whileHover={{ scale: 1.05, y: -4 }}
+      className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition-all cursor-pointer group"
     >
-      <CarrierIcon 
-        carrierKey={carrier.key}
-        carrierName={carrier.name}
-        size={20}
-        color={carrier.color}
-      />
-    </div>
-    <span className="font-medium text-gray-800 text-sm">{carrier.name}</span>
-  </motion.div>
-);
+      <div 
+        className="w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
+        style={{ backgroundColor: hasIcon ? `${carrier.color}35` : carrier.color }}
+      >
+        <CarrierIcon 
+          carrierKey={carrier.key}
+          carrierName={carrier.name}
+          size={hasIcon ? 22 : 28}
+          color={hasIcon ? carrier.color : "#FFFFFF"}
+          showFallbackBg={false}
+        />
+      </div>
+      <span className="font-medium text-gray-800 text-sm">{carrier.name}</span>
+    </motion.div>
+  );
+};
 
 const Integrations = () => {
   const [selectedPlatform, setSelectedPlatform] = useState<typeof topPlatforms[0] | null>(null);
@@ -723,7 +766,7 @@ const Integrations = () => {
 
                 <div 
                   className="w-24 h-24 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg relative"
-                  style={{ backgroundColor: `${item.color}15` }}
+                  style={{ backgroundColor: `${item.color}30` }}
                 >
                   <item.icon className="w-10 h-10" style={{ color: item.color }} />
                   <div 
