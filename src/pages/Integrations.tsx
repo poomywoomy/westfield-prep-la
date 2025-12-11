@@ -282,17 +282,15 @@ const cardVariants = {
   },
 };
 
-// Render platform icon with fallback - solid colored background for text fallbacks
+// Render platform icon - natural colors, no opacity backgrounds
 const PlatformIcon = ({ 
   platformKey, 
-  size = 24, 
+  size = 36, 
   color,
-  showFallbackBg = false
 }: { 
   platformKey: string; 
   size?: number; 
   color: string;
-  showFallbackBg?: boolean;
 }) => {
   const Icon = platformIcons[platformKey];
   
@@ -302,48 +300,32 @@ const PlatformIcon = ({
   
   // Text fallback with solid colored background and white text
   const initials = platformKey.slice(0, 2).toUpperCase();
-  if (showFallbackBg) {
-    return (
-      <div 
-        className="rounded-lg flex items-center justify-center font-bold text-white"
-        style={{ 
-          backgroundColor: color,
-          width: size,
-          height: size,
-          fontSize: size * 0.4,
-        }}
-      >
-        {initials}
-      </div>
-    );
-  }
   return (
-    <span 
-      className="font-bold"
+    <div 
+      className="rounded-lg flex items-center justify-center font-bold text-white"
       style={{ 
-        color, 
-        fontSize: size * 0.5,
-        lineHeight: 1
+        backgroundColor: color,
+        width: size,
+        height: size,
+        fontSize: size * 0.4,
       }}
     >
       {initials}
-    </span>
+    </div>
   );
 };
 
-// Render carrier icon with fallback - solid colored background for text fallbacks
+// Render carrier icon - natural colors, no opacity backgrounds
 const CarrierIcon = ({ 
   carrierKey, 
   carrierName,
-  size = 20, 
+  size = 32, 
   color,
-  showFallbackBg = false
 }: { 
   carrierKey: string; 
   carrierName: string;
   size?: number; 
   color: string;
-  showFallbackBg?: boolean;
 }) => {
   const Icon = carrierIcons[carrierKey];
   
@@ -353,36 +335,22 @@ const CarrierIcon = ({
   
   // Text fallback with solid colored background and white text
   const initials = carrierName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-  if (showFallbackBg) {
-    return (
-      <div 
-        className="rounded-md flex items-center justify-center font-bold text-white"
-        style={{ 
-          backgroundColor: color,
-          width: size,
-          height: size,
-          fontSize: size * 0.45,
-        }}
-      >
-        {initials}
-      </div>
-    );
-  }
   return (
-    <span 
-      className="font-bold"
+    <div 
+      className="rounded-lg flex items-center justify-center font-bold text-white"
       style={{ 
-        color, 
-        fontSize: size * 0.6,
-        lineHeight: 1
+        backgroundColor: color,
+        width: size,
+        height: size,
+        fontSize: size * 0.4,
       }}
     >
       {initials}
-    </span>
+    </div>
   );
 };
 
-// Hero floating brand logos
+// Hero floating brand logos - larger icons
 const HeroBrandLogos = () => {
   const brands = [
     { name: "Shopify", key: "shopify", color: brandColors.shopify },
@@ -408,17 +376,19 @@ const HeroBrandLogos = () => {
           <motion.div
             key={brand.name}
             variants={cardVariants}
-            className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center gap-2 hover:bg-white/20 transition-colors"
+            className="px-4 py-2.5 rounded-full bg-white shadow-md border border-gray-100 flex items-center gap-2.5 hover:shadow-lg transition-all"
           >
             {Icon ? (
-              <Icon size={16} color={brand.color} />
+              <Icon size={24} color={brand.color} />
             ) : (
               <div 
-                className="w-4 h-4 rounded-full" 
+                className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold" 
                 style={{ backgroundColor: brand.color }}
-              />
+              >
+                {brand.name.slice(0, 2).toUpperCase()}
+              </div>
             )}
-            <span className="text-white/90 text-sm font-medium">{brand.name}</span>
+            <span className="text-gray-800 text-sm font-semibold">{brand.name}</span>
           </motion.div>
         );
       })}
@@ -478,19 +448,17 @@ const PlatformCard = ({
       )}
 
       <div className={`relative z-10 ${isHero ? 'p-8' : 'p-5'}`}>
-        {/* Logo/Icon Area - darker background */}
+        {/* Logo/Icon Area - clean white background */}
         <div 
           className={`
-            rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110
-            ${isHero ? 'w-20 h-20' : 'w-12 h-12'}
+            rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 bg-white shadow-sm border border-gray-100
+            ${isHero ? 'w-24 h-24' : 'w-14 h-14'}
           `}
-          style={{ backgroundColor: `${color}30` }}
         >
           <PlatformIcon 
             platformKey={platform.key}
-            size={isHero ? 40 : 24}
+            size={isHero ? 56 : 36}
             color={color}
-            showFallbackBg={!platformIcons[platform.key]}
           />
         </div>
 
@@ -542,28 +510,25 @@ const PlatformCard = ({
   );
 };
 
-// Carrier Card Component - darker backgrounds
+// Carrier Card Component - clean white backgrounds, larger icons
 const CarrierCard = ({ carrier }: { carrier: { name: string; key: string; color: string } }) => {
-  const hasIcon = carrierIcons[carrier.key];
   return (
     <motion.div
       variants={cardVariants}
       whileHover={{ scale: 1.05, y: -4 }}
-      className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+      className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 shadow-sm hover:shadow-lg transition-all cursor-pointer group"
     >
       <div 
-        className="w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
-        style={{ backgroundColor: hasIcon ? `${carrier.color}35` : carrier.color }}
+        className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 bg-white shadow-sm border border-gray-100"
       >
         <CarrierIcon 
           carrierKey={carrier.key}
           carrierName={carrier.name}
-          size={hasIcon ? 22 : 28}
-          color={hasIcon ? carrier.color : "#FFFFFF"}
-          showFallbackBg={false}
+          size={36}
+          color={carrier.color}
         />
       </div>
-      <span className="font-medium text-gray-800 text-sm">{carrier.name}</span>
+      <span className="font-semibold text-gray-800">{carrier.name}</span>
     </motion.div>
   );
 };
