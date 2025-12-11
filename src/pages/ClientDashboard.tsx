@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { 
   Home, Package, ShoppingCart, FileText, Truck, Activity, DollarSign, 
   Settings, LogOut, RotateCcw 
@@ -29,11 +30,22 @@ const ClientDashboard = () => {
   const { user, role, loading, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [clientName, setClientName] = useState<string>("");
   const [clientId, setClientId] = useState<string>("");
   const [showSKUDialog, setShowSKUDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("analytics");
   const [hasShopifyStore, setHasShopifyStore] = useState(false);
+
+  // Prefetch handlers for hover-based data loading
+  const prefetchHandlers: Record<string, () => void> = {
+    products: () => queryClient.prefetchQuery({ queryKey: ['client-skus', clientId], staleTime: 60000 }),
+    orders: () => queryClient.prefetchQuery({ queryKey: ['client-orders', clientId], staleTime: 60000 }),
+    asns: () => queryClient.prefetchQuery({ queryKey: ['client-asns', clientId], staleTime: 60000 }),
+    shipments: () => queryClient.prefetchQuery({ queryKey: ['client-shipments', clientId], staleTime: 60000 }),
+    billing: () => queryClient.prefetchQuery({ queryKey: ['client-bills', clientId], staleTime: 60000 }),
+    returns: () => queryClient.prefetchQuery({ queryKey: ['client-returns', clientId], staleTime: 60000 }),
+  };
 
 
   useEffect(() => {
@@ -159,6 +171,7 @@ const ClientDashboard = () => {
             variant="ghost"
             className={`w-full justify-start gap-3 ${activeTab === 'products' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
             onClick={() => setActiveTab('products')}
+            onMouseEnter={() => prefetchHandlers.products?.()}
           >
             <Package className="h-5 w-5" />
             Products
@@ -168,6 +181,7 @@ const ClientDashboard = () => {
               variant="ghost"
               className={`w-full justify-start gap-3 ${activeTab === 'orders' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
               onClick={() => setActiveTab('orders')}
+              onMouseEnter={() => prefetchHandlers.orders?.()}
             >
               <ShoppingCart className="h-5 w-5" />
               Orders
@@ -177,6 +191,7 @@ const ClientDashboard = () => {
             variant="ghost"
             className={`w-full justify-start gap-3 ${activeTab === 'asns' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
             onClick={() => setActiveTab('asns')}
+            onMouseEnter={() => prefetchHandlers.asns?.()}
           >
             <FileText className="h-5 w-5" />
             ASNs
@@ -185,6 +200,7 @@ const ClientDashboard = () => {
             variant="ghost"
             className={`w-full justify-start gap-3 ${activeTab === 'returns' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
             onClick={() => setActiveTab('returns')}
+            onMouseEnter={() => prefetchHandlers.returns?.()}
           >
             <RotateCcw className="h-5 w-5" />
             Returns
@@ -193,6 +209,7 @@ const ClientDashboard = () => {
             variant="ghost"
             className={`w-full justify-start gap-3 ${activeTab === 'shipments' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
             onClick={() => setActiveTab('shipments')}
+            onMouseEnter={() => prefetchHandlers.shipments?.()}
           >
             <Truck className="h-5 w-5" />
             Outbound Shipments
@@ -209,6 +226,7 @@ const ClientDashboard = () => {
             variant="ghost"
             className={`w-full justify-start gap-3 ${activeTab === 'billing' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
             onClick={() => setActiveTab('billing')}
+            onMouseEnter={() => prefetchHandlers.billing?.()}
           >
             <DollarSign className="h-5 w-5" />
             Billing

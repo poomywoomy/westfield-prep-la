@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { usePendingShipmentRequestsCount } from "@/hooks/useShipmentRequests";
 import { useOpenSupportTicketsCount } from "@/hooks/useSupportTickets";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AppSidebarAdminProps {
   activeTab: string;
@@ -25,12 +26,23 @@ interface AppSidebarAdminProps {
 export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount, shipmentRequestsCount: propShipmentCount, supportTicketsCount: propSupportCount }: AppSidebarAdminProps) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const queryClient = useQueryClient();
   
   const { data: fetchedShipmentCount = 0 } = usePendingShipmentRequestsCount();
   const { data: fetchedSupportCount = 0 } = useOpenSupportTicketsCount();
   
   const shipmentRequestsCount = propShipmentCount ?? fetchedShipmentCount;
   const supportTicketsCount = propSupportCount ?? fetchedSupportCount;
+
+  // Prefetch handlers for hover-based data loading
+  const prefetchHandlers: Record<string, () => void> = {
+    clients: () => queryClient.prefetchQuery({ queryKey: ['clients'], staleTime: 60000 }),
+    inventory: () => queryClient.prefetchQuery({ queryKey: ['skus'], staleTime: 60000 }),
+    shipments: () => queryClient.prefetchQuery({ queryKey: ['outbound-shipments'], staleTime: 60000 }),
+    orders: () => queryClient.prefetchQuery({ queryKey: ['shopify-orders'], staleTime: 60000 }),
+    discrepancies: () => queryClient.prefetchQuery({ queryKey: ['discrepancies'], staleTime: 60000 }),
+    billing: () => queryClient.prefetchQuery({ queryKey: ['bills'], staleTime: 60000 }),
+  };
 
   const menuItems = [
     { id: "clients", label: "Clients", icon: Users },
@@ -58,6 +70,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount, ship
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => onTabChange(item.id)}
+                    onMouseEnter={() => prefetchHandlers[item.id]?.()}
                     isActive={activeTab === item.id}
                     className="w-full"
                   >
