@@ -120,6 +120,8 @@ const carrierLogoImages: Record<string, string> = {
   passport: "/integration-logos/passport-logo.jpeg",
   stallion: "/integration-logos/stallion-logo.png",
   vesyl: "/integration-logos/vesyl-logo.jpeg",
+  flavorcloud: "/integration-logos/flavorcloud-logo.png",
+  buku: "/integration-logos/bukuship-logo.png",
 };
 
 // Size multipliers for logos with extra whitespace
