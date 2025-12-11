@@ -95,6 +95,12 @@ const platformIcons: Record<string, IconType | null> = {
 // Image-based logos for platforms without good react-icons
 const logoImages: Record<string, string> = {
   mystore: "/integration-logos/mystore-logo.jpeg",
+  faire: "/integration-logos/faire-logo.png",
+};
+
+// Image-based carrier logos
+const carrierLogoImages: Record<string, string> = {
+  uship: "/integration-logos/uship-logo.png",
 };
 
 // Carrier icon mapping
@@ -345,6 +351,19 @@ const CarrierIcon = ({
   size?: number; 
   color: string;
 }) => {
+  // Check for image-based logo first
+  const logoImage = carrierLogoImages[carrierKey];
+  if (logoImage) {
+    return (
+      <img 
+        src={logoImage} 
+        alt={carrierName} 
+        className="object-contain rounded"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  
   const Icon = carrierIcons[carrierKey];
   
   if (Icon) {
