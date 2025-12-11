@@ -984,6 +984,31 @@ const Integrations = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* And More Indicator */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-12 text-center"
+          >
+            <div className="inline-flex flex-col items-center gap-3 px-8 py-6 rounded-2xl bg-white border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                <span className="text-secondary">+</span>
+                Many More Integrations Available
+              </div>
+              <p className="text-sm text-gray-500 max-w-md">
+                Don't see your platform or carrier? We support 100+ additional integrations 
+                and can build custom connections for enterprise clients.
+              </p>
+              <Link to="/contact">
+                <Button variant="outline" size="sm" className="mt-2 rounded-full">
+                  Request an Integration
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 
