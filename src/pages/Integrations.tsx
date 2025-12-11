@@ -92,6 +92,11 @@ const platformIcons: Record<string, IconType | null> = {
   mystore: null,
 };
 
+// Image-based logos for platforms without good react-icons
+const logoImages: Record<string, string> = {
+  mystore: "/integration-logos/mystore-logo.jpeg",
+};
+
 // Carrier icon mapping
 const carrierIcons: Record<string, IconType | null> = {
   dhl: SiDhl,
@@ -292,6 +297,19 @@ const PlatformIcon = ({
   size?: number; 
   color: string;
 }) => {
+  // Check for image-based logo first
+  const logoImage = logoImages[platformKey];
+  if (logoImage) {
+    return (
+      <img 
+        src={logoImage} 
+        alt={platformKey} 
+        className="object-contain rounded"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  
   const Icon = platformIcons[platformKey];
   
   if (Icon) {
