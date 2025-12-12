@@ -3,6 +3,12 @@ import { Helmet } from "react-helmet";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
@@ -1167,6 +1173,71 @@ const Integrations = () => {
                 </div>
               </div>
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <motion.div
+            variants={fadeUpVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Integration FAQs
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Common questions about connecting your sales channels
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUpVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              <AccordionItem value="shopify" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                  How do Shopify integrations work with Westfield?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-4">
+                  Our native Shopify integration connects via OAuth in under 2 minutes. Once connected, orders automatically sync in real-time, inventory updates push back to your store, and tracking numbers are added as soon as shipments go out.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="realtime" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                  Do you support real-time order syncing?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-4">
+                  Yes! Orders from Shopify, Amazon, Walmart, and TikTok Shop sync automatically as they come in. No manual imports needed—your orders appear in our system within seconds.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="marketplaces" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                  What marketplaces can connect to Westfield?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-4">
+                  We support Shopify, Shopify Plus, Amazon, Walmart, TikTok Shop, Etsy, WooCommerce, BigCommerce, Faire, and more. Most marketplaces connect through our OrderDesk or Pipe17 integrations for seamless multi-channel fulfillment.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="developer" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                  Do I need a developer to set up integrations?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-4">
+                  Not at all! Our integrations are plug-and-play. Shopify connects in under 2 minutes with a few clicks. For other platforms, our team handles the setup at no extra charge.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </motion.div>
         </div>
       </section>
