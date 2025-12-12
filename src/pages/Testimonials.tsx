@@ -48,17 +48,18 @@ const Testimonials = () => {
   return (
     <>
       <Helmet>
-        <title>Customer Testimonials | Westfield Prep Center Reviews</title>
+        <title>3PL Reviews | Los Angeles Prep Center Testimonials | Westfield</title>
         <meta 
           name="description" 
-          content="Read real reviews from satisfied customers of Westfield Prep Center. See why businesses trust us for Amazon FBA prep, Shopify fulfillment, and TikTok Shop services." 
+          content="Read reviews from e-commerce brands using our Los Angeles 3PL and prep center services. See why sellers trust Westfield for Amazon FBA prep and Shopify fulfillment." 
         />
-        <link rel="canonical" href="https://westfieldprepcenter.com/testimonials/" />
+        <meta name="keywords" content="3pl reviews, prep center testimonials, los angeles 3pl reviews, amazon fba prep reviews, fulfillment center reviews" />
+        <link rel="canonical" href="https://westfieldprepcenter.com/testimonials" />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content="Customer Testimonials | Westfield Prep Center Reviews" />
-        <meta property="og:description" content="Read real reviews from satisfied customers. See why businesses trust Westfield Prep Center for Amazon FBA prep, Shopify fulfillment, and TikTok Shop services." />
-        <meta property="og:url" content="https://westfieldprepcenter.com/testimonials/" />
+        <meta property="og:title" content="3PL Reviews | Los Angeles Prep Center Testimonials" />
+        <meta property="og:description" content="Read reviews from e-commerce brands using our Los Angeles 3PL and prep center services. See why sellers trust Westfield." />
+        <meta property="og:url" content="https://westfieldprepcenter.com/testimonials" />
         <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
         <meta property="og:type" content="website" />
         

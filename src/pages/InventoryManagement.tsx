@@ -19,8 +19,8 @@ const InventoryManagement = () => {
   }, []);
 
   const meta = generateMetaTags(
-    "Inventory Management Services | Real-Time Tracking Los Angeles",
-    "Real-time inventory management with cycle counts, analytics, and barcode tracking. $2.4M+ inventory under management in Los Angeles.",
+    "Inventory Management | Los Angeles 3PL Prep Center Services",
+    "Real-time inventory management at our Los Angeles 3PL. Prep center with SKU tracking, low-stock alerts, and cycle counts for e-commerce brands.",
     "/inventory-management"
   );
 
@@ -63,6 +63,7 @@ const InventoryManagement = () => {
       <Helmet>
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
+        <meta name="keywords" content="3pl los angeles, inventory management, prep center, sku tracking, cycle counts, ecommerce inventory" />
         <link rel="canonical" href={meta.canonical} />
       </Helmet>
 

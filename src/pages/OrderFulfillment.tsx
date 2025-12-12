@@ -19,8 +19,8 @@ const OrderFulfillment = () => {
   }, []);
 
   const meta = generateMetaTags(
-    "Order Fulfillment Services Los Angeles | Same-Day Processing",
-    "Lightning-fast order fulfillment in Los Angeles. Same-day processing, 99.8% accuracy, real-time tracking. Shopify, Amazon, TikTok Shop integration.",
+    "Order Fulfillment | Los Angeles 3PL & E-commerce Prep Center",
+    "Fast order fulfillment from our LA 3PL prep center. Same-day processing, 99.8% accuracy, multi-channel support for Shopify, Amazon, and TikTok Shop.",
     "/order-fulfillment"
   );
 
@@ -72,6 +72,7 @@ const OrderFulfillment = () => {
       <Helmet>
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
+        <meta name="keywords" content="3pl los angeles, order fulfillment, prep center, ecommerce fulfillment, shopify fulfillment, same day shipping" />
         <link rel="canonical" href={meta.canonical} />
         <meta property="og:title" content={meta.ogTitle} />
         <meta property="og:description" content={meta.ogDescription} />

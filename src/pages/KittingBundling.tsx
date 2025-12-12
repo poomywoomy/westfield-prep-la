@@ -19,9 +19,9 @@ const KittingBundling = () => {
 
   const serviceData = {
     serviceType: "Service",
-    name: "Kitting & Bundling Services",
-    description: "Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands.",
-    features: ["Multi-SKU Kits", "Gift Sets", "Promotional Bundles", "Photo-Proof QC"]
+    name: "Kitting & Bundling Services - Los Angeles 3PL Prep Center",
+    description: "Custom kitting and bundling at our LA 3PL prep center. Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC.",
+    features: ["Multi-SKU Kits", "Gift Sets", "Promotional Bundles", "Photo-Proof QC", "3PL Services"]
   };
 
   const faqData = [
@@ -42,8 +42,9 @@ const KittingBundling = () => {
   return (
     <>
       <Helmet>
-        <title>Kitting & Bundling Services | Westfield Prep Center</title>
-        <meta name="description" content="Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC for e-commerce brands." />
+        <title>Kitting & Bundling Services | Los Angeles 3PL Prep Center</title>
+        <meta name="description" content="Custom kitting and bundling at our LA prep center. 3PL services for subscription boxes, product sets, and promotional bundles with same-day assembly." />
+        <meta name="keywords" content="3pl los angeles, kitting services, bundling, prep center, subscription box assembly, product kitting" />
         <link rel="canonical" href="https://westfieldprepcenter.com/kitting-bundling" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />

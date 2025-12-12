@@ -19,8 +19,8 @@ const ReceivingInspection = () => {
   }, []);
 
   const meta = generateMetaTags(
-    "Receiving & QC Inspection Services Los Angeles | Quality Control",
-    "Professional receiving and quality control inspection in Los Angeles. 100% photo documentation, barcode verification, defect tracking.",
+    "Receiving & QC Inspection | Los Angeles 3PL Prep Center",
+    "Professional receiving and inspection at our LA prep center. 3PL services with photo documentation, damage detection, and same-day inventory updates.",
     "/receiving-inspection"
   );
 
@@ -55,6 +55,7 @@ const ReceivingInspection = () => {
       <Helmet>
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
+        <meta name="keywords" content="3pl los angeles, receiving inspection, prep center, quality control, qc inspection, amazon fba prep" />
         <link rel="canonical" href={meta.canonical} />
       </Helmet>
 

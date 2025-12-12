@@ -19,9 +19,9 @@ const StorageWarehousing = () => {
 
   const serviceData = {
     serviceType: "WarehouseService",
-    name: "Storage & Warehousing Services",
-    description: "Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management.",
-    features: ["Secure Racking", "Pallet Storage", "Lot Control", "Cycle Counts"]
+    name: "3PL Warehouse Storage & Prep Center Services",
+    description: "Secure 3PL warehouse storage in Los Angeles. Climate-controlled prep center with pallet storage, lot control, and cycle counts for e-commerce inventory management.",
+    features: ["Secure Racking", "Pallet Storage", "Lot Control", "Cycle Counts", "3PL Services"]
   };
 
   const faqData = [
@@ -42,8 +42,9 @@ const StorageWarehousing = () => {
   return (
     <>
       <Helmet>
-        <title>Storage & Warehousing | Westfield Prep Center</title>
-        <meta name="description" content="Secure racking, pallet storage, lot control, and cycle counts for e-commerce inventory management." />
+        <title>3PL Warehouse Storage Los Angeles | Prep Center Inventory Solutions</title>
+        <meta name="description" content="Secure 3PL warehouse storage in Los Angeles. Climate-controlled prep center with 24/7 security, pallet storage, and real-time inventory tracking for e-commerce brands." />
+        <meta name="keywords" content="3pl los angeles, los angeles 3pl, prep center, warehouse storage, pallet storage, climate controlled warehouse, ecommerce fulfillment" />
         <link rel="canonical" href="https://westfieldprepcenter.com/storage-warehousing" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
