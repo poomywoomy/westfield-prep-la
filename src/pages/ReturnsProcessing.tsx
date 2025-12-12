@@ -19,8 +19,8 @@ const ReturnsProcessing = () => {
   }, []);
 
   const meta = generateMetaTags(
-    "Returns Processing Services | Reverse Logistics Los Angeles",
-    "Efficient returns processing in Los Angeles. 5h inspection, restocking, value recovery. Amazon FBA returns, customer returns, warranty claims.",
+    "Returns Processing | Los Angeles 3PL & Prep Center Services",
+    "Fast returns processing at our LA prep center. 5-hour inspection, restocking, and value recovery. Expert 3PL reverse logistics for Amazon FBA and e-commerce returns.",
     "/returns-processing"
   );
 
@@ -55,6 +55,7 @@ const ReturnsProcessing = () => {
       <Helmet>
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
+        <meta name="keywords" content="3pl los angeles, prep center, returns processing, reverse logistics, amazon fba returns, ecommerce fulfillment" />
         <link rel="canonical" href={meta.canonical} />
       </Helmet>
 

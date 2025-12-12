@@ -14,9 +14,9 @@ const LabelingCompliance = () => {
 
   const serviceData = {
     serviceType: "Service",
-    name: "Labeling & Compliance Services",
-    description: "FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance.",
-    features: ["FNSKU Labels", "Warning Labels", "Carton Labeling", "Documentation", "Compliance Standards"]
+    name: "Labeling & Compliance Services - Los Angeles 3PL Prep Center",
+    description: "Expert 3PL labeling and compliance services at our LA prep center. FNSKU/barcodes, warning labels, and audit-ready documentation.",
+    features: ["FNSKU Labels", "Warning Labels", "Carton Labeling", "Documentation", "Compliance Standards", "3PL Services"]
   };
 
   const faqData = [
@@ -53,13 +53,14 @@ const LabelingCompliance = () => {
   return (
     <>
       <Helmet>
-        <title>Labeling & Compliance Services | Westfield Prep Center</title>
-        <meta name="description" content="FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance." />
+        <title>Labeling & Compliance | Los Angeles 3PL Prep Center</title>
+        <meta name="description" content="Expert labeling and compliance services at our LA prep center. 3PL FNSKU labeling, warning labels, and Amazon FBA compliance for e-commerce sellers." />
+        <meta name="keywords" content="3pl los angeles, labeling services, prep center, fnsku labels, amazon fba compliance, ecommerce labeling" />
         <link rel="canonical" href="https://westfieldprepcenter.com/labeling-fnsku" />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content="Labeling & Compliance Services | Westfield Prep Center" />
-        <meta property="og:description" content="FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance." />
+        <meta property="og:title" content="Labeling & Compliance | Los Angeles 3PL Prep Center" />
+        <meta property="og:description" content="Expert labeling and compliance services at our LA prep center. 3PL FNSKU labeling, warning labels, and Amazon FBA compliance." />
         <meta property="og:url" content="https://westfieldprepcenter.com/labeling-fnsku" />
         <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
         <meta property="og:type" content="website" />
