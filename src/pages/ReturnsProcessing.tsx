@@ -97,6 +97,16 @@ const ReturnsProcessing = () => {
                   <p className="text-xs md:text-sm text-gray-400 mt-1">Avg Processing</p>
                 </div>
               </div>
+
+              {/* Hero CTA Button */}
+              <Button 
+                size="lg" 
+                className="mt-8"
+                style={{ backgroundColor: 'hsl(350, 89%, 60%)', color: 'white' }}
+                onClick={() => navigate("/contact")}
+              >
+                Get Returns Quote
+              </Button>
             </div>
           </div>
         </section>
