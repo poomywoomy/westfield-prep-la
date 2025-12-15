@@ -25,22 +25,58 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://westfieldprepcenter.com/kitting-bundling</loc>
+    <loc>https://westfieldprepcenter.com/3pl-los-angeles</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://westfieldprepcenter.com/labeling-fnsku</loc>
+    <loc>https://westfieldprepcenter.com/kitting-bundling</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/labeling-compliance</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/storage-warehousing</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/order-fulfillment</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/inventory-management</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/receiving-inspection</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/returns-processing</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://westfieldprepcenter.com/integrations</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/pricing</loc>
@@ -94,43 +130,43 @@
     <loc>https://westfieldprepcenter.com/blog/common-3pl-mistakes-costing-shopify-sales</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/blog/shopify-3pl-services-los-angeles</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/blog/shopify-prep-center-fulfillment-guide</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/blog/amazon-fba-prep-center-los-angeles</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/blog/benefits-los-angeles-prep-center</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/blog/choose-best-prep-center-los-angeles</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/blog/what-is-a-prep-center-guide</loc>
     <lastmod>2025-01-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://westfieldprepcenter.com/privacy</loc>

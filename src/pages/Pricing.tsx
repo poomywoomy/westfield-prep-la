@@ -74,10 +74,10 @@ const Pricing = () => {
   return (
     <>
       <Helmet>
-        <title>Custom 3PL Pricing for Your Business | Westfield Prep Center</title>
+        <title>3PL Pricing Los Angeles | Custom Fulfillment Rates | Westfield Prep Center</title>
         <meta 
           name="description" 
-          content="Get custom 3PL pricing for your business. Transparent, volume-based rates for fulfillment, prep, and storage in Los Angeles. Request your quote today." 
+          content="Los Angeles 3PL pricing for fulfillment, prep, and storage. Transparent rates, no hidden fees. Request your custom quote from our LA fulfillment center today." 
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/pricing" />
       </Helmet>

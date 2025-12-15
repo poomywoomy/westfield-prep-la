@@ -44,6 +44,10 @@ const Footer = () => {
             <div className="space-y-4 pr-8 min-w-[200px]">
               <h4 className="text-lg font-semibold mb-6">Contact Us</h4>
               <div className="space-y-6">
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">Serving Los Angeles & Southern California</span>
+                </div>
                 <a href="tel:+18189355478" className="flex items-start gap-3 hover:text-secondary transition-colors group" aria-label="Call Westfield Prep Center">
                   <Phone className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
                   <span className="text-sm break-words">+1 (818) 935-5478</span>
