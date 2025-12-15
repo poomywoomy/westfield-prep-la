@@ -46,6 +46,13 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         telephone: "+18189355478",
         email: "info@westfieldprepcenter.com",
         priceRange: "$$",
+        // SAB-compliant address: city/region only, NO street address
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Los Angeles",
+          addressRegion: "CA",
+          addressCountry: "US"
+        },
         geo: {
           "@type": "GeoCoordinates",
           latitude: "34.0522",
@@ -60,10 +67,35 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
             timeZone: "America/Los_Angeles"
           }
         ],
-        areaServed: {
-          "@type": "Country",
-          name: "United States"
-        },
+        // SAB service area - covers Los Angeles and nationwide
+        serviceArea: [
+          {
+            "@type": "City",
+            name: "Los Angeles",
+            containedInPlace: {
+              "@type": "State",
+              name: "California"
+            }
+          },
+          {
+            "@type": "Country",
+            name: "United States"
+          }
+        ],
+        areaServed: [
+          {
+            "@type": "City",
+            name: "Los Angeles",
+            containedInPlace: {
+              "@type": "State",
+              name: "California"
+            }
+          },
+          {
+            "@type": "Country",
+            name: "United States"
+          }
+        ],
         sameAs: [
           "https://www.linkedin.com/company/westfield-prep-center/?viewAsMember=true",
           "https://www.instagram.com/westfieldprepcenter/",
@@ -143,22 +175,30 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
       return {
         "@context": "https://schema.org",
         "@type": "Service",
+        "@id": `${baseUrl}/#service-${data.serviceType?.toLowerCase().replace(/\s+/g, '-') || 'default'}`,
         serviceType: data.serviceType,
         name: data.name,
         description: data.description,
         category: "Prep Center Services",
+        // SAB-compliant: Link to main LocalBusiness via @id reference
         provider: {
-          "@type": "Organization",
+          "@type": "LocalBusiness",
+          "@id": `${baseUrl}/#organization`,
           name: "Westfield Prep Center",
           telephone: "+18189355478"
         },
+        // SAB-compliant: No address, only service area
         areaServed: [
           {
-            "@type": "Place",
-            name: "California"
+            "@type": "City",
+            name: "Los Angeles",
+            containedInPlace: {
+              "@type": "State",
+              name: "California"
+            }
           },
           {
-            "@type": "Place",
+            "@type": "Country",
             name: "United States"
           }
         ],
