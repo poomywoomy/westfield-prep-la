@@ -60,37 +60,9 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
             timeZone: "America/Los_Angeles"
           }
         ],
-        areaServed: [
-          {
-            "@type": "City",
-            name: "Los Angeles",
-            containedInPlace: {
-              "@type": "State",
-              name: "California"
-            }
-          },
-          {
-            "@type": "AdministrativeArea",
-            name: "Southern California"
-          },
-          {
-            "@type": "State",
-            name: "California",
-            containedIn: "United States"
-          },
-          {
-            "@type": "Country",
-            name: "United States"
-          }
-        ],
-        serviceArea: {
-          "@type": "GeoCircle",
-          geoMidpoint: {
-            "@type": "GeoCoordinates",
-            latitude: 34.0522,
-            longitude: -118.2437
-          },
-          geoRadius: "50 miles"
+        areaServed: {
+          "@type": "Country",
+          name: "United States"
         },
         sameAs: [
           "https://www.linkedin.com/company/westfield-prep-center/?viewAsMember=true",
