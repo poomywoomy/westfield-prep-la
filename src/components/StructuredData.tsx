@@ -33,7 +33,7 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
     if (type === "organization") {
       return {
         "@context": "https://schema.org",
-        "@type": ["LocalBusiness", "Warehouse", "Service"],
+        "@type": ["LocalBusiness", "Warehouse", "LogisticsService", "Service"],
         "@id": `${baseUrl}/#organization`,
         name: "Westfield Prep Center",
         legalName: "Sathatham LLC",
@@ -62,40 +62,36 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         ],
         areaServed: [
           {
+            "@type": "City",
+            name: "Los Angeles",
+            containedInPlace: {
+              "@type": "State",
+              name: "California"
+            }
+          },
+          {
+            "@type": "AdministrativeArea",
+            name: "Southern California"
+          },
+          {
             "@type": "State",
             name: "California",
             containedIn: "United States"
-          },
-          {
-            "@type": "AdministrativeArea",
-            name: "Los Angeles County",
-            containedIn: "California"
-          },
-          {
-            "@type": "AdministrativeArea",
-            name: "Orange County",
-            containedIn: "California"
-          },
-          {
-            "@type": "AdministrativeArea",
-            name: "San Diego County",
-            containedIn: "California"
-          },
-          {
-            "@type": "AdministrativeArea",
-            name: "San Francisco Bay Area",
-            containedIn: "California"
-          },
-          {
-            "@type": "AdministrativeArea",
-            name: "Sacramento County",
-            containedIn: "California"
           },
           {
             "@type": "Country",
             name: "United States"
           }
         ],
+        serviceArea: {
+          "@type": "GeoCircle",
+          geoMidpoint: {
+            "@type": "GeoCoordinates",
+            latitude: 34.0522,
+            longitude: -118.2437
+          },
+          geoRadius: "50 miles"
+        },
         sameAs: [
           "https://www.linkedin.com/company/westfield-prep-center/?viewAsMember=true",
           "https://www.instagram.com/westfieldprepcenter/",
@@ -134,7 +130,7 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         aggregateRating: {
           "@type": "AggregateRating",
           ratingValue: "5.0",
-          reviewCount: "4",
+          reviewCount: "6",
           bestRating: "5",
           worstRating: "1"
         },
