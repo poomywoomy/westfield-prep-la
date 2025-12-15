@@ -43,20 +43,28 @@ const Index = () => {
     }
   }, [user, role, loading, navigate]);
 
-  // Memoize FAQ data to prevent regeneration
+  // Memoize FAQ data to prevent regeneration - SAB-compliant questions
   const faqData = useMemo(() => ({
     questions: [
       {
-        question: "Do you offer Shopify fulfillment services?",
-        answer: "Yes! We specialize in Shopify fulfillment with custom branding, same-day processing, and direct integration. Whether you're selling on Shopify, Amazon FBA, TikTok Shop, or other channels, we handle everything from receiving to shipping with full photo documentation."
+        question: "Do you operate as a Los Angeles 3PL?",
+        answer: "Yes, Westfield Prep Center is a service-area-based 3PL operating from Los Angeles, California. We serve e-commerce businesses nationwide, handling their inventory, fulfillment, and prep services from our LA facility. Our strategic location near major ports provides shipping advantages for West Coast distribution."
       },
       {
-        question: "What areas do you serve?",
-        answer: "We're based in Los Angeles and provide fulfillment services to e-commerce businesses in all 50 states. We handle shipments to Amazon FBA warehouses, direct-to-consumer Shopify orders, TikTok Shop fulfillment, and multi-channel distribution nationwide."
+        question: "Do clients visit your warehouse?",
+        answer: "Our facility is not open for public visits. As a service-area business, we handle all client inventory remotely. Clients manage their accounts through our secure online portal and communicate with their dedicated account manager for any needs."
       },
       {
-        question: "Do you offer same-day processing?",
-        answer: "Yes! Orders received before 2 PM PST ship the same day. We pride ourselves on fast turnaround times to keep your customers happy and your inventory moving."
+        question: "What areas do you serve from Los Angeles?",
+        answer: "While strategically located in Los Angeles for port proximity and West Coast shipping advantages, we serve e-commerce businesses across all 50 states. Clients ship their inventory to us, and we handle fulfillment to their customers nationwide."
+      },
+      {
+        question: "Do you offer Amazon FBA prep in Los Angeles?",
+        answer: "Yes! We provide complete Amazon FBA prep services including labeling, poly-bagging, bubble wrapping, inspection, and shipping to Amazon fulfillment centers. Our LA location offers fast transit times to West Coast Amazon warehouses."
+      },
+      {
+        question: "Do you support Shopify fulfillment?",
+        answer: "Absolutely! We specialize in Shopify fulfillment with native integration, same-day processing, custom branding options, and full photo documentation. Orders sync automatically and ship with real-time tracking updates."
       }
     ]
   }), []);

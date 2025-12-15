@@ -28,6 +28,10 @@ const FAQAccordion = () => {
       answer: "Yes, we provide complete returns management. We receive returned products, inspect them, and either restock or dispose per your instructions. You'll receive reports on all returns processed."
     },
     {
+      question: "Do you offer warehouse tours or client visits?",
+      answer: "As a service-area business, we handle all client operations remotely through our secure client portal. This allows us to focus on fast turnaround times and efficient fulfillment. Your dedicated account manager is always available for questions and updates."
+    },
+    {
       question: "How do I get started?",
       answer: "Start with a free fulfillment audit. We'll review your current operations, discuss your needs, and provide a custom quote. Once you're ready, onboarding typically takes 3-5 business days."
     },
