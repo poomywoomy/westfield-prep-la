@@ -40,9 +40,18 @@ const services = [
   }
 ];
 
+const serviceLinks: Record<string, string> = {
+  "Same-Day Shipping": "/order-fulfillment",
+  "Same-Day Check-Ins": "/receiving-inspection",
+  "International Shipping": "/order-fulfillment",
+  "B2B Fulfillment": "/order-fulfillment",
+  "DTC Fulfillment": "/shopify-fulfillment",
+  "Storage & Warehousing": "/storage-warehousing",
+};
+
 const Services = () => {
-  const goToContact = () => {
-    window.location.href = "/contact";
+  const goToService = (title: string) => {
+    window.location.href = serviceLinks[title] || "/contact";
   };
 
   return (
@@ -87,7 +96,7 @@ const Services = () => {
                       {service.description}
                     </p>
                     <button 
-                      onClick={goToContact}
+                      onClick={() => goToService(service.title)}
                       className="text-primary hover:text-primary/80 flex items-center gap-2 font-medium transition-colors group/btn"
                     >
                       Learn More 
@@ -115,7 +124,7 @@ const Services = () => {
           <div className="mt-20 text-center">
             <Button 
               size="lg"
-              onClick={goToContact}
+              onClick={() => window.location.href = "/contact"}
               className="px-8 py-6 text-lg"
             >
               Explore All Services

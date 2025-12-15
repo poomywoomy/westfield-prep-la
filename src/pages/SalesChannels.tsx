@@ -86,13 +86,13 @@ const SalesChannels = () => {
       <Helmet>
         <title>Supported Sales Channels | Multi-Channel Fulfillment - Westfield Prep Center</title>
         <meta name="description" content="We support all major e-commerce platforms including Shopify, Amazon, TikTok Shop, Walmart, eBay, and more. Multi-channel fulfillment from our Los Angeles warehouse." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels/" />
+        <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels" />
       </Helmet>
       <StructuredData type="itemList" data={{ platforms: allPlatforms }} />
 
       <div className="min-h-screen flex flex-col">
         <Header />
-        <Breadcrumbs items={[{ label: "Sales Channels", path: "/sales-channels/" }]} />
+        <Breadcrumbs items={[{ label: "Sales Channels", path: "/sales-channels" }]} />
 
         <main className="flex-1">
           {/* Hero Section */}

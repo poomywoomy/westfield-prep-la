@@ -16,20 +16,6 @@ const LocationShowcase = () => {
             </p>
           </div>
 
-          {/* Google Maps Embed - Generic Los Angeles */}
-          <div className="mb-12 rounded-xl overflow-hidden border border-border shadow-lg">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d423286.27404827416!2d-118.69192993631785!3d34.02016130653294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2c75ddc27da13%3A0xe22fdf6f254608f4!2sLos%20Angeles%2C%20CA!5e0!3m2!1sen!2sus!4v1234567890"
-              width="100%"
-              height="400"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Westfield Prep Center - Los Angeles, CA"
-            />
-          </div>
-
           {/* Interactive Tabs */}
           <Tabs defaultValue="la-benefits" className="w-full">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
