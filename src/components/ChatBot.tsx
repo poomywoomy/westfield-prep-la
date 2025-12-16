@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useChatBot } from "@/hooks/useChatBot";
 import { ChatBotButton } from "./ChatBotButton";
 import { ChatBotMessage } from "./ChatBotMessage";
+import { ChatBotQuickAsk } from "./ChatBotQuickAsk";
 
 // Routes where chatbot should NOT appear
 const EXCLUDED_ROUTES = [
@@ -23,6 +24,7 @@ const ChatBotInner = () => {
     isLoading,
     isEnabled,
     greeting,
+    hasUserSentMessage,
     sendMessage,
     toggleChat,
     closeChat,
@@ -60,17 +62,24 @@ const ChatBotInner = () => {
     await sendMessage(message);
   };
 
+  const handleQuickAskClick = async (question: string) => {
+    await sendMessage(question);
+  };
+
   // Don't render if disabled or on excluded route (AFTER all hooks)
   if (!isEnabled || isExcludedRoute) {
     return null;
   }
+
+  // Show Quick Ask when chat is open, no messages yet, and user hasn't sent a message
+  const showQuickAsk = messages.length === 0 && !hasUserSentMessage;
 
   return (
     <>
       {/* Floating button */}
       <ChatBotButton isOpen={isOpen} greeting={greeting} onClick={toggleChat} />
 
-      {/* Chat panel */}
+      {/* Chat panel - increased sizing */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -78,7 +87,7 @@ const ChatBotInner = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[380px] max-h-[80vh] md:max-h-[500px] bg-background border border-border rounded-xl shadow-xl flex flex-col overflow-hidden"
+            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-[calc(100vw-2rem)] max-w-[420px] max-h-[85vh] md:max-h-[560px] bg-background border border-border rounded-xl shadow-xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/50">
@@ -105,6 +114,13 @@ const ChatBotInner = () => {
                   <p>Ask me about our services, turnaround times, or if we're a good fit for your business.</p>
                 </div>
               )}
+              
+              {/* Quick Ask Questions */}
+              <ChatBotQuickAsk 
+                visible={showQuickAsk} 
+                onQuestionClick={handleQuickAskClick} 
+              />
+
               {messages.map((message) => (
                 <ChatBotMessage key={message.id} message={message} />
               ))}
