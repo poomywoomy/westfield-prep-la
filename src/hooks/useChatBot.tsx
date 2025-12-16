@@ -19,6 +19,7 @@ interface UseChatBotReturn {
   sendMessage: (content: string) => Promise<void>;
   toggleChat: () => void;
   closeChat: () => void;
+  addAssistantMessage: (content: string) => void;
 }
 
 export const useChatBot = (): UseChatBotReturn => {
@@ -65,6 +66,17 @@ export const useChatBot = (): UseChatBotReturn => {
 
   const closeChat = useCallback(() => {
     setIsOpen(false);
+  }, []);
+
+  // Add an assistant message directly (for intake flow)
+  const addAssistantMessage = useCallback((content: string) => {
+    const assistantMessage: ChatMessage = {
+      id: `assistant-${Date.now()}`,
+      role: "assistant",
+      content,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, assistantMessage]);
   }, []);
 
   const sendMessage = useCallback(async (content: string) => {
@@ -210,5 +222,6 @@ export const useChatBot = (): UseChatBotReturn => {
     sendMessage,
     toggleChat,
     closeChat,
+    addAssistantMessage,
   };
 };

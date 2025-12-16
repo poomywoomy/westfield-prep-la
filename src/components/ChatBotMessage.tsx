@@ -1,9 +1,19 @@
 import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/hooks/useChatBot";
 import { Link } from "react-router-dom";
+import { ChatBotActionButtons } from "./ChatBotActionButtons";
+import { ChatBotIntakeChoices, INTAKE_CHOICES } from "./ChatBotIntakeChoices";
+import { Button } from "@/components/ui/button";
+import { IntakeStep } from "@/hooks/useChatBotIntake";
 
 interface ChatBotMessageProps {
   message: ChatMessage;
+  onBookCall?: () => void;
+  onChatIntake?: () => void;
+  onIntakeChoice?: (value: string | string[]) => void;
+  onConfirmSubmit?: () => void;
+  onConfirmEdit?: () => void;
+  intakeStep?: IntakeStep;
 }
 
 // Simple CTA detection and rendering
@@ -59,8 +69,49 @@ const renderMessageWithCTAs = (content: string) => {
   );
 };
 
-export const ChatBotMessage = ({ message }: ChatBotMessageProps) => {
+// Get choice options based on intake step
+const getChoiceOptions = (step: IntakeStep) => {
+  switch (step) {
+    case "monthlyUnits":
+      return { type: "single" as const, options: INTAKE_CHOICES.volume };
+    case "skuCount":
+      return { type: "single" as const, options: INTAKE_CHOICES.skuCount };
+    case "marketplaces":
+      return { type: "multiple" as const, options: INTAKE_CHOICES.marketplaces };
+    case "packaging":
+      return { type: "single" as const, options: INTAKE_CHOICES.packaging };
+    case "timeline":
+      return { type: "single" as const, options: INTAKE_CHOICES.timeline };
+    default:
+      return null;
+  }
+};
+
+export const ChatBotMessage = ({ 
+  message, 
+  onBookCall, 
+  onChatIntake,
+  onIntakeChoice,
+  onConfirmSubmit,
+  onConfirmEdit,
+  intakeStep 
+}: ChatBotMessageProps) => {
   const isUser = message.role === "user";
+  const content = message.content;
+
+  // Check for special markers
+  const hasIntakeChoice = content.includes("[SHOW_INTAKE_CHOICE]");
+  const hasConfirmation = content.includes("[INTAKE_CONFIRM]");
+  
+  // Clean content of markers
+  const cleanContent = content
+    .replace(/\[SHOW_INTAKE_CHOICE\]/g, "")
+    .replace(/\[INTAKE_CONFIRM\]/g, "")
+    .trim();
+
+  // Determine if we should show choice buttons for current intake step
+  const choiceConfig = intakeStep ? getChoiceOptions(intakeStep) : null;
+  const showChoices = choiceConfig && onIntakeChoice && !isUser;
 
   return (
     <div
@@ -78,9 +129,40 @@ export const ChatBotMessage = ({ message }: ChatBotMessageProps) => {
         )}
       >
         {isUser ? (
-          <span>{message.content}</span>
+          <span>{content}</span>
         ) : (
-          renderMessageWithCTAs(message.content)
+          <div className="space-y-3">
+            {cleanContent && renderMessageWithCTAs(cleanContent)}
+            
+            {/* Intake Choice Buttons */}
+            {hasIntakeChoice && onBookCall && onChatIntake && (
+              <ChatBotActionButtons 
+                onBookCall={onBookCall} 
+                onChatIntake={onChatIntake} 
+              />
+            )}
+            
+            {/* Intake Step Choice Buttons */}
+            {showChoices && (
+              <ChatBotIntakeChoices
+                type={choiceConfig.type}
+                options={choiceConfig.options}
+                onSelect={onIntakeChoice}
+              />
+            )}
+            
+            {/* Confirmation Buttons */}
+            {hasConfirmation && onConfirmSubmit && onConfirmEdit && (
+              <div className="flex gap-2 mt-3">
+                <Button size="sm" onClick={onConfirmSubmit}>
+                  Submit
+                </Button>
+                <Button size="sm" variant="outline" onClick={onConfirmEdit}>
+                  Edit
+                </Button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -3,9 +3,12 @@ import { useLocation } from "react-router-dom";
 import { X, Send, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChatBot } from "@/hooks/useChatBot";
+import { useChatBotIntake } from "@/hooks/useChatBotIntake";
 import { ChatBotButton } from "./ChatBotButton";
 import { ChatBotMessage } from "./ChatBotMessage";
 import { ChatBotQuickAsk } from "./ChatBotQuickAsk";
+
+const CALENDLY_URL = "https://calendly.com/westfieldprepcenter-info/westfield-3pl-meeting";
 
 // Routes where chatbot should NOT appear
 const EXCLUDED_ROUTES = [
@@ -28,7 +31,22 @@ const ChatBotInner = () => {
     sendMessage,
     toggleChat,
     closeChat,
+    addAssistantMessage,
   } = useChatBot();
+
+  const {
+    intakeStep,
+    isIntakeActive,
+    isConfirming,
+    isChoiceStep,
+    isSubmitting,
+    startIntake,
+    processResponse,
+    processChoiceResponse,
+    getConfirmationSummary,
+    submitIntake,
+    editIntake,
+  } = useChatBotIntake();
 
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -44,35 +62,117 @@ const ChatBotInner = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, isIntakeActive]);
 
   // Focus input when chat opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
+    if (isOpen && inputRef.current && !isChoiceStep) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [isOpen]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const message = input;
-    setInput("");
-    await sendMessage(message);
-  };
-
-  const handleQuickAskClick = async (question: string) => {
-    await sendMessage(question);
-  };
+  }, [isOpen, isChoiceStep]);
 
   // Don't render if disabled or on excluded route (AFTER all hooks)
   if (!isEnabled || isExcludedRoute) {
     return null;
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading || isSubmitting) return;
+
+    const userInput = input.trim();
+    setInput("");
+
+    // If intake is active (not confirming), process the response
+    if (isIntakeActive && !isConfirming) {
+      // Add user message visually
+      await sendMessage(userInput);
+      
+      // Process intake response (don't send to AI)
+      const { nextQuestion, isComplete } = processResponse(userInput);
+      
+      if (isComplete) {
+        const summary = getConfirmationSummary();
+        addAssistantMessage(summary + "\n\n[INTAKE_CONFIRM]");
+      } else if (nextQuestion) {
+        addAssistantMessage(nextQuestion);
+      }
+    } else {
+      // Regular chat message - send to AI
+      await sendMessage(userInput);
+    }
+  };
+
+  const handleQuickAskClick = async (question: string) => {
+    await sendMessage(question);
+  };
+
+  const handleBookCall = () => {
+    window.open(CALENDLY_URL, "_blank");
+    addAssistantMessage(
+      "Great choice! The Calendly link should have opened in a new tab. Feel free to ask me anything else in the meantime."
+    );
+  };
+
+  const handleChatIntake = () => {
+    const firstQuestion = startIntake();
+    addAssistantMessage(firstQuestion);
+  };
+
+  const handleIntakeChoice = async (value: string | string[]) => {
+    // Add user's selection as a message visually
+    const displayValue = Array.isArray(value) ? value.join(", ") : value;
+    
+    // First, add the user message (this sets hasUserSentMessage to true)
+    // We use a fake send that just adds the message without calling AI
+    const userMessage = {
+      id: `user-${Date.now()}`,
+      role: "user" as const,
+      content: displayValue,
+      timestamp: new Date(),
+    };
+    
+    // Manually trigger the message display via sendMessage (won't call AI if intake is active)
+    await sendMessage(displayValue);
+    
+    // Process the choice and get next question
+    const { nextQuestion, isComplete } = processChoiceResponse(value);
+    
+    if (isComplete) {
+      const summary = getConfirmationSummary();
+      addAssistantMessage(summary + "\n\n[INTAKE_CONFIRM]");
+    } else if (nextQuestion) {
+      addAssistantMessage(nextQuestion);
+    }
+  };
+
+  const handleConfirmSubmit = async () => {
+    const success = await submitIntake();
+    if (success) {
+      addAssistantMessage(
+        "Your information has been submitted! Our team typically responds within 24 hours with a custom quote. Onboarding can begin immediately after approval. Feel free to ask me anything else in the meantime!"
+      );
+    }
+  };
+
+  const handleConfirmEdit = () => {
+    editIntake();
+    addAssistantMessage("No problem! Let's start over. What's your full name?");
+  };
+
   // Show Quick Ask when chat is open, no messages yet, and user hasn't sent a message
   const showQuickAsk = messages.length === 0 && !hasUserSentMessage;
+
+  // Get intake step for the last assistant message only
+  const getIntakeStepForMessage = (index: number) => {
+    if (!isIntakeActive || isConfirming) return undefined;
+    // Only show choice buttons for the last assistant message
+    const lastAssistantIndex = messages.map((m, i) => m.role === "assistant" ? i : -1).filter(i => i >= 0).pop();
+    if (index === lastAssistantIndex) {
+      return intakeStep;
+    }
+    return undefined;
+  };
 
   return (
     <>
@@ -121,14 +221,26 @@ const ChatBotInner = () => {
                 onQuestionClick={handleQuickAskClick} 
               />
 
-              {messages.map((message) => (
-                <ChatBotMessage key={message.id} message={message} />
+              {messages.map((message, index) => (
+                <ChatBotMessage 
+                  key={message.id} 
+                  message={message}
+                  onBookCall={handleBookCall}
+                  onChatIntake={handleChatIntake}
+                  onIntakeChoice={handleIntakeChoice}
+                  onConfirmSubmit={handleConfirmSubmit}
+                  onConfirmEdit={handleConfirmEdit}
+                  intakeStep={getIntakeStepForMessage(index)}
+                />
               ))}
-              {isLoading && (
+              
+              {(isLoading || isSubmitting) && (
                 <div className="flex justify-start">
                   <div className="bg-muted rounded-lg px-3 py-2 flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Typing...</span>
+                    <span className="text-sm text-muted-foreground">
+                      {isSubmitting ? "Submitting..." : "Typing..."}
+                    </span>
                   </div>
                 </div>
               )}
@@ -146,13 +258,19 @@ const ChatBotInner = () => {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your question..."
+                  placeholder={
+                    isChoiceStep 
+                      ? "Select an option above or type..." 
+                      : isIntakeActive 
+                        ? "Type your answer..." 
+                        : "Type your question..."
+                  }
                   className="flex-1 px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
-                  disabled={isLoading}
+                  disabled={isLoading || isSubmitting}
                 />
                 <button
                   type="submit"
-                  disabled={!input.trim() || isLoading}
+                  disabled={!input.trim() || isLoading || isSubmitting}
                   className="px-3 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   aria-label="Send message"
                 >
