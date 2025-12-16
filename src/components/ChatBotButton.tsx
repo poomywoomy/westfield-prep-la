@@ -37,14 +37,14 @@ export const ChatBotButton = ({ isOpen, greeting, onClick }: ChatBotButtonProps)
             onClick={onClick}
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[hsl(210,30%,12%)] to-[hsl(210,40%,20%)] text-white shadow-xl shadow-[hsl(28,100%,50%)]/20 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[hsl(28,100%,50%)] focus:ring-offset-2 group"
+            className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[hsl(28,100%,50%)] to-[hsl(28,100%,40%)] text-white shadow-xl shadow-[hsl(28,100%,50%)]/30 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[hsl(28,100%,50%)] focus:ring-offset-2 group"
             aria-label="Open chat"
           >
             {/* Animated glow ring */}
-            <span className="absolute inset-0 rounded-full bg-gradient-to-br from-[hsl(28,100%,50%)] to-[hsl(28,100%,40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md -z-10" />
+            <span className="absolute inset-0 rounded-full bg-gradient-to-br from-white/30 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md -z-10" />
             
             {/* Pulse ring animation */}
-            <span className="absolute inset-0 rounded-full border-2 border-[hsl(28,100%,50%)]/30 animate-ping" style={{ animationDuration: '2s' }} />
+            <span className="absolute inset-0 rounded-full border-2 border-white/40 animate-ping" style={{ animationDuration: '2s' }} />
             
             <MessageCircle className="w-7 h-7 drop-shadow-sm" />
           </motion.button>
