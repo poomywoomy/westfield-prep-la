@@ -88,8 +88,14 @@ const ChatBotInner = () => {
       // Add user message visually
       await sendMessage(userInput);
       
-      // Process intake response (don't send to AI)
-      const { nextQuestion, isComplete } = processResponse(userInput);
+      // Process intake response with validation
+      const { nextQuestion, isComplete, isValid, errorMessage } = processResponse(userInput);
+      
+      // CRITICAL: If validation failed, stay on current step and show clarification
+      if (!isValid && errorMessage) {
+        addAssistantMessage(errorMessage);
+        return; // Don't advance
+      }
       
       if (isComplete) {
         const summary = getConfirmationSummary();
@@ -124,19 +130,16 @@ const ChatBotInner = () => {
     const displayValue = Array.isArray(value) ? value.join(", ") : value;
     
     // First, add the user message (this sets hasUserSentMessage to true)
-    // We use a fake send that just adds the message without calling AI
-    const userMessage = {
-      id: `user-${Date.now()}`,
-      role: "user" as const,
-      content: displayValue,
-      timestamp: new Date(),
-    };
-    
-    // Manually trigger the message display via sendMessage (won't call AI if intake is active)
     await sendMessage(displayValue);
     
-    // Process the choice and get next question
-    const { nextQuestion, isComplete } = processChoiceResponse(value);
+    // Process the choice with validation
+    const { nextQuestion, isComplete, isValid, errorMessage } = processChoiceResponse(value);
+    
+    // CRITICAL: If validation failed, stay on current step and show clarification
+    if (!isValid && errorMessage) {
+      addAssistantMessage(errorMessage);
+      return; // Don't advance
+    }
     
     if (isComplete) {
       const summary = getConfirmationSummary();
