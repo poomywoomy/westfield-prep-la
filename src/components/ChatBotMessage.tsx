@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils";
-import { ChatMessage } from "@/hooks/useChatBot";
+import { motion } from "framer-motion";
+import { Phone, Calendar, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { ChatMessage } from "@/hooks/useChatBot";
 
 interface ChatBotMessageProps {
   message: ChatMessage;
@@ -10,118 +10,104 @@ interface ChatBotMessageProps {
 
 const CALENDLY_URL = "https://calendly.com/westfieldprepcenter-info/westfield-3pl-meeting";
 
-// Simple CTA detection and rendering
-const renderMessageWithCTAs = (content: string) => {
+// Render CTAs with modern styling
+const renderMessageWithCTAs = (content: string, onBookCall?: () => void): JSX.Element => {
   // Check for CTA patterns
-  const ctaPatterns = [
-    { pattern: /Get Free Fulfillment Audit/gi, url: "/contact", label: "Get Free Fulfillment Audit" },
-    { pattern: /Contact Our Team/gi, url: "/contact", label: "Contact Our Team" },
-    { pattern: /\(818\) 935-5478/g, url: "tel:+18189355478", label: "(818) 935-5478" },
-  ];
-
-  let processedContent = content;
-  const ctasFound: { label: string; url: string }[] = [];
-
-  ctaPatterns.forEach(({ pattern, url, label }) => {
-    if (pattern.test(content)) {
-      ctasFound.push({ label, url });
-      // Remove CTA text from content to avoid duplication
-      processedContent = processedContent.replace(pattern, "").trim();
-    }
-  });
-
-  // Clean up any extra punctuation left over
-  processedContent = processedContent.replace(/\.\s*\.$/, ".").replace(/,\s*$/, "").trim();
+  const hasCtaOptions = content.includes("[SHOW_CTA_OPTIONS]");
+  const phoneMatch = content.match(/\(818\) 935-5478/);
+  
+  // Clean content of markers
+  let cleanContent = content
+    .replace(/\[SHOW_CTA_OPTIONS\]/g, "")
+    .replace(/Get Free Fulfillment Audit/gi, "")
+    .replace(/Contact Our Team/gi, "")
+    .trim();
+  
+  // Clean up extra punctuation
+  cleanContent = cleanContent.replace(/\.\s*\.$/, ".").replace(/,\s*$/, "").trim();
 
   return (
-    <div className="space-y-2">
-      <div className="whitespace-pre-wrap">{processedContent}</div>
-      {ctasFound.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {ctasFound.map((cta, idx) => (
-            cta.url.startsWith("tel:") ? (
-              <a
-                key={idx}
-                href={cta.url}
-                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors"
-              >
-                {cta.label}
-              </a>
-            ) : (
-              <Link
-                key={idx}
-                to={cta.url}
-                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors"
-              >
-                {cta.label}
-              </Link>
-            )
-          ))}
+    <div className="space-y-3">
+      <p className="text-sm leading-relaxed whitespace-pre-wrap">{cleanContent}</p>
+      
+      {/* CTA Options */}
+      {hasCtaOptions && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full bg-gradient-to-r from-[hsl(28,100%,50%)] to-[hsl(28,100%,40%)] text-white shadow-md shadow-[hsl(28,100%,50%)]/20 hover:shadow-lg hover:shadow-[hsl(28,100%,50%)]/30 hover:scale-[1.02] transition-all duration-200"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            Get a Free Quote
+          </Link>
+          <button
+            onClick={() => {
+              window.open(CALENDLY_URL, "_blank");
+              onBookCall?.();
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-white hover:shadow-md hover:scale-[1.02] transition-all duration-200"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            Book a Call
+          </button>
         </div>
+      )}
+      
+      {/* Phone CTA */}
+      {phoneMatch && (
+        <a
+          href="tel:+18189355478"
+          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full bg-gradient-to-r from-[hsl(28,100%,50%)] to-[hsl(28,100%,40%)] text-white shadow-md shadow-[hsl(28,100%,50%)]/20 hover:shadow-lg hover:shadow-[hsl(28,100%,50%)]/30 hover:scale-[1.02] transition-all duration-200"
+        >
+          <Phone className="w-3.5 h-3.5" />
+          (818) 935-5478
+        </a>
       )}
     </div>
   );
 };
 
-export const ChatBotMessage = ({ 
-  message, 
-  onBookCall,
-}: ChatBotMessageProps) => {
-  const isUser = message.role === "user";
+export const ChatBotMessage = ({ message, onBookCall }: ChatBotMessageProps) => {
+  const isUser = message.role === 'user';
   const content = message.content;
 
-  // Check for CTA options marker
-  const hasCtaOptions = content.includes("[SHOW_CTA_OPTIONS]");
-  
-  // Clean content of markers
-  const cleanContent = content
-    .replace(/\[SHOW_CTA_OPTIONS\]/g, "")
-    .trim();
+  // Check if message has CTAs
+  const hasCTAs = content.includes('[SHOW_CTA_OPTIONS]') || 
+                  content.includes('(818) 935-5478') ||
+                  content.includes('Get Free Fulfillment Audit') ||
+                  content.includes('Contact Our Team');
 
   return (
-    <div
-      className={cn(
-        "flex w-full",
-        isUser ? "justify-end" : "justify-start"
-      )}
+    <motion.div
+      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-1`}
     >
+      {/* Bot avatar */}
+      {!isUser && (
+        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-[hsl(210,30%,12%)] to-[hsl(210,40%,20%)] flex items-center justify-center mr-2 mt-1 shadow-sm">
+          <span className="text-xs font-bold text-white">W</span>
+        </div>
+      )}
+      
       <div
-        className={cn(
-          "max-w-[85%] rounded-lg px-3 py-2 text-sm",
+        className={`max-w-[85%] px-4 py-3 ${
           isUser
-            ? "bg-secondary text-secondary-foreground"
-            : "bg-muted text-foreground"
-        )}
+            ? 'bg-gradient-to-br from-[hsl(28,100%,50%)] to-[hsl(28,100%,42%)] text-white rounded-2xl rounded-br-md shadow-md shadow-[hsl(28,100%,50%)]/20'
+            : 'bg-white/90 backdrop-blur-sm border border-gray-100/80 text-gray-800 rounded-2xl rounded-bl-md shadow-sm'
+        }`}
       >
         {isUser ? (
-          <span>{content}</span>
+          <p className="text-sm leading-relaxed">{content}</p>
         ) : (
-          <div className="space-y-3">
-            {cleanContent && renderMessageWithCTAs(cleanContent)}
-            
-            {/* CTA Options: Get a Quote OR Book a Call */}
-            {hasCtaOptions && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                <Link to="/contact">
-                  <Button size="sm">
-                    📝 Get a Free Quote
-                  </Button>
-                </Link>
-                <Button 
-                  size="sm" 
-                  variant="secondary" 
-                  onClick={() => {
-                    window.open(CALENDLY_URL, "_blank");
-                    onBookCall?.();
-                  }}
-                >
-                  📅 Book a Call
-                </Button>
-              </div>
-            )}
-          </div>
+          hasCTAs ? (
+            renderMessageWithCTAs(content, onBookCall)
+          ) : (
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+          )
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
