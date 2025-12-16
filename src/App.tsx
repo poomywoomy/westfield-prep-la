@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { ChatBot } from "@/components/ChatBot";
 
 // Lazy load routes for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -108,6 +109,7 @@ const App = () => {
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <ChatBot />
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>
