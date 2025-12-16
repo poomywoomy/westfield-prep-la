@@ -15,6 +15,7 @@ interface UseChatBotReturn {
   isLoading: boolean;
   isEnabled: boolean;
   greeting: string;
+  hasUserSentMessage: boolean;
   sendMessage: (content: string) => Promise<void>;
   toggleChat: () => void;
   closeChat: () => void;
@@ -26,6 +27,7 @@ export const useChatBot = (): UseChatBotReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
   const [greeting, setGreeting] = useState("");
+  const [hasUserSentMessage, setHasUserSentMessage] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Check feature flag on mount
@@ -67,6 +69,9 @@ export const useChatBot = (): UseChatBotReturn => {
 
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || isLoading) return;
+
+    // Mark that user has sent their first message (hides Quick Ask)
+    setHasUserSentMessage(true);
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -201,6 +206,7 @@ export const useChatBot = (): UseChatBotReturn => {
     isLoading,
     isEnabled,
     greeting,
+    hasUserSentMessage,
     sendMessage,
     toggleChat,
     closeChat,

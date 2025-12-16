@@ -23,18 +23,18 @@ export const ChatBotButton = ({ isOpen, greeting, onClick }: ChatBotButtonProps)
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1, duration: 0.3 }}
-            className="max-w-[200px] bg-background border border-border rounded-lg px-3 py-2 shadow-lg text-sm text-foreground"
+            className="max-w-[220px] bg-background border border-border rounded-lg px-3 py-2 shadow-lg text-sm text-foreground"
           >
             {greeting}
           </motion.div>
 
-          {/* Chat button */}
+          {/* Chat button - increased size */}
           <button
             onClick={onClick}
-            className="w-14 h-14 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
+            className="w-16 h-16 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
             aria-label="Open chat"
           >
-            <MessageCircle className="w-6 h-6" />
+            <MessageCircle className="w-7 h-7" />
           </button>
         </motion.div>
       )}
