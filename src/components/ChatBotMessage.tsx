@@ -1,20 +1,14 @@
 import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/hooks/useChatBot";
 import { Link } from "react-router-dom";
-import { ChatBotActionButtons } from "./ChatBotActionButtons";
-import { ChatBotIntakeChoices, INTAKE_CHOICES } from "./ChatBotIntakeChoices";
 import { Button } from "@/components/ui/button";
-import { IntakeStep } from "@/hooks/useChatBotIntake";
 
 interface ChatBotMessageProps {
   message: ChatMessage;
   onBookCall?: () => void;
-  onChatIntake?: () => void;
-  onIntakeChoice?: (value: string | string[]) => void;
-  onConfirmSubmit?: () => void;
-  onConfirmEdit?: () => void;
-  intakeStep?: IntakeStep;
 }
+
+const CALENDLY_URL = "https://calendly.com/westfieldprepcenter-info/westfield-3pl-meeting";
 
 // Simple CTA detection and rendering
 const renderMessageWithCTAs = (content: string) => {
@@ -69,49 +63,20 @@ const renderMessageWithCTAs = (content: string) => {
   );
 };
 
-// Get choice options based on intake step
-const getChoiceOptions = (step: IntakeStep) => {
-  switch (step) {
-    case "monthlyUnits":
-      return { type: "single" as const, options: INTAKE_CHOICES.volume };
-    case "skuCount":
-      return { type: "single" as const, options: INTAKE_CHOICES.skuCount };
-    case "marketplaces":
-      return { type: "multiple" as const, options: INTAKE_CHOICES.marketplaces };
-    case "packaging":
-      return { type: "single" as const, options: INTAKE_CHOICES.packaging };
-    case "timeline":
-      return { type: "single" as const, options: INTAKE_CHOICES.timeline };
-    default:
-      return null;
-  }
-};
-
 export const ChatBotMessage = ({ 
   message, 
-  onBookCall, 
-  onChatIntake,
-  onIntakeChoice,
-  onConfirmSubmit,
-  onConfirmEdit,
-  intakeStep 
+  onBookCall,
 }: ChatBotMessageProps) => {
   const isUser = message.role === "user";
   const content = message.content;
 
-  // Check for special markers
-  const hasIntakeChoice = content.includes("[SHOW_INTAKE_CHOICE]");
-  const hasConfirmation = content.includes("[INTAKE_CONFIRM]");
+  // Check for CTA options marker
+  const hasCtaOptions = content.includes("[SHOW_CTA_OPTIONS]");
   
   // Clean content of markers
   const cleanContent = content
-    .replace(/\[SHOW_INTAKE_CHOICE\]/g, "")
-    .replace(/\[INTAKE_CONFIRM\]/g, "")
+    .replace(/\[SHOW_CTA_OPTIONS\]/g, "")
     .trim();
-
-  // Determine if we should show choice buttons for current intake step
-  const choiceConfig = intakeStep ? getChoiceOptions(intakeStep) : null;
-  const showChoices = choiceConfig && onIntakeChoice && !isUser;
 
   return (
     <div
@@ -134,34 +99,23 @@ export const ChatBotMessage = ({
           <div className="space-y-3">
             {cleanContent && renderMessageWithCTAs(cleanContent)}
             
-            {/* Intake Choice Buttons */}
-            {hasIntakeChoice && onBookCall && onChatIntake && (
-              <ChatBotActionButtons 
-                onBookCall={onBookCall} 
-                onChatIntake={onChatIntake} 
-              />
-            )}
-            
-            {/* Intake Step Choice Buttons */}
-            {showChoices && (
-              <ChatBotIntakeChoices
-                type={choiceConfig.type}
-                options={choiceConfig.options}
-                onSelect={onIntakeChoice}
-              />
-            )}
-            
-            {/* Confirmation Buttons - Submit / Book Call / Edit */}
-            {hasConfirmation && onConfirmSubmit && onConfirmEdit && onBookCall && (
+            {/* CTA Options: Get a Quote OR Book a Call */}
+            {hasCtaOptions && (
               <div className="flex flex-wrap gap-2 mt-3">
-                <Button size="sm" onClick={onConfirmSubmit}>
-                  ✅ Submit for me
-                </Button>
-                <Button size="sm" variant="secondary" onClick={onBookCall}>
-                  📅 Book a call
-                </Button>
-                <Button size="sm" variant="ghost" onClick={onConfirmEdit} className="text-xs">
-                  ✏️ Edit
+                <Link to="/contact">
+                  <Button size="sm">
+                    📝 Get a Free Quote
+                  </Button>
+                </Link>
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  onClick={() => {
+                    window.open(CALENDLY_URL, "_blank");
+                    onBookCall?.();
+                  }}
+                >
+                  📅 Book a Call
                 </Button>
               </div>
             )}

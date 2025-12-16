@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 import { X, Send, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChatBot } from "@/hooks/useChatBot";
-import { useChatBotIntake } from "@/hooks/useChatBotIntake";
 import { ChatBotButton } from "./ChatBotButton";
 import { ChatBotMessage } from "./ChatBotMessage";
 import { ChatBotQuickAsk } from "./ChatBotQuickAsk";
@@ -34,20 +33,6 @@ const ChatBotInner = () => {
     addAssistantMessage,
   } = useChatBot();
 
-  const {
-    intakeStep,
-    isIntakeActive,
-    isConfirming,
-    isChoiceStep,
-    isSubmitting,
-    startIntake,
-    processResponse,
-    processChoiceResponse,
-    getConfirmationSummary,
-    submitIntake,
-    editIntake,
-  } = useChatBotIntake();
-
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,14 +47,14 @@ const ChatBotInner = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, isIntakeActive]);
+  }, [messages]);
 
   // Focus input when chat opens
   useEffect(() => {
-    if (isOpen && inputRef.current && !isChoiceStep) {
+    if (isOpen && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [isOpen, isChoiceStep]);
+  }, [isOpen]);
 
   // Don't render if disabled or on excluded route (AFTER all hooks)
   if (!isEnabled || isExcludedRoute) {
@@ -78,35 +63,11 @@ const ChatBotInner = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading || isSubmitting) return;
+    if (!input.trim() || isLoading) return;
 
     const userInput = input.trim();
     setInput("");
-
-    // If intake is active (not confirming), process the response
-    if (isIntakeActive && !isConfirming) {
-      // Add user message visually
-      await sendMessage(userInput);
-      
-      // Process intake response with validation
-      const { nextQuestion, isComplete, isValid, errorMessage } = processResponse(userInput);
-      
-      // CRITICAL: If validation failed, stay on current step and show clarification
-      if (!isValid && errorMessage) {
-        addAssistantMessage(errorMessage);
-        return; // Don't advance
-      }
-      
-      if (isComplete) {
-        const summary = getConfirmationSummary();
-        addAssistantMessage(summary + "\n\n[INTAKE_CONFIRM]");
-      } else if (nextQuestion) {
-        addAssistantMessage(nextQuestion);
-      }
-    } else {
-      // Regular chat message - send to AI
-      await sendMessage(userInput);
-    }
+    await sendMessage(userInput);
   };
 
   const handleQuickAskClick = async (question: string) => {
@@ -120,69 +81,15 @@ const ChatBotInner = () => {
     );
   };
 
-  const handleChatIntake = () => {
-    const firstQuestion = startIntake();
-    addAssistantMessage(firstQuestion);
-  };
-
-  const handleIntakeChoice = async (value: string | string[]) => {
-    // Add user's selection as a message visually
-    const displayValue = Array.isArray(value) ? value.join(", ") : value;
-    
-    // First, add the user message (this sets hasUserSentMessage to true)
-    await sendMessage(displayValue);
-    
-    // Process the choice with validation
-    const { nextQuestion, isComplete, isValid, errorMessage } = processChoiceResponse(value);
-    
-    // CRITICAL: If validation failed, stay on current step and show clarification
-    if (!isValid && errorMessage) {
-      addAssistantMessage(errorMessage);
-      return; // Don't advance
-    }
-    
-    if (isComplete) {
-      const summary = getConfirmationSummary();
-      addAssistantMessage(summary + "\n\n[INTAKE_CONFIRM]");
-    } else if (nextQuestion) {
-      addAssistantMessage(nextQuestion);
-    }
-  };
-
-  const handleConfirmSubmit = async () => {
-    const success = await submitIntake();
-    if (success) {
-      addAssistantMessage(
-        "Thanks! I've successfully sent this to our team. You and our team should receive an email shortly, and we typically follow up within 24 hours. Onboarding can begin immediately after approval. Feel free to ask me anything else!"
-      );
-    }
-  };
-
-  const handleConfirmEdit = () => {
-    editIntake();
-    addAssistantMessage("No problem! Let's start over. What's your full name?");
-  };
-
   // Show Quick Ask when chat is open, no messages yet, and user hasn't sent a message
   const showQuickAsk = messages.length === 0 && !hasUserSentMessage;
-
-  // Get intake step for the last assistant message only
-  const getIntakeStepForMessage = (index: number) => {
-    if (!isIntakeActive || isConfirming) return undefined;
-    // Only show choice buttons for the last assistant message
-    const lastAssistantIndex = messages.map((m, i) => m.role === "assistant" ? i : -1).filter(i => i >= 0).pop();
-    if (index === lastAssistantIndex) {
-      return intakeStep;
-    }
-    return undefined;
-  };
 
   return (
     <>
       {/* Floating button */}
       <ChatBotButton isOpen={isOpen} greeting={greeting} onClick={toggleChat} />
 
-      {/* Chat panel - increased sizing */}
+      {/* Chat panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -224,26 +131,19 @@ const ChatBotInner = () => {
                 onQuestionClick={handleQuickAskClick} 
               />
 
-              {messages.map((message, index) => (
+              {messages.map((message) => (
                 <ChatBotMessage 
                   key={message.id} 
                   message={message}
                   onBookCall={handleBookCall}
-                  onChatIntake={handleChatIntake}
-                  onIntakeChoice={handleIntakeChoice}
-                  onConfirmSubmit={handleConfirmSubmit}
-                  onConfirmEdit={handleConfirmEdit}
-                  intakeStep={getIntakeStepForMessage(index)}
                 />
               ))}
               
-              {(isLoading || isSubmitting) && (
+              {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-muted rounded-lg px-3 py-2 flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      {isSubmitting ? "Submitting..." : "Typing..."}
-                    </span>
+                    <span className="text-sm text-muted-foreground">Typing...</span>
                   </div>
                 </div>
               )}
@@ -261,19 +161,13 @@ const ChatBotInner = () => {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={
-                    isChoiceStep 
-                      ? "Select an option above or type..." 
-                      : isIntakeActive 
-                        ? "Type your answer..." 
-                        : "Type your question..."
-                  }
+                  placeholder="Type your question..."
                   className="flex-1 px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
-                  disabled={isLoading || isSubmitting}
+                  disabled={isLoading}
                 />
                 <button
                   type="submit"
-                  disabled={!input.trim() || isLoading || isSubmitting}
+                  disabled={!input.trim() || isLoading}
                   className="px-3 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   aria-label="Send message"
                 >
