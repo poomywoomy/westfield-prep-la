@@ -107,11 +107,11 @@ const ChatBotInner = () => {
             </div>
 
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {messages.length === 0 && (
-                <div className="text-center text-sm text-muted-foreground py-4">
-                  <p className="mb-2">{greeting}</p>
-                  <p>Ask me about our services, turnaround times, or if we're a good fit for your business.</p>
+                <div className="text-center text-sm text-muted-foreground py-3 px-2">
+                  <p className="mb-3 font-medium">{greeting}</p>
+                  <p className="text-xs">Ask me about our services, turnaround times, or if we're a good fit for your business.</p>
                 </div>
               )}
               
