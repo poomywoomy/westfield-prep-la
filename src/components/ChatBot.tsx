@@ -37,11 +37,6 @@ const ChatBotInner = () => {
     location.pathname.startsWith(route)
   );
 
-  // Don't render if disabled or on excluded route
-  if (!isEnabled || isExcludedRoute) {
-    return null;
-  }
-
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -64,6 +59,11 @@ const ChatBotInner = () => {
     setInput("");
     await sendMessage(message);
   };
+
+  // Don't render if disabled or on excluded route (AFTER all hooks)
+  if (!isEnabled || isExcludedRoute) {
+    return null;
+  }
 
   return (
     <>
