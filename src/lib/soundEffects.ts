@@ -127,3 +127,65 @@ export const playNotificationSound = () => {
     console.warn('Could not play notification sound:', error);
   }
 };
+
+/**
+ * Play a soft "pop" when user sends a chat message
+ * Frequency: 900Hz, Duration: 60ms, Volume: 0.15
+ */
+export const playChatSendSound = () => {
+  try {
+    const ctx = getAudioContext();
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    oscillator.frequency.value = 900;
+    oscillator.type = 'sine';
+    gainNode.gain.value = 0.15;
+    
+    const now = ctx.currentTime;
+    gainNode.gain.setValueAtTime(0.15, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+    
+    oscillator.start(now);
+    oscillator.stop(now + 0.06);
+  } catch (error) {
+    console.warn('Could not play chat send sound:', error);
+  }
+};
+
+/**
+ * Play a gentle two-tone "ding" when bot responds
+ * Frequencies: 500Hz → 700Hz ascending
+ */
+export const playChatReceiveSound = () => {
+  try {
+    const ctx = getAudioContext();
+    const frequencies = [500, 700];
+    
+    frequencies.forEach((freq, index) => {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      oscillator.frequency.value = freq;
+      oscillator.type = 'sine';
+      gainNode.gain.value = 0.12;
+      
+      const startTime = ctx.currentTime + (index * 0.08);
+      const endTime = startTime + 0.08;
+      
+      gainNode.gain.setValueAtTime(0.12, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, endTime);
+      
+      oscillator.start(startTime);
+      oscillator.stop(endTime);
+    });
+  } catch (error) {
+    console.warn('Could not play chat receive sound:', error);
+  }
+};
