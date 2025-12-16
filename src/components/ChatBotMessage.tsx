@@ -151,14 +151,17 @@ export const ChatBotMessage = ({
               />
             )}
             
-            {/* Confirmation Buttons */}
-            {hasConfirmation && onConfirmSubmit && onConfirmEdit && (
-              <div className="flex gap-2 mt-3">
+            {/* Confirmation Buttons - Submit / Book Call / Edit */}
+            {hasConfirmation && onConfirmSubmit && onConfirmEdit && onBookCall && (
+              <div className="flex flex-wrap gap-2 mt-3">
                 <Button size="sm" onClick={onConfirmSubmit}>
-                  Submit
+                  ✅ Submit for me
                 </Button>
-                <Button size="sm" variant="outline" onClick={onConfirmEdit}>
-                  Edit
+                <Button size="sm" variant="secondary" onClick={onBookCall}>
+                  📅 Book a call
+                </Button>
+                <Button size="sm" variant="ghost" onClick={onConfirmEdit} className="text-xs">
+                  ✏️ Edit
                 </Button>
               </div>
             )}

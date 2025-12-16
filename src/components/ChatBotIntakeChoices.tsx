@@ -79,37 +79,37 @@ export const ChatBotIntakeChoices = ({ type, options, onSelect, question }: Chat
   );
 };
 
-// Predefined choice sets for intake questions
+// Predefined choice sets for intake questions (EXACT enum values per spec)
 export const INTAKE_CHOICES = {
   volume: [
-    { value: "0-1000", label: "0-1K" },
-    { value: "1000-5000", label: "1K-5K" },
-    { value: "5000-10000", label: "5K-10K" },
-    { value: "10000+", label: "10K+" },
+    { value: "0 – 1,000", label: "0 – 1,000" },
+    { value: "1,001 – 5,000", label: "1,001 – 5,000" },
+    { value: "5,001 – 10,000", label: "5,001 – 10,000" },
+    { value: "10,000+", label: "10,000+" },
   ],
   skuCount: [
-    { value: "0-10", label: "0-10" },
-    { value: "11-25", label: "11-25" },
-    { value: "25-50", label: "25-50" },
+    { value: "0 – 10", label: "0 – 10" },
+    { value: "11 – 25", label: "11 – 25" },
+    { value: "25 – 50", label: "25 – 50" },
     { value: "50+", label: "50+" },
-    { value: "unsure", label: "Unsure" },
+    { value: "Unsure", label: "Unsure" },
   ],
   marketplaces: [
-    { value: "shopify", label: "Shopify" },
-    { value: "amazon", label: "Amazon" },
-    { value: "walmart", label: "Walmart" },
-    { value: "tiktok", label: "TikTok Shop" },
-    { value: "other", label: "Other" },
+    { value: "Shopify", label: "Shopify" },
+    { value: "Amazon", label: "Amazon" },
+    { value: "Walmart", label: "Walmart" },
+    { value: "TikTok Shop", label: "TikTok Shop" },
+    { value: "Other", label: "Other" },
   ],
   packaging: [
-    { value: "standard", label: "Standard" },
-    { value: "custom", label: "Custom" },
-    { value: "unsure", label: "Not sure yet" },
+    { value: "Standard packaging", label: "Standard packaging" },
+    { value: "Custom / branded packaging", label: "Custom / branded" },
+    { value: "Not sure yet", label: "Not sure yet" },
   ],
   timeline: [
-    { value: "asap", label: "ASAP" },
-    { value: "1-2-weeks", label: "1-2 weeks" },
-    { value: "1-month", label: "Within a month" },
-    { value: "exploring", label: "Just exploring" },
+    { value: "ASAP", label: "ASAP" },
+    { value: "Within a month", label: "Within a month" },
+    { value: "Next quarter", label: "Next quarter" },
+    { value: "Just exploring", label: "Just exploring" },
   ],
 };
