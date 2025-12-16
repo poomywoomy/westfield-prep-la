@@ -153,7 +153,7 @@ const ChatBotInner = () => {
     const success = await submitIntake();
     if (success) {
       addAssistantMessage(
-        "Your information has been submitted! Our team typically responds within 24 hours with a custom quote. Onboarding can begin immediately after approval. Feel free to ask me anything else in the meantime!"
+        "Thanks! I've successfully sent this to our team. You and our team should receive an email shortly, and we typically follow up within 24 hours. Onboarding can begin immediately after approval. Feel free to ask me anything else!"
       );
     }
   };

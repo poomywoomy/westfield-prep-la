@@ -80,11 +80,11 @@ const validators: Record<string, (value: string | string[]) => ValidationResult>
     const invalid = ["ok", "yes", "no", "idk", "sure", "yeah", "yep", "y", "n"];
     
     if (invalid.includes(trimmed.toLowerCase())) {
-      return { isValid: false, errorMessage: "I just want to make sure I got that right — what's your business or company name?" };
+      return { isValid: false, errorMessage: "I just want to make sure I got that right — what's your business or brand name?" };
     }
     // At least 2 characters AND contains letters
     if (trimmed.length < 2 || !/[a-zA-Z]/.test(trimmed)) {
-      return { isValid: false, errorMessage: "I just want to make sure I got that right — what's your business or company name?" };
+      return { isValid: false, errorMessage: "I just want to make sure I got that right — what's your business or brand name?" };
     }
     return { isValid: true };
   },
@@ -143,16 +143,16 @@ const validators: Record<string, (value: string | string[]) => ValidationResult>
 
 const INTAKE_QUESTIONS: Record<IntakeStep, string> = {
   idle: "",
-  name: "Great! Let's get started. What's your full name?",
-  email: "Thanks! What's the best email to reach you?",
-  phone: "Got it! And your phone number? (Say 'skip' if you'd prefer not to share)",
-  businessName: "What's your business or company name?",
+  name: "What's your full name?",
+  email: "What's the best email to reach you at?",
+  phone: "And a good phone number for quick follow-ups? (Say 'skip' if you'd prefer not to share)",
+  businessName: "What's your business or brand name?",
   monthlyUnits: "About how many units do you ship per month?",
   skuCount: "How many different SKUs do you have?",
   marketplaces: "Which marketplaces do you sell on? (Select all that apply)",
-  packaging: "Do you need standard or custom packaging?",
+  packaging: "What are your packaging requirements?",
   timeline: "When would you like to get started?",
-  comments: "Any additional comments or special requirements? (Type 'skip' or 'none' to continue)",
+  comments: "Anything else we should know about your products or requirements? (Type 'skip' to continue)",
   confirming: "",
   submitted: "",
 };
@@ -314,7 +314,7 @@ export const useChatBotIntake = () => {
 • **Timeline:** ${data.timeline || "Not provided"}
 • **Comments:** ${data.comments || "None"}
 
-Does this look correct?`;
+Thanks — I've got everything I need. Would you like me to submit this for you now, or would you prefer to book a call instead?`;
   }, [intakeData]);
 
   const validateAllRequiredFields = useCallback((): { isValid: boolean; missingFields: string[] } => {
