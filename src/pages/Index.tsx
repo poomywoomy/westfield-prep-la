@@ -21,7 +21,7 @@ const FAQAccordion = lazy(() => import("@/components/FAQAccordion"));
 const FinalCTA = lazy(() => import("@/components/FinalCTA"));
 const Compliance = lazy(() => import("@/components/Compliance"));
 const StatsStrip = lazy(() => import("@/components/StatsStrip"));
-const ROICalculator = lazy(() => import("@/components/ROICalculator"));
+
 const BlogPreview = lazy(() => import("@/components/BlogPreview"));
 const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA"));
 
@@ -105,10 +105,6 @@ const Index = () => {
       <div className="pt-32">
         <PremiumHero />
         
-        {/* ROI Calculator - After Hero */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <ROICalculator />
-        </Suspense>
         
         {/* Stats Strip */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-64 w-full" /></div>}>
