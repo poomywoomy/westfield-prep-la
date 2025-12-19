@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
@@ -6,6 +6,7 @@ import ContactForm from "@/components/ContactForm";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Check, Zap, Clock, Shield, DollarSign } from "lucide-react";
 import {
   Table,
@@ -16,6 +17,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
+const EnhancedROICalculator = lazy(() => import("@/components/EnhancedROICalculator"));
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -99,6 +102,11 @@ const Pricing = () => {
               />
             </div>
           </section>
+
+          {/* Enhanced ROI Calculator */}
+          <Suspense fallback={<div className="container py-16"><Skeleton className="h-[600px] w-full" /></div>}>
+            <EnhancedROICalculator variant="pricing" />
+          </Suspense>
 
           {/* Hero Section */}
           <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
