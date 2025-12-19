@@ -21,6 +21,7 @@ const FAQAccordion = lazy(() => import("@/components/FAQAccordion"));
 const FinalCTA = lazy(() => import("@/components/FinalCTA"));
 const Compliance = lazy(() => import("@/components/Compliance"));
 const StatsStrip = lazy(() => import("@/components/StatsStrip"));
+const ServiceGuarantees = lazy(() => import("@/components/ServiceGuarantees"));
 const BlogPreview = lazy(() => import("@/components/BlogPreview"));
 const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA"));
 
@@ -107,6 +108,11 @@ const Index = () => {
         {/* Stats Strip - NEW */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-64 w-full" /></div>}>
           <StatsStrip />
+        </Suspense>
+        
+        {/* Service Guarantees - Premium Section */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <ServiceGuarantees />
         </Suspense>
         
         {/* Phase 3: Value Proposition */}
