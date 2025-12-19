@@ -37,7 +37,7 @@ export const ChatBotButton = ({ isOpen, greeting, onClick }: ChatBotButtonProps)
             onClick={onClick}
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[hsl(28,100%,50%)] to-[hsl(28,100%,40%)] text-white shadow-xl shadow-[hsl(28,100%,50%)]/30 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[hsl(28,100%,50%)] focus:ring-offset-2 group"
+            className="relative w-[72px] h-[72px] rounded-full bg-gradient-to-br from-[hsl(28,100%,50%)] to-[hsl(28,100%,40%)] text-white shadow-xl shadow-[hsl(28,100%,50%)]/30 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[hsl(28,100%,50%)] focus:ring-offset-2 group"
             aria-label="Open chat"
           >
             {/* Animated glow ring */}
@@ -46,7 +46,7 @@ export const ChatBotButton = ({ isOpen, greeting, onClick }: ChatBotButtonProps)
             {/* Pulse ring animation */}
             <span className="absolute inset-0 rounded-full border-2 border-white/40 animate-ping" style={{ animationDuration: '2s' }} />
             
-            <MessageCircle className="w-7 h-7 drop-shadow-sm" />
+            <MessageCircle className="w-8 h-8 drop-shadow-sm" />
           </motion.button>
         </motion.div>
       )}
