@@ -20,8 +20,9 @@ const contactEmailSchema = z.object({
   unitsPerMonth: z.string().min(1),
   skuCount: z.string().min(1),
   marketplaces: z.array(z.string()).min(1),
+  otherMarketplace: z.string().trim().max(200).optional(),
   packagingRequirements: z.string().min(1),
-  timeline: z.string().trim().min(1).max(200),
+  timeline: z.string().min(1),
   comments: z.string().trim().max(1000).optional(),
   recipientEmail: z.string().email().max(255),
 });
@@ -38,6 +39,29 @@ function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, (m) => map[m]);
 }
 
+// Map dropdown values to human-readable labels
+function formatUnitsPerMonth(value: string): string {
+  const map: Record<string, string> = {
+    'just-starting': 'Just Starting',
+    '0-1000': '0 – 1,000',
+    '1001-5000': '1,001 – 5,000',
+    '5001-10000': '5,001 – 10,000',
+    '10000+': '10,000+',
+  };
+  return map[value] || value;
+}
+
+function formatTimeline(value: string): string {
+  const map: Record<string, string> = {
+    'asap': 'ASAP',
+    '1-3-months': '1–3 months',
+    '3-6-months': '3–6 months',
+    '6-12-months': '6–12 months',
+    '12-months-plus': '12 months+',
+  };
+  return map[value] || value;
+}
+
 interface ContactEmailRequest {
   name: string;
   email: string;
@@ -46,6 +70,7 @@ interface ContactEmailRequest {
   unitsPerMonth: string;
   skuCount: string;
   marketplaces: string[];
+  otherMarketplace?: string;
   packagingRequirements: string;
   timeline: string;
   comments?: string;
@@ -75,7 +100,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
     
-    const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data;
+    const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, otherMarketplace, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data;
     
     // Rate limiting check (5 submissions per hour per IP)
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -117,11 +142,18 @@ const handler = async (req: Request): Promise<Response> => {
     const safeEmail = escapeHtml(email);
     const safePhone = escapeHtml(phone);
     const safeBusiness = escapeHtml(business);
-    const safeUnitsPerMonth = escapeHtml(unitsPerMonth);
+    const safeUnitsPerMonth = escapeHtml(formatUnitsPerMonth(unitsPerMonth));
     const safeSkuCount = escapeHtml(skuCount);
-    const safeMarketplaces = marketplaces.map(m => escapeHtml(m)).join(", ");
+    
+    // Build marketplaces string with "Other" details if provided
+    let marketplacesDisplay = marketplaces.map(m => escapeHtml(m)).join(", ");
+    if (marketplaces.includes("Other") && otherMarketplace && otherMarketplace.trim()) {
+      marketplacesDisplay = marketplacesDisplay.replace("Other", `Other (${escapeHtml(otherMarketplace.trim())})`);
+    }
+    const safeMarketplaces = marketplacesDisplay;
+    
     const safePackaging = escapeHtml(packagingRequirements);
-    const safeTimeline = escapeHtml(timeline);
+    const safeTimeline = escapeHtml(formatTimeline(timeline));
     const safeComments = comments ? escapeHtml(comments) : "None provided";
 
     // Send notification email to business
@@ -144,7 +176,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p><strong>Business:</strong> ${safeBusiness}</p>
           <hr>
           <h3>Business Details</h3>
-          <p><strong>Units per Month:</strong> ${safeUnitsPerMonth}</p>
+          <p><strong>Units Sold per Month:</strong> ${safeUnitsPerMonth}</p>
           <p><strong>SKU Count:</strong> ${safeSkuCount}</p>
           <p><strong>Marketplaces:</strong> ${safeMarketplaces}</p>
           <p><strong>Packaging Requirements:</strong> ${safePackaging}</p>
@@ -231,7 +263,7 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeBusiness}</td>
                               </tr>
                               <tr>
-                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Units/Month:</td>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Units Sold/Month:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeUnitsPerMonth}</td>
                               </tr>
                               <tr>

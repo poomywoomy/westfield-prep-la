@@ -133,7 +133,7 @@ const ChatBotInner = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-[calc(100vw-2rem)] max-w-[420px] max-h-[85vh] md:max-h-[560px] bg-gray-50 border border-gray-200/80 rounded-2xl shadow-2xl shadow-black/10 flex flex-col overflow-hidden"
+            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-[calc(100vw-2rem)] max-w-[460px] max-h-[90vh] md:max-h-[640px] bg-gray-50 border border-gray-200/80 rounded-2xl shadow-2xl shadow-black/10 flex flex-col overflow-hidden"
           >
             {/* Header - Gradient */}
             <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[hsl(210,30%,12%)] to-[hsl(210,35%,18%)]">
@@ -182,7 +182,7 @@ const ChatBotInner = () => {
             </div>
 
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-gray-50 to-white">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-gray-50 to-white">
               {messages.length === 0 && (
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
@@ -245,7 +245,7 @@ const ChatBotInner = () => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your question..."
-                  className="flex-1 px-4 py-2.5 text-sm rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[hsl(28,100%,50%)]/30 focus:border-[hsl(28,100%,50%)]/50 transition-all placeholder:text-gray-400"
+                  className="flex-1 px-4 py-3.5 text-base rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[hsl(28,100%,50%)]/30 focus:border-[hsl(28,100%,50%)]/50 transition-all placeholder:text-gray-400"
                   disabled={isLoading}
                 />
                 <motion.button
@@ -253,10 +253,10 @@ const ChatBotInner = () => {
                   disabled={!input.trim() || isLoading}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[hsl(28,100%,50%)] to-[hsl(28,100%,42%)] text-white shadow-md shadow-[hsl(28,100%,50%)]/20 hover:shadow-lg hover:shadow-[hsl(28,100%,50%)]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all"
+                  className="px-4 py-3.5 rounded-xl bg-gradient-to-r from-[hsl(28,100%,50%)] to-[hsl(28,100%,42%)] text-white shadow-md shadow-[hsl(28,100%,50%)]/20 hover:shadow-lg hover:shadow-[hsl(28,100%,50%)]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all"
                   aria-label="Send message"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-5 h-5" />
                 </motion.button>
               </div>
               <p className="text-center text-[10px] text-gray-400 mt-2">

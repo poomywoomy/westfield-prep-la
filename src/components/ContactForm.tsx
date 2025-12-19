@@ -15,11 +15,12 @@ const contactSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
   phone: z.string().trim().min(1, "Phone is required").max(20),
   business: z.string().trim().min(1, "Business name is required").max(100),
-  unitsPerMonth: z.string().min(1, "Units per month is required"),
+  unitsPerMonth: z.string().min(1, "Units sold per month is required"),
   skuCount: z.string().min(1, "SKU count is required"),
   marketplaces: z.array(z.string()).min(1, "Select at least one marketplace"),
+  otherMarketplace: z.string().trim().max(200).optional(),
   packagingRequirements: z.string().min(1, "Packaging requirements is required"),
-  timeline: z.string().trim().min(1, "Timeline is required").max(200),
+  timeline: z.string().min(1, "Timeline is required"),
   comments: z.string().trim().max(1000).optional(),
 });
 
@@ -34,6 +35,7 @@ const ContactForm = () => {
     unitsPerMonth: "",
     skuCount: "",
     marketplaces: [] as string[],
+    otherMarketplace: "",
     packagingRequirements: "",
     timeline: "",
     comments: "",
@@ -63,7 +65,9 @@ const ContactForm = () => {
       const marketplaces = prev.marketplaces.includes(marketplace)
         ? prev.marketplaces.filter((m) => m !== marketplace)
         : [...prev.marketplaces, marketplace];
-      return { ...prev, marketplaces };
+      // Clear otherMarketplace if "Other" is unchecked
+      const otherMarketplace = marketplaces.includes("Other") ? prev.otherMarketplace : "";
+      return { ...prev, marketplaces, otherMarketplace };
     });
     if (errors.marketplaces) {
       setErrors((prev) => ({ ...prev, marketplaces: "" }));
@@ -162,17 +166,19 @@ const ContactForm = () => {
     }
   };
 
+  const showOtherInput = formData.marketplaces.includes("Other");
+
   return (
-    <section id="contact" className="py-20 bg-muted/30">
+    <section id="contact" className="py-12 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Get Your Quote</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Tell us about your business and get your custom quote within 24 hours
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6 bg-card p-8 rounded-lg shadow-lg border border-border">
             {/* Name and Email - Side by Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -237,7 +243,7 @@ const ContactForm = () => {
             {/* Units per Month and SKU Count - Side by Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="unitsPerMonth">Units per Month *</Label>
+                <Label htmlFor="unitsPerMonth">Units Sold per Month *</Label>
                 <Select
                   value={formData.unitsPerMonth}
                   onValueChange={(value) => handleSelectChange("unitsPerMonth", value)}
@@ -246,9 +252,10 @@ const ContactForm = () => {
                     <SelectValue placeholder="Select monthly units" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border border-border z-50">
-                    <SelectItem value="0-1000">0 - 1,000</SelectItem>
-                    <SelectItem value="1001-5000">1,001 - 5,000</SelectItem>
-                    <SelectItem value="5001-10000">5,001 - 10,000</SelectItem>
+                    <SelectItem value="just-starting">Just Starting</SelectItem>
+                    <SelectItem value="0-1000">0 – 1,000</SelectItem>
+                    <SelectItem value="1001-5000">1,001 – 5,000</SelectItem>
+                    <SelectItem value="5001-10000">5,001 – 10,000</SelectItem>
                     <SelectItem value="10000+">10,000+</SelectItem>
                   </SelectContent>
                 </Select>
@@ -296,6 +303,19 @@ const ContactForm = () => {
                   </div>
                 ))}
               </div>
+              {/* Conditional input for "Other" marketplace */}
+              {showOtherInput && (
+                <div className="mt-3">
+                  <Input
+                    id="otherMarketplace"
+                    name="otherMarketplace"
+                    value={formData.otherMarketplace}
+                    onChange={handleChange}
+                    placeholder="Please specify marketplace(s)"
+                    className="max-w-md"
+                  />
+                </div>
+              )}
               {errors.marketplaces && <p className="text-sm text-destructive mt-1">{errors.marketplaces}</p>}
             </div>
 
@@ -320,14 +340,21 @@ const ContactForm = () => {
 
               <div>
                 <Label htmlFor="timeline">When would you like to start? *</Label>
-                <Input
-                  id="timeline"
-                  name="timeline"
+                <Select
                   value={formData.timeline}
-                  onChange={handleChange}
-                  className={errors.timeline ? "border-destructive" : ""}
-                  placeholder="e.g., ASAP, Next month, Q1 2026"
-                />
+                  onValueChange={(value) => handleSelectChange("timeline", value)}
+                >
+                  <SelectTrigger className={errors.timeline ? "border-destructive" : ""}>
+                    <SelectValue placeholder="Select timeline" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border z-50">
+                    <SelectItem value="asap">ASAP</SelectItem>
+                    <SelectItem value="1-3-months">1–3 months</SelectItem>
+                    <SelectItem value="3-6-months">3–6 months</SelectItem>
+                    <SelectItem value="6-12-months">6–12 months</SelectItem>
+                    <SelectItem value="12-months-plus">12 months+</SelectItem>
+                  </SelectContent>
+                </Select>
                 {errors.timeline && <p className="text-sm text-destructive mt-1">{errors.timeline}</p>}
               </div>
             </div>
