@@ -96,16 +96,16 @@ const initialFormData: FormData = {
 
 const useCaseOptions = [
   { id: "shopify", label: "Shopify / DTC", icon: ShoppingCart, description: "Direct-to-consumer fulfillment" },
-  { id: "amazon", label: "Amazon FBA", icon: Package, description: "FBA prep & shipping" },
+  { id: "amazon", label: "Amazon FBA / Walmart WFS", icon: Package, description: "FBA/WFS prep and shipping" },
   { id: "multi-channel", label: "Multi-Channel", icon: Store, description: "Shopify + Amazon + more" },
   { id: "b2b", label: "B2B / Wholesale", icon: Truck, description: "Bulk & wholesale fulfillment" },
 ];
 
 const businessStageOptions = [
-  { id: "startup", label: "Just Starting", description: "<$50K/year" },
+  { id: "startup", label: "Initial Stage", description: "<$50K/year" },
   { id: "growing", label: "Growing", description: "$50K-$500K/year" },
-  { id: "established", label: "Established", description: "$500K-$2M/year" },
-  { id: "scaling", label: "Scaling Fast", description: "$2M+/year" },
+  { id: "scaling", label: "Scaling Fast", description: "$500K-$2M/year" },
+  { id: "established", label: "Established", description: "$2M+/year" },
 ];
 
 const fulfillmentOptions = [
@@ -133,9 +133,9 @@ const painPointOptions = [
 ];
 
 const serviceOptions = [
+  { id: "fba-prep", label: "FBA / WFS Prep", icon: TrendingUp },
   { id: "receiving", label: "Receiving & Inspection", icon: Package },
   { id: "storage", label: "Storage & Warehousing", icon: Building2 },
-  { id: "fba-prep", label: "Amazon FBA Prep", icon: TrendingUp },
   { id: "pick-pack", label: "Pick & Pack", icon: Package },
   { id: "labeling", label: "Labeling & Compliance", icon: FileText },
   { id: "kitting", label: "Kitting & Bundling", icon: Package },
@@ -184,6 +184,13 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     setStepStartTime(Date.now());
   }, [currentStep]);
 
+  // Auto-set hours to 0 when switching from another 3PL
+  useEffect(() => {
+    if (formData.currentFulfillment === "other-3pl" && formData.hoursSpentWeekly > 0) {
+      setFormData(prev => ({ ...prev, hoursSpentWeekly: 0 }));
+    }
+  }, [formData.currentFulfillment]);
+
   // Calculate ROI metrics in real-time
   const calculateROI = useCallback(() => {
     const monthlyUnits = formData.monthlyOrders * formData.avgUnitsPerOrder;
@@ -192,13 +199,14 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     const timeSavedHours = formData.hoursSpentWeekly * 4 * 0.85;
     const timeSavedValue = timeSavedHours * 30;
     
-    // Volume-based pricing tiers
-    let baseCostPerUnit = 1.25;
-    if (monthlyUnits > 5000) baseCostPerUnit = 0.95;
-    if (monthlyUnits > 10000) baseCostPerUnit = 0.75;
-    if (monthlyUnits > 25000) baseCostPerUnit = 0.55;
+    // Order-volume-based pricing tiers (per order, not per unit)
+    let costPerUnit: number;
+    if (formData.monthlyOrders < 1000) costPerUnit = 2.50;
+    else if (formData.monthlyOrders < 2500) costPerUnit = 2.25;
+    else if (formData.monthlyOrders < 5000) costPerUnit = 2.00;
+    else costPerUnit = 1.50;
     
-    const estimatedMonthlyCost = monthlyUnits * baseCostPerUnit;
+    const estimatedMonthlyCost = monthlyUnits * costPerUnit;
     const totalSavings = currentErrorCost + returnCost + timeSavedValue;
     const netBenefit = totalSavings - estimatedMonthlyCost;
     const roi = estimatedMonthlyCost > 0 ? ((netBenefit) / estimatedMonthlyCost) * 100 : 0;
@@ -215,7 +223,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
       netBenefit: Math.round(netBenefit),
       roi: Math.max(0, Math.round(roi)),
       annualSavings: Math.round(annualSavings),
-      costPerUnit: baseCostPerUnit.toFixed(2),
+      costPerUnit: costPerUnit.toFixed(2),
     };
   }, [formData]);
 
@@ -317,8 +325,8 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     switch (currentStep) {
       case 0: return !!formData.useCase;
       case 1: return !!formData.businessStage && !!formData.currentFulfillment;
-      case 2: return formData.monthlyOrders > 0 && !!formData.productType;
-      case 3: return true;
+      case 2: return formData.monthlyOrders > 0; // Removed productType requirement
+      case 3: return !!formData.currentCostPerOrder; // Made cost per order required
       case 4: return formData.services.length > 0;
       case 5: return !!formData.fullName && !!formData.email;
       default: return false;
@@ -441,7 +449,6 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                       <StepVolumeProducts 
                         formData={formData} 
                         setFormData={setFormData}
-                        productTypeOptions={productTypeOptions}
                         roi={roi}
                       />
                     )}
@@ -662,15 +669,14 @@ interface ROIResult {
   costPerUnit: string;
 }
 
-const StepVolumeProducts = ({ formData, setFormData, productTypeOptions, roi }: {
+const StepVolumeProducts = ({ formData, setFormData, roi }: {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  productTypeOptions: ProductTypeOption[];
   roi: ROIResult;
 }) => (
   <div className="space-y-6">
     <div className="text-center mb-6">
-      <h3 className="text-2xl font-bold mb-2">Volume & Product Details</h3>
+      <h3 className="text-2xl font-bold mb-2">Volume Details</h3>
       <p className="text-muted-foreground">This determines your pricing tier</p>
     </div>
     
@@ -678,16 +684,26 @@ const StepVolumeProducts = ({ formData, setFormData, productTypeOptions, roi }: 
       <div className="space-y-3">
         <Label className="flex justify-between">
           <span>Monthly Orders</span>
-          <span className="text-secondary font-semibold">{formData.monthlyOrders.toLocaleString()}</span>
         </Label>
-        <Slider
-          value={[formData.monthlyOrders]}
-          onValueChange={([value]) => setFormData(prev => ({ ...prev, monthlyOrders: value }))}
-          min={50}
-          max={50000}
-          step={50}
-          className="py-4"
-        />
+        <div className="flex items-center gap-3">
+          <Slider
+            value={[formData.monthlyOrders]}
+            onValueChange={([value]) => setFormData(prev => ({ ...prev, monthlyOrders: value }))}
+            min={50}
+            max={50000}
+            step={50}
+            className="py-4 flex-1"
+          />
+          <Input
+            type="number"
+            value={formData.monthlyOrders}
+            onChange={(e) => {
+              const value = Math.max(50, Math.min(50000, parseInt(e.target.value) || 50));
+              setFormData(prev => ({ ...prev, monthlyOrders: value }));
+            }}
+            className="w-24 h-10 text-center font-semibold"
+          />
+        </div>
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>50</span>
           <span>50,000+</span>
@@ -697,57 +713,58 @@ const StepVolumeProducts = ({ formData, setFormData, productTypeOptions, roi }: 
       <div className="space-y-3">
         <Label className="flex justify-between">
           <span>Avg Units per Order</span>
-          <span className="text-secondary font-semibold">{formData.avgUnitsPerOrder}</span>
         </Label>
-        <Slider
-          value={[formData.avgUnitsPerOrder]}
-          onValueChange={([value]) => setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }))}
-          min={1}
-          max={20}
-          step={1}
-          className="py-4"
-        />
+        <div className="flex items-center gap-3">
+          <Slider
+            value={[formData.avgUnitsPerOrder]}
+            onValueChange={([value]) => setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }))}
+            min={1}
+            max={20}
+            step={1}
+            className="py-4 flex-1"
+          />
+          <Input
+            type="number"
+            value={formData.avgUnitsPerOrder}
+            onChange={(e) => {
+              const value = Math.max(1, Math.min(20, parseInt(e.target.value) || 1));
+              setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }));
+            }}
+            className="w-24 h-10 text-center font-semibold"
+          />
+        </div>
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>1</span>
           <span>20</span>
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 md:col-span-2">
         <Label className="flex justify-between">
           <span>SKU Count</span>
-          <span className="text-secondary font-semibold">{formData.skuCount}</span>
         </Label>
-        <Slider
-          value={[formData.skuCount]}
-          onValueChange={([value]) => setFormData(prev => ({ ...prev, skuCount: value }))}
-          min={1}
-          max={500}
-          step={5}
-          className="py-4"
-        />
+        <div className="flex items-center gap-3">
+          <Slider
+            value={[formData.skuCount]}
+            onValueChange={([value]) => setFormData(prev => ({ ...prev, skuCount: value }))}
+            min={1}
+            max={500}
+            step={5}
+            className="py-4 flex-1"
+          />
+          <Input
+            type="number"
+            value={formData.skuCount}
+            onChange={(e) => {
+              const value = Math.max(1, Math.min(500, parseInt(e.target.value) || 1));
+              setFormData(prev => ({ ...prev, skuCount: value }));
+            }}
+            className="w-24 h-10 text-center font-semibold"
+          />
+        </div>
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>1</span>
           <span>500+</span>
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <Label>Product Category</Label>
-        <div className="grid grid-cols-2 gap-2">
-          {productTypeOptions.map((option) => (
-            <Button
-              key={option.id}
-              type="button"
-              variant={formData.productType === option.id ? "default" : "outline"}
-              onClick={() => setFormData(prev => ({ ...prev, productType: option.id }))}
-              className={`h-auto py-2 px-3 text-xs ${
-                formData.productType === option.id ? "bg-secondary text-secondary-foreground" : ""
-              }`}
-            >
-              {option.label}
-            </Button>
-          ))}
         </div>
       </div>
     </div>
@@ -823,14 +840,20 @@ const StepPainPoints = ({ formData, setFormData, handleToggle }: {
       </div>
 
       <div className="space-y-3">
-        <Label htmlFor="costPerOrder">Current Cost per Order (optional)</Label>
+        <Label htmlFor="costPerOrder" className="flex items-center gap-1">
+          Average Cost per Order <span className="text-destructive">*</span>
+        </Label>
         <Input
           id="costPerOrder"
           placeholder="e.g. $4.50"
           value={formData.currentCostPerOrder}
           onChange={(e) => setFormData(prev => ({ ...prev, currentCostPerOrder: e.target.value }))}
           className="h-12"
+          required
         />
+        <p className="text-xs text-muted-foreground">
+          Include pick, pack, and shipping costs to calculate potential savings
+        </p>
       </div>
     </div>
 
