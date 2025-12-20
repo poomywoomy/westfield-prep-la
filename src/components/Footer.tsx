@@ -137,6 +137,9 @@ const Footer = () => {
         <div className="space-y-4 min-w-[200px]">
           <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <div className="space-y-2">
+                <Link to="/3pl-los-angeles" className="block text-sm text-white/80 hover:text-secondary transition-colors">
+                  3PL Los Angeles
+                </Link>
                 <Link to="/testimonials" className="block text-sm text-white/80 hover:text-secondary transition-colors">
                   Testimonials
                 </Link>

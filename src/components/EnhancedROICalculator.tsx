@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { downloadROIReport } from "@/lib/roiReportPdfGenerator";
 
 // Analytics helper - can be replaced with Mixpanel/PostHog later
 const logAnalyticsEvent = (eventName: string, data?: Record<string, unknown>) => {
@@ -246,13 +247,44 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     try {
       const calculatorResults = calculateROI();
       
-      const { error } = await supabase.from("lead_magnet_downloads").insert({
-        full_name: formData.fullName,
-        email: formData.email,
-        guide_type: "enhanced_roi_calculator",
+      // Send email via edge function
+      const { error: emailError } = await supabase.functions.invoke("send-roi-report", {
+        body: {
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          companyName: formData.companyName,
+          useCase: formData.useCase,
+          businessStage: formData.businessStage,
+          currentFulfillment: formData.currentFulfillment,
+          productType: formData.productType,
+          monthlyOrders: formData.monthlyOrders,
+          avgUnitsPerOrder: formData.avgUnitsPerOrder,
+          skuCount: formData.skuCount,
+          currentErrorRate: formData.currentErrorRate,
+          returnRate: formData.returnRate,
+          hoursSpentWeekly: formData.hoursSpentWeekly,
+          painPoints: formData.painPoints,
+          services: formData.services,
+          specialRequirements: formData.specialRequirements,
+          fbaDtcSplit: formData.fbaDtcSplit,
+          roi: {
+            monthlyUnits: calculatorResults.monthlyUnits,
+            totalSavings: calculatorResults.totalSavings,
+            annualSavings: calculatorResults.annualSavings,
+            timeSavedHours: calculatorResults.timeSavedHours,
+            currentErrorCost: calculatorResults.currentErrorCost,
+            returnCost: calculatorResults.returnCost,
+            estimatedMonthlyCost: calculatorResults.estimatedMonthlyCost,
+            costPerUnit: calculatorResults.costPerUnit,
+            roiPercent: calculatorResults.roi,
+          },
+        },
       });
 
-      if (error) throw error;
+      if (emailError) {
+        console.error("Email error:", emailError);
+      }
 
       logAnalyticsEvent("form_submit_success", { 
         useCase: formData.useCase,
@@ -1152,7 +1184,8 @@ const ResultsView = ({ roi, formData }: {
         className="gap-2"
         onClick={() => {
           logAnalyticsEvent("pdf_download_requested");
-          toast.info("PDF report coming soon!");
+          downloadROIReport(roi, formData);
+          toast.success("PDF downloaded successfully!");
         }}
       >
         <Download className="w-4 h-4" />

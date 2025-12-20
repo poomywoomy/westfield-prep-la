@@ -77,58 +77,22 @@ const Header = () => {
               Home
             </Link>
             
-            <Link to="/3pl-los-angeles" className="text-foreground hover:text-primary transition-colors font-medium text-base">
-              3PL Los Angeles
+            <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium text-base flex items-center gap-1">
+              <span className="text-secondary">See Your Savings</span>
             </Link>
             
             <Link to="/integrations" className="text-foreground hover:text-primary transition-colors font-medium text-base">
               Integrations
             </Link>
 
-            {/* About Dropdown */}
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-base font-medium">
-                    About
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[300px] gap-3 p-4">
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/why-choose-us"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Why Choose Us</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Discover what sets us apart
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/testimonials"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Testimonials</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              What our clients say about us
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
-            <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium text-base">
-              Pricing
+            <Link to="/why-choose-us" className="text-foreground hover:text-primary transition-colors font-medium text-base">
+              Why Choose Us
             </Link>
+
+            <Link to="/testimonials" className="text-foreground hover:text-primary transition-colors font-medium text-base">
+              Testimonials
+            </Link>
+
             <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium text-base">
               Blog
             </Link>
