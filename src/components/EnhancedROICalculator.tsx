@@ -26,7 +26,10 @@ import {
   BarChart3,
   Phone,
   FileText,
-  Download
+  Download,
+  Tag,
+  Boxes,
+  ShieldCheck
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -46,11 +49,17 @@ interface FormData {
   currentFulfillment: string;
   revenueRange: string;
   
-  // Step 2: Volume & Products
+  // Step 2: Volume & Products (Standard)
   monthlyOrders: number;
   avgUnitsPerOrder: number;
   skuCount: number;
   productType: string;
+  
+  // Step 2: Volume & Products (FBA/WFS specific)
+  unitsRequiringPrep: number;
+  fnskuPolybagUnits: number;
+  bundlingOrders: number;
+  bubbleWrapUnits: number;
   
   // Step 3: Pain Points & Costs
   currentErrorRate: number;
@@ -80,6 +89,10 @@ const initialFormData: FormData = {
   avgUnitsPerOrder: 2,
   skuCount: 25,
   productType: "",
+  unitsRequiringPrep: 1000,
+  fnskuPolybagUnits: 0,
+  bundlingOrders: 0,
+  bubbleWrapUnits: 0,
   currentErrorRate: 5,
   returnRate: 8,
   hoursSpentWeekly: 20,
@@ -154,6 +167,33 @@ interface EnhancedROICalculatorProps {
   variant?: "pricing" | "standalone";
 }
 
+// FBA Pricing tier helper
+const getFBAPricingTier = (prepUnits: number) => {
+  let polybagRate = 1.40;
+  let bundleRate = 0.50;
+  let bubbleRate = 0.50;
+  let tierName = "Standard";
+
+  if (prepUnits > 5000) {
+    polybagRate = 1.00;
+    bundleRate = 0.25;
+    bubbleRate = 0.25;
+    tierName = "High Volume (5,001+)";
+  } else if (prepUnits > 3000) {
+    polybagRate = 1.10;
+    bundleRate = 0.25;
+    bubbleRate = 0.25;
+    tierName = "Volume (3,001-5,000)";
+  } else if (prepUnits > 1000) {
+    polybagRate = 1.20;
+    bundleRate = 0.50;
+    bubbleRate = 0.50;
+    tierName = "Growth (1,001-3,000)";
+  }
+
+  return { polybagRate, bundleRate, bubbleRate, tierName };
+};
+
 const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -191,8 +231,47 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     }
   }, [formData.currentFulfillment]);
 
+  // Calculate FBA Prep Cost
+  const calculateFBAPrepCost = useCallback(() => {
+    const { polybagRate, bundleRate, bubbleRate } = getFBAPricingTier(formData.unitsRequiringPrep);
+    
+    const fnskuCost = formData.fnskuPolybagUnits * polybagRate;
+    const bundlingCost = formData.bundlingOrders * bundleRate;
+    const bubbleCost = formData.bubbleWrapUnits * bubbleRate;
+    
+    return {
+      fnskuCost,
+      bundlingCost,
+      bubbleCost,
+      totalPrepCost: fnskuCost + bundlingCost + bubbleCost,
+      ...getFBAPricingTier(formData.unitsRequiringPrep)
+    };
+  }, [formData.unitsRequiringPrep, formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits]);
+
+  // Check if FBA fields have any values
+  const hasFBAData = useMemo(() => {
+    return formData.fnskuPolybagUnits > 0 || 
+           formData.bundlingOrders > 0 || 
+           formData.bubbleWrapUnits > 0;
+  }, [formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits]);
+
+  // Check if standard fields have any values (changed from default)
+  const hasStandardData = useMemo(() => {
+    return formData.monthlyOrders > 10; // More than initial minimum
+  }, [formData.monthlyOrders]);
+
+  // Validate FBA prep services don't exceed total prep units
+  const prepServicesExceedTotal = useMemo(() => {
+    const totalPrepServices = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
+    return totalPrepServices > formData.unitsRequiringPrep;
+  }, [formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits, formData.unitsRequiringPrep]);
+
   // Calculate ROI metrics in real-time
   const calculateROI = useCallback(() => {
+    const isFBAOnly = formData.useCase === "amazon";
+    const isMultiChannel = formData.useCase === "multi-channel";
+    
+    // Standard order-based calculations
     const monthlyUnits = formData.monthlyOrders * formData.avgUnitsPerOrder;
     const currentErrorCost = monthlyUnits * (formData.currentErrorRate / 100) * 18;
     const returnCost = monthlyUnits * (formData.returnRate / 100) * 12;
@@ -202,24 +281,60 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     const hourlyRate = 25;
     const timeSavedValue = timeSavedHours * hourlyRate;
     
-    // Order-volume-based pricing tiers (per order, not per unit)
+    // Order-volume-based pricing tiers (per unit)
     let costPerUnit: number;
     if (formData.monthlyOrders < 1000) costPerUnit = 2.50;
     else if (formData.monthlyOrders < 2500) costPerUnit = 2.25;
     else if (formData.monthlyOrders < 5000) costPerUnit = 2.00;
     else costPerUnit = 1.50;
     
-    // Cost savings calculation (user's cost vs our cost per order)
+    // FIX: Cost per order with flat $0.50 surcharge for multi-unit orders
     const userCostPerOrder = parseFloat(formData.currentCostPerOrder.replace(/[^0-9.]/g, '')) || 0;
-    const ourCostPerOrder = costPerUnit * formData.avgUnitsPerOrder;
+    const ourCostPerOrder = formData.avgUnitsPerOrder > 1 
+      ? costPerUnit + 0.50 
+      : costPerUnit;
     const costSavingsPerOrder = Math.max(0, userCostPerOrder - ourCostPerOrder);
-    const costSavings = costSavingsPerOrder * formData.monthlyOrders;
+    const standardCostSavings = costSavingsPerOrder * formData.monthlyOrders;
     
-    const estimatedMonthlyCost = monthlyUnits * costPerUnit;
-    const totalSavings = currentErrorCost + returnCost + timeSavedValue + costSavings;
+    // FBA Prep cost calculation
+    const fbaPrepResult = calculateFBAPrepCost();
+    const fbaTotalCost = fbaPrepResult.totalPrepCost;
+    
+    // Determine which costs to use based on use case
+    let estimatedMonthlyCost: number;
+    let totalSavings: number;
+    
+    if (isFBAOnly) {
+      // FBA Only: Use per-unit prep cost
+      estimatedMonthlyCost = fbaTotalCost;
+      // For FBA, use the user's cost per unit input for comparison
+      const userCostPerUnit = parseFloat(formData.currentCostPerOrder.replace(/[^0-9.]/g, '')) || 0;
+      const totalPrepUnits = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
+      const userTotalPrepCost = userCostPerUnit * totalPrepUnits;
+      const fbaSavings = Math.max(0, userTotalPrepCost - fbaTotalCost);
+      totalSavings = currentErrorCost + returnCost + timeSavedValue + fbaSavings;
+    } else if (isMultiChannel) {
+      // Multi-channel: Combine both standard and FBA costs
+      const standardEstimatedCost = monthlyUnits * costPerUnit;
+      estimatedMonthlyCost = standardEstimatedCost + fbaTotalCost;
+      totalSavings = currentErrorCost + returnCost + timeSavedValue + standardCostSavings;
+      // Add FBA savings if they have FBA data
+      if (hasFBAData) {
+        const userCostPerUnit = parseFloat(formData.currentCostPerOrder.replace(/[^0-9.]/g, '')) || 0;
+        const totalPrepUnits = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
+        const userTotalPrepCost = userCostPerUnit * totalPrepUnits;
+        const fbaSavings = Math.max(0, userTotalPrepCost - fbaTotalCost);
+        totalSavings += fbaSavings;
+      }
+    } else {
+      // Standard (Shopify/B2B): Use order-based cost
+      estimatedMonthlyCost = monthlyUnits * costPerUnit;
+      totalSavings = currentErrorCost + returnCost + timeSavedValue + standardCostSavings;
+    }
+    
     const netBenefit = totalSavings - estimatedMonthlyCost;
     
-    // ROI includes ALL savings (error cost + return cost + time value + cost savings)
+    // ROI calculation - ALLOW NEGATIVE VALUES
     const roi = estimatedMonthlyCost > 0 ? (totalSavings / estimatedMonthlyCost) * 100 : 0;
     const annualSavings = totalSavings * 12;
 
@@ -229,19 +344,34 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
       returnCost: Math.round(returnCost),
       timeSavedHours: Math.round(timeSavedHours),
       timeSavedValue: Math.round(timeSavedValue),
-      costSavings: Math.round(costSavings),
+      costSavings: Math.round(standardCostSavings),
       estimatedMonthlyCost: Math.round(estimatedMonthlyCost),
       totalSavings: Math.round(totalSavings),
       netBenefit: Math.round(netBenefit),
-      roi: Math.max(0, Math.round(roi)),
+      roi: Math.round(roi), // Allow negative ROI
       annualSavings: Math.round(annualSavings),
       costPerUnit: costPerUnit.toFixed(2),
+      fbaPrepCost: Math.round(fbaTotalCost),
+      fbaTierName: fbaPrepResult.tierName,
     };
-  }, [formData]);
+  }, [formData, calculateFBAPrepCost, hasFBAData]);
 
   const roi = useMemo(() => calculateROI(), [calculateROI]);
 
   const handleNext = () => {
+    // Validation for multi-channel on step 2
+    if (currentStep === 2 && formData.useCase === "multi-channel") {
+      if (!hasStandardData && !hasFBAData) {
+        toast.error("Please fill out at least one fulfillment method (Standard or FBA/WFS)");
+        return;
+      }
+    }
+    
+    // Validation for FBA prep services exceeding total
+    if (currentStep === 2 && (formData.useCase === "amazon" || formData.useCase === "multi-channel") && prepServicesExceedTotal) {
+      toast.warning("Your prep services exceed the total units requiring prep. Please adjust your values.");
+    }
+    
     if (currentStep < steps.length - 1) {
       logAnalyticsEvent("step_navigation", { direction: "next", fromStep: currentStep });
       setCurrentStep(currentStep + 1);
@@ -288,6 +418,11 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
           services: formData.services,
           specialRequirements: formData.specialRequirements,
           fbaDtcSplit: formData.fbaDtcSplit,
+          // FBA/WFS specific fields
+          unitsRequiringPrep: formData.unitsRequiringPrep,
+          fnskuPolybagUnits: formData.fnskuPolybagUnits,
+          bundlingOrders: formData.bundlingOrders,
+          bubbleWrapUnits: formData.bubbleWrapUnits,
           roi: {
             monthlyUnits: calculatorResults.monthlyUnits,
             totalSavings: calculatorResults.totalSavings,
@@ -298,6 +433,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
             estimatedMonthlyCost: calculatorResults.estimatedMonthlyCost,
             costPerUnit: calculatorResults.costPerUnit,
             roiPercent: calculatorResults.roi,
+            fbaPrepCost: calculatorResults.fbaPrepCost,
           },
         },
       });
@@ -337,8 +473,18 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     switch (currentStep) {
       case 0: return !!formData.useCase;
       case 1: return !!formData.businessStage && !!formData.currentFulfillment;
-      case 2: return formData.monthlyOrders > 0; // Removed productType requirement
-      case 3: return !!formData.currentCostPerOrder; // Made cost per order required
+      case 2: 
+        // Multi-channel: needs at least one set filled
+        if (formData.useCase === "multi-channel") {
+          return hasStandardData || hasFBAData;
+        }
+        // FBA only: needs at least one prep service
+        if (formData.useCase === "amazon") {
+          return hasFBAData;
+        }
+        // Standard: needs monthly orders
+        return formData.monthlyOrders > 0;
+      case 3: return !!formData.currentCostPerOrder;
       case 4: return formData.services.length > 0;
       case 5: return !!formData.fullName && !!formData.email;
       default: return false;
@@ -456,8 +602,27 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                       />
                     )}
 
-                    {/* Step 2: Volume & Products */}
-                    {currentStep === 2 && (
+                    {/* Step 2: Volume & Products - Conditional based on use case */}
+                    {currentStep === 2 && formData.useCase === "amazon" && (
+                      <StepVolumeProductsFBA 
+                        formData={formData} 
+                        setFormData={setFormData}
+                        prepServicesExceedTotal={prepServicesExceedTotal}
+                        fbaPrepCost={calculateFBAPrepCost()}
+                      />
+                    )}
+                    
+                    {currentStep === 2 && formData.useCase === "multi-channel" && (
+                      <StepVolumeProductsMultiChannel 
+                        formData={formData} 
+                        setFormData={setFormData}
+                        roi={roi}
+                        prepServicesExceedTotal={prepServicesExceedTotal}
+                        fbaPrepCost={calculateFBAPrepCost()}
+                      />
+                    )}
+                    
+                    {currentStep === 2 && formData.useCase !== "amazon" && formData.useCase !== "multi-channel" && (
                       <StepVolumeProducts 
                         formData={formData} 
                         setFormData={setFormData}
@@ -679,8 +844,22 @@ interface ROIResult {
   roi: number;
   annualSavings: number;
   costPerUnit: string;
+  fbaPrepCost?: number;
+  fbaTierName?: string;
 }
 
+interface FBAPrepCostResult {
+  fnskuCost: number;
+  bundlingCost: number;
+  bubbleCost: number;
+  totalPrepCost: number;
+  polybagRate: number;
+  bundleRate: number;
+  bubbleRate: number;
+  tierName: string;
+}
+
+// Standard Volume & Products Step (Shopify/DTC, B2B)
 const StepVolumeProducts = ({ formData, setFormData, roi }: {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
@@ -689,10 +868,10 @@ const StepVolumeProducts = ({ formData, setFormData, roi }: {
   const [isHighVolumeMode, setIsHighVolumeMode] = useState(formData.monthlyOrders >= 10000);
   
   const handleOrdersChange = (value: number) => {
-    // Check if we need to switch modes
+    // Bi-directional mode switching
     if (!isHighVolumeMode && value >= 10000) {
       setIsHighVolumeMode(true);
-    } else if (isHighVolumeMode && value < 10000) {
+    } else if (isHighVolumeMode && value <= 10000) {
       setIsHighVolumeMode(false);
     }
     setFormData(prev => ({ ...prev, monthlyOrders: value }));
@@ -815,6 +994,403 @@ const StepVolumeProducts = ({ formData, setFormData, roi }: {
   );
 };
 
+// FBA/WFS Volume & Products Step
+const StepVolumeProductsFBA = ({ formData, setFormData, prepServicesExceedTotal, fbaPrepCost }: {
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  prepServicesExceedTotal: boolean;
+  fbaPrepCost: FBAPrepCostResult;
+}) => {
+  return (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h3 className="text-2xl font-bold mb-2">FBA/WFS Prep Volume</h3>
+        <p className="text-muted-foreground">This determines your prep pricing tier</p>
+      </div>
+      
+      {/* Monthly Units Requiring Prep - Full Width, determines tier */}
+      <div className="space-y-3">
+        <Label className="flex justify-between items-center">
+          <span className="text-lg font-semibold">Monthly Units Requiring Prep</span>
+          <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
+            {fbaPrepCost.tierName}
+          </span>
+        </Label>
+        <div className="flex items-center gap-3">
+          <Slider
+            value={[formData.unitsRequiringPrep]}
+            onValueChange={([value]) => setFormData(prev => ({ ...prev, unitsRequiringPrep: value }))}
+            min={100}
+            max={20000}
+            step={100}
+            className="py-4 flex-1"
+          />
+          <Input
+            type="number"
+            value={formData.unitsRequiringPrep}
+            onChange={(e) => {
+              const value = Math.max(100, Math.min(20000, parseInt(e.target.value) || 100));
+              setFormData(prev => ({ ...prev, unitsRequiringPrep: value }));
+            }}
+            className="w-28 h-12 text-center font-bold text-lg"
+          />
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>100</span>
+          <span>20,000+</span>
+        </div>
+      </div>
+
+      {/* Prep Services Grid */}
+      <div className="grid md:grid-cols-3 gap-4">
+        {/* FNSKU + Polybag */}
+        <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
+          <Label className="flex items-center gap-2">
+            <Tag className="w-4 h-4 text-secondary" />
+            <span>FNSKU + Polybag</span>
+          </Label>
+          <div className="text-xs text-muted-foreground mb-2">
+            ${fbaPrepCost.polybagRate.toFixed(2)}/unit
+          </div>
+          <Slider
+            value={[formData.fnskuPolybagUnits]}
+            onValueChange={([value]) => setFormData(prev => ({ ...prev, fnskuPolybagUnits: value }))}
+            min={0}
+            max={formData.unitsRequiringPrep}
+            step={50}
+            className="py-4"
+          />
+          <Input
+            type="number"
+            value={formData.fnskuPolybagUnits}
+            onChange={(e) => {
+              const value = Math.max(0, Math.min(formData.unitsRequiringPrep, parseInt(e.target.value) || 0));
+              setFormData(prev => ({ ...prev, fnskuPolybagUnits: value }));
+            }}
+            className="w-full h-10 text-center font-semibold"
+          />
+        </div>
+
+        {/* Bundling */}
+        <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
+          <Label className="flex items-center gap-2">
+            <Boxes className="w-4 h-4 text-secondary" />
+            <span>Bundling Orders</span>
+          </Label>
+          <div className="text-xs text-muted-foreground mb-2">
+            ${fbaPrepCost.bundleRate.toFixed(2)}/order
+          </div>
+          <Slider
+            value={[formData.bundlingOrders]}
+            onValueChange={([value]) => setFormData(prev => ({ ...prev, bundlingOrders: value }))}
+            min={0}
+            max={5000}
+            step={25}
+            className="py-4"
+          />
+          <Input
+            type="number"
+            value={formData.bundlingOrders}
+            onChange={(e) => {
+              const value = Math.max(0, Math.min(5000, parseInt(e.target.value) || 0));
+              setFormData(prev => ({ ...prev, bundlingOrders: value }));
+            }}
+            className="w-full h-10 text-center font-semibold"
+          />
+        </div>
+
+        {/* Bubble Wrap */}
+        <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
+          <Label className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-secondary" />
+            <span>Bubble Wrap</span>
+          </Label>
+          <div className="text-xs text-muted-foreground mb-2">
+            ${fbaPrepCost.bubbleRate.toFixed(2)}/unit
+          </div>
+          <Slider
+            value={[formData.bubbleWrapUnits]}
+            onValueChange={([value]) => setFormData(prev => ({ ...prev, bubbleWrapUnits: value }))}
+            min={0}
+            max={formData.unitsRequiringPrep}
+            step={50}
+            className="py-4"
+          />
+          <Input
+            type="number"
+            value={formData.bubbleWrapUnits}
+            onChange={(e) => {
+              const value = Math.max(0, Math.min(formData.unitsRequiringPrep, parseInt(e.target.value) || 0));
+              setFormData(prev => ({ ...prev, bubbleWrapUnits: value }));
+            }}
+            className="w-full h-10 text-center font-semibold"
+          />
+        </div>
+      </div>
+
+      {/* Validation Warning */}
+      {prepServicesExceedTotal && (
+        <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-destructive" />
+          <p className="text-sm text-destructive">
+            Your prep services ({(formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits).toLocaleString()}) exceed the total units requiring prep ({formData.unitsRequiringPrep.toLocaleString()}).
+          </p>
+        </div>
+      )}
+
+      {/* Cost Preview */}
+      <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm">Estimated Monthly Prep Cost</span>
+          <span className="text-xl font-bold text-secondary">
+            ${fbaPrepCost.totalPrepCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+          <div>FNSKU: ${fbaPrepCost.fnskuCost.toFixed(2)}</div>
+          <div>Bundling: ${fbaPrepCost.bundlingCost.toFixed(2)}</div>
+          <div>Bubble: ${fbaPrepCost.bubbleCost.toFixed(2)}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Multi-Channel Volume & Products Step (shows BOTH standard and FBA fields)
+const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, prepServicesExceedTotal, fbaPrepCost }: {
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  roi: ROIResult;
+  prepServicesExceedTotal: boolean;
+  fbaPrepCost: FBAPrepCostResult;
+}) => {
+  const [isHighVolumeMode, setIsHighVolumeMode] = useState(formData.monthlyOrders >= 10000);
+  
+  const handleOrdersChange = (value: number) => {
+    if (!isHighVolumeMode && value >= 10000) {
+      setIsHighVolumeMode(true);
+    } else if (isHighVolumeMode && value <= 10000) {
+      setIsHighVolumeMode(false);
+    }
+    setFormData(prev => ({ ...prev, monthlyOrders: value }));
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="text-center mb-6">
+        <h3 className="text-2xl font-bold mb-2">Multi-Channel Volume</h3>
+        <p className="text-muted-foreground">Fill out at least one section below</p>
+      </div>
+
+      {/* SECTION 1: Standard Order Fulfillment */}
+      <div className="border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-2 mb-2">
+          <ShoppingCart className="w-5 h-5 text-secondary" />
+          <h4 className="font-semibold text-lg">Standard Order Fulfillment</h4>
+          <span className="text-xs text-muted-foreground">(DTC, Shopify, B2B)</span>
+        </div>
+        
+        {/* Monthly Orders */}
+        <div className="space-y-3">
+          <Label className="flex justify-between items-center">
+            <span>Monthly Orders</span>
+            {isHighVolumeMode && (
+              <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
+                High-volume
+              </span>
+            )}
+          </Label>
+          <div className="flex items-center gap-3">
+            <Slider
+              value={[formData.monthlyOrders]}
+              onValueChange={([value]) => handleOrdersChange(value)}
+              min={isHighVolumeMode ? 10000 : 10}
+              max={isHighVolumeMode ? 100000 : 10000}
+              step={isHighVolumeMode ? 1000 : 50}
+              className="py-4 flex-1"
+            />
+            <Input
+              type="number"
+              value={formData.monthlyOrders}
+              onChange={(e) => {
+                const value = Math.max(10, Math.min(100000, parseInt(e.target.value) || 10));
+                handleOrdersChange(value);
+              }}
+              className="w-24 h-10 text-center font-semibold"
+            />
+          </div>
+        </div>
+
+        {/* Units per Order + SKU Count */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Avg Units per Order</Label>
+            <div className="flex items-center gap-2">
+              <Slider
+                value={[formData.avgUnitsPerOrder]}
+                onValueChange={([value]) => setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }))}
+                min={1}
+                max={20}
+                step={0.5}
+                className="py-4 flex-1"
+              />
+              <Input
+                type="number"
+                value={formData.avgUnitsPerOrder}
+                onChange={(e) => {
+                  const value = Math.max(1, Math.min(20, parseFloat(e.target.value) || 1));
+                  setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }));
+                }}
+                step="0.5"
+                className="w-20 h-9 text-center font-semibold"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>SKU Count</Label>
+            <div className="flex items-center gap-2">
+              <Slider
+                value={[formData.skuCount]}
+                onValueChange={([value]) => setFormData(prev => ({ ...prev, skuCount: value }))}
+                min={1}
+                max={250}
+                step={5}
+                className="py-4 flex-1"
+              />
+              <Input
+                type="number"
+                value={formData.skuCount}
+                onChange={(e) => {
+                  const value = Math.max(1, Math.min(250, parseInt(e.target.value) || 1));
+                  setFormData(prev => ({ ...prev, skuCount: value }));
+                }}
+                className="w-20 h-9 text-center font-semibold"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Volume Preview for Standard */}
+        <div className="bg-muted/30 rounded-lg p-3 flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Standard Volume</span>
+          <span className="font-bold text-secondary">{roi.monthlyUnits.toLocaleString()} units/mo</span>
+        </div>
+      </div>
+
+      {/* SECTION 2: FBA/WFS Prep Services */}
+      <div className="border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Package className="w-5 h-5 text-secondary" />
+          <h4 className="font-semibold text-lg">FBA/WFS Prep Services</h4>
+          <span className="text-xs text-muted-foreground">(Amazon, Walmart)</span>
+        </div>
+
+        {/* Units Requiring Prep */}
+        <div className="space-y-3">
+          <Label className="flex justify-between items-center">
+            <span>Monthly Units Requiring Prep</span>
+            <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
+              {fbaPrepCost.tierName}
+            </span>
+          </Label>
+          <div className="flex items-center gap-3">
+            <Slider
+              value={[formData.unitsRequiringPrep]}
+              onValueChange={([value]) => setFormData(prev => ({ ...prev, unitsRequiringPrep: value }))}
+              min={100}
+              max={20000}
+              step={100}
+              className="py-4 flex-1"
+            />
+            <Input
+              type="number"
+              value={formData.unitsRequiringPrep}
+              onChange={(e) => {
+                const value = Math.max(100, Math.min(20000, parseInt(e.target.value) || 100));
+                setFormData(prev => ({ ...prev, unitsRequiringPrep: value }));
+              }}
+              className="w-24 h-10 text-center font-semibold"
+            />
+          </div>
+        </div>
+
+        {/* Prep Services Grid */}
+        <div className="grid md:grid-cols-3 gap-3">
+          <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
+            <Label className="text-sm flex items-center gap-1">
+              <Tag className="w-3 h-3" />
+              FNSKU + Polybag
+            </Label>
+            <div className="text-xs text-muted-foreground">${fbaPrepCost.polybagRate.toFixed(2)}/unit</div>
+            <Input
+              type="number"
+              value={formData.fnskuPolybagUnits}
+              onChange={(e) => {
+                const value = Math.max(0, parseInt(e.target.value) || 0);
+                setFormData(prev => ({ ...prev, fnskuPolybagUnits: value }));
+              }}
+              className="w-full h-9 text-center font-semibold"
+            />
+          </div>
+
+          <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
+            <Label className="text-sm flex items-center gap-1">
+              <Boxes className="w-3 h-3" />
+              Bundling Orders
+            </Label>
+            <div className="text-xs text-muted-foreground">${fbaPrepCost.bundleRate.toFixed(2)}/order</div>
+            <Input
+              type="number"
+              value={formData.bundlingOrders}
+              onChange={(e) => {
+                const value = Math.max(0, parseInt(e.target.value) || 0);
+                setFormData(prev => ({ ...prev, bundlingOrders: value }));
+              }}
+              className="w-full h-9 text-center font-semibold"
+            />
+          </div>
+
+          <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
+            <Label className="text-sm flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3" />
+              Bubble Wrap
+            </Label>
+            <div className="text-xs text-muted-foreground">${fbaPrepCost.bubbleRate.toFixed(2)}/unit</div>
+            <Input
+              type="number"
+              value={formData.bubbleWrapUnits}
+              onChange={(e) => {
+                const value = Math.max(0, parseInt(e.target.value) || 0);
+                setFormData(prev => ({ ...prev, bubbleWrapUnits: value }));
+              }}
+              className="w-full h-9 text-center font-semibold"
+            />
+          </div>
+        </div>
+
+        {/* Validation Warning */}
+        {prepServicesExceedTotal && (
+          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
+            <p className="text-xs text-destructive">
+              Prep services exceed total units requiring prep.
+            </p>
+          </div>
+        )}
+
+        {/* FBA Cost Preview */}
+        <div className="bg-muted/30 rounded-lg p-3 flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">FBA Prep Cost</span>
+          <span className="font-bold text-secondary">
+            ${fbaPrepCost.totalPrepCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mo
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const StepPainPoints = ({ formData, setFormData, handleToggle }: {
   formData: FormData;
@@ -883,18 +1459,21 @@ const StepPainPoints = ({ formData, setFormData, handleToggle }: {
 
       <div className="space-y-3">
         <Label htmlFor="costPerOrder" className="flex items-center gap-1">
-          Average Cost per Order <span className="text-destructive">*</span>
+          {formData.useCase === "amazon" ? "Average Cost per Unit" : "Average Cost per Order"} <span className="text-destructive">*</span>
         </Label>
         <Input
           id="costPerOrder"
-          placeholder="e.g. $4.50"
+          placeholder={formData.useCase === "amazon" ? "e.g. $1.50" : "e.g. $4.50"}
           value={formData.currentCostPerOrder}
           onChange={(e) => setFormData(prev => ({ ...prev, currentCostPerOrder: e.target.value }))}
           className="h-12"
           required
         />
         <p className="text-xs text-muted-foreground">
-          Include pick, pack, and shipping costs to calculate potential savings
+          {formData.useCase === "amazon" 
+            ? "Include your current prep cost per unit to calculate potential savings"
+            : "Include pick, pack, and shipping costs to calculate potential savings"
+          }
         </p>
       </div>
     </div>
@@ -1093,68 +1672,90 @@ const LiveResultsSidebar = ({ roi, formData, showResults }: {
   roi: ROIResult;
   formData: FormData;
   showResults: boolean;
-}) => (
-  <div className="backdrop-blur-xl bg-background/90 border border-border/50 rounded-3xl p-6 shadow-xl">
-    <div className="flex items-center gap-2 mb-6">
-      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-      <span className="text-sm font-medium text-muted-foreground">Live Estimate</span>
-    </div>
+}) => {
+  const isNegativeROI = roi.roi < 0;
+  const isFBAUseCase = formData.useCase === "amazon";
+  
+  return (
+    <div className="backdrop-blur-xl bg-background/90 border border-border/50 rounded-3xl p-6 shadow-xl">
+      <div className="flex items-center gap-2 mb-6">
+        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+        <span className="text-sm font-medium text-muted-foreground">Live Estimate</span>
+      </div>
 
-    <div className="space-y-4">
-      <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-xl p-4">
-        <p className="text-xs text-muted-foreground mb-1">Est. Monthly Savings</p>
-        <motion.p 
-          key={roi.totalSavings}
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          className="text-3xl font-bold text-green-500"
+      <div className="space-y-4">
+        <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-xl p-4">
+          <p className="text-xs text-muted-foreground mb-1">Est. Monthly Savings</p>
+          <motion.p 
+            key={roi.totalSavings}
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            className="text-3xl font-bold text-green-500"
+          >
+            ${roi.totalSavings.toLocaleString()}
+          </motion.p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-muted/50 rounded-xl p-3">
+            <p className="text-xs text-muted-foreground mb-1">Time Saved</p>
+            <p className="text-lg font-bold">{roi.timeSavedHours}h/mo</p>
+          </div>
+          
+          <div className="bg-muted/50 rounded-xl p-3">
+            <p className="text-xs text-muted-foreground mb-1">Error Savings</p>
+            <p className="text-lg font-bold">${roi.currentErrorCost.toLocaleString()}</p>
+          </div>
+          
+          <div className="bg-muted/50 rounded-xl p-3">
+            <p className="text-xs text-muted-foreground mb-1">ROI</p>
+            <p className={`text-lg font-bold ${isNegativeROI ? "text-destructive" : "text-secondary"}`}>
+              {roi.roi}%
+            </p>
+          </div>
+          
+          <div className="bg-muted/50 rounded-xl p-3">
+            <p className="text-xs text-muted-foreground mb-1">
+              {isFBAUseCase ? "Prep Cost" : "Cost/Unit"}
+            </p>
+            <p className="text-lg font-bold">
+              {isFBAUseCase 
+                ? `$${(roi.fbaPrepCost || 0).toLocaleString()}`
+                : `$${roi.costPerUnit}`
+              }
+            </p>
+          </div>
+        </div>
+
+        {/* Show pricing tier for FBA */}
+        {isFBAUseCase && roi.fbaTierName && (
+          <div className="bg-secondary/10 border border-secondary/20 rounded-lg p-3 text-center">
+            <p className="text-xs text-muted-foreground">Your Pricing Tier</p>
+            <p className="text-sm font-semibold text-secondary">{roi.fbaTierName}</p>
+          </div>
+        )}
+
+        <div className="border-t border-border pt-4 mt-4">
+          <p className="text-xs text-muted-foreground mb-1">Annual Savings Potential</p>
+          <p className="text-2xl font-bold text-secondary">${roi.annualSavings.toLocaleString()}</p>
+        </div>
+      </div>
+
+      {!showResults && (
+        <Button 
+          className="w-full mt-6 gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+          onClick={() => {
+            const element = document.getElementById("savings-calculator");
+            element?.scrollIntoView({ behavior: "smooth" });
+          }}
         >
-          ${roi.totalSavings.toLocaleString()}
-        </motion.p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-muted/50 rounded-xl p-3">
-          <p className="text-xs text-muted-foreground mb-1">Time Saved</p>
-          <p className="text-lg font-bold">{roi.timeSavedHours}h/mo</p>
-        </div>
-        
-        <div className="bg-muted/50 rounded-xl p-3">
-          <p className="text-xs text-muted-foreground mb-1">Error Savings</p>
-          <p className="text-lg font-bold">${roi.currentErrorCost.toLocaleString()}</p>
-        </div>
-        
-        <div className="bg-muted/50 rounded-xl p-3">
-          <p className="text-xs text-muted-foreground mb-1">ROI</p>
-          <p className="text-lg font-bold text-secondary">{roi.roi}%</p>
-        </div>
-        
-        <div className="bg-muted/50 rounded-xl p-3">
-          <p className="text-xs text-muted-foreground mb-1">Cost/Unit</p>
-          <p className="text-lg font-bold">${roi.costPerUnit}</p>
-        </div>
-      </div>
-
-      <div className="border-t border-border pt-4 mt-4">
-        <p className="text-xs text-muted-foreground mb-1">Annual Savings Potential</p>
-        <p className="text-2xl font-bold text-secondary">${roi.annualSavings.toLocaleString()}</p>
-      </div>
+          Get Full Quote
+          <ArrowRight className="w-4 h-4" />
+        </Button>
+      )}
     </div>
-
-    {!showResults && (
-      <Button 
-        className="w-full mt-6 gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-        onClick={() => {
-          const element = document.getElementById("savings-calculator");
-          element?.scrollIntoView({ behavior: "smooth" });
-        }}
-      >
-        Get Full Quote
-        <ArrowRight className="w-4 h-4" />
-      </Button>
-    )}
-  </div>
-);
+  );
+};
 
 // Results View Component
 const ResultsView = ({ roi, formData }: {
