@@ -900,9 +900,9 @@ const StepVolumeProducts = ({ formData, setFormData, roi }: {
 
   return (
     <div className="space-y-6">
-      <div className="text-center mb-6">
+    <div className="text-center mb-6">
         <h3 className="text-2xl font-bold mb-2">Volume Details</h3>
-        <p className="text-muted-foreground">This determines your pricing tier</p>
+        <p className="text-muted-foreground">Tell us about your monthly order volume</p>
       </div>
       
       {/* Monthly Orders - Full Width Standalone */}
@@ -1045,18 +1045,15 @@ const StepVolumeProductsFBA = ({ formData, setFormData, prepServicesExceedTotal,
 
   return (
     <div className="space-y-6">
-      <div className="text-center mb-6">
+    <div className="text-center mb-6">
         <h3 className="text-2xl font-bold mb-2">FBA/WFS Prep Volume</h3>
-        <p className="text-muted-foreground">This determines your prep pricing tier</p>
+        <p className="text-muted-foreground">Tell us about your prep service needs</p>
       </div>
       
-      {/* Monthly Units Requiring Prep - Full Width, determines tier */}
+      {/* Monthly Units Requiring Prep - Full Width */}
       <div className="space-y-3">
         <Label className="flex justify-between items-center">
           <span className="text-lg font-semibold">Monthly Units Requiring Prep</span>
-          <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
-            {fbaPrepCost.tierName}
-          </span>
         </Label>
         <div className="flex items-center gap-3">
           <Slider
@@ -1344,9 +1341,6 @@ const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, prepServic
         <div className="space-y-3">
           <Label className="flex justify-between items-center">
             <span>Monthly Units Requiring Prep</span>
-            <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
-              {fbaPrepCost.tierName}
-            </span>
           </Label>
           <div className="flex items-center gap-3">
             <Slider
@@ -1514,9 +1508,18 @@ const StepPainPoints = ({ formData, setFormData, handleToggle }: {
         </Label>
         <Input
           id="costPerOrder"
-          placeholder={formData.useCase === "amazon" ? "e.g. $1.50" : "e.g. $4.50"}
+          type="number"
+          min="0"
+          step="0.01"
+          inputMode="decimal"
+          placeholder={formData.useCase === "amazon" ? "1.50" : "4.50"}
           value={formData.currentCostPerOrder}
           onChange={(e) => setFormData(prev => ({ ...prev, currentCostPerOrder: e.target.value }))}
+          onKeyDown={(e) => {
+            if (['e', 'E', '+', '-'].includes(e.key)) {
+              e.preventDefault();
+            }
+          }}
           className="h-12"
           required
         />
@@ -1821,7 +1824,7 @@ const ResultsView = ({ roi, formData }: {
       </motion.div>
       <h3 className="text-2xl md:text-3xl font-bold mb-2">Your Personalized Savings Report</h3>
       <p className="text-muted-foreground">
-        Based on {roi.monthlyUnits.toLocaleString()} units/month
+        Based on {(formData.useCase === "amazon" ? formData.unitsRequiringPrep : roi.monthlyUnits).toLocaleString()} units/month
       </p>
     </div>
 
@@ -1882,10 +1885,16 @@ const ResultsView = ({ roi, formData }: {
       <Button 
         size="lg" 
         className="gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-        onClick={() => window.location.href = "/contact"}
+        asChild
       >
-        Schedule a Call
-        <ArrowRight className="w-4 h-4" />
+        <a 
+          href="https://calendly.com/westfieldprepcenter/30min"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Schedule a Call
+          <ArrowRight className="w-4 h-4" />
+        </a>
       </Button>
     </div>
   </motion.div>
