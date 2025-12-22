@@ -26,6 +26,11 @@ const roiReportSchema = z.object({
   services: z.array(z.string()),
   specialRequirements: z.array(z.string()),
   fbaDtcSplit: z.number().optional(),
+  // FBA/WFS specific fields
+  unitsRequiringPrep: z.number().optional(),
+  fnskuPolybagUnits: z.number().optional(),
+  bundlingOrders: z.number().optional(),
+  bubbleWrapUnits: z.number().optional(),
   // Calculated results
   roi: z.object({
     monthlyUnits: z.number(),
@@ -37,6 +42,7 @@ const roiReportSchema = z.object({
     estimatedMonthlyCost: z.number(),
     costPerUnit: z.string(),
     roiPercent: z.number(),
+    fbaPrepCost: z.number().optional(),
   }),
 });
 
@@ -120,6 +126,22 @@ const handler = async (req: Request): Promise<Response> => {
 
     const servicesFormatted = data.services.map(s => serviceLabels[s] || s).join(', ') || 'None selected';
 
+    // Check if this is an FBA/WFS or Multi-Channel use case
+    const isFBAUseCase = data.useCase === 'amazon' || data.useCase === 'multi-channel';
+    const hasFBAData = (data.fnskuPolybagUnits || 0) > 0 || (data.bundlingOrders || 0) > 0 || (data.bubbleWrapUnits || 0) > 0;
+
+    // Build FBA section for user email
+    const userFBASection = isFBAUseCase && hasFBAData ? `
+      <h3 style="color: #0A66C2; margin-top: 30px;">FBA/WFS Prep Breakdown</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 8px 0; color: #64748b;">Units Requiring Prep:</td><td style="font-weight: bold;">${(data.unitsRequiringPrep || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 8px 0; color: #64748b;">FNSKU + Polybag Units:</td><td style="font-weight: bold;">${(data.fnskuPolybagUnits || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 8px 0; color: #64748b;">Bundling Units:</td><td style="font-weight: bold;">${(data.bundlingOrders || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 8px 0; color: #64748b;">Bubble Wrap Units:</td><td style="font-weight: bold;">${(data.bubbleWrapUnits || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 8px 0; color: #64748b;">Estimated Prep Cost:</td><td style="font-weight: bold; color: #F97316;">$${(data.roi.fbaPrepCost || 0).toLocaleString()}/mo</td></tr>
+      </table>
+    ` : '';
+
     // User email
     const userEmailHtml = `
 <!DOCTYPE html>
@@ -173,8 +195,8 @@ const handler = async (req: Request): Promise<Response> => {
           <div class="stat-label">ROI</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">$${data.roi.costPerUnit}</div>
-          <div class="stat-label">Est. Cost/Unit</div>
+          <div class="stat-value">${isFBAUseCase && data.roi.fbaPrepCost ? '$' + data.roi.fbaPrepCost.toLocaleString() : '$' + data.roi.costPerUnit}</div>
+          <div class="stat-label">${isFBAUseCase && data.roi.fbaPrepCost ? 'Est. Prep Cost' : 'Est. Cost/Unit'}</div>
         </div>
       </div>
       
@@ -185,6 +207,8 @@ const handler = async (req: Request): Promise<Response> => {
         <tr><td style="padding: 8px 0; color: #64748b;">Monthly Volume:</td><td style="font-weight: bold;">${data.roi.monthlyUnits.toLocaleString()} units</td></tr>
         <tr><td style="padding: 8px 0; color: #64748b;">Services Needed:</td><td style="font-weight: bold;">${servicesFormatted}</td></tr>
       </table>
+      
+      ${userFBASection}
       
       <h3 style="color: #0A66C2; margin-top: 30px;">What's Next?</h3>
       <ol style="padding-left: 20px;">
@@ -337,6 +361,34 @@ const handler = async (req: Request): Promise<Response> => {
         <div class="value">${servicesFormatted}</div>
         ${data.specialRequirements.length > 0 ? `<div style="margin-top: 10px;"><div class="label">Special Requirements</div><div class="value">${data.specialRequirements.join(', ')}</div></div>` : ''}
       </div>
+      
+      ${isFBAUseCase && hasFBAData ? `
+      <h3 style="color: #F97316; border-bottom: 2px solid #F97316; padding-bottom: 8px;">📦 FBA/WFS Prep Details</h3>
+      <div class="section" style="background: linear-gradient(135deg, #F9731615 0%, #F9731605 100%);">
+        <div class="grid">
+          <div class="metric" style="background: white;">
+            <div class="metric-val" style="color: #F97316;">${(data.unitsRequiringPrep || 0).toLocaleString()}</div>
+            <div class="label">Units Requiring Prep</div>
+          </div>
+          <div class="metric" style="background: white;">
+            <div class="metric-val" style="color: #F97316;">$${(data.roi.fbaPrepCost || 0).toLocaleString()}</div>
+            <div class="label">Est. Prep Cost</div>
+          </div>
+          <div class="metric" style="background: white;">
+            <div class="metric-val">${(data.fnskuPolybagUnits || 0).toLocaleString()}</div>
+            <div class="label">FNSKU + Polybag</div>
+          </div>
+          <div class="metric" style="background: white;">
+            <div class="metric-val">${(data.bundlingOrders || 0).toLocaleString()}</div>
+            <div class="label">Bundling</div>
+          </div>
+          <div class="metric" style="background: white;">
+            <div class="metric-val">${(data.bubbleWrapUnits || 0).toLocaleString()}</div>
+            <div class="label">Bubble Wrap</div>
+          </div>
+        </div>
+      </div>
+      ` : ''}
       
       <h3 style="color: #22c55e; border-bottom: 2px solid #22c55e; padding-bottom: 8px;">💰 Calculated Savings</h3>
       <div class="section" style="background: linear-gradient(135deg, #22c55e15 0%, #22c55e05 100%);">
