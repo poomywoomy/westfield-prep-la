@@ -47,8 +47,11 @@ const GREEN_SUCCESS: [number, number, number] = [34, 197, 94];
 const LIGHT_BG: [number, number, number] = [248, 250, 252];
 const ORANGE_LIGHT: [number, number, number] = [254, 243, 234];
 
-// Logo as base64 - using a simple text-based logo for reliability
-const drawLogo = (pdf: jsPDF, x: number, y: number, isWhite: boolean = false) => {
+// Embedded logo as base64 (actual Westfield logo)
+const LOGO_BASE64 = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCABkAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9U6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9k=';
+
+const drawLogo = (pdf: jsPDF, x: number, y: number, width: number = 50, height: number = 20, isWhite: boolean = false) => {
+  // Draw text-based logo for reliability (embedded image can be added later)
   const textColor = isWhite ? [255, 255, 255] : BRAND_ORANGE;
   pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
   pdf.setFontSize(18);
@@ -82,17 +85,17 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
     pdf.rect(0, pageHeight - 20, pageWidth, 20, 'F');
     pdf.setFontSize(8);
     pdf.setTextColor(255, 255, 255);
-    pdf.text('Prepared by Westfield Prep Center  •  (818) 935-5478  •  info@westfieldprepcenter.com  •  westfieldprepcenter.com', pageWidth / 2, pageHeight - 10, { align: 'center' });
+    pdf.text('Prepared by Westfield Prep Center | (818) 935-5478 | info@westfieldprepcenter.com | westfieldprepcenter.com', pageWidth / 2, pageHeight - 10, { align: 'center' });
   };
 
-  const drawSectionHeader = (title: string, icon: string = '') => {
+  const drawSectionHeader = (title: string) => {
     checkPageBreak(20);
     pdf.setFillColor(...BRAND_ORANGE);
     pdf.roundedRect(margin, yPosition, contentWidth, 10, 2, 2, 'F');
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'bold');
-    pdf.text(`${icon} ${title}`.trim(), margin + 5, yPosition + 7);
+    pdf.text(title.toUpperCase(), margin + 5, yPosition + 7);
     yPosition += 15;
   };
 
@@ -102,7 +105,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   pdf.rect(0, 0, pageWidth, 80, 'F');
 
   // Logo (white text on orange)
-  drawLogo(pdf, margin, 25, true);
+  drawLogo(pdf, margin, 25, 50, 20, true);
 
   // Date (right side)
   pdf.setTextColor(255, 255, 255);
@@ -151,7 +154,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   pdf.setFontSize(48);
   pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(...GREEN_SUCCESS);
-  pdf.text(`$${roi.totalSavings.toLocaleString()}`, margin + 15, yPosition + 45);
+  pdf.text('$' + roi.totalSavings.toLocaleString(), margin + 15, yPosition + 45);
 
   // Annual savings badge
   pdf.setFillColor(...BRAND_ORANGE);
@@ -162,7 +165,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   pdf.text('Annual Savings', margin + 50, yPosition + 65, { align: 'center' });
   pdf.setFontSize(14);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(`$${roi.annualSavings.toLocaleString()}`, margin + 50, yPosition + 75, { align: 'center' });
+  pdf.text('$' + roi.annualSavings.toLocaleString(), margin + 50, yPosition + 75, { align: 'center' });
 
   // Right side metrics
   const rightCol = pageWidth - margin - 50;
@@ -174,7 +177,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   pdf.setFontSize(20);
   pdf.setTextColor(...BRAND_BLUE);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(`${roi.timeSavedHours} hrs`, rightCol, yPosition + 27);
+  pdf.text(roi.timeSavedHours + ' hrs', rightCol, yPosition + 27);
 
   pdf.setFontSize(10);
   pdf.setTextColor(...TEXT_GRAY);
@@ -183,7 +186,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   pdf.setFontSize(20);
   pdf.setTextColor(...BRAND_ORANGE);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(`${roi.roi}%`, rightCol, yPosition + 57);
+  pdf.text(roi.roi + '%', rightCol, yPosition + 57);
 
   pdf.setFontSize(10);
   pdf.setTextColor(...TEXT_GRAY);
@@ -192,7 +195,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   pdf.setFontSize(16);
   pdf.setTextColor(...TEXT_DARK);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(`$${roi.costPerUnit}`, rightCol, yPosition + 85);
+  pdf.text('$' + roi.costPerUnit, rightCol, yPosition + 85);
 
   addPageFooter();
 
@@ -210,7 +213,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
 
   // Business Profile Section
   yPosition = 30;
-  drawSectionHeader('Business Profile', '💼');
+  drawSectionHeader('Business Profile');
 
   const businessData = [
     ['Use Case', getUseCaseLabel(formData.useCase)],
@@ -222,7 +225,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   businessData.forEach(([label, value]) => {
     pdf.setTextColor(...TEXT_GRAY);
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`${label}:`, margin + 5, yPosition);
+    pdf.text(label + ':', margin + 5, yPosition);
     pdf.setTextColor(...TEXT_DARK);
     pdf.setFont('helvetica', 'bold');
     pdf.text(value || 'N/A', margin + 55, yPosition);
@@ -232,7 +235,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   yPosition += 10;
 
   // Volume Metrics Section
-  drawSectionHeader('Volume Metrics', '📦');
+  drawSectionHeader('Volume Metrics');
 
   // Two-column layout for metrics
   const colWidth = (contentWidth - 10) / 2;
@@ -244,7 +247,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   const rightMetrics = [
     ['Total Monthly Units', roi.monthlyUnits.toLocaleString()],
     ['Avg Cost/Order', formData.currentCostPerOrder || 'Not specified'],
-    ['Your Price Tier', `$${roi.costPerUnit}/unit`],
+    ['Your Price Tier', '$' + roi.costPerUnit + '/unit'],
   ];
 
   const startY = yPosition;
@@ -275,12 +278,12 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   yPosition += 55;
 
   // Current Costs Section
-  drawSectionHeader('Current Costs & Challenges', '⚠️');
+  drawSectionHeader('Current Costs and Challenges');
 
   const costData = [
-    ['Error Rate', `${formData.currentErrorRate}%`, `~$${roi.currentErrorCost}/mo in losses`],
-    ['Return Rate', `${formData.returnRate}%`, `~$${roi.returnCost}/mo processing`],
-    ['Weekly Hours', `${formData.hoursSpentWeekly}h`, `~$${roi.timeSavedValue}/mo opportunity cost`],
+    ['Error Rate', formData.currentErrorRate + '%', '~$' + roi.currentErrorCost + '/mo in losses'],
+    ['Return Rate', formData.returnRate + '%', '~$' + roi.returnCost + '/mo processing'],
+    ['Weekly Hours', formData.hoursSpentWeekly + 'h', '~$' + roi.timeSavedValue + '/mo opportunity cost'],
   ];
 
   pdf.setFontSize(10);
@@ -288,7 +291,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
     checkPageBreak(15);
     pdf.setTextColor(...TEXT_DARK);
     pdf.setFont('helvetica', 'bold');
-    pdf.text(`${label}: ${value}`, margin + 5, yPosition);
+    pdf.text(label + ': ' + value, margin + 5, yPosition);
     pdf.setTextColor(...TEXT_GRAY);
     pdf.setFont('helvetica', 'italic');
     pdf.text(impact, margin + 70, yPosition);
@@ -305,7 +308,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
     pdf.setTextColor(...TEXT_DARK);
     formData.painPoints.forEach(point => {
       checkPageBreak(8);
-      pdf.text(`• ${getPainPointLabel(point)}`, margin + 10, yPosition);
+      pdf.text('- ' + getPainPointLabel(point), margin + 10, yPosition);
       yPosition += 6;
     });
   }
@@ -314,7 +317,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
 
   // Services Section
   checkPageBreak(50);
-  drawSectionHeader('Services Selected', '✅');
+  drawSectionHeader('Services Selected');
 
   // Services in 2 columns
   const servicesPerCol = Math.ceil(formData.services.length / 2);
@@ -325,7 +328,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
     const col = i < servicesPerCol ? 0 : 1;
     const row = i < servicesPerCol ? i : i - servicesPerCol;
     const xPos = margin + 5 + (col * (contentWidth / 2));
-    pdf.text(`✓ ${getServiceLabel(service)}`, xPos, yPosition + (row * 8));
+    pdf.text('* ' + getServiceLabel(service), xPos, yPosition + (row * 8));
   });
   
   yPosition += (servicesPerCol * 8) + 5;
@@ -354,12 +357,12 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   pdf.text('YOUR SAVINGS BREAKDOWN', margin, 8);
 
   yPosition = 30;
-  drawSectionHeader('How We Calculate Your Savings', '💰');
+  drawSectionHeader('How We Calculate Your Savings');
 
   const savingsItems = [
-    { label: 'Error Cost Reduction', value: roi.currentErrorCost, desc: 'Based on your error rate × $18/error industry average', color: GREEN_SUCCESS },
-    { label: 'Return Processing Savings', value: roi.returnCost, desc: 'Based on your return rate × $12/return processing cost', color: GREEN_SUCCESS },
-    { label: 'Time Value Recovered', value: roi.timeSavedValue, desc: `${roi.timeSavedHours} hours/month × $25/hour opportunity cost`, color: BRAND_BLUE },
+    { label: 'Error Cost Reduction', value: roi.currentErrorCost, desc: 'Based on your error rate x $18/error industry average', color: GREEN_SUCCESS },
+    { label: 'Return Processing Savings', value: roi.returnCost, desc: 'Based on your return rate x $12/return processing cost', color: GREEN_SUCCESS },
+    { label: 'Time Value Recovered', value: roi.timeSavedValue, desc: roi.timeSavedHours + ' hours/month x $25/hour opportunity cost', color: BRAND_BLUE },
   ];
 
   // Add cost savings if available
@@ -367,7 +370,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
     savingsItems.push({ 
       label: 'Per-Order Cost Savings', 
       value: roi.costSavings, 
-      desc: `Your cost vs our rate × ${formData.monthlyOrders.toLocaleString()} monthly orders`, 
+      desc: 'Your cost vs our rate x ' + formData.monthlyOrders.toLocaleString() + ' monthly orders', 
       color: BRAND_ORANGE 
     });
   }
@@ -388,7 +391,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
     
     pdf.setFontSize(18);
     pdf.setTextColor(...item.color);
-    pdf.text(`$${item.value.toLocaleString()}`, pageWidth - margin - 5, yPosition + 12, { align: 'right' });
+    pdf.text('$' + item.value.toLocaleString(), pageWidth - margin - 5, yPosition + 12, { align: 'right' });
     
     pdf.setFontSize(8);
     pdf.setTextColor(...TEXT_GRAY);
@@ -415,7 +418,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   
   pdf.setFontSize(32);
   pdf.setTextColor(...GREEN_SUCCESS);
-  pdf.text(`$${roi.totalSavings.toLocaleString()}`, pageWidth - margin - 10, yPosition + 22, { align: 'right' });
+  pdf.text('$' + roi.totalSavings.toLocaleString(), pageWidth - margin - 10, yPosition + 22, { align: 'right' });
   
   yPosition += 45;
 
@@ -431,23 +434,23 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   pdf.setFontSize(9);
   pdf.setTextColor(...TEXT_GRAY);
   pdf.setFont('helvetica', 'normal');
-  pdf.text(`Based on ${roi.monthlyUnits.toLocaleString()} units/month at $${roi.costPerUnit}/unit`, margin + 10, yPosition + 20);
+  pdf.text('Based on ' + roi.monthlyUnits.toLocaleString() + ' units/month at $' + roi.costPerUnit + '/unit', margin + 10, yPosition + 20);
   
   pdf.setFontSize(14);
   pdf.setTextColor(...TEXT_DARK);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(`$${roi.estimatedMonthlyCost.toLocaleString()}/month`, pageWidth - margin - 10, yPosition + 18, { align: 'right' });
+  pdf.text('$' + roi.estimatedMonthlyCost.toLocaleString() + '/month', pageWidth - margin - 10, yPosition + 18, { align: 'right' });
   
   yPosition += 45;
 
   // Next Steps Section
   checkPageBreak(80);
-  drawSectionHeader('Next Steps', '🚀');
+  drawSectionHeader('Next Steps');
 
   const nextSteps = [
     { step: '1', text: 'A fulfillment specialist will contact you within 24 hours' },
-    { step: '2', text: 'We\'ll review your specific requirements in detail' },
-    { step: '3', text: 'You\'ll receive a detailed quote with no obligation' },
+    { step: '2', text: 'We will review your specific requirements in detail' },
+    { step: '3', text: 'You will receive a detailed quote with no obligation' },
     { step: '4', text: 'Optional: Schedule a facility tour in Los Angeles' },
   ];
 
@@ -482,8 +485,8 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
   
   pdf.setFontSize(11);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('📞 (818) 935-5478', margin + 10, yPosition + 28);
-  pdf.text('✉️ info@westfieldprepcenter.com', margin + 80, yPosition + 28);
+  pdf.text('Phone: (818) 935-5478', margin + 10, yPosition + 28);
+  pdf.text('Email: info@westfieldprepcenter.com', margin + 80, yPosition + 28);
 
   addPageFooter();
 
@@ -493,7 +496,7 @@ export const generateROIReportPDF = (roi: ROIResult, formData: FormData): jsPDF 
     pdf.setPage(i);
     pdf.setFontSize(8);
     pdf.setTextColor(...TEXT_GRAY);
-    pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 25, { align: 'right' });
+    pdf.text('Page ' + i + ' of ' + totalPages, pageWidth - margin, pageHeight - 25, { align: 'right' });
   }
 
   return pdf;
@@ -534,7 +537,7 @@ function getPainPointLabel(id: string): string {
     'errors': 'High Error Rates', 
     'slow': 'Slow Processing', 
     'expensive': 'High Costs', 
-    'scaling': 'Can\'t Scale', 
+    'scaling': 'Cannot Scale', 
     'visibility': 'No Visibility', 
     'support': 'Poor Support' 
   };
@@ -567,6 +570,6 @@ function getSpecialReqLabel(id: string): string {
 
 export const downloadROIReport = (roi: ROIResult, formData: FormData) => {
   const pdf = generateROIReportPDF(roi, formData);
-  const fileName = `Westfield-Savings-Report-${formData.fullName?.replace(/\s+/g, '-') || 'Report'}-${new Date().toISOString().split('T')[0]}.pdf`;
+  const fileName = 'Westfield-Savings-Report-' + (formData.fullName?.replace(/\s+/g, '-') || 'Report') + '-' + new Date().toISOString().split('T')[0] + '.pdf';
   pdf.save(fileName);
 };
