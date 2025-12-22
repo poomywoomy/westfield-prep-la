@@ -219,8 +219,8 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     const totalSavings = currentErrorCost + returnCost + timeSavedValue + costSavings;
     const netBenefit = totalSavings - estimatedMonthlyCost;
     
-    // ROI now includes cost savings even if time = 0
-    const roi = estimatedMonthlyCost > 0 ? ((costSavings + timeSavedValue) / estimatedMonthlyCost) * 100 : 0;
+    // ROI includes ALL savings (error cost + return cost + time value + cost savings)
+    const roi = estimatedMonthlyCost > 0 ? (totalSavings / estimatedMonthlyCost) * 100 : 0;
     const annualSavings = totalSavings * 12;
 
     return {
@@ -685,114 +685,135 @@ const StepVolumeProducts = ({ formData, setFormData, roi }: {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   roi: ROIResult;
-}) => (
-  <div className="space-y-6">
-    <div className="text-center mb-6">
-      <h3 className="text-2xl font-bold mb-2">Volume Details</h3>
-      <p className="text-muted-foreground">This determines your pricing tier</p>
-    </div>
-    
-    <div className="grid md:grid-cols-2 gap-6">
+}) => {
+  const [isHighVolumeMode, setIsHighVolumeMode] = useState(formData.monthlyOrders >= 10000);
+  
+  const handleOrdersChange = (value: number) => {
+    // Check if we need to switch modes
+    if (!isHighVolumeMode && value >= 10000) {
+      setIsHighVolumeMode(true);
+    } else if (isHighVolumeMode && value < 10000) {
+      setIsHighVolumeMode(false);
+    }
+    setFormData(prev => ({ ...prev, monthlyOrders: value }));
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h3 className="text-2xl font-bold mb-2">Volume Details</h3>
+        <p className="text-muted-foreground">This determines your pricing tier</p>
+      </div>
+      
+      {/* Monthly Orders - Full Width Standalone */}
       <div className="space-y-3">
-        <Label className="flex justify-between">
-          <span>Monthly Orders</span>
+        <Label className="flex justify-between items-center">
+          <span className="text-lg font-semibold">Monthly Orders</span>
+          {isHighVolumeMode && (
+            <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
+              High-volume range unlocked
+            </span>
+          )}
         </Label>
         <div className="flex items-center gap-3">
           <Slider
             value={[formData.monthlyOrders]}
-            onValueChange={([value]) => setFormData(prev => ({ ...prev, monthlyOrders: value }))}
-            min={50}
-            max={50000}
-            step={50}
+            onValueChange={([value]) => handleOrdersChange(value)}
+            min={isHighVolumeMode ? 10000 : 10}
+            max={isHighVolumeMode ? 100000 : 10000}
+            step={isHighVolumeMode ? 1000 : 50}
             className="py-4 flex-1"
           />
           <Input
             type="number"
             value={formData.monthlyOrders}
             onChange={(e) => {
-              const value = Math.max(50, Math.min(50000, parseInt(e.target.value) || 50));
-              setFormData(prev => ({ ...prev, monthlyOrders: value }));
+              const value = Math.max(10, Math.min(100000, parseInt(e.target.value) || 10));
+              handleOrdersChange(value);
             }}
-            className="w-24 h-10 text-center font-semibold"
+            className="w-28 h-12 text-center font-bold text-lg"
           />
         </div>
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>50</span>
-          <span>50,000+</span>
+          <span>{isHighVolumeMode ? '10,000' : '10'}</span>
+          <span>{isHighVolumeMode ? '100,000+' : '10,000'}</span>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <Label className="flex justify-between">
-          <span>Avg Units per Order</span>
-        </Label>
-        <div className="flex items-center gap-3">
-          <Slider
-            value={[formData.avgUnitsPerOrder]}
-            onValueChange={([value]) => setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }))}
-            min={1}
-            max={20}
-            step={0.5}
-            className="py-4 flex-1"
-          />
-          <Input
-            type="number"
-            value={formData.avgUnitsPerOrder}
-            onChange={(e) => {
-              const value = Math.max(1, Math.min(20, parseFloat(e.target.value) || 1));
-              setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }));
-            }}
-            step="0.5"
-            className="w-24 h-10 text-center font-semibold"
-          />
+      {/* Second Row: Units per Order + SKU Count */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="space-y-3">
+          <Label className="flex justify-between">
+            <span>Avg Units per Order</span>
+          </Label>
+          <div className="flex items-center gap-3">
+            <Slider
+              value={[formData.avgUnitsPerOrder]}
+              onValueChange={([value]) => setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }))}
+              min={1}
+              max={20}
+              step={0.5}
+              className="py-4 flex-1"
+            />
+            <Input
+              type="number"
+              value={formData.avgUnitsPerOrder}
+              onChange={(e) => {
+                const value = Math.max(1, Math.min(20, parseFloat(e.target.value) || 1));
+                setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }));
+              }}
+              step="0.5"
+              className="w-24 h-10 text-center font-semibold"
+            />
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>1</span>
+            <span>20</span>
+          </div>
         </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>1</span>
-          <span>20</span>
+
+        <div className="space-y-3">
+          <Label className="flex justify-between">
+            <span>SKU Count</span>
+          </Label>
+          <div className="flex items-center gap-3">
+            <Slider
+              value={[formData.skuCount]}
+              onValueChange={([value]) => setFormData(prev => ({ ...prev, skuCount: value }))}
+              min={1}
+              max={250}
+              step={5}
+              className="py-4 flex-1"
+            />
+            <Input
+              type="number"
+              value={formData.skuCount}
+              onChange={(e) => {
+                const value = Math.max(1, Math.min(250, parseInt(e.target.value) || 1));
+                setFormData(prev => ({ ...prev, skuCount: value }));
+              }}
+              className="w-24 h-10 text-center font-semibold"
+            />
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>1</span>
+            <span>250+</span>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-3 md:col-span-2">
-        <Label className="flex justify-between">
-          <span>SKU Count</span>
-        </Label>
-        <div className="flex items-center gap-3">
-          <Slider
-            value={[formData.skuCount]}
-            onValueChange={([value]) => setFormData(prev => ({ ...prev, skuCount: value }))}
-            min={1}
-            max={500}
-            step={5}
-            className="py-4 flex-1"
-          />
-          <Input
-            type="number"
-            value={formData.skuCount}
-            onChange={(e) => {
-              const value = Math.max(1, Math.min(500, parseInt(e.target.value) || 1));
-              setFormData(prev => ({ ...prev, skuCount: value }));
-            }}
-            className="w-24 h-10 text-center font-semibold"
-          />
-        </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>1</span>
-          <span>500+</span>
+      {/* Volume Preview */}
+      <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 mt-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm">Monthly Volume</span>
+          <span className="text-xl font-bold text-secondary">
+            {roi.monthlyUnits.toLocaleString()} units
+          </span>
         </div>
       </div>
     </div>
-
-    {/* Volume Preview */}
-    <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 mt-4">
-      <div className="flex items-center justify-between">
-        <span className="text-sm">Monthly Volume</span>
-        <span className="text-xl font-bold text-secondary">
-          {roi.monthlyUnits.toLocaleString()} units
-        </span>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 
 const StepPainPoints = ({ formData, setFormData, handleToggle }: {
