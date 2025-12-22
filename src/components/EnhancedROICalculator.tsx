@@ -229,38 +229,40 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     }
   }, [formData.currentFulfillment]);
 
-  // Calculate FBA Prep Cost with ADDITIVE per-unit pricing
+  // Calculate FBA Prep Cost with SINGLE ADDITIVE per-unit pricing
+  // CORRECT MODEL: perUnitRate = baseRate + bundleAddon + bubbleAddon
+  // Total = fnskuPolybagUnits × perUnitRate
   const calculateFBAPrepCost = useCallback(() => {
     const { polybagRate, bundleRate, bubbleRate, tierName } = getFBAPricingTier(formData.unitsRequiringPrep);
     
-    // FNSKU+Polybag is the base service - charged per unit at polybag rate
-    const fnskuCost = formData.fnskuPolybagUnits * polybagRate;
+    // Base rate from tier (FNSKU + Polybag)
+    const baseRate = polybagRate;
     
-    // Bundling and Bubble Wrap are ADDITIVE services - charged per unit at their rates
-    // These add to the per-unit cost when applied, not replace it
-    const bundlingCost = formData.bundlingOrders * bundleRate;
-    const bubbleCost = formData.bubbleWrapUnits * bubbleRate;
-    
-    // Total prep cost is the sum of all services
-    const totalPrepCost = fnskuCost + bundlingCost + bubbleCost;
-    
-    // Calculate effective per-unit price when all services are applied (for display)
+    // Bundling and Bubble Wrap ADD to the per-unit price (boolean add-ons)
     const hasBundling = formData.bundlingOrders > 0;
     const hasBubbleWrap = formData.bubbleWrapUnits > 0;
-    const effectivePerUnitPrice = polybagRate 
+    
+    // Build single per-unit rate with additive services
+    const perUnitRate = baseRate 
       + (hasBundling ? bundleRate : 0)
       + (hasBubbleWrap ? bubbleRate : 0);
     
+    // Total prep cost = fnskuPolybagUnits × perUnitRate
+    const totalPrepCost = formData.fnskuPolybagUnits * perUnitRate;
+    
     return {
-      fnskuCost,
-      bundlingCost,
-      bubbleCost,
+      fnskuCost: formData.fnskuPolybagUnits * baseRate,
+      bundlingCost: hasBundling ? formData.fnskuPolybagUnits * bundleRate : 0,
+      bubbleCost: hasBubbleWrap ? formData.fnskuPolybagUnits * bubbleRate : 0,
       totalPrepCost,
       polybagRate,
       bundleRate,
       bubbleRate,
       tierName,
-      effectivePerUnitPrice,
+      effectivePerUnitPrice: perUnitRate,
+      baseRate,
+      bundleAddOn: hasBundling ? bundleRate : 0,
+      bubbleAddOn: hasBubbleWrap ? bubbleRate : 0,
     };
   }, [formData.unitsRequiringPrep, formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits]);
 
@@ -456,9 +458,12 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
 
       if (emailError) {
         console.error("Email error:", emailError);
+        toast.error("We couldn't send your estimate email. Please try again or contact us directly.");
+        setIsSubmitting(false);
+        return;
       }
 
-      logAnalyticsEvent("form_submit_success", { 
+      logAnalyticsEvent("form_submit_success", {
         useCase: formData.useCase,
         businessStage: formData.businessStage,
         monthlyOrders: formData.monthlyOrders,
@@ -1762,23 +1767,16 @@ const LiveResultsSidebar = ({ roi, formData, showResults }: {
           
           <div className="bg-muted/50 rounded-xl p-3">
             <p className="text-xs text-muted-foreground mb-1">
-              {isFBAUseCase ? "Prep Cost" : "Cost/Unit"}
+              {isFBAUseCase ? "Est. Monthly Prep Cost" : "Est. Monthly Fulfillment Cost"}
             </p>
             <p className="text-lg font-bold">
-              {isFBAUseCase 
-                ? `$${(roi.fbaPrepCost || 0).toLocaleString()}`
-                : `$${roi.costPerUnit}`
-              }
+              ${(isFBAUseCase 
+                ? (roi.fbaPrepCost || 0) 
+                : roi.estimatedMonthlyCost
+              ).toLocaleString()}
             </p>
           </div>
         </div>
-
-        {/* Show pricing tier for FBA - tier name only, no label */}
-        {isFBAUseCase && roi.fbaTierName && (
-          <div className="bg-secondary/10 border border-secondary/20 rounded-lg p-3 text-center">
-            <p className="text-sm font-semibold text-secondary">{roi.fbaTierName}</p>
-          </div>
-        )}
 
         <div className="border-t border-border pt-4 mt-4">
           <p className="text-xs text-muted-foreground mb-1">Annual Savings Potential</p>
