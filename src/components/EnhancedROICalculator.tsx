@@ -196,8 +196,11 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     const monthlyUnits = formData.monthlyOrders * formData.avgUnitsPerOrder;
     const currentErrorCost = monthlyUnits * (formData.currentErrorRate / 100) * 18;
     const returnCost = monthlyUnits * (formData.returnRate / 100) * 12;
+    
+    // Time savings calculation
     const timeSavedHours = formData.hoursSpentWeekly * 4 * 0.85;
-    const timeSavedValue = timeSavedHours * 30;
+    const hourlyRate = 25;
+    const timeSavedValue = timeSavedHours * hourlyRate;
     
     // Order-volume-based pricing tiers (per order, not per unit)
     let costPerUnit: number;
@@ -206,10 +209,18 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     else if (formData.monthlyOrders < 5000) costPerUnit = 2.00;
     else costPerUnit = 1.50;
     
+    // Cost savings calculation (user's cost vs our cost per order)
+    const userCostPerOrder = parseFloat(formData.currentCostPerOrder.replace(/[^0-9.]/g, '')) || 0;
+    const ourCostPerOrder = costPerUnit * formData.avgUnitsPerOrder;
+    const costSavingsPerOrder = Math.max(0, userCostPerOrder - ourCostPerOrder);
+    const costSavings = costSavingsPerOrder * formData.monthlyOrders;
+    
     const estimatedMonthlyCost = monthlyUnits * costPerUnit;
-    const totalSavings = currentErrorCost + returnCost + timeSavedValue;
+    const totalSavings = currentErrorCost + returnCost + timeSavedValue + costSavings;
     const netBenefit = totalSavings - estimatedMonthlyCost;
-    const roi = estimatedMonthlyCost > 0 ? ((netBenefit) / estimatedMonthlyCost) * 100 : 0;
+    
+    // ROI now includes cost savings even if time = 0
+    const roi = estimatedMonthlyCost > 0 ? ((costSavings + timeSavedValue) / estimatedMonthlyCost) * 100 : 0;
     const annualSavings = totalSavings * 12;
 
     return {
@@ -218,6 +229,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
       returnCost: Math.round(returnCost),
       timeSavedHours: Math.round(timeSavedHours),
       timeSavedValue: Math.round(timeSavedValue),
+      costSavings: Math.round(costSavings),
       estimatedMonthlyCost: Math.round(estimatedMonthlyCost),
       totalSavings: Math.round(totalSavings),
       netBenefit: Math.round(netBenefit),
@@ -379,10 +391,10 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
             <div className="backdrop-blur-xl bg-background/90 border border-border/50 rounded-3xl p-6 md:p-8 shadow-2xl">
               {/* Progress Steps */}
               {!showResults && (
-                <div className="flex justify-between mb-8 relative overflow-x-auto pb-2">
-                  <div className="absolute top-5 left-0 right-0 h-0.5 bg-muted -z-10 min-w-full" />
+                <div className="flex justify-between mb-8 relative overflow-x-auto pb-2 pt-2">
+                  <div className="absolute top-7 left-0 right-0 h-0.5 bg-muted -z-10 min-w-full" />
                   <div 
-                    className="absolute top-5 left-0 h-0.5 bg-secondary -z-10 transition-all duration-500"
+                    className="absolute top-7 left-0 h-0.5 bg-secondary -z-10 transition-all duration-500"
                     style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
                   />
                   
@@ -720,16 +732,17 @@ const StepVolumeProducts = ({ formData, setFormData, roi }: {
             onValueChange={([value]) => setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }))}
             min={1}
             max={20}
-            step={1}
+            step={0.5}
             className="py-4 flex-1"
           />
           <Input
             type="number"
             value={formData.avgUnitsPerOrder}
             onChange={(e) => {
-              const value = Math.max(1, Math.min(20, parseInt(e.target.value) || 1));
+              const value = Math.max(1, Math.min(20, parseFloat(e.target.value) || 1));
               setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }));
             }}
+            step="0.5"
             className="w-24 h-10 text-center font-semibold"
           />
         </div>
@@ -827,7 +840,9 @@ const StepPainPoints = ({ formData, setFormData, handleToggle }: {
       <div className="space-y-3">
         <Label className="flex justify-between">
           <span>Hours Spent on Fulfillment (Weekly)</span>
-          <span className="text-secondary font-semibold">{formData.hoursSpentWeekly}h</span>
+          <span className={`font-semibold ${formData.currentFulfillment === "other-3pl" ? "text-muted-foreground" : "text-secondary"}`}>
+            {formData.hoursSpentWeekly}h
+          </span>
         </Label>
         <Slider
           value={[formData.hoursSpentWeekly]}
@@ -835,8 +850,14 @@ const StepPainPoints = ({ formData, setFormData, handleToggle }: {
           min={0}
           max={60}
           step={1}
-          className="py-4"
+          className={`py-4 ${formData.currentFulfillment === "other-3pl" ? "opacity-50 cursor-not-allowed" : ""}`}
+          disabled={formData.currentFulfillment === "other-3pl"}
         />
+        {formData.currentFulfillment === "other-3pl" && (
+          <p className="text-xs text-muted-foreground italic">
+            Time is near-zero when outsourcing to a 3PL
+          </p>
+        )}
       </div>
 
       <div className="space-y-3">
