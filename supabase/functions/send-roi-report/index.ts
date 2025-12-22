@@ -187,11 +187,13 @@ const handler = async (req: Request): Promise<Response> => {
 <body>
   <div class="container">
     <div class="header">
-      <img 
-        src="https://westfieldprepcenter.com/westfield-logo.png" 
-        alt="Westfield Prep Center" 
-        style="max-width: 180px; height: auto; margin-bottom: 15px;"
-      />
+      <a href="https://westfieldprepcenter.com" target="_blank" style="display: inline-block;">
+        <img 
+          src="https://westfieldprepcenter.com/westfield-logo.png" 
+          alt="Westfield Prep Center" 
+          style="max-width: 180px; height: auto; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px;"
+        />
+      </a>
       <h1 style="margin: 0; font-size: 26px;">Your Savings Report is Ready!</h1>
       <p style="margin: 10px 0 0; opacity: 0.9;">Your Personalized 3PL Savings Estimate</p>
     </div>
@@ -225,15 +227,23 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
       </div>
       
-      <h3 style="color: #0A66C2; margin-top: 30px;">Your Profile Summary</h3>
+      <h3 style="color: #0A66C2; margin-top: 30px;">Your Business Profile</h3>
       <table style="width: 100%; border-collapse: collapse;">
         <tr><td style="padding: 8px 0; color: #64748b;">Use Case:</td><td style="font-weight: bold;">${useCaseLabels[data.useCase] || data.useCase}</td></tr>
         <tr><td style="padding: 8px 0; color: #64748b;">Business Stage:</td><td style="font-weight: bold;">${businessStageLabels[data.businessStage] || data.businessStage}</td></tr>
+        <tr><td style="padding: 8px 0; color: #64748b;">Current Fulfillment:</td><td style="font-weight: bold;">${currentFulfillmentFormatted}</td></tr>
         <tr><td style="padding: 8px 0; color: #64748b;">Monthly Volume:</td><td style="font-weight: bold;">${data.roi.monthlyUnits.toLocaleString()} units</td></tr>
+        <tr><td style="padding: 8px 0; color: #64748b;">Pain Points:</td><td style="font-weight: bold;">${painPointsFormatted}</td></tr>
         <tr><td style="padding: 8px 0; color: #64748b;">Services Needed:</td><td style="font-weight: bold;">${servicesFormatted}</td></tr>
       </table>
       
       ${userFBASection}
+      
+      <div style="background: #fef3c7; border-left: 4px solid #F97316; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+        <p style="margin: 0; font-size: 14px;">
+          💡 <strong>You may qualify for additional per-unit discounts</strong> — just reach out to explore custom pricing!
+        </p>
+      </div>
       
       <h3 style="color: #0A66C2; margin-top: 30px;">What's Next?</h3>
       <ol style="padding-left: 20px;">
@@ -243,7 +253,7 @@ const handler = async (req: Request): Promise<Response> => {
       </ol>
       
       <center>
-        <a href="https://westfieldprepcenter.com/contact" class="button">Schedule a Call →</a>
+        <a href="https://calendly.com/westfieldprepcenter/30min" class="button" target="_blank">Schedule a Call →</a>
       </center>
       
       <p style="margin-top: 30px; color: #64748b; font-size: 13px;">
@@ -284,7 +294,7 @@ const handler = async (req: Request): Promise<Response> => {
 <body>
   <div class="container">
     <div class="header">
-      <h2 style="margin: 0;">🎯 New High-Intent Lead from ROI Calculator</h2>
+      <h2 style="margin: 0;">New High-Intent Lead from ROI Calculator</h2>
     </div>
     
     <div class="content">
@@ -415,7 +425,7 @@ const handler = async (req: Request): Promise<Response> => {
       </div>
       ` : ''}
       
-      <h3 style="color: #22c55e; border-bottom: 2px solid #22c55e; padding-bottom: 8px;">💰 Calculated Savings</h3>
+      <h3 style="color: #22c55e; border-bottom: 2px solid #22c55e; padding-bottom: 8px;">Calculated Savings</h3>
       <div class="section" style="background: linear-gradient(135deg, #22c55e15 0%, #22c55e05 100%);">
         <div class="grid">
           <div class="metric" style="background: white;">
@@ -487,7 +497,7 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Westfield Leads <info@westfieldprepcenter.com>",
         to: ["info@westfieldprepcenter.com"],
-        subject: `New ROI Lead: ${safeFullName} - $${data.roi.totalSavings.toLocaleString()}/mo Potential Savings`,
+        subject: `New Lead: ${safeFullName} | ${useCaseLabels[data.useCase] || data.useCase} | $${data.roi.totalSavings.toLocaleString()}/mo`,
         html: adminEmailHtml,
       }),
     });
