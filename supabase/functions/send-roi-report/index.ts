@@ -126,6 +126,26 @@ const handler = async (req: Request): Promise<Response> => {
 
     const servicesFormatted = data.services.map(s => serviceLabels[s] || s).join(', ') || 'None selected';
 
+    // Label mappings for currentFulfillment
+    const currentFulfillmentLabels: Record<string, string> = {
+      'self': 'Self-Fulfilled',
+      'other-3pl': 'Using Another 3PL',
+      'hybrid': 'Hybrid (Self + 3PL)',
+    };
+
+    // Label mappings for pain points
+    const painPointLabels: Record<string, string> = {
+      'errors': 'High Error Rates',
+      'slow': 'Slow Processing',
+      'expensive': 'High Costs',
+      'scaling': "Can't Scale",
+      'visibility': 'No Visibility',
+      'support': 'Poor Support',
+    };
+
+    const painPointsFormatted = data.painPoints.map(p => painPointLabels[p] || p).join(', ') || 'None selected';
+    const currentFulfillmentFormatted = currentFulfillmentLabels[data.currentFulfillment] || data.currentFulfillment;
+
     // Check if this is an FBA/WFS or Multi-Channel use case
     const isFBAUseCase = data.useCase === 'amazon' || data.useCase === 'multi-channel';
     const hasFBAData = (data.fnskuPolybagUnits || 0) > 0 || (data.bundlingOrders || 0) > 0 || (data.bubbleWrapUnits || 0) > 0;
@@ -167,8 +187,13 @@ const handler = async (req: Request): Promise<Response> => {
 <body>
   <div class="container">
     <div class="header">
-      <h1 style="margin: 0; font-size: 26px;">Your Savings Report is Ready! 📊</h1>
-      <p style="margin: 10px 0 0; opacity: 0.9;">Westfield Prep Center</p>
+      <img 
+        src="https://westfieldprepcenter.com/westfield-logo.png" 
+        alt="Westfield Prep Center" 
+        style="max-width: 180px; height: auto; margin-bottom: 15px;"
+      />
+      <h1 style="margin: 0; font-size: 26px;">Your Savings Report is Ready!</h1>
+      <p style="margin: 10px 0 0; opacity: 0.9;">Your Personalized 3PL Savings Estimate</p>
     </div>
     
     <div class="content">
@@ -303,7 +328,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           <div>
             <div class="label">Current Fulfillment</div>
-            <div class="value">${data.currentFulfillment}</div>
+            <div class="value">${currentFulfillmentFormatted}</div>
           </div>
           <div>
             <div class="label">Product Type</div>
@@ -351,7 +376,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           <div>
             <div class="label">Key Pain Points</div>
-            <div class="value">${data.painPoints.join(', ') || 'None selected'}</div>
+            <div class="value">${painPointsFormatted}</div>
           </div>
         </div>
       </div>
@@ -424,7 +449,12 @@ const handler = async (req: Request): Promise<Response> => {
 </body>
 </html>`;
 
-    // Send user email
+    // Send user email with proper subject
+    let userEmailFailed = false;
+    let adminEmailFailed = false;
+    let userEmailError = '';
+    let adminEmailError = '';
+
     const userEmailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -434,14 +464,15 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Westfield Prep Center <info@westfieldprepcenter.com>",
         to: [data.email],
-        subject: `Your Savings Report: $${data.roi.totalSavings.toLocaleString()}/month Potential 📊`,
+        subject: "Your Westfield Prep Center Savings Estimate",
         html: userEmailHtml,
       }),
     });
 
     if (!userEmailResponse.ok) {
-      const errorData = await userEmailResponse.text();
-      console.error("User email error:", userEmailResponse.status, errorData);
+      userEmailFailed = true;
+      userEmailError = await userEmailResponse.text();
+      console.error("User email error:", userEmailResponse.status, userEmailError);
     } else {
       console.log("User email sent successfully to:", data.email);
     }
@@ -456,16 +487,32 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Westfield Leads <info@westfieldprepcenter.com>",
         to: ["info@westfieldprepcenter.com"],
-        subject: `🎯 New ROI Lead: ${safeFullName} - $${data.roi.totalSavings.toLocaleString()}/mo savings`,
+        subject: `New ROI Lead: ${safeFullName} - $${data.roi.totalSavings.toLocaleString()}/mo Potential Savings`,
         html: adminEmailHtml,
       }),
     });
 
     if (!adminEmailResponse.ok) {
-      const errorData = await adminEmailResponse.text();
-      console.error("Admin email error:", adminEmailResponse.status, errorData);
+      adminEmailFailed = true;
+      adminEmailError = await adminEmailResponse.text();
+      console.error("Admin email error:", adminEmailResponse.status, adminEmailError);
     } else {
       console.log("Admin notification sent successfully");
+    }
+
+    // Return error if any email failed
+    if (userEmailFailed || adminEmailFailed) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Email delivery failed",
+          failedEmails: {
+            user: userEmailFailed ? userEmailError : null,
+            admin: adminEmailFailed ? adminEmailError : null
+          }
+        }),
+        { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
     return new Response(
