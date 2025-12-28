@@ -28,7 +28,8 @@ import {
   FileText,
   Tag,
   Boxes,
-  ShieldCheck
+  ShieldCheck,
+  Layers
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -1068,8 +1069,16 @@ const StepVolumeProductsFBA = ({ formData, setFormData, fbaPrepCost }: {
         </div>
       </div>
 
-      {/* Prep Services Grid - Independent sliders (no caps) */}
-      <div className="grid md:grid-cols-3 gap-4">
+      {/* Prep Services Applied to Units */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Layers className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Prep Services Applied to Units</span>
+        </div>
+        <p className="text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
+          💡 Note: Some units may require multiple services. Totals across categories may exceed units requiring prep due to service overlap.
+        </p>
+        <div className="grid md:grid-cols-3 gap-4">
         {/* FNSKU + Polybag */}
         <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
           <Label className="flex items-center gap-2">
@@ -1143,6 +1152,7 @@ const StepVolumeProductsFBA = ({ formData, setFormData, fbaPrepCost }: {
             onChange={(e) => handleBubbleChange(parseInt(e.target.value) || 0)}
             className="w-full h-10 text-center font-semibold"
           />
+        </div>
         </div>
       </div>
 
@@ -1348,7 +1358,14 @@ const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, fbaPrepCos
           </div>
         </div>
 
-        {/* Prep Services Grid - Independent sliders (no caps) */}
+        {/* Prep Services Applied to Units */}
+        <div className="flex items-center gap-2 mb-1">
+          <Layers className="w-3 h-3 text-muted-foreground" />
+          <span className="text-xs font-medium">Prep Services Applied to Units</span>
+        </div>
+        <p className="text-xs text-muted-foreground bg-muted/50 rounded-lg p-2 mb-3">
+          💡 Totals may exceed units requiring prep due to service overlap (e.g., same unit gets FNSKU + bundling).
+        </p>
         <div className="grid md:grid-cols-3 gap-3">
           <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
             <Label className="text-sm flex items-center gap-1">
