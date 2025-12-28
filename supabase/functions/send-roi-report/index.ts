@@ -162,52 +162,243 @@ const handler = async (req: Request): Promise<Response> => {
       </table>
     ` : '';
 
-    // User email
+    // Determine ROI color based on positive/negative
+    const roiColor = data.roi.roiPercent >= 0 ? '#22c55e' : '#ef4444';
+    const roiSign = data.roi.roiPercent >= 0 ? '+' : '';
+
+    // User email - Premium redesigned template
     const userEmailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; }
-    .header { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); color: white; padding: 30px; text-align: center; }
-    .content { background: #ffffff; padding: 30px; }
-    .metric-box { background: linear-gradient(135deg, #22c55e15 0%, #22c55e05 100%); border: 1px solid #22c55e30; border-radius: 12px; padding: 25px; margin: 20px 0; text-align: center; }
-    .metric-value { font-size: 42px; font-weight: bold; color: #22c55e; }
-    .metric-label { font-size: 14px; color: #64748b; margin-top: 5px; }
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
-    .stat-box { background: #f8fafc; border-radius: 8px; padding: 15px; text-align: center; }
-    .stat-value { font-size: 24px; font-weight: bold; color: #0A66C2; }
-    .stat-label { font-size: 12px; color: #64748b; }
-    .button { display: inline-block; background: #F97316; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
-    .footer { background: #1e293b; color: #94a3b8; padding: 25px; text-align: center; font-size: 12px; }
-    .footer a { color: #F97316; }
+    body { 
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; 
+      line-height: 1.6; 
+      color: #333; 
+      margin: 0; 
+      padding: 0; 
+      background-color: #f8fafc;
+    }
+    .container { max-width: 640px; margin: 0 auto; background: #ffffff; }
+    .header { 
+      background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); 
+      color: white; 
+      padding: 40px 30px; 
+      text-align: center; 
+    }
+    .logo-container {
+      background: white;
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .content { background: #ffffff; padding: 40px 30px; }
+    
+    /* Hero Savings Box */
+    .hero-savings {
+      background: linear-gradient(135deg, #22c55e15 0%, #22c55e08 100%);
+      border: 2px solid #22c55e40;
+      border-radius: 20px;
+      padding: 35px 25px;
+      margin: 30px 0;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.12);
+    }
+    .hero-savings-label { 
+      font-size: 14px; 
+      color: #64748b; 
+      text-transform: uppercase; 
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    .hero-savings-value { 
+      font-size: 52px; 
+      font-weight: 800; 
+      color: #22c55e; 
+      margin: 12px 0;
+      line-height: 1.1;
+    }
+    .hero-savings-sublabel { 
+      font-size: 13px; 
+      color: #94a3b8; 
+    }
+    
+    /* ROI Badge */
+    .roi-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 15px;
+    }
+    
+    /* Stats Grid */
+    .stats-grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 16px; 
+      margin: 25px 0; 
+    }
+    .stat-box { 
+      background: #f8fafc; 
+      border: 1px solid #e2e8f0;
+      border-radius: 16px; 
+      padding: 20px; 
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .stat-value { 
+      font-size: 28px; 
+      font-weight: 700; 
+      color: #0A66C2; 
+    }
+    .stat-label { 
+      font-size: 12px; 
+      color: #64748b; 
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+    
+    /* Section Cards */
+    .section-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .section-heading {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0A66C2;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .section-table td {
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+    .section-table tr:last-child td {
+      border-bottom: none;
+    }
+    .section-table td:first-child {
+      color: #64748b;
+    }
+    .section-table td:last-child {
+      font-weight: 600;
+      text-align: right;
+    }
+    
+    /* CTA Button */
+    .cta-button {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+      color: white;
+      padding: 18px 32px;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 17px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+      margin: 30px 0;
+    }
+    
+    /* Promo Banner */
+    .promo-banner {
+      background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+      border-left: 4px solid #F97316;
+      padding: 20px;
+      margin: 25px 0;
+      border-radius: 0 12px 12px 0;
+    }
+    .promo-banner p {
+      margin: 0;
+      font-size: 14px;
+      color: #92400e;
+    }
+    .promo-banner strong {
+      color: #78350f;
+    }
+    
+    /* Footer */
+    .footer { 
+      background: #1e293b; 
+      color: #94a3b8; 
+      padding: 30px; 
+      text-align: center; 
+      font-size: 13px; 
+    }
+    .footer a { 
+      color: #F97316; 
+      text-decoration: none;
+    }
+    .footer-links {
+      margin-top: 15px;
+    }
+    .footer-links a {
+      margin: 0 12px;
+    }
+    
+    /* Mobile Responsive */
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; }
+      .content { padding: 25px 20px !important; }
+      .header { padding: 30px 20px !important; }
+      .hero-savings-value { font-size: 42px !important; }
+      .stats-grid { grid-template-columns: 1fr !important; }
+      .stat-value { font-size: 24px !important; }
+      .section-card { padding: 18px !important; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Header with Logo -->
     <div class="header">
-      <a href="https://westfieldprepcenter.com" target="_blank" style="display: inline-block;">
-        <img 
-          src="https://westfieldprepcenter.com/westfield-logo.png" 
-          alt="Westfield Prep Center" 
-          style="max-width: 180px; height: auto; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px;"
-        />
-      </a>
-      <h1 style="margin: 0; font-size: 26px;">Your Savings Report is Ready!</h1>
-      <p style="margin: 10px 0 0; opacity: 0.9;">Your Personalized 3PL Savings Estimate</p>
+      <div class="logo-container">
+        <a href="https://westfieldprepcenter.com" target="_blank" style="display: inline-block;">
+          <img 
+            src="https://westfieldprepcenter.com/westfield-logo.png" 
+            alt="Westfield Prep Center" 
+            style="max-width: 200px; height: auto; display: block;"
+          />
+        </a>
+      </div>
+      <h1 style="margin: 0; font-size: 28px; font-weight: 800;">Your Savings Report is Ready</h1>
+      <p style="margin: 12px 0 0; opacity: 0.9; font-size: 16px;">Based on your selections, here's what we've calculated</p>
     </div>
     
     <div class="content">
-      <p>Hi ${safeFullName},</p>
+      <p style="font-size: 16px; margin-bottom: 5px;">Hi ${safeFullName},</p>
+      <p style="color: #64748b; font-size: 15px; margin-top: 0;">Thank you for using our 3PL Savings Calculator! Here's your personalized estimate:</p>
       
-      <p>Thank you for using our 3PL Savings Calculator! Based on your inputs, here's what you could save by partnering with Westfield:</p>
-      
-      <div class="metric-box">
-        <div class="metric-label">Estimated Monthly Savings</div>
-        <div class="metric-value">$${data.roi.totalSavings.toLocaleString()}</div>
+      <!-- Hero Savings Box -->
+      <div class="hero-savings">
+        <div class="hero-savings-label">Estimated Monthly Savings</div>
+        <div class="hero-savings-value">$${data.roi.totalSavings.toLocaleString()}</div>
+        <div class="hero-savings-sublabel">Based on ${data.roi.monthlyUnits.toLocaleString()} units/month</div>
+        <div class="roi-badge" style="background: ${roiColor}20; color: ${roiColor};">
+          ${roiSign}${data.roi.roiPercent}% ROI
+        </div>
       </div>
       
+      <!-- Stats Grid -->
       <div class="stats-grid">
         <div class="stat-box">
           <div class="stat-value">$${data.roi.annualSavings.toLocaleString()}</div>
@@ -218,55 +409,88 @@ const handler = async (req: Request): Promise<Response> => {
           <div class="stat-label">Hours Saved/Month</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">${data.roi.roiPercent}%</div>
-          <div class="stat-label">ROI</div>
+          <div class="stat-value" style="color: ${roiColor};">${roiSign}${data.roi.roiPercent}%</div>
+          <div class="stat-label">Return on Investment</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">${isFBAUseCase && data.roi.fbaPrepCost ? '$' + data.roi.fbaPrepCost.toLocaleString() : '$' + data.roi.costPerUnit}</div>
+          <div class="stat-value" style="color: #F97316;">${isFBAUseCase && data.roi.fbaPrepCost ? '$' + data.roi.fbaPrepCost.toLocaleString() : '$' + data.roi.costPerUnit}</div>
           <div class="stat-label">${isFBAUseCase && data.roi.fbaPrepCost ? 'Est. Prep Cost' : 'Est. Cost/Unit'}</div>
         </div>
       </div>
-      
-      <h3 style="color: #0A66C2; margin-top: 30px;">Your Business Profile</h3>
-      <table style="width: 100%; border-collapse: collapse;">
-        <tr><td style="padding: 8px 0; color: #64748b;">Use Case:</td><td style="font-weight: bold;">${useCaseLabels[data.useCase] || data.useCase}</td></tr>
-        <tr><td style="padding: 8px 0; color: #64748b;">Business Stage:</td><td style="font-weight: bold;">${businessStageLabels[data.businessStage] || data.businessStage}</td></tr>
-        <tr><td style="padding: 8px 0; color: #64748b;">Current Fulfillment:</td><td style="font-weight: bold;">${currentFulfillmentFormatted}</td></tr>
-        <tr><td style="padding: 8px 0; color: #64748b;">Monthly Volume:</td><td style="font-weight: bold;">${data.roi.monthlyUnits.toLocaleString()} units</td></tr>
-        <tr><td style="padding: 8px 0; color: #64748b;">Pain Points:</td><td style="font-weight: bold;">${painPointsFormatted}</td></tr>
-        <tr><td style="padding: 8px 0; color: #64748b;">Services Needed:</td><td style="font-weight: bold;">${servicesFormatted}</td></tr>
-      </table>
+
+      <!-- Current Fulfillment Section -->
+      <div class="section-card">
+        <h3 class="section-heading">📊 Current Fulfillment Method</h3>
+        <table class="section-table">
+          <tr><td>Use Case</td><td>${useCaseLabels[data.useCase] || data.useCase}</td></tr>
+          <tr><td>Business Stage</td><td>${businessStageLabels[data.businessStage] || data.businessStage}</td></tr>
+          <tr><td>Current Fulfillment</td><td>${currentFulfillmentFormatted}</td></tr>
+        </table>
+      </div>
+
+      <!-- Pain Points Section -->
+      <div class="section-card">
+        <h3 class="section-heading">⚠️ Key Pain Points</h3>
+        <table class="section-table">
+          <tr><td>Pain Points</td><td>${painPointsFormatted}</td></tr>
+          <tr><td>Current Error Rate</td><td>${data.currentErrorRate}%</td></tr>
+          <tr><td>Return Rate</td><td>${data.returnRate}%</td></tr>
+        </table>
+      </div>
+
+      <!-- Monthly Order Details -->
+      <div class="section-card">
+        <h3 class="section-heading">📦 Monthly Order Details</h3>
+        <table class="section-table">
+          <tr><td>Monthly Units</td><td>${data.roi.monthlyUnits.toLocaleString()}</td></tr>
+          <tr><td>Monthly Orders</td><td>${data.monthlyOrders.toLocaleString()}</td></tr>
+          <tr><td>SKU Count</td><td>${data.skuCount}</td></tr>
+          <tr><td>Services Needed</td><td>${servicesFormatted}</td></tr>
+        </table>
+      </div>
+
+      <!-- ROI & Cost Breakdown -->
+      <div class="section-card" style="background: linear-gradient(135deg, #22c55e08 0%, #22c55e03 100%); border-color: #22c55e30;">
+        <h3 class="section-heading" style="color: #22c55e;">💰 Estimated ROI & Cost Breakdown</h3>
+        <table class="section-table">
+          <tr><td>Monthly Savings</td><td style="color: #22c55e; font-size: 18px;">$${data.roi.totalSavings.toLocaleString()}</td></tr>
+          <tr><td>Annual Savings</td><td style="color: #22c55e;">$${data.roi.annualSavings.toLocaleString()}</td></tr>
+          <tr><td>Error Cost Eliminated</td><td>$${data.roi.currentErrorCost.toLocaleString()}</td></tr>
+          <tr><td>Time Saved</td><td>${data.roi.timeSavedHours} hours/month</td></tr>
+        </table>
+      </div>
       
       ${userFBASection}
       
-      <div style="background: #fef3c7; border-left: 4px solid #F97316; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
-        <p style="margin: 0; font-size: 14px;">
-          💡 <strong>You may qualify for additional per-unit discounts</strong> — just reach out to explore custom pricing!
-        </p>
+      <!-- CTA Button -->
+      <a href="https://calendly.com/westfieldprepcenter/30min" class="cta-button" target="_blank">
+        Schedule a Call →
+      </a>
+      
+      <!-- Promo Banner -->
+      <div class="promo-banner">
+        <p><strong>💡 Looking for even greater savings?</strong></p>
+        <p style="margin-top: 8px;">You're likely eligible for additional per-unit discounts as your volume scales. Let's explore a custom quote for you.</p>
       </div>
       
-      <h3 style="color: #0A66C2; margin-top: 30px;">What's Next?</h3>
-      <ol style="padding-left: 20px;">
-        <li style="margin-bottom: 10px;">A fulfillment specialist will contact you within 24 hours</li>
-        <li style="margin-bottom: 10px;">We'll review your specific requirements and provide a detailed quote</li>
-        <li style="margin-bottom: 10px;">No obligation – just honest answers to help you decide</li>
+      <h3 style="color: #0A66C2; margin-top: 30px; font-size: 18px; font-weight: 700;">What's Next?</h3>
+      <ol style="padding-left: 20px; color: #475569;">
+        <li style="margin-bottom: 12px;">A fulfillment specialist will contact you within 24 hours</li>
+        <li style="margin-bottom: 12px;">We'll review your specific requirements and provide a detailed quote</li>
+        <li style="margin-bottom: 12px;">No obligation – just honest answers to help you decide</li>
       </ol>
       
-      <center>
-        <a href="https://calendly.com/westfieldprepcenter/30min" class="button" target="_blank">Schedule a Call →</a>
-      </center>
-      
-      <p style="margin-top: 30px; color: #64748b; font-size: 13px;">
-        Have questions? Reply to this email or call us at <strong>(818) 935-5478</strong>.
+      <p style="margin-top: 30px; color: #64748b; font-size: 14px;">
+        Have questions? Reply to this email or call us at <strong style="color: #333;">(818) 935-5478</strong>.
       </p>
     </div>
     
     <div class="footer">
-      <p>© 2025 Westfield Prep Center. Los Angeles, CA</p>
-      <p>
-        <a href="https://westfieldprepcenter.com">Website</a> | 
+      <p style="margin: 0;">© 2025 Westfield Prep Center. Los Angeles, CA</p>
+      <div class="footer-links">
+        <a href="https://westfieldprepcenter.com">Website</a>
         <a href="mailto:info@westfieldprepcenter.com">Contact</a>
-      </p>
+      </div>
     </div>
   </div>
 </body>
