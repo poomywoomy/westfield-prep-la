@@ -29,7 +29,10 @@ import {
   Tag,
   Boxes,
   ShieldCheck,
-  Layers
+  Layers,
+  Zap,
+  Users,
+  Calendar
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -1902,97 +1905,217 @@ const LiveResultsSidebar = ({ roi, formData, showResults }: {
 const ResultsView = ({ roi, formData }: {
   roi: ROIResult;
   formData: FormData;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    className="space-y-8"
-  >
-    <div className="text-center">
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.2, type: "spring" }}
-        className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
-      >
-        <CheckCircle2 className="w-10 h-10 text-green-500" />
-      </motion.div>
-      <h3 className="text-2xl md:text-3xl font-bold mb-2">Your Personalized Savings Report</h3>
-      <p className="text-muted-foreground">
-        Based on {(formData.useCase === "amazon" ? formData.unitsRequiringPrep : roi.monthlyUnits).toLocaleString()} units/month
-      </p>
-    </div>
+}) => {
+  const isFBAUseCase = formData.useCase === "amazon" || formData.useCase === "multi-channel";
+  const roiIsPositive = roi.roi >= 0;
+  
+  const highlights = [
+    {
+      icon: Zap,
+      title: "Avg. 48-Hour Turnaround",
+      description: "Fast processing for your orders",
+      color: "text-[#F97316]"
+    },
+    {
+      icon: ShieldCheck,
+      title: "Amazon/Walmart FBA Compliance",
+      description: "Prep to marketplace standards",
+      color: "text-green-500"
+    },
+    {
+      icon: BarChart3,
+      title: "Real-Time Inventory Tracking",
+      description: "Full visibility into your stock",
+      color: "text-[#0A66C2]"
+    },
+    {
+      icon: Users,
+      title: "Hands-On Support Team",
+      description: "Dedicated fulfillment specialists",
+      color: "text-purple-500"
+    }
+  ];
 
-    <div className="grid md:grid-cols-3 gap-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-2xl p-6 text-center"
-      >
-        <DollarSign className="w-8 h-8 text-green-500 mx-auto mb-2" />
-        <p className="text-sm text-muted-foreground mb-1">Monthly Savings</p>
-        <p className="text-3xl font-bold text-green-500">${roi.totalSavings.toLocaleString()}</p>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20 rounded-2xl p-6 text-center"
-      >
-        <TrendingUp className="w-8 h-8 text-secondary mx-auto mb-2" />
-        <p className="text-sm text-muted-foreground mb-1">Annual Savings</p>
-        <p className="text-3xl font-bold text-secondary">${roi.annualSavings.toLocaleString()}</p>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 rounded-2xl p-6 text-center"
-      >
-        <Clock className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-        <p className="text-sm text-muted-foreground mb-1">Hours Saved/Month</p>
-        <p className="text-3xl font-bold text-blue-500">{roi.timeSavedHours}</p>
-      </motion.div>
-    </div>
-
-    <div className="bg-muted/30 rounded-2xl p-6">
-      <h4 className="font-semibold mb-4">What's Next?</h4>
-      <ul className="space-y-3 text-sm">
-        <li className="flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-green-500" />
-          <span>A fulfillment specialist will contact you within 24 hours</span>
-        </li>
-        <li className="flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-green-500" />
-          <span>We'll review your requirements and provide a detailed quote</span>
-        </li>
-        <li className="flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-green-500" />
-          <span>No obligation - just honest pricing for your business</span>
-        </li>
-      </ul>
-    </div>
-
-    <div className="flex justify-center">
-      <Button 
-        size="lg" 
-        className="gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-        asChild
-      >
-        <a 
-          href="https://calendly.com/westfieldprepcenter/30min"
-          target="_blank"
-          rel="noopener noreferrer"
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="space-y-10"
+    >
+      {/* Hero Confirmation Section */}
+      <div className="text-center">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl"
         >
-          Schedule a Call
-          <ArrowRight className="w-4 h-4" />
-        </a>
-      </Button>
-    </div>
-  </motion.div>
-);
+          <CheckCircle2 className="w-12 h-12 text-white" />
+        </motion.div>
+        <motion.h3 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-3xl md:text-4xl font-bold mb-3"
+        >
+          Your Savings Report is Ready
+        </motion.h3>
+        <motion.p 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="text-muted-foreground text-lg"
+        >
+          Based on {(isFBAUseCase ? formData.unitsRequiringPrep : roi.monthlyUnits).toLocaleString()} units/month, here's what we've calculated
+        </motion.p>
+        
+        {/* Animated Savings Counter */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4, type: "spring" }}
+          className="mt-8"
+        >
+          <p className="text-sm text-muted-foreground uppercase tracking-wider mb-2">Estimated Monthly Savings</p>
+          <p className="text-5xl md:text-6xl font-extrabold text-green-500">
+            ${roi.totalSavings.toLocaleString()}
+          </p>
+          <div className={`inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full text-lg font-bold ${roiIsPositive ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'}`}>
+            <TrendingUp className="w-5 h-5" />
+            {roiIsPositive ? '+' : ''}{roi.roi}% ROI
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-2xl p-6 text-center shadow-lg"
+        >
+          <DollarSign className="w-8 h-8 text-green-500 mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground mb-1">Monthly Savings</p>
+          <p className="text-3xl font-bold text-green-500">${roi.totalSavings.toLocaleString()}</p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-gradient-to-br from-[#F97316]/10 to-[#F97316]/5 border border-[#F97316]/20 rounded-2xl p-6 text-center shadow-lg"
+        >
+          <TrendingUp className="w-8 h-8 text-[#F97316] mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground mb-1">Annual Savings</p>
+          <p className="text-3xl font-bold text-[#F97316]">${roi.annualSavings.toLocaleString()}</p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 }}
+          className="bg-gradient-to-br from-[#0A66C2]/10 to-[#0A66C2]/5 border border-[#0A66C2]/20 rounded-2xl p-6 text-center shadow-lg"
+        >
+          <Clock className="w-8 h-8 text-[#0A66C2] mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground mb-1">Hours Saved/Month</p>
+          <p className="text-3xl font-bold text-[#0A66C2]">{roi.timeSavedHours}</p>
+        </motion.div>
+      </div>
+
+      {/* Highlights Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+      >
+        {highlights.map((item, index) => (
+          <motion.div
+            key={item.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 + index * 0.05 }}
+            className="bg-white dark:bg-muted/10 rounded-2xl p-5 text-center shadow-md border border-border/50 hover:shadow-lg transition-shadow"
+          >
+            <item.icon className={`w-8 h-8 ${item.color} mx-auto mb-3`} />
+            <p className="font-semibold text-sm leading-tight">{item.title}</p>
+            <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Trusted By Brands Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.75 }}
+        className="text-center py-8"
+      >
+        <h4 className="text-lg font-semibold text-muted-foreground mb-6">Trusted by Growing Brands</h4>
+        <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div 
+              key={i} 
+              className="w-20 h-10 md:w-24 md:h-12 bg-muted/30 rounded-lg opacity-60 hover:opacity-80 transition-opacity"
+            />
+          ))}
+        </div>
+      </motion.div>
+
+      {/* What's Next Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="bg-muted/30 rounded-2xl p-6 shadow-md border border-border/50"
+      >
+        <h4 className="font-semibold text-lg mb-4">What's Next?</h4>
+        <ul className="space-y-3 text-sm">
+          <li className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+            <span>A fulfillment specialist will contact you within 24 hours</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+            <span>We'll review your requirements and provide a detailed quote</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+            <span>No obligation – just honest pricing for your business</span>
+          </li>
+        </ul>
+      </motion.div>
+
+      {/* Sticky CTA Panel */}
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.85 }}
+        className="bg-gradient-to-br from-[#0A66C2] to-[#0A66C2]/90 rounded-3xl p-8 text-white text-center shadow-2xl"
+      >
+        <Calendar className="w-10 h-10 mx-auto mb-4 text-white/80" />
+        <h4 className="text-2xl md:text-3xl font-bold mb-3">Want to Talk Numbers?</h4>
+        <p className="text-white/80 mb-6 max-w-md mx-auto text-base">
+          You're likely eligible for even greater per-unit savings. Reach out for a custom quote.
+        </p>
+        <Button 
+          size="lg" 
+          className="bg-[#F97316] hover:bg-[#EA580C] text-white font-bold px-8 py-6 text-lg rounded-xl shadow-lg transition-all hover:scale-105 gap-2"
+          asChild
+        >
+          <a 
+            href="https://calendly.com/westfieldprepcenter/30min"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Schedule a Call
+            <ArrowRight className="w-5 h-5" />
+          </a>
+        </Button>
+      </motion.div>
+    </motion.div>
+  );
+};
 
 export default EnhancedROICalculator;
