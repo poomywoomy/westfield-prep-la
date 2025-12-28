@@ -409,19 +409,19 @@ const Pricing = () => {
           {/* Section Divider */}
           <SectionDivider icon={Package} />
 
-          {/* DIY vs. Westfield Comparison Grid */}
+          {/* 3-Way Comparison Grid */}
           <section className="py-16 md:py-20 relative overflow-hidden">
             {/* Subtle gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-background to-green-500/5 pointer-events-none" />
             
-            <div className="container mx-auto px-4 max-w-5xl relative z-10">
+            <div className="container mx-auto px-4 max-w-6xl relative z-10">
               <motion.h2 
                 initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-2xl md:text-4xl font-bold text-center mb-10 md:mb-12"
+                className="text-2xl md:text-4xl font-bold text-center mb-10 md:mb-14"
               >
-                Why Westfield Beats DIY Fulfillment
+                Why Westfield Beats In-House and Big-Box 3PLs
               </motion.h2>
               
               <motion.div 
@@ -429,36 +429,105 @@ const Pricing = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                className="grid md:grid-cols-2 gap-6 md:gap-8"
+                className="grid md:grid-cols-3 gap-6 md:gap-8"
               >
-                {/* In-House Fulfillment Card - Red Theme */}
+                {/* Card 1 – In-House Fulfillment (Red) */}
                 <motion.div 
                   variants={itemVariants}
                   whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
-                  className="bg-card border-2 border-red-200 dark:border-red-900/50 rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-xl transition-all"
+                  className="bg-card border-2 border-red-200 dark:border-red-900/50 rounded-3xl p-6 md:p-8 shadow-md hover:shadow-lg transition-all"
                 >
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                       <Package className="w-6 h-6 text-red-500" />
                     </div>
-                    <h3 className="text-xl font-bold">In-House Fulfillment</h3>
+                    <h3 className="text-xl font-bold text-red-600 dark:text-red-400">In-House Fulfillment</h3>
                   </div>
-                  <ul className="space-y-4">
-                    {[
-                      "$3.10+/unit with labor + materials",
-                      "Inventory blind spots",
-                      "Compliance risks (FBA/WFS)",
-                      "2–5 day turnaround times"
-                    ].map((text, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <X className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-muted-foreground">{text}</span>
-                      </li>
-                    ))}
+                  <ul className="space-y-4 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span>❌</span>
+                      <span className="text-muted-foreground">$3.10+/unit (labor + materials)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>❌</span>
+                      <span className="text-muted-foreground">Slow 2–5 day turnaround</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>❌</span>
+                      <span className="text-muted-foreground">No live inventory visibility</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>❌</span>
+                      <span className="text-muted-foreground">Risk of non-compliance (FBA/WFS)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>❌</span>
+                      <span className="text-muted-foreground">No shipping integrations</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>❌</span>
+                      <span className="text-muted-foreground">Manual spreadsheets & tracking</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>⚠️</span>
+                      <span className="text-muted-foreground">Full-time labor cost & liability</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>⚠️</span>
+                      <span className="text-muted-foreground">Limited DTC flexibility</span>
+                    </li>
                   </ul>
                 </motion.div>
-                
-                {/* Westfield Card - Green Theme */}
+
+                {/* Card 2 – Big-Box 3PLs (Gray) */}
+                <motion.div 
+                  variants={itemVariants}
+                  whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
+                  className="bg-card border-2 border-gray-300 dark:border-gray-700 rounded-3xl p-6 md:p-8 shadow-md hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                      <Truck className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">Big-Box 3PLs</h3>
+                  </div>
+                  <ul className="space-y-4 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span>💸</span>
+                      <span className="text-muted-foreground">$2.50–$3.50/unit (tiered fees)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>⚠️</span>
+                      <span className="text-muted-foreground">48–72 hour turnaround</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>⚠️</span>
+                      <span className="text-muted-foreground">Delayed inventory syncs</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>✅</span>
+                      <span className="text-muted-foreground">FBA-compliant (not always WFS)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>✅</span>
+                      <span className="text-muted-foreground">Shopify & Amazon integrations</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>⚠️</span>
+                      <span className="text-muted-foreground">Tiered support response</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>❌</span>
+                      <span className="text-muted-foreground">High monthly minimums ($3K+)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>⚠️</span>
+                      <span className="text-muted-foreground">Less flexibility for hybrid sellers</span>
+                    </li>
+                  </ul>
+                </motion.div>
+
+                {/* Card 3 – Westfield Prep Center (Green) */}
                 <motion.div 
                   variants={itemVariants}
                   whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
@@ -470,18 +539,39 @@ const Pricing = () => {
                     </div>
                     <h3 className="text-xl font-bold text-green-600 dark:text-green-400">Westfield Prep Center</h3>
                   </div>
-                  <ul className="space-y-4">
-                    {[
-                      { emoji: "💰", text: "$1.20–$1.70/unit all-in" },
-                      { emoji: "📊", text: "Real-time inventory visibility" },
-                      { emoji: "✅", text: "FBA & WFS compliance by default" },
-                      { emoji: "⚡", text: "Avg. 24-hour turnaround" }
-                    ].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <span className="text-lg">{item.emoji}</span>
-                        <span className="text-foreground font-medium">{item.text}</span>
-                      </li>
-                    ))}
+                  <ul className="space-y-4 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span>✅</span>
+                      <span className="text-foreground font-medium">$1.20–$1.70/unit (FBA & DTC)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>⚡</span>
+                      <span className="text-foreground font-medium">Avg. 24-hour turnaround</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>📊</span>
+                      <span className="text-foreground font-medium">Real-time inventory visibility</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>✅</span>
+                      <span className="text-foreground font-medium">FBA & WFS compliance included</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>🔗</span>
+                      <span className="text-foreground font-medium">Shopify, Amazon, Walmart + more</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>💬</span>
+                      <span className="text-foreground font-medium">Dedicated human support</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>🙌</span>
+                      <span className="text-foreground font-medium">Low minimums & volume discounts</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>🧠</span>
+                      <span className="text-foreground font-medium">Built for hybrid DTC + marketplace</span>
+                    </li>
                   </ul>
                 </motion.div>
               </motion.div>
