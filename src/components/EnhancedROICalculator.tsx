@@ -1436,52 +1436,76 @@ const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, fbaPrepCos
         <p className="text-xs text-muted-foreground bg-amber-500/10 border border-amber-500/20 rounded-lg p-2 mb-3">
           ⚠️ Total units across all services cannot exceed Monthly Units Requiring Prep.
         </p>
-        <div className="grid md:grid-cols-3 gap-3">
-          <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
-            <Label className="text-sm flex items-center gap-1">
-              <Tag className="w-3 h-3" />
-              FNSKU + Polybag
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
+            <Label className="flex items-center gap-2">
+              <Tag className="w-4 h-4 text-secondary" />
+              <span>FNSKU + Polybag</span>
             </Label>
-            <div className="text-xs text-muted-foreground">
-              ${fbaPrepCost.polybagRate.toFixed(2)}/unit (max: {maxFnsku.toLocaleString()})
+            <div className="text-xs text-muted-foreground mb-2">
+              ${fbaPrepCost.polybagRate.toFixed(2)}/unit
             </div>
+            <Slider
+              value={[formData.fnskuPolybagUnits]}
+              onValueChange={([value]) => handleFnskuChange(value)}
+              min={0}
+              max={maxFnsku}
+              step={50}
+              className="py-4"
+            />
             <Input
               type="number"
               value={formData.fnskuPolybagUnits}
               onChange={(e) => handleFnskuChange(parseInt(e.target.value) || 0)}
-              className="w-full h-9 text-center font-semibold"
+              className="w-full h-10 text-center font-semibold"
             />
           </div>
 
-          <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
-            <Label className="text-sm flex items-center gap-1">
-              <Boxes className="w-3 h-3" />
-              Bundling
+          <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
+            <Label className="flex items-center gap-2">
+              <Boxes className="w-4 h-4 text-secondary" />
+              <span>Bundling</span>
             </Label>
-            <div className="text-xs text-muted-foreground">
-              +${fbaPrepCost.bundleRate.toFixed(2)}/unit (max: {maxBundling.toLocaleString()})
+            <div className="text-xs text-muted-foreground mb-2">
+              +${fbaPrepCost.bundleRate.toFixed(2)}/unit
             </div>
+            <Slider
+              value={[formData.bundlingOrders]}
+              onValueChange={([value]) => handleBundlingChange(value)}
+              min={0}
+              max={maxBundling}
+              step={50}
+              className="py-4"
+            />
             <Input
               type="number"
               value={formData.bundlingOrders}
               onChange={(e) => handleBundlingChange(parseInt(e.target.value) || 0)}
-              className="w-full h-9 text-center font-semibold"
+              className="w-full h-10 text-center font-semibold"
             />
           </div>
 
-          <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
-            <Label className="text-sm flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3" />
-              Bubble Wrap
+          <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
+            <Label className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-secondary" />
+              <span>Bubble Wrap</span>
             </Label>
-            <div className="text-xs text-muted-foreground">
-              +${fbaPrepCost.bubbleRate.toFixed(2)}/unit (max: {maxBubble.toLocaleString()})
+            <div className="text-xs text-muted-foreground mb-2">
+              +${fbaPrepCost.bubbleRate.toFixed(2)}/unit
             </div>
+            <Slider
+              value={[formData.bubbleWrapUnits]}
+              onValueChange={([value]) => handleBubbleChange(value)}
+              min={0}
+              max={maxBubble}
+              step={50}
+              className="py-4"
+            />
             <Input
               type="number"
               value={formData.bubbleWrapUnits}
               onChange={(e) => handleBubbleChange(parseInt(e.target.value) || 0)}
-              className="w-full h-9 text-center font-semibold"
+              className="w-full h-10 text-center font-semibold"
             />
           </div>
         </div>
