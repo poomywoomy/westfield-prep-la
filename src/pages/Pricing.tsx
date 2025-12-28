@@ -141,8 +141,8 @@ const Pricing = () => {
       role: "Founder, Beauty Sector"
     },
     {
-      quote: "Their 24-hour turnaround has been a game-changer for our Amazon business.",
-      company: "FBA Seller",
+      quote: "Their 24-hour turnaround has been a game-changer for our Amazon business. Inventory is received and prepped quickly, communication is clear, and everything is handled to Amazon standards. We've stayed in stock more consistently since working with them.",
+      company: "Product's for you",
       role: "Operations Manager"
     },
     {
