@@ -229,40 +229,41 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
     }
   }, [formData.currentFulfillment]);
 
-  // Calculate FBA Prep Cost with SINGLE ADDITIVE per-unit pricing
-  // CORRECT MODEL: perUnitRate = baseRate + bundleAddon + bubbleAddon
-  // Total = fnskuPolybagUnits × perUnitRate
+  // Calculate FBA Prep Cost with AUTHORITATIVE per-unit pricing model
+  // CORRECT MODEL: Each service adds (baseRate + serviceAddon) per unit
+  // fnskuCost = fnskuUnits × baseRate
+  // bundlingCost = bundlingUnits × (baseRate + bundleRate)
+  // bubbleCost = bubbleUnits × (baseRate + bubbleRate)
+  // Total = sum of all three (overlap allowed intentionally)
   const calculateFBAPrepCost = useCallback(() => {
     const { polybagRate, bundleRate, bubbleRate, tierName } = getFBAPricingTier(formData.unitsRequiringPrep);
     
     // Base rate from tier (FNSKU + Polybag)
     const baseRate = polybagRate;
     
-    // Bundling and Bubble Wrap ADD to the per-unit price (boolean add-ons)
-    const hasBundling = formData.bundlingOrders > 0;
-    const hasBubbleWrap = formData.bubbleWrapUnits > 0;
+    // AUTHORITATIVE PRICING: Each service is priced per-unit independently
+    // FNSKU + Polybag: just the base rate
+    const fnskuCost = formData.fnskuPolybagUnits * baseRate;
     
-    // Build single per-unit rate with additive services
-    const perUnitRate = baseRate 
-      + (hasBundling ? bundleRate : 0)
-      + (hasBubbleWrap ? bubbleRate : 0);
+    // Bundling: baseRate + bundleRate per unit
+    const bundlingCost = formData.bundlingOrders * (baseRate + bundleRate);
     
-    // Total prep cost = fnskuPolybagUnits × perUnitRate
-    const totalPrepCost = formData.fnskuPolybagUnits * perUnitRate;
+    // Bubble Wrap: baseRate + bubbleRate per unit
+    const bubbleCost = formData.bubbleWrapUnits * (baseRate + bubbleRate);
+    
+    // Total prep cost = sum of all (overlap accepted per business rule)
+    const totalPrepCost = fnskuCost + bundlingCost + bubbleCost;
     
     return {
-      fnskuCost: formData.fnskuPolybagUnits * baseRate,
-      bundlingCost: hasBundling ? formData.fnskuPolybagUnits * bundleRate : 0,
-      bubbleCost: hasBubbleWrap ? formData.fnskuPolybagUnits * bubbleRate : 0,
+      fnskuCost,
+      bundlingCost,
+      bubbleCost,
       totalPrepCost,
       polybagRate,
       bundleRate,
       bubbleRate,
       tierName,
-      effectivePerUnitPrice: perUnitRate,
       baseRate,
-      bundleAddOn: hasBundling ? bundleRate : 0,
-      bubbleAddOn: hasBubbleWrap ? bubbleRate : 0,
     };
   }, [formData.unitsRequiringPrep, formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits]);
 
@@ -277,12 +278,6 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
   const hasStandardData = useMemo(() => {
     return formData.monthlyOrders > 10; // More than initial minimum
   }, [formData.monthlyOrders]);
-
-  // Validate FBA prep services don't exceed total prep units
-  const prepServicesExceedTotal = useMemo(() => {
-    const totalPrepServices = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
-    return totalPrepServices > formData.unitsRequiringPrep;
-  }, [formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits, formData.unitsRequiringPrep]);
 
   // Calculate ROI metrics in real-time
   const calculateROI = useCallback(() => {
@@ -385,10 +380,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
       }
     }
     
-    // Validation for FBA prep services exceeding total
-    if (currentStep === 2 && (formData.useCase === "amazon" || formData.useCase === "multi-channel") && prepServicesExceedTotal) {
-      toast.warning("Your prep services exceed the total units requiring prep. Please adjust your values.");
-    }
+    // No warning for exceeding total - overlap is allowed per business rule
     
     if (currentStep < steps.length - 1) {
       logAnalyticsEvent("step_navigation", { direction: "next", fromStep: currentStep });
@@ -628,7 +620,6 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                       <StepVolumeProductsFBA 
                         formData={formData} 
                         setFormData={setFormData}
-                        prepServicesExceedTotal={prepServicesExceedTotal}
                         fbaPrepCost={calculateFBAPrepCost()}
                       />
                     )}
@@ -638,7 +629,6 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                         formData={formData} 
                         setFormData={setFormData}
                         roi={roi}
-                        prepServicesExceedTotal={prepServicesExceedTotal}
                         fbaPrepCost={calculateFBAPrepCost()}
                       />
                     )}
@@ -1015,37 +1005,35 @@ const StepVolumeProducts = ({ formData, setFormData, roi }: {
   );
 };
 
-// FBA/WFS Volume & Products Step
-const StepVolumeProductsFBA = ({ formData, setFormData, prepServicesExceedTotal, fbaPrepCost }: {
+// FBA/WFS Volume & Products Step - AUTHORITATIVE PRICING MODEL
+// Sliders are independent (no caps based on other sliders)
+// Overlap is allowed and intentional per business rule
+const StepVolumeProductsFBA = ({ formData, setFormData, fbaPrepCost }: {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  prepServicesExceedTotal: boolean;
   fbaPrepCost: FBAPrepCostResult;
 }) => {
-  // Calculate dynamic max values for sliders based on remaining allocation
-  const maxFnskuPolybag = Math.max(0, formData.unitsRequiringPrep - formData.bundlingOrders - formData.bubbleWrapUnits);
-  const maxBundling = Math.max(0, formData.unitsRequiringPrep - formData.fnskuPolybagUnits - formData.bubbleWrapUnits);
-  const maxBubbleWrap = Math.max(0, formData.unitsRequiringPrep - formData.fnskuPolybagUnits - formData.bundlingOrders);
+  // Each slider independently goes from 0 → unitsRequiringPrep
+  const maxUnits = formData.unitsRequiringPrep;
 
-  // Auto-clamp values when they exceed new max
   const handleFnskuChange = (value: number) => {
-    const clamped = Math.max(0, Math.min(maxFnskuPolybag, value));
+    const clamped = Math.max(0, Math.min(maxUnits, value));
     setFormData(prev => ({ ...prev, fnskuPolybagUnits: clamped }));
   };
 
   const handleBundlingChange = (value: number) => {
-    const clamped = Math.max(0, Math.min(maxBundling, value));
+    const clamped = Math.max(0, Math.min(maxUnits, value));
     setFormData(prev => ({ ...prev, bundlingOrders: clamped }));
   };
 
   const handleBubbleChange = (value: number) => {
-    const clamped = Math.max(0, Math.min(maxBubbleWrap, value));
+    const clamped = Math.max(0, Math.min(maxUnits, value));
     setFormData(prev => ({ ...prev, bubbleWrapUnits: clamped }));
   };
 
   return (
     <div className="space-y-6">
-    <div className="text-center mb-6">
+      <div className="text-center mb-6">
         <h3 className="text-2xl font-bold mb-2">FBA/WFS Prep Volume</h3>
         <p className="text-muted-foreground">Tell us about your prep service needs</p>
       </div>
@@ -1080,7 +1068,7 @@ const StepVolumeProductsFBA = ({ formData, setFormData, prepServicesExceedTotal,
         </div>
       </div>
 
-      {/* Prep Services Grid with Dynamic Caps */}
+      {/* Prep Services Grid - Independent sliders (no caps) */}
       <div className="grid md:grid-cols-3 gap-4">
         {/* FNSKU + Polybag */}
         <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
@@ -1089,13 +1077,13 @@ const StepVolumeProductsFBA = ({ formData, setFormData, prepServicesExceedTotal,
             <span>FNSKU + Polybag</span>
           </Label>
           <div className="text-xs text-muted-foreground mb-2">
-            ${fbaPrepCost.polybagRate.toFixed(2)}/unit • Max: {maxFnskuPolybag.toLocaleString()}
+            ${fbaPrepCost.polybagRate.toFixed(2)}/unit
           </div>
           <Slider
-            value={[Math.min(formData.fnskuPolybagUnits, maxFnskuPolybag)]}
+            value={[formData.fnskuPolybagUnits]}
             onValueChange={([value]) => handleFnskuChange(value)}
             min={0}
-            max={maxFnskuPolybag}
+            max={maxUnits}
             step={50}
             className="py-4"
           />
@@ -1114,14 +1102,14 @@ const StepVolumeProductsFBA = ({ formData, setFormData, prepServicesExceedTotal,
             <span>Bundling</span>
           </Label>
           <div className="text-xs text-muted-foreground mb-2">
-            ${fbaPrepCost.bundleRate.toFixed(2)}/unit • Max: {maxBundling.toLocaleString()}
+            +${fbaPrepCost.bundleRate.toFixed(2)}/unit (${(fbaPrepCost.polybagRate + fbaPrepCost.bundleRate).toFixed(2)} total)
           </div>
           <Slider
-            value={[Math.min(formData.bundlingOrders, maxBundling)]}
+            value={[formData.bundlingOrders]}
             onValueChange={([value]) => handleBundlingChange(value)}
             min={0}
-            max={maxBundling}
-            step={25}
+            max={maxUnits}
+            step={50}
             className="py-4"
           />
           <Input
@@ -1139,13 +1127,13 @@ const StepVolumeProductsFBA = ({ formData, setFormData, prepServicesExceedTotal,
             <span>Bubble Wrap</span>
           </Label>
           <div className="text-xs text-muted-foreground mb-2">
-            ${fbaPrepCost.bubbleRate.toFixed(2)}/unit • Max: {maxBubbleWrap.toLocaleString()}
+            +${fbaPrepCost.bubbleRate.toFixed(2)}/unit (${(fbaPrepCost.polybagRate + fbaPrepCost.bubbleRate).toFixed(2)} total)
           </div>
           <Slider
-            value={[Math.min(formData.bubbleWrapUnits, maxBubbleWrap)]}
+            value={[formData.bubbleWrapUnits]}
             onValueChange={([value]) => handleBubbleChange(value)}
             min={0}
-            max={maxBubbleWrap}
+            max={maxUnits}
             step={50}
             className="py-4"
           />
@@ -1158,48 +1146,46 @@ const StepVolumeProductsFBA = ({ formData, setFormData, prepServicesExceedTotal,
         </div>
       </div>
 
-      {/* Validation Warning */}
-      {prepServicesExceedTotal && (
-        <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-destructive" />
-          <p className="text-sm text-destructive">
-            Your prep services ({(formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits).toLocaleString()}) exceed the total units requiring prep ({formData.unitsRequiringPrep.toLocaleString()}).
-          </p>
-        </div>
-      )}
-
-      {/* Cost Preview */}
+      {/* Cost Preview with Breakdown */}
       <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm">Estimated Monthly Prep Cost</span>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-medium">Estimated Monthly Prep Cost</span>
           <span className="text-xl font-bold text-secondary">
             ${fbaPrepCost.totalPrepCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
-        <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
-          <div>FNSKU: ${fbaPrepCost.fnskuCost.toFixed(2)}</div>
-          <div>Bundling: ${fbaPrepCost.bundlingCost.toFixed(2)}</div>
-          <div>Bubble: ${fbaPrepCost.bubbleCost.toFixed(2)}</div>
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="bg-background/50 rounded-lg p-2 text-center">
+            <div className="text-muted-foreground">FNSKU + Polybag</div>
+            <div className="font-semibold">${fbaPrepCost.fnskuCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          </div>
+          <div className="bg-background/50 rounded-lg p-2 text-center">
+            <div className="text-muted-foreground">Bundling</div>
+            <div className="font-semibold">${fbaPrepCost.bundlingCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          </div>
+          <div className="bg-background/50 rounded-lg p-2 text-center">
+            <div className="text-muted-foreground">Bubble Wrap</div>
+            <div className="font-semibold">${fbaPrepCost.bubbleCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// Multi-Channel Volume & Products Step (shows BOTH standard and FBA fields)
-const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, prepServicesExceedTotal, fbaPrepCost }: {
+// Multi-Channel Volume & Products Step - AUTHORITATIVE PRICING MODEL
+// Sliders are independent (no caps based on other sliders)
+// Overlap is allowed and intentional per business rule
+const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, fbaPrepCost }: {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   roi: ROIResult;
-  prepServicesExceedTotal: boolean;
   fbaPrepCost: FBAPrepCostResult;
 }) => {
   const [isHighVolumeMode, setIsHighVolumeMode] = useState(formData.monthlyOrders >= 10000);
   
-  // Calculate dynamic max values for FBA sliders based on remaining allocation
-  const maxFnskuPolybag = Math.max(0, formData.unitsRequiringPrep - formData.bundlingOrders - formData.bubbleWrapUnits);
-  const maxBundling = Math.max(0, formData.unitsRequiringPrep - formData.fnskuPolybagUnits - formData.bubbleWrapUnits);
-  const maxBubbleWrap = Math.max(0, formData.unitsRequiringPrep - formData.fnskuPolybagUnits - formData.bundlingOrders);
+  // Each FBA slider independently goes from 0 → unitsRequiringPrep
+  const maxUnits = formData.unitsRequiringPrep;
   
   const handleOrdersChange = (value: number) => {
     if (!isHighVolumeMode && value >= 10000) {
@@ -1210,19 +1196,18 @@ const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, prepServic
     setFormData(prev => ({ ...prev, monthlyOrders: value }));
   };
 
-  // FBA slider handlers with clamping
   const handleFnskuChange = (value: number) => {
-    const clamped = Math.max(0, Math.min(maxFnskuPolybag, value));
+    const clamped = Math.max(0, Math.min(maxUnits, value));
     setFormData(prev => ({ ...prev, fnskuPolybagUnits: clamped }));
   };
 
   const handleBundlingChange = (value: number) => {
-    const clamped = Math.max(0, Math.min(maxBundling, value));
+    const clamped = Math.max(0, Math.min(maxUnits, value));
     setFormData(prev => ({ ...prev, bundlingOrders: clamped }));
   };
 
   const handleBubbleChange = (value: number) => {
-    const clamped = Math.max(0, Math.min(maxBubbleWrap, value));
+    const clamped = Math.max(0, Math.min(maxUnits, value));
     setFormData(prev => ({ ...prev, bubbleWrapUnits: clamped }));
   };
 
@@ -1363,7 +1348,7 @@ const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, prepServic
           </div>
         </div>
 
-        {/* Prep Services Grid with Dynamic Caps */}
+        {/* Prep Services Grid - Independent sliders (no caps) */}
         <div className="grid md:grid-cols-3 gap-3">
           <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
             <Label className="text-sm flex items-center gap-1">
@@ -1371,7 +1356,7 @@ const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, prepServic
               FNSKU + Polybag
             </Label>
             <div className="text-xs text-muted-foreground">
-              ${fbaPrepCost.polybagRate.toFixed(2)}/unit • Max: {maxFnskuPolybag.toLocaleString()}
+              ${fbaPrepCost.polybagRate.toFixed(2)}/unit
             </div>
             <Input
               type="number"
@@ -1387,7 +1372,7 @@ const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, prepServic
               Bundling
             </Label>
             <div className="text-xs text-muted-foreground">
-              ${fbaPrepCost.bundleRate.toFixed(2)}/unit • Max: {maxBundling.toLocaleString()}
+              +${fbaPrepCost.bundleRate.toFixed(2)}/unit
             </div>
             <Input
               type="number"
@@ -1403,7 +1388,7 @@ const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, prepServic
               Bubble Wrap
             </Label>
             <div className="text-xs text-muted-foreground">
-              ${fbaPrepCost.bubbleRate.toFixed(2)}/unit • Max: {maxBubbleWrap.toLocaleString()}
+              +${fbaPrepCost.bubbleRate.toFixed(2)}/unit
             </div>
             <Input
               type="number"
@@ -1414,23 +1399,22 @@ const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, prepServic
           </div>
         </div>
 
-        {/* Validation Warning */}
-        {prepServicesExceedTotal && (
-          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
-            <p className="text-xs text-destructive">
-              Prep services exceed total units requiring prep.
-            </p>
+        {/* FBA Cost Preview with Breakdown */}
+        {(formData.fnskuPolybagUnits > 0 || formData.bundlingOrders > 0 || formData.bubbleWrapUnits > 0) && (
+          <div className="bg-secondary/10 border border-secondary/20 rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">FBA Prep Cost</span>
+              <span className="font-bold text-secondary">
+                ${fbaPrepCost.totalPrepCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-1 text-xs text-muted-foreground">
+              <div>FNSKU: ${fbaPrepCost.fnskuCost.toFixed(2)}</div>
+              <div>Bundling: ${fbaPrepCost.bundlingCost.toFixed(2)}</div>
+              <div>Bubble: ${fbaPrepCost.bubbleCost.toFixed(2)}</div>
+            </div>
           </div>
         )}
-
-        {/* FBA Cost Preview */}
-        <div className="bg-muted/30 rounded-lg p-3 flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">FBA Prep Cost</span>
-          <span className="font-bold text-secondary">
-            ${fbaPrepCost.totalPrepCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mo
-          </span>
-        </div>
       </div>
     </div>
   );
