@@ -9,6 +9,7 @@ import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { 
   Check, Zap, Clock, Shield, DollarSign, 
@@ -508,10 +509,19 @@ const Pricing = () => {
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
                         <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">FBA & WFS Pricing</td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
-                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
-                            <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">$3.10+/unit</span>
-                          </div>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400 cursor-help">
+                                  <X className="w-4 h-4 flex-shrink-0" />
+                                  <span className="text-sm underline decoration-dotted underline-offset-2">$2.75–$4.50/unit</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Supplies + Labor + Error</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
@@ -531,10 +541,19 @@ const Pricing = () => {
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
                         <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">DTC Fulfillment Pricing</td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
-                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
-                            <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">N/A</span>
-                          </div>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400 cursor-help">
+                                  <X className="w-4 h-4 flex-shrink-0" />
+                                  <span className="text-sm underline decoration-dotted underline-offset-2">$1.50–$3.00/unit</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Supplies + Labor + Error</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
