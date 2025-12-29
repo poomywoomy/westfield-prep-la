@@ -47,6 +47,7 @@ import {
   Sparkles,
   Phone,
   Mail,
+  Plus,
 } from "lucide-react";
 import {
   SiShopify,
@@ -759,6 +760,18 @@ const Integrations = () => {
                   onClick={() => setSelectedIntegration(integration)}
                 />
               ))}
+              
+              {/* And Many More Card */}
+              <motion.div
+                variants={cardVariants}
+                className="group relative bg-muted/30 rounded-2xl border-2 border-dashed border-muted-foreground/30 p-6 flex flex-col items-center justify-center text-center min-h-[180px] hover:border-primary/50 hover:bg-muted/50 transition-all duration-300"
+              >
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                  <Plus className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1">And Many More...</h3>
+                <p className="text-xs text-muted-foreground">New integrations added regularly</p>
+              </motion.div>
             </motion.div>
           </AnimatePresence>
         </div>
