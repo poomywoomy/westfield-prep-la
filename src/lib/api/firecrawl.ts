@@ -20,6 +20,12 @@ type SearchOptions = {
   scrapeOptions?: { formats?: ('markdown' | 'html')[] };
 };
 
+type MapOptions = {
+  search?: string;
+  limit?: number;
+  includeSubdomains?: boolean;
+};
+
 export type SearchResult = {
   url: string;
   title: string;
@@ -38,6 +44,8 @@ export type ScrapeResult = {
     statusCode?: number;
   };
 };
+
+export type MapResult = string[];
 
 export const firecrawlApi = {
   // Scrape a single URL
@@ -72,6 +80,23 @@ export const firecrawlApi = {
     return { 
       success: data?.success ?? true, 
       data: data?.data || [],
+      error: data?.error 
+    };
+  },
+
+  // Map a website to discover all URLs
+  async map(url: string, options?: MapOptions): Promise<FirecrawlResponse<MapResult>> {
+    const { data, error } = await supabase.functions.invoke('firecrawl-map', {
+      body: { url, options },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
+    return { 
+      success: data?.success ?? true, 
+      data: data?.links || [],
       error: data?.error 
     };
   },
