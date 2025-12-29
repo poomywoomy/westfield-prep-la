@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import StickyIntegrationsCTA from "@/components/StickyIntegrationsCTA";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -1181,6 +1182,9 @@ const Integrations = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Sticky CTA for high-intent conversion */}
+      <StickyIntegrationsCTA />
 
       <Footer />
     </div>
