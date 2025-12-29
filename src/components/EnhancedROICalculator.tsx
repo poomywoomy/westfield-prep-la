@@ -36,10 +36,18 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 
 // Analytics helper - can be replaced with Mixpanel/PostHog later
 const logAnalyticsEvent = (eventName: string, data?: Record<string, unknown>) => {
   console.log(`[Analytics] ${eventName}`, { timestamp: new Date().toISOString(), ...data });
+  
+  // Track ROI calculator events via centralized analytics
+  if (eventName === "step_completed" && data?.step === 1) {
+    trackEvent('roi_calculator_started', { 
+      use_case: String(data?.useCase || 'unknown')
+    });
+  }
 };
 
 interface FormData {
@@ -464,6 +472,14 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
         businessStage: formData.businessStage,
         monthlyOrders: formData.monthlyOrders,
         estimatedSavings: calculatorResults.totalSavings,
+      });
+
+      // Track ROI calculator completion via centralized analytics
+      trackEvent('roi_calculator_completed', {
+        use_case: formData.useCase,
+        monthly_orders: formData.monthlyOrders,
+        estimated_savings: calculatorResults.totalSavings,
+        annual_savings: calculatorResults.annualSavings
       });
 
       setShowResults(true);
