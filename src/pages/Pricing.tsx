@@ -8,6 +8,7 @@ import ContactForm from "@/components/ContactForm";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import ExitIntentModal from "@/components/ExitIntentModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
@@ -1204,6 +1205,7 @@ const Pricing = () => {
         </main>
 
         <Footer />
+        <ExitIntentModal />
       </div>
     </>
   );
