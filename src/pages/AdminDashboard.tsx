@@ -24,6 +24,8 @@ const ShopifySyncCenter = lazy(() => import("@/components/admin/ShopifySyncCente
 const InventoryTab = lazy(() => import("@/components/admin/InventoryTab").then(m => ({ default: m.InventoryTab })));
 const BlogTab = lazy(() => import("@/components/admin/BlogTab").then(m => ({ default: m.BlogTab })));
 const BlogResearchTab = lazy(() => import("@/components/admin/BlogResearchTab"));
+const SEOAuditTab = lazy(() => import("@/components/admin/SEOAuditTab"));
+const IndustryNewsTab = lazy(() => import("@/components/admin/IndustryNewsTab"));
 const DiscrepanciesTab = lazy(() => import("@/components/admin/DiscrepanciesTab").then(m => ({ default: m.DiscrepanciesTab })));
 const OrdersTab = lazy(() => import("@/components/admin/OrdersTab").then(m => ({ default: m.OrdersTab })));
 const ShipmentsTab = lazy(() => import("@/components/admin/ShipmentsTab").then(m => ({ default: m.ShipmentsTab })));
@@ -204,6 +206,18 @@ const AdminDashboard = () => {
           <TabsContent value="blog-research">
             <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
               <BlogResearchTab />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="seo-audit">
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <SEOAuditTab />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="industry-news">
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <IndustryNewsTab />
             </Suspense>
           </TabsContent>
 
