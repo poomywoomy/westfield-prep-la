@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { DollarSign } from "lucide-react";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, type AnalyticsEvent } from "@/lib/analytics";
 
 const StickyMobileCTA = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -34,7 +34,8 @@ const StickyMobileCTA = () => {
   }, []);
 
   const handleClick = () => {
-    trackEvent('pricing_cta_click', { location: 'sticky_mobile' });
+    const event: AnalyticsEvent = 'pricing_cta_click';
+    trackEvent(event, { location: 'sticky_mobile' });
     navigate("/pricing");
   };
 
