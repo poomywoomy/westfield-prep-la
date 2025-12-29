@@ -37,7 +37,6 @@ import {
   Shield,
   ShoppingCart,
   Code,
-  Users,
   RefreshCcw,
   Route,
   Clock,
@@ -167,7 +166,7 @@ const carrierLogoImages: Record<string, string> = {
 };
 
 // Filter categories
-type FilterCategory = "all" | "ecommerce" | "shipping" | "inventory" | "api" | "erp";
+type FilterCategory = "all" | "ecommerce" | "shipping" | "inventory";
 
 interface FilterOption {
   id: FilterCategory;
@@ -180,8 +179,6 @@ const filterOptions: FilterOption[] = [
   { id: "ecommerce", label: "E-Commerce", icon: <ShoppingCart className="w-4 h-4" /> },
   { id: "shipping", label: "Shipping & Returns", icon: <Truck className="w-4 h-4" /> },
   { id: "inventory", label: "Inventory & WMS", icon: <Package className="w-4 h-4" /> },
-  { id: "api", label: "Custom API / EDI", icon: <Code className="w-4 h-4" /> },
-  { id: "erp", label: "ERPs & CRMs", icon: <Users className="w-4 h-4" /> },
 ];
 
 // Integration type definition
@@ -200,29 +197,19 @@ interface Integration {
   badge?: string;
 }
 
-// All integrations (only original platforms from platformsData + actual carrier logos)
+// All integrations (only platforms with logos)
 const integrations: Integration[] = [
-  // E-Commerce (from platformsData.ts)
+  // E-Commerce (only those with icons/logos)
   { name: "Shopify", key: "shopify", category: "ecommerce", description: "Seamlessly sync your Shopify store with real-time order imports, inventory updates, and automatic tracking.", setupTime: "< 5 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true }, badge: "Most Popular" },
   { name: "Amazon", key: "amazon", category: "ecommerce", description: "Full Amazon Seller Central integration with FBA prep and inventory sync capabilities.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
   { name: "Walmart", key: "walmart", category: "ecommerce", description: "Connect your Walmart Marketplace with WFS-ready fulfillment support.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true }, badge: "WFS Ready" },
   { name: "TikTok Shop", key: "tiktok", category: "ecommerce", description: "Fulfill TikTok Shop orders with automatic inventory sync and tracking updates.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
   { name: "Etsy", key: "etsy", category: "ecommerce", description: "Sync your Etsy shop orders and manage inventory across all channels.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
-  { name: "eBay", key: "ebay", category: "ecommerce", description: "Global online marketplace for auctions and fixed-price sales with multi-channel fulfillment.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
   { name: "WooCommerce", key: "woocommerce", category: "ecommerce", description: "WordPress WooCommerce integration with webhook support for real-time updates.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
   { name: "BigCommerce", key: "bigcommerce", category: "ecommerce", description: "Enterprise e-commerce platform integration with full order management.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
   { name: "Faire", key: "faire", category: "ecommerce", description: "Wholesale marketplace connecting brands and retailers for B2B order fulfillment.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
   { name: "Magento", key: "magento", category: "ecommerce", description: "Flexible open-source e-commerce platform for enterprise merchants.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
   { name: "Wix", key: "wix", category: "ecommerce", description: "Website builder with integrated e-commerce and automatic order sync.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
-  { name: "Squarespace", key: "squarespace", category: "ecommerce", description: "Design-focused website and commerce platform integration.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
-  { name: "Target Plus", key: "targetplus", category: "ecommerce", description: "Target's curated third-party marketplace for enterprise sellers.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
-  { name: "Instagram Shopping", key: "instagram", category: "ecommerce", description: "Social commerce through Instagram posts and stories.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
-  { name: "Facebook Shops", key: "facebook", category: "ecommerce", description: "Social selling through Facebook and Messenger.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
-  { name: "Whatnot", key: "whatnot", category: "ecommerce", description: "Live selling and auction platform with same-day shipping support.", setupTime: "< 5 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
-  { name: "Pinterest Shopping", key: "pinterest", category: "ecommerce", description: "Visual discovery and shopping platform integration.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
-  { name: "Alibaba", key: "alibaba", category: "ecommerce", description: "Global B2B wholesale and manufacturing marketplace.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: false } },
-  { name: "Mercado Libre", key: "mercadolibre", category: "ecommerce", description: "Leading e-commerce platform in Latin America.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
-  { name: "Rakuten", key: "rakuten", category: "ecommerce", description: "Major Japanese e-commerce platform for international sellers.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
   
   // Shipping (only carriers with actual logos in public/integration-logos)
   { name: "ShipStation", key: "shipstation", category: "shipping", description: "Multi-carrier shipping platform integration for label printing and tracking.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
@@ -244,9 +231,6 @@ const integrations: Integration[] = [
   
   // Inventory & WMS
   { name: "Lightspeed", key: "lightspeed", category: "inventory", description: "Point of sale and inventory management for retail.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
-  
-  // ERPs & CRMs (only Salesforce has a logo)
-  { name: "Salesforce", key: "salesforce", category: "erp", description: "Enterprise CRM integration for unified customer and order management.", setupTime: "< 30 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
 ];
 
 // Feature highlights for carousel
