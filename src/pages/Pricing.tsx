@@ -91,24 +91,32 @@ const Pricing = () => {
 
   const faqData = [
     { 
-      question: "How is 3PL pricing calculated?", 
-      answer: "We use volume-based pricing that scales with your business. Pricing is based on services needed (receiving, prep, storage, fulfillment), monthly volume, and product complexity. The more you ship, the better your per-unit rates." 
+      question: "What's included in Westfield 3PL pricing?", 
+      answer: "All-in pricing includes receiving, storage, labeling, pick & pack, and compliance for Amazon FBA, WFS, and DTC. Our transparent pricing means no hidden fees—what we quote is what you pay." 
+    },
+    { 
+      question: "Do you support Shopify integrations?", 
+      answer: "Yes, we offer native Shopify integration for real-time inventory and order sync, with no additional charge. Orders sync automatically and ship same-day when received before 2 PM PST." 
+    },
+    { 
+      question: "What are your Amazon FBA prep rates?", 
+      answer: "Our Amazon FBA prep services range from $1.20–$1.70 per unit depending on volume and complexity. This includes FNSKU labeling, polybagging, bubble wrap, and compliance with all Amazon requirements." 
+    },
+    { 
+      question: "How does your DTC fulfillment pricing compare to big-box 3PLs?", 
+      answer: "Unlike big-box 3PLs with $3K+ minimums and tiered fees, we offer flexible pricing starting at $1.20/unit with no monthly minimums. You get dedicated support and 24-hour turnaround at a fraction of the cost." 
     },
     { 
       question: "Are there any setup fees or minimums?", 
       answer: "No setup fees or long-term contracts required. We work with businesses of all sizes. While we don't have strict minimums, pricing is optimized for businesses shipping at least 100 units per month." 
     },
     { 
-      question: "What's included in your fulfillment pricing?", 
-      answer: "Our fulfillment pricing includes pick, pack, quality control, shipping label generation, and photo documentation. Storage, receiving, and additional prep services are priced separately based on your needs." 
+      question: "How does storage pricing work?", 
+      answer: "Storage is billed monthly based on space used (pallet or cubic feet). Rates vary by volume—higher volume clients receive preferred pricing. We also offer overflow and seasonal storage options." 
     },
     { 
       question: "Do you charge for receiving inventory?", 
       answer: "Yes, we charge a per-carton or per-pallet fee for receiving and inspection. This includes check-in, inventory counting, photo documentation, and system updates. Exact rates depend on shipment size and frequency." 
-    },
-    { 
-      question: "How does storage pricing work?", 
-      answer: "Storage is billed monthly based on space used (pallet or cubic feet). Rates vary by volume—higher volume clients receive preferred pricing. We also offer overflow and seasonal storage options." 
     },
     { 
       question: "Can I get a custom quote for my business?", 
@@ -218,15 +226,37 @@ const Pricing = () => {
   return (
     <>
       <Helmet>
-        <title>3PL Pricing Los Angeles | Custom Fulfillment Rates | Westfield Prep Center</title>
+        <title>3PL Fulfillment Pricing | Shopify & Amazon Sellers | Westfield</title>
         <meta 
           name="description" 
-          content="Los Angeles 3PL pricing for fulfillment, prep, and storage. Transparent rates, no hidden fees. Request your custom quote from our LA fulfillment center today." 
+          content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.20–$1.70/unit. 24-hour turnaround. Calculate your ROI savings instantly." 
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/pricing" />
+        
+        {/* Robots */}
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="Westfield Prep Center" />
+        <meta name="keywords" content="3PL pricing, Shopify fulfillment, Amazon FBA prep, DTC fulfillment, Los Angeles 3PL, fulfillment center pricing, pick and pack rates" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://westfieldprepcenter.com/pricing" />
+        <meta property="og:title" content="3PL Fulfillment Pricing | Shopify & Amazon Sellers" />
+        <meta property="og:description" content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.20–$1.70/unit. 24-hour turnaround." />
+        <meta property="og:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
+        <meta property="og:site_name" content="Westfield Prep Center" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@Westfield3PL" />
+        <meta name="twitter:title" content="3PL Fulfillment Pricing | Shopify & Amazon Sellers" />
+        <meta name="twitter:description" content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.20–$1.70/unit. 24-hour turnaround." />
+        <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
+      <StructuredData type="product" />
+      <StructuredData type="breadcrumb" data={{ items: [{ label: "Home", path: "/" }, { label: "3PL Pricing", path: "/pricing" }] }} />
 
       {/* Scroll-Persistent Sticky CTA (Desktop Only) */}
       <AnimatePresence>
@@ -300,7 +330,11 @@ const Pricing = () => {
             </div>
 
             {/* Lottie Animation Behind Stats */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-20 blur-sm pointer-events-none overflow-hidden">
+            <div 
+              className="absolute inset-0 flex items-center justify-center opacity-20 blur-sm pointer-events-none overflow-hidden"
+              role="img"
+              aria-label="3PL shipping and fulfillment animation for Shopify and Amazon sellers"
+            >
               <Lottie 
                 animationData={shippingAnimationData} 
                 loop={true}
@@ -315,13 +349,21 @@ const Pricing = () => {
                 transition={{ delay: prefersReducedMotion ? 0 : 0.2, duration: prefersReducedMotion ? 0.1 : 0.5 }}
                 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6"
               >
-                Custom Pricing Built for Your Business
+                3PL Fulfillment Pricing for Shopify, Amazon & DTC Brands
               </motion.h1>
               <motion.p 
                 initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: prefersReducedMotion ? 0 : 0.3, duration: prefersReducedMotion ? 0.1 : 0.5 }}
-                className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-12"
+                className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-4"
+              >
+                Real ROI, Real Savings
+              </motion.p>
+              <motion.p 
+                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: prefersReducedMotion ? 0 : 0.4, duration: prefersReducedMotion ? 0.1 : 0.5 }}
+                className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto mb-12"
               >
                 Every business is unique. Tell us your needs and we'll create a pricing model that scales with you. 
                 No hidden fees, no surprises—just transparent pricing tailored to your volume.
@@ -758,7 +800,7 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className="text-center mb-10 md:mb-12"
               >
-                <h2 className="text-2xl md:text-4xl font-bold mb-4">What We Offer</h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-4">Pricing Built Around Your Shopify Volume</h2>
                 <p className="text-base md:text-lg text-muted-foreground">
                   Professional services included in your custom quote
                 </p>
@@ -880,7 +922,7 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className="text-center mb-10 md:mb-12"
               >
-                <h2 className="text-2xl md:text-4xl font-bold mb-4">Pricing FAQs</h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-4">Frequently Asked Questions About Our 3PL Pricing</h2>
                 <p className="text-base md:text-lg text-muted-foreground">
                   Common questions about our pricing structure
                 </p>
@@ -988,7 +1030,7 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className="text-center mb-10 md:mb-12"
               >
-                <h2 className="text-2xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-4">Get Your Custom 3PL Quote Today</h2>
                 <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
                   Tell us about your business and receive a detailed pricing breakdown within 24 hours. 
                   No pressure, no commitment—just honest answers to help you make the right decision.
