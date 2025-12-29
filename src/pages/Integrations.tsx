@@ -519,22 +519,26 @@ const Integrations = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Integrations | Westfield Prep Center</title>
+        <title>Shopify & Amazon 3PL Integrations | Westfield Prep Center</title>
         <meta
           name="description"
-          content="Connect Shopify, Amazon, Walmart & 20+ platforms in minutes. Real-time order sync, inventory management & 24+ carrier integrations. No developers needed."
+          content="Connect Shopify, Amazon, Walmart, and 20+ platforms to Westfield's 3PL. Real-time order sync, inventory visibility — no developers required."
         />
+        <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://westfieldprepcenter.com/integrations" />
         
-        <meta property="og:title" content="Integrations | Westfield Prep Center" />
-        <meta property="og:description" content="Connect Shopify, Amazon, Walmart & 20+ platforms in minutes. Real-time order sync, inventory management & 24+ carrier integrations." />
+        <meta property="og:title" content="Shopify & Amazon 3PL Integrations | Westfield Prep Center" />
+        <meta property="og:description" content="Connect Shopify, Amazon, Walmart, and 20+ platforms to Westfield's 3PL. Real-time order sync, inventory visibility — no developers required." />
         <meta property="og:url" content="https://westfieldprepcenter.com/integrations" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://westfieldprepcenter.com/warehouse-hero-bg.jpg" />
+        <meta property="og:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
+        <meta property="og:site_name" content="Westfield Prep Center" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Integrations | Westfield Prep Center" />
-        <meta name="twitter:description" content="Connect Shopify, Amazon, Walmart & 20+ platforms in minutes. Real-time order sync & 24+ carrier integrations." />
+        <meta name="twitter:site" content="@Westfield3PL" />
+        <meta name="twitter:title" content="Shopify & Amazon 3PL Integrations | Westfield Prep Center" />
+        <meta name="twitter:description" content="Connect Shopify, Amazon, Walmart, and 20+ platforms to Westfield's 3PL. Real-time order sync, inventory visibility." />
+        <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
         
         <script type="application/ld+json">
           {JSON.stringify({
@@ -542,50 +546,57 @@ const Integrations = () => {
             "@graph": [
               {
                 "@type": "SoftwareApplication",
-                "name": "Westfield Integration Platform",
+                "name": "Westfield 3PL Integration Platform",
                 "applicationCategory": "BusinessApplication",
                 "operatingSystem": "Web",
-                "description": "Connect your e-commerce platforms, marketplaces, and carriers in minutes",
-                "featureList": integrations.map(i => i.name),
+                "description": "Connect your e-commerce platforms, marketplaces, and carriers for Shopify 3PL integration and Amazon prep center sync",
+                "featureList": [
+                  "Shopify fulfillment integration",
+                  "Amazon prep center sync",
+                  "Order routing and tracking",
+                  "Real-time inventory sync",
+                  ...integrations.map(i => i.name)
+                ],
                 "offers": {
                   "@type": "Offer",
                   "price": "0",
                   "priceCurrency": "USD"
-                }
+                },
+                "url": "https://westfieldprepcenter.com/integrations"
               },
               {
                 "@type": "FAQPage",
                 "mainEntity": [
                   {
                     "@type": "Question",
-                    "name": "How do integrations work with Westfield Prep Center?",
+                    "name": "How do Shopify 3PL integrations work with Westfield?",
                     "acceptedAnswer": {
                       "@type": "Answer",
-                      "text": "Our integrations connect directly to your platforms via OAuth or API. Once connected, orders automatically sync in real-time, inventory updates push within minutes, and tracking numbers upload automatically when orders ship."
+                      "text": "Our Shopify 3PL integration connects directly via OAuth. Once connected, orders automatically sync in real-time, inventory updates push within minutes, and tracking numbers upload automatically when orders ship."
                     }
                   },
                   {
                     "@type": "Question",
-                    "name": "Do you support real-time order syncing?",
+                    "name": "Do you support real-time order syncing for Amazon prep?",
                     "acceptedAnswer": {
                       "@type": "Answer",
-                      "text": "Yes, all our e-commerce integrations support real-time order syncing via webhooks. When a customer places an order, it appears in our system within seconds."
+                      "text": "Yes, all our e-commerce integrations including Amazon prep center sync support real-time order syncing via webhooks. When a customer places an order, it appears in our system within seconds."
                     }
                   },
                   {
                     "@type": "Question",
-                    "name": "Do I need a developer to set up integrations?",
+                    "name": "Do I need a developer to set up 3PL integrations?",
                     "acceptedAnswer": {
                       "@type": "Answer",
-                      "text": "No developer needed. Our integrations are plug-and-play with guided setup. Most clients complete setup in under 10 minutes."
+                      "text": "No developer needed. Our Shopify and Amazon 3PL integrations are plug-and-play with guided setup. Most clients complete setup in under 10 minutes."
                     }
                   },
                   {
                     "@type": "Question",
-                    "name": "Which platforms do you integrate with?",
+                    "name": "Which e-commerce platforms do you integrate with?",
                     "acceptedAnswer": {
                       "@type": "Answer",
-                      "text": "We integrate with 40+ platforms including Shopify, Amazon, Walmart, TikTok Shop, Etsy, eBay, WooCommerce, BigCommerce, and many more. Contact us to see if we support your platform."
+                      "text": "We integrate with 40+ platforms including Shopify, Amazon, Walmart, TikTok Shop, Etsy, WooCommerce, BigCommerce, and many more. Contact us to see if we support your platform."
                     }
                   }
                 ]
@@ -628,7 +639,7 @@ const Integrations = () => {
                 variants={fadeUpVariants}
                 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
               >
-                Seamless Integrations with the Tools You Already Use
+                Shopify & Amazon 3PL Integrations
               </motion.h1>
 
               <motion.p 

@@ -73,9 +73,10 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Los Angeles 3PL Fulfillment | Shopify Fulfillment Center | Westfield Prep Center</title>
-        <meta name="description" content="LA's top-rated 3PL and Shopify fulfillment center offering same-day receiving, transparent pricing, and 2M+ orders fulfilled. Located in Los Angeles, CA." />
-        <meta name="keywords" content="3pl los angeles, los angeles 3pl, shopify 3pl, 3pl fulfillment los angeles, ecommerce fulfillment los angeles, 3pl warehouse la, california 3pl, shopify fulfillment center los angeles" />
+        <title>3PL Fulfillment for Shopify, Amazon & DTC Brands | Westfield</title>
+        <meta name="description" content="Westfield is a nationwide 3PL providing Shopify fulfillment, Amazon FBA prep, and DTC logistics. Transparent pricing, real-time integrations, and 24-hour turnaround." />
+        <meta name="robots" content="index, follow" />
+        <meta name="keywords" content="3pl shopify, shopify fulfillment center, amazon prep center, FBA prep center los angeles, 3pl pricing, DTC fulfillment, los angeles 3pl" />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
         <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
         <meta name="geo.region" content="US-CA" />
@@ -85,20 +86,21 @@ const Index = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
         <meta property="og:site_name" content="Westfield Prep Center" />
-        <meta property="og:title" content="Los Angeles 3PL Fulfillment | Shopify Fulfillment Center | Westfield Prep Center" />
-        <meta property="og:description" content="LA's top-rated 3PL and Shopify fulfillment center offering same-day receiving, transparent pricing, and 2M+ orders fulfilled. Located in Los Angeles, CA." />
-        <meta property="og:image" content="https://westfieldprepcenter.com/warehouse-exterior-la.jpg" />
+        <meta property="og:title" content="3PL Fulfillment for Shopify, Amazon & DTC Brands" />
+        <meta property="og:description" content="Shopify fulfillment, FBA prep & DTC logistics with real-time integrations. $1–2.50/unit." />
+        <meta property="og:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@westfieldprep" />
-        <meta name="twitter:creator" content="@westfieldprep" />
-        <meta name="twitter:title" content="Los Angeles 3PL Fulfillment | Shopify Fulfillment Center | Westfield Prep Center" />
-        <meta name="twitter:description" content="LA's top-rated 3PL and Shopify fulfillment center offering same-day receiving, transparent pricing, and 2M+ orders fulfilled." />
-        <meta name="twitter:image" content="https://westfieldprepcenter.com/warehouse-exterior-la.jpg" />
+        <meta name="twitter:site" content="@Westfield3PL" />
+        <meta name="twitter:creator" content="@Westfield3PL" />
+        <meta name="twitter:title" content="3PL Fulfillment for Shopify, Amazon & DTC Brands" />
+        <meta name="twitter:description" content="Westfield is a nationwide 3PL providing Shopify fulfillment, Amazon FBA prep, and DTC logistics. Transparent pricing and 24-hour turnaround." />
+        <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
       </Helmet>
       <StructuredData type="organization" />
       <StructuredData type="website" />
+      <StructuredData type="localBusiness" />
       <StructuredData type="faq" data={faqData} />
       <div className="min-h-screen">
       <Header />
