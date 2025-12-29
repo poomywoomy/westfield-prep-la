@@ -23,6 +23,7 @@ const DocumentGeneratorTab = lazy(() => import("@/components/admin/DocumentGener
 const ShopifySyncCenter = lazy(() => import("@/components/admin/ShopifySyncCenter").then(m => ({ default: m.ShopifySyncCenter })));
 const InventoryTab = lazy(() => import("@/components/admin/InventoryTab").then(m => ({ default: m.InventoryTab })));
 const BlogTab = lazy(() => import("@/components/admin/BlogTab").then(m => ({ default: m.BlogTab })));
+const BlogResearchTab = lazy(() => import("@/components/admin/BlogResearchTab"));
 const DiscrepanciesTab = lazy(() => import("@/components/admin/DiscrepanciesTab").then(m => ({ default: m.DiscrepanciesTab })));
 const OrdersTab = lazy(() => import("@/components/admin/OrdersTab").then(m => ({ default: m.OrdersTab })));
 const ShipmentsTab = lazy(() => import("@/components/admin/ShipmentsTab").then(m => ({ default: m.ShipmentsTab })));
@@ -197,6 +198,12 @@ const AdminDashboard = () => {
           <TabsContent value="blog">
             <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
               <BlogTab />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="blog-research">
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <BlogResearchTab />
             </Suspense>
           </TabsContent>
 
