@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 
 interface StructuredDataProps {
-  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact" | "collectionPage" | "itemList";
+  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact" | "collectionPage" | "itemList" | "product";
   data?: any;
 }
 
@@ -335,6 +335,40 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
             }
           }
         }))
+      };
+    }
+
+    // Product schema for pricing page
+    if (type === "product") {
+      return {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: "3PL Fulfillment Pricing",
+        description: "Westfield Prep offers transparent, high-speed Shopify, Amazon FBA, and DTC fulfillment services with pricing starting at $1.20/unit.",
+        brand: {
+          "@type": "Organization",
+          name: "Westfield Prep Center"
+        },
+        offers: {
+          "@type": "AggregateOffer",
+          lowPrice: "1.20",
+          highPrice: "1.70",
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+          url: `${baseUrl}/pricing`
+        },
+        review: {
+          "@type": "Review",
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+            bestRating: "5"
+          },
+          author: {
+            "@type": "Person",
+            name: "Shopify Seller"
+          }
+        }
       };
     }
 
