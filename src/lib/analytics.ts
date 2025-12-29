@@ -12,6 +12,7 @@ export type AnalyticsEvent =
   | 'roi_calculator_started'
   | 'roi_calculator_completed'
   | 'quote_form_submitted'
+  | 'form_submit'
   | 'calendly_modal_opened'
   | 'calendly_booking_completed'
   | 'lead_magnet_downloaded'

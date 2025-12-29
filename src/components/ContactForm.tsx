@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
+import { trackEvent } from "@/lib/analytics";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -137,6 +138,13 @@ const ContactForm = () => {
         });
         return;
       }
+
+      // Track successful form submission
+      trackEvent('form_submit', { 
+        form_type: 'quote_request',
+        marketplaces: validatedData.marketplaces.join(','),
+        units_per_month: validatedData.unitsPerMonth
+      });
 
       toast({
         title: "Success!",
