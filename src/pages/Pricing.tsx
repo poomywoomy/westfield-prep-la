@@ -101,11 +101,11 @@ const Pricing = () => {
     },
     { 
       question: "What are your Amazon FBA prep rates?", 
-      answer: "Our Amazon FBA prep services range from $1.20–$1.70 per unit depending on volume and complexity. This includes FNSKU labeling, polybagging, bubble wrap, and compliance with all Amazon requirements." 
+      answer: "Our Amazon FBA prep services range from $1.00–$2.50 per unit depending on volume and complexity. This includes FNSKU labeling, polybagging, bubble wrap, and compliance with all Amazon requirements." 
     },
     { 
       question: "How does your DTC fulfillment pricing compare to big-box 3PLs?", 
-      answer: "Unlike big-box 3PLs with $3K+ minimums and tiered fees, we offer flexible pricing starting at $1.20/unit with no monthly minimums. You get dedicated support and 24-hour turnaround at a fraction of the cost." 
+      answer: "Unlike big-box 3PLs with $3K+ minimums and tiered fees, we offer flexible pricing starting at $1.00/unit with no monthly minimums. You get dedicated support and 24-hour turnaround at a fraction of the cost." 
     },
     { 
       question: "Are there any setup fees or minimums?", 
@@ -213,7 +213,7 @@ const Pricing = () => {
         <title>3PL Fulfillment Pricing | Shopify & Amazon Sellers | Westfield</title>
         <meta 
           name="description" 
-          content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.20–$1.70/unit. 24-hour turnaround. Calculate your ROI savings instantly." 
+          content="Transparent 3PL pricing for Shopify fulfillment, Amazon FBA & WFS prep, and DTC brands. Rates from $1.00–$2.50 per unit with a 24-hour turnaround. Calculate your ROI instantly." 
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/pricing" />
         
@@ -226,7 +226,7 @@ const Pricing = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://westfieldprepcenter.com/pricing" />
         <meta property="og:title" content="3PL Fulfillment Pricing | Shopify & Amazon Sellers" />
-        <meta property="og:description" content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.20–$1.70/unit. 24-hour turnaround." />
+        <meta property="og:description" content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.00–$2.50/unit. 24-hour turnaround." />
         <meta property="og:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
         <meta property="og:site_name" content="Westfield Prep Center" />
         
@@ -234,7 +234,7 @@ const Pricing = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Westfield3PL" />
         <meta name="twitter:title" content="3PL Fulfillment Pricing | Shopify & Amazon Sellers" />
-        <meta name="twitter:description" content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.20–$1.70/unit. 24-hour turnaround." />
+        <meta name="twitter:description" content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.00–$2.50/unit. 24-hour turnaround." />
         <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
       </Helmet>
       <StructuredData type="service" data={serviceData} />

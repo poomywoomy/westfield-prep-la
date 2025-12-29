@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 
 interface StructuredDataProps {
-  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact" | "collectionPage" | "itemList" | "product";
+  type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact" | "collectionPage" | "itemList" | "product" | "localBusiness" | "software";
   data?: any;
 }
 
@@ -344,15 +344,15 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         "@context": "https://schema.org",
         "@type": "Product",
         name: "3PL Fulfillment Pricing",
-        description: "Westfield Prep offers transparent, high-speed Shopify, Amazon FBA, and DTC fulfillment services with pricing starting at $1.20/unit.",
+        description: "Shopify, Amazon, and DTC 3PL pricing starting at $1.00/unit with 24-hour turnaround.",
         brand: {
           "@type": "Organization",
           name: "Westfield Prep Center"
         },
         offers: {
           "@type": "AggregateOffer",
-          lowPrice: "1.20",
-          highPrice: "1.70",
+          lowPrice: "1.00",
+          highPrice: "2.50",
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
           url: `${baseUrl}/pricing`
@@ -369,6 +369,43 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
             name: "Shopify Seller"
           }
         }
+      };
+    }
+
+    // SAB-Compliant LocalBusiness schema (no street address)
+    if (type === "localBusiness") {
+      return {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        name: "Westfield Prep Center",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Los Angeles",
+          addressRegion: "CA",
+          postalCode: "91010",
+          addressCountry: "US"
+        },
+        telephone: "818-935-5478",
+        email: "info@westfieldprepcenter.com",
+        url: baseUrl
+      };
+    }
+
+    // SoftwareApplication schema for Integrations page
+    if (type === "software") {
+      return {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "Westfield 3PL Integration Platform",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        featureList: [
+          "Shopify fulfillment integration",
+          "Amazon prep center sync",
+          "Order routing and tracking",
+          "Real-time inventory sync"
+        ],
+        url: `${baseUrl}/integrations`
       };
     }
 
