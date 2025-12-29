@@ -16,6 +16,7 @@ const Services = lazy(() => import("@/components/Services"));
 const HowItWorksProcess = lazy(() => import("@/components/HowItWorksProcess"));
 const Reviews = lazy(() => import("@/components/Reviews"));
 const LocationShowcase = lazy(() => import("@/components/LocationShowcase"));
+const UseCaseSection = lazy(() => import("@/components/UseCaseSection"));
 
 const FAQAccordion = lazy(() => import("@/components/FAQAccordion"));
 const FinalCTA = lazy(() => import("@/components/FinalCTA"));
@@ -113,6 +114,10 @@ const Index = () => {
           <StatsStrip />
         </Suspense>
         
+        {/* Use Case Section - NEW CRO Component */}
+        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
+          <UseCaseSection />
+        </Suspense>
         
         {/* Phase 3: Value Proposition */}
         <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
