@@ -14,7 +14,7 @@ import {
   Check, Zap, Clock, Shield, DollarSign, 
   ShieldCheck, BarChart3, Users, Calendar, 
   ArrowRight, Sparkles, Package, Truck,
-  X, CheckCircle, Quote, Star, Mail
+  X, CheckCircle, Quote, Star, Mail, AlertTriangle
 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -451,171 +451,336 @@ const Pricing = () => {
           {/* Section Divider */}
           <SectionDivider icon={Package} />
 
-          {/* 3-Way Comparison Grid */}
-          <section className="py-16 md:py-20 relative overflow-hidden">
-            {/* Subtle gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-background to-green-500/5 pointer-events-none" />
-            
+          {/* 3PL Fulfillment Comparison Matrix */}
+          <section className="py-16 md:py-24 relative overflow-hidden">
             <div className="container mx-auto px-4 max-w-6xl relative z-10">
-              <motion.h2 
+              <motion.div
                 initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-2xl md:text-4xl font-bold text-center mb-10 md:mb-14"
+                className="text-center mb-10 md:mb-14"
               >
-                Why Westfield Beats In-House and Big-Box 3PLs
-              </motion.h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-4">
+                  3PL Fulfillment Comparison: In-House vs Big Box vs Westfield
+                </h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  See how our boutique 3PL stacks up against doing it yourself or using a large fulfillment provider
+                </p>
+              </motion.div>
               
-              <motion.div 
-                variants={containerVariants}
-                initial="hidden"
-                whileInView="visible"
+              <motion.div
+                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="grid md:grid-cols-3 gap-6 md:gap-8"
+                transition={{ delay: 0.1 }}
+                className="bg-card rounded-2xl shadow-lg border overflow-hidden"
               >
-                {/* Card 1 – In-House Fulfillment (Red) */}
-                <motion.div 
-                  variants={itemVariants}
-                  whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
-                  className="bg-card border-2 border-red-200 dark:border-red-900/50 rounded-3xl p-6 md:p-8 shadow-md hover:shadow-lg transition-all"
-                >
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                      <Package className="w-6 h-6 text-red-500" />
-                    </div>
-                    <h3 className="text-xl font-bold text-red-600 dark:text-red-400">In-House Fulfillment</h3>
-                  </div>
-                  <ul className="space-y-4 text-sm">
-                    <li className="flex items-start gap-2">
-                      <span>❌</span>
-                      <span className="text-muted-foreground">$3.10+/unit (labor + materials)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>❌</span>
-                      <span className="text-muted-foreground">Slow 2–5 day turnaround</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>❌</span>
-                      <span className="text-muted-foreground">No live inventory visibility</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>❌</span>
-                      <span className="text-muted-foreground">Risk of non-compliance (FBA/WFS)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>❌</span>
-                      <span className="text-muted-foreground">No shipping integrations</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>❌</span>
-                      <span className="text-muted-foreground">Manual spreadsheets & tracking</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>⚠️</span>
-                      <span className="text-muted-foreground">Full-time labor cost & liability</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>⚠️</span>
-                      <span className="text-muted-foreground">Limited DTC flexibility</span>
-                    </li>
-                  </ul>
-                </motion.div>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[700px]">
+                    {/* Table Header */}
+                    <thead>
+                      <tr className="bg-muted/50 border-b border-border">
+                        <th className="px-4 py-4 md:px-6 md:py-5 text-left font-semibold text-sm uppercase tracking-wide text-muted-foreground w-[200px]">
+                          Feature
+                        </th>
+                        <th className="px-4 py-4 md:px-6 md:py-5 text-center font-semibold text-sm uppercase tracking-wide">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <Package className="w-4 h-4" />
+                            <span>In-House</span>
+                          </div>
+                        </th>
+                        <th className="px-4 py-4 md:px-6 md:py-5 text-center font-semibold text-sm uppercase tracking-wide">
+                          <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                            <Truck className="w-4 h-4" />
+                            <span>Big Box 3PLs</span>
+                          </div>
+                        </th>
+                        <th className="px-4 py-4 md:px-6 md:py-5 text-center font-semibold text-sm uppercase tracking-wide bg-green-50/50 dark:bg-green-900/10">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <CheckCircle className="w-4 h-4" />
+                            <span>Westfield ★</span>
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* FBA & WFS Pricing */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">FBA & WFS Pricing</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">$3.10+/unit</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">$2.50–$3.50/unit</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">$1.00–$2.00/unit</span>
+                          </div>
+                        </td>
+                      </tr>
 
-                {/* Card 2 – Big-Box 3PLs (Gray) */}
-                <motion.div 
-                  variants={itemVariants}
-                  whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
-                  className="bg-card border-2 border-gray-300 dark:border-gray-700 rounded-3xl p-6 md:p-8 shadow-md hover:shadow-lg transition-all"
-                >
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                      <Truck className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">Big-Box 3PLs</h3>
-                  </div>
-                  <ul className="space-y-4 text-sm">
-                    <li className="flex items-start gap-2">
-                      <span>💸</span>
-                      <span className="text-muted-foreground">$2.50–$3.50/unit (tiered fees)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>⚠️</span>
-                      <span className="text-muted-foreground">48–72 hour turnaround</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>⚠️</span>
-                      <span className="text-muted-foreground">Delayed inventory syncs</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>✅</span>
-                      <span className="text-muted-foreground">FBA-compliant (not always WFS)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>✅</span>
-                      <span className="text-muted-foreground">Shopify & Amazon integrations</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>⚠️</span>
-                      <span className="text-muted-foreground">Tiered support response</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>❌</span>
-                      <span className="text-muted-foreground">High monthly minimums ($3K+)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>⚠️</span>
-                      <span className="text-muted-foreground">Less flexibility for hybrid sellers</span>
-                    </li>
-                  </ul>
-                </motion.div>
+                      {/* DTC Fulfillment Pricing */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">DTC Fulfillment Pricing</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">N/A</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Variable</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">$1.00–$2.50/unit</span>
+                          </div>
+                        </td>
+                      </tr>
 
-                {/* Card 3 – Westfield Prep Center (Green) */}
-                <motion.div 
-                  variants={itemVariants}
-                  whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
-                  className="bg-card border-2 border-green-300 dark:border-green-700 rounded-3xl p-6 md:p-8 shadow-xl ring-2 ring-green-200/50 dark:ring-green-800/50 hover:shadow-2xl transition-all"
-                >
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                      <CheckCircle className="w-6 h-6 text-green-500" />
-                    </div>
-                    <h3 className="text-xl font-bold text-green-600 dark:text-green-400">Westfield Prep Center</h3>
-                  </div>
-                  <ul className="space-y-4 text-sm">
-                    <li className="flex items-start gap-2">
-                      <span>✅</span>
-                      <span className="text-foreground font-medium">$1.20–$1.70/unit (FBA & DTC)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>⚡</span>
-                      <span className="text-foreground font-medium">Avg. 24-hour turnaround</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>📊</span>
-                      <span className="text-foreground font-medium">Real-time inventory visibility</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>✅</span>
-                      <span className="text-foreground font-medium">FBA & WFS compliance included</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>🔗</span>
-                      <span className="text-foreground font-medium">Shopify, Amazon, Walmart + more</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>💬</span>
-                      <span className="text-foreground font-medium">Dedicated human support</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>🙌</span>
-                      <span className="text-foreground font-medium">Low minimums & volume discounts</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span>🧠</span>
-                      <span className="text-foreground font-medium">Built for hybrid DTC + marketplace</span>
-                    </li>
-                  </ul>
-                </motion.div>
+                      {/* Turnaround Time */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Turnaround Time</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">2–5 days</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">48–72 hours</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">24 hours</span>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Real-Time Inventory Visibility */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Real-Time Inventory Visibility</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">No</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Limited</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">Yes</span>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Amazon / Walmart / Shopify / WFS Support */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Amazon / Walmart / Shopify / WFS</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">None</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Partial</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">All Supported</span>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Dedicated Human Support */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Dedicated Human Support</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">No</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Tiered</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">Yes</span>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Compliance (FBA/WFS) */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Compliance (FBA/WFS)</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Risk</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">FBA Only</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">Both</span>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Order Integrations */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Order Integrations</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Manual</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Yes</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">Yes</span>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Hybrid Selling Support */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Hybrid DTC + Marketplace</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Limited</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Limited</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">Built-in</span>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Monthly Minimums */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Monthly Minimums</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                            <span className="text-sm">N/A</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">$3K+</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">Low/None</span>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Liability Exposure */}
+                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Liability Exposure</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">High</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Low</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">Low</span>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Operational Complexity */}
+                      <tr className="hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Operational Complexity</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">High</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">Medium</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
+                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                            <Check className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm font-semibold">Low</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </motion.div>
             </div>
           </section>
