@@ -1,4 +1,4 @@
-// Centralized Analytics Helper
+// Centralized Analytics Helper for CRO Tracking
 // Tracks CRO events for GA4, can be extended for Mixpanel/PostHog
 
 declare global {
