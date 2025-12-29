@@ -15,7 +15,7 @@ import {
   Check, Zap, Clock, Shield, DollarSign, 
   ShieldCheck, BarChart3, Users, Calendar, 
   ArrowRight, Sparkles, Package, Truck,
-  X, CheckCircle, Quote, Star, Mail, AlertTriangle
+  X, CheckCircle, Star, Mail, AlertTriangle
 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -143,23 +143,6 @@ const Pricing = () => {
     { icon: Zap, service: "Multi-Channel Support", description: "Shopify, Amazon, TikTok Shop integration" },
   ];
 
-  const testimonials = [
-    {
-      quote: "Switching to Westfield cut our fulfillment costs in half and improved turnaround overnight.",
-      company: "DTC Beauty Brand",
-      role: "Founder, Beauty Sector"
-    },
-    {
-      quote: "Their 24-hour turnaround has been a game-changer for our Amazon business. Inventory is received and prepped quickly, communication is clear, and everything is handled to Amazon standards. We've stayed in stock more consistently since working with them.",
-      company: "Product's for you",
-      role: "Operations Manager"
-    },
-    {
-      quote: "Real-time inventory tracking finally gave us the visibility we needed to scale.",
-      company: "Multi-Channel Brand",
-      role: "E-commerce Director"
-    }
-  ];
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -800,52 +783,6 @@ const Pricing = () => {
                     </tbody>
                   </table>
                 </div>
-              </motion.div>
-            </div>
-          </section>
-
-          {/* Section Divider */}
-          <SectionDivider icon={Sparkles} />
-
-          {/* Testimonials Section */}
-          <section className="py-16 md:py-20 bg-muted/30">
-            <div className="container mx-auto px-4 max-w-5xl">
-              <motion.h2 
-                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-2xl md:text-4xl font-bold text-center mb-10 md:mb-12"
-              >
-                What Our Clients Are Saying
-              </motion.h2>
-              
-              <motion.div 
-                variants={containerVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="grid md:grid-cols-3 gap-6"
-              >
-                {testimonials.map((testimonial, i) => (
-                  <motion.div 
-                    key={i}
-                    variants={itemVariants}
-                    whileHover={prefersReducedMotion ? {} : { scale: 1.03, y: -6 }}
-                    className="bg-card rounded-2xl p-6 border shadow-lg hover:shadow-xl transition-all group"
-                  >
-                    <Quote className="w-8 h-8 text-[#F97316]/30 mb-4 group-hover:text-[#F97316]/50 transition-colors" />
-                    <p className="text-muted-foreground italic mb-6 leading-relaxed">"{testimonial.quote}"</p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-[#F97316] to-[#EA580C] rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">{testimonial.company[0]}</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">{testimonial.company}</p>
-                        <p className="text-xs text-muted-foreground">{testimonial.role}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
               </motion.div>
             </div>
           </section>
