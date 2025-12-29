@@ -16,6 +16,7 @@ export type AnalyticsEvent =
   | 'calendly_booking_completed'
   | 'lead_magnet_downloaded'
   | 'pricing_page_viewed'
+  | 'pricing_cta_click'
   | 'exit_intent_shown'
   | 'exit_intent_converted'
   | 'schedule_call_clicked'

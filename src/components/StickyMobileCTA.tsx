@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { DollarSign } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 const StickyMobileCTA = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -32,6 +33,11 @@ const StickyMobileCTA = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleClick = () => {
+    trackEvent('pricing_cta_click', { location: 'sticky_mobile' });
+    navigate("/pricing");
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -39,12 +45,12 @@ const StickyMobileCTA = () => {
       <div className="bg-[hsl(var(--shopify-page-accent))] shadow-lg border-t border-white/10">
         <div className="container mx-auto px-4 py-3">
           <Button
-            onClick={() => navigate("/contact")}
+            onClick={handleClick}
             size="lg"
             className="w-full bg-white text-[hsl(var(--shopify-page-accent))] hover:bg-white/90 font-semibold shadow-md"
           >
-            Get a Quote
-            <ArrowRight className="ml-2 w-5 h-5" />
+            <DollarSign className="mr-2 w-5 h-5" />
+            View Fulfillment Pricing
           </Button>
         </div>
       </div>
