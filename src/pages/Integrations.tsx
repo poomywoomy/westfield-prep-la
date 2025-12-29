@@ -44,8 +44,6 @@ import {
   Activity,
   Lock,
   X,
-  Copy,
-  ExternalLink,
   ChevronRight,
   Sparkles,
   Phone,
@@ -202,45 +200,53 @@ interface Integration {
   badge?: string;
 }
 
-// All integrations
+// All integrations (only original platforms from platformsData + actual carrier logos)
 const integrations: Integration[] = [
-  // E-Commerce
+  // E-Commerce (from platformsData.ts)
   { name: "Shopify", key: "shopify", category: "ecommerce", description: "Seamlessly sync your Shopify store with real-time order imports, inventory updates, and automatic tracking.", setupTime: "< 5 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true }, badge: "Most Popular" },
-  { name: "Shopify Plus", key: "shopifyPlus", category: "ecommerce", description: "Enterprise-grade integration with advanced features for high-volume merchants.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true }, badge: "Enterprise" },
   { name: "Amazon", key: "amazon", category: "ecommerce", description: "Full Amazon Seller Central integration with FBA prep and inventory sync capabilities.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
   { name: "Walmart", key: "walmart", category: "ecommerce", description: "Connect your Walmart Marketplace with WFS-ready fulfillment support.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true }, badge: "WFS Ready" },
   { name: "TikTok Shop", key: "tiktok", category: "ecommerce", description: "Fulfill TikTok Shop orders with automatic inventory sync and tracking updates.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
   { name: "Etsy", key: "etsy", category: "ecommerce", description: "Sync your Etsy shop orders and manage inventory across all channels.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
+  { name: "eBay", key: "ebay", category: "ecommerce", description: "Global online marketplace for auctions and fixed-price sales with multi-channel fulfillment.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
   { name: "WooCommerce", key: "woocommerce", category: "ecommerce", description: "WordPress WooCommerce integration with webhook support for real-time updates.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
   { name: "BigCommerce", key: "bigcommerce", category: "ecommerce", description: "Enterprise e-commerce platform integration with full order management.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
-  { name: "Faire", key: "faire", category: "ecommerce", description: "Wholesale marketplace integration for B2B order fulfillment.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
-  { name: "Magento", key: "magento", category: "ecommerce", description: "Adobe Commerce / Magento integration for enterprise merchants.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
-  { name: "Wix", key: "wix", category: "ecommerce", description: "Wix eCommerce store integration with automatic order sync.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
+  { name: "Faire", key: "faire", category: "ecommerce", description: "Wholesale marketplace connecting brands and retailers for B2B order fulfillment.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
+  { name: "Magento", key: "magento", category: "ecommerce", description: "Flexible open-source e-commerce platform for enterprise merchants.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
+  { name: "Wix", key: "wix", category: "ecommerce", description: "Website builder with integrated e-commerce and automatic order sync.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
+  { name: "Squarespace", key: "squarespace", category: "ecommerce", description: "Design-focused website and commerce platform integration.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
+  { name: "Target Plus", key: "targetplus", category: "ecommerce", description: "Target's curated third-party marketplace for enterprise sellers.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
+  { name: "Instagram Shopping", key: "instagram", category: "ecommerce", description: "Social commerce through Instagram posts and stories.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
+  { name: "Facebook Shops", key: "facebook", category: "ecommerce", description: "Social selling through Facebook and Messenger.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
+  { name: "Whatnot", key: "whatnot", category: "ecommerce", description: "Live selling and auction platform with same-day shipping support.", setupTime: "< 5 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
+  { name: "Pinterest Shopping", key: "pinterest", category: "ecommerce", description: "Visual discovery and shopping platform integration.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
+  { name: "Alibaba", key: "alibaba", category: "ecommerce", description: "Global B2B wholesale and manufacturing marketplace.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: false } },
+  { name: "Mercado Libre", key: "mercadolibre", category: "ecommerce", description: "Leading e-commerce platform in Latin America.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
+  { name: "Rakuten", key: "rakuten", category: "ecommerce", description: "Major Japanese e-commerce platform for international sellers.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
   
-  // Shipping
-  { name: "FedEx", key: "fedex", category: "shipping", description: "Domestic and international shipping with real-time rate shopping.", setupTime: "< 5 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
-  { name: "UPS", key: "ups", category: "shipping", description: "Full UPS integration for ground, air, and international shipping.", setupTime: "< 5 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
-  { name: "USPS", key: "usps", category: "shipping", description: "Priority, First Class, and Media Mail shipping options.", setupTime: "< 5 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
-  { name: "DHL", key: "dhl", category: "shipping", description: "Express international shipping with customs handling.", setupTime: "< 5 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  // Shipping (only carriers with actual logos in public/integration-logos)
   { name: "ShipStation", key: "shipstation", category: "shipping", description: "Multi-carrier shipping platform integration for label printing and tracking.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
   { name: "Canada Post", key: "canadapost", category: "shipping", description: "Canadian domestic and international shipping integration.", setupTime: "< 5 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
   { name: "Australia Post", key: "australiapost", category: "shipping", description: "Australian domestic and international shipping services.", setupTime: "< 5 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  { name: "Pitney Bowes", key: "pitneybowes", category: "shipping", description: "Global shipping and mailing solutions integration.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  { name: "PostNord", key: "postnord", category: "shipping", description: "Nordic region postal and logistics services.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  { name: "Bring", key: "bring", category: "shipping", description: "Scandinavian logistics and parcel delivery.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  { name: "Asendia", key: "asendia", category: "shipping", description: "International mail and e-commerce delivery solutions.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  { name: "NZ Couriers", key: "nzcouriers", category: "shipping", description: "New Zealand domestic courier services.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  { name: "Stallion Express", key: "stallion", category: "shipping", description: "Cross-border shipping solutions for Canadian sellers.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  { name: "Passport", key: "passport", category: "shipping", description: "International shipping with duties and taxes included.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  { name: "BUKU Ship", key: "buku", category: "shipping", description: "E-commerce shipping and fulfillment platform.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
+  { name: "Vesyl", key: "vesyl", category: "shipping", description: "Multi-carrier shipping management platform.", setupTime: "< 10 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
+  { name: "FlavorCloud", key: "flavorcloud", category: "shipping", description: "International shipping with landed cost calculations.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
+  { name: "uShip", key: "uship", category: "shipping", description: "Freight and large item shipping marketplace.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: false, realTime: true } },
+  { name: "eHub", key: "ehub", category: "shipping", description: "Enterprise shipping technology platform.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
+  { name: "Tusk Logistics", key: "tusk", category: "shipping", description: "Regional parcel delivery network.", setupTime: "< 10 minutes", features: { orderSync: false, inventorySync: false, returns: true, realTime: true } },
   
   // Inventory & WMS
-  { name: "NetSuite", key: "netsuite", category: "inventory", description: "Enterprise ERP integration for inventory and order management.", setupTime: "< 30 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
-  { name: "Skubana", key: "skubana", category: "inventory", description: "Unified commerce operations platform integration.", setupTime: "< 20 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
-  { name: "Cin7", key: "cin7", category: "inventory", description: "Point of sale and inventory management integration.", setupTime: "< 20 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
-  { name: "QuickBooks", key: "quickbooks", category: "inventory", description: "Accounting and inventory management integration.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
+  { name: "Lightspeed", key: "lightspeed", category: "inventory", description: "Point of sale and inventory management for retail.", setupTime: "< 15 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: true } },
   
-  // Custom API / EDI
-  { name: "REST API", key: "restapi", category: "api", description: "Developer-friendly RESTful API for custom integrations.", setupTime: "Custom", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
-  { name: "EDI", key: "edi", category: "api", description: "Electronic Data Interchange for retail compliance.", setupTime: "Custom", features: { orderSync: true, inventorySync: true, returns: true, realTime: false } },
-  { name: "Webhooks", key: "webhooks", category: "api", description: "Real-time event notifications for custom workflows.", setupTime: "< 30 minutes", features: { orderSync: true, inventorySync: true, returns: true, realTime: true } },
-  
-  // ERPs & CRMs
+  // ERPs & CRMs (only Salesforce has a logo)
   { name: "Salesforce", key: "salesforce", category: "erp", description: "Enterprise CRM integration for unified customer and order management.", setupTime: "< 30 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
-  { name: "HubSpot", key: "hubspot", category: "erp", description: "CRM and marketing automation platform integration.", setupTime: "< 20 minutes", features: { orderSync: true, inventorySync: false, returns: false, realTime: true } },
-  { name: "Zoho", key: "zoho", category: "erp", description: "Zoho CRM and inventory management integration.", setupTime: "< 20 minutes", features: { orderSync: true, inventorySync: true, returns: false, realTime: false } },
 ];
 
 // Feature highlights for carousel
@@ -514,7 +520,6 @@ const SecurityBanner = () => {
 const Integrations = () => {
   const [selectedFilter, setSelectedFilter] = useState<FilterCategory>("all");
   const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null);
-  const [copiedCode, setCopiedCode] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -525,21 +530,6 @@ const Integrations = () => {
     if (selectedFilter === "all") return integrations;
     return integrations.filter(i => i.category === selectedFilter);
   }, [selectedFilter]);
-
-  const copyCodeSnippet = () => {
-    const code = `POST /api/v1/orders
-{
-  "orderId": "ORD-12345",
-  "channel": "shopify",
-  "items": [
-    { "sku": "WIDGET-001", "qty": 2 }
-  ],
-  "warehouse": "westfield-la"
-}`;
-    navigator.clipboard.writeText(code);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -607,10 +597,10 @@ const Integrations = () => {
                   },
                   {
                     "@type": "Question",
-                    "name": "What if I need a custom integration?",
+                    "name": "Which platforms do you integrate with?",
                     "acceptedAnswer": {
                       "@type": "Answer",
-                      "text": "We offer a developer-friendly REST API and EDI support for custom integrations. Our team can also build custom connectors for unique requirements."
+                      "text": "We integrate with 40+ platforms including Shopify, Amazon, Walmart, TikTok Shop, Etsy, eBay, WooCommerce, BigCommerce, and many more. Contact us to see if we support your platform."
                     }
                   }
                 ]
@@ -669,7 +659,7 @@ const Integrations = () => {
                     size="lg" 
                     className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-8 py-6 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
                   >
-                    Request Custom Integration
+                    Get Started Today
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
@@ -895,7 +885,7 @@ const Integrations = () => {
         </div>
       </section>
 
-      {/* ========== SECTION 5: DEVELOPER BLOCK ========== */}
+      {/* ========== SECTION 5: HOW IT WORKS BLOCK ========== */}
       <section className="py-20 bg-foreground text-background">
         <div className="container mx-auto px-4">
           <motion.div
@@ -908,59 +898,65 @@ const Integrations = () => {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <motion.div variants={fadeUpVariants}>
                 <Badge className="bg-secondary/20 text-secondary border-secondary/30 mb-4">
-                  <Code className="w-4 h-4 mr-2" />
-                  For Developers
+                  <Zap className="w-4 h-4 mr-2" />
+                  Quick Setup
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  Build Custom Integrations
+                  Connect Your Store in Minutes
                 </h2>
                 <p className="text-background/70 mb-6">
-                  Need something unique? Our developer-friendly REST API and webhook system lets you build exactly what you need.
+                  Our pre-built integrations make it easy to connect your e-commerce platforms. No developers needed — just authenticate and start syncing.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button variant="secondary" size="lg" className="rounded-full">
-                    View API Docs
-                    <ExternalLink className="ml-2 w-4 h-4" />
-                  </Button>
-                  <Link to="/contact">
-                    <Button variant="outline" size="lg" className="rounded-full border-background/30 text-background hover:bg-background/10">
-                      Request Sandbox Access
-                    </Button>
-                  </Link>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-secondary font-bold">1</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">Authenticate Your Store</h4>
+                      <p className="text-background/60 text-sm">Click connect and log in to your platform. We use secure OAuth for authentication.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-secondary font-bold">2</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">Configure Sync Settings</h4>
+                      <p className="text-background/60 text-sm">Choose which products to sync and set your fulfillment preferences.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-secondary font-bold">3</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">Start Fulfilling Orders</h4>
+                      <p className="text-background/60 text-sm">Orders sync automatically. We ship, you grow.</p>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
 
               <motion.div variants={fadeUpVariants}>
-                <div className="relative">
-                  <div className="bg-[#1e1e1e] rounded-xl p-6 font-mono text-sm overflow-hidden border border-white/10">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-3 h-3 rounded-full bg-red-500" />
-                      <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                      <div className="w-3 h-3 rounded-full bg-green-500" />
-                      <span className="ml-2 text-white/50 text-xs">api-request.json</span>
+                <div className="relative bg-gradient-to-br from-secondary/20 to-primary/20 rounded-2xl p-8 border border-white/10">
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <RefreshCcw className="w-10 h-10 text-secondary" />
                     </div>
-                    <pre className="text-green-400 overflow-x-auto">
-{`POST /api/v1/orders
-{
-  "orderId": "ORD-12345",
-  "channel": "shopify",
-  "items": [
-    { "sku": "WIDGET-001", "qty": 2 }
-  ],
-  "warehouse": "westfield-la"
-}`}
-                    </pre>
+                    <h3 className="text-2xl font-bold mb-2">Real-Time Sync</h3>
+                    <p className="text-background/70 mb-6">Orders, inventory, and tracking update automatically across all your connected platforms.</p>
+                    <div className="grid grid-cols-2 gap-4 text-center">
+                      <div className="bg-white/5 rounded-xl p-4">
+                        <div className="text-3xl font-bold text-secondary">40+</div>
+                        <div className="text-sm text-background/60">Integrations</div>
+                      </div>
+                      <div className="bg-white/5 rounded-xl p-4">
+                        <div className="text-3xl font-bold text-secondary">&lt;5min</div>
+                        <div className="text-sm text-background/60">Avg. Setup</div>
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    onClick={copyCodeSnippet}
-                    className="absolute top-4 right-4 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-                  >
-                    {copiedCode ? (
-                      <Check className="w-4 h-4 text-green-400" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-white/70" />
-                    )}
-                  </button>
                 </div>
               </motion.div>
             </div>
@@ -1019,10 +1015,10 @@ const Integrations = () => {
 
                 <AccordionItem value="item-4" className="border rounded-xl px-6 bg-card">
                   <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                    What if I need a custom integration?
+                    Which platforms do you integrate with?
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    We offer a developer-friendly REST API and EDI support for custom integrations. Our team can also build custom connectors for unique requirements. Contact us to discuss your specific needs.
+                    We integrate with 40+ platforms including Shopify, Amazon, Walmart, TikTok Shop, Etsy, eBay, WooCommerce, BigCommerce, Faire, and many more e-commerce platforms and shipping carriers. Check our catalog above to see if your platform is supported.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -1045,14 +1041,14 @@ const Integrations = () => {
               variants={fadeUpVariants}
               className="text-3xl md:text-4xl font-bold mb-6"
             >
-              Need a Unique Integration or Tech Stack?
+              Ready to Connect Your Store?
             </motion.h2>
             
             <motion.p 
               variants={fadeUpVariants}
               className="text-xl mb-10 opacity-90 leading-relaxed"
             >
-              Let's build it — or connect what you're already using. Our team has integrated with 100+ platforms and can handle any custom requirement.
+              Get started with our pre-built integrations and start fulfilling orders faster. Our team is ready to help you connect your platforms.
             </motion.p>
 
             <motion.div variants={fadeUpVariants} className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
@@ -1061,18 +1057,19 @@ const Integrations = () => {
                   size="lg"
                   className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-10 py-7 text-lg font-bold rounded-full"
                 >
-                  Schedule a Call
+                  Get Started
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
-              <Button 
-                size="lg"
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 px-10 py-7 text-lg rounded-full"
-              >
-                Developer API Access
-                <Code className="ml-2 w-5 h-5" />
-              </Button>
+              <Link to="/pricing">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10 px-10 py-7 text-lg rounded-full"
+                >
+                  View Pricing
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Contact Options */}
