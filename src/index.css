@@ -78,6 +78,7 @@ All colors MUST be HSL.
     /* Blog-specific colors */
     --blog-navy: 215 30% 15%;
     --blog-orange: 28 100% 50%;
+    --blog-orange-hover: 28 100% 45%;
     --blog-light-blue: 213 100% 97%;
     --blog-gray-blue: 215 15% 30%;
     --blog-muted-bg: 210 20% 96%;
@@ -116,6 +117,7 @@ All colors MUST be HSL.
     /* Blog-specific colors (dark mode) */
     --blog-navy: 215 25% 90%;
     --blog-orange: 28 100% 50%;
+    --blog-orange-hover: 28 100% 55%;
     --blog-light-blue: 215 25% 18%;
     --blog-gray-blue: 215 10% 80%;
     --blog-muted-bg: 215 15% 14%;
