@@ -8,6 +8,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import StickyIntegrationsCTA from "@/components/StickyIntegrationsCTA";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { TranslatedText } from "@/components/TranslatedText";
 import {
   Carousel,
   CarouselContent,
@@ -176,11 +177,18 @@ interface FilterOption {
   icon: React.ReactNode;
 }
 
+const filterLabels: Record<FilterCategory, string> = {
+  all: "All",
+  ecommerce: "E-Commerce",
+  shipping: "Shipping & Returns",
+  inventory: "Inventory & WMS",
+};
+
 const filterOptions: FilterOption[] = [
-  { id: "all", label: "All", icon: <Globe className="w-4 h-4" /> },
-  { id: "ecommerce", label: "E-Commerce", icon: <ShoppingCart className="w-4 h-4" /> },
-  { id: "shipping", label: "Shipping & Returns", icon: <Truck className="w-4 h-4" /> },
-  { id: "inventory", label: "Inventory & WMS", icon: <Package className="w-4 h-4" /> },
+  { id: "all", label: filterLabels.all, icon: <Globe className="w-4 h-4" /> },
+  { id: "ecommerce", label: filterLabels.ecommerce, icon: <ShoppingCart className="w-4 h-4" /> },
+  { id: "shipping", label: filterLabels.shipping, icon: <Truck className="w-4 h-4" /> },
+  { id: "inventory", label: filterLabels.inventory, icon: <Package className="w-4 h-4" /> },
 ];
 
 // Integration type definition
@@ -236,12 +244,12 @@ const integrations: Integration[] = [
 ];
 
 // Feature highlights for carousel
-const featureHighlights = [
-  { icon: RefreshCcw, title: "Sync in Real Time", description: "Inventory and order data flows in both directions — no manual updates needed." },
-  { icon: Zap, title: "Zero Setup Required", description: "Pre-built integrations for Shopify, Amazon, Walmart, Faire & more." },
-  { icon: Code, title: "Custom API Access", description: "Need something unique? Use our developer-friendly REST API or EDI." },
-  { icon: Route, title: "Automated Order Routing", description: "Set rules by channel, SKU, or customer segment." },
-  { icon: Shield, title: "Enterprise Security", description: "SOC2-compliant infrastructure with role-based access." },
+const featureHighlightsData = [
+  { icon: RefreshCcw, titleKey: "Sync in Real Time", descKey: "Inventory and order data flows in both directions — no manual updates needed." },
+  { icon: Zap, titleKey: "Zero Setup Required", descKey: "Pre-built integrations for Shopify, Amazon, Walmart, Faire & more." },
+  { icon: Code, titleKey: "Custom API Access", descKey: "Need something unique? Use our developer-friendly REST API or EDI." },
+  { icon: Route, titleKey: "Automated Order Routing", descKey: "Set rules by channel, SKU, or customer segment." },
+  { icon: Shield, titleKey: "Enterprise Security", descKey: "SOC2-compliant infrastructure with role-based access." },
 ];
 
 // Animation variants
@@ -469,10 +477,10 @@ const IntegrationCard = ({
 // Security Banner Component
 const SecurityBanner = () => {
   const securityFeatures = [
-    { icon: Clock, label: "99.99% Uptime SLA" },
-    { icon: Shield, label: "SOC2-Compliant" },
-    { icon: Activity, label: "Real-Time Monitoring" },
-    { icon: Lock, label: "Role-Based Access" },
+    { icon: Clock, labelKey: "99.99% Uptime SLA" },
+    { icon: Shield, labelKey: "SOC2-Compliant" },
+    { icon: Activity, labelKey: "Real-Time Monitoring" },
+    { icon: Lock, labelKey: "Role-Based Access" },
   ];
 
   return (
@@ -487,14 +495,14 @@ const SecurityBanner = () => {
         >
           {securityFeatures.map((feature) => (
             <motion.div
-              key={feature.label}
+              key={feature.labelKey}
               variants={cardVariants}
               className="flex flex-col md:flex-row items-center gap-3 text-center md:text-left"
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <feature.icon className="w-6 h-6 text-primary" />
               </div>
-              <span className="font-semibold text-foreground text-sm md:text-base">{feature.label}</span>
+              <span className="font-semibold text-foreground text-sm md:text-base"><TranslatedText>{feature.labelKey}</TranslatedText></span>
             </motion.div>
           ))}
         </motion.div>
@@ -632,7 +640,7 @@ const Integrations = () => {
               <motion.div variants={fadeUpVariants}>
                 <Badge className="bg-white/20 text-white border-white/30 mb-6 px-4 py-2">
                   <Zap className="w-4 h-4 mr-2" />
-                  20+ Integrations
+                  <TranslatedText>20+ Integrations</TranslatedText>
                 </Badge>
               </motion.div>
 
@@ -640,14 +648,14 @@ const Integrations = () => {
                 variants={fadeUpVariants}
                 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
               >
-                Shopify & Amazon 3PL Integrations
+                <TranslatedText>Shopify & Amazon 3PL Integrations</TranslatedText>
               </motion.h1>
 
               <motion.p 
                 variants={fadeUpVariants}
                 className="text-xl text-white/80 mb-8 max-w-xl"
               >
-                From Shopify to Amazon, our 3PL platform connects your entire stack — effortlessly.
+                <TranslatedText>From Shopify to Amazon, our 3PL platform connects your entire stack — effortlessly.</TranslatedText>
               </motion.p>
 
               <motion.div variants={fadeUpVariants} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -656,7 +664,7 @@ const Integrations = () => {
                     size="lg" 
                     className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-8 py-6 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
                   >
-                    Get Started Today
+                    <TranslatedText>Get Started Today</TranslatedText>
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
@@ -714,13 +722,13 @@ const Integrations = () => {
               variants={fadeUpVariants}
               className="text-3xl md:text-4xl font-bold text-foreground mb-4"
             >
-              Browse All Integrations
+              <TranslatedText>Browse All Integrations</TranslatedText>
             </motion.h2>
             <motion.p 
               variants={fadeUpVariants}
               className="text-lg text-muted-foreground max-w-2xl mx-auto"
             >
-              Filter by category to find the perfect connections for your business.
+              <TranslatedText>Filter by category to find the perfect connections for your business.</TranslatedText>
             </motion.p>
           </motion.div>
 
@@ -745,7 +753,7 @@ const Integrations = () => {
                 `}
               >
                 {filter.icon}
-                {filter.label}
+                <TranslatedText>{filter.label}</TranslatedText>
                 {selectedFilter === filter.id && (
                   <Badge variant="secondary" className="ml-1 text-xs">
                     {filteredIntegrations.length}
@@ -781,8 +789,8 @@ const Integrations = () => {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
                   <Plus className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1">And Many More...</h3>
-                <p className="text-xs text-muted-foreground">New integrations added regularly</p>
+                <h3 className="font-semibold text-foreground mb-1"><TranslatedText>And Many More...</TranslatedText></h3>
+                <p className="text-xs text-muted-foreground"><TranslatedText>New integrations added regularly</TranslatedText></p>
               </motion.div>
             </motion.div>
           </AnimatePresence>
@@ -803,13 +811,13 @@ const Integrations = () => {
               variants={fadeUpVariants}
               className="text-3xl md:text-4xl font-bold text-foreground mb-4"
             >
-              Why Integrations Matter
+              <TranslatedText>Why Integrations Matter</TranslatedText>
             </motion.h2>
             <motion.p 
               variants={fadeUpVariants}
               className="text-lg text-muted-foreground max-w-2xl mx-auto"
             >
-              Connect once, automate forever. Here's what our integrations unlock for your business.
+              <TranslatedText>Connect once, automate forever. Here's what our integrations unlock for your business.</TranslatedText>
             </motion.p>
           </motion.div>
 
@@ -827,7 +835,7 @@ const Integrations = () => {
               className="w-full max-w-5xl mx-auto"
             >
               <CarouselContent className="-ml-2 md:-ml-4">
-                {featureHighlights.map((feature, index) => (
+                {featureHighlightsData.map((feature, index) => (
                   <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                     <motion.div
                       whileHover={{ y: -6, scale: 1.02 }}
@@ -836,8 +844,8 @@ const Integrations = () => {
                       <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-4">
                         <feature.icon className="w-7 h-7 text-primary" />
                       </div>
-                      <h3 className="text-xl font-bold text-foreground mb-2">{feature.title}</h3>
-                      <p className="text-muted-foreground text-sm flex-grow">{feature.description}</p>
+                      <h3 className="text-xl font-bold text-foreground mb-2"><TranslatedText>{feature.titleKey}</TranslatedText></h3>
+                      <p className="text-muted-foreground text-sm flex-grow"><TranslatedText>{feature.descKey}</TranslatedText></p>
                     </motion.div>
                   </CarouselItem>
                 ))}
@@ -863,14 +871,14 @@ const Integrations = () => {
               variants={fadeUpVariants}
               className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12"
             >
-              Plug & Play in 3 Simple Steps
+              <TranslatedText>Plug & Play in 3 Simple Steps</TranslatedText>
             </motion.h2>
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { step: "1", title: "Connect Your Store", description: "Authenticate with OAuth in one click. No API keys or developers needed." },
-                { step: "2", title: "Configure Settings", description: "Set your sync preferences, inventory rules, and order routing logic." },
-                { step: "3", title: "Start Shipping", description: "Orders flow in automatically. Inventory syncs. Tracking uploads." },
+                { step: "1", titleKey: "Connect Your Store", descKey: "Authenticate with OAuth in one click. No API keys or developers needed." },
+                { step: "2", titleKey: "Configure Settings", descKey: "Set your sync preferences, inventory rules, and order routing logic." },
+                { step: "3", titleKey: "Start Shipping", descKey: "Orders flow in automatically. Inventory syncs. Tracking uploads." },
               ].map((item, index) => (
                 <motion.div
                   key={item.step}
@@ -881,8 +889,8 @@ const Integrations = () => {
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary text-white text-2xl font-bold flex items-center justify-center mx-auto mb-4 shadow-lg">
                     {item.step}
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm">{item.description}</p>
+                  <h3 className="text-xl font-bold text-foreground mb-2"><TranslatedText>{item.titleKey}</TranslatedText></h3>
+                  <p className="text-muted-foreground text-sm"><TranslatedText>{item.descKey}</TranslatedText></p>
                   
                   {index < 2 && (
                     <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-primary/50 to-transparent" />
@@ -908,13 +916,13 @@ const Integrations = () => {
               <motion.div variants={fadeUpVariants}>
                 <Badge className="bg-secondary/20 text-secondary border-secondary/30 mb-4">
                   <Zap className="w-4 h-4 mr-2" />
-                  Quick Setup
+                  <TranslatedText>Quick Setup</TranslatedText>
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  Connect Your Store in Minutes
+                  <TranslatedText>Connect Your Store in Minutes</TranslatedText>
                 </h2>
                 <p className="text-background/70 mb-6">
-                  Our pre-built integrations make it easy to connect your e-commerce platforms. No developers needed — just authenticate and start syncing.
+                  <TranslatedText>Our pre-built integrations make it easy to connect your e-commerce platforms. No developers needed — just authenticate and start syncing.</TranslatedText>
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
@@ -922,8 +930,8 @@ const Integrations = () => {
                       <span className="text-secondary font-bold">1</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-1">Authenticate Your Store</h4>
-                      <p className="text-background/60 text-sm">Click connect and log in to your platform. We use secure OAuth for authentication.</p>
+                      <h4 className="font-semibold mb-1"><TranslatedText>Authenticate Your Store</TranslatedText></h4>
+                      <p className="text-background/60 text-sm"><TranslatedText>Click connect and log in to your platform. We use secure OAuth for authentication.</TranslatedText></p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -931,8 +939,8 @@ const Integrations = () => {
                       <span className="text-secondary font-bold">2</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-1">Configure Sync Settings</h4>
-                      <p className="text-background/60 text-sm">Choose which products to sync and set your fulfillment preferences.</p>
+                      <h4 className="font-semibold mb-1"><TranslatedText>Configure Sync Settings</TranslatedText></h4>
+                      <p className="text-background/60 text-sm"><TranslatedText>Choose which products to sync and set your fulfillment preferences.</TranslatedText></p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -940,8 +948,8 @@ const Integrations = () => {
                       <span className="text-secondary font-bold">3</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-1">Start Fulfilling Orders</h4>
-                      <p className="text-background/60 text-sm">Orders sync automatically. We ship, you grow.</p>
+                      <h4 className="font-semibold mb-1"><TranslatedText>Start Fulfilling Orders</TranslatedText></h4>
+                      <p className="text-background/60 text-sm"><TranslatedText>Orders sync automatically. We ship, you grow.</TranslatedText></p>
                     </div>
                   </div>
                 </div>
@@ -953,16 +961,16 @@ const Integrations = () => {
                     <div className="w-20 h-20 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6">
                       <RefreshCcw className="w-10 h-10 text-secondary" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">Real-Time Sync</h3>
-                    <p className="text-background/70 mb-6">Orders, inventory, and tracking update automatically across all your connected platforms.</p>
+                    <h3 className="text-2xl font-bold mb-2"><TranslatedText>Real-Time Sync</TranslatedText></h3>
+                    <p className="text-background/70 mb-6"><TranslatedText>Orders, inventory, and tracking update automatically across all your connected platforms.</TranslatedText></p>
                     <div className="grid grid-cols-2 gap-4 text-center">
                       <div className="bg-white/5 rounded-xl p-4">
                         <div className="text-3xl font-bold text-secondary">40+</div>
-                        <div className="text-sm text-background/60">Integrations</div>
+                        <div className="text-sm text-background/60"><TranslatedText>Integrations</TranslatedText></div>
                       </div>
                       <div className="bg-white/5 rounded-xl p-4">
                         <div className="text-3xl font-bold text-secondary">&lt;5min</div>
-                        <div className="text-sm text-background/60">Avg. Setup</div>
+                        <div className="text-sm text-background/60"><TranslatedText>Avg. Setup</TranslatedText></div>
                       </div>
                     </div>
                   </div>
@@ -990,44 +998,44 @@ const Integrations = () => {
               variants={fadeUpVariants}
               className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12"
             >
-              Frequently Asked Questions
+              <TranslatedText>Frequently Asked Questions</TranslatedText>
             </motion.h2>
 
             <motion.div variants={fadeUpVariants}>
               <Accordion type="single" collapsible className="space-y-4">
                 <AccordionItem value="item-1" className="border rounded-xl px-6 bg-card">
                   <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                    How do integrations work with Westfield?
+                    <TranslatedText>How do integrations work with Westfield?</TranslatedText>
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    Our integrations connect directly to your platforms via OAuth. Once connected, orders automatically sync in real-time, inventory updates push to your stores within minutes, and tracking numbers are uploaded automatically when orders ship. Setup takes less than 10 minutes with no coding required.
+                    <TranslatedText>Our integrations connect directly to your platforms via OAuth. Once connected, orders automatically sync in real-time, inventory updates push to your stores within minutes, and tracking numbers are uploaded automatically when orders ship. Setup takes less than 10 minutes with no coding required.</TranslatedText>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-2" className="border rounded-xl px-6 bg-card">
                   <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                    Do you support real-time order syncing?
+                    <TranslatedText>Do you support real-time order syncing?</TranslatedText>
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    Yes, all our e-commerce integrations support real-time order syncing via webhooks. When a customer places an order on your store, it appears in our system within seconds. Inventory levels sync bidirectionally, so your store always shows accurate stock counts.
+                    <TranslatedText>Yes, all our e-commerce integrations support real-time order syncing via webhooks. When a customer places an order on your store, it appears in our system within seconds. Inventory levels sync bidirectionally, so your store always shows accurate stock counts.</TranslatedText>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-3" className="border rounded-xl px-6 bg-card">
                   <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                    Do I need a developer to set up integrations?
+                    <TranslatedText>Do I need a developer to set up integrations?</TranslatedText>
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    No developer needed. Our integrations are plug-and-play with guided setup. Simply authenticate your store, configure your preferences, and start syncing. Most clients complete setup in under 10 minutes. Our team is available to help if you need assistance.
+                    <TranslatedText>No developer needed. Our integrations are plug-and-play with guided setup. Simply authenticate your store, configure your preferences, and start syncing. Most clients complete setup in under 10 minutes. Our team is available to help if you need assistance.</TranslatedText>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-4" className="border rounded-xl px-6 bg-card">
                   <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                    Which platforms do you integrate with?
+                    <TranslatedText>Which platforms do you integrate with?</TranslatedText>
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    We integrate with 40+ platforms including Shopify, Amazon, Walmart, TikTok Shop, Etsy, eBay, WooCommerce, BigCommerce, Faire, and many more e-commerce platforms and shipping carriers. Check our catalog above to see if your platform is supported.
+                    <TranslatedText>We integrate with 40+ platforms including Shopify, Amazon, Walmart, TikTok Shop, Etsy, eBay, WooCommerce, BigCommerce, Faire, and many more e-commerce platforms and shipping carriers. Check our catalog above to see if your platform is supported.</TranslatedText>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -1050,14 +1058,14 @@ const Integrations = () => {
               variants={fadeUpVariants}
               className="text-3xl md:text-4xl font-bold mb-6"
             >
-              Ready to Connect Your Store?
+              <TranslatedText>Ready to Connect Your Store?</TranslatedText>
             </motion.h2>
             
             <motion.p 
               variants={fadeUpVariants}
               className="text-xl mb-10 opacity-90 leading-relaxed"
             >
-              Get started with our pre-built integrations and start fulfilling orders faster. Our team is ready to help you connect your platforms.
+              <TranslatedText>Get started with our pre-built integrations and start fulfilling orders faster. Our team is ready to help you connect your platforms.</TranslatedText>
             </motion.p>
 
             <motion.div variants={fadeUpVariants} className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
@@ -1066,7 +1074,7 @@ const Integrations = () => {
                   size="lg"
                   className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-10 py-7 text-lg font-bold rounded-full"
                 >
-                  Get Started
+                  <TranslatedText>Get Started</TranslatedText>
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
@@ -1076,7 +1084,7 @@ const Integrations = () => {
                   variant="outline"
                   className="border-white/30 text-white hover:bg-white/10 px-10 py-7 text-lg rounded-full"
                 >
-                  View Pricing
+                  <TranslatedText>View Pricing</TranslatedText>
                 </Button>
               </Link>
             </motion.div>
@@ -1106,7 +1114,7 @@ const Integrations = () => {
               variants={fadeUpVariants}
               className="text-sm opacity-75"
             >
-              Trusted by 100+ e-commerce brands | 2M+ orders shipped | Same-day turnaround
+              <TranslatedText>Trusted by 100+ e-commerce brands | 2M+ orders shipped | Same-day turnaround</TranslatedText>
             </motion.p>
           </motion.div>
         </div>
@@ -1125,7 +1133,7 @@ const Integrations = () => {
                   <div>
                     <DialogTitle className="text-2xl">{selectedIntegration.name}</DialogTitle>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Setup time: {selectedIntegration.setupTime}
+                      <TranslatedText>Setup time:</TranslatedText> {selectedIntegration.setupTime}
                     </p>
                   </div>
                 </div>
@@ -1136,7 +1144,7 @@ const Integrations = () => {
               </DialogDescription>
 
               <div className="space-y-4 mt-4">
-                <h4 className="font-semibold text-foreground">Supported Features</h4>
+                <h4 className="font-semibold text-foreground"><TranslatedText>Supported Features</TranslatedText></h4>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { label: "Order Sync", enabled: selectedIntegration.features.orderSync },
