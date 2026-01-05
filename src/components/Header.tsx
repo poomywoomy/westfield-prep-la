@@ -101,7 +101,6 @@ const Header = () => {
             </nav>
 
             <div className="hidden xl:flex items-center gap-4">
-              <LanguageSwitcher variant="compact" />
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-2 text-primary hover:text-secondary transition-colors group"
@@ -125,10 +124,10 @@ const Header = () => {
               >
                 Get a Quote
               </Button>
+              <LanguageSwitcher variant="compact" />
             </div>
 
             <div className="flex lg:hidden items-center gap-2">
-              <LanguageSwitcher variant="compact" />
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-1 text-primary hover:text-secondary transition-colors"
@@ -150,6 +149,7 @@ const Header = () => {
               >
                 Get Quote
               </Button>
+              <LanguageSwitcher variant="compact" />
             </div>
           </div>
         </div>

@@ -111,10 +111,18 @@ serve(async (req) => {
       const textsForPrompt = batch.map((item, idx) => `[${idx}] ${item.text}`).join('\n');
 
       const systemPrompt = `You are a professional translator for a Los Angeles-based e-commerce fulfillment and prep center website (Westfield Prep Center). 
-Translate the following texts to ${languageName}. 
-Keep brand names, technical terms like "FBA", "SKU", "3PL", and company names in English.
-Maintain the same tone - professional but friendly.
-Return ONLY the translations in the same numbered format, nothing else.
+Translate the following texts to ${languageName}.
+
+TRANSLATION STYLE:
+- Use a CONVERSATIONAL PROFESSIONAL tone, like talking to a trusted business partner
+- Sound natural and approachable, NOT stiff or overly formal
+- Avoid corporate jargon or legal-sounding language
+- Keep it warm, friendly, and relatable while staying professional
+- Use everyday language that people actually speak
+
+RULES:
+- Keep brand names, company names, and technical terms (FBA, SKU, 3PL, FNSKU, DTC) in English
+- Return ONLY the translations in the same numbered format, nothing else
 ${context ? `Context: ${context}` : ''}`;
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

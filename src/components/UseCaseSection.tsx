@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Package, Layers, ArrowRight } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const personas = [
   {
@@ -55,13 +56,13 @@ const UseCaseSection = () => {
           className="text-center mb-12"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-secondary/10 text-secondary text-sm font-semibold mb-4">
-            Built For Your Business
+            <TranslatedText>Built For Your Business</TranslatedText>
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Which seller are you?
+            <TranslatedText>Which seller are you?</TranslatedText>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            We've optimized our services for each selling channel. Find your fit.
+            <TranslatedText>We've optimized our services for each selling channel. Find your fit.</TranslatedText>
           </p>
         </motion.div>
 
@@ -88,13 +89,13 @@ const UseCaseSection = () => {
 
                   {/* Content */}
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                    {persona.title}
+                    <TranslatedText>{persona.title}</TranslatedText>
                   </h3>
                   <p className="text-xl font-bold text-foreground mb-3">
-                    {persona.headline}
+                    <TranslatedText>{persona.headline}</TranslatedText>
                   </p>
                   <p className="text-muted-foreground text-sm leading-relaxed mb-5">
-                    {persona.description}
+                    <TranslatedText>{persona.description}</TranslatedText>
                   </p>
 
                   {/* Features */}
@@ -102,14 +103,14 @@ const UseCaseSection = () => {
                     {persona.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-foreground">
                         <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
-                        {feature}
+                        <TranslatedText>{feature}</TranslatedText>
                       </li>
                     ))}
                   </ul>
 
                   {/* CTA */}
                   <div className="flex items-center gap-2 text-secondary font-semibold text-sm group-hover:gap-3 transition-all">
-                    Learn more
+                    <TranslatedText>Learn more</TranslatedText>
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>

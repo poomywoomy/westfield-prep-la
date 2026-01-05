@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Package, Database, PackageCheck, Truck } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const HowItWorksProcess = () => {
   const navigate = useNavigate();
@@ -55,10 +56,10 @@ const HowItWorksProcess = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              How It Actually Works (No Jargon, No Confusion)
+              <TranslatedText>How It Actually Works (No Jargon, No Confusion)</TranslatedText>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              We made fulfillment simple because you've got a brand to build.
+              <TranslatedText>We made fulfillment simple because you've got a brand to build.</TranslatedText>
             </p>
           </div>
 
@@ -90,12 +91,12 @@ const HowItWorksProcess = () => {
 
                   {/* Title */}
                   <h3 className="text-2xl font-bold mb-3 text-center text-card-foreground group-hover:text-primary transition-colors">
-                    {step.title}
+                    <TranslatedText>{step.title}</TranslatedText>
                   </h3>
 
                   {/* Description */}
                   <p className="text-sm text-muted-foreground text-center mb-6 leading-relaxed">
-                    {step.description}
+                    <TranslatedText>{step.description}</TranslatedText>
                   </p>
 
                   {/* Stats Section */}
@@ -103,16 +104,16 @@ const HowItWorksProcess = () => {
                     {/* Primary Stat */}
                     <div className="bg-primary/5 rounded-lg p-4 text-center group-hover:bg-primary/10 transition-colors">
                       <div className="text-3xl font-bold text-primary mb-1">
-                        {step.stat}
+                        <TranslatedText>{step.stat}</TranslatedText>
                       </div>
                       <div className="text-xs text-muted-foreground uppercase tracking-wide">
-                        {step.statLabel}
+                        <TranslatedText>{step.statLabel}</TranslatedText>
                       </div>
                     </div>
 
                     {/* Secondary Metric */}
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">{step.metricLabel}:</span>
+                      <span className="text-muted-foreground"><TranslatedText>{step.metricLabel}</TranslatedText>:</span>
                       <span className="font-bold text-foreground">{step.metric}</span>
                     </div>
 
@@ -146,7 +147,7 @@ const HowItWorksProcess = () => {
               onClick={() => navigate("/contact")}
               className="bg-primary hover:bg-primary/90 text-primary-foreground px-12 py-8 text-xl font-bold"
             >
-              Schedule Your Onboarding Call
+              <TranslatedText>Schedule Your Onboarding Call</TranslatedText>
             </Button>
           </div>
         </div>

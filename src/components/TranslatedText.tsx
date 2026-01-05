@@ -17,36 +17,48 @@ export function TranslatedText({
   fallback
 }: TranslatedTextProps) {
   const { currentLanguage, translate, translationCache } = useLanguage();
+  // Always start with the original text (no blank flicker)
   const [translated, setTranslated] = useState<string>(children);
-  const [isLoading, setIsLoading] = useState(false);
+  const [hasTranslated, setHasTranslated] = useState(false);
+
+  useEffect(() => {
+    // Reset when children change
+    setTranslated(children);
+    setHasTranslated(false);
+  }, [children]);
 
   useEffect(() => {
     if (currentLanguage === 'en') {
       setTranslated(children);
+      setHasTranslated(true);
       return;
     }
 
     const cacheKey = `${currentLanguage}:${children}`;
     
-    // Check cache first
+    // Check cache first - instant swap
     if (translationCache[cacheKey]) {
       setTranslated(translationCache[cacheKey]);
+      setHasTranslated(true);
       return;
     }
 
-    // Translate
-    setIsLoading(true);
+    // Translate in background - shows English while loading
     translate([children], context).then(([result]) => {
       setTranslated(result);
-      setIsLoading(false);
+      setHasTranslated(true);
+    }).catch(() => {
+      // On error, keep original text
+      setHasTranslated(true);
     });
   }, [children, currentLanguage, translate, translationCache, context]);
 
-  if (isLoading && fallback) {
-    return <>{fallback}</>;
-  }
+  // Smooth transition class when translation loads
+  const transitionClass = hasTranslated ? 'transition-opacity duration-200' : '';
 
-  return createElement(as, { className }, translated);
+  return createElement(as, { 
+    className: `${className} ${transitionClass}`.trim(),
+  }, translated);
 }
 
 // Hook version for more flexibility
