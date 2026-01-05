@@ -6,14 +6,7 @@ import logo from "@/assets/westfield-logo-original.jpg";
 import { useAuth } from "@/hooks/useAuth";
 import { trackEvent } from "@/lib/analytics";
 import CalendlyModal from "./CalendlyModal";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -108,6 +101,7 @@ const Header = () => {
             </nav>
 
             <div className="hidden xl:flex items-center gap-4">
+              <LanguageSwitcher variant="compact" />
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-2 text-primary hover:text-secondary transition-colors group"
@@ -134,6 +128,7 @@ const Header = () => {
             </div>
 
             <div className="flex lg:hidden items-center gap-2">
+              <LanguageSwitcher variant="compact" />
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-1 text-primary hover:text-secondary transition-colors"

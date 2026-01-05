@@ -3111,6 +3111,33 @@ export type Database = {
           },
         ]
       }
+      supported_languages: {
+        Row: {
+          code: string
+          created_at: string | null
+          flag_emoji: string
+          is_active: boolean | null
+          name: string
+          native_name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          flag_emoji: string
+          is_active?: boolean | null
+          name: string
+          native_name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          flag_emoji?: string
+          is_active?: boolean | null
+          name?: string
+          native_name?: string
+        }
+        Relationships: []
+      }
       sync_logs: {
         Row: {
           client_id: string
@@ -3170,6 +3197,53 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      translations: {
+        Row: {
+          context: string | null
+          created_at: string | null
+          id: string
+          is_reviewed: boolean | null
+          manually_edited: boolean | null
+          source_hash: string
+          source_text: string
+          target_language: string
+          translated_text: string
+          updated_at: string | null
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string | null
+          id?: string
+          is_reviewed?: boolean | null
+          manually_edited?: boolean | null
+          source_hash: string
+          source_text: string
+          target_language: string
+          translated_text: string
+          updated_at?: string | null
+        }
+        Update: {
+          context?: string | null
+          created_at?: string | null
+          id?: string
+          is_reviewed?: boolean | null
+          manually_edited?: boolean | null
+          source_hash?: string
+          source_text?: string
+          target_language?: string
+          translated_text?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translations_target_language_fkey"
+            columns: ["target_language"]
+            isOneToOne: false
+            referencedRelation: "supported_languages"
+            referencedColumns: ["code"]
           },
         ]
       }
