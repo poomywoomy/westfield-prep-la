@@ -188,7 +188,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           }
           return prevState;
         });
-      }, 5000);
+      }, 1500);  // 1.5 second emergency fallback only
     } else if (lang === 'en') {
       // Switching to English is instant - force reset everything
       setIsLanguageTransitioning(false);
@@ -258,13 +258,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return results;
   }, []); // No dependencies - uses refs
 
-  // Check if transition should end
+  // Check if transition should end - no delay for instant response
   const checkTransitionComplete = useCallback(() => {
     if (pendingCountRef.current <= 0 && pendingTranslationsRef.current.size === 0) {
-      // Small delay to ensure all components have updated
-      transitionTimeoutRef.current = window.setTimeout(() => {
-        setIsLanguageTransitioning(false);
-      }, 150);
+      setIsLanguageTransitioning(false);
     }
   }, []);
 
@@ -301,9 +298,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       });
     }
     
-    // Check if all translations are complete
-    checkTransitionComplete();
-  }, [translate, checkTransitionComplete]);
+    // Immediate exit if all translations complete
+    if (pendingCountRef.current <= 0 && pendingTranslationsRef.current.size === 0) {
+      setIsLanguageTransitioning(false);
+    }
+  }, [translate]);
 
   // Queue translation with batching and debouncing
   const queueTranslation = useCallback((text: string): Promise<string> => {

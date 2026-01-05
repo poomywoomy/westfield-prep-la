@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const NotFound = () => {
   const location = useLocation();
@@ -38,12 +39,14 @@ const NotFound = () => {
       <div className="flex-1 flex items-center justify-center bg-background">
         <div className="text-center">
           <h1 className="mb-4 text-4xl font-bold text-foreground">404</h1>
-          <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
+          <p className="mb-4 text-xl text-muted-foreground">
+            <TranslatedText>Oops! Page not found</TranslatedText>
+          </p>
           <p className="mb-6 text-sm text-muted-foreground">
-            Redirecting to homepage in {countdown}...
+            <TranslatedText>Redirecting to homepage in</TranslatedText> {countdown}...
           </p>
           <Button onClick={() => navigate('/')}>
-            Return to Home Now
+            <TranslatedText>Return to Home Now</TranslatedText>
           </Button>
         </div>
       </div>
