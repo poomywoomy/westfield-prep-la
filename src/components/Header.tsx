@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { trackEvent } from "@/lib/analytics";
 import CalendlyModal from "./CalendlyModal";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { TranslatedText } from "./TranslatedText";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -76,27 +77,27 @@ const Header = () => {
 
             <nav className="hidden lg:flex items-center gap-5">
               <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
-                Home
+                <TranslatedText>Home</TranslatedText>
               </Link>
               
               <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium text-sm flex items-center gap-1">
-                <span className="text-secondary">See Your Savings</span>
+                <span className="text-secondary"><TranslatedText>See Your Savings</TranslatedText></span>
               </Link>
               
               <Link to="/integrations" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
-                Integrations
+                <TranslatedText>Integrations</TranslatedText>
               </Link>
 
               <Link to="/why-choose-us" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
-                Why Choose Us
+                <TranslatedText>Why Choose Us</TranslatedText>
               </Link>
 
               <Link to="/testimonials" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
-                Testimonials
+                <TranslatedText>Testimonials</TranslatedText>
               </Link>
 
               <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
-                Blog
+                <TranslatedText>Blog</TranslatedText>
               </Link>
             </nav>
 
@@ -115,14 +116,14 @@ const Header = () => {
                 className="border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-semibold"
               >
                 <Calendar className="w-4 h-4 mr-2" />
-                Schedule a Call
+                <TranslatedText>Schedule a Call</TranslatedText>
               </Button>
               <Button
                 onClick={() => navigate("/contact")}
                 size="default"
                 className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
               >
-                Get a Quote
+                <TranslatedText>Get a Quote</TranslatedText>
               </Button>
               <LanguageSwitcher variant="compact" />
             </div>
@@ -147,7 +148,7 @@ const Header = () => {
                 className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
                 size="sm"
               >
-                Get Quote
+                <TranslatedText>Get Quote</TranslatedText>
               </Button>
               <LanguageSwitcher variant="compact" />
             </div>

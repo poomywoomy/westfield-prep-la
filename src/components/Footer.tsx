@@ -119,19 +119,19 @@ const Footer = () => {
               <div className="space-y-2">
                 <Link to="/shopify-fulfillment" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    Shopify
+                    <TranslatedText>Shopify</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
                 <Link to="/amazon-fba-prep" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    Amazon FBA
+                    <TranslatedText>Amazon FBA</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
                 <Link to="/tiktok-shop-fulfillment" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    TikTok Shop
+                    <TranslatedText>TikTok Shop</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>

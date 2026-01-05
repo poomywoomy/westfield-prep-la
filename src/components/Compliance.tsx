@@ -1,40 +1,5 @@
 import { Shield, FileCheck, Award, Flame, Lock, Leaf } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-
-const complianceFeatures = [
-  {
-    icon: Shield,
-    title: "Fully Insured",
-    description:
-      "General Liability and Warehouse Legal Liability coverage for complete peace of mind.",
-  },
-  {
-    icon: FileCheck,
-    title: "Multi-Platform Compliant",
-    description:
-      "All prep meets Amazon, Walmart, and Shopify requirements: polybag suffocation warnings, 50-lb box rule, accurate case labels.",
-  },
-  {
-    icon: Award,
-    title: "Quality Assurance",
-    description: "Rigorous inspection processes and photo documentation for every order.",
-  },
-  {
-    icon: Flame,
-    title: "Fire & Theft Prevention",
-    description: "Advanced security systems with 24/7 monitoring, fire suppression, and comprehensive theft prevention protocols.",
-  },
-  {
-    icon: Lock,
-    title: "Data Security & Confidentiality",
-    description: "Enterprise-grade data protection with encrypted systems and strict confidentiality agreements to safeguard your business information.",
-  },
-  {
-    icon: Leaf,
-    title: "Sustainable Practices",
-    description: "Eco-friendly operations with recycling programs, energy-efficient facilities, and sustainable packaging materials.",
-  },
-];
+import { TranslatedText } from "./TranslatedText";
 
 const Compliance = () => {
   return (
@@ -45,13 +10,13 @@ const Compliance = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-4">
             <Shield className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Industry-Leading Protection</span>
+            <span className="text-sm font-medium text-primary"><TranslatedText>Industry-Leading Protection</TranslatedText></span>
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            Compliance & Safety You Can Trust
+            <TranslatedText>Compliance & Safety You Can Trust</TranslatedText>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Your inventory deserves enterprise-grade protection. We've invested in comprehensive insurance, security systems, and sustainable practices to safeguard your business.
+            <TranslatedText>Your inventory deserves enterprise-grade protection. We've invested in comprehensive insurance, security systems, and sustainable practices to safeguard your business.</TranslatedText>
           </p>
         </div>
 
@@ -64,13 +29,13 @@ const Compliance = () => {
                   <Shield className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-primary">Fully Insured Operations</h3>
+                  <h3 className="text-2xl font-bold mb-3 text-primary"><TranslatedText>Fully Insured Operations</TranslatedText></h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    General Liability and Warehouse Legal Liability coverage provides complete peace of mind for your inventory. Your products are protected from receiving through shipping.
+                    <TranslatedText>General Liability and Warehouse Legal Liability coverage provides complete peace of mind for your inventory. Your products are protected from receiving through shipping.</TranslatedText>
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">General Liability</span>
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">WLL Coverage</span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>General Liability</TranslatedText></span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>WLL Coverage</TranslatedText></span>
                   </div>
                 </div>
               </div>
@@ -82,9 +47,9 @@ const Compliance = () => {
                   <FileCheck className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-primary">Multi-Platform Compliant</h3>
+                  <h3 className="text-2xl font-bold mb-3 text-primary"><TranslatedText>Multi-Platform Compliant</TranslatedText></h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    All prep meets Amazon, Walmart, and Shopify requirements: polybag suffocation warnings, 50-lb box rule, accurate case labels. We stay current with all marketplace requirements.
+                    <TranslatedText>All prep meets Amazon, Walmart, and Shopify requirements: polybag suffocation warnings, 50-lb box rule, accurate case labels. We stay current with all marketplace requirements.</TranslatedText>
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <span className="px-3 py-1 bg-secondary/10 text-secondary text-sm font-medium rounded-full">Amazon FBA</span>
@@ -104,13 +69,13 @@ const Compliance = () => {
                   <Award className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-primary">Quality Assurance</h3>
+                  <h3 className="text-2xl font-bold mb-3 text-primary"><TranslatedText>Quality Assurance</TranslatedText></h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Rigorous inspection processes and photo documentation for every order. Each shipment is verified against ASNs with timestamped quality control photos for full transparency and accountability.
+                    <TranslatedText>Rigorous inspection processes and photo documentation for every order. Each shipment is verified against ASNs with timestamped quality control photos for full transparency and accountability.</TranslatedText>
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">Photo QC</span>
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">ASN Verification</span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>Photo QC</TranslatedText></span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>ASN Verification</TranslatedText></span>
                   </div>
                 </div>
               </div>
@@ -122,13 +87,13 @@ const Compliance = () => {
                   <Flame className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-primary">Advanced Security Systems</h3>
+                  <h3 className="text-2xl font-bold mb-3 text-primary"><TranslatedText>Advanced Security Systems</TranslatedText></h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    24/7 monitoring, fire suppression, and comprehensive theft prevention protocols. Our facility features state-of-the-art security cameras, restricted access zones, and automated fire detection systems.
+                    <TranslatedText>24/7 monitoring, fire suppression, and comprehensive theft prevention protocols. Our facility features state-of-the-art security cameras, restricted access zones, and automated fire detection systems.</TranslatedText>
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">24/7 Surveillance</span>
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">Fire Protection</span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>24/7 Surveillance</TranslatedText></span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>Fire Protection</TranslatedText></span>
                   </div>
                 </div>
               </div>
@@ -143,13 +108,13 @@ const Compliance = () => {
                   <Lock className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-primary">Data Security & Confidentiality</h3>
+                  <h3 className="text-2xl font-bold mb-3 text-primary"><TranslatedText>Data Security & Confidentiality</TranslatedText></h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Enterprise-grade data protection with encrypted systems and strict confidentiality agreements to safeguard your business information. Your data and intellectual property are always protected.
+                    <TranslatedText>Enterprise-grade data protection with encrypted systems and strict confidentiality agreements to safeguard your business information. Your data and intellectual property are always protected.</TranslatedText>
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">Encrypted Systems</span>
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">NDAs Available</span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>Encrypted Systems</TranslatedText></span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>NDAs Available</TranslatedText></span>
                   </div>
                 </div>
               </div>
@@ -161,13 +126,13 @@ const Compliance = () => {
                   <Leaf className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-primary">Sustainable Practices</h3>
+                  <h3 className="text-2xl font-bold mb-3 text-primary"><TranslatedText>Sustainable Practices</TranslatedText></h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Eco-friendly operations with recycling programs, energy-efficient facilities, and sustainable packaging materials. We're committed to reducing our environmental impact while maintaining excellence.
+                    <TranslatedText>Eco-friendly operations with recycling programs, energy-efficient facilities, and sustainable packaging materials. We're committed to reducing our environmental impact while maintaining excellence.</TranslatedText>
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">Recycling Program</span>
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">Eco Packaging</span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>Recycling Program</TranslatedText></span>
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full"><TranslatedText>Eco Packaging</TranslatedText></span>
                   </div>
                 </div>
               </div>

@@ -30,7 +30,7 @@ export function TranslatedText({
 
     const cacheKey = `${currentLanguage}:${children}`;
     
-    // Check cache first (instant)
+    // Check cache first (instant) - triggers on cache updates too
     if (translationCache[cacheKey]) {
       setTranslated(translationCache[cacheKey]);
       return;
@@ -42,7 +42,7 @@ export function TranslatedText({
         setTranslated(result);
       }
     });
-  }, [children, currentLanguage]);
+  }, [children, currentLanguage, translationCache]);
 
   return createElement(as, { className }, translated);
 }
