@@ -16,6 +16,7 @@ import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { AuthorBio } from "@/components/blog/AuthorBio";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { parseMarkdown } from "@/lib/markdownParser";
+import { TranslatedText } from "@/components/TranslatedText";
 
 // Blog post page component
 interface BlogPost {
@@ -94,7 +95,7 @@ const BlogPost = () => {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading article...</p>
+            <p className="text-muted-foreground"><TranslatedText>Loading article...</TranslatedText></p>
           </div>
         </div>
         <Footer />
@@ -181,7 +182,7 @@ const BlogPost = () => {
                   <div className="max-w-4xl mx-auto">
                     <Link to="/blog" className="inline-flex items-center text-white/90 hover:text-white mb-6 transition-colors group">
                       <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                      Back to Blog
+                      <TranslatedText>Back to Blog</TranslatedText>
                     </Link>
                     <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white leading-tight">{post.title}</h1>
                     <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white/90">
@@ -207,7 +208,7 @@ const BlogPost = () => {
                 <div className="max-w-4xl mx-auto">
                   <Link to="/blog" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors group">
                     <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                    Back to Blog
+                    <TranslatedText>Back to Blog</TranslatedText>
                   </Link>
                   <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent leading-tight">
                     {post.title}
@@ -264,7 +265,7 @@ const BlogPost = () => {
                         <Link to="/blog">
                           <Button variant="outline" size="lg" className="group">
                             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                            Back to All Posts
+                            <TranslatedText>Back to All Posts</TranslatedText>
                           </Button>
                         </Link>
                         <ShareButtons 
@@ -296,13 +297,13 @@ const BlogPost = () => {
               <div className="absolute bottom-10 left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
             </div>
             <div className="container mx-auto px-4 text-center relative">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Ready to Scale Your Business?</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white"><TranslatedText>Ready to Scale Your Business?</TranslatedText></h2>
               <p className="text-lg md:text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-                Partner with Westfield Prep Center for professional fulfillment services
+                <TranslatedText>Partner with Westfield Prep Center for professional fulfillment services</TranslatedText>
               </p>
               <Link to="/contact">
                 <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-xl">
-                  Get a Free Quote
+                  <TranslatedText>Get a Free Quote</TranslatedText>
                 </Button>
               </Link>
             </div>

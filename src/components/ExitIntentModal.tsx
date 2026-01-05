@@ -13,6 +13,7 @@ import { Calculator, Mail, ArrowRight, X } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { TranslatedText } from "@/components/TranslatedText";
 
 interface ExitIntentModalProps {
   onClose?: () => void;
@@ -129,16 +130,16 @@ const ExitIntentModal = ({ onClose }: ExitIntentModalProps) => {
             <Calculator className="w-8 h-8 text-secondary" />
           </div>
           <DialogTitle className="text-2xl font-bold">
-            Wait! Want a Custom Savings Estimate?
+            <TranslatedText>Wait! Want a Custom Savings Estimate?</TranslatedText>
           </DialogTitle>
           <DialogDescription className="text-base mt-2">
-            Get a personalized fulfillment cost analysis sent to your inbox.
+            <TranslatedText>Get a personalized fulfillment cost analysis sent to your inbox.</TranslatedText>
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="exit-email">Email Address *</Label>
+            <Label htmlFor="exit-email"><TranslatedText>Email Address</TranslatedText> *</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -154,7 +155,7 @@ const ExitIntentModal = ({ onClose }: ExitIntentModalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="exit-orders">Monthly Order Volume (optional)</Label>
+            <Label htmlFor="exit-orders"><TranslatedText>Monthly Order Volume (optional)</TranslatedText></Label>
             <Input
               id="exit-orders"
               type="text"
@@ -169,12 +170,12 @@ const ExitIntentModal = ({ onClose }: ExitIntentModalProps) => {
             className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Sending..." : "Send My Estimate"}
+            {isSubmitting ? <TranslatedText>Sending...</TranslatedText> : <TranslatedText>Send My Estimate</TranslatedText>}
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">
-            No spam. Just your personalized savings breakdown.
+            <TranslatedText>No spam. Just your personalized savings breakdown.</TranslatedText>
           </p>
         </form>
       </DialogContent>

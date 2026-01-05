@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Calendar, Loader2 } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
+import { TranslatedText } from "@/components/TranslatedText";
 
 interface CalendlyModalProps {
   open: boolean;
@@ -118,7 +119,7 @@ const CalendlyModal = ({ open, onOpenChange }: CalendlyModalProps) => {
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Calendar className="w-5 h-5 text-secondary" />
-            Schedule a Call with Our Team
+            <TranslatedText>Schedule a Call with Our Team</TranslatedText>
           </DialogTitle>
         </DialogHeader>
         
@@ -128,7 +129,7 @@ const CalendlyModal = ({ open, onOpenChange }: CalendlyModalProps) => {
             <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
               <div className="text-center space-y-4">
                 <Loader2 className="w-10 h-10 mx-auto text-secondary animate-spin" />
-                <p className="text-muted-foreground">Loading calendar...</p>
+                <p className="text-muted-foreground"><TranslatedText>Loading calendar...</TranslatedText></p>
               </div>
             </div>
           )}
@@ -138,14 +139,14 @@ const CalendlyModal = ({ open, onOpenChange }: CalendlyModalProps) => {
             <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
               <div className="text-center space-y-4 p-8">
                 <Calendar className="w-12 h-12 mx-auto text-muted-foreground" />
-                <p className="text-muted-foreground">Unable to load calendar</p>
+                <p className="text-muted-foreground"><TranslatedText>Unable to load calendar</TranslatedText></p>
                 <a 
                   href="https://calendly.com/westfieldprepcenter-info/westfield-3pl-meeting"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90"
                 >
-                  Open in new tab
+                  <TranslatedText>Open in new tab</TranslatedText>
                 </a>
               </div>
             </div>

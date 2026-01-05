@@ -13,6 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Shield, Camera, Clock, Heart, MapPin, Award, TrendingUp, CheckCircle, Package, ClipboardCheck, Tag, Warehouse, Headphones, Truck, X } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const processSteps = [
   {
@@ -176,20 +177,20 @@ const WhyChooseUs = () => {
             <div className="container mx-auto px-4 relative z-10">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
-                  We're Not Your Average<br />
+                  <TranslatedText>We're Not Your Average</TranslatedText><br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                    Prep Center
+                    <TranslatedText>Prep Center</TranslatedText>
                   </span>
                 </h1>
                 <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in delay-200">
-                  Whether you're selling on Amazon, Shopify, or direct—your brand gets VIP treatment ✨
+                  <TranslatedText>Whether you're selling on Amazon, Shopify, or direct—your brand gets VIP treatment</TranslatedText> ✨
                 </p>
                 <Button 
                   size="lg" 
                   onClick={() => navigate("/contact")}
                   className="bg-secondary hover:bg-secondary/90 hover:scale-105 transition-all duration-300"
                 >
-                  Let's Talk →
+                  <TranslatedText>Let's Talk</TranslatedText> →
                 </Button>
               </div>
             </div>
@@ -199,9 +200,9 @@ const WhyChooseUs = () => {
           <section className="py-16 bg-gradient-to-br from-primary/5 to-secondary/5">
             <div className="container mx-auto px-4">
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-3">We Fulfill for Every Channel You Sell On</h2>
+                <h2 className="text-3xl font-bold mb-3"><TranslatedText>We Fulfill for Every Channel You Sell On</TranslatedText></h2>
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  One prep center. All your sales channels. Seamless multi-channel fulfillment.
+                  <TranslatedText>One prep center. All your sales channels. Seamless multi-channel fulfillment.</TranslatedText>
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
@@ -210,8 +211,8 @@ const WhyChooseUs = () => {
                     <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
                       <Package className="h-6 w-6 text-white" />
                     </div>
-                    <p className="font-semibold">Amazon FBA</p>
-                    <p className="text-xs text-muted-foreground mt-1">Full prep & compliance</p>
+                    <p className="font-semibold"><TranslatedText>Amazon FBA</TranslatedText></p>
+                    <p className="text-xs text-muted-foreground mt-1"><TranslatedText>Full prep & compliance</TranslatedText></p>
                   </CardContent>
                 </Card>
                 
@@ -220,8 +221,8 @@ const WhyChooseUs = () => {
                     <div className="h-12 w-12 bg-gradient-to-br from-secondary to-secondary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
                       <Package className="h-6 w-6 text-white" />
                     </div>
-                    <p className="font-semibold">Shopify Stores</p>
-                    <p className="text-xs text-muted-foreground mt-1">Direct fulfillment</p>
+                    <p className="font-semibold"><TranslatedText>Shopify Stores</TranslatedText></p>
+                    <p className="text-xs text-muted-foreground mt-1"><TranslatedText>Direct fulfillment</TranslatedText></p>
                   </CardContent>
                 </Card>
                 
@@ -230,8 +231,8 @@ const WhyChooseUs = () => {
                     <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
                       <Package className="h-6 w-6 text-white" />
                     </div>
-                    <p className="font-semibold">TikTok Shop</p>
-                    <p className="text-xs text-muted-foreground mt-1">Fast turnaround</p>
+                    <p className="font-semibold"><TranslatedText>TikTok Shop</TranslatedText></p>
+                    <p className="text-xs text-muted-foreground mt-1"><TranslatedText>Fast turnaround</TranslatedText></p>
                   </CardContent>
                 </Card>
                 
@@ -240,8 +241,8 @@ const WhyChooseUs = () => {
                     <div className="h-12 w-12 bg-gradient-to-br from-secondary to-secondary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
                       <Package className="h-6 w-6 text-white" />
                     </div>
-                    <p className="font-semibold">Direct to Customer</p>
-                    <p className="text-xs text-muted-foreground mt-1">Branded packaging</p>
+                    <p className="font-semibold"><TranslatedText>Direct to Customer</TranslatedText></p>
+                    <p className="text-xs text-muted-foreground mt-1"><TranslatedText>Branded packaging</TranslatedText></p>
                   </CardContent>
                 </Card>
               </div>
@@ -252,9 +253,9 @@ const WhyChooseUs = () => {
           <section className="py-20 bg-background">
             <div className="container mx-auto px-4">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4">What Makes Us Different</h2>
+                <h2 className="text-4xl font-bold mb-4"><TranslatedText>What Makes Us Different</TranslatedText></h2>
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  Boutique service meets enterprise-grade capabilities
+                  <TranslatedText>Boutique service meets enterprise-grade capabilities</TranslatedText>
                 </p>
               </div>
               <div className="grid md:grid-cols-6 gap-6 max-w-6xl mx-auto">
@@ -263,10 +264,10 @@ const WhyChooseUs = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center mb-4">
                       <Heart className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Boutique Service</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Boutique Service</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">Big 3PLs treat you like a number. We treat you like the business owner you are.</p>
+                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>Big 3PLs treat you like a number. We treat you like the business owner you are.</TranslatedText></p>
                   </CardContent>
                 </Card>
 
@@ -275,11 +276,11 @@ const WhyChooseUs = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-secondary to-secondary/70 rounded-xl flex items-center justify-center mb-4">
                       <Clock className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Same-Day Processing</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Same-Day Processing</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed mb-4">Orders placed before 2 PM PST ship the same business day. No backlog, no delays, no excuses.</p>
-                    <p className="text-sm text-muted-foreground">While other prep centers make you wait 2-3 days, we're already shipping your orders.</p>
+                    <p className="text-muted-foreground leading-relaxed mb-4"><TranslatedText>Orders placed before 2 PM PST ship the same business day. No backlog, no delays, no excuses.</TranslatedText></p>
+                    <p className="text-sm text-muted-foreground"><TranslatedText>While other prep centers make you wait 2-3 days, we're already shipping your orders.</TranslatedText></p>
                   </CardContent>
                 </Card>
 
@@ -288,10 +289,10 @@ const WhyChooseUs = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center mb-4">
                       <Camera className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Photo-Proof QC</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Photo-Proof QC</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">Every shipment documented with timestamped photos. Complete transparency.</p>
+                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>Every shipment documented with timestamped photos. Complete transparency.</TranslatedText></p>
                   </CardContent>
                 </Card>
 
@@ -300,10 +301,10 @@ const WhyChooseUs = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-secondary to-secondary/70 rounded-xl flex items-center justify-center mb-4">
                       <Shield className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Full Insurance Coverage</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Full Insurance Coverage</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">$2M general liability and cargo insurance. Your inventory is protected at every stage.</p>
+                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>$2M general liability and cargo insurance. Your inventory is protected at every stage.</TranslatedText></p>
                   </CardContent>
                 </Card>
 
@@ -312,10 +313,10 @@ const WhyChooseUs = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center mb-4">
                       <MapPin className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Strategic LA Location</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Strategic LA Location</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                     <p className="text-muted-foreground leading-relaxed">Los Angeles location means easy access to LA/Long Beach ports and fast West Coast shipping.</p>
+                     <p className="text-muted-foreground leading-relaxed"><TranslatedText>Los Angeles location means easy access to LA/Long Beach ports and fast West Coast shipping.</TranslatedText></p>
                    </CardContent>
                  </Card>
                </div>
@@ -327,10 +328,10 @@ const WhyChooseUs = () => {
             <div className="container mx-auto px-4">
               <div className="text-center mb-16">
                 <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                  How We Make It Happen
+                  <TranslatedText>How We Make It Happen</TranslatedText>
                 </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Ever wonder what actually happens between 'order placed' and 'delivered'? We document every step. Here's the full behind-the-scenes.
+            <TranslatedText>Ever wonder what actually happens between 'order placed' and 'delivered'? We document every step. Here's the full behind-the-scenes.</TranslatedText>
           </p>
               </div>
 
@@ -457,11 +458,11 @@ const WhyChooseUs = () => {
           <section className="py-20 bg-background">
             <div className="container mx-auto px-4">
               <div className="max-w-5xl mx-auto">
-                <h2 className="text-4xl font-bold text-center mb-12">Boutique Prep Center vs. Large 3PL</h2>
+                <h2 className="text-4xl font-bold text-center mb-12"><TranslatedText>Boutique Prep Center vs. Large 3PL</TranslatedText></h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   <Card className="border-2 border-primary/20">
                     <CardHeader>
-                      <CardTitle className="text-2xl text-primary">Westfield Prep Center</CardTitle>
+                      <CardTitle className="text-2xl text-primary"><TranslatedText>Westfield Prep Center</TranslatedText></CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
               {[
@@ -476,7 +477,7 @@ const WhyChooseUs = () => {
               ].map((item, idx) => (
                         <div key={idx} className="flex items-start gap-2">
                           <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                          <p className="text-sm">{item}</p>
+                          <p className="text-sm"><TranslatedText>{item}</TranslatedText></p>
                         </div>
                       ))}
                     </CardContent>
@@ -484,7 +485,7 @@ const WhyChooseUs = () => {
 
                   <Card className="border-2 border-muted">
                     <CardHeader>
-                      <CardTitle className="text-2xl text-muted-foreground">Large 3PL</CardTitle>
+                      <CardTitle className="text-2xl text-muted-foreground"><TranslatedText>Large 3PL</TranslatedText></CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {[
@@ -498,7 +499,7 @@ const WhyChooseUs = () => {
                       ].map((item, idx) => (
                         <div key={idx} className="flex items-start gap-2">
                           <X className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-                          <p className="text-sm text-muted-foreground line-through">{item}</p>
+                          <p className="text-sm text-muted-foreground line-through"><TranslatedText>{item}</TranslatedText></p>
                         </div>
                       ))}
                     </CardContent>
@@ -512,17 +513,17 @@ const WhyChooseUs = () => {
           <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-4xl font-bold text-center mb-12">Los Angeles Location Advantages</h2>
+                <h2 className="text-4xl font-bold text-center mb-12"><TranslatedText>Los Angeles Location Advantages</TranslatedText></h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <MapPin className="h-5 w-5 text-primary" />
-                        Port Proximity
+                        <TranslatedText>Port Proximity</TranslatedText>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">Close to LA/Long Beach ports for fast receiving of international shipments. Reduce transit time and get products to market faster.</p>
+                      <p className="text-muted-foreground"><TranslatedText>Close to LA/Long Beach ports for fast receiving of international shipments. Reduce transit time and get products to market faster.</TranslatedText></p>
                     </CardContent>
                   </Card>
 
