@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const FAQAccordion = () => {
   const navigate = useNavigate();
@@ -47,10 +48,10 @@ const FAQAccordion = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Frequently Asked Questions
+              <TranslatedText>Frequently Asked Questions</TranslatedText>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Everything you need to know about working with Westfield Prep Center
+              <TranslatedText>Everything you need to know about working with Westfield Prep Center</TranslatedText>
             </p>
           </div>
 
@@ -76,7 +77,7 @@ const FAQAccordion = () => {
                       <span className={`font-bold text-lg ${
                         activeIndex === index ? 'text-primary-foreground' : 'text-card-foreground'
                       }`}>
-                        {faq.question}
+                        <TranslatedText>{faq.question}</TranslatedText>
                       </span>
                     </div>
                     <ChevronDown
@@ -96,10 +97,10 @@ const FAQAccordion = () => {
                     {String(activeIndex + 1).padStart(2, '0')}
                   </div>
                   <h3 className="text-3xl font-bold mb-6 text-foreground">
-                    {faqs[activeIndex].question}
+                    <TranslatedText>{faqs[activeIndex].question}</TranslatedText>
                   </h3>
                   <p className="text-xl text-muted-foreground leading-relaxed">
-                    {faqs[activeIndex].answer}
+                    <TranslatedText>{faqs[activeIndex].answer}</TranslatedText>
                   </p>
                 </div>
               )}
@@ -107,7 +108,7 @@ const FAQAccordion = () => {
               {activeIndex === null && (
                 <div className="sticky top-32 bg-gradient-to-br from-muted/50 to-muted/30 border-2 border-dashed border-border rounded-3xl p-12 flex items-center justify-center h-96">
                   <p className="text-2xl text-muted-foreground text-center">
-                    Click a question to see the answer
+                    <TranslatedText>Click a question to see the answer</TranslatedText>
                   </p>
                 </div>
               )}
@@ -119,7 +120,7 @@ const FAQAccordion = () => {
               onClick={() => navigate("/contact")}
               className="text-primary hover:underline font-medium"
             >
-              Have another question? Contact Us →
+              <TranslatedText>Have another question? Contact Us</TranslatedText> →
             </button>
           </div>
         </div>

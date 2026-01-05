@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const BlogPreview = () => {
   const navigate = useNavigate();
@@ -34,10 +35,10 @@ const BlogPreview = () => {
           {/* Section Header */}
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              E-Commerce Insights & Resources
+              <TranslatedText>E-Commerce Insights & Resources</TranslatedText>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Expert guidance on 3PL logistics, fulfillment optimization, and scaling your online business.
+              <TranslatedText>Expert guidance on 3PL logistics, fulfillment optimization, and scaling your online business.</TranslatedText>
             </p>
           </div>
 
@@ -59,19 +60,19 @@ const BlogPreview = () => {
                 {/* Card Content */}
                 <div className="p-6 space-y-3">
                   <Badge variant="secondary" className="bg-secondary/10 text-secondary hover:bg-secondary/20">
-                    {article.category}
+                    <TranslatedText>{article.category}</TranslatedText>
                   </Badge>
                   
                   <h3 className="text-xl font-bold text-foreground group-hover:text-secondary transition-colors duration-200">
-                    {article.title}
+                    <TranslatedText>{article.title}</TranslatedText>
                   </h3>
                   
                   <p className="text-sm text-muted-foreground line-clamp-2">
-                    {article.excerpt}
+                    <TranslatedText>{article.excerpt}</TranslatedText>
                   </p>
 
                   <div className="flex items-center text-secondary font-semibold text-sm pt-2">
-                    Read More
+                    <TranslatedText>Read More</TranslatedText>
                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                   </div>
                 </div>

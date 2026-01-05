@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ShoppingBag, ShoppingCart, Store, Music, Package, Building2, Palette, Hammer, Code, Zap } from "lucide-react";
+import { ShoppingBag, ShoppingCart, Store, Music, Package, Building2, Palette, Code, Zap } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const PlatformCompatibility = () => {
   const navigate = useNavigate();
@@ -25,16 +24,18 @@ const PlatformCompatibility = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Seamlessly Integrates With Every Platform You Sell On
+              <TranslatedText>Seamlessly Integrates With Every Platform You Sell On</TranslatedText>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Connect your store in minutes. Orders flow automatically to our warehouse for fast, accurate fulfillment.
+              <TranslatedText>Connect your store in minutes. Orders flow automatically to our warehouse for fast, accurate fulfillment.</TranslatedText>
             </p>
           </div>
 
           {/* E-Commerce Platforms */}
           <div className="mb-12">
-            <h3 className="text-2xl font-bold mb-6 text-card-foreground text-center">E-Commerce Platforms</h3>
+            <h3 className="text-2xl font-bold mb-6 text-card-foreground text-center">
+              <TranslatedText>E-Commerce Platforms</TranslatedText>
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {ecommercePlatforms.map((platform, index) => (
                 <div 
@@ -50,7 +51,7 @@ const PlatformCompatibility = () => {
                     {platform.name}
                   </div>
                   <div className="text-sm text-primary font-semibold relative z-10">
-                    {platform.strength}
+                    <TranslatedText>{platform.strength}</TranslatedText>
                   </div>
                 </div>
               ))}
@@ -59,7 +60,9 @@ const PlatformCompatibility = () => {
 
           {/* Marketplaces */}
           <div>
-            <h3 className="text-2xl font-bold mb-6 text-card-foreground text-center">Marketplaces</h3>
+            <h3 className="text-2xl font-bold mb-6 text-card-foreground text-center">
+              <TranslatedText>Marketplaces</TranslatedText>
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {marketplaces.map((platform, index) => (
                 <div 
@@ -75,7 +78,7 @@ const PlatformCompatibility = () => {
                     {platform.name}
                   </div>
                   <div className="text-sm text-secondary font-semibold relative z-10">
-                    {platform.strength}
+                    <TranslatedText>{platform.strength}</TranslatedText>
                   </div>
                 </div>
               ))}
@@ -91,10 +94,10 @@ const PlatformCompatibility = () => {
                   <Code className="w-16 h-16 text-primary group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="text-center font-bold text-xl text-card-foreground mb-2 relative z-10">
-                  Many More
+                  <TranslatedText>Many More</TranslatedText>
                 </div>
                 <div className="text-sm text-primary font-semibold relative z-10">
-                  View All →
+                  <TranslatedText>View All</TranslatedText> →
                 </div>
               </button>
             </div>
@@ -104,28 +107,32 @@ const PlatformCompatibility = () => {
           <div className="mt-12 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
               <Zap className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">API-First • Webhook-Enabled • Real-Time Sync</span>
+              <span className="text-sm font-medium text-primary">
+                <TranslatedText>API-First • Webhook-Enabled • Real-Time Sync</TranslatedText>
+              </span>
             </div>
           </div>
 
           {/* Multi-Channel CTA */}
           <div className="mt-8 text-center bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 rounded-3xl p-12 border border-border/50">
-            <h3 className="text-3xl font-bold mb-4 text-foreground">Selling on Multiple Channels?</h3>
+            <h3 className="text-3xl font-bold mb-4 text-foreground">
+              <TranslatedText>Selling on Multiple Channels?</TranslatedText>
+            </h3>
             <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              We manage your inventory centrally so you never oversell and always ship fast. Connect your tech stack in minutes.
+              <TranslatedText>We manage your inventory centrally so you never oversell and always ship fast. Connect your tech stack in minutes.</TranslatedText>
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <button 
                 onClick={() => navigate("/sales-channels")}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold hover:bg-primary/90 transition-colors text-lg"
               >
-                See All Platforms →
+                <TranslatedText>See All Platforms</TranslatedText> →
               </button>
               <button 
                 onClick={() => navigate("/integrations")}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-transparent border-2 border-primary text-primary rounded-full font-bold hover:bg-primary/10 transition-colors text-lg"
               >
-                View Integrations & API →
+                <TranslatedText>View Integrations & API</TranslatedText> →
               </button>
             </div>
           </div>
