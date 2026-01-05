@@ -177,9 +177,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if (lang !== 'en' && lang !== currentLanguageRef.current) {
       setIsLanguageTransitioning(true);
       pendingCountRef.current = 0;
+      
+      // Safety timeout - force hide spinner after 5 seconds max
+      setTimeout(() => {
+        setIsLanguageTransitioning(prevState => {
+          if (prevState) {
+            console.warn('Translation transition timed out - forcing complete');
+            pendingCountRef.current = 0;
+            return false;
+          }
+          return prevState;
+        });
+      }, 5000);
     } else if (lang === 'en') {
-      // Switching to English is instant
+      // Switching to English is instant - force reset everything
       setIsLanguageTransitioning(false);
+      pendingCountRef.current = 0;
+      pendingTranslationsRef.current.clear();
     }
     
     setCurrentLanguage(lang);
@@ -265,13 +279,27 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
     
     const texts = pending.map(([text]) => text);
-    const results = await translate(texts);
     
-    // Resolve all pending promises
-    pending.forEach(([text, resolvers], i) => {
-      resolvers.forEach(resolve => resolve(results[i]));
-      pendingCountRef.current -= 1;
-    });
+    try {
+      const results = await translate(texts);
+      
+      // Resolve all pending promises - decrement once per resolver (not per text)
+      pending.forEach(([text, resolvers], i) => {
+        resolvers.forEach(resolve => {
+          resolve(results[i]);
+          pendingCountRef.current -= 1;
+        });
+      });
+    } catch (error) {
+      console.error('Batch translation failed:', error);
+      // Still decrement and resolve with original text on error
+      pending.forEach(([text, resolvers]) => {
+        resolvers.forEach(resolve => {
+          resolve(text);
+          pendingCountRef.current -= 1;
+        });
+      });
+    }
     
     // Check if all translations are complete
     checkTransitionComplete();
