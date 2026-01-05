@@ -5,6 +5,7 @@ import { ArrowRight, Calendar, CheckCircle, Clock, Package, Plug, Shield, Star, 
 import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/analytics";
 import CalendlyModal from "./CalendlyModal";
+import { TranslatedText } from "./TranslatedText";
 
 const PremiumHero = () => {
   const navigate = useNavigate();
@@ -102,9 +103,9 @@ const PremiumHero = () => {
                 <motion.div variants={fadeUpVariants}>
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
                     <div className="h-2 w-2 rounded-full bg-[#FF7A00] animate-pulse" />
-                    <span className="text-sm text-white/90 font-medium tracking-wide">
+                    <TranslatedText className="text-sm text-white/90 font-medium tracking-wide">
                       Los Angeles 3PL
-                    </span>
+                    </TranslatedText>
                   </div>
                 </motion.div>
 
@@ -113,8 +114,8 @@ const PremiumHero = () => {
                   variants={fadeUpVariants}
                   className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white tracking-tight"
                 >
-                  Ship 3x Faster with a{" "}
-                  <span className="text-[#FF7A00]">Shopify + Amazon-Ready 3PL</span>
+                  <TranslatedText>Ship 3x Faster with a</TranslatedText>{" "}
+                  <TranslatedText className="text-[#FF7A00]">Shopify + Amazon-Ready 3PL</TranslatedText>
                 </motion.h1>
 
                 {/* Subheadline - Updated CRO Copy */}
@@ -122,7 +123,7 @@ const PremiumHero = () => {
                   variants={fadeUpVariants}
                   className="text-lg md:text-xl text-white/80 leading-relaxed max-w-xl"
                 >
-                  Full-service fulfillment & FBA prep in 24 hours. Transparent pricing. No monthly minimums.
+                  <TranslatedText>Full-service fulfillment & FBA prep in 24 hours. Transparent pricing. No monthly minimums.</TranslatedText>
                 </motion.p>
 
                 {/* Trust Badges Row */}
@@ -136,7 +137,7 @@ const PremiumHero = () => {
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10"
                     >
                       <badge.icon className="w-3.5 h-3.5 text-[#FF7A00]" />
-                      <span className="text-xs font-medium text-white/80">{badge.text}</span>
+                      <TranslatedText className="text-xs font-medium text-white/80">{badge.text}</TranslatedText>
                     </div>
                   ))}
                 </motion.div>
@@ -151,7 +152,7 @@ const PremiumHero = () => {
                     size="lg"
                     className="bg-[#FF7A00] hover:bg-[#FF7A00]/90 text-white font-semibold shadow-lg shadow-[#FF7A00]/25 transition-all duration-300 hover:shadow-xl hover:shadow-[#FF7A00]/30 hover:-translate-y-0.5 group"
                   >
-                    Get a Quote
+                    <TranslatedText>Get a Quote</TranslatedText>
                     <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                   </Button>
                   <Button
@@ -159,7 +160,7 @@ const PremiumHero = () => {
                     size="lg"
                     className="border-2 border-white bg-white text-[#0A0A23] hover:bg-white/90 font-semibold transition-all duration-300 shadow-lg"
                   >
-                    See Pricing
+                    <TranslatedText>See Pricing</TranslatedText>
                   </Button>
                 </motion.div>
 
@@ -170,9 +171,9 @@ const PremiumHero = () => {
                     className="flex items-center gap-2 text-white/70 hover:text-white transition-colors group"
                   >
                     <Calendar className="w-4 h-4" />
-                    <span className="text-sm font-medium underline-offset-4 group-hover:underline">
+                    <TranslatedText className="text-sm font-medium underline-offset-4 group-hover:underline">
                       Or schedule a call with our team
-                    </span>
+                    </TranslatedText>
                   </button>
                 </motion.div>
 
@@ -188,12 +189,12 @@ const PremiumHero = () => {
                       className="group relative flex items-center gap-3 px-4 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-lg transition-all duration-300 hover:bg-white/15 hover:border-white/30 hover:shadow-xl cursor-default"
                     >
                       <span className="text-lg">{tag.emoji}</span>
-                      <span className="text-sm font-medium text-white/90">
+                      <TranslatedText className="text-sm font-medium text-white/90">
                         {tag.text}
-                      </span>
+                      </TranslatedText>
                       {/* Tooltip on hover */}
                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-[#0A0A23] text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-xl border border-white/10">
-                        {tag.tooltip}
+                        <TranslatedText>{tag.tooltip}</TranslatedText>
                       </div>
                     </motion.div>
                   ))}
@@ -205,7 +206,7 @@ const PremiumHero = () => {
                   className="pt-8 border-t border-white/10 mt-8"
                 >
                   <p className="text-xs text-white/50 uppercase tracking-widest mb-4 font-medium">
-                    Integrated with
+                    <TranslatedText>Integrated with</TranslatedText>
                   </p>
                   <div className="flex flex-wrap gap-3">
                     {platformLogos.map((platform, index) => (

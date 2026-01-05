@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Package, Users, TrendingUp, Award } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { MetricCounter } from "@/components/ui/metric-counter";
+import { TranslatedText } from "./TranslatedText";
 
 const StatsStrip = () => {
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -78,10 +79,10 @@ const StatsStrip = () => {
                     )}
                   </div>
                   <div className="text-sm text-muted-foreground font-medium">
-                    {stat.label}
+                    <TranslatedText>{stat.label}</TranslatedText>
                   </div>
                   <div className="text-xs text-muted-foreground/70 italic">
-                    {stat.subtext}
+                    <TranslatedText>{stat.subtext}</TranslatedText>
                   </div>
                 </div>
               </div>

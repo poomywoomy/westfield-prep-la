@@ -1,5 +1,6 @@
 import { Zap, Clock, Globe, Building2, Users, Warehouse, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TranslatedText } from "./TranslatedText";
 
 const services = [
   {
@@ -61,10 +62,10 @@ const Services = () => {
           {/* Header */}
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Every Fulfillment Scenario, Covered
+              <TranslatedText>Every Fulfillment Scenario, Covered</TranslatedText>
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              From your first 50 orders to full-scale multi-channel distribution, we've built the playbook.
+              <TranslatedText>From your first 50 orders to full-scale multi-channel distribution, we've built the playbook.</TranslatedText>
             </p>
           </div>
 
@@ -90,28 +91,28 @@ const Services = () => {
                   {/* Middle: Title + Description */}
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold mb-2 text-foreground group-hover:text-primary transition-colors">
-                      {service.title}
+                      <TranslatedText>{service.title}</TranslatedText>
                     </h3>
                     <p className="text-muted-foreground mb-4 leading-relaxed">
-                      {service.description}
+                      <TranslatedText>{service.description}</TranslatedText>
                     </p>
                     <button 
                       onClick={() => goToService(service.title)}
                       className="text-primary hover:text-primary/80 flex items-center gap-2 font-medium transition-colors group/btn"
                     >
-                      Learn More 
+                      <TranslatedText>Learn More</TranslatedText>
                       <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
                   </div>
                   
                   {/* Right: Best For Badge */}
                   <div className="text-left md:text-right flex-shrink-0 md:min-w-[180px]">
-                    <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Best For</span>
+                    <TranslatedText className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Best For</TranslatedText>
                     <div className="flex flex-col gap-1">
                       {service.bestFor.map((item, i) => (
-                        <span key={i} className="text-sm font-semibold text-primary">
+                        <TranslatedText key={i} className="text-sm font-semibold text-primary">
                           {item}
-                        </span>
+                        </TranslatedText>
                       ))}
                     </div>
                   </div>
@@ -127,7 +128,7 @@ const Services = () => {
               onClick={() => window.location.href = "/contact"}
               className="px-8 py-6 text-lg"
             >
-              Explore All Services
+              <TranslatedText>Explore All Services</TranslatedText>
             </Button>
           </div>
         </div>

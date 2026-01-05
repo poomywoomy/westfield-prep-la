@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Linkedin, Instagram, Twitter } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
+import { TranslatedText } from "./TranslatedText";
+
 const Footer = () => {
-  return <footer className="bg-primary text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            {/* Main Footer Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-20 xl:gap-24 mb-12">
+  return (
+    <footer className="bg-primary text-white py-16">
+      <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-20 xl:gap-24 mb-12">
             {/* Company Info */}
             <div className="space-y-4 min-w-[220px]">
               <div className="bg-white/95 rounded-md px-3 py-2 w-fit mb-4">
@@ -19,10 +22,12 @@ const Footer = () => {
                 />
               </div>
               <h1 className="text-sm text-white/80 leading-relaxed font-normal">
-                Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner
+                <TranslatedText>Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner</TranslatedText>
               </h1>
               <div className="pt-2">
-                <p className="text-sm text-secondary font-semibold">Open 7 Days a Week</p>
+                <p className="text-sm text-secondary font-semibold">
+                  <TranslatedText>Open 7 Days a Week</TranslatedText>
+                </p>
                 <p className="text-sm text-white/90">8am - 5pm PT</p>
               </div>
               
@@ -42,11 +47,13 @@ const Footer = () => {
 
             {/* Contact Info */}
             <div className="space-y-4 pr-8 min-w-[200px]">
-              <h4 className="text-lg font-semibold mb-6">Contact Us</h4>
+              <h4 className="text-lg font-semibold mb-6">
+                <TranslatedText>Contact Us</TranslatedText>
+              </h4>
               <div className="space-y-6">
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">Strategically Located in Los Angeles</span>
+                  <TranslatedText className="text-sm">Strategically Located in Los Angeles</TranslatedText>
                 </div>
                 <a href="tel:+18189355478" className="flex items-start gap-3 hover:text-secondary transition-colors group" aria-label="Call Westfield Prep Center">
                   <Phone className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
@@ -59,52 +66,56 @@ const Footer = () => {
               </div>
             </div>
 
-        {/* Services */}
-        <div className="space-y-4 min-w-[200px]">
-          <h4 className="text-lg font-semibold mb-4">Services</h4>
+            {/* Services */}
+            <div className="space-y-4 min-w-[200px]">
+              <h4 className="text-lg font-semibold mb-4">
+                <TranslatedText>Services</TranslatedText>
+              </h4>
               <div className="space-y-2">
                 <Link to="/order-fulfillment" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    Order Fulfillment
+                    <TranslatedText>Order Fulfillment</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
                 <Link to="/inventory-management" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    Inventory Management
+                    <TranslatedText>Inventory Management</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
                 <Link to="/receiving-inspection" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    Receiving & Inspection
+                    <TranslatedText>Receiving & Inspection</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
                 <Link to="/returns-processing" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    Returns Processing
+                    <TranslatedText>Returns Processing</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
                 <Link to="/kitting-bundling" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    Kitting & Bundling
+                    <TranslatedText>Kitting & Bundling</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
                 <Link to="/storage-warehousing" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    Storage & Warehousing
+                    <TranslatedText>Storage & Warehousing</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
               </div>
             </div>
 
-        {/* Sales Channels */}
-        <div className="space-y-4 min-w-[200px]">
-          <h4 className="text-lg font-semibold mb-4">Sales Channels</h4>
+            {/* Sales Channels */}
+            <div className="space-y-4 min-w-[200px]">
+              <h4 className="text-lg font-semibold mb-4">
+                <TranslatedText>Sales Channels</TranslatedText>
+              </h4>
               <div className="space-y-2">
                 <Link to="/shopify-fulfillment" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
@@ -126,41 +137,42 @@ const Footer = () => {
                 </Link>
                 <Link to="/sales-channels" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
                   <span className="relative">
-                    All Channels
+                    <TranslatedText>All Channels</TranslatedText>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
               </div>
             </div>
 
-        {/* Quick Links */}
-        <div className="space-y-4 min-w-[200px]">
-          <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            {/* Quick Links */}
+            <div className="space-y-4 min-w-[200px]">
+              <h4 className="text-lg font-semibold mb-4">
+                <TranslatedText>Quick Links</TranslatedText>
+              </h4>
               <div className="space-y-2">
                 <Link to="/3pl-los-angeles" className="block text-sm text-white/80 hover:text-secondary transition-colors">
-                  3PL Los Angeles
+                  <TranslatedText>3PL Los Angeles</TranslatedText>
                 </Link>
                 <Link to="/testimonials" className="block text-sm text-white/80 hover:text-secondary transition-colors">
-                  Testimonials
+                  <TranslatedText>Testimonials</TranslatedText>
                 </Link>
                 <Link to="/why-choose-us" className="block text-sm text-white/80 hover:text-secondary transition-colors">
-                  Why Choose Us
+                  <TranslatedText>Why Choose Us</TranslatedText>
                 </Link>
                 <Link to="/integrations" className="block text-sm text-white/80 hover:text-secondary transition-colors">
-                  Integrations & API
+                  <TranslatedText>Integrations & API</TranslatedText>
                 </Link>
                 <Link to="/faq" className="block text-sm text-white/80 hover:text-secondary transition-colors">
-                  FAQ
+                  <TranslatedText>FAQ</TranslatedText>
                 </Link>
                 <Link to="/contact" className="block text-sm text-white/80 hover:text-secondary transition-colors">
-                  Contact
+                  <TranslatedText>Contact</TranslatedText>
                 </Link>
                 <Link to="/login" className="block text-sm text-white/80 hover:text-secondary transition-colors">
-                  Client Portal
+                  <TranslatedText>Client Portal</TranslatedText>
                 </Link>
               </div>
             </div>
-
           </div>
 
           {/* Bottom Bar */}
@@ -171,21 +183,23 @@ const Footer = () => {
               </p>
               <div className="flex items-center gap-4">
                 <Link to="/terms" className="text-sm text-white/70 hover:text-secondary transition-colors">
-                  Terms
+                  <TranslatedText>Terms</TranslatedText>
                 </Link>
                 <span className="text-white/40">•</span>
                 <Link to="/privacy" className="text-sm text-white/70 hover:text-secondary transition-colors">
-                  Privacy
+                  <TranslatedText>Privacy</TranslatedText>
                 </Link>
                 <span className="text-white/40">•</span>
                 <p className="text-sm text-white/60">
-                  © {new Date().getFullYear()} All rights reserved.
+                  © {new Date().getFullYear()} <TranslatedText>All rights reserved.</TranslatedText>
                 </p>
               </div>
             </div>
           </div>
-          </div>
         </div>
-      </footer>;
+      </div>
+    </footer>
+  );
 };
+
 export default Footer;

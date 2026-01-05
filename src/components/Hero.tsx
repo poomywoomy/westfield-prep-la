@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-warehouse-optimized.webp";
 import { ArrowRight, Shield, Clock, Award, TrendingUp } from "lucide-react";
+import { TranslatedText } from "./TranslatedText";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -44,12 +45,12 @@ const Hero = () => {
         <div className="max-w-5xl mx-auto text-center">
           {/* Main Headline */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-6 animate-fade-in bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
-            Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner
+            <TranslatedText>Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner</TranslatedText>
           </h1>
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl lg:text-3xl mb-10 text-muted-foreground font-light leading-relaxed max-w-4xl mx-auto animate-fade-in">
-            Fast order processing, transparent pricing, and reliable logistics for growing online brands.
+            <TranslatedText>Fast order processing, transparent pricing, and reliable logistics for growing online brands.</TranslatedText>
           </p>
 
           {/* Trust Badges - Horizontal Row */}
@@ -57,7 +58,7 @@ const Hero = () => {
             {trustBadges.map((badge, index) => (
               <div key={index} className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors">
                 <badge.icon className="w-5 h-5 text-primary" />
-                <span className="text-sm font-semibold text-foreground">{badge.text}</span>
+                <TranslatedText className="text-sm font-semibold text-foreground">{badge.text}</TranslatedText>
               </div>
             ))}
           </div>
@@ -69,7 +70,7 @@ const Hero = () => {
               size="lg"
               className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-10 py-7 font-bold shadow-lg hover:scale-105 transition-all group"
             >
-              Get Free Fulfillment Audit
+              <TranslatedText>Get Free Fulfillment Audit</TranslatedText>
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button
@@ -78,7 +79,7 @@ const Hero = () => {
               variant="outline"
               className="border-2 border-primary/30 hover:bg-primary/10 text-foreground text-lg px-10 py-7 font-semibold hover:scale-105 transition-all"
             >
-              View Pricing
+              <TranslatedText>View Pricing</TranslatedText>
             </Button>
           </div>
 
@@ -87,7 +88,9 @@ const Hero = () => {
             {stats.map((stat, index) => (
               <div key={index} className="text-center p-6 bg-card border border-border rounded-lg hover:border-primary/50 transition-all hover:shadow-lg">
                 <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{stat.value}</div>
-                <div className="text-sm text-muted-foreground font-medium">{stat.label}</div>
+                <div className="text-sm text-muted-foreground font-medium">
+                  <TranslatedText>{stat.label}</TranslatedText>
+                </div>
               </div>
             ))}
           </div>
