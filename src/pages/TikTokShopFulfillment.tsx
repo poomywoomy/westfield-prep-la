@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -12,6 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import LiveMetrics from "@/components/LiveMetrics";
 import ResultsSnapshot from "@/components/ResultsSnapshot";
 import { Zap, Video, Package, Truck, Sparkles, TrendingUp, Camera, CheckCircle, Users, Clock, Award, Boxes } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const TikTokShopFulfillment = () => {
   const navigate = useNavigate();
@@ -63,21 +64,21 @@ const TikTokShopFulfillment = () => {
               <div className="max-w-4xl mx-auto text-center">
                 <div className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500/10 via-cyan-500/10 to-yellow-500/10 border border-pink-500/20 rounded-full px-4 py-2 mb-6 animate-fade-in">
                   <Sparkles className="h-4 w-4 text-pink-600 animate-pulse" />
-                  <span className="text-sm font-medium bg-gradient-to-r from-pink-600 to-cyan-600 bg-clip-text text-transparent">Viral-Ready Fulfillment</span>
+                  <span className="text-sm font-medium bg-gradient-to-r from-pink-600 to-cyan-600 bg-clip-text text-transparent"><TranslatedText>Viral-Ready Fulfillment</TranslatedText></span>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-pink-600 via-cyan-600 to-yellow-600 bg-clip-text text-transparent animate-fade-in">
-                  TikTok Shop Fulfillment
+                  <TranslatedText>TikTok Shop Fulfillment</TranslatedText>
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                  Lightning-fast fulfillment, creator-optimized packaging, and viral-moment scaling for TikTok sellers.
+                  <TranslatedText>Lightning-fast fulfillment, creator-optimized packaging, and viral-moment scaling for TikTok sellers.</TranslatedText>
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
                   <Button size="lg" className="bg-gradient-to-r from-pink-600 via-pink-500 to-cyan-500 hover:opacity-90 shadow-lg hover:shadow-pink-500/50 transition-all" onClick={() => navigate("/contact")}>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Get a Quote
+                    <TranslatedText>Get a Quote</TranslatedText>
                   </Button>
                   <Button size="lg" variant="outline" className="border-pink-300 text-pink-600 hover:bg-pink-50 hover:border-pink-400" onClick={() => navigate("/contact")}>
-                    See Our Work
+                    <TranslatedText>See Our Work</TranslatedText>
                   </Button>
                 </div>
               </div>
@@ -89,10 +90,10 @@ const TikTokShopFulfillment = () => {
             <div className="container mx-auto px-4">
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-pink-600 to-cyan-600 bg-clip-text text-transparent">
-                  Built for TikTok's Lightning Pace
+                  <TranslatedText>Built for TikTok's Lightning Pace</TranslatedText>
                 </h2>
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  Fulfillment that keeps up with viral moments and creator demands
+                  <TranslatedText>Fulfillment that keeps up with viral moments and creator demands</TranslatedText>
                 </p>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">

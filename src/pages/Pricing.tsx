@@ -19,6 +19,7 @@ import {
   X, CheckCircle, Star, Mail, AlertTriangle
 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const EnhancedROICalculator = lazy(() => import("@/components/EnhancedROICalculator"));
 
@@ -127,21 +128,21 @@ const Pricing = () => {
   ];
 
   const highlights = [
-    { icon: Zap, title: "24-Hour Turnaround", description: "Lightning-fast prep and fulfillment" },
-    { icon: ShieldCheck, title: "FBA Compliance", description: "Amazon/Walmart prep to spec" },
-    { icon: BarChart3, title: "Real-Time Inventory", description: "Full visibility into stock" },
-    { icon: Users, title: "Dedicated Support", description: "Hands-on fulfillment specialists" },
+    { icon: Zap, titleKey: "24-Hour Turnaround", descKey: "Lightning-fast prep and fulfillment" },
+    { icon: ShieldCheck, titleKey: "FBA Compliance", descKey: "Amazon/Walmart prep to spec" },
+    { icon: BarChart3, titleKey: "Real-Time Inventory", descKey: "Full visibility into stock" },
+    { icon: Users, titleKey: "Dedicated Support", descKey: "Hands-on fulfillment specialists" },
   ];
 
   const serviceCards = [
-    { icon: Package, service: "Receiving", description: "Per carton or pallet inspection and check-in" },
-    { icon: ShieldCheck, service: "FBA Prep", description: "FNSKU labeling, polybagging, bubble wrap, bundling" },
-    { icon: Truck, service: "DTC Fulfillment", description: "Pick, pack, and ship direct to your customers" },
-    { icon: BarChart3, service: "Storage", description: "Secure, climate-controlled warehouse space" },
-    { icon: Clock, service: "Returns Processing", description: "Inspection, restocking, and customer updates" },
-    { icon: Shield, service: "Photo Documentation", description: "Quality control and proof of service" },
-    { icon: Check, service: "Inventory Tracking", description: "Real-time dashboard access to your stock" },
-    { icon: Zap, service: "Multi-Channel Support", description: "Shopify, Amazon, TikTok Shop integration" },
+    { icon: Package, serviceKey: "Receiving", descKey: "Per carton or pallet inspection and check-in" },
+    { icon: ShieldCheck, serviceKey: "FBA Prep", descKey: "FNSKU labeling, polybagging, bubble wrap, bundling" },
+    { icon: Truck, serviceKey: "DTC Fulfillment", descKey: "Pick, pack, and ship direct to your customers" },
+    { icon: BarChart3, serviceKey: "Storage", descKey: "Secure, climate-controlled warehouse space" },
+    { icon: Clock, serviceKey: "Returns Processing", descKey: "Inspection, restocking, and customer updates" },
+    { icon: Shield, serviceKey: "Photo Documentation", descKey: "Quality control and proof of service" },
+    { icon: Check, serviceKey: "Inventory Tracking", descKey: "Real-time dashboard access to your stock" },
+    { icon: Zap, serviceKey: "Multi-Channel Support", descKey: "Shopify, Amazon, TikTok Shop integration" },
   ];
 
 
@@ -334,7 +335,7 @@ const Pricing = () => {
                 transition={{ delay: prefersReducedMotion ? 0 : 0.2, duration: prefersReducedMotion ? 0.1 : 0.5 }}
                 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6"
               >
-                3PL Fulfillment Pricing for Shopify, Amazon & DTC Brands
+                <TranslatedText>3PL Fulfillment Pricing for Shopify, Amazon & DTC Brands</TranslatedText>
               </motion.h1>
               <motion.p 
                 initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
@@ -342,7 +343,7 @@ const Pricing = () => {
                 transition={{ delay: prefersReducedMotion ? 0 : 0.3, duration: prefersReducedMotion ? 0.1 : 0.5 }}
                 className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-4"
               >
-                Real ROI, Real Savings
+                <TranslatedText>Real ROI, Real Savings</TranslatedText>
               </motion.p>
               <motion.p 
                 initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
@@ -350,8 +351,7 @@ const Pricing = () => {
                 transition={{ delay: prefersReducedMotion ? 0 : 0.4, duration: prefersReducedMotion ? 0.1 : 0.5 }}
                 className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto mb-12"
               >
-                Every business is unique. Tell us your needs and we'll create a pricing model that scales with you. 
-                No hidden fees, no surprises—just transparent pricing tailored to your volume.
+                <TranslatedText>Every business is unique. Tell us your needs and we'll create a pricing model that scales with you. No hidden fees, no surprises—just transparent pricing tailored to your volume.</TranslatedText>
               </motion.p>
 
               {/* Dynamic Stats Grid */}
@@ -370,7 +370,7 @@ const Pricing = () => {
                     {savedCalculation?.monthlyUnits?.toLocaleString() || "2M+"}
                   </p>
                   <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                    {savedCalculation?.monthlyUnits ? "Your Monthly Units" : "Units Processed"}
+                    <TranslatedText>{savedCalculation?.monthlyUnits ? "Your Monthly Units" : "Units Processed"}</TranslatedText>
                   </p>
                 </motion.div>
                 <motion.div 
@@ -382,7 +382,7 @@ const Pricing = () => {
                     ${savedCalculation?.estimatedSavings?.toLocaleString() || "50K+"}
                   </p>
                   <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                    {savedCalculation?.estimatedSavings ? "Your Est. Savings" : "Client Savings"}
+                    <TranslatedText>{savedCalculation?.estimatedSavings ? "Your Est. Savings" : "Client Savings"}</TranslatedText>
                   </p>
                 </motion.div>
                 <motion.div 
@@ -391,7 +391,7 @@ const Pricing = () => {
                   className="bg-card/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
                 >
                   <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#0A66C2]">24hr</p>
-                  <p className="text-xs md:text-sm text-muted-foreground mt-1">Avg. Turnaround</p>
+                  <p className="text-xs md:text-sm text-muted-foreground mt-1"><TranslatedText>Avg. Turnaround</TranslatedText></p>
                 </motion.div>
                 <motion.div 
                   variants={itemVariants}
@@ -399,7 +399,7 @@ const Pricing = () => {
                   className="bg-card/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
                 >
                   <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#F97316]">99.8%</p>
-                  <p className="text-xs md:text-sm text-muted-foreground mt-1">Accuracy Rate</p>
+                  <p className="text-xs md:text-sm text-muted-foreground mt-1"><TranslatedText>Accuracy Rate</TranslatedText></p>
                 </motion.div>
               </motion.div>
             </div>
@@ -425,8 +425,8 @@ const Pricing = () => {
                     <div className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-4 rounded-xl bg-[#F97316]/10 flex items-center justify-center group-hover:bg-[#F97316]/20 transition-colors">
                       <item.icon className="w-6 h-6 md:w-7 md:h-7 text-[#F97316] group-hover:scale-110 transition-transform" />
                     </div>
-                    <h3 className="font-bold text-sm md:text-base mb-1">{item.title}</h3>
-                    <p className="text-xs md:text-sm text-muted-foreground">{item.description}</p>
+                    <h3 className="font-bold text-sm md:text-base mb-1"><TranslatedText>{item.titleKey}</TranslatedText></h3>
+                    <p className="text-xs md:text-sm text-muted-foreground"><TranslatedText>{item.descKey}</TranslatedText></p>
                   </motion.div>
                 ))}
               </motion.div>
@@ -446,10 +446,10 @@ const Pricing = () => {
                 className="text-center mb-10 md:mb-14"
               >
                 <h2 className="text-2xl md:text-4xl font-bold mb-4">
-                  3PL Fulfillment Comparison: In-House vs Big Box vs Westfield
+                  <TranslatedText>3PL Fulfillment Comparison: In-House vs Big Box vs Westfield</TranslatedText>
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  See how our boutique 3PL stacks up against doing it yourself or using a large fulfillment provider
+                  <TranslatedText>See how our boutique 3PL stacks up against doing it yourself or using a large fulfillment provider</TranslatedText>
                 </p>
               </motion.div>
               
@@ -945,8 +945,8 @@ const Pricing = () => {
                     <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-muted flex items-center justify-center group-hover:bg-[#F97316]/10 transition-colors">
                       <item.icon className="w-5 h-5 text-[#F97316] group-hover:scale-110 transition-transform" />
                     </div>
-                    <h4 className="font-semibold text-sm mb-1">{item.service}</h4>
-                    <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
+                    <h4 className="font-semibold text-sm mb-1"><TranslatedText>{item.serviceKey}</TranslatedText></h4>
+                    <p className="text-xs text-muted-foreground line-clamp-2"><TranslatedText>{item.descKey}</TranslatedText></p>
                   </motion.div>
                 ))}
               </motion.div>

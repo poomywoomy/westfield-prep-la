@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
 import { Helmet } from "react-helmet";
 import StructuredData from "@/components/StructuredData";
+import { Link } from "react-router-dom";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const Testimonials = () => {
   const reviews = [
@@ -91,14 +93,14 @@ const Testimonials = () => {
                     ))}
                   </div>
                   <span className="text-2xl font-bold text-primary">5.0</span>
-                  <span className="text-muted-foreground">Rating</span>
+                  <span className="text-muted-foreground"><TranslatedText>Rating</TranslatedText></span>
                 </div>
                 <h1 className="text-5xl md:text-6xl font-bold mb-6 text-primary">
-                  Trusted by Businesses
-                  <span className="block text-secondary mt-2">Nationwide</span>
+                  <TranslatedText>Trusted by Businesses</TranslatedText>
+                  <span className="block text-secondary mt-2"><TranslatedText>Nationwide</TranslatedText></span>
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Don't just take our word for it. See what our clients have to say about their experience with Westfield Prep Center.
+                  <TranslatedText>Don't just take our word for it. See what our clients have to say about their experience with Westfield Prep Center.</TranslatedText>
                 </p>
               </div>
             </div>
@@ -159,18 +161,18 @@ const Testimonials = () => {
                   <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItaDJ2LTJoLTJ6bTAgNHYyaDJ2LTJoLTJ6bS0yIDJ2Mmgydi0yaC0yem0wLTR2Mmgydi0yaC0yem0yLTJ2LTJoLTJ2Mmgyem0wLTRoLTJ2Mmgydi0yem0yIDJ2LTJoLTJ2Mmgyem0wIDR2LTJoLTJ2Mmgyem0yLTJ2Mmgydi0yaC0yem0wIDR2Mmgydi0yaC0yem0tMi00aDJ2LTJoLTJ2MnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
                   <div className="relative">
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                      Ready to Experience Premium Service?
+                      <TranslatedText>Ready to Experience Premium Service?</TranslatedText>
                     </h2>
                     <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-                      Join hundreds of satisfied clients who trust Westfield Prep Center for their fulfillment needs
+                      <TranslatedText>Join hundreds of satisfied clients who trust Westfield Prep Center for their fulfillment needs</TranslatedText>
                     </p>
-                    <a 
-                      href="/contact" 
+                    <Link 
+                      to="/contact" 
                       className="inline-flex items-center gap-2 bg-secondary hover:bg-secondary/90 text-white font-bold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     >
-                      Get Your Free Quote
+                      <TranslatedText>Get Your Free Quote</TranslatedText>
                       <Star className="w-5 h-5 fill-white" />
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
