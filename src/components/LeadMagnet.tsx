@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { FileText, CheckCircle2, Loader2 } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const LeadMagnet = () => {
   const [email, setEmail] = useState("");
@@ -51,15 +52,15 @@ const LeadMagnet = () => {
             {/* Left: Guide Info */}
             <div className="space-y-6">
               <div className="inline-block px-4 py-2 bg-primary/10 rounded-full mb-4">
-                <span className="text-primary font-semibold text-sm">FREE DOWNLOAD</span>
+                <span className="text-primary font-semibold text-sm"><TranslatedText>FREE DOWNLOAD</TranslatedText></span>
               </div>
               
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
-                The Complete Guide to Choosing a Fulfillment Partner
+                <TranslatedText>The Complete Guide to Choosing a Fulfillment Partner</TranslatedText>
               </h2>
               
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Everything you need to know before outsourcing your e-commerce logistics. No fluff, just actionable insights.
+                <TranslatedText>Everything you need to know before outsourcing your e-commerce logistics. No fluff, just actionable insights.</TranslatedText>
               </p>
 
               <div className="space-y-4 pt-4">
@@ -74,7 +75,7 @@ const LeadMagnet = () => {
                     <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="w-4 h-4 text-primary" />
                     </div>
-                    <span className="text-foreground/80 leading-relaxed">{item}</span>
+                    <span className="text-foreground/80 leading-relaxed"><TranslatedText>{item}</TranslatedText></span>
                   </div>
                 ))}
               </div>
@@ -86,12 +87,12 @@ const LeadMagnet = () => {
                     <FileText className="w-10 h-10 text-primary" />
                   </div>
                   <div>
-                    <p className="font-bold text-foreground">50+ Pages</p>
-                    <p className="text-sm text-muted-foreground">Comprehensive Guide (PDF)</p>
+                    <p className="font-bold text-foreground"><TranslatedText>50+ Pages</TranslatedText></p>
+                    <p className="text-sm text-muted-foreground"><TranslatedText>Comprehensive Guide (PDF)</TranslatedText></p>
                   </div>
                 </div>
                 <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                  FREE
+                  <TranslatedText>FREE</TranslatedText>
                 </div>
               </div>
             </div>
@@ -102,17 +103,17 @@ const LeadMagnet = () => {
               <div className="relative bg-card border-2 border-border rounded-2xl p-8 md:p-10 shadow-2xl">
                 <div className="mb-6 text-center">
                   <h3 className="text-2xl font-bold text-foreground mb-2">
-                    Get Your Free Copy
+                    <TranslatedText>Get Your Free Copy</TranslatedText>
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Instant access. No credit card required.
+                    <TranslatedText>Instant access. No credit card required.</TranslatedText>
                   </p>
                 </div>
 
                 <form onSubmit={handleDownload} className="space-y-5">
                   <div>
                     <Label htmlFor="fullName" className="text-sm font-medium">
-                      Full Name *
+                      <TranslatedText>Full Name</TranslatedText> *
                     </Label>
                     <Input
                       id="fullName"
@@ -128,7 +129,7 @@ const LeadMagnet = () => {
 
                   <div>
                     <Label htmlFor="email" className="text-sm font-medium">
-                      Email Address *
+                      <TranslatedText>Email Address</TranslatedText> *
                     </Label>
                     <Input
                       id="email"
@@ -151,18 +152,18 @@ const LeadMagnet = () => {
                     {loading ? (
                       <>
                         <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Sending to your email...
+                        <TranslatedText>Sending to your email...</TranslatedText>
                       </>
                     ) : (
                       <>
                         <FileText className="w-5 h-5 mr-2" />
-                        Download Free Guide
+                        <TranslatedText>Download Free Guide</TranslatedText>
                       </>
                     )}
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center pt-2">
-                    🔒 We respect your privacy. Your information will never be shared with third parties.
+                    <TranslatedText>🔒 We respect your privacy. Your information will never be shared with third parties.</TranslatedText>
                   </p>
                 </form>
               </div>

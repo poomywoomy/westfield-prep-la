@@ -11,6 +11,7 @@ import { BlogCard } from "@/components/blog/BlogCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TranslatedText } from "@/components/TranslatedText";
 
 interface BlogPost {
   id: string;
@@ -102,11 +103,11 @@ const Blog = () => {
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-[hsl(28,100%,50%)] text-white px-4 py-2 rounded-full mb-6">
               <BookOpen className="w-5 h-5" />
-              <span className="font-semibold text-sm uppercase">Industry Insights</span>
+              <span className="font-semibold text-sm uppercase"><TranslatedText>Industry Insights</TranslatedText></span>
             </div>
-            <h1 className="text-6xl font-bold text-white mb-6">Blog</h1>
+            <h1 className="text-6xl font-bold text-white mb-6"><TranslatedText>Blog</TranslatedText></h1>
             <div className="w-32 h-1 bg-[hsl(28,100%,50%)] mx-auto mb-6" />
-            <p className="text-xl text-white/90">Expert fulfillment strategies, warehouse optimization tips, and logistics insights</p>
+            <p className="text-xl text-white/90"><TranslatedText>Expert fulfillment strategies, warehouse optimization tips, and logistics insights</TranslatedText></p>
           </div>
         </div>
       </section>
@@ -120,7 +121,9 @@ const Blog = () => {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="mb-8 flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-[hsl(210,30%,12%)]">{selectedCategory === "All" ? "All Articles" : selectedCategory}</h2>
+            <h2 className="text-2xl font-bold text-[hsl(210,30%,12%)]">
+              {selectedCategory === "All" ? <TranslatedText>All Articles</TranslatedText> : selectedCategory}
+            </h2>
             <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
           </div>
 
@@ -138,7 +141,7 @@ const Blog = () => {
           ) : filteredPosts.length === 0 ? (
             <div className="text-center py-16">
               <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-2">No Articles Found</h3>
+              <h3 className="text-2xl font-bold mb-2"><TranslatedText>No Articles Found</TranslatedText></h3>
             </div>
           ) : (
             <>
@@ -189,8 +192,10 @@ const Blog = () => {
 
       <section className="py-16 bg-[hsl(210,30%,12%)] border-t-4 border-[hsl(28,100%,50%)]">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to Optimize Your Fulfillment?</h2>
-          <Button onClick={() => (window.location.href = "/contact")} className="bg-[hsl(28,100%,50%)] hover:bg-[hsl(28,100%,45%)] text-white px-8 py-6 text-lg">Get Started Today</Button>
+          <h2 className="text-4xl font-bold text-white mb-6"><TranslatedText>Ready to Optimize Your Fulfillment?</TranslatedText></h2>
+          <Button onClick={() => (window.location.href = "/contact")} className="bg-[hsl(28,100%,50%)] hover:bg-[hsl(28,100%,45%)] text-white px-8 py-6 text-lg">
+            <TranslatedText>Get Started Today</TranslatedText>
+          </Button>
         </div>
       </section>
 

@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { trackEvent } from "@/lib/analytics";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -180,9 +181,11 @@ const ContactForm = () => {
     <section id="contact" className="py-12 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Get Your Quote</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+            <TranslatedText>Get Your Quote</TranslatedText>
+          </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Tell us about your business and get your custom quote within 24 hours
+            <TranslatedText>Tell us about your business and get your custom quote within 24 hours</TranslatedText>
           </p>
         </div>
 
@@ -191,7 +194,7 @@ const ContactForm = () => {
             {/* Name and Email - Side by Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="name">Full Name *</Label>
+                <Label htmlFor="name"><TranslatedText>Full Name</TranslatedText> *</Label>
                 <Input
                   id="name"
                   name="name"
@@ -204,7 +207,7 @@ const ContactForm = () => {
               </div>
 
               <div>
-                <Label htmlFor="email">Email Address *</Label>
+                <Label htmlFor="email"><TranslatedText>Email Address</TranslatedText> *</Label>
                 <Input
                   id="email"
                   name="email"
@@ -221,7 +224,7 @@ const ContactForm = () => {
             {/* Phone and Business - Side by Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="phone">Phone Number *</Label>
+                <Label htmlFor="phone"><TranslatedText>Phone Number</TranslatedText> *</Label>
                 <Input
                   id="phone"
                   name="phone"
@@ -235,7 +238,7 @@ const ContactForm = () => {
               </div>
 
               <div>
-                <Label htmlFor="business">Business Name *</Label>
+                <Label htmlFor="business"><TranslatedText>Business Name</TranslatedText> *</Label>
                 <Input
                   id="business"
                   name="business"
@@ -251,7 +254,7 @@ const ContactForm = () => {
             {/* Units per Month and SKU Count - Side by Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="unitsPerMonth">Units Sold per Month *</Label>
+                <Label htmlFor="unitsPerMonth"><TranslatedText>Units Sold per Month</TranslatedText> *</Label>
                 <Select
                   value={formData.unitsPerMonth}
                   onValueChange={(value) => handleSelectChange("unitsPerMonth", value)}
@@ -260,7 +263,7 @@ const ContactForm = () => {
                     <SelectValue placeholder="Select monthly units" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border border-border z-50">
-                    <SelectItem value="just-starting">Just Starting</SelectItem>
+                    <SelectItem value="just-starting"><TranslatedText>Just Starting</TranslatedText></SelectItem>
                     <SelectItem value="0-1000">0 – 1,000</SelectItem>
                     <SelectItem value="1001-5000">1,001 – 5,000</SelectItem>
                     <SelectItem value="5001-10000">5,001 – 10,000</SelectItem>
@@ -271,7 +274,7 @@ const ContactForm = () => {
               </div>
 
               <div>
-                <Label htmlFor="skuCount">SKU Count *</Label>
+                <Label htmlFor="skuCount"><TranslatedText>SKU Count</TranslatedText> *</Label>
                 <Select
                   value={formData.skuCount}
                   onValueChange={(value) => handleSelectChange("skuCount", value)}
@@ -284,7 +287,7 @@ const ContactForm = () => {
                     <SelectItem value="11-25">11 - 25</SelectItem>
                     <SelectItem value="25-50">25 - 50</SelectItem>
                     <SelectItem value="50+">50+</SelectItem>
-                    <SelectItem value="unsure">Unsure</SelectItem>
+                    <SelectItem value="unsure"><TranslatedText>Unsure</TranslatedText></SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.skuCount && <p className="text-sm text-destructive mt-1">{errors.skuCount}</p>}
@@ -293,7 +296,7 @@ const ContactForm = () => {
 
             {/* Marketplaces - Checkboxes */}
             <div>
-              <Label>Marketplaces *</Label>
+              <Label><TranslatedText>Marketplaces</TranslatedText> *</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
                 {["Shopify", "Amazon", "Walmart", "TikTok Shop", "Other"].map((marketplace) => (
                   <div key={marketplace} className="flex items-center space-x-2">
@@ -306,7 +309,7 @@ const ContactForm = () => {
                       htmlFor={`marketplace-${marketplace}`}
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                     >
-                      {marketplace}
+                      <TranslatedText>{marketplace}</TranslatedText>
                     </label>
                   </div>
                 ))}
@@ -330,7 +333,7 @@ const ContactForm = () => {
             {/* Packaging Requirements and Timeline - Side by Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="packagingRequirements">Packaging Requirements *</Label>
+                <Label htmlFor="packagingRequirements"><TranslatedText>Packaging Requirements</TranslatedText> *</Label>
                 <Select
                   value={formData.packagingRequirements}
                   onValueChange={(value) => handleSelectChange("packagingRequirements", value)}
@@ -339,15 +342,15 @@ const ContactForm = () => {
                     <SelectValue placeholder="Select packaging" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border border-border z-50">
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="custom">Custom</SelectItem>
+                    <SelectItem value="standard"><TranslatedText>Standard</TranslatedText></SelectItem>
+                    <SelectItem value="custom"><TranslatedText>Custom</TranslatedText></SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.packagingRequirements && <p className="text-sm text-destructive mt-1">{errors.packagingRequirements}</p>}
               </div>
 
               <div>
-                <Label htmlFor="timeline">When would you like to start? *</Label>
+                <Label htmlFor="timeline"><TranslatedText>When would you like to start?</TranslatedText> *</Label>
                 <Select
                   value={formData.timeline}
                   onValueChange={(value) => handleSelectChange("timeline", value)}
@@ -356,11 +359,11 @@ const ContactForm = () => {
                     <SelectValue placeholder="Select timeline" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border border-border z-50">
-                    <SelectItem value="asap">ASAP</SelectItem>
-                    <SelectItem value="1-3-months">1–3 months</SelectItem>
-                    <SelectItem value="3-6-months">3–6 months</SelectItem>
-                    <SelectItem value="6-12-months">6–12 months</SelectItem>
-                    <SelectItem value="12-months-plus">12 months+</SelectItem>
+                    <SelectItem value="asap"><TranslatedText>ASAP</TranslatedText></SelectItem>
+                    <SelectItem value="1-3-months"><TranslatedText>1–3 months</TranslatedText></SelectItem>
+                    <SelectItem value="3-6-months"><TranslatedText>3–6 months</TranslatedText></SelectItem>
+                    <SelectItem value="6-12-months"><TranslatedText>6–12 months</TranslatedText></SelectItem>
+                    <SelectItem value="12-months-plus"><TranslatedText>12 months+</TranslatedText></SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.timeline && <p className="text-sm text-destructive mt-1">{errors.timeline}</p>}
@@ -369,7 +372,7 @@ const ContactForm = () => {
 
             {/* Comments */}
             <div>
-              <Label htmlFor="comments">Comments or Additional Requirements</Label>
+              <Label htmlFor="comments"><TranslatedText>Comments or Additional Requirements</TranslatedText></Label>
               <Textarea
                 id="comments"
                 name="comments"
@@ -398,7 +401,7 @@ const ContactForm = () => {
               disabled={isSubmitting}
               className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold text-lg py-6"
             >
-              {isSubmitting ? "Submitting..." : "Get Quote"}
+              {isSubmitting ? <TranslatedText>Submitting...</TranslatedText> : <TranslatedText>Get Quote</TranslatedText>}
             </Button>
           </form>
         </div>

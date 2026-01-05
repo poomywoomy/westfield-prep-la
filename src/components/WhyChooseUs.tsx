@@ -1,6 +1,7 @@
-import { Clock, Camera, DollarSign, MapPin } from "lucide-react";
+import { Clock, Camera, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const reasons = [
   {
@@ -27,9 +28,11 @@ const WhyChooseUs = () => {
     <section className="py-20 bg-primary text-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Sellers Choose Our LA Prep Center</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <TranslatedText>Why Sellers Choose Our LA Prep Center</TranslatedText>
+          </h2>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            Experience the boutique prep center advantage—personalized service with faster turnaround times
+            <TranslatedText>Experience the boutique prep center advantage—personalized service with faster turnaround times</TranslatedText>
           </p>
         </div>
 
@@ -41,8 +44,12 @@ const WhyChooseUs = () => {
                 <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4">
                   <Icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{reason.title}</h3>
-                <p className="text-white/80">{reason.description}</p>
+                <h3 className="text-xl font-semibold mb-3">
+                  <TranslatedText>{reason.title}</TranslatedText>
+                </h3>
+                <p className="text-white/80">
+                  <TranslatedText>{reason.description}</TranslatedText>
+                </p>
               </div>
             );
           })}
@@ -54,7 +61,7 @@ const WhyChooseUs = () => {
             size="lg"
             className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-6 font-semibold"
           >
-            Get a Free Quote
+            <TranslatedText>Get a Free Quote</TranslatedText>
           </Button>
         </div>
       </div>
