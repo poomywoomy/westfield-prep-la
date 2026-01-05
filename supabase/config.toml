@@ -128,3 +128,9 @@ verify_jwt = true
 
 [functions.firecrawl-map]
 verify_jwt = true
+
+[functions.detect-country]
+verify_jwt = false
+
+[functions.translate-content]
+verify_jwt = false

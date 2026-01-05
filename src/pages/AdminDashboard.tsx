@@ -31,6 +31,7 @@ const OrdersTab = lazy(() => import("@/components/admin/OrdersTab").then(m => ({
 const ShipmentsTab = lazy(() => import("@/components/admin/ShipmentsTab").then(m => ({ default: m.ShipmentsTab })));
 const ShipmentRequestsTab = lazy(() => import("@/components/admin/ShipmentRequestsTab"));
 const SupportTicketsTab = lazy(() => import("@/components/admin/SupportTicketsTab"));
+const TranslationsTab = lazy(() => import("@/components/admin/TranslationsTab"));
 
 const AdminDashboard = () => {
   const { user, role, loading, logout } = useAuth();
@@ -236,6 +237,12 @@ const AdminDashboard = () => {
           <TabsContent value="support-tickets">
             <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
               <SupportTicketsTab />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="translations">
+            <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+              <TranslationsTab />
             </Suspense>
           </TabsContent>
         </Tabs>

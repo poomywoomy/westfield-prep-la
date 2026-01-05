@@ -1,4 +1,4 @@
-import { Users, FileText, DollarSign, Package, AlertTriangle, Store, ShoppingCart, PenSquare, FileSignature, History, Activity, Truck, LifeBuoy, Search, Globe, Newspaper } from "lucide-react";
+import { Users, FileText, DollarSign, Package, AlertTriangle, Store, ShoppingCart, PenSquare, FileSignature, History, Activity, Truck, LifeBuoy, Search, Globe, Newspaper, Languages } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -59,6 +59,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount, ship
     { id: "blog-research", label: "Blog Research", icon: Search },
     { id: "seo-audit", label: "SEO Audit", icon: Globe },
     { id: "industry-news", label: "Industry News", icon: Newspaper },
+    { id: "translations", label: "Translations", icon: Languages },
     { id: "documents", label: "Documents", icon: FileSignature },
   ];
 
