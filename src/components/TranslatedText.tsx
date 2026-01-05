@@ -1,71 +1,69 @@
-import { useEffect, useState, ReactNode, createElement } from 'react';
+import { useEffect, useState, useRef, createElement } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TranslatedTextProps {
   children: string;
   as?: keyof JSX.IntrinsicElements;
   className?: string;
-  context?: string;
-  fallback?: ReactNode;
 }
 
 export function TranslatedText({ 
   children, 
   as = 'span', 
-  className = '',
-  context,
-  fallback
+  className = ''
 }: TranslatedTextProps) {
-  const { currentLanguage, translate, translationCache } = useLanguage();
-  // Always start with the original text (no blank flicker)
+  const { currentLanguage, queueTranslation, translationCache } = useLanguage();
   const [translated, setTranslated] = useState<string>(children);
-  const [hasTranslated, setHasTranslated] = useState(false);
+  const mountedRef = useRef(true);
+  const lastChildrenRef = useRef(children);
+  const lastLanguageRef = useRef(currentLanguage);
 
   useEffect(() => {
-    // Reset when children change
-    setTranslated(children);
-    setHasTranslated(false);
-  }, [children]);
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   useEffect(() => {
+    // Skip if nothing changed
+    if (lastChildrenRef.current === children && lastLanguageRef.current === currentLanguage) {
+      return;
+    }
+    
+    lastChildrenRef.current = children;
+    lastLanguageRef.current = currentLanguage;
+
+    // If English, just show original
     if (currentLanguage === 'en') {
       setTranslated(children);
-      setHasTranslated(true);
       return;
     }
 
     const cacheKey = `${currentLanguage}:${children}`;
     
-    // Check cache first - instant swap
+    // Check cache first (instant)
     if (translationCache[cacheKey]) {
       setTranslated(translationCache[cacheKey]);
-      setHasTranslated(true);
       return;
     }
 
-    // Translate in background - shows English while loading
-    translate([children], context).then(([result]) => {
-      setTranslated(result);
-      setHasTranslated(true);
-    }).catch(() => {
-      // On error, keep original text
-      setHasTranslated(true);
+    // Show original while loading, then queue translation
+    setTranslated(children);
+    
+    queueTranslation(children).then((result) => {
+      if (mountedRef.current) {
+        setTranslated(result);
+      }
     });
-  }, [children, currentLanguage, translate, translationCache, context]);
+  }, [children, currentLanguage, queueTranslation, translationCache]);
 
-  // Smooth transition class when translation loads
-  const transitionClass = hasTranslated ? 'transition-opacity duration-200' : '';
-
-  return createElement(as, { 
-    className: `${className} ${transitionClass}`.trim(),
-  }, translated);
+  return createElement(as, { className }, translated);
 }
 
 // Hook version for more flexibility
 export function useTranslation() {
-  const { currentLanguage, translate, translationCache, isTranslating } = useLanguage();
+  const { currentLanguage, translate, queueTranslation, translationCache, isTranslating } = useLanguage();
 
-  const t = async (text: string, context?: string): Promise<string> => {
+  const t = async (text: string): Promise<string> => {
     if (currentLanguage === 'en') return text;
     
     const cacheKey = `${currentLanguage}:${text}`;
@@ -73,8 +71,7 @@ export function useTranslation() {
       return translationCache[cacheKey];
     }
 
-    const [result] = await translate([text], context);
-    return result;
+    return queueTranslation(text);
   };
 
   const tBatch = async (texts: string[], context?: string): Promise<string[]> => {

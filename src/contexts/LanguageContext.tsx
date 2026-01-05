@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface SupportedLanguage {
@@ -18,6 +18,7 @@ interface LanguageContextType {
   supportedLanguages: SupportedLanguage[];
   isDetecting: boolean;
   translate: (texts: string[], context?: string) => Promise<string[]>;
+  queueTranslation: (text: string) => Promise<string>;
   translationCache: TranslationCache;
   isTranslating: boolean;
 }
@@ -32,6 +33,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [isDetecting, setIsDetecting] = useState(true);
   const [translationCache, setTranslationCache] = useState<TranslationCache>({});
   const [isTranslating, setIsTranslating] = useState(false);
+
+  // Use refs to avoid recreating functions on every cache update
+  const translationCacheRef = useRef<TranslationCache>({});
+  const currentLanguageRef = useRef<string>('en');
+  const pendingTranslationsRef = useRef<Map<string, Array<(result: string) => void>>>(new Map());
+  const batchTimeoutRef = useRef<number | null>(null);
+
+  // Sync refs with state
+  useEffect(() => {
+    translationCacheRef.current = translationCache;
+  }, [translationCache]);
+
+  useEffect(() => {
+    currentLanguageRef.current = currentLanguage;
+  }, [currentLanguage]);
 
   // Load supported languages
   useEffect(() => {
@@ -117,10 +133,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, lang);
   }, []);
 
+  // Core translate function - uses refs to avoid dependency issues
   const translate = useCallback(async (texts: string[], context?: string): Promise<string[]> => {
-    if (currentLanguage === 'en') {
+    const lang = currentLanguageRef.current;
+    if (lang === 'en') {
       return texts;
     }
+
+    const cache = translationCacheRef.current;
 
     // Check cache first
     const uncachedTexts: string[] = [];
@@ -128,9 +148,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const results: string[] = [...texts];
 
     texts.forEach((text, i) => {
-      const cacheKey = `${currentLanguage}:${text}`;
-      if (translationCache[cacheKey]) {
-        results[i] = translationCache[cacheKey];
+      const cacheKey = `${lang}:${text}`;
+      if (cache[cacheKey]) {
+        results[i] = cache[cacheKey];
       } else {
         uncachedTexts.push(text);
         uncachedIndices.push(i);
@@ -145,7 +165,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     try {
       const response = await supabase.functions.invoke('translate-content', {
-        body: { texts: uncachedTexts, targetLanguage: currentLanguage, context }
+        body: { texts: uncachedTexts, targetLanguage: lang, context }
       });
 
       if (response.data?.translations) {
@@ -154,9 +174,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         response.data.translations.forEach((t: { source: string; translated: string }, i: number) => {
           const originalIndex = uncachedIndices[i];
           results[originalIndex] = t.translated;
-          newCache[`${currentLanguage}:${t.source}`] = t.translated;
+          newCache[`${lang}:${t.source}`] = t.translated;
         });
 
+        // Update both ref and state
+        translationCacheRef.current = { ...translationCacheRef.current, ...newCache };
         setTranslationCache(prev => ({ ...prev, ...newCache }));
       }
     } catch (error) {
@@ -165,7 +187,58 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     setIsTranslating(false);
     return results;
-  }, [currentLanguage, translationCache]);
+  }, []); // No dependencies - uses refs
+
+  // Process batched translations
+  const processBatch = useCallback(async () => {
+    const pending = Array.from(pendingTranslationsRef.current.entries());
+    pendingTranslationsRef.current.clear();
+    
+    if (pending.length === 0) return;
+    
+    const texts = pending.map(([text]) => text);
+    const results = await translate(texts);
+    
+    // Resolve all pending promises
+    pending.forEach(([text, resolvers], i) => {
+      resolvers.forEach(resolve => resolve(results[i]));
+    });
+  }, [translate]);
+
+  // Queue translation with batching and debouncing
+  const queueTranslation = useCallback((text: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const lang = currentLanguageRef.current;
+      
+      // If English, resolve immediately
+      if (lang === 'en') {
+        resolve(text);
+        return;
+      }
+      
+      const cacheKey = `${lang}:${text}`;
+      
+      // If already cached, resolve immediately
+      if (translationCacheRef.current[cacheKey]) {
+        resolve(translationCacheRef.current[cacheKey]);
+        return;
+      }
+      
+      // Add to pending queue
+      const existing = pendingTranslationsRef.current.get(text);
+      if (existing) {
+        existing.push(resolve);
+      } else {
+        pendingTranslationsRef.current.set(text, [resolve]);
+      }
+      
+      // Debounce: wait 50ms to collect all pending texts, then batch translate
+      if (batchTimeoutRef.current) {
+        clearTimeout(batchTimeoutRef.current);
+      }
+      batchTimeoutRef.current = window.setTimeout(processBatch, 50);
+    });
+  }, [processBatch]);
 
   return (
     <LanguageContext.Provider value={{
@@ -174,6 +247,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       supportedLanguages,
       isDetecting,
       translate,
+      queueTranslation,
       translationCache,
       isTranslating,
     }}>
