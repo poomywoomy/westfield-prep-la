@@ -15,8 +15,6 @@ export function TranslatedText({
   const { currentLanguage, queueTranslation, translationCache } = useLanguage();
   const [translated, setTranslated] = useState<string>(children);
   const mountedRef = useRef(true);
-  const lastChildrenRef = useRef(children);
-  const lastLanguageRef = useRef(currentLanguage);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -24,14 +22,6 @@ export function TranslatedText({
   }, []);
 
   useEffect(() => {
-    // Skip if nothing changed
-    if (lastChildrenRef.current === children && lastLanguageRef.current === currentLanguage) {
-      return;
-    }
-    
-    lastChildrenRef.current = children;
-    lastLanguageRef.current = currentLanguage;
-
     // If English, just show original
     if (currentLanguage === 'en') {
       setTranslated(children);
@@ -46,15 +36,13 @@ export function TranslatedText({
       return;
     }
 
-    // Show original while loading, then queue translation
-    setTranslated(children);
-    
+    // Queue translation (batched with debounce)
     queueTranslation(children).then((result) => {
       if (mountedRef.current) {
         setTranslated(result);
       }
     });
-  }, [children, currentLanguage, queueTranslation, translationCache]);
+  }, [children, currentLanguage]);
 
   return createElement(as, { className }, translated);
 }
