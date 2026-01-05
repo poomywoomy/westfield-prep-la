@@ -17,6 +17,7 @@ import { ArrowLeft, ChevronDown } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const FAQ = () => {
   const navigate = useNavigate();
@@ -530,7 +531,7 @@ const FAQ = () => {
             <Link to="/">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Home
+                <TranslatedText>Back to Home</TranslatedText>
               </Button>
             </Link>
           </div>
@@ -541,16 +542,18 @@ const FAQ = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-              Comprehensive FAQ
+              <TranslatedText>Comprehensive FAQ</TranslatedText>
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Everything you need to know about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, and more
+              <TranslatedText>Everything you need to know about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, and more</TranslatedText>
             </p>
           </div>
 
           {/* Quick Navigation */}
           <div className="mb-8 p-6 bg-muted/30 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Quick Navigation</h3>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">
+              <TranslatedText>Quick Navigation</TranslatedText>
+            </h3>
             <div className="flex flex-wrap gap-2">
               {faqCategories.map((category, idx) => (
                 <Button
@@ -563,7 +566,7 @@ const FAQ = () => {
                   }}
                   className="text-sm"
                 >
-                  {category.emoji} {category.title}
+                  {category.emoji} <TranslatedText>{category.title}</TranslatedText>
                 </Button>
               ))}
             </div>
@@ -578,9 +581,11 @@ const FAQ = () => {
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{category.emoji}</span>
                       <div className="text-left">
-                        <span className="text-xl font-bold text-foreground">{category.title}</span>
+                        <span className="text-xl font-bold text-foreground">
+                          <TranslatedText>{category.title}</TranslatedText>
+                        </span>
                         <span className="ml-2 text-sm text-muted-foreground">
-                          ({category.questions.length} questions)
+                          ({category.questions.length} <TranslatedText>questions</TranslatedText>)
                         </span>
                       </div>
                     </div>
@@ -595,10 +600,10 @@ const FAQ = () => {
                           className="bg-card border border-border rounded-lg px-4"
                         >
                           <AccordionTrigger className="text-left font-semibold text-foreground hover:text-primary py-4">
-                            {faq.question}
+                            <TranslatedText>{faq.question}</TranslatedText>
                           </AccordionTrigger>
                           <AccordionContent className="text-muted-foreground pb-4">
-                            {faq.answer}
+                            <TranslatedText>{faq.answer}</TranslatedText>
                           </AccordionContent>
                         </AccordionItem>
                       ))}
@@ -612,20 +617,20 @@ const FAQ = () => {
           {/* Still Have Questions CTA */}
           <section className="mt-12 text-center py-12 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg border border-border">
             <h2 className="text-3xl font-bold text-primary mb-4">
-              Still Have Questions?
+              <TranslatedText>Still Have Questions?</TranslatedText>
             </h2>
             <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Our team is here to help. Contact us for personalized answers and custom pricing quotes tailored to your business needs.
+              <TranslatedText>Our team is here to help. Contact us for personalized answers and custom pricing quotes tailored to your business needs.</TranslatedText>
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Link to="/contact">
                 <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold">
-                  Contact Us
+                  <TranslatedText>Contact Us</TranslatedText>
                 </Button>
               </Link>
               <Button size="lg" variant="outline" asChild>
                 <a href="tel:+18189355478" className="font-semibold">
-                  📞 Call (818) 935-5478
+                  📞 <TranslatedText>Call</TranslatedText> (818) 935-5478
                 </a>
               </Button>
             </div>

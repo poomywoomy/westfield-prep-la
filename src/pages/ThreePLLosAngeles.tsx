@@ -7,6 +7,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import StructuredData from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { MapPin, Package, Truck, Zap, Check, X, ArrowRight } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ThreePLLosAngeles = () => {
   const meta = generateMetaTags(
@@ -97,13 +98,13 @@ const ThreePLLosAngeles = () => {
               <div className="flex items-center justify-center gap-4">
                 <MapPin className="w-12 h-12 text-primary flex-shrink-0" />
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-wide text-foreground leading-[1.1] border-l-4 border-primary pl-6 shadow-sm">
-                  3PL in Los Angeles
+                  <TranslatedText>3PL in Los Angeles</TranslatedText>
                 </h1>
               </div>
               
               {/* Subtitle/Value Prop */}
               <p className="text-xl md:text-2xl text-muted-foreground/90 font-light leading-relaxed max-w-3xl mx-auto">
-                Los Angeles's trusted 3PL partner for growing online brands. Expert order fulfillment, real-time inventory tracking, and strategic West Coast distribution.
+                <TranslatedText>Los Angeles's trusted 3PL partner for growing online brands. Expert order fulfillment, real-time inventory tracking, and strategic West Coast distribution.</TranslatedText>
               </p>
               
               {/* CTA Button */}
@@ -113,7 +114,7 @@ const ThreePLLosAngeles = () => {
                   className="text-lg px-8 py-6"
                   onClick={() => window.location.href = '/contact'}
                 >
-                  Get Your Quote
+                  <TranslatedText>Get Your Quote</TranslatedText>
                 </Button>
               </div>
             </div>
@@ -124,7 +125,7 @@ const ThreePLLosAngeles = () => {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-6 md:px-12 max-w-4xl">
             <p className="text-lg md:text-xl text-center text-muted-foreground leading-relaxed">
-              A Los Angeles 3PL brings speed, structure, and proximity to one of the world's busiest logistics ecosystems. From same-day container receiving to 2-day West Coast delivery, our fulfillment center positions your brand where it needs to be.
+              <TranslatedText>A Los Angeles 3PL brings speed, structure, and proximity to one of the world's busiest logistics ecosystems. From same-day container receiving to 2-day West Coast delivery, our fulfillment center positions your brand where it needs to be.</TranslatedText>
             </p>
           </div>
         </section>
@@ -137,9 +138,11 @@ const ThreePLLosAngeles = () => {
                 <div className="flex justify-center mb-6">
                   <Package className="w-10 h-10 text-primary stroke-[1]" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">Port Proximity</h3>
+                <h3 className="text-xl font-semibold text-foreground">
+                  <TranslatedText>Port Proximity</TranslatedText>
+                </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  Immediate access to Port of Los Angeles and Port of Long Beach with faster inbound container processing
+                  <TranslatedText>Immediate access to Port of Los Angeles and Port of Long Beach with faster inbound container processing</TranslatedText>
                 </p>
               </div>
 
@@ -147,9 +150,11 @@ const ThreePLLosAngeles = () => {
                 <div className="flex justify-center mb-6">
                   <Truck className="w-10 h-10 text-primary stroke-[1]" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">Carrier Hub</h3>
+                <h3 className="text-xl font-semibold text-foreground">
+                  <TranslatedText>Carrier Hub</TranslatedText>
+                </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  Proximity to USPS, UPS, FedEx major hubs with reduced lead time for replenishment
+                  <TranslatedText>Proximity to USPS, UPS, FedEx major hubs with reduced lead time for replenishment</TranslatedText>
                 </p>
               </div>
 
@@ -157,9 +162,11 @@ const ThreePLLosAngeles = () => {
                 <div className="flex justify-center mb-6">
                   <Zap className="w-10 h-10 text-primary stroke-[1]" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">West Coast Distribution</h3>
+                <h3 className="text-xl font-semibold text-foreground">
+                  <TranslatedText>West Coast Distribution</TranslatedText>
+                </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  Strategic positioning for 1 to 2 day delivery across California and western states
+                  <TranslatedText>Strategic positioning for 1 to 2 day delivery across California and western states</TranslatedText>
                 </p>
               </div>
             </div>
@@ -179,14 +186,14 @@ const ThreePLLosAngeles = () => {
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="space-y-6">
                 <h2 className="text-5xl font-light leading-tight">
-                  Secure, Climate-Controlled Storage Designed for West Coast Brands
+                  <TranslatedText>Secure, Climate-Controlled Storage Designed for West Coast Brands</TranslatedText>
                 </h2>
                 <div className="w-20 h-0.5 bg-primary" />
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  A modern 3PL warehouse does far more than hold inventory. It protects your products, organizes your stock intelligently, and maintains the consistency your supply chain depends on. A Los Angeles-based fulfillment center provides climate-controlled storage, dedicated racking zones, and product-specific segregation ensuring your inventory stays in optimal condition from arrival to outbound.
+                  <TranslatedText>A modern 3PL warehouse does far more than hold inventory. It protects your products, organizes your stock intelligently, and maintains the consistency your supply chain depends on. A Los Angeles-based fulfillment center provides climate-controlled storage, dedicated racking zones, and product-specific segregation ensuring your inventory stays in optimal condition from arrival to outbound.</TranslatedText>
                 </p>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  This creates faster access, safer handling, and a more stable operational flow for brands shipping throughout California and the broader West Coast.
+                  <TranslatedText>This creates faster access, safer handling, and a more stable operational flow for brands shipping throughout California and the broader West Coast.</TranslatedText>
                 </p>
               </div>
                 <div className="h-96 rounded-lg overflow-hidden shadow-lg">
@@ -215,29 +222,31 @@ const ThreePLLosAngeles = () => {
                 </div>
               <div className="space-y-6 order-1 md:order-2">
                 <h2 className="text-5xl font-light leading-tight">
-                  Streamlined Inventory Management With Real-Time Visibility
+                  <TranslatedText>Streamlined Inventory Management With Real-Time Visibility</TranslatedText>
                 </h2>
                 <div className="w-20 h-0.5 bg-primary" />
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  Partnering with a 3PL in Los Angeles brings structure and transparency to your inventory movement. Advanced tracking systems monitor every SKU, update stock levels automatically, and provide location accuracy down to the bin.
+                  <TranslatedText>Partnering with a 3PL in Los Angeles brings structure and transparency to your inventory movement. Advanced tracking systems monitor every SKU, update stock levels automatically, and provide location accuracy down to the bin.</TranslatedText>
                 </p>
-                <p className="text-lg font-medium">This helps your team:</p>
+                <p className="text-lg font-medium">
+                  <TranslatedText>This helps your team:</TranslatedText>
+                </p>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <span>Identify trends in slow-moving and high-velocity SKUs</span>
+                    <span><TranslatedText>Identify trends in slow-moving and high-velocity SKUs</TranslatedText></span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <span>Prevent costly oversells and stockouts</span>
+                    <span><TranslatedText>Prevent costly oversells and stockouts</TranslatedText></span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <span>Maintain accurate counts across all sales channels</span>
+                    <span><TranslatedText>Maintain accurate counts across all sales channels</TranslatedText></span>
                   </li>
                 </ul>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  With a professional 3PL, you eliminate manual errors and gain a clear, real-time view of your product flow.
+                  <TranslatedText>With a professional 3PL, you eliminate manual errors and gain a clear, real-time view of your product flow.</TranslatedText>
                 </p>
               </div>
             </div>
@@ -252,31 +261,31 @@ const ThreePLLosAngeles = () => {
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="space-y-6">
                 <h2 className="text-5xl font-light leading-tight">
-                  Fast, Reliable Distribution Across LA, California, and Nationwide
+                  <TranslatedText>Fast, Reliable Distribution Across LA, California, and Nationwide</TranslatedText>
                 </h2>
                 <div className="w-20 h-0.5 bg-primary" />
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  A third-party logistics partner ensures your shipments move efficiently across multiple routes whether you're fulfilling DTC orders, sending wholesale replenishments, or distributing bulk shipments.
+                  <TranslatedText>A third-party logistics partner ensures your shipments move efficiently across multiple routes whether you're fulfilling DTC orders, sending wholesale replenishments, or distributing bulk shipments.</TranslatedText>
                 </p>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  Los Angeles is one of the strongest shipping hubs in the country, giving brands access to:
+                  <TranslatedText>Los Angeles is one of the strongest shipping hubs in the country, giving brands access to:</TranslatedText>
                 </p>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <span>Distributed networks for faster regional delivery</span>
+                    <span><TranslatedText>Distributed networks for faster regional delivery</TranslatedText></span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <span>Optimized carrier selection (UPS, FedEx, USPS, carriers local to LA)</span>
+                    <span><TranslatedText>Optimized carrier selection (UPS, FedEx, USPS, carriers local to LA)</TranslatedText></span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <span>Multiple outbound strategies to support DTC, retail, and B2B</span>
+                    <span><TranslatedText>Multiple outbound strategies to support DTC, retail, and B2B</TranslatedText></span>
                   </li>
                 </ul>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  A professional 3PL coordinates every step so your orders leave accurately, on time, and without operational friction.
+                  <TranslatedText>A professional 3PL coordinates every step so your orders leave accurately, on time, and without operational friction.</TranslatedText>
                 </p>
               </div>
               <div className="h-96 rounded-lg overflow-hidden shadow-lg">
@@ -302,44 +311,44 @@ const ThreePLLosAngeles = () => {
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-16 gap-y-20">
               <div className="space-y-4 border-b border-border pb-10">
-                <h4 className="text-xl font-bold">DTC & Lifestyle Brands</h4>
-                <p className="text-sm text-muted-foreground">Direct-to-consumer growth</p>
-                <p className="text-base leading-relaxed">Brands needing fast order turnaround and clean packaging</p>
+                <h4 className="text-xl font-bold"><TranslatedText>DTC & Lifestyle Brands</TranslatedText></h4>
+                <p className="text-sm text-muted-foreground"><TranslatedText>Direct-to-consumer growth</TranslatedText></p>
+                <p className="text-base leading-relaxed"><TranslatedText>Brands needing fast order turnaround and clean packaging</TranslatedText></p>
               </div>
               <div className="space-y-4 border-b border-border pb-10">
-                <h4 className="text-xl font-bold">Beauty, Skincare, Cosmetics</h4>
-                <p className="text-sm text-muted-foreground">Temperature-sensitive products</p>
-                <p className="text-base leading-relaxed">Climate-controlled storage with product segregation</p>
+                <h4 className="text-xl font-bold"><TranslatedText>Beauty, Skincare, Cosmetics</TranslatedText></h4>
+                <p className="text-sm text-muted-foreground"><TranslatedText>Temperature-sensitive products</TranslatedText></p>
+                <p className="text-base leading-relaxed"><TranslatedText>Climate-controlled storage with product segregation</TranslatedText></p>
               </div>
               <div className="space-y-4 border-b border-border pb-10">
-                <h4 className="text-xl font-bold">Apparel & Accessories</h4>
-                <p className="text-sm text-muted-foreground">Fashion and seasonal goods</p>
-                <p className="text-base leading-relaxed">Quick restocking and multi-channel distribution</p>
+                <h4 className="text-xl font-bold"><TranslatedText>Apparel & Accessories</TranslatedText></h4>
+                <p className="text-sm text-muted-foreground"><TranslatedText>Fashion and seasonal goods</TranslatedText></p>
+                <p className="text-base leading-relaxed"><TranslatedText>Quick restocking and multi-channel distribution</TranslatedText></p>
               </div>
               <div className="space-y-4 border-b border-border pb-10">
-                <h4 className="text-xl font-bold">Wellness & Supplement Brands</h4>
-                <p className="text-sm text-muted-foreground">Health-focused products</p>
-                <p className="text-base leading-relaxed">Compliance-ready handling and lot tracking</p>
+                <h4 className="text-xl font-bold"><TranslatedText>Wellness & Supplement Brands</TranslatedText></h4>
+                <p className="text-sm text-muted-foreground"><TranslatedText>Health-focused products</TranslatedText></p>
+                <p className="text-base leading-relaxed"><TranslatedText>Compliance-ready handling and lot tracking</TranslatedText></p>
               </div>
               <div className="space-y-4 border-b border-border pb-10">
-                <h4 className="text-xl font-bold">TikTok Shop Creators</h4>
-                <p className="text-sm text-muted-foreground">High-velocity social commerce</p>
-                <p className="text-base leading-relaxed">Rapid fulfillment for viral product launches</p>
+                <h4 className="text-xl font-bold"><TranslatedText>TikTok Shop Creators</TranslatedText></h4>
+                <p className="text-sm text-muted-foreground"><TranslatedText>High-velocity social commerce</TranslatedText></p>
+                <p className="text-base leading-relaxed"><TranslatedText>Rapid fulfillment for viral product launches</TranslatedText></p>
               </div>
               <div className="space-y-4 border-b border-border pb-10">
-                <h4 className="text-xl font-bold">Influencer-Led Launches</h4>
-                <p className="text-sm text-muted-foreground">Creator-driven brands</p>
-                <p className="text-base leading-relaxed">Flexible fulfillment for launch campaigns</p>
+                <h4 className="text-xl font-bold"><TranslatedText>Influencer-Led Launches</TranslatedText></h4>
+                <p className="text-sm text-muted-foreground"><TranslatedText>Creator-driven brands</TranslatedText></p>
+                <p className="text-base leading-relaxed"><TranslatedText>Flexible fulfillment for launch campaigns</TranslatedText></p>
               </div>
               <div className="space-y-4 border-b border-border pb-10">
-                <h4 className="text-xl font-bold">West Coast Focused Brands</h4>
-                <p className="text-sm text-muted-foreground">Regional distribution priority</p>
-                <p className="text-base leading-relaxed">1 to 2 day delivery across California</p>
+                <h4 className="text-xl font-bold"><TranslatedText>West Coast Focused Brands</TranslatedText></h4>
+                <p className="text-sm text-muted-foreground"><TranslatedText>Regional distribution priority</TranslatedText></p>
+                <p className="text-base leading-relaxed"><TranslatedText>1 to 2 day delivery across California</TranslatedText></p>
               </div>
               <div className="space-y-4 border-b border-border pb-10">
-                <h4 className="text-xl font-bold">Amazon FBA Prep</h4>
-                <p className="text-sm text-muted-foreground">FBA-bound inventory</p>
-                <p className="text-base leading-relaxed">Professional prep, labeling, and shipment creation</p>
+                <h4 className="text-xl font-bold"><TranslatedText>Amazon FBA Prep</TranslatedText></h4>
+                <p className="text-sm text-muted-foreground"><TranslatedText>FBA-bound inventory</TranslatedText></p>
+                <p className="text-base leading-relaxed"><TranslatedText>Professional prep, labeling, and shipment creation</TranslatedText></p>
               </div>
             </div>
           </div>
@@ -352,14 +361,14 @@ const ThreePLLosAngeles = () => {
           }} />
           <div className="container mx-auto px-4 max-w-5xl relative z-10">
             <h2 className="text-5xl font-light text-center mb-12">
-              How a 3PL Streamlines Your Logistics in LA
+              <TranslatedText>How a 3PL Streamlines Your Logistics in LA</TranslatedText>
             </h2>
             <div className="space-y-8 text-center">
               <p className="text-lg text-muted-foreground leading-relaxed max-w-4xl mx-auto">
-                Los Angeles provides infrastructure that most logistics markets cannot match. LAX air freight terminals handle international shipments daily. The USPS distribution hub in City of Industry processes millions of parcels weekly. A dense courier network ensures same-day and next-day pickup across the metro area.
+                <TranslatedText>Los Angeles provides infrastructure that most logistics markets cannot match. LAX air freight terminals handle international shipments daily. The USPS distribution hub in City of Industry processes millions of parcels weekly. A dense courier network ensures same-day and next-day pickup across the metro area.</TranslatedText>
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed max-w-4xl mx-auto">
-                Warehouse clusters in Commerce, Vernon, Torrance, and Gardena create low-latency restock routes to Amazon fulfillment centers like ONT8, LGB8, and SNA4. For brands shipping West Coast inventory or managing FBA prep, LA provides the operational clarity and speed required to scale without friction.
+                <TranslatedText>Warehouse clusters in Commerce, Vernon, Torrance, and Gardena create low-latency restock routes to Amazon fulfillment centers like ONT8, LGB8, and SNA4. For brands shipping West Coast inventory or managing FBA prep, LA provides the operational clarity and speed required to scale without friction.</TranslatedText>
               </p>
             </div>
           </div>
@@ -387,8 +396,8 @@ const ThreePLLosAngeles = () => {
               }
             ].map((useCase, index) => (
               <div key={index} className="min-w-[400px] px-12 py-16 border-r border-border snap-center">
-                <h3 className="text-2xl font-bold mb-4">{useCase.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{useCase.description}</p>
+                <h3 className="text-2xl font-bold mb-4"><TranslatedText>{useCase.title}</TranslatedText></h3>
+                <p className="text-muted-foreground leading-relaxed"><TranslatedText>{useCase.description}</TranslatedText></p>
               </div>
             ))}
           </div>
@@ -400,14 +409,14 @@ const ThreePLLosAngeles = () => {
           <div className="absolute inset-0 bg-black/40" />
           <div className="container mx-auto px-4 max-w-7xl relative z-10">
             <h2 className="text-5xl md:text-6xl font-bold text-white text-center mb-4">
-              Los Angeles vs Non-Los Angeles 3PLs
+              <TranslatedText>Los Angeles vs Non-Los Angeles 3PLs</TranslatedText>
             </h2>
             <p className="text-lg text-white/60 text-center mb-16">
-              Why location matters for e-commerce fulfillment
+              <TranslatedText>Why location matters for e-commerce fulfillment</TranslatedText>
             </p>
             <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
               <div className="space-y-4">
-                <h3 className="text-2xl font-bold text-white mb-6">LA 3PL</h3>
+                <h3 className="text-2xl font-bold text-white mb-6"><TranslatedText>LA 3PL</TranslatedText></h3>
                 {[
                   "Direct port proximity",
                   "1 to 2 days West Coast delivery",
@@ -418,12 +427,12 @@ const ThreePLLosAngeles = () => {
                 ].map((item, index) => (
                   <div key={index} className="flex items-start gap-3 text-white">
                     <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
-                    <span>{item}</span>
+                    <span><TranslatedText>{item}</TranslatedText></span>
                   </div>
                 ))}
               </div>
               <div className="space-y-4">
-                <h3 className="text-2xl font-bold text-white mb-6">Non-LA 3PL</h3>
+                <h3 className="text-2xl font-bold text-white mb-6"><TranslatedText>Non-LA 3PL</TranslatedText></h3>
                 {[
                   "Slower inbound movement",
                   "3 to 5 days delivery",
@@ -434,7 +443,7 @@ const ThreePLLosAngeles = () => {
                 ].map((item, index) => (
                   <div key={index} className="flex items-start gap-3 text-white/60">
                     <X className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
-                    <span>{item}</span>
+                    <span><TranslatedText>{item}</TranslatedText></span>
                   </div>
                 ))}
               </div>
@@ -446,7 +455,7 @@ const ThreePLLosAngeles = () => {
         <section className="py-32 bg-background">
           <div className="container mx-auto px-4 max-w-4xl">
             <h2 className="text-5xl font-light text-center mb-4">
-              Why Brands Choose a 3PL in Los Angeles
+              <TranslatedText>Why Brands Choose a 3PL in Los Angeles</TranslatedText>
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto mb-16" />
             <div className="space-y-0">
@@ -459,7 +468,7 @@ const ThreePLLosAngeles = () => {
                 "Frequent freight schedules from Asia to LA ports"
               ].map((reason, index) => (
                 <div key={index} className="py-5 border-b border-border">
-                  <p className="text-lg text-center">{reason}</p>
+                  <p className="text-lg text-center"><TranslatedText>{reason}</TranslatedText></p>
                 </div>
               ))}
             </div>
@@ -470,10 +479,10 @@ const ThreePLLosAngeles = () => {
         <section className="py-32 bg-background">
           <div className="container mx-auto px-4 max-w-3xl text-center">
             <p className="text-lg text-muted-foreground mb-4">
-              Explore more about fulfillment, logistics, and 3PL operations in Los Angeles.
+              <TranslatedText>Explore more about fulfillment, logistics, and 3PL operations in Los Angeles.</TranslatedText>
             </p>
             <Link to="/why-choose-us" className="inline-flex items-center gap-2 text-primary hover:underline">
-              Learn more about our services
+              <TranslatedText>Learn more about our services</TranslatedText>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
