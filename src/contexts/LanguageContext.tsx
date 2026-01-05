@@ -21,6 +21,7 @@ interface LanguageContextType {
   queueTranslation: (text: string) => Promise<string>;
   translationCache: TranslationCache;
   isTranslating: boolean;
+  isLanguageTransitioning: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | null>(null);
@@ -67,12 +68,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [isDetecting, setIsDetecting] = useState(true);
   const [translationCache, setTranslationCache] = useState<TranslationCache>(loadCacheFromStorage);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [isLanguageTransitioning, setIsLanguageTransitioning] = useState(false);
 
   // Use refs to avoid recreating functions on every cache update
   const translationCacheRef = useRef<TranslationCache>(loadCacheFromStorage());
   const currentLanguageRef = useRef<string>('en');
   const pendingTranslationsRef = useRef<Map<string, Array<(result: string) => void>>>(new Map());
   const batchTimeoutRef = useRef<number | null>(null);
+  const pendingCountRef = useRef<number>(0);
+  const transitionTimeoutRef = useRef<number | null>(null);
 
   // Sync refs with state
   useEffect(() => {
@@ -164,6 +168,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [currentLanguage]);
 
   const setLanguage = useCallback((lang: string) => {
+    // Clear any existing transition timeout
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+    
+    // Only show transition when switching TO a non-English language
+    if (lang !== 'en' && lang !== currentLanguageRef.current) {
+      setIsLanguageTransitioning(true);
+      pendingCountRef.current = 0;
+    } else if (lang === 'en') {
+      // Switching to English is instant
+      setIsLanguageTransitioning(false);
+    }
+    
     setCurrentLanguage(lang);
     localStorage.setItem(STORAGE_KEY, lang);
   }, []);
@@ -226,12 +244,25 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return results;
   }, []); // No dependencies - uses refs
 
+  // Check if transition should end
+  const checkTransitionComplete = useCallback(() => {
+    if (pendingCountRef.current <= 0 && pendingTranslationsRef.current.size === 0) {
+      // Small delay to ensure all components have updated
+      transitionTimeoutRef.current = window.setTimeout(() => {
+        setIsLanguageTransitioning(false);
+      }, 150);
+    }
+  }, []);
+
   // Process batched translations
   const processBatch = useCallback(async () => {
     const pending = Array.from(pendingTranslationsRef.current.entries());
     pendingTranslationsRef.current.clear();
     
-    if (pending.length === 0) return;
+    if (pending.length === 0) {
+      checkTransitionComplete();
+      return;
+    }
     
     const texts = pending.map(([text]) => text);
     const results = await translate(texts);
@@ -239,8 +270,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     // Resolve all pending promises
     pending.forEach(([text, resolvers], i) => {
       resolvers.forEach(resolve => resolve(results[i]));
+      pendingCountRef.current -= 1;
     });
-  }, [translate]);
+    
+    // Check if all translations are complete
+    checkTransitionComplete();
+  }, [translate, checkTransitionComplete]);
 
   // Queue translation with batching and debouncing
   const queueTranslation = useCallback((text: string): Promise<string> => {
@@ -263,6 +298,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         return;
       }
       
+      // Track pending count
+      pendingCountRef.current += 1;
+      
       // Add to pending queue (use normalized text)
       const existing = pendingTranslationsRef.current.get(normalized);
       if (existing) {
@@ -271,11 +309,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         pendingTranslationsRef.current.set(normalized, [resolve]);
       }
       
-      // Debounce: wait 30ms to collect all pending texts, then batch translate
+      // Debounce: wait 10ms to collect all pending texts, then batch translate
       if (batchTimeoutRef.current) {
         clearTimeout(batchTimeoutRef.current);
       }
-      batchTimeoutRef.current = window.setTimeout(processBatch, 30);
+      batchTimeoutRef.current = window.setTimeout(processBatch, 10);
     });
   }, [processBatch]);
 
@@ -289,6 +327,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       queueTranslation,
       translationCache,
       isTranslating,
+      isLanguageTransitioning,
     }}>
       {children}
     </LanguageContext.Provider>

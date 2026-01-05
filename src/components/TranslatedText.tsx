@@ -17,7 +17,7 @@ export function TranslatedText({
   as = 'span', 
   className = ''
 }: TranslatedTextProps) {
-  const { currentLanguage, queueTranslation, translationCache } = useLanguage();
+  const { currentLanguage, queueTranslation, translationCache, isLanguageTransitioning } = useLanguage();
   const [translated, setTranslated] = useState<string>(children);
   const mountedRef = useRef(true);
 
@@ -54,7 +54,13 @@ export function TranslatedText({
     });
   }, [children, currentLanguage, cached, queueTranslation]);
 
-  return createElement(as, { className }, translated);
+  // Add subtle opacity during loading (transitioning but not yet translated)
+  const isLoading = currentLanguage !== 'en' && !cached && isLanguageTransitioning;
+  const opacityClass = isLoading ? 'opacity-60' : 'opacity-100';
+
+  return createElement(as, { 
+    className: `${className} transition-opacity duration-200 ${opacityClass}`.trim()
+  }, translated);
 }
 
 // Hook version for more flexibility
