@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyFulfillment = () => {
   const navigate = useNavigate();
@@ -115,7 +116,7 @@ const ShopifyFulfillment = () => {
                 >
                   <Badge className="mb-6 px-4 py-2 text-sm font-semibold bg-white border-2 border-[hsl(var(--shopify-page-accent))]/30 text-[hsl(var(--shopify-page-accent))] hover:bg-[hsl(var(--shopify-page-accent))]/5">
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    Shopify Fulfillment Partner
+                    <TranslatedText>Shopify Fulfillment Partner</TranslatedText>
                   </Badge>
                 </motion.div>
 
@@ -126,7 +127,7 @@ const ShopifyFulfillment = () => {
                   transition={{ duration: 0.6, delay: 0.1 }}
                   className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-[hsl(var(--shopify-page-primary))] leading-tight"
                 >
-                  LA's Trusted Shopify 3PL for DTC Brands
+                  <TranslatedText>LA's Trusted Shopify 3PL for DTC Brands</TranslatedText>
                 </motion.h1>
 
                 {/* Subheadline */}
@@ -136,9 +137,9 @@ const ShopifyFulfillment = () => {
                   transition={{ duration: 0.6, delay: 0.2 }}
                   className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-3xl mx-auto"
                 >
-                  Same-day fulfillment. Real-time QC photos. Branded unboxing.
+                  <TranslatedText>Same-day fulfillment. Real-time QC photos. Branded unboxing.</TranslatedText>
                   <br />
-                  We make your brand unforgettable — and your shipping invisible.
+                  <TranslatedText>We make your brand unforgettable — and your shipping invisible.</TranslatedText>
                 </motion.p>
 
                 {/* CTA */}
@@ -153,7 +154,7 @@ const ShopifyFulfillment = () => {
                     onClick={() => navigate("/contact")}
                     className="bg-[hsl(var(--shopify-page-accent))] hover:bg-[hsl(var(--shopify-page-accent))]/90 text-white px-10 py-7 text-lg font-bold shadow-xl hover:scale-105 transition-transform"
                   >
-                    Get a Custom Quote
+                    <TranslatedText>Get a Custom Quote</TranslatedText>
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </motion.div>
@@ -165,18 +166,18 @@ const ShopifyFulfillment = () => {
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="mt-8 text-sm text-muted-foreground"
                 >
-                  Learn more about our{" "}
-                  <a href="/why-choose-us" className="text-[hsl(var(--shopify-page-accent))] hover:underline font-medium">
-                    fulfillment approach
-                  </a>
+                  <TranslatedText>Learn more about our</TranslatedText>{" "}
+                  <Link to="/why-choose-us" className="text-[hsl(var(--shopify-page-accent))] hover:underline font-medium">
+                    <TranslatedText>fulfillment approach</TranslatedText>
+                  </Link>
                   ,{" "}
-                  <a href="/pricing" className="text-[hsl(var(--shopify-page-accent))] hover:underline font-medium">
-                    transparent pricing
-                  </a>
-                  , and{" "}
-                  <a href="/kitting-bundling" className="text-[hsl(var(--shopify-page-accent))] hover:underline font-medium">
-                    custom kitting services
-                  </a>
+                  <Link to="/pricing" className="text-[hsl(var(--shopify-page-accent))] hover:underline font-medium">
+                    <TranslatedText>transparent pricing</TranslatedText>
+                  </Link>
+                  , <TranslatedText>and</TranslatedText>{" "}
+                  <Link to="/kitting-bundling" className="text-[hsl(var(--shopify-page-accent))] hover:underline font-medium">
+                    <TranslatedText>custom kitting services</TranslatedText>
+                  </Link>
                   .
                 </motion.div>
               </div>

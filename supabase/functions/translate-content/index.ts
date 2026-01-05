@@ -17,6 +17,11 @@ function hashText(text: string): string {
   return Math.abs(hash).toString(16);
 }
 
+// Normalize text consistently (trim whitespace, normalize newlines)
+function normalizeText(text: string): string {
+  return text.trim().replace(/\s+/g, ' ');
+}
+
 const languageNames: Record<string, string> = {
   'th': 'Thai',
   'es': 'Spanish',
@@ -49,7 +54,7 @@ serve(async (req) => {
     if (!targetLanguage || targetLanguage === 'en') {
       // Return original texts if English
       return new Response(JSON.stringify({ 
-        translations: texts.map(t => ({ source: t, translated: t, cached: true }))
+        translations: texts.map(t => ({ source: normalizeText(t), translated: normalizeText(t), cached: true }))
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -61,29 +66,53 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Check cache for each text
-    const results: Array<{ source: string; translated: string; cached: boolean }> = [];
-    const textsToTranslate: Array<{ index: number; text: string; hash: string }> = [];
+    // Normalize all texts and compute hashes upfront
+    const normalizedTexts = texts.map(t => normalizeText(t));
+    const hashMap = new Map<string, { index: number; text: string; hash: string }>();
+    const results: Array<{ source: string; translated: string; cached: boolean }> = new Array(texts.length);
 
-    for (let i = 0; i < texts.length; i++) {
-      const text = texts[i].trim();
+    // Build hash map for unique texts only
+    for (let i = 0; i < normalizedTexts.length; i++) {
+      const text = normalizedTexts[i];
       if (!text) {
         results[i] = { source: text, translated: text, cached: true };
         continue;
       }
-
       const hash = hashText(text);
-      
-      // Check cache
+      if (!hashMap.has(hash)) {
+        hashMap.set(hash, { index: i, text, hash });
+      }
+    }
+
+    const uniqueHashes = Array.from(hashMap.keys());
+    
+    // BULK CACHE LOOKUP - single query for all hashes
+    let cachedTranslations: Record<string, string> = {};
+    if (uniqueHashes.length > 0) {
       const { data: cached } = await supabase
         .from('translations')
-        .select('translated_text')
-        .eq('source_hash', hash)
+        .select('source_hash, translated_text')
         .eq('target_language', targetLanguage)
-        .single();
+        .in('source_hash', uniqueHashes);
 
       if (cached) {
-        results[i] = { source: text, translated: cached.translated_text, cached: true };
+        for (const row of cached) {
+          cachedTranslations[row.source_hash] = row.translated_text;
+        }
+      }
+    }
+
+    // Separate cached vs uncached
+    const textsToTranslate: Array<{ index: number; text: string; hash: string }> = [];
+
+    for (let i = 0; i < normalizedTexts.length; i++) {
+      const text = normalizedTexts[i];
+      if (!text) continue;
+      
+      const hash = hashText(text);
+      
+      if (cachedTranslations[hash]) {
+        results[i] = { source: text, translated: cachedTranslations[hash], cached: true };
       } else {
         textsToTranslate.push({ index: i, text, hash });
         results[i] = { source: text, translated: '', cached: false };
@@ -92,10 +121,13 @@ serve(async (req) => {
 
     // If all cached, return early
     if (textsToTranslate.length === 0) {
+      console.log(`All ${texts.length} texts found in cache for ${targetLanguage}`);
       return new Response(JSON.stringify({ translations: results }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    console.log(`Translating ${textsToTranslate.length} uncached texts to ${targetLanguage} (${texts.length - textsToTranslate.length} cached)`);
 
     // Translate uncached texts using Lovable AI
     if (!lovableApiKey) {
@@ -104,8 +136,10 @@ serve(async (req) => {
 
     const languageName = languageNames[targetLanguage] || targetLanguage;
     
-    // Batch translate (up to 10 at a time for efficiency)
-    const batchSize = 10;
+    // Batch translate (up to 20 at a time for efficiency)
+    const batchSize = 20;
+    const newTranslations: Array<{ text: string; hash: string; translated: string }> = [];
+
     for (let i = 0; i < textsToTranslate.length; i += batchSize) {
       const batch = textsToTranslate.slice(i, i + batchSize);
       const textsForPrompt = batch.map((item, idx) => `[${idx}] ${item.text}`).join('\n');
@@ -121,8 +155,9 @@ TRANSLATION STYLE:
 - Use everyday language that people actually speak
 
 RULES:
-- Keep brand names, company names, and technical terms (FBA, SKU, 3PL, FNSKU, DTC) in English
+- Keep brand names, company names, and technical terms (FBA, SKU, 3PL, FNSKU, DTC, Shopify, Amazon, TikTok) in English
 - Return ONLY the translations in the same numbered format, nothing else
+- Preserve any emojis in the original text
 ${context ? `Context: ${context}` : ''}`;
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -153,7 +188,6 @@ ${context ? `Context: ${context}` : ''}`;
       const lines = translatedContent.split('\n').filter((line: string) => line.trim());
       
       for (const item of batch) {
-        // Find the corresponding translation
         const lineIndex = batch.indexOf(item);
         let translatedText = item.text; // Default to original if parsing fails
 
@@ -172,21 +206,30 @@ ${context ? `Context: ${context}` : ''}`;
         }
 
         results[item.index] = { source: item.text, translated: translatedText, cached: false };
-
-        // Cache the translation
-        await supabase.from('translations').upsert({
-          source_text: item.text,
-          source_hash: item.hash,
-          target_language: targetLanguage,
-          translated_text: translatedText,
-          context: context || null,
-        }, {
-          onConflict: 'source_hash,target_language',
-        });
+        newTranslations.push({ text: item.text, hash: item.hash, translated: translatedText });
       }
     }
 
-    console.log(`Translated ${textsToTranslate.length} texts to ${targetLanguage}`);
+    // BULK UPSERT - single call for all new translations
+    if (newTranslations.length > 0) {
+      const upsertData = newTranslations.map(t => ({
+        source_text: t.text,
+        source_hash: t.hash,
+        target_language: targetLanguage,
+        translated_text: t.translated,
+        context: context || null,
+      }));
+
+      const { error: upsertError } = await supabase
+        .from('translations')
+        .upsert(upsertData, { onConflict: 'source_hash,target_language' });
+
+      if (upsertError) {
+        console.error('Bulk upsert error:', upsertError);
+      }
+    }
+
+    console.log(`Translated ${textsToTranslate.length} texts to ${targetLanguage}, cached ${newTranslations.length} new translations`);
 
     return new Response(JSON.stringify({ translations: results }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

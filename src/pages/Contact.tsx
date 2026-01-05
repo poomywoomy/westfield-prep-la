@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import ContactForm from "@/components/ContactForm";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const Contact = () => {
   const navigate = useNavigate();

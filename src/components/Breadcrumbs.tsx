@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { TranslatedText } from "./TranslatedText";
 
 interface BreadcrumbItem {
   label: string;
@@ -46,17 +47,17 @@ const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
           <ol className="flex items-center gap-2 text-sm">
             <li>
               <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
-                Home
+                <TranslatedText>Home</TranslatedText>
               </Link>
             </li>
             {items.map((item, index) => (
               <li key={index} className="flex items-center gap-2">
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 {index === items.length - 1 ? (
-                  <span className="text-foreground font-medium">{item.label}</span>
+                  <span className="text-foreground font-medium"><TranslatedText>{item.label}</TranslatedText></span>
                 ) : (
                   <Link to={item.path} className="text-muted-foreground hover:text-primary transition-colors">
-                    {item.label}
+                    <TranslatedText>{item.label}</TranslatedText>
                   </Link>
                 )}
               </li>

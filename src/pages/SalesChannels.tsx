@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -10,6 +10,7 @@ import { platformsData } from "@/data/platformsData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Store, Video, ShoppingCart, Globe, Building2, Boxes } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const SalesChannels = () => {
   const navigate = useNavigate();
@@ -102,16 +103,16 @@ const SalesChannels = () => {
               <div className="max-w-4xl mx-auto text-center">
                 <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
                   <Boxes className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium text-primary">Multi-Channel Support</span>
+                  <span className="text-sm font-medium text-primary"><TranslatedText>Multi-Channel Support</TranslatedText></span>
                 </div>
                 <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  We Support All Major Sales Channels
+                  <TranslatedText>We Support All Major Sales Channels</TranslatedText>
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  One 3PL partner for all your selling platforms. Seamless multi-channel fulfillment from our Los Angeles warehouse.
+                  <TranslatedText>One 3PL partner for all your selling platforms. Seamless multi-channel fulfillment from our Los Angeles warehouse.</TranslatedText>
                 </p>
                 <Button size="lg" className="bg-secondary hover:bg-secondary/90" onClick={() => navigate("/contact")}>
-                  Get Started
+                  <TranslatedText>Get Started</TranslatedText>
                 </Button>
               </div>
             </div>
@@ -129,7 +130,7 @@ const SalesChannels = () => {
                         <div className="h-12 w-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
                           <Icon className="h-6 w-6 text-white" />
                         </div>
-                        <h2 className="text-3xl font-bold">{category.category}</h2>
+                        <h2 className="text-3xl font-bold"><TranslatedText>{category.category}</TranslatedText></h2>
                       </div>
                       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {category.platforms.map((platform, pIdx) => (
@@ -154,10 +155,10 @@ const SalesChannels = () => {
                             </CardHeader>
                             <CardContent>
                               <p className="text-muted-foreground text-sm mb-3">
-                                {platform.description || "Full fulfillment integration available"}
+                                <TranslatedText>{platform.description || "Full fulfillment integration available"}</TranslatedText>
                               </p>
                               <span className="text-sm font-medium text-primary hover:underline">
-                                Learn More →
+                                <TranslatedText>Learn More</TranslatedText> →
                               </span>
                             </CardContent>
                           </Card>
@@ -174,17 +175,17 @@ const SalesChannels = () => {
           <section className="py-20 bg-gradient-to-br from-primary to-secondary">
             <div className="container mx-auto px-4 text-center">
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-                Don't See Your Platform?
+                <TranslatedText>Don't See Your Platform?</TranslatedText>
               </h2>
               <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-                We integrate with custom platforms and APIs. Contact us to discuss your specific needs.
+                <TranslatedText>We integrate with custom platforms and APIs. Contact us to discuss your specific needs.</TranslatedText>
               </p>
               <Button
                 size="lg"
                 className="bg-white text-primary hover:bg-white/90"
                 onClick={() => navigate("/contact")}
               >
-                Contact Us
+                <TranslatedText>Contact Us</TranslatedText>
               </Button>
             </div>
           </section>

@@ -26,16 +26,50 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 const STORAGE_KEY = 'westfield_language';
+const CACHE_STORAGE_KEY = 'westfield_translation_cache';
+
+// Normalize text consistently - must match backend normalization
+function normalizeText(text: string): string {
+  return text.trim().replace(/\s+/g, ' ');
+}
+
+// Load cache from localStorage
+function loadCacheFromStorage(): TranslationCache {
+  try {
+    const stored = localStorage.getItem(CACHE_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load translation cache:', e);
+  }
+  return {};
+}
+
+// Save cache to localStorage (debounced)
+let saveCacheTimeout: number | null = null;
+function saveCacheToStorage(cache: TranslationCache) {
+  if (saveCacheTimeout) {
+    clearTimeout(saveCacheTimeout);
+  }
+  saveCacheTimeout = window.setTimeout(() => {
+    try {
+      localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(cache));
+    } catch (e) {
+      console.error('Failed to save translation cache:', e);
+    }
+  }, 500);
+}
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState<string>('en');
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
   const [isDetecting, setIsDetecting] = useState(true);
-  const [translationCache, setTranslationCache] = useState<TranslationCache>({});
+  const [translationCache, setTranslationCache] = useState<TranslationCache>(loadCacheFromStorage);
   const [isTranslating, setIsTranslating] = useState(false);
 
   // Use refs to avoid recreating functions on every cache update
-  const translationCacheRef = useRef<TranslationCache>({});
+  const translationCacheRef = useRef<TranslationCache>(loadCacheFromStorage());
   const currentLanguageRef = useRef<string>('en');
   const pendingTranslationsRef = useRef<Map<string, Array<(result: string) => void>>>(new Map());
   const batchTimeoutRef = useRef<number | null>(null);
@@ -43,6 +77,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Sync refs with state
   useEffect(() => {
     translationCacheRef.current = translationCache;
+    saveCacheToStorage(translationCache);
   }, [translationCache]);
 
   useEffect(() => {
@@ -142,16 +177,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     const cache = translationCacheRef.current;
 
-    // Check cache first
+    // Normalize texts and check cache first
+    const normalizedTexts = texts.map(t => normalizeText(t));
     const uncachedTexts: string[] = [];
     const uncachedIndices: number[] = [];
     const results: string[] = [...texts];
 
-    texts.forEach((text, i) => {
+    normalizedTexts.forEach((text, i) => {
       const cacheKey = `${lang}:${text}`;
       if (cache[cacheKey]) {
         results[i] = cache[cacheKey];
-      } else {
+      } else if (text) {
         uncachedTexts.push(text);
         uncachedIndices.push(i);
       }
@@ -174,6 +210,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         response.data.translations.forEach((t: { source: string; translated: string }, i: number) => {
           const originalIndex = uncachedIndices[i];
           results[originalIndex] = t.translated;
+          // Use normalized source for cache key consistency
           newCache[`${lang}:${t.source}`] = t.translated;
         });
 
@@ -216,7 +253,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         return;
       }
       
-      const cacheKey = `${lang}:${text}`;
+      // Normalize text for consistent cache lookup
+      const normalized = normalizeText(text);
+      const cacheKey = `${lang}:${normalized}`;
       
       // If already cached, resolve immediately
       if (translationCacheRef.current[cacheKey]) {
@@ -224,19 +263,19 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         return;
       }
       
-      // Add to pending queue
-      const existing = pendingTranslationsRef.current.get(text);
+      // Add to pending queue (use normalized text)
+      const existing = pendingTranslationsRef.current.get(normalized);
       if (existing) {
         existing.push(resolve);
       } else {
-        pendingTranslationsRef.current.set(text, [resolve]);
+        pendingTranslationsRef.current.set(normalized, [resolve]);
       }
       
-      // Debounce: wait 50ms to collect all pending texts, then batch translate
+      // Debounce: wait 30ms to collect all pending texts, then batch translate
       if (batchTimeoutRef.current) {
         clearTimeout(batchTimeoutRef.current);
       }
-      batchTimeoutRef.current = window.setTimeout(processBatch, 50);
+      batchTimeoutRef.current = window.setTimeout(processBatch, 30);
     });
   }, [processBatch]);
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -13,6 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import LiveMetrics from "@/components/LiveMetrics";
 import ResultsSnapshot from "@/components/ResultsSnapshot";
 import { CheckCircle, Package, Tag, Shield, Boxes, TrendingUp } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const AmazonFBAPrep = () => {
   const navigate = useNavigate();
@@ -66,20 +67,23 @@ const AmazonFBAPrep = () => {
               <div className="max-w-4xl mx-auto text-center">
                 <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
                   <Boxes className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-600">Amazon FBA Certified</span>
+                  <span className="text-sm font-medium text-blue-600"><TranslatedText>Amazon FBA Certified</TranslatedText></span>
                 </div>
                 <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent">
-                  Amazon FBA Prep & Compliance
+                  <TranslatedText>Amazon FBA Prep & Compliance</TranslatedText>
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  FNSKU labeling, polybagging, bubble wrap, carton prep, pallet forwarding with full Amazon compliance. <a href="/why-choose-us" className="text-primary hover:underline">Learn why sellers choose our LA prep center</a> and review our <a href="/faq" className="text-primary hover:underline">Amazon FBA prep questions</a>.
+                  <TranslatedText>FNSKU labeling, polybagging, bubble wrap, carton prep, pallet forwarding with full Amazon compliance.</TranslatedText>{" "}
+                  <Link to="/why-choose-us" className="text-primary hover:underline"><TranslatedText>Learn why sellers choose our LA prep center</TranslatedText></Link>{" "}
+                  <TranslatedText>and review our</TranslatedText>{" "}
+                  <Link to="/faq" className="text-primary hover:underline"><TranslatedText>Amazon FBA prep questions</TranslatedText></Link>.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => navigate("/contact")}>
-                    Get a Quote
+                    <TranslatedText>Get a Quote</TranslatedText>
                   </Button>
                   <Button size="lg" variant="outline" onClick={() => navigate("/contact")}>
-                    View Pricing
+                    <TranslatedText>View Pricing</TranslatedText>
                   </Button>
                 </div>
               </div>
@@ -92,9 +96,9 @@ const AmazonFBAPrep = () => {
           <section className="py-20 bg-gradient-to-b from-background to-blue-50/30">
             <div className="container mx-auto px-4">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4">Amazon FBA Services</h2>
+                <h2 className="text-4xl font-bold mb-4"><TranslatedText>Amazon FBA Services</TranslatedText></h2>
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  Comprehensive prep services designed for Amazon seller success
+                  <TranslatedText>Comprehensive prep services designed for Amazon seller success</TranslatedText>
                 </p>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -103,10 +107,10 @@ const AmazonFBAPrep = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <Tag className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">FNSKU Labeling</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>FNSKU Labeling</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">Amazon-compliant FNSKU labels printed and applied to every unit with precision.</p>
+                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>Amazon-compliant FNSKU labels printed and applied to every unit with precision.</TranslatedText></p>
                   </CardContent>
                 </Card>
 
@@ -115,10 +119,10 @@ const AmazonFBAPrep = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <Package className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Polybagging</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Polybagging</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">Suffocation warning labels and transparent poly bags per Amazon standards.</p>
+                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>Suffocation warning labels and transparent poly bags per Amazon standards.</TranslatedText></p>
                   </CardContent>
                 </Card>
 
@@ -127,10 +131,10 @@ const AmazonFBAPrep = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <Shield className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Bubble Wrap</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Bubble Wrap</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">Fragile item protection with bubble wrap and reinforced packaging.</p>
+                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>Fragile item protection with bubble wrap and reinforced packaging.</TranslatedText></p>
                   </CardContent>
                 </Card>
 
@@ -139,10 +143,10 @@ const AmazonFBAPrep = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-orange-600 to-orange-700 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <Package className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Carton Prep</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Carton Prep</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">Case packing with FBA box labels and shipment plan adherence.</p>
+                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>Case packing with FBA box labels and shipment plan adherence.</TranslatedText></p>
                   </CardContent>
                 </Card>
 
@@ -151,10 +155,10 @@ const AmazonFBAPrep = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-blue-700 to-blue-800 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <Shield className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Pallet Forwarding</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Pallet Forwarding</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">LTL shipments palletized and forwarded directly to Amazon FCs.</p>
+                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>LTL shipments palletized and forwarded directly to Amazon FCs.</TranslatedText></p>
                   </CardContent>
                 </Card>
 
@@ -163,10 +167,10 @@ const AmazonFBAPrep = () => {
                     <div className="h-14 w-14 bg-gradient-to-br from-orange-700 to-orange-800 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <CheckCircle className="h-7 w-7 text-white" />
                     </div>
-                    <CardTitle className="text-xl">Photo-Proof QC</CardTitle>
+                    <CardTitle className="text-xl"><TranslatedText>Photo-Proof QC</TranslatedText></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">Every prep step documented with photos for compliance verification.</p>
+                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>Every prep step documented with photos for compliance verification.</TranslatedText></p>
                   </CardContent>
                 </Card>
               </div>
@@ -176,14 +180,14 @@ const AmazonFBAPrep = () => {
           {/* Process */}
           <section className="py-16 bg-muted/30">
             <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Our FBA Prep Process</h2>
+              <h2 className="text-3xl font-bold text-center mb-12"><TranslatedText>Our FBA Prep Process</TranslatedText></h2>
               <div className="max-w-4xl mx-auto space-y-6">
                 {[
-                  { step: 1, title: "Receive Inventory", desc: "Inbound shipments checked against your ASN and inspected for damage" },
-                  { step: 2, title: "Prep & Label", desc: "FNSKU labels, polybagging, bubble wrap, and compliance prep applied" },
-                  { step: 3, title: "Carton & Pallet", desc: "Units case-packed per your shipment plan and palletized for LTL" },
-                  { step: 4, title: "QC Photos", desc: "Photo documentation of prep steps for quality assurance" },
-                  { step: 5, title: "Ship to Amazon", desc: "Forwarded to Amazon FBA warehouses with tracking and BOL" },
+                  { step: 1, titleKey: "Receive Inventory", descKey: "Inbound shipments checked against your ASN and inspected for damage" },
+                  { step: 2, titleKey: "Prep & Label", descKey: "FNSKU labels, polybagging, bubble wrap, and compliance prep applied" },
+                  { step: 3, titleKey: "Carton & Pallet", descKey: "Units case-packed per your shipment plan and palletized for LTL" },
+                  { step: 4, titleKey: "QC Photos", descKey: "Photo documentation of prep steps for quality assurance" },
+                  { step: 5, titleKey: "Ship to Amazon", descKey: "Forwarded to Amazon FBA warehouses with tracking and BOL" },
                 ].map((item) => (
                   <Card key={item.step}>
                     <CardHeader>
@@ -191,11 +195,11 @@ const AmazonFBAPrep = () => {
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
                           {item.step}
                         </div>
-                        <CardTitle>{item.title}</CardTitle>
+                        <CardTitle><TranslatedText>{item.titleKey}</TranslatedText></CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">{item.desc}</p>
+                      <p className="text-muted-foreground"><TranslatedText>{item.descKey}</TranslatedText></p>
                     </CardContent>
                   </Card>
                 ))}
