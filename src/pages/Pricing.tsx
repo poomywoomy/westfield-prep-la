@@ -19,7 +19,7 @@ import {
   X, CheckCircle, Star, Mail, AlertTriangle
 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { TranslatedText } from "@/components/TranslatedText";
+import { TranslatedText, useTranslation } from "@/components/TranslatedText";
 
 const EnhancedROICalculator = lazy(() => import("@/components/EnhancedROICalculator"));
 
@@ -78,6 +78,7 @@ const Pricing = () => {
     estimatedSavings?: number;
     roiPercent?: number;
   } | null>(null);
+  const { tSync } = useTranslation();
 
   // Check for reduced motion preference
   const prefersReducedMotion = useMemo(() => {
@@ -256,7 +257,7 @@ const Pricing = () => {
           >
             <div className="container mx-auto px-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <p className="text-white font-semibold">Ready to save on fulfillment?</p>
+                <p className="text-white font-semibold"><TranslatedText>Ready to save on fulfillment?</TranslatedText></p>
                 {savedCalculation?.estimatedSavings && (
                   <motion.span 
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -272,7 +273,7 @@ const Pricing = () => {
                 asChild
               >
                 <a href="https://calendly.com/westfieldprepcenter/30min" target="_blank" rel="noopener noreferrer">
-                  Schedule a Call <ArrowRight className="ml-2 w-4 h-4" />
+                  <TranslatedText>Schedule a Call</TranslatedText> <ArrowRight className="ml-2 w-4 h-4" />
                 </a>
               </Button>
             </div>
@@ -319,7 +320,7 @@ const Pricing = () => {
             <div 
               className="absolute inset-0 flex items-center justify-center opacity-20 blur-sm pointer-events-none overflow-hidden"
               role="img"
-              aria-label="3PL shipping and fulfillment animation for Shopify and Amazon sellers"
+              aria-label={tSync("3PL shipping and fulfillment animation for Shopify and Amazon sellers")}
             >
               <Lottie 
                 animationData={shippingAnimationData} 
@@ -466,18 +467,18 @@ const Pricing = () => {
                     <thead>
                       <tr className="bg-muted/50 border-b border-border">
                         <th className="px-4 py-4 md:px-6 md:py-5 text-left font-semibold text-sm uppercase tracking-wide text-muted-foreground w-[200px]">
-                          Feature
+                          <TranslatedText>Feature</TranslatedText>
                         </th>
                         <th className="px-4 py-4 md:px-6 md:py-5 text-center font-semibold text-sm uppercase tracking-wide">
                           <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
                             <Package className="w-4 h-4" />
-                            <span>In-House</span>
+                            <span><TranslatedText>In-House</TranslatedText></span>
                           </div>
                         </th>
                         <th className="px-4 py-4 md:px-6 md:py-5 text-center font-semibold text-sm uppercase tracking-wide">
                           <div className="flex items-center justify-center gap-2 text-muted-foreground">
                             <Truck className="w-4 h-4" />
-                            <span>Big Box 3PLs</span>
+                            <span><TranslatedText>Big Box 3PLs</TranslatedText></span>
                           </div>
                         </th>
                         <th className="px-4 py-4 md:px-6 md:py-5 text-center font-semibold text-sm uppercase tracking-wide bg-green-50/50 dark:bg-green-900/10">
@@ -491,18 +492,18 @@ const Pricing = () => {
                     <tbody>
                       {/* FBA & WFS Pricing */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">FBA & WFS Pricing</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>FBA & WFS Pricing</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400 cursor-help">
                                   <X className="w-4 h-4 flex-shrink-0" />
-                                  <span className="text-sm underline decoration-dotted underline-offset-2">$2.75–$4.50/unit</span>
+                                  <span className="text-sm underline decoration-dotted underline-offset-2">$2.75–$4.50/<TranslatedText>unit</TranslatedText></span>
                                 </div>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Supplies + Labor + Error</p>
+                                <p><TranslatedText>Supplies + Labor + Error</TranslatedText></p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -510,31 +511,31 @@ const Pricing = () => {
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">$2.50–$3.50/unit</span>
+                            <span className="text-sm">$2.50–$3.50/<TranslatedText>unit</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">$1.00–$2.00/unit</span>
+                            <span className="text-sm font-semibold">$1.00–$2.00/<TranslatedText>unit</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* DTC Fulfillment Pricing */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">DTC Fulfillment Pricing</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>DTC Fulfillment Pricing</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400 cursor-help">
                                   <X className="w-4 h-4 flex-shrink-0" />
-                                  <span className="text-sm underline decoration-dotted underline-offset-2">$1.50–$3.00/unit</span>
+                                  <span className="text-sm underline decoration-dotted underline-offset-2">$1.50–$3.00/<TranslatedText>unit</TranslatedText></span>
                                 </div>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Supplies + Labor + Error</p>
+                                <p><TranslatedText>Supplies + Labor + Error</TranslatedText></p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -542,59 +543,59 @@ const Pricing = () => {
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Variable</span>
+                            <span className="text-sm"><TranslatedText>Variable</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">$1.00–$2.50/unit</span>
+                            <span className="text-sm font-semibold">$1.00–$2.50/<TranslatedText>unit</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* Turnaround Time */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Turnaround Time</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Turnaround Time</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
                             <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">2–5 days</span>
+                            <span className="text-sm"><TranslatedText>2–5 days</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">48–72 hours</span>
+                            <span className="text-sm"><TranslatedText>48–72 hours</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">24 hours</span>
+                            <span className="text-sm font-semibold"><TranslatedText>24 hours</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* Real-Time Inventory Visibility */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Real-Time Inventory Visibility</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Real-Time Inventory Visibility</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
                             <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">No</span>
+                            <span className="text-sm"><TranslatedText>No</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Limited</span>
+                            <span className="text-sm"><TranslatedText>Limited</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">Yes</span>
+                            <span className="text-sm font-semibold"><TranslatedText>Yes</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
@@ -605,121 +606,121 @@ const Pricing = () => {
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
                             <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">None</span>
+                            <span className="text-sm"><TranslatedText>None</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Partial</span>
+                            <span className="text-sm"><TranslatedText>Partial</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">All Supported</span>
+                            <span className="text-sm font-semibold"><TranslatedText>All Supported</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* Dedicated Human Support */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Dedicated Human Support</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Dedicated Human Support</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
                             <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">No</span>
+                            <span className="text-sm"><TranslatedText>No</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Tiered</span>
+                            <span className="text-sm"><TranslatedText>Tiered</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">Yes</span>
+                            <span className="text-sm font-semibold"><TranslatedText>Yes</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* Compliance (FBA/WFS) */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Compliance (FBA/WFS)</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Compliance (FBA/WFS)</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
                             <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Risk</span>
+                            <span className="text-sm"><TranslatedText>Risk</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">FBA Only</span>
+                            <span className="text-sm"><TranslatedText>FBA Only</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">Both</span>
+                            <span className="text-sm font-semibold"><TranslatedText>Both</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* Order Integrations */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Order Integrations</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Order Integrations</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
                             <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Manual</span>
+                            <span className="text-sm"><TranslatedText>Manual</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Yes</span>
+                            <span className="text-sm"><TranslatedText>Yes</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">Yes</span>
+                            <span className="text-sm font-semibold"><TranslatedText>Yes</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* Hybrid Selling Support */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Hybrid DTC + Marketplace</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Hybrid DTC + Marketplace</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Limited</span>
+                            <span className="text-sm"><TranslatedText>Limited</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Limited</span>
+                            <span className="text-sm"><TranslatedText>Limited</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">Built-in</span>
+                            <span className="text-sm font-semibold"><TranslatedText>Built-in</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* Monthly Minimums */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Monthly Minimums</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Monthly Minimums</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                            <span className="text-sm">N/A</span>
+                            <span className="text-sm"><TranslatedText>N/A</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
@@ -731,53 +732,53 @@ const Pricing = () => {
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">Low/None</span>
+                            <span className="text-sm font-semibold"><TranslatedText>Low/None</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* Liability Exposure */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Liability Exposure</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Liability Exposure</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
                             <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">High</span>
+                            <span className="text-sm"><TranslatedText>High</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Low</span>
+                            <span className="text-sm"><TranslatedText>Low</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">Low</span>
+                            <span className="text-sm font-semibold"><TranslatedText>Low</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
 
                       {/* Operational Complexity */}
                       <tr className="hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm">Operational Complexity</td>
+                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Operational Complexity</TranslatedText></td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
                             <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">High</span>
+                            <span className="text-sm"><TranslatedText>High</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">Medium</span>
+                            <span className="text-sm"><TranslatedText>Medium</TranslatedText></span>
                           </div>
                         </td>
                         <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
                           <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                             <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold">Low</span>
+                            <span className="text-sm font-semibold"><TranslatedText>Low</TranslatedText></span>
                           </div>
                         </td>
                       </tr>
@@ -801,9 +802,9 @@ const Pricing = () => {
                 transition={{ duration: prefersReducedMotion ? 0.1 : 0.5 }}
                 className="text-center mb-12 md:mb-16"
               >
-                <h2 className="text-2xl md:text-4xl font-bold mb-4">How We Determine Your Pricing</h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-4"><TranslatedText>How We Determine Your Pricing</TranslatedText></h2>
                 <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-                  We believe in transparent, fair pricing based on your actual needs
+                  <TranslatedText>We believe in transparent, fair pricing based on your actual needs</TranslatedText>
                 </p>
               </motion.div>
 
@@ -822,10 +823,9 @@ const Pricing = () => {
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <DollarSign className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-3">Volume-Based Pricing</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-3"><TranslatedText>Volume-Based Pricing</TranslatedText></h3>
                   <p className="text-muted-foreground text-sm md:text-base">
-                    The more you ship, the better your rates. Our pricing scales with your business, 
-                    ensuring you always get competitive rates that improve as you grow.
+                    <TranslatedText>The more you ship, the better your rates. Our pricing scales with your business, ensuring you always get competitive rates that improve as you grow.</TranslatedText>
                   </p>
                 </motion.div>
 
@@ -837,10 +837,9 @@ const Pricing = () => {
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#0A66C2] to-[#0A66C2]/80 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Shield className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-3">No Hidden Fees</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-3"><TranslatedText>No Hidden Fees</TranslatedText></h3>
                   <p className="text-muted-foreground text-sm md:text-base">
-                    What we quote is what you pay. No surprise charges, no hidden costs. 
-                    We provide detailed breakdowns so you know exactly where your money goes.
+                    <TranslatedText>What we quote is what you pay. No surprise charges, no hidden costs. We provide detailed breakdowns so you know exactly where your money goes.</TranslatedText>
                   </p>
                 </motion.div>
 
@@ -852,10 +851,9 @@ const Pricing = () => {
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Zap className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-3">Custom Quotes Within 24 Hours</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-3"><TranslatedText>Custom Quotes Within 24 Hours</TranslatedText></h3>
                   <p className="text-muted-foreground text-sm md:text-base">
-                    Fill out our form below and receive a detailed pricing breakdown within 24 hours. 
-                    Fast, accurate, and tailored specifically to your business needs.
+                    <TranslatedText>Fill out our form below and receive a detailed pricing breakdown within 24 hours. Fast, accurate, and tailored specifically to your business needs.</TranslatedText>
                   </p>
                 </motion.div>
 
@@ -867,10 +865,9 @@ const Pricing = () => {
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Clock className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-3">Flexible & Scalable</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-3"><TranslatedText>Flexible & Scalable</TranslatedText></h3>
                   <p className="text-muted-foreground text-sm md:text-base">
-                    Our pricing adapts to your business. Whether you're shipping 100 units or 10,000, 
-                    we have a solution that works for your current size and future growth.
+                    <TranslatedText>Our pricing adapts to your business. Whether you're shipping 100 units or 10,000, we have a solution that works for your current size and future growth.</TranslatedText>
                   </p>
                 </motion.div>
               </motion.div>
@@ -882,7 +879,7 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className="bg-card p-6 md:p-8 rounded-2xl border shadow-lg"
               >
-                <h3 className="text-xl md:text-2xl font-bold mb-6 text-center">What Affects Your Price</h3>
+                <h3 className="text-xl md:text-2xl font-bold mb-6 text-center"><TranslatedText>What Affects Your Price</TranslatedText></h3>
                 <div className="grid md:grid-cols-2 gap-4 md:gap-6">
                   {[
                     { title: "Monthly Unit Volume", desc: "Higher volumes unlock better per-unit rates and additional benefits" },
@@ -903,8 +900,8 @@ const Pricing = () => {
                         <Check className="w-4 h-4 text-green-500" />
                       </div>
                       <div>
-                        <p className="font-semibold mb-1 text-sm md:text-base">{item.title}</p>
-                        <p className="text-xs md:text-sm text-muted-foreground">{item.desc}</p>
+                        <p className="font-semibold mb-1 text-sm md:text-base"><TranslatedText>{item.title}</TranslatedText></p>
+                        <p className="text-xs md:text-sm text-muted-foreground"><TranslatedText>{item.desc}</TranslatedText></p>
                       </div>
                     </motion.div>
                   ))}
@@ -922,9 +919,9 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className="text-center mb-10 md:mb-12"
               >
-                <h2 className="text-2xl md:text-4xl font-bold mb-4">Pricing Built Around Your Shopify Volume</h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-4"><TranslatedText>Pricing Built Around Your Shopify Volume</TranslatedText></h2>
                 <p className="text-base md:text-lg text-muted-foreground">
-                  Professional services included in your custom quote
+                  <TranslatedText>Professional services included in your custom quote</TranslatedText>
                 </p>
               </motion.div>
 
@@ -952,7 +949,7 @@ const Pricing = () => {
               </motion.div>
 
               <p className="text-center text-xs md:text-sm text-muted-foreground mt-6">
-                All services are customized based on your specific needs and volume. Contact us for detailed pricing.
+                <TranslatedText>All services are customized based on your specific needs and volume. Contact us for detailed pricing.</TranslatedText>
               </p>
             </div>
           </section>
@@ -966,7 +963,7 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className="text-base md:text-lg font-semibold text-muted-foreground mb-8"
               >
-                Trusted by Growing Brands
+                <TranslatedText>Trusted by Growing Brands</TranslatedText>
               </motion.h2>
               <motion.div 
                 initial={{ opacity: 0 }}
@@ -981,7 +978,7 @@ const Pricing = () => {
                     whileHover={prefersReducedMotion ? {} : { scale: 1.1, opacity: 1 }}
                     className="w-20 md:w-24 h-10 md:h-12 bg-muted/60 rounded-lg opacity-50 hover:opacity-80 transition-all flex items-center justify-center cursor-pointer"
                   >
-                    <span className="text-xs text-muted-foreground">Logo {i}</span>
+                    <span className="text-xs text-muted-foreground"><TranslatedText>Logo</TranslatedText> {i}</span>
                   </motion.div>
                 ))}
               </motion.div>
@@ -1000,7 +997,7 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className="text-2xl md:text-4xl font-bold mb-10 md:mb-12 text-center"
               >
-                Why Our Clients Choose Us
+                <TranslatedText>Why Our Clients Choose Us</TranslatedText>
               </motion.h2>
 
               <motion.div 
@@ -1026,8 +1023,8 @@ const Pricing = () => {
                       <item.icon className="w-6 h-6 text-[#F97316] group-hover:scale-110 transition-transform" />
                     </div>
                     <div>
-                      <h3 className="text-base md:text-xl font-semibold mb-2">{item.title}</h3>
-                      <p className="text-sm md:text-base text-muted-foreground">{item.desc}</p>
+                      <h3 className="text-base md:text-xl font-semibold mb-2"><TranslatedText>{item.title}</TranslatedText></h3>
+                      <p className="text-sm md:text-base text-muted-foreground"><TranslatedText>{item.desc}</TranslatedText></p>
                     </div>
                   </motion.div>
                 ))}
@@ -1044,9 +1041,9 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className="text-center mb-10 md:mb-12"
               >
-                <h2 className="text-2xl md:text-4xl font-bold mb-4">Frequently Asked Questions About Our 3PL Pricing</h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-4"><TranslatedText>Frequently Asked Questions About Our 3PL Pricing</TranslatedText></h2>
                 <p className="text-base md:text-lg text-muted-foreground">
-                  Common questions about our pricing structure
+                  <TranslatedText>Common questions about our pricing structure</TranslatedText>
                 </p>
               </motion.div>
 
@@ -1064,10 +1061,10 @@ const Pricing = () => {
                       className="bg-card border rounded-2xl px-4 md:px-6 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <AccordionTrigger className="text-left text-sm md:text-base hover:no-underline py-4">
-                        {faq.question}
+                        <TranslatedText>{faq.question}</TranslatedText>
                       </AccordionTrigger>
                       <AccordionContent className="text-sm md:text-base text-muted-foreground pb-4">
-                        {faq.answer}
+                        <TranslatedText>{faq.answer}</TranslatedText>
                       </AccordionContent>
                     </AccordionItem>
                   ))}
@@ -1099,9 +1096,9 @@ const Pricing = () => {
                   transition={{ delay: prefersReducedMotion ? 0 : 0.1, type: "spring", stiffness: 200 }}
                   className="text-3xl md:text-5xl font-extrabold mb-4"
                 >
-                  Save up to <span className="text-[#F97316]">
+                  <TranslatedText>Save up to</TranslatedText> <span className="text-[#F97316]">
                     ${savedCalculation?.estimatedSavings?.toLocaleString() || "2,500+"}
-                  </span>/month
+                  </span>/<TranslatedText>month</TranslatedText>
                 </motion.div>
 
                 {/* Bold promotional line */}
@@ -1114,14 +1111,14 @@ const Pricing = () => {
                 >
                   <Sparkles className="w-5 h-5 text-[#F97316]" />
                   <span className="font-bold text-sm md:text-base">
-                    You're Likely Eligible for Additional Per-Unit Discounts
+                    <TranslatedText>You're Likely Eligible for Additional Per-Unit Discounts</TranslatedText>
                   </span>
                 </motion.div>
 
                 <Calendar className="w-12 h-12 mx-auto mb-4 opacity-90" />
-                <h2 className="text-2xl md:text-3xl font-bold mb-4">Want to Talk Numbers?</h2>
+                <h2 className="text-2xl md:text-3xl font-bold mb-4"><TranslatedText>Want to Talk Numbers?</TranslatedText></h2>
                 <p className="text-white/80 mb-8 max-w-md mx-auto text-sm md:text-base">
-                  Let's explore a custom quote tailored to your volume and needs.
+                  <TranslatedText>Let's explore a custom quote tailored to your volume and needs.</TranslatedText>
                 </p>
                 <Button 
                   size="lg" 
@@ -1129,7 +1126,7 @@ const Pricing = () => {
                   asChild
                 >
                   <a href="https://calendly.com/westfieldprepcenter/30min" target="_blank" rel="noopener noreferrer">
-                    Schedule a Call <ArrowRight className="ml-2 w-5 h-5" />
+                    <TranslatedText>Schedule a Call</TranslatedText> <ArrowRight className="ml-2 w-5 h-5" />
                   </a>
                 </Button>
               </motion.div>
@@ -1152,10 +1149,9 @@ const Pricing = () => {
                 viewport={{ once: true }}
                 className="text-center mb-10 md:mb-12"
               >
-                <h2 className="text-2xl md:text-4xl font-bold mb-4">Get Your Custom 3PL Quote Today</h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-4"><TranslatedText>Get Your Custom 3PL Quote Today</TranslatedText></h2>
                 <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Tell us about your business and receive a detailed pricing breakdown within 24 hours. 
-                  No pressure, no commitment—just honest answers to help you make the right decision.
+                  <TranslatedText>Tell us about your business and receive a detailed pricing breakdown within 24 hours. No pressure, no commitment—just honest answers to help you make the right decision.</TranslatedText>
                 </p>
               </motion.div>
 
@@ -1179,25 +1175,25 @@ const Pricing = () => {
                   to="/pricing" 
                   className="flex items-center gap-2 text-sm font-medium text-primary"
                 >
-                  <DollarSign className="w-4 h-4" /> Pricing
+                  <DollarSign className="w-4 h-4" /> <TranslatedText>Pricing</TranslatedText>
                 </Link>
                 <Link 
                   to="/why-choose-us" 
                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
                 >
-                  <Star className="w-4 h-4 group-hover:scale-110 transition-transform" /> Features
+                  <Star className="w-4 h-4 group-hover:scale-110 transition-transform" /> <TranslatedText>Features</TranslatedText>
                 </Link>
                 <Link 
                   to="/contact" 
                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
                 >
-                  <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" /> Contact
+                  <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" /> <TranslatedText>Contact</TranslatedText>
                 </Link>
                 <Link 
                   to="/faq" 
                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
                 >
-                  <Users className="w-4 h-4 group-hover:scale-110 transition-transform" /> FAQ
+                  <Users className="w-4 h-4 group-hover:scale-110 transition-transform" /> <TranslatedText>FAQ</TranslatedText>
                 </Link>
               </nav>
             </div>
