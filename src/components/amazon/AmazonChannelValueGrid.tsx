@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Shield, Zap, DollarSign, Headphones } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
@@ -30,7 +31,9 @@ const values = [
 ];
 
 const AmazonChannelValueGrid = () => {
-  const { ref, isVisible } = useIntersectionObserver({ threshold: 0.1 });
+  const ref = useRef<HTMLDivElement>(null);
+  const entry = useIntersectionObserver(ref, { threshold: 0.1 });
+  const isVisible = !!entry?.isIntersecting;
 
   return (
     <section className="py-20 bg-gradient-to-b from-background to-orange-50/30">

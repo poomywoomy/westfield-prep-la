@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Clock, Package, Star } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
@@ -5,7 +6,9 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const TikTokChannelCaseStudy = () => {
-  const { ref, isVisible } = useIntersectionObserver({ threshold: 0.2 });
+  const ref = useRef<HTMLDivElement>(null);
+  const entry = useIntersectionObserver(ref, { threshold: 0.2 });
+  const isVisible = !!entry?.isIntersecting;
 
   return (
     <section className="py-20 bg-background">

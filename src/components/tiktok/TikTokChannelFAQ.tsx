@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Accordion,
@@ -36,7 +37,9 @@ const faqs = [
 ];
 
 const TikTokChannelFAQ = () => {
-  const { ref, isVisible } = useIntersectionObserver({ threshold: 0.1 });
+  const ref = useRef<HTMLDivElement>(null);
+  const entry = useIntersectionObserver(ref, { threshold: 0.1 });
+  const isVisible = !!entry?.isIntersecting;
 
   // Schema.org FAQ structured data
   const faqSchema = {
