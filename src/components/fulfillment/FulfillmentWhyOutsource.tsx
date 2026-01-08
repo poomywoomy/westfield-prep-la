@@ -47,8 +47,11 @@ const FulfillmentWhyOutsource = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Why Outsource Your Fulfillment?
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            In-house fulfillment sounds simple until it isn't. Here's what we hear from brands who made the switch.
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Running fulfillment in-house sounds manageable—until your first viral moment. Suddenly you're drowning in orders, 
+            making errors, and spending all your time packing boxes instead of growing your brand. Here's what we hear from 
+            brands who finally made the switch to Westfield. The transformation isn't just operational—it's transformational 
+            for your entire business.
           </p>
         </motion.div>
 

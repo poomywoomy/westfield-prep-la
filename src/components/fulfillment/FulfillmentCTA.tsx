@@ -35,10 +35,27 @@ const FulfillmentCTA = () => {
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
             Ready to Scale Your Fulfillment?
           </h2>
-          <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-300 mb-6 max-w-2xl mx-auto">
             Join 500+ brands that trust Westfield Prep Center for their e-commerce fulfillment. 
             Get a custom quote in 24 hours.
           </p>
+          
+          {/* Testimonial */}
+          <div className="bg-slate-800/50 backdrop-blur-sm border border-blue-500/20 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
+            <p className="text-slate-300 italic mb-4">
+              "Switching to Westfield cut our shipping errors by 95% and freed up 20 hours per week. 
+              Our customers are happier, and we can finally focus on growing instead of packing boxes."
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-semibold">
+                JM
+              </div>
+              <div className="text-left">
+                <div className="text-white font-medium">Jessica Martinez</div>
+                <div className="text-slate-400 text-sm">Founder, Bloom Cosmetics</div>
+              </div>
+            </div>
+          </div>
 
           {/* Benefits */}
           <div className="flex flex-wrap justify-center gap-6 mb-10">
@@ -75,7 +92,7 @@ const FulfillmentCTA = () => {
               size="lg"
               variant="outline"
               onClick={() => navigate("/pricing")}
-              className="border-slate-500 text-white hover:bg-slate-800 px-8 py-6 text-lg"
+              className="border-white/40 bg-white/10 text-white hover:bg-white/20 px-8 py-6 text-lg"
             >
               View Pricing
             </Button>

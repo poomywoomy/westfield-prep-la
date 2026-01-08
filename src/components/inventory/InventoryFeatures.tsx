@@ -52,8 +52,13 @@ const InventoryFeatures = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Inventory Tracking Features
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
             Everything you need to maintain perfect inventory accuracy
+          </p>
+          <p className="text-muted-foreground max-w-3xl mx-auto">
+            Our feature set goes beyond basic inventory counts. We've built tools for every scenario: 
+            seasonal fluctuations, product launches, clearance events, and steady-state operations. Whether 
+            you have 50 SKUs or 5,000, the same powerful features scale with your business without adding complexity.
           </p>
         </motion.div>
 

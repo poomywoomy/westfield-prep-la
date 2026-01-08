@@ -1,13 +1,20 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Package, Zap, Shield, Clock } from "lucide-react";
+import { Package, Zap, Shield, Clock, CheckCircle } from "lucide-react";
 
 const FulfillmentHero = () => {
   const navigate = useNavigate();
 
+  const stats = [
+    { value: "99.8%", label: "Accuracy Rate" },
+    { value: "2PM", label: "Same-Day Cutoff" },
+    { value: "4.5hr", label: "Avg Processing" },
+    { value: "10K+", label: "Monthly Orders" }
+  ];
+
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <section className="relative pt-12 pb-16 lg:pt-16 lg:pb-20 overflow-hidden">
       {/* Dark Command Center Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
       
@@ -71,7 +78,7 @@ const FulfillmentHero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl leading-relaxed"
+            className="text-lg md:text-xl text-slate-300 mb-8 max-w-2xl leading-relaxed"
           >
             From order received to doorstep delivered, we handle your entire fulfillment operation. 
             Real-time tracking, multi-channel integration, and obsessive attention to accuracy—all from our Los Angeles facility.
@@ -82,7 +89,7 @@ const FulfillmentHero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap gap-4"
+            className="flex flex-wrap gap-4 mb-12"
           >
             <Button 
               size="lg"
@@ -95,48 +102,33 @@ const FulfillmentHero = () => {
               size="lg"
               variant="outline"
               onClick={() => navigate("/pricing")}
-              className="border-slate-600 text-slate-200 hover:bg-slate-800 px-8 py-6 text-lg"
+              className="border-white/40 bg-white/10 text-white hover:bg-white/20 px-8 py-6 text-lg"
             >
               See Pricing
             </Button>
           </motion.div>
-        </div>
 
-        {/* Live Order Ticker */}
-        <motion.div 
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 w-80"
-        >
-          <div className="bg-slate-800/80 backdrop-blur-xl border border-blue-500/20 rounded-2xl p-6 shadow-[0_0_60px_rgba(59,130,246,0.15)]">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-sm text-slate-400 font-medium">Live Order Feed</span>
-            </div>
-            
-            <div className="space-y-3">
-              {[
-                { id: "#WF-7842", status: "Shipped", time: "2m ago", color: "text-green-400" },
-                { id: "#WF-7841", status: "Packing", time: "5m ago", color: "text-blue-400" },
-                { id: "#WF-7840", status: "Picking", time: "8m ago", color: "text-yellow-400" },
-                { id: "#WF-7839", status: "Received", time: "12m ago", color: "text-slate-400" }
-              ].map((order, idx) => (
-                <motion.div 
-                  key={idx}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 + idx * 0.1 }}
-                  className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0"
-                >
-                  <span className="font-mono text-sm text-white">{order.id}</span>
-                  <span className={`text-sm font-medium ${order.color}`}>{order.status}</span>
-                  <span className="text-xs text-slate-500">{order.time}</span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+          {/* Horizontal Stats Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          >
+            {stats.map((stat, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.5 + idx * 0.1 }}
+                className="bg-slate-800/60 backdrop-blur-sm border border-blue-500/20 rounded-xl p-4 text-center"
+              >
+                <div className="text-2xl md:text-3xl font-bold text-blue-400">{stat.value}</div>
+                <div className="text-sm text-slate-400">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </div>
     </section>
   );

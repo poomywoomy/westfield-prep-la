@@ -42,10 +42,23 @@ const InventoryCTA = () => {
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
             Take Control of Your Inventory
           </h2>
-          <p className="text-xl text-purple-200/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-purple-200/80 mb-6 max-w-2xl mx-auto">
             Real-time visibility, automated alerts, and seamless multi-channel sync. 
             See how our WMS can transform your operations.
           </p>
+          
+          {/* Demo Process */}
+          <div className="bg-slate-800/50 backdrop-blur-sm border border-cyan-500/20 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
+            <p className="text-purple-200/80 mb-4">
+              During your demo, we'll walk through your catalog, show how inventory would flow through our system, 
+              and answer every question. Most demos take just 30 minutes—we respect your time and focus on your specific needs.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 text-sm">
+              <span className="px-3 py-1 bg-cyan-500/10 text-cyan-400 rounded-full">30-minute session</span>
+              <span className="px-3 py-1 bg-cyan-500/10 text-cyan-400 rounded-full">Screen share walkthrough</span>
+              <span className="px-3 py-1 bg-cyan-500/10 text-cyan-400 rounded-full">Q&A included</span>
+            </div>
+          </div>
 
           {/* Benefits */}
           <div className="flex flex-wrap justify-center gap-6 mb-10">
@@ -82,7 +95,7 @@ const InventoryCTA = () => {
               size="lg"
               variant="outline"
               onClick={() => navigate("/pricing")}
-              className="border-purple-400/50 text-white hover:bg-purple-500/10 px-8 py-6 text-lg"
+              className="border-white/40 bg-white/10 text-white hover:bg-white/20 px-8 py-6 text-lg"
             >
               View Pricing
             </Button>

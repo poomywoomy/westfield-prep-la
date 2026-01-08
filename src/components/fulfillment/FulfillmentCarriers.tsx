@@ -45,8 +45,14 @@ const FulfillmentCarriers = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Carrier Network
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Access to every major carrier at rates you couldn't get on your own.
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
+            Access to every major carrier at rates you couldn't get on your own. 
+          </p>
+          <p className="text-muted-foreground max-w-3xl mx-auto">
+            Why not just negotiate your own carrier rates? Because volume matters. We ship thousands of packages monthly, 
+            unlocking discounts you couldn't get shipping dozens. Those savings—often 30-50% below retail rates—go directly 
+            to your bottom line. Plus, our relationships mean priority support when issues arise. Your packages don't get 
+            lost in the system; they get personal attention from carrier reps who know us by name.
           </p>
         </motion.div>
 
