@@ -7,7 +7,7 @@ const InventoryHero = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <section className="relative pt-12 pb-16 lg:pt-16 lg:pb-20 overflow-hidden">
       {/* Deep Purple Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-indigo-900 to-slate-900" />
       
@@ -28,13 +28,14 @@ const InventoryHero = () => {
       <div className="absolute bottom-1/4 left-1/3 w-48 h-48 bg-purple-500/20 rounded-full blur-[60px] animate-pulse" style={{ animationDelay: '1.5s' }} />
 
       <div className="container relative z-10">
-        <div className="max-w-4xl">
+        {/* Centered Content */}
+        <div className="max-w-4xl mx-auto text-center">
           {/* Trust Badges */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex flex-wrap gap-4 mb-8"
+            className="flex flex-wrap justify-center gap-4 mb-8"
           >
             {[
               { icon: Shield, text: "99.9% Accuracy" },
@@ -59,7 +60,7 @@ const InventoryHero = () => {
             className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
           >
             Real-Time{" "}
-            <span className="relative">
+            <span className="relative inline-block">
               Inventory Intelligence
               <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-purple-500" />
             </span>
@@ -69,7 +70,7 @@ const InventoryHero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-purple-200/80 mb-10 max-w-2xl leading-relaxed"
+            className="text-lg md:text-xl text-purple-200/80 mb-8 max-w-2xl mx-auto leading-relaxed"
           >
             Know exactly what you have, where it is, and when you'll need more. 
             Our WMS syncs with every sales channel to prevent stockouts, eliminate overselling, and give you complete visibility—24/7.
@@ -80,7 +81,7 @@ const InventoryHero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap gap-4"
+            className="flex flex-wrap justify-center gap-4 mb-12"
           >
             <Button 
               size="lg"
@@ -93,48 +94,47 @@ const InventoryHero = () => {
               size="lg"
               variant="outline"
               onClick={() => navigate("/pricing")}
-              className="border-purple-400/50 text-white hover:bg-purple-500/10 px-8 py-6 text-lg"
+              className="border-white/40 bg-white/10 text-white hover:bg-white/20 px-8 py-6 text-lg"
             >
               View Pricing
             </Button>
           </motion.div>
-        </div>
 
-        {/* Animated Dashboard Preview */}
-        <motion.div 
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 w-96"
-        >
-          <div className="bg-slate-900/80 backdrop-blur-xl border border-purple-500/20 rounded-2xl p-6 shadow-[0_0_60px_rgba(139,92,246,0.15)]">
+          {/* Dashboard Preview - Full Width Below */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="bg-slate-900/80 backdrop-blur-xl border border-purple-500/20 rounded-2xl p-6 shadow-[0_0_60px_rgba(139,92,246,0.15)]"
+          >
             <div className="flex items-center justify-between mb-6">
-              <span className="text-sm text-purple-300 font-medium">Inventory Dashboard</span>
+              <span className="text-sm text-purple-300 font-medium">Live Inventory Dashboard</span>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-xs text-slate-400">Live</span>
+                <span className="text-xs text-slate-400">Syncing</span>
               </div>
             </div>
             
-            {/* Animated Inventory Bars */}
-            <div className="space-y-4">
+            {/* Animated Inventory Bars - Horizontal Grid */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { sku: "SKU-1234", level: 85, color: "bg-cyan-500" },
-                { sku: "SKU-5678", level: 45, color: "bg-yellow-500" },
-                { sku: "SKU-9012", level: 92, color: "bg-green-500" },
-                { sku: "SKU-3456", level: 23, color: "bg-red-500" }
+                { sku: "SKU-1234", level: 85, color: "bg-cyan-500", status: "Healthy" },
+                { sku: "SKU-5678", level: 45, color: "bg-yellow-500", status: "Low Stock" },
+                { sku: "SKU-9012", level: 92, color: "bg-green-500", status: "Healthy" },
+                { sku: "SKU-3456", level: 23, color: "bg-red-500", status: "Critical" }
               ].map((item, idx) => (
                 <motion.div 
                   key={idx}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.7 + idx * 0.1 }}
+                  className="bg-slate-800/50 rounded-lg p-4"
                 >
-                  <div className="flex justify-between text-xs mb-1">
+                  <div className="flex justify-between text-xs mb-2">
                     <span className="font-mono text-slate-400">{item.sku}</span>
                     <span className="text-white">{item.level}%</span>
                   </div>
-                  <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${item.level}%` }}
@@ -142,6 +142,9 @@ const InventoryHero = () => {
                       className={`h-full ${item.color} rounded-full`}
                     />
                   </div>
+                  <span className={`text-xs ${item.level < 30 ? 'text-red-400' : item.level < 50 ? 'text-yellow-400' : 'text-green-400'}`}>
+                    {item.status}
+                  </span>
                 </motion.div>
               ))}
             </div>
@@ -153,13 +156,13 @@ const InventoryHero = () => {
               transition={{ delay: 1.3 }}
               className="mt-6 p-3 bg-red-500/10 border border-red-500/30 rounded-lg"
             >
-              <div className="flex items-center gap-2 text-red-400 text-sm">
+              <div className="flex items-center justify-center gap-2 text-red-400 text-sm">
                 <BarChart3 className="w-4 h-4" />
-                <span>1 SKU below threshold</span>
+                <span>2 SKUs below reorder threshold • Auto-alert sent to purchasing</span>
               </div>
             </motion.div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

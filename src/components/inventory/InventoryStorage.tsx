@@ -81,9 +81,15 @@ const InventoryStorage = () => {
                 <h2 className="text-3xl md:text-4xl font-bold">Storage & Warehousing</h2>
               </div>
               
-              <p className="text-lg text-muted-foreground mb-6">
+              <p className="text-lg text-muted-foreground mb-4">
                 Our Los Angeles facility offers flexible storage solutions for inventory of all sizes. 
                 From single pallets to thousands of SKUs, we have the space and systems to keep your products organized, accessible, and ready to ship.
+              </p>
+              <p className="text-muted-foreground mb-6">
+                With over 25,000 square feet of warehouse space and capacity for 500+ pallets, we can accommodate 
+                everything from startup inventory to enterprise-scale operations. Our strategic location—just 
+                miles from the Port of Los Angeles—means your imported goods move quickly from container to shelf, 
+                ready for fulfillment within days, not weeks.
               </p>
 
               <div className="space-y-4 mb-8">

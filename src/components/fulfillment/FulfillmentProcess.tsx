@@ -64,8 +64,14 @@ const FulfillmentProcess = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             The Westfield Fulfillment Process
           </h2>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Six precision steps from click to doorstep. Every order, every time.
+          <p className="text-lg text-slate-400 max-w-3xl mx-auto mb-4">
+            Six precision steps from click to doorstep. Every order, every time. Our process has been refined 
+            over thousands of shipments to eliminate errors and maximize speed.
+          </p>
+          <p className="text-slate-500 max-w-3xl mx-auto">
+            Each step includes built-in quality checkpoints. Barcodes are scanned at every handoff, photos are 
+            captured for high-value items, and exceptions are flagged instantly. The result? A 99.8% accuracy rate 
+            that protects your brand reputation and keeps customers coming back.
           </p>
         </motion.div>
 

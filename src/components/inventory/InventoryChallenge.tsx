@@ -46,8 +46,14 @@ const InventoryChallenge = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             The Inventory Challenge
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
             Growing brands face the same painful inventory problems. Sound familiar?
+          </p>
+          <p className="text-muted-foreground max-w-3xl mx-auto">
+            When you're selling on multiple channels—Shopify, Amazon, TikTok Shop, wholesale—keeping track of 
+            what's actually in stock becomes a full-time job. Spreadsheets break down, manual counts take hours, 
+            and by the time you update one platform, another sale has already changed everything. The cost of 
+            getting it wrong? Lost sales, angry customers, and refunds that eat into your margins.
           </p>
         </motion.div>
 

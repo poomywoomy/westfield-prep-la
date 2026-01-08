@@ -42,8 +42,14 @@ const InventoryTechnology = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Our WMS Technology
           </h2>
-          <p className="text-lg text-purple-200/70 max-w-2xl mx-auto">
+          <p className="text-lg text-purple-200/70 max-w-3xl mx-auto mb-4">
             Enterprise-grade warehouse management that grows with your business
+          </p>
+          <p className="text-purple-200/50 max-w-3xl mx-auto">
+            Built on years of 3PL experience, our Warehouse Management System was designed specifically for 
+            e-commerce sellers—not retrofitted from legacy systems built for traditional retail. Every feature 
+            exists because a real brand needed it. From lot tracking for consumables to bundle management for 
+            kits, we've solved the problems you're dealing with right now.
           </p>
         </motion.div>
 
