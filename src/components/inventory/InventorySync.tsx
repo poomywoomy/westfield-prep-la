@@ -39,7 +39,7 @@ const InventorySync = () => {
                   "Automatic stock level updates across all channels",
                   "Oversell prevention with real-time inventory locks",
                   "Unified dashboard for all platform inventory",
-                  "API integrations for custom platforms"
+                  "Historical inventory reporting and analytics"
                 ].map((item, idx) => (
                   <motion.div
                     key={idx}

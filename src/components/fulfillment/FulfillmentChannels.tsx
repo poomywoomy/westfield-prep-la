@@ -3,7 +3,7 @@ import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { SiShopify, SiAmazon, SiTiktok } from "react-icons/si";
-import { Store, Code, ArrowRight } from "lucide-react";
+import { Store, ArrowRight } from "lucide-react";
 
 const FulfillmentChannels = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -36,13 +36,6 @@ const FulfillmentChannels = () => {
       icon: Store,
       color: "bg-[#0071DC]",
       description: "Walmart Marketplace fulfillment with their two-day delivery standards built-in.",
-      link: "/integrations"
-    },
-    {
-      name: "Custom API",
-      icon: Code,
-      color: "bg-slate-700",
-      description: "Have your own platform? Our REST API connects to any e-commerce system.",
       link: "/integrations"
     }
   ];

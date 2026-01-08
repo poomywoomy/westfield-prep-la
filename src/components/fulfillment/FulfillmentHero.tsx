@@ -14,7 +14,7 @@ const FulfillmentHero = () => {
   ];
 
   return (
-    <section className="relative pt-12 pb-16 lg:pt-16 lg:pb-20 overflow-hidden">
+    <section className="relative pt-24 pb-16 lg:pt-28 lg:pb-20 overflow-hidden">
       {/* Dark Command Center Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
       

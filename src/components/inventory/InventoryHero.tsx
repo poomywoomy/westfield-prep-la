@@ -7,7 +7,7 @@ const InventoryHero = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative pt-12 pb-16 lg:pt-16 lg:pb-20 overflow-hidden">
+    <section className="relative pt-24 pb-16 lg:pt-28 lg:pb-20 overflow-hidden">
       {/* Deep Purple Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-indigo-900 to-slate-900" />
       
