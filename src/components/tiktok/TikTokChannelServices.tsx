@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Zap, Package, Truck } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
@@ -31,7 +32,9 @@ const capabilities = [
 ];
 
 const TikTokChannelServices = () => {
-  const { ref, isVisible } = useIntersectionObserver({ threshold: 0.1 });
+  const ref = useRef<HTMLDivElement>(null);
+  const entry = useIntersectionObserver(ref, { threshold: 0.1 });
+  const isVisible = !!entry?.isIntersecting;
 
   return (
     <section className="py-20 bg-background">

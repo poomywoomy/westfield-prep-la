@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { MetricCounter } from "@/components/ui/metric-counter";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
@@ -12,7 +13,9 @@ const metrics = [
 ];
 
 const AmazonChannelMetrics = () => {
-  const { ref, isVisible } = useIntersectionObserver({ threshold: 0.2 });
+  const ref = useRef<HTMLDivElement>(null);
+  const entry = useIntersectionObserver(ref, { threshold: 0.2 });
+  const isVisible = !!entry?.isIntersecting;
 
   return (
     <section className="relative py-24 overflow-hidden bg-gradient-to-br from-slate-900 via-orange-950 to-slate-900">
@@ -70,7 +73,7 @@ const AmazonChannelMetrics = () => {
                   {metric.prefix}
                   {isVisible ? (
                     <MetricCounter
-                      end={metric.value}
+                      value={metric.value}
                       duration={2000}
                       suffix={metric.suffix}
                     />

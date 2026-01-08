@@ -4,73 +4,32 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import StructuredData from "@/components/StructuredData";
-import ChannelHero from "@/components/sales-channels/ChannelHero";
 import TrustStrip from "@/components/sales-channels/TrustStrip";
-import ChannelFeatures from "@/components/sales-channels/ChannelFeatures";
-import CaseStudyCard from "@/components/sales-channels/CaseStudyCard";
-import ChannelFAQ from "@/components/sales-channels/ChannelFAQ";
-import ChannelCTA from "@/components/sales-channels/ChannelCTA";
 import StickyCTA from "@/components/sales-channels/StickyCTA";
-import { TranslatedText } from "@/components/TranslatedText";
-import { 
-  RefreshCw, 
-  TrendingUp, 
-  Truck, 
-  Clock, 
-  Zap,
-  Package,
-  AlertTriangle,
-  CheckCircle,
-  Boxes
-} from "lucide-react";
-
-const features = [
-  {
-    icon: RefreshCw,
-    title: "Real-Time Order Sync",
-    description: "Orders move fast, always — direct API connection to TikTok Shop.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Scalability for Campaign Peaks",
-    description: "Stay stocked during viral surges with elastic fulfillment capacity.",
-  },
-  {
-    icon: Zap,
-    title: "Rapid Pick/Pack",
-    description: "Short delivery windows met with prioritized processing.",
-  },
-  {
-    icon: Truck,
-    title: "Carrier Selection",
-    description: "Best transit time & cost optimization across multiple carriers.",
-  },
-  {
-    icon: Boxes,
-    title: "Buffer Inventory",
-    description: "Prevent sell-outs with strategic safety stock staging.",
-  },
-];
+import TikTokChannelHero from "@/components/tiktok/TikTokChannelHero";
+import TikTokChannelValueGrid from "@/components/tiktok/TikTokChannelValueGrid";
+import TikTokChannelServices from "@/components/tiktok/TikTokChannelServices";
+import TikTokChannelMetrics from "@/components/tiktok/TikTokChannelMetrics";
+import TikTokChannelIntegration from "@/components/tiktok/TikTokChannelIntegration";
+import TikTokChannelCaseStudy from "@/components/tiktok/TikTokChannelCaseStudy";
+import TikTokChannelFAQ from "@/components/tiktok/TikTokChannelFAQ";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Heart, Gift, Video } from "lucide-react";
 
 const faqs = [
   {
-    question: "How fast is your turnaround?",
-    answer: "Typically same or next business day fulfillment depending on volume. During viral surges, we prioritize your orders to meet TikTok Shop's delivery expectations.",
+    question: "How do you connect to TikTok Shop?",
+    answer: "We integrate via established middleware platforms and APIs. Setup takes 24-48 hours.",
   },
   {
-    question: "Do you handle returns from TikTok Shop?",
-    answer: "Yes — returns and exchanges get routed back into our system and synced to your account. We process, inspect, and restock eligible items automatically.",
+    question: "Can you handle viral order spikes?",
+    answer: "Absolutely. We maintain surge capacity specifically for TikTok sellers with 10x scaling ability.",
   },
   {
-    question: "Can you handle surprise spikes?",
-    answer: "Yes — our workflows scale automatically with demand surges. We've handled viral drops with thousands of orders in hours without missing SLAs.",
+    question: "What's your average processing time?",
+    answer: "Our average is 6 hours from order receipt to shipment. Same-day shipping is typical.",
   },
-];
-
-const caseStudyMetrics = [
-  { label: "Processing Time", value: "6hrs" },
-  { label: "Error Rate", value: "<0.8%" },
-  { label: "Satisfaction", value: "95%+" },
 ];
 
 const TikTokShop = () => {
@@ -81,14 +40,14 @@ const TikTokShop = () => {
   return (
     <>
       <Helmet>
-        <title>TikTok Shop Fulfillment & 3PL for Viral Brands | Westfield Prep Center</title>
+        <title>TikTok Shop Fulfillment Los Angeles | 3PL for Viral Brands</title>
         <meta
           name="description"
-          content="Fulfill viral TikTok Shop drops with lightning-fast turnaround. Real-time order sync, surge support, and carrier optimization from Los Angeles."
+          content="TikTok Shop fulfillment built for viral demand. 6-hour processing, surge capacity, branded packaging, and real-time order sync from Los Angeles. Get started today."
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels/tiktok-shop" />
-        <meta property="og:title" content="TikTok Shop Fulfillment & 3PL for Viral Brands | Westfield" />
-        <meta property="og:description" content="Fulfill viral TikTok Shop drops with lightning-fast turnaround and real-time order sync." />
+        <meta property="og:title" content="TikTok Shop Fulfillment Los Angeles | Westfield 3PL" />
+        <meta property="og:description" content="Fulfill viral TikTok Shop orders with 6hr processing, surge capacity, and branded packaging." />
         <meta property="og:url" content="https://westfieldprepcenter.com/sales-channels/tiktok-shop" />
         <meta property="og:type" content="website" />
       </Helmet>
@@ -97,7 +56,7 @@ const TikTokShop = () => {
         type="service"
         data={{
           name: "TikTok Shop Fulfillment",
-          description: "Professional TikTok Shop fulfillment services with real-time order sync, surge capacity, and rapid pick/pack for viral demand.",
+          description: "Professional TikTok Shop fulfillment services with real-time order sync, surge capacity, and rapid pick/pack for viral demand in Los Angeles.",
         }}
       />
       <StructuredData type="faq" data={{ faqs }} />
@@ -113,180 +72,217 @@ const TikTokShop = () => {
         />
 
         <main className="flex-1">
-          <ChannelHero
-            title="TikTok Shop Logistics & 3PL Fulfillment"
-            subtitle="Fulfill Viral Demand with Speed, Accuracy, and Seamless Sync"
-            channelType="tiktok"
-            backgroundImage="/blog-images/shopify-3pl-warehouse-operations.jpg"
-          />
+          {/* Premium Hero Section */}
+          <TikTokChannelHero />
 
+          {/* Trust Strip */}
           <TrustStrip />
 
           {/* The Power of TikTok Shopping */}
-          <section className="py-16 bg-background">
+          <section className="py-20 bg-background">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">
-                  <TranslatedText>The Power of TikTok Shopping</TranslatedText>
+                  The Power of{" "}
+                  <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+                    TikTok Shopping
+                  </span>
                 </h2>
-                <p className="text-lg text-muted-foreground mb-8 text-center">
-                  <TranslatedText>
-                    TikTok Shop has flipped the ecommerce funnel:
-                  </TranslatedText>
+                <p className="text-lg text-muted-foreground mb-8 text-center max-w-3xl mx-auto">
+                  TikTok Shop has flipped the ecommerce funnel. Unlike traditional platforms where 
+                  customers search for products, TikTok's algorithm delivers products to customers 
+                  through engaging content. This creates a unique dynamic where demand can explode 
+                  overnight with zero warning.
                 </p>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-3 gap-6 mb-8">
                   {[
-                    "Viral content generates instant demand",
-                    "Live selling drives impulse purchases",
-                    "Limited production drops can sell out in minutes",
+                    { icon: Video, text: "Viral content generates instant demand" },
+                    { icon: Heart, text: "Live selling drives impulse purchases" },
+                    { icon: Gift, text: "Limited drops sell out in minutes" },
                   ].map((item, idx) => (
-                    <div key={idx} className="p-5 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-xl text-center border border-pink-500/20">
-                      <span className="font-medium"><TranslatedText>{item}</TranslatedText></span>
+                    <div key={idx} className="p-6 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-xl text-center border border-pink-500/20 hover:border-pink-500/40 transition-colors">
+                      <item.icon className="w-8 h-8 text-pink-500 mx-auto mb-3" />
+                      <span className="font-medium">{item.text}</span>
                     </div>
                   ))}
                 </div>
-                <p className="text-muted-foreground mt-8 text-center">
-                  <TranslatedText>
-                    But that explosive demand requires fulfillment workflows that won't break when traffic spikes.
-                  </TranslatedText>
+                <p className="text-muted-foreground text-center">
+                  But that explosive demand requires fulfillment workflows that won't break when 
+                  traffic spikes. Your viral moment should be celebrated, not stressed over.
                 </p>
               </div>
             </div>
           </section>
 
           {/* Why TikTok Shop Needs a 3PL Partner */}
-          <section className="py-16 bg-muted/20">
+          <section className="py-20 bg-gradient-to-b from-pink-50/50 to-background">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
                 <div className="flex items-center justify-center mb-6">
-                  <div className="h-14 w-14 rounded-xl bg-destructive/10 flex items-center justify-center">
-                    <AlertTriangle className="h-7 w-7 text-destructive" />
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+                    <AlertTriangle className="h-8 w-8 text-pink-600" />
                   </div>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">
-                  <TranslatedText>Why TikTok Shop Needs a 3PL Partner</TranslatedText>
+                  Why TikTok Shop Needs a{" "}
+                  <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+                    3PL Partner
+                  </span>
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8 text-center">
-                  <TranslatedText>
-                    One viral video can lead to thousands of orders in hours. Without scalable fulfillment your brand risks:
-                  </TranslatedText>
+                  One viral video can lead to thousands of orders in hours. Without scalable 
+                  fulfillment infrastructure, your brand risks serious consequences that can 
+                  damage your reputation and TikTok Shop seller metrics.
                 </p>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-3 gap-6 mb-8">
                   {[
-                    "Fulfillment delays",
+                    "Fulfillment delays and backlogs",
                     "Missing delivery expectations",
-                    "Higher support costs",
+                    "Higher support costs and refunds",
                   ].map((item, idx) => (
-                    <div key={idx} className="p-4 bg-destructive/10 rounded-lg text-center">
-                      <span className="font-medium text-destructive"><TranslatedText>{item}</TranslatedText></span>
+                    <div key={idx} className="p-5 bg-pink-50 border border-pink-200 rounded-lg text-center">
+                      <span className="font-medium text-pink-700">{item}</span>
                     </div>
                   ))}
                 </div>
-                <p className="text-muted-foreground mt-8 text-center">
-                  <TranslatedText>
-                    A 3PL with experience in rapid surges gives you the operational backbone to support peak moments.
-                  </TranslatedText>
+                <p className="text-muted-foreground text-center">
+                  A 3PL with experience in rapid surges gives you the operational backbone to 
+                  support peak moments. We've handled drops going from 100 to 10,000+ orders 
+                  overnight without missing SLAs. Learn more about our{" "}
+                  <Link to="/order-fulfillment" className="text-pink-600 hover:underline font-medium">
+                    order fulfillment capabilities
+                  </Link>.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* TikTok Shop Integration */}
-          <section className="py-16 bg-background">
+          {/* Value Grid */}
+          <TikTokChannelValueGrid />
+
+          {/* Integration Section */}
+          <TikTokChannelIntegration />
+
+          {/* Services/Capabilities */}
+          <TikTokChannelServices />
+
+          {/* Metrics Section (Dark) */}
+          <TikTokChannelMetrics />
+
+          {/* Creator-Friendly Fulfillment */}
+          <section className="py-20 bg-background">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+                    <Heart className="h-8 w-8 text-pink-600" />
+                  </div>
+                </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">
-                  <TranslatedText>TikTok Shop Integration for Order Sync</TranslatedText>
+                  Creator-Friendly{" "}
+                  <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+                    Fulfillment
+                  </span>
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8 text-center">
-                  <TranslatedText>We provide:</TranslatedText>
+                  Unboxing content is huge on TikTok. When customers share their experience, 
+                  it creates organic marketing that money can't buy. That's why we offer custom 
+                  branded packaging options including branded boxes, tissue paper, thank-you cards, 
+                  stickers, and promotional inserts.
                 </p>
-                <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                <p className="text-center text-muted-foreground mb-8">
+                  Many of our TikTok sellers see their customers post unboxing videos, creating 
+                  a virtuous cycle of content and sales. We work with you to design a packaging 
+                  experience worth sharing. Explore our{" "}
+                  <Link to="/kitting-bundling" className="text-pink-600 hover:underline font-medium">
+                    kitting and bundling services
+                  </Link>{" "}
+                  for more options.
+                </p>
+                <div className="flex justify-center">
+                  <Button
+                    asChild
+                    className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                  >
+                    <Link to="/contact">Discuss Custom Packaging</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Surge Handling */}
+          <section className="py-20 bg-gradient-to-b from-pink-50/50 to-background">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto text-center">
+                <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                  Built for{" "}
+                  <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+                    Surge Handling
+                  </span>
+                </h2>
+                <p className="text-lg text-muted-foreground mb-8">
+                  We maintain buffer inventory, flexible staffing, and prioritized pick queues 
+                  specifically for TikTok sellers. When your video hits the For You page and 
+                  orders explode, we activate surge protocols immediately. Extra staff are 
+                  brought in, and your orders move to the front of the queue.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8">
                   {[
-                    "Real-time order import (via API or middleware)",
-                    "SKU mapping to fulfillment SKUs",
-                    "Instant status sync to TikTok platform",
-                    "Tracking updates pushed back to buyer",
+                    "10x surge capacity on demand",
+                    "Flexible staffing for peak events",
+                    "Priority pick queue activation",
+                    "Real-time communication throughout",
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 p-4 bg-card rounded-lg border border-border">
-                      <CheckCircle className="h-5 w-5 text-secondary flex-shrink-0" />
-                      <span className="font-medium text-sm"><TranslatedText>{item}</TranslatedText></span>
+                      <div className="w-2 h-2 rounded-full bg-pink-500 flex-shrink-0" />
+                      <span className="text-sm font-medium text-left">{item}</span>
                     </div>
                   ))}
                 </div>
-                <p className="text-center mt-8 font-medium text-secondary">
-                  <TranslatedText>Orders placed on TikTok Shop flow directly into our warehouse dashboard — no CSVs, no bottlenecks.</TranslatedText>
+                <p className="text-muted-foreground">
+                  Don't let your viral moment become a logistics nightmare. We're your partner 
+                  in turning TikTok fame into sustainable business growth.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* TikTok Shop Fulfillment Capabilities */}
-          <section className="py-16 bg-muted/20">
-            <div className="container mx-auto px-4">
-              <div className="max-w-5xl mx-auto">
-                <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
-                  <TranslatedText>TikTok Shop Fulfillment Capabilities</TranslatedText>
-                </h2>
-                <div className="grid md:grid-cols-3 gap-8">
-                  <div className="p-6 bg-card rounded-2xl border border-border">
-                    <div className="h-12 w-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-4">
-                      <Clock className="h-6 w-6 text-secondary" />
-                    </div>
-                    <h3 className="text-lg font-bold mb-3">
-                      <TranslatedText>Fast Turnaround</TranslatedText>
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      <TranslatedText>
-                        Prioritized pick/pack based on demand windows. Same-day handling for viral events.
-                      </TranslatedText>
-                    </p>
-                  </div>
-                  <div className="p-6 bg-card rounded-2xl border border-border">
-                    <div className="h-12 w-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-4">
-                      <Package className="h-6 w-6 text-secondary" />
-                    </div>
-                    <h3 className="text-lg font-bold mb-3">
-                      <TranslatedText>Scalable Inventory Management</TranslatedText>
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      <TranslatedText>
-                        Buffer stock staging for promotions, safety stock levels, and instant alerts on low inventory.
-                      </TranslatedText>
-                    </p>
-                  </div>
-                  <div className="p-6 bg-card rounded-2xl border border-border">
-                    <div className="h-12 w-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-4">
-                      <Truck className="h-6 w-6 text-secondary" />
-                    </div>
-                    <h3 className="text-lg font-bold mb-3">
-                      <TranslatedText>Order Routing & Carrier Optimization</TranslatedText>
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      <TranslatedText>
-                        Automatic routing to faster delivery carriers, economy options, and international channels where supported.
-                      </TranslatedText>
-                    </p>
-                  </div>
-                </div>
+          {/* Case Study */}
+          <TikTokChannelCaseStudy />
+
+          {/* FAQ */}
+          <TikTokChannelFAQ />
+
+          {/* Final CTA */}
+          <section className="py-24 bg-gradient-to-br from-pink-500 via-purple-500 to-fuchsia-600 text-white">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl md:text-5xl font-bold mb-6">
+                Ready for Your Viral Moment?
+              </h2>
+              <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                Partner with a 3PL that's built for TikTok's unpredictable, explosive demand. 
+                We'll handle the logistics so you can focus on creating content.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  asChild
+                  size="lg"
+                  className="px-10 py-7 text-lg font-bold bg-white text-pink-600 hover:bg-white/90 shadow-lg"
+                >
+                  <Link to="/contact">Get Started Today</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="px-10 py-7 text-lg font-bold border-2 border-white text-white bg-transparent hover:bg-white/10"
+                >
+                  <Link to="/pricing">View Pricing</Link>
+                </Button>
               </div>
             </div>
           </section>
-
-          <ChannelFeatures features={features} title="TikTok Shop Fulfillment Features" />
-
-          <CaseStudyCard
-            title="Viral Drop Fulfilled in Hours"
-            description="A TikTok creator brand experienced a 48hr demand surge after their video hit 3M views. Without a 3PL partner, they would have lost sales and reviews:"
-            metrics={caseStudyMetrics}
-          />
-
-          <ChannelFAQ faqs={faqs} title="FAQ — TikTok Shop Fulfillment" />
-
-          <ChannelCTA
-            title="Dominate TikTok Shop with a 3PL Built for Viral Demand"
-            subtitle="Get lightning-fast fulfillment that scales with your content."
-          />
         </main>
 
         <Footer />

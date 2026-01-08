@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { MetricCounter } from "@/components/ui/metric-counter";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
@@ -12,7 +13,9 @@ const metrics = [
 ];
 
 const TikTokChannelMetrics = () => {
-  const { ref, isVisible } = useIntersectionObserver({ threshold: 0.2 });
+  const ref = useRef<HTMLDivElement>(null);
+  const entry = useIntersectionObserver(ref, { threshold: 0.2 });
+  const isVisible = !!entry?.isIntersecting;
 
   return (
     <section className="relative py-24 overflow-hidden bg-gradient-to-br from-purple-900 via-pink-900 to-fuchsia-900">
@@ -77,7 +80,7 @@ const TikTokChannelMetrics = () => {
                   {metric.prefix}
                   {isVisible ? (
                     <MetricCounter
-                      end={metric.value}
+                      value={metric.value}
                       duration={2000}
                       suffix={metric.suffix}
                     />
