@@ -31,8 +31,8 @@ const StorageHero = () => {
             <p className="text-lg md:text-xl text-cyan-100/80 mb-10 max-w-3xl mx-auto leading-relaxed">Industrial-grade storage with 24/7 security, climate control, and flexible terms. From single pallets to dedicated warehouse space, we scale with your business. Real-time inventory tracking, FIFO rotation, and same-day access to your goods.</p>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" onClick={() => navigate("/contact")} className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-6 text-lg">Get Storage Quote</Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/pricing")} className="border-white/40 bg-white/10 text-white hover:bg-white/20 px-8 py-6 text-lg">View Pricing</Button>
+            <Button size="lg" onClick={() => navigate("/contact")} className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-6 text-lg font-semibold shadow-lg">Get Storage Quote</Button>
+            <Button size="lg" variant="outline" onClick={() => navigate("/pricing")} className="border-2 border-white/50 bg-white/15 text-white hover:bg-white/25 px-8 py-6 text-lg font-semibold backdrop-blur-sm">View Pricing</Button>
           </motion.div>
         </div>
       </div>
