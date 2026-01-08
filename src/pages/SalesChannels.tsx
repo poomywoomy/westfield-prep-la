@@ -25,7 +25,7 @@ const SalesChannels = () => {
       category: "Major Marketplaces",
       icon: ShoppingCart,
       platforms: [
-        { name: "Amazon FBA", path: "/amazon-fba-prep", featured: true },
+        { name: "Amazon FBA", path: "/sales-channels/amazon", featured: true },
         { name: "Walmart Marketplace", description: "Available upon request" },
         { name: "eBay", description: "Multi-channel fulfillment" },
         { name: "Etsy", description: "Handmade & craft fulfillment" },
@@ -36,7 +36,7 @@ const SalesChannels = () => {
       category: "Social Commerce",
       icon: Video,
       platforms: [
-        { name: "TikTok Shop", path: "/tiktok-shop-fulfillment", featured: true },
+        { name: "TikTok Shop", path: "/sales-channels/tiktok-shop", featured: true },
         { name: "Instagram Shopping", description: "Direct commerce integration" },
         { name: "Facebook Shops", description: "Social selling fulfillment" },
         { name: "Whatnot", description: "Live selling platform" },
@@ -47,7 +47,7 @@ const SalesChannels = () => {
       category: "E-commerce Platforms",
       icon: Store,
       platforms: [
-        { name: "Shopify", path: "/shopify-fulfillment", featured: true },
+        { name: "Shopify", path: "/sales-channels/shopify", featured: true },
         { name: "WooCommerce", description: "WordPress fulfillment" },
         { name: "BigCommerce", description: "Enterprise e-commerce" },
         { name: "Magento", description: "Custom platform integration" },
