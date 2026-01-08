@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { ChatBot } from "@/components/ChatBot";
@@ -14,9 +14,7 @@ const Index = lazy(() => import("./pages/Index"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Pricing = lazy(() => import("./pages/Pricing"));
-const ShopifyFulfillment = lazy(() => import("./pages/ShopifyFulfillment"));
-const AmazonFBAPrep = lazy(() => import("./pages/AmazonFBAPrep"));
-const TikTokShopFulfillment = lazy(() => import("./pages/TikTokShopFulfillment"));
+// Sales channel pages now at /sales-channels/* routes
 const KittingBundling = lazy(() => import("./pages/KittingBundling"));
 const LabelingCompliance = lazy(() => import("./pages/LabelingCompliance"));
 const StorageWarehousing = lazy(() => import("./pages/StorageWarehousing"));
@@ -84,10 +82,10 @@ const App = () => {
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 
-                {/* Service Pages */}
-                <Route path="/shopify-fulfillment" element={<ShopifyFulfillment />} />
-                <Route path="/amazon-fba-prep" element={<AmazonFBAPrep />} />
-                <Route path="/tiktok-shop-fulfillment" element={<TikTokShopFulfillment />} />
+                {/* Service Pages - Redirect old routes to new sales-channels paths */}
+                <Route path="/shopify-fulfillment" element={<Navigate to="/sales-channels/shopify" replace />} />
+                <Route path="/amazon-fba-prep" element={<Navigate to="/sales-channels/amazon" replace />} />
+                <Route path="/tiktok-shop-fulfillment" element={<Navigate to="/sales-channels/tiktok-shop" replace />} />
                 <Route path="/sales-channels" element={<SalesChannels />} />
                 <Route path="/sales-channels/amazon" element={<SalesChannelAmazon />} />
                 <Route path="/sales-channels/shopify" element={<SalesChannelShopify />} />
@@ -102,10 +100,10 @@ const App = () => {
                 <Route path="/returns-processing" element={<ReturnsProcessing />} />
                 
                 {/* Legacy Redirects */}
-                <Route path="/services" element={<ShopifyFulfillment />} />
-                <Route path="/platforms" element={<ShopifyFulfillment />} />
-                <Route path="/platforms/*" element={<ShopifyFulfillment />} />
-                <Route path="/walmart-fulfillment" element={<AmazonFBAPrep />} />
+                <Route path="/services" element={<Navigate to="/sales-channels/shopify" replace />} />
+                <Route path="/platforms" element={<Navigate to="/sales-channels/shopify" replace />} />
+                <Route path="/platforms/*" element={<Navigate to="/sales-channels/shopify" replace />} />
+                <Route path="/walmart-fulfillment" element={<Navigate to="/sales-channels/amazon" replace />} />
                 
                 <Route path="/terms" element={<TOS />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
