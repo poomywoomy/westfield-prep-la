@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Check, ArrowRight, RefreshCw, Package, Truck, Bell } from "lucide-react";
+import { SiTiktok } from "react-icons/si";
+import westfieldLogo from "@/assets/westfield-logo.png";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { Link } from "react-router-dom";
 
@@ -70,7 +72,7 @@ const TikTokChannelIntegration = () => {
               {/* TikTok Shop */}
               <div className="flex flex-col items-center">
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center shadow-lg mb-2">
-                  <span className="text-2xl font-bold text-white">TT</span>
+                  <SiTiktok className="text-white w-10 h-10" />
                 </div>
                 <span className="text-sm font-medium text-foreground">TikTok Shop</span>
               </div>
@@ -80,8 +82,12 @@ const TikTokChannelIntegration = () => {
 
               {/* Westfield */}
               <div className="flex flex-col items-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg mb-2">
-                  <span className="text-2xl font-bold text-white">WF</span>
+                <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-lg mb-2 p-2 border border-gray-100">
+                  <img 
+                    src={westfieldLogo} 
+                    alt="Westfield 3PL" 
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <span className="text-sm font-medium text-foreground">Westfield 3PL</span>
               </div>

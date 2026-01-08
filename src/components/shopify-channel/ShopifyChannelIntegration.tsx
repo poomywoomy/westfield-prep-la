@@ -4,6 +4,8 @@ import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { SiShopify } from "react-icons/si";
+import westfieldLogo from "@/assets/westfield-logo.png";
 
 const ShopifyChannelIntegration = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -106,7 +108,7 @@ const ShopifyChannelIntegration = () => {
                   <div className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-[#96BF48] rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">S</span>
+                        <SiShopify className="text-white w-6 h-6" />
                       </div>
                       <span className="font-medium">Shopify Store</span>
                     </div>
@@ -118,8 +120,12 @@ const ShopifyChannelIntegration = () => {
                       ⟷
                     </motion.div>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[hsl(var(--shopify-page-accent))] rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">W</span>
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-1">
+                        <img 
+                          src={westfieldLogo} 
+                          alt="Westfield WMS" 
+                          className="w-full h-full object-contain"
+                        />
                       </div>
                       <span className="font-medium">WMS</span>
                     </div>
