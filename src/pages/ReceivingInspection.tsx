@@ -6,10 +6,9 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import StructuredData from "@/components/StructuredData";
 import { generateMetaTags } from "@/utils/seo";
 import ReceivingHero from "@/components/receiving/ReceivingHero";
-import ReceivingProcess from "@/components/receiving/ReceivingProcess";
-import ReceivingChecklist from "@/components/receiving/ReceivingChecklist";
-import ReceivingMetrics from "@/components/receiving/ReceivingMetrics";
-import ReceivingDocumentation from "@/components/receiving/ReceivingDocumentation";
+import ReceivingPainPoints from "@/components/receiving/ReceivingPainPoints";
+import ReceivingTimeline from "@/components/receiving/ReceivingTimeline";
+import ReceivingPhotoGallery from "@/components/receiving/ReceivingPhotoGallery";
 import ReceivingFAQ from "@/components/receiving/ReceivingFAQ";
 import ReceivingCTA from "@/components/receiving/ReceivingCTA";
 
@@ -62,38 +61,6 @@ const ReceivingInspection = () => {
           "@type": "Answer",
           "text": "Yes, we photograph 100% of received units. Photos are available in your dashboard for 30 days."
         }
-      },
-      {
-        "@type": "Question",
-        "name": "What happens if there's a discrepancy?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Discrepancies are documented with photos and reported immediately. You'll receive alerts for damaged or missing items."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Can I specify special handling instructions?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Absolutely. Custom receiving instructions can be added per SKU or per shipment via your dashboard."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How are damaged items handled?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Damaged items are photographed, quarantined, and you're notified to decide: discard, return to sender, or attempt repair."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Do you inspect all items or just samples?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "We inspect 100% of units by default. Sample inspection is available for high-volume, low-risk products at reduced rates."
-        }
       }
     ]
   };
@@ -114,10 +81,9 @@ const ReceivingInspection = () => {
         <Header />
         <Breadcrumbs items={[{ label: "Receiving & Inspection", path: "/receiving-inspection" }]} />
         <ReceivingHero />
-        <ReceivingProcess />
-        <ReceivingChecklist />
-        <ReceivingMetrics />
-        <ReceivingDocumentation />
+        <ReceivingPainPoints />
+        <ReceivingTimeline />
+        <ReceivingPhotoGallery />
         <ReceivingFAQ />
         <ReceivingCTA />
         <Footer />
