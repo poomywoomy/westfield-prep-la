@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Phone, Calendar } from "lucide-react";
+import { Phone, Calendar, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { SiShopify, SiAmazon, SiTiktok, SiWalmart, SiEtsy, SiWoo } from "react-icons/si";
 import logo from "@/assets/westfield-logo-original.jpg";
 import { useAuth } from "@/hooks/useAuth";
 import { trackEvent } from "@/lib/analytics";
@@ -83,6 +92,63 @@ const Header = () => {
               <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium text-sm flex items-center gap-1">
                 <span className="text-secondary"><TranslatedText>See Your Savings</TranslatedText></span>
               </Link>
+              
+              {/* Sales Channels Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors font-medium text-sm focus:outline-none">
+                  <TranslatedText>Sales Channels</TranslatedText>
+                  <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="start" 
+                  className="w-64 bg-background border border-border shadow-lg z-[60]"
+                >
+                  <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider">
+                    Featured Platforms
+                  </DropdownMenuLabel>
+                  
+                  <DropdownMenuItem onClick={() => navigate("/sales-channels")} className="cursor-pointer">
+                    <SiShopify className="mr-2 h-4 w-4 text-[#5E8E3E]" />
+                    Shopify
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/sales-channels")} className="cursor-pointer">
+                    <SiAmazon className="mr-2 h-4 w-4 text-[#FF9900]" />
+                    Amazon
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/sales-channels")} className="cursor-pointer">
+                    <SiTiktok className="mr-2 h-4 w-4" />
+                    TikTok Shop
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuSeparator />
+                  
+                  <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider">
+                    More Platforms
+                  </DropdownMenuLabel>
+                  
+                  <DropdownMenuItem onClick={() => navigate("/sales-channels")} className="cursor-pointer">
+                    <SiWalmart className="mr-2 h-4 w-4 text-[#0057A0]" />
+                    Walmart
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/sales-channels")} className="cursor-pointer">
+                    <SiEtsy className="mr-2 h-4 w-4 text-[#D5581D]" />
+                    Etsy
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/sales-channels")} className="cursor-pointer">
+                    <SiWoo className="mr-2 h-4 w-4 text-[#674399]" />
+                    WooCommerce
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuSeparator />
+                  
+                  <DropdownMenuItem 
+                    onClick={() => navigate("/sales-channels")} 
+                    className="cursor-pointer font-medium text-primary"
+                  >
+                    View All Channels →
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               
               <Link to="/integrations" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
                 <TranslatedText>Integrations</TranslatedText>
