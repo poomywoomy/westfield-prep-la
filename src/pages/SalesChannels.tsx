@@ -11,7 +11,7 @@ import PlatformCard, { PlatformData } from "@/components/sales-channels/Platform
 import PlatformDetailModal from "@/components/sales-channels/PlatformDetailModal";
 import { Button } from "@/components/ui/button";
 import { TranslatedText } from "@/components/TranslatedText";
-import { Code, Zap, ArrowRight, Sparkles } from "lucide-react";
+import { Plus, ArrowRight, Sparkles } from "lucide-react";
 import { supportedPlatforms, featuredPlatforms, regularPlatforms } from "@/data/supportedPlatforms";
 
 const SalesChannels = () => {
@@ -115,75 +115,26 @@ const SalesChannels = () => {
                       index={idx + featuredPlatforms.length}
                     />
                   ))}
+                  
+                  {/* And More Card */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 * (regularPlatforms.length + featuredPlatforms.length) }}
+                    className="group relative bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:border-primary/50 transition-all duration-300"
+                  >
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Plus className="w-7 h-7 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-bold text-foreground mb-1">
+                      <TranslatedText>And More</TranslatedText>
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      <TranslatedText>Custom integrations available</TranslatedText>
+                    </p>
+                  </motion.div>
                 </div>
-              </div>
-            </div>
-          </section>
-
-          {/* API CTA Section */}
-          <section className="py-16 bg-muted/30">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 md:p-12"
-                >
-                  {/* Background Pattern */}
-                  <div
-                    className="absolute inset-0 opacity-10"
-                    style={{
-                      backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-                      backgroundSize: "24px 24px",
-                    }}
-                  />
-
-                  <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-                    <div className="flex-1 text-center md:text-left">
-                      <div className="inline-flex items-center gap-2 bg-primary/20 border border-primary/30 rounded-full px-3 py-1 mb-4">
-                        <Code className="h-4 w-4 text-primary" />
-                        <span className="text-xs font-medium text-primary">
-                          <TranslatedText>Developer Friendly</TranslatedText>
-                        </span>
-                      </div>
-
-                      <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                        <TranslatedText>Need a Custom Integration?</TranslatedText>
-                      </h3>
-                      <p className="text-slate-300 mb-6 max-w-lg">
-                        <TranslatedText>
-                          Our REST API and webhook support make it easy to connect any platform. EDI integration available for enterprise clients.
-                        </TranslatedText>
-                      </p>
-
-                      <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                        <Button
-                          size="lg"
-                          className="bg-primary hover:bg-primary/90"
-                          onClick={() => navigate("/integrations")}
-                        >
-                          <TranslatedText>View API Docs</TranslatedText>
-                          <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
-                        <Button
-                          size="lg"
-                          variant="outline"
-                          className="border-white/30 text-white hover:bg-white/10"
-                          onClick={() => navigate("/contact")}
-                        >
-                          <TranslatedText>Talk to Sales</TranslatedText>
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="hidden md:block">
-                      <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
-                        <Zap className="w-16 h-16 text-white" />
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
               </div>
             </div>
           </section>

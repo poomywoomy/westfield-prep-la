@@ -37,7 +37,6 @@ const SalesChannelsHero = () => {
 
         {/* Gradient Orbs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -114,11 +113,11 @@ const SalesChannelsHero = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6"
-              onClick={() => navigate("/integrations")}
+              className="bg-white/15 border-white/50 text-white hover:bg-white/25 text-lg px-8 py-6"
+              onClick={() => navigate("/pricing")}
             >
               <Boxes className="w-5 h-5 mr-2" />
-              <TranslatedText>View All Integrations</TranslatedText>
+              <TranslatedText>View Pricing</TranslatedText>
             </Button>
           </motion.div>
 
