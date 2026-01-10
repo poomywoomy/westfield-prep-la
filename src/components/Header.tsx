@@ -72,7 +72,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-full gap-6">
             <Link 
               to="/" 
-              className="flex items-center cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
+              className="flex items-center cursor-pointer p-1 rounded-md hover:bg-accent transition-colors"
               onClick={handleLogoClick}
             >
               <img 
@@ -84,18 +84,18 @@ const Header = () => {
               />
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-5">
-              <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
+            <nav className="hidden lg:flex items-center gap-8">
+              <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Home</TranslatedText>
               </Link>
               
-              <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium text-sm flex items-center gap-1">
+              <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium text-sm flex items-center gap-1 whitespace-nowrap">
                 <span className="text-secondary"><TranslatedText>See Your Savings</TranslatedText></span>
               </Link>
               
               {/* Sales Channels Dropdown */}
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors font-medium text-sm focus:outline-none">
+                <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors font-medium text-sm focus:outline-none whitespace-nowrap">
                   <TranslatedText>Sales Channels</TranslatedText>
                   <ChevronDown className="h-4 w-4" />
                 </DropdownMenuTrigger>
@@ -150,24 +150,24 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
               
-              <Link to="/integrations" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
+              <Link to="/integrations" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Integrations</TranslatedText>
               </Link>
 
-              <Link to="/why-choose-us" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
+              <Link to="/why-choose-us" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Why Choose Us</TranslatedText>
               </Link>
 
-              <Link to="/testimonials" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
+              <Link to="/testimonials" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Testimonials</TranslatedText>
               </Link>
 
-              <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium text-sm">
+              <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Blog</TranslatedText>
               </Link>
             </nav>
 
-            <div className="hidden xl:flex items-center gap-4">
+            <div className="hidden xl:flex items-center gap-3">
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-2 text-primary hover:text-secondary transition-colors group"
