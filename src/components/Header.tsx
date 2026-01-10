@@ -72,7 +72,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-full gap-6">
             <Link 
               to="/" 
-              className="flex items-center cursor-pointer p-1 rounded-md hover:bg-accent transition-colors"
+              className="flex items-center cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
               onClick={handleLogoClick}
             >
               <img 
@@ -167,7 +167,7 @@ const Header = () => {
               </Link>
             </nav>
 
-            <div className="hidden xl:flex items-center gap-3">
+            <div className="hidden xl:flex items-center gap-3 ml-4">
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-2 text-primary hover:text-secondary transition-colors group"
