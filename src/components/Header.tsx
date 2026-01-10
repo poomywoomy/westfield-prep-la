@@ -64,21 +64,20 @@ const Header = () => {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? "bg-background shadow-md h-24" : "bg-background/95 backdrop-blur-sm h-28"
+          isScrolled ? "bg-background shadow-md py-4" : "bg-background/95 backdrop-blur-sm py-5"
         }`}
-        style={{ willChange: 'height' }}
       >
         <div className="container mx-auto px-4 h-full">
           <div className="flex items-center justify-between h-full gap-6">
             <Link 
               to="/" 
-              className="flex items-center cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
+              className="flex items-center cursor-pointer p-2 rounded-md hover:bg-accent/50 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
               onClick={handleLogoClick}
             >
               <img 
                 src={logo} 
                 alt="Los Angeles Prep Center | Westfield Fulfillment Logo" 
-                className="h-16 w-auto object-contain" 
+                className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain transition-all duration-300" 
                 width="147" 
                 height="56"
               />
@@ -167,7 +166,7 @@ const Header = () => {
               </Link>
             </nav>
 
-            <div className="hidden xl:flex items-center gap-3 ml-4">
+            <div className="hidden xl:flex items-center gap-4 ml-6">
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-2 text-primary hover:text-secondary transition-colors group"
@@ -194,7 +193,7 @@ const Header = () => {
               <LanguageSwitcher variant="compact" />
             </div>
 
-            <div className="flex lg:hidden items-center gap-2">
+            <div className="flex lg:hidden items-center gap-3">
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-1 text-primary hover:text-secondary transition-colors"
