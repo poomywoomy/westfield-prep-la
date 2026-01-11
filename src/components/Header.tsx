@@ -67,8 +67,8 @@ const Header = () => {
           isScrolled ? "bg-background shadow-md py-4" : "bg-background/95 backdrop-blur-sm py-5"
         }`}
       >
-        <div className="container mx-auto px-4 h-full">
-          <div className="flex items-center justify-between h-full gap-6">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between gap-6">
             <Link 
               to="/" 
               className="flex items-center cursor-pointer p-2 rounded-md hover:bg-accent/50 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
@@ -77,9 +77,7 @@ const Header = () => {
               <img 
                 src={logo} 
                 alt="Los Angeles Prep Center | Westfield Fulfillment Logo" 
-                className="h-12 md:h-14 lg:h-16 w-auto object-contain" 
-                width="147" 
-                height="56"
+                className="h-16 md:h-20 lg:h-24 w-auto object-contain" 
               />
             </Link>
 
