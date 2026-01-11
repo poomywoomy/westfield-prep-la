@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SiShopify, SiAmazon, SiTiktok, SiWalmart, SiEtsy, SiWoo } from "react-icons/si";
-import logo from "@/assets/westfield-logo-original.jpg";
+import logo from "@/assets/westfield-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { trackEvent } from "@/lib/analytics";
 import CalendlyModal from "./CalendlyModal";
@@ -71,13 +71,13 @@ const Header = () => {
           <div className="flex items-center justify-between gap-6">
             <Link 
               to="/" 
-              className="flex items-center cursor-pointer p-2 rounded-md hover:bg-accent/50 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
+              className="flex items-center flex-shrink-0 cursor-pointer p-2 rounded-md hover:bg-accent/50 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
               onClick={handleLogoClick}
             >
               <img 
                 src={logo} 
                 alt="Los Angeles Prep Center | Westfield Fulfillment Logo" 
-                className="h-16 md:h-20 lg:h-24 w-auto object-contain" 
+                className="h-8 md:h-10 w-auto object-contain block" 
               />
             </Link>
 
