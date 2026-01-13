@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyChannelValueGrid = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -42,10 +43,10 @@ const ShopifyChannelValueGrid = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[hsl(var(--shopify-page-primary))]">
-            Why Shopify Brands Choose Westfield
+            <TranslatedText>Why Shopify Brands Choose Westfield</TranslatedText>
           </h2>
           <p className="text-muted-foreground text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-            Running a Shopify store is hard enough. Let us handle the fulfillment complexity while you focus on growing your brand, launching products, and delighting customers. Here's what sets us apart from generic 3PLs.
+            <TranslatedText>Running a Shopify store is hard enough. Let us handle the fulfillment complexity while you focus on growing your brand, launching products, and delighting customers. Here's what sets us apart from generic 3PLs.</TranslatedText>
           </p>
         </motion.div>
 
@@ -63,10 +64,10 @@ const ShopifyChannelValueGrid = () => {
                   <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[hsl(var(--shopify-page-accent))]/10 to-[hsl(var(--shopify-page-accent))]/25 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                     <value.icon className="h-8 w-8 text-[hsl(var(--shopify-page-accent))]" />
                   </div>
-                  <CardTitle className="text-xl md:text-2xl">{value.title}</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl"><TranslatedText>{value.title}</TranslatedText></CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground leading-relaxed">{value.description}</p>
+                  <p className="text-muted-foreground leading-relaxed"><TranslatedText>{value.description}</TranslatedText></p>
                 </CardContent>
               </Card>
             </motion.div>

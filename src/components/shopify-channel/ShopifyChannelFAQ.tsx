@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyChannelFAQ = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -51,10 +52,10 @@ const ShopifyChannelFAQ = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[hsl(var(--shopify-page-primary))]">
-            Shopify Fulfillment FAQ
+            <TranslatedText>Shopify Fulfillment FAQ</TranslatedText>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Common questions from Shopify store owners considering Westfield as their fulfillment partner.
+            <TranslatedText>Common questions from Shopify store owners considering Westfield as their fulfillment partner.</TranslatedText>
           </p>
         </motion.div>
 
@@ -71,7 +72,7 @@ const ShopifyChannelFAQ = () => {
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-[hsl(var(--shopify-page-light))]/50 transition-colors"
               >
-                <span className="font-semibold text-foreground pr-4">{faq.question}</span>
+                <span className="font-semibold text-foreground pr-4"><TranslatedText>{faq.question}</TranslatedText></span>
                 <ChevronDown
                   className={`h-5 w-5 flex-shrink-0 text-[hsl(var(--shopify-page-accent))] transition-transform duration-300 ${
                     openIndex === index ? "rotate-180" : ""
@@ -88,7 +89,7 @@ const ShopifyChannelFAQ = () => {
                     className="overflow-hidden"
                   >
                     <div className="px-6 pb-5 text-muted-foreground leading-relaxed border-t border-border/30 pt-4">
-                      {faq.answer}
+                      <TranslatedText>{faq.answer}</TranslatedText>
                     </div>
                   </motion.div>
                 )}

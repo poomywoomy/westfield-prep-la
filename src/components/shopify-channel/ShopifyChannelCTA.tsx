@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Phone } from "lucide-react";
 import { motion } from "framer-motion";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyChannelCTA = () => {
   const navigate = useNavigate();
@@ -37,9 +38,9 @@ const ShopifyChannelCTA = () => {
             viewport={{ once: true }}
             className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
           >
-            Ready to Transform Your
+            <TranslatedText>Ready to Transform Your</TranslatedText>
             <br />
-            Shopify Fulfillment?
+            <TranslatedText>Shopify Fulfillment?</TranslatedText>
           </motion.h2>
 
           <motion.p
@@ -49,8 +50,7 @@ const ShopifyChannelCTA = () => {
             viewport={{ once: true }}
             className="text-xl md:text-2xl mb-10 opacity-95 leading-relaxed max-w-3xl mx-auto"
           >
-            Let's discuss your volume, your brand requirements, and your growth goals. 
-            We'll build a custom fulfillment solution that scales with your Shopify store.
+            <TranslatedText>Let's discuss your volume, your brand requirements, and your growth goals. We'll build a custom fulfillment solution that scales with your Shopify store.</TranslatedText>
           </motion.p>
 
           <motion.div
@@ -65,7 +65,7 @@ const ShopifyChannelCTA = () => {
               onClick={() => navigate("/contact")}
               className="bg-white text-[hsl(var(--shopify-page-accent))] hover:bg-white/90 px-10 py-7 text-lg font-bold shadow-2xl hover:scale-105 transition-all duration-300 group"
             >
-              Get Your Free Quote
+              <TranslatedText>Get Your Free Quote</TranslatedText>
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button
@@ -75,7 +75,7 @@ const ShopifyChannelCTA = () => {
               className="border-2 border-white text-white hover:bg-white/10 px-10 py-7 text-lg font-bold"
             >
               <Phone className="mr-2 h-5 w-5" />
-              View Pricing First
+              <TranslatedText>View Pricing First</TranslatedText>
             </Button>
           </motion.div>
 
@@ -88,19 +88,19 @@ const ShopifyChannelCTA = () => {
           >
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-white" />
-              No minimums
+              <TranslatedText>No minimums</TranslatedText>
             </span>
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-white" />
-              No long-term contracts
+              <TranslatedText>No long-term contracts</TranslatedText>
             </span>
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-white" />
-              Same-day shipping
+              <TranslatedText>Same-day shipping</TranslatedText>
             </span>
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-white" />
-              48-hour onboarding
+              <TranslatedText>48-hour onboarding</TranslatedText>
             </span>
           </motion.div>
         </div>

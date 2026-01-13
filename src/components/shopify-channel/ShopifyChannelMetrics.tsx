@@ -3,6 +3,7 @@ import { MetricCounter } from "@/components/ui/metric-counter";
 import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyChannelMetrics = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -48,10 +49,10 @@ const ShopifyChannelMetrics = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Proven Performance for Shopify Brands
+            <TranslatedText>Proven Performance for Shopify Brands</TranslatedText>
           </h2>
           <p className="text-white/80 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-            These aren't projections. These are real metrics from real Shopify stores we fulfill daily. Our success is measured by your growth, your customer satisfaction, and your operational efficiency.
+            <TranslatedText>These aren't projections. These are real metrics from real Shopify stores we fulfill daily. Our success is measured by your growth, your customer satisfaction, and your operational efficiency.</TranslatedText>
           </p>
         </motion.div>
 
@@ -76,7 +77,7 @@ const ShopifyChannelMetrics = () => {
                   "0"
                 )}
               </div>
-              <div className="text-white/70 text-sm font-medium">{metric.label}</div>
+              <div className="text-white/70 text-sm font-medium"><TranslatedText>{metric.label}</TranslatedText></div>
             </motion.div>
           ))}
         </div>
@@ -88,7 +89,7 @@ const ShopifyChannelMetrics = () => {
           className="text-center mt-12 pt-8 border-t border-white/20 max-w-4xl mx-auto"
         >
           <p className="text-white/70 text-sm">
-            Metrics updated quarterly • Data verified by third-party audit • Industry-leading performance benchmarks
+            <TranslatedText>Metrics updated quarterly • Data verified by third-party audit • Industry-leading performance benchmarks</TranslatedText>
           </p>
         </motion.div>
       </div>
