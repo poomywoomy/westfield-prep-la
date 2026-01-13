@@ -14,6 +14,7 @@ import { ReceivingDialog } from "./ReceivingDialog";
 import { TemplateManagementDialog } from "./TemplateManagementDialog";
 import { ResolveIssueDialog } from "./ResolveIssueDialog";
 import { ReturnASNDetailDialog } from "./ReturnASNDetailDialog";
+import { AdminASNDetailDialog } from "./AdminASNDetailDialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type ASN = Database["public"]["Tables"]["asn_headers"]["Row"] & {
@@ -40,6 +41,8 @@ export const ASNList = () => {
   const [asnToResolve, setAsnToResolve] = useState<ASN | null>(null);
   const [returnDetailDialogOpen, setReturnDetailDialogOpen] = useState(false);
   const [returnDetailAsnId, setReturnDetailAsnId] = useState<string | null>(null);
+  const [adminDetailDialogOpen, setAdminDetailDialogOpen] = useState(false);
+  const [adminDetailAsnId, setAdminDetailAsnId] = useState<string | null>(null);
   const [qcPhotoAges, setQcPhotoAges] = useState<Map<string, number>>(new Map());
   const [pendingDecisions, setPendingDecisions] = useState<Map<string, number>>(new Map());
   const { toast } = useToast();
@@ -449,7 +452,7 @@ export const ASNList = () => {
                         )}
                         
                         {/* Receive/View button */}
-                        {asn.status !== "closed" ? (
+                        {asn.status === "not_received" || asn.status === "receiving" ? (
                           <Button
                             size="sm"
                             onClick={() => {
@@ -457,15 +460,15 @@ export const ASNList = () => {
                               setReceivingDialogOpen(true);
                             }}
                           >
-                            Receive
+                            {asn.status === "not_received" ? "Receive" : "Continue"}
                           </Button>
                         ) : (
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                              setSelectedASN(asn);
-                              setReceivingDialogOpen(true);
+                              setAdminDetailAsnId(asn.id);
+                              setAdminDetailDialogOpen(true);
                             }}
                           >
                             View
@@ -499,6 +502,13 @@ export const ASNList = () => {
         open={returnDetailDialogOpen}
         onOpenChange={setReturnDetailDialogOpen}
         asnId={returnDetailAsnId}
+        onSuccess={fetchASNs}
+      />
+
+      <AdminASNDetailDialog
+        open={adminDetailDialogOpen}
+        onOpenChange={setAdminDetailDialogOpen}
+        asnId={adminDetailAsnId}
         onSuccess={fetchASNs}
       />
     </div>
