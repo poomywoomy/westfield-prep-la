@@ -103,12 +103,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     loadLanguages();
   }, []);
 
-  // Detect language on mount
+  // Detect language on mount - prioritizes browser language, no IP geolocation
   useEffect(() => {
     async function detectLanguage() {
       setIsDetecting(true);
 
-      // 1. Check localStorage first (user preference)
+      // 1. Check localStorage first (explicit user preference)
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         setCurrentLanguage(saved);
@@ -116,8 +116,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // 2. Check browser language
-      const browserLang = navigator.language?.split('-')[0];
+      // 2. Check browser language (user's system preference)
+      const browserLang = navigator.language?.split('-')[0]?.toLowerCase();
       if (browserLang && browserLang !== 'en') {
         // Check if we support this language
         const { data: langData } = await supabase
@@ -135,27 +135,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // 3. Try IP geolocation
-      try {
-        const response = await supabase.functions.invoke('detect-country');
-        if (response.data?.language && response.data.language !== 'en') {
-          // Check if we support this language
-          const { data: langData } = await supabase
-            .from('supported_languages')
-            .select('code')
-            .eq('code', response.data.language)
-            .eq('is_active', true)
-            .single();
-          
-          if (langData) {
-            setCurrentLanguage(response.data.language);
-            localStorage.setItem(STORAGE_KEY, response.data.language);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to detect country:', error);
-      }
-
+      // 3. Default to English (no IP geolocation - prevents unwanted language switching)
+      setCurrentLanguage('en');
       setIsDetecting(false);
     }
 
