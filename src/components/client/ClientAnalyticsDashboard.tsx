@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useClientIssues } from "@/hooks/useClientIssues";
 import { DamagedItemReviewDialog } from "./DamagedItemReviewDialog";
 import { MissingItemReviewDialog } from "./MissingItemReviewDialog";
@@ -18,6 +19,7 @@ interface ClientAnalyticsDashboardProps {
 }
 
 export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardProps) => {
+  const queryClient = useQueryClient();
   const [selectedIssue, setSelectedIssue] = useState<any>(null);
   const [dialogType, setDialogType] = useState<"damaged" | "missing" | "sku" | null>(null);
   const [showASNDialog, setShowASNDialog] = useState(false);
@@ -165,6 +167,8 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
         onOpenChange={setShowASNDialog}
         onSuccess={() => {
           setShowASNDialog(false);
+          // Invalidate ASNs cache to trigger immediate refresh
+          queryClient.invalidateQueries({ queryKey: ["asns", clientId] });
         }}
         prefillData={{
           client_id: clientId
