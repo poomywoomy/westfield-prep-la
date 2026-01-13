@@ -58,7 +58,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { data: existingAttempts } = await supabaseAdmin
       .from('rate_limits')
       .select('request_count, window_start')
-      .eq('key', rateLimitKey)
+      .eq('rate_key', rateLimitKey)
       .gte('window_start', windowStart.toISOString())
       .maybeSingle();
     
@@ -81,10 +81,10 @@ const handler = async (req: Request): Promise<Response> => {
     await supabaseAdmin
       .from('rate_limits')
       .upsert({
-        key: rateLimitKey,
+        rate_key: rateLimitKey,
         request_count: (existingAttempts?.request_count || 0) + 1,
         window_start: existingAttempts ? existingAttempts.window_start : new Date().toISOString()
-      });
+      }, { onConflict: 'rate_key' });
 
     // Generate password reset link using Supabase
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
