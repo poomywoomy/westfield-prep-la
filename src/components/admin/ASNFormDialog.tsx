@@ -17,6 +17,20 @@ import { TemplateSelector } from "./TemplateSelector";
 import { detectCarrier, isTrackingNumber, normalizeBarcode } from "@/lib/barcodeDetection";
 import type { Database } from "@/integrations/supabase/types";
 
+const COMMON_CARRIERS = [
+  "FedEx",
+  "UPS",
+  "USPS",
+  "DHL",
+  "Amazon Logistics",
+  "OnTrac",
+  "LaserShip",
+  "Freight",
+  "LTL",
+  "Ocean Freight",
+  "Air Freight",
+] as const;
+
 type Client = Database["public"]["Tables"]["clients"]["Row"];
 type SKU = Database["public"]["Tables"]["skus"]["Row"];
 
@@ -89,6 +103,7 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
   const [activeScanLine, setActiveScanLine] = useState<number | null>(null);
   const [showQuickAddSKU, setShowQuickAddSKU] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCustomCarrier, setIsCustomCarrier] = useState(false);
   const keyboardBuffer = useRef<string>("");
   const keyboardTimeout = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
@@ -100,10 +115,13 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
         loadASN(asnId);
       } else if (prefillData) {
         // Load from prefill (template or tracking intelligence)
+        const carrierValue = prefillData.carrier || "";
+        const isCustom = carrierValue !== "" && !COMMON_CARRIERS.includes(carrierValue as any);
+        setIsCustomCarrier(isCustom);
         setFormData({
           client_id: prefillData.client_id || "",
           asn_number: prefillData.asn_number || "",
-          carrier: prefillData.carrier || "",
+          carrier: carrierValue,
           tracking_number: prefillData.tracking_number || "",
           eta: prefillData.eta || "",
           ship_from: prefillData.ship_from || "",
@@ -210,10 +228,13 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
 
       if (linesError) throw linesError;
 
+      const carrierValue = header.carrier || "";
+      const isCustom = carrierValue !== "" && !COMMON_CARRIERS.includes(carrierValue as any);
+      setIsCustomCarrier(isCustom);
       setFormData({
         client_id: header.client_id,
         asn_number: header.asn_number,
-        carrier: header.carrier || "",
+        carrier: carrierValue,
         tracking_number: header.tracking_number || "",
         eta: header.eta || "",
         ship_from: header.ship_from || "",
@@ -649,13 +670,40 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="carrier">Carrier</Label>
-              <Input
-                id="carrier"
-                value={formData.carrier}
-                onChange={e => setFormData({ ...formData, carrier: e.target.value })}
-                placeholder="e.g. FedEx, UPS"
-                maxLength={100}
-              />
+              <Select 
+                value={isCustomCarrier ? "custom" : formData.carrier}
+                onValueChange={(value) => {
+                  if (value === "custom") {
+                    setIsCustomCarrier(true);
+                    setFormData({ ...formData, carrier: "" });
+                  } else {
+                    setIsCustomCarrier(false);
+                    setFormData({ ...formData, carrier: value });
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select carrier" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COMMON_CARRIERS.map((carrier) => (
+                    <SelectItem key={carrier} value={carrier}>
+                      {carrier}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="custom">Custom...</SelectItem>
+                </SelectContent>
+              </Select>
+              {isCustomCarrier && (
+                <Input
+                  id="carrier-custom"
+                  value={formData.carrier}
+                  onChange={e => setFormData({ ...formData, carrier: e.target.value })}
+                  placeholder="Enter custom carrier name"
+                  maxLength={100}
+                  className="mt-2"
+                />
+              )}
             </div>
 
             <div className="space-y-2">
