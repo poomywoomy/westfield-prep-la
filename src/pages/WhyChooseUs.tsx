@@ -356,17 +356,17 @@ const WhyChooseUs = () => {
                         <div className="p-8">
                           <h3 className="text-2xl md:text-3xl font-bold mb-4 flex items-center gap-3">
                             <IconComponent className="h-8 w-8 text-primary" />
-                            {step.title}
+                            <TranslatedText>{step.title}</TranslatedText>
                           </h3>
                           <p className="text-muted-foreground text-lg mb-6">
-                            {step.description}
+                            <TranslatedText>{step.description}</TranslatedText>
                           </p>
 
                           {/* Expandable accordion with detailed steps */}
                           <Accordion type="single" collapsible className="w-full">
                             <AccordionItem value="details" className="border-none">
                               <AccordionTrigger className="text-primary hover:no-underline py-3 bg-primary/5 px-4 rounded-lg hover:bg-primary/10 transition-colors">
-                                <span className="font-semibold">See the full process →</span>
+                                <span className="font-semibold"><TranslatedText>See the full process →</TranslatedText></span>
                               </AccordionTrigger>
                               <AccordionContent className="px-4 pt-4">
                                 <ul className="space-y-4">
@@ -374,8 +374,8 @@ const WhyChooseUs = () => {
                                     <li key={idx} className="flex items-start gap-3">
                                       <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                                       <div>
-                                        <p className="font-medium text-foreground">{detail.title}</p>
-                                        <p className="text-sm text-muted-foreground mt-1">{detail.description}</p>
+                                        <p className="font-medium text-foreground"><TranslatedText>{detail.title}</TranslatedText></p>
+                                        <p className="text-sm text-muted-foreground mt-1"><TranslatedText>{detail.description}</TranslatedText></p>
                                       </div>
                         </li>
                       ))}
@@ -384,49 +384,49 @@ const WhyChooseUs = () => {
                     {/* Pro Tip callout */}
                     {step.number === 1 && (
                       <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-primary mb-1">💡 Pro Tip</p>
+                        <p className="text-sm font-semibold text-primary mb-1"><TranslatedText>💡 Pro Tip</TranslatedText></p>
                         <p className="text-sm text-muted-foreground">
-                          Send us an ASN (Advanced Ship Notice) before your shipment arrives and we'll prioritize your check-in for same-day processing.
+                          <TranslatedText>Send us an ASN (Advanced Ship Notice) before your shipment arrives and we'll prioritize your check-in for same-day processing.</TranslatedText>
                         </p>
                       </div>
                     )}
                     {step.number === 2 && (
                       <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-secondary mb-1">⚡ Quality Promise</p>
+                        <p className="text-sm font-semibold text-secondary mb-1"><TranslatedText>⚡ Quality Promise</TranslatedText></p>
                         <p className="text-sm text-muted-foreground">
-                          Whether you're shipping to Amazon FBA, fulfilling Shopify orders, or sending gifts directly—we catch defects before they reach your customers. Fewer returns, higher satisfaction.
+                          <TranslatedText>Whether you're shipping to Amazon FBA, fulfilling Shopify orders, or sending gifts directly—we catch defects before they reach your customers. Fewer returns, higher satisfaction.</TranslatedText>
                         </p>
                       </div>
                     )}
                     {step.number === 3 && (
                       <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-primary mb-1">🎨 Brand Boost</p>
+                        <p className="text-sm font-semibold text-primary mb-1"><TranslatedText>🎨 Brand Boost</TranslatedText></p>
                         <p className="text-sm text-muted-foreground">
-                          Branded unboxing experiences increase repeat purchases by 32%. Let us handle your inserts, thank you cards, and custom packaging.
+                          <TranslatedText>Branded unboxing experiences increase repeat purchases by 32%. Let us handle your inserts, thank you cards, and custom packaging.</TranslatedText>
                         </p>
                       </div>
                     )}
                     {step.number === 4 && (
                       <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-secondary mb-1">🔒 Security First</p>
+                        <p className="text-sm font-semibold text-secondary mb-1"><TranslatedText>🔒 Security First</TranslatedText></p>
                         <p className="text-sm text-muted-foreground">
-                          24/7 surveillance, restricted access zones, and comprehensive insurance. Your inventory is as safe as it would be in a bank vault.
+                          <TranslatedText>24/7 surveillance, restricted access zones, and comprehensive insurance. Your inventory is as safe as it would be in a bank vault.</TranslatedText>
                         </p>
                       </div>
                     )}
                     {step.number === 5 && (
                       <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-primary mb-1">📦 Speed Matters</p>
+                        <p className="text-sm font-semibold text-primary mb-1"><TranslatedText>📦 Speed Matters</TranslatedText></p>
                         <p className="text-sm text-muted-foreground">
-                          Our 2 PM cutoff means your orders get to customers faster. Faster delivery = happier customers = better reviews = more sales.
+                          <TranslatedText>Our 2 PM cutoff means your orders get to customers faster. Faster delivery = happier customers = better reviews = more sales.</TranslatedText>
                         </p>
                       </div>
                     )}
                     {step.number === 6 && (
                       <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-secondary mb-1">📊 Data-Driven</p>
+                        <p className="text-sm font-semibold text-secondary mb-1"><TranslatedText>📊 Data-Driven</TranslatedText></p>
                         <p className="text-sm text-muted-foreground">
-                          We track every metric—speed, accuracy, cost per order. Monthly reports help you identify trends and optimize your operations.
+                          <TranslatedText>We track every metric—speed, accuracy, cost per order. Monthly reports help you identify trends and optimize your operations.</TranslatedText>
                         </p>
                       </div>
                     )}
@@ -434,12 +434,12 @@ const WhyChooseUs = () => {
                     {/* Additional info boxes */}
                                 <div className="grid md:grid-cols-2 gap-4 mt-6 pt-6 border-t">
                                   <div className="bg-primary/5 p-4 rounded-lg">
-                                    <p className="text-xs uppercase tracking-wide text-primary font-semibold mb-1">Timeline</p>
-                                    <p className="text-foreground font-medium">{step.timeline}</p>
+                                    <p className="text-xs uppercase tracking-wide text-primary font-semibold mb-1"><TranslatedText>Timeline</TranslatedText></p>
+                                    <p className="text-foreground font-medium"><TranslatedText>{step.timeline}</TranslatedText></p>
                                   </div>
                                   <div className="bg-secondary/5 p-4 rounded-lg">
-                                    <p className="text-xs uppercase tracking-wide text-secondary font-semibold mb-1">You'll See</p>
-                                    <p className="text-foreground font-medium">{step.clientVisibility}</p>
+                                    <p className="text-xs uppercase tracking-wide text-secondary font-semibold mb-1"><TranslatedText>You'll See</TranslatedText></p>
+                                    <p className="text-foreground font-medium"><TranslatedText>{step.clientVisibility}</TranslatedText></p>
                                   </div>
                                 </div>
                               </AccordionContent>
@@ -531,11 +531,11 @@ const WhyChooseUs = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <TrendingUp className="h-5 w-5 text-primary" />
-                        West Coast Shipping
+                        <TranslatedText>West Coast Shipping</TranslatedText>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">Strategic location enables 1-2 day shipping to the entire West Coast and fast delivery to all US markets.</p>
+                      <p className="text-muted-foreground"><TranslatedText>Strategic location enables 1-2 day shipping to the entire West Coast and fast delivery to all US markets.</TranslatedText></p>
                     </CardContent>
                   </Card>
 
@@ -543,11 +543,11 @@ const WhyChooseUs = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Award className="h-5 w-5 text-primary" />
-                        Local Support
+                        <TranslatedText>Local Support</TranslatedText>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">Based in Los Angeles with a local team that understands e-commerce sellers and their unique needs.</p>
+                      <p className="text-muted-foreground"><TranslatedText>Based in Los Angeles with a local team that understands e-commerce sellers and their unique needs.</TranslatedText></p>
                     </CardContent>
                   </Card>
 
@@ -555,11 +555,11 @@ const WhyChooseUs = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Shield className="h-5 w-5 text-primary" />
-                        E-Commerce Compliance Experts
+                        <TranslatedText>E-Commerce Compliance Experts</TranslatedText>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">Expert in multi-channel regulations: California Prop 65, product safety labeling, customs documentation, and compliance requirements for Amazon, Shopify, and DTC brands.</p>
+                      <p className="text-muted-foreground"><TranslatedText>Expert in multi-channel regulations: California Prop 65, product safety labeling, customs documentation, and compliance requirements for Amazon, Shopify, and DTC brands.</TranslatedText></p>
                     </CardContent>
                   </Card>
                 </div>
@@ -571,27 +571,27 @@ const WhyChooseUs = () => {
           <section className="py-20 bg-background">
             <div className="container mx-auto px-4">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4">By the Numbers</h2>
-                <p className="text-muted-foreground text-lg">Why sellers trust us with their fulfillment</p>
+                <h2 className="text-4xl font-bold mb-4"><TranslatedText>By the Numbers</TranslatedText></h2>
+                <p className="text-muted-foreground text-lg"><TranslatedText>Why sellers trust us with their fulfillment</TranslatedText></p>
               </div>
               <div className="grid md:grid-cols-4 gap-8 max-w-4xl mx-auto">
                 <div className="text-center">
                   <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2">
                     {orderAccuracy}%
                   </div>
-                  <p className="text-muted-foreground">Order Accuracy</p>
+                  <p className="text-muted-foreground"><TranslatedText>Order Accuracy</TranslatedText></p>
                 </div>
                 <div className="text-center">
                   <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2">2PM</div>
-                  <p className="text-muted-foreground">Same-Day Cutoff</p>
+                  <p className="text-muted-foreground"><TranslatedText>Same-Day Cutoff</TranslatedText></p>
                 </div>
                 <div className="text-center">
                   <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2">$2M</div>
-                  <p className="text-muted-foreground">Insurance Coverage</p>
+                  <p className="text-muted-foreground"><TranslatedText>Insurance Coverage</TranslatedText></p>
                 </div>
                 <div className="text-center">
-                  <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2">7 Days</div>
-                  <p className="text-muted-foreground">Support Available</p>
+                  <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2"><TranslatedText>7 Days</TranslatedText></div>
+                  <p className="text-muted-foreground"><TranslatedText>Support Available</TranslatedText></p>
                 </div>
               </div>
             </div>
@@ -600,19 +600,19 @@ const WhyChooseUs = () => {
           {/* Enhanced CTA */}
           <section className="py-20 bg-gradient-to-br from-primary via-primary/90 to-secondary">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Ready to Experience the Difference?</h2>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white"><TranslatedText>Ready to Experience the Difference?</TranslatedText></h2>
               <p className="text-xl mb-4 text-white/90 max-w-2xl mx-auto">
-                Join 500+ e-commerce sellers who trust us with their fulfillment.
+                <TranslatedText>Join 500+ e-commerce sellers who trust us with their fulfillment.</TranslatedText>
               </p>
               <p className="text-lg mb-8 text-white/80 max-w-xl mx-auto">
-                Get a custom quote in 24 hours. Limited onboarding slots available.
+                <TranslatedText>Get a custom quote in 24 hours. Limited onboarding slots available.</TranslatedText>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" className="bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all" onClick={() => navigate("/contact")}>
-                  Get a Quote
+                  <TranslatedText>Get a Quote</TranslatedText>
                 </Button>
                 <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10" onClick={() => navigate("/shopify-fulfillment")}>
-                  View Services
+                  <TranslatedText>View Services</TranslatedText>
                 </Button>
               </div>
             </div>
