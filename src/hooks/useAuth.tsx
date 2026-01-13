@@ -15,24 +15,32 @@ export const useAuth = () => {
     if (isLoggingOut.current) return;
     isLoggingOut.current = true;
     
-    // Clear all Supabase tokens from localStorage FIRST (synchronous)
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('sb-')) {
-        localStorage.removeItem(key);
-      }
-    });
-    
     // Clear React state immediately
     setSession(null);
     setUser(null);
     setRole(null);
     
     try {
-      // Sign out from Supabase (non-blocking)
-      await supabase.auth.signOut({ scope: 'local' });
+      // Sign out from Supabase GLOBALLY - invalidates session on server and ALL devices
+      await supabase.auth.signOut({ scope: 'global' });
     } catch (error) {
-      // Ignore errors - we're already clearing state
+      // Log error but proceed with cleanup
+      console.error('SignOut error:', error);
     }
+    
+    // Clear all Supabase tokens from localStorage AFTER signOut completes
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    // Clear sessionStorage as backup
+    Object.keys(sessionStorage).forEach(key => {
+      if (key.startsWith('sb-')) {
+        sessionStorage.removeItem(key);
+      }
+    });
     
     // Single redirect - use replace to prevent back navigation
     window.location.replace('/login');
