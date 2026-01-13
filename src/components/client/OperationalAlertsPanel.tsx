@@ -23,7 +23,7 @@ export const OperationalAlertsPanel = ({
   const [activeTab, setActiveTab] = useState("discrepancies");
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden min-h-[280px]">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full justify-start rounded-none border-b bg-muted/50 p-0 h-auto">
           <TabsTrigger 
@@ -63,7 +63,7 @@ export const OperationalAlertsPanel = ({
             {loading ? (
               <div className="p-8 text-center text-muted-foreground">Loading...</div>
             ) : discrepancies.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">No discrepancies found</div>
+              <div className="p-12 text-center text-muted-foreground">No discrepancies found</div>
             ) : (
               <table className="w-full text-sm">
                 <thead className="bg-muted/50 border-b">
@@ -113,7 +113,7 @@ export const OperationalAlertsPanel = ({
             {loading ? (
               <div className="p-8 text-center text-muted-foreground">Loading...</div>
             ) : returns.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">No returns found</div>
+              <div className="p-12 text-center text-muted-foreground">No returns found</div>
             ) : (
               <table className="w-full text-sm">
                 <thead className="bg-muted/50 border-b">
@@ -154,7 +154,7 @@ export const OperationalAlertsPanel = ({
             {loading ? (
               <div className="p-8 text-center text-muted-foreground">Loading...</div>
             ) : lowStock.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">No low stock items</div>
+              <div className="p-12 text-center text-muted-foreground">No low stock items</div>
             ) : (
               <table className="w-full text-sm">
                 <thead className="bg-muted/50 border-b">

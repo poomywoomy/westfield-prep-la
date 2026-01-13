@@ -100,14 +100,14 @@ export const DashboardStatsRow = ({ salesToday, shippedToday, pendingAction, loa
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((stat) => (
-        <Card key={stat.title} className="p-6 hover:shadow-md transition-all">
+        <Card key={stat.title} className="p-8 hover:shadow-md transition-all">
           <div className="flex items-start gap-4">
-            <div className={`p-3 ${stat.bgColor} border ${stat.borderColor} rounded-lg`}>
-              <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
+            <div className={`p-4 ${stat.bgColor} border ${stat.borderColor} rounded-lg`}>
+              <stat.icon className={`h-8 w-8 ${stat.iconColor}`} />
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-muted-foreground mb-1">{stat.title}</h3>
-              <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
+              <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
             </div>
           </div>
         </Card>

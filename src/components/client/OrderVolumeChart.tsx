@@ -101,11 +101,11 @@ export const OrderVolumeChart = ({ clientId }: OrderVolumeChartProps) => {
 
         {/* Chart */}
         {loading ? (
-          <div className="h-[300px] flex items-center justify-center">
+          <div className="h-[350px] flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="h-[300px] w-full">
+          <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={currentData}>
               <defs>
