@@ -66,6 +66,9 @@ interface ASNAttachment {
 }
 
 export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillData }: ASNFormDialogProps) => {
+  // If prefillData includes client_id and we're creating (not editing), lock the client selection
+  const isClientLocked = !!prefillData?.client_id && !asnId;
+  
   const [clients, setClients] = useState<Client[]>([]);
   const [skus, setSKUs] = useState<SKU[]>([]);
   const [loading, setLoading] = useState(false);
@@ -109,6 +112,16 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
         
         if (prefillData.client_id) {
           fetchSKUs(prefillData.client_id);
+          
+          // Auto-generate ASN number if not provided
+          if (!prefillData.asn_number) {
+            supabase.rpc("generate_asn_number", { p_client_id: prefillData.client_id })
+              .then(({ data }) => {
+                if (data) {
+                  setFormData(prev => ({ ...prev, asn_number: data }));
+                }
+              });
+          }
         }
         
         if (prefillData.lines) {
@@ -542,8 +555,12 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="client">Client *</Label>
-              <Select value={formData.client_id} onValueChange={handleClientChange}>
-                <SelectTrigger>
+              <Select 
+                value={formData.client_id} 
+                onValueChange={handleClientChange}
+                disabled={isClientLocked}
+              >
+                <SelectTrigger className={isClientLocked ? "bg-muted" : ""}>
                   <SelectValue placeholder="Select client" />
                 </SelectTrigger>
                 <SelectContent>
@@ -554,6 +571,11 @@ export const ASNFormDialog = ({ open, onOpenChange, onSuccess, asnId, prefillDat
                   ))}
                 </SelectContent>
               </Select>
+              {isClientLocked && (
+                <p className="text-xs text-muted-foreground">
+                  Client is automatically set to your account
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

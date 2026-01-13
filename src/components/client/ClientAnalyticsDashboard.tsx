@@ -166,6 +166,9 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
         onSuccess={() => {
           setShowASNDialog(false);
         }}
+        prefillData={{
+          client_id: clientId
+        }}
       />
       
       <RequestShipmentDialog 
