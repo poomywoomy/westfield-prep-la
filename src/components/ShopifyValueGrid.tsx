@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyValueGrid = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -37,10 +38,10 @@ const ShopifyValueGrid = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[hsl(var(--shopify-page-primary))]">
-            Why DTC Brands Choose Us
+            <TranslatedText>Why DTC Brands Choose Us</TranslatedText>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            We deliver speed, quality, and brand excellence in every order
+            <TranslatedText>We deliver speed, quality, and brand excellence in every order</TranslatedText>
           </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
@@ -56,10 +57,10 @@ const ShopifyValueGrid = () => {
                   <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[hsl(var(--shopify-page-accent))]/10 to-[hsl(var(--shopify-page-accent))]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <value.icon className="h-7 w-7 text-[hsl(var(--shopify-page-accent))]" />
                   </div>
-                  <CardTitle className="text-xl">{value.title}</CardTitle>
+                  <CardTitle className="text-xl"><TranslatedText>{value.title}</TranslatedText></CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{value.description}</p>
+                  <p className="text-muted-foreground"><TranslatedText>{value.description}</TranslatedText></p>
                 </CardContent>
               </Card>
             </motion.div>

@@ -5,6 +5,7 @@ import { SiTiktok } from "react-icons/si";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { Link } from "react-router-dom";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const integrationFeatures = [
   {
@@ -49,14 +50,13 @@ const TikTokChannelIntegration = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Seamless{" "}
+            <TranslatedText>Seamless</TranslatedText>{" "}
             <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-              TikTok Shop Integration
+              <TranslatedText>TikTok Shop Integration</TranslatedText>
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Connect your TikTok Shop and let automation handle the rest. 
-            Our integration keeps orders, inventory, and tracking in perfect sync.
+            <TranslatedText>Connect your TikTok Shop and let automation handle the rest. Our integration keeps orders, inventory, and tracking in perfect sync.</TranslatedText>
           </p>
         </motion.div>
 
@@ -74,7 +74,7 @@ const TikTokChannelIntegration = () => {
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center shadow-lg mb-2">
                   <SiTiktok className="text-white w-10 h-10" />
                 </div>
-                <span className="text-sm font-medium text-foreground">TikTok Shop</span>
+                <span className="text-sm font-medium text-foreground"><TranslatedText>TikTok Shop</TranslatedText></span>
               </div>
 
               {/* Arrow */}
@@ -89,7 +89,7 @@ const TikTokChannelIntegration = () => {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <span className="text-sm font-medium text-foreground">Westfield 3PL</span>
+                <span className="text-sm font-medium text-foreground"><TranslatedText>Westfield 3PL</TranslatedText></span>
               </div>
 
               {/* Arrow */}
@@ -100,7 +100,7 @@ const TikTokChannelIntegration = () => {
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg mb-2">
                   <Check className="w-10 h-10 text-white" />
                 </div>
-                <span className="text-sm font-medium text-foreground">Happy Customer</span>
+                <span className="text-sm font-medium text-foreground"><TranslatedText>Happy Customer</TranslatedText></span>
               </div>
             </div>
           </motion.div>
@@ -122,10 +122,10 @@ const TikTokChannelIntegration = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-2 text-foreground">
-                    {feature.title}
+                    <TranslatedText>{feature.title}</TranslatedText>
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {feature.description}
+                    <TranslatedText>{feature.description}</TranslatedText>
                   </p>
                 </div>
               </motion.div>
@@ -142,7 +142,7 @@ const TikTokChannelIntegration = () => {
               to="/integrations"
               className="text-pink-600 hover:text-pink-700 font-medium inline-flex items-center gap-1"
             >
-              See all integrations
+              <TranslatedText>See all integrations</TranslatedText>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>

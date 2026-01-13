@@ -110,7 +110,7 @@ const PlatformCard = ({ platform, onClick, index }: PlatformCardProps) => {
               >
                 {platform.name}
               </h3>
-              <p className="text-sm text-muted-foreground">{platform.tagline}</p>
+              <p className="text-sm text-muted-foreground"><TranslatedText>{platform.tagline}</TranslatedText></p>
             </div>
           </div>
 
@@ -126,7 +126,7 @@ const PlatformCard = ({ platform, onClick, index }: PlatformCardProps) => {
         <div className="flex items-center gap-4 mb-4">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Clock className="w-3.5 h-3.5" />
-            <span>{platform.setupTime} setup</span>
+            <span><TranslatedText>{`${platform.setupTime} setup`}</TranslatedText></span>
           </div>
           {platform.featured && (
             <div className="flex items-center gap-1.5 text-xs text-primary">
@@ -144,7 +144,7 @@ const PlatformCard = ({ platform, onClick, index }: PlatformCardProps) => {
                 key={idx}
                 className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-full"
               >
-                {item}
+                <TranslatedText>{item}</TranslatedText>
               </span>
             ))}
           </div>

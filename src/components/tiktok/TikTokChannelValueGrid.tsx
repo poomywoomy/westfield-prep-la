@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Zap, TrendingUp, Heart, RefreshCw } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const values = [
   {
@@ -46,14 +47,13 @@ const TikTokChannelValueGrid = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Why TikTok Sellers{" "}
+            <TranslatedText>Why TikTok Sellers</TranslatedText>{" "}
             <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-              Choose Us
+              <TranslatedText>Choose Us</TranslatedText>
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            TikTok commerce is different. Demand is unpredictable, speed is everything, 
-            and the unboxing experience can go viral. We're built for this reality.
+            <TranslatedText>TikTok commerce is different. Demand is unpredictable, speed is everything, and the unboxing experience can go viral. We're built for this reality.</TranslatedText>
           </p>
         </motion.div>
 
@@ -70,10 +70,10 @@ const TikTokChannelValueGrid = () => {
                 <value.icon className="w-6 h-6 text-pink-600 group-hover:scale-110 transition-transform duration-300" />
               </div>
               <h3 className="text-lg font-semibold mb-2 text-foreground group-hover:text-pink-600 transition-colors duration-300">
-                {value.title}
+                <TranslatedText>{value.title}</TranslatedText>
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {value.description}
+                <TranslatedText>{value.description}</TranslatedText>
               </p>
             </motion.div>
           ))}

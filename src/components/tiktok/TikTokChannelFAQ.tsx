@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const faqs = [
   {
@@ -71,13 +72,13 @@ const TikTokChannelFAQ = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Frequently Asked{" "}
+            <TranslatedText>Frequently Asked</TranslatedText>{" "}
             <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-              Questions
+              <TranslatedText>Questions</TranslatedText>
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Get answers to common questions about TikTok Shop fulfillment.
+            <TranslatedText>Get answers to common questions about TikTok Shop fulfillment.</TranslatedText>
           </p>
         </motion.div>
 
@@ -95,10 +96,10 @@ const TikTokChannelFAQ = () => {
                 className="border border-border rounded-xl px-6 bg-card hover:border-pink-200 transition-colors duration-200 data-[state=open]:border-pink-300 data-[state=open]:shadow-md"
               >
                 <AccordionTrigger className="text-left font-semibold hover:text-pink-600 hover:no-underline py-4">
-                  {faq.question}
+                  <TranslatedText>{faq.question}</TranslatedText>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pb-4 leading-relaxed">
-                  {faq.answer}
+                  <TranslatedText>{faq.answer}</TranslatedText>
                 </AccordionContent>
               </AccordionItem>
             ))}

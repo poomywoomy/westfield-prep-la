@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Zap, Package, Truck } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { Link } from "react-router-dom";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const capabilities = [
   {
@@ -47,14 +48,13 @@ const TikTokChannelServices = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Fulfillment{" "}
+            <TranslatedText>Fulfillment</TranslatedText>{" "}
             <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-              Capabilities
+              <TranslatedText>Capabilities</TranslatedText>
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Purpose-built for the unpredictable nature of TikTok commerce. 
-            We handle the logistics so you can focus on creating content.
+            <TranslatedText>Purpose-built for the unpredictable nature of TikTok commerce. We handle the logistics so you can focus on creating content.</TranslatedText>
           </p>
         </motion.div>
 
@@ -72,18 +72,18 @@ const TikTokChannelServices = () => {
               </div>
               
               <h3 className="text-2xl font-semibold mb-4 text-foreground group-hover:text-pink-600 transition-colors duration-300">
-                {capability.title}
+                <TranslatedText>{capability.title}</TranslatedText>
               </h3>
               
               <p className="text-muted-foreground leading-relaxed mb-6">
-                {capability.description}
+                <TranslatedText>{capability.description}</TranslatedText>
               </p>
 
               <ul className="space-y-2 mb-6">
                 {capability.features.map((feature, fIndex) => (
                   <li key={fIndex} className="flex items-center gap-2 text-sm text-muted-foreground">
                     <div className="w-1.5 h-1.5 rounded-full bg-pink-500" />
-                    {feature}
+                    <TranslatedText>{feature}</TranslatedText>
                   </li>
                 ))}
               </ul>
@@ -92,7 +92,7 @@ const TikTokChannelServices = () => {
                 to={capability.link}
                 className="text-sm font-medium text-pink-600 hover:text-pink-700 inline-flex items-center gap-1 group/link"
               >
-                Learn more
+                <TranslatedText>Learn more</TranslatedText>
                 <span className="group-hover/link:translate-x-1 transition-transform duration-200">→</span>
               </Link>
             </motion.div>
