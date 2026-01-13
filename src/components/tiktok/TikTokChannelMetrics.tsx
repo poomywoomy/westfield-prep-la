@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { motion } from "framer-motion";
 import { MetricCounter } from "@/components/ui/metric-counter";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const metrics = [
   { value: 100000, suffix: "+", label: "Viral Orders Fulfilled", prefix: "" },
@@ -55,14 +56,13 @@ const TikTokChannelMetrics = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-            Built for{" "}
+            <TranslatedText>Built for</TranslatedText>{" "}
             <span className="bg-gradient-to-r from-pink-400 to-fuchsia-400 bg-clip-text text-transparent">
-              Viral Moments
+              <TranslatedText>Viral Moments</TranslatedText>
             </span>
           </h2>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            When your content takes off, your fulfillment needs to keep pace. 
-            These numbers show why TikTok sellers trust us with their biggest moments.
+            <TranslatedText>When your content takes off, your fulfillment needs to keep pace. These numbers show why TikTok sellers trust us with their biggest moments.</TranslatedText>
           </p>
         </motion.div>
 
@@ -88,7 +88,7 @@ const TikTokChannelMetrics = () => {
                     `0${metric.suffix}`
                   )}
                 </div>
-                <div className="text-sm text-white/60">{metric.label}</div>
+                <div className="text-sm text-white/60"><TranslatedText>{metric.label}</TranslatedText></div>
               </div>
             </motion.div>
           ))}

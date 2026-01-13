@@ -116,13 +116,13 @@ const PlatformDetailModal = ({ platform, open, onClose }: PlatformDetailModalPro
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                     {platform.name}
                   </h2>
-                  <p className="text-muted-foreground">{platform.tagline}</p>
+                  <p className="text-muted-foreground"><TranslatedText>{platform.tagline}</TranslatedText></p>
 
                   {/* Quick Stats */}
                   <div className="flex items-center gap-4 mt-2">
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                       <Clock className="w-4 h-4" />
-                      <span>{platform.setupTime} setup</span>
+                      <span><TranslatedText>{`${platform.setupTime} setup`}</TranslatedText></span>
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-primary">
                       <Zap className="w-4 h-4" />
@@ -141,7 +141,7 @@ const PlatformDetailModal = ({ platform, open, onClose }: PlatformDetailModalPro
                   <TranslatedText>Overview</TranslatedText>
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  {platform.description}
+                  <TranslatedText>{platform.description}</TranslatedText>
                 </p>
               </div>
 
@@ -162,7 +162,7 @@ const PlatformDetailModal = ({ platform, open, onClose }: PlatformDetailModalPro
                           style={{ color: platform.brandColor }}
                         />
                       </div>
-                      <span className="text-muted-foreground">{feature}</span>
+                      <span className="text-muted-foreground"><TranslatedText>{feature}</TranslatedText></span>
                     </li>
                   ))}
                 </ul>
@@ -183,7 +183,7 @@ const PlatformDetailModal = ({ platform, open, onClose }: PlatformDetailModalPro
                         color: platform.brandColor,
                       }}
                     >
-                      {item}
+                      <TranslatedText>{item}</TranslatedText>
                     </span>
                   ))}
                 </div>
