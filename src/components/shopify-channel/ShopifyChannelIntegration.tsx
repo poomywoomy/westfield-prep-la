@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { SiShopify } from "react-icons/si";
 import westfieldLogo from "@/assets/westfield-logo.png";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyChannelIntegration = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -51,10 +52,12 @@ const ShopifyChannelIntegration = () => {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-[hsl(var(--shopify-page-primary))]">
-              True Shopify Integration, Not Just a Plugin
+              <TranslatedText>True Shopify Integration, Not Just a Plugin</TranslatedText>
             </h2>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Most 3PLs offer basic Shopify connections that break during peak seasons. Our integration is battle-tested across Black Friday surges, flash sales, and viral TikTok moments. We've processed millions of orders without a single sync failure. Learn why brands trust our <a href="/why-choose-us" className="text-[hsl(var(--shopify-page-accent))] hover:underline font-medium">dedicated fulfillment approach</a>.
+              <TranslatedText>Most 3PLs offer basic Shopify connections that break during peak seasons. Our integration is battle-tested across Black Friday surges, flash sales, and viral TikTok moments. We've processed millions of orders without a single sync failure.</TranslatedText>{" "}
+              <TranslatedText>Learn why brands trust our</TranslatedText>{" "}
+              <a href="/why-choose-us" className="text-[hsl(var(--shopify-page-accent))] hover:underline font-medium"><TranslatedText>dedicated fulfillment approach</TranslatedText></a>.
             </p>
 
             <div className="grid gap-4 mb-8">
@@ -70,8 +73,8 @@ const ShopifyChannelIntegration = () => {
                     <Check className="h-4 w-4 text-[hsl(var(--shopify-page-accent))]" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">{feature.title}</h4>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    <h4 className="font-semibold text-foreground mb-1"><TranslatedText>{feature.title}</TranslatedText></h4>
+                    <p className="text-sm text-muted-foreground"><TranslatedText>{feature.description}</TranslatedText></p>
                   </div>
                 </motion.div>
               ))}
@@ -81,7 +84,7 @@ const ShopifyChannelIntegration = () => {
               onClick={() => navigate("/integrations")}
               className="bg-[hsl(var(--shopify-page-accent))] hover:bg-[hsl(var(--shopify-page-accent))]/90 text-white"
             >
-              View All Integrations
+              <TranslatedText>View All Integrations</TranslatedText>
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </motion.div>
@@ -100,7 +103,7 @@ const ShopifyChannelIntegration = () => {
               
               <div className="relative z-10 text-white">
                 <div className="text-sm font-medium opacity-80 mb-4 uppercase tracking-wider">
-                  Shopify ↔ Westfield WMS
+                  <TranslatedText>Shopify ↔ Westfield WMS</TranslatedText>
                 </div>
                 
                 <div className="space-y-6">
@@ -110,7 +113,7 @@ const ShopifyChannelIntegration = () => {
                       <div className="w-10 h-10 bg-[#96BF48] rounded-lg flex items-center justify-center">
                         <SiShopify className="text-white w-6 h-6" />
                       </div>
-                      <span className="font-medium">Shopify Store</span>
+                      <span className="font-medium"><TranslatedText>Shopify Store</TranslatedText></span>
                     </div>
                     <motion.div
                       animate={{ x: [0, 10, 0] }}
@@ -127,7 +130,7 @@ const ShopifyChannelIntegration = () => {
                           className="w-full h-full object-contain"
                         />
                       </div>
-                      <span className="font-medium">WMS</span>
+                      <span className="font-medium"><TranslatedText>WMS</TranslatedText></span>
                     </div>
                   </div>
 
@@ -135,16 +138,16 @@ const ShopifyChannelIntegration = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                       <div className="text-3xl font-bold">147</div>
-                      <div className="text-sm opacity-80">Orders Today</div>
+                      <div className="text-sm opacity-80"><TranslatedText>Orders Today</TranslatedText></div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                       <div className="text-3xl font-bold">98.9%</div>
-                      <div className="text-sm opacity-80">Sync Success</div>
+                      <div className="text-sm opacity-80"><TranslatedText>Sync Success</TranslatedText></div>
                     </div>
                   </div>
 
                   <div className="text-sm opacity-80 text-center pt-4 border-t border-white/20">
-                    Real-time sync • Zero downtime • Enterprise-grade reliability
+                    <TranslatedText>Real-time sync • Zero downtime • Enterprise-grade reliability</TranslatedText>
                   </div>
                 </div>
               </div>

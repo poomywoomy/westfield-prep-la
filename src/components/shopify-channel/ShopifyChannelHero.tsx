@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, Package, Zap, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyChannelHero = () => {
   const trustPoints = [
@@ -64,7 +65,7 @@ const ShopifyChannelHero = () => {
           >
             <Badge className="bg-emerald-500 text-white border-emerald-600 px-5 py-2 text-sm font-semibold shadow-lg shadow-emerald-500/20">
               <div className="w-2 h-2 rounded-full bg-white mr-2 animate-pulse" />
-              Shopify-Certified 3PL Partner
+              <TranslatedText>Shopify-Certified 3PL Partner</TranslatedText>
             </Badge>
           </motion.div>
 
@@ -75,9 +76,9 @@ const ShopifyChannelHero = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-5 leading-tight"
           >
-            Shopify Fulfillment That{" "}
+            <TranslatedText>Shopify Fulfillment That</TranslatedText>{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-lime-500 to-emerald-500">
-              Grows With You
+              <TranslatedText>Grows With You</TranslatedText>
             </span>
           </motion.h1>
 
@@ -88,9 +89,11 @@ const ShopifyChannelHero = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg md:text-xl text-slate-600 mb-6 max-w-3xl lg:max-w-2xl leading-relaxed"
           >
-            Real-time inventory sync, branded unboxing experiences, and same-day shipping from Los Angeles. Scale your DTC brand without the operational headaches. Learn more about our{" "}
-            <Link to="/why-choose-us" className="text-emerald-600 hover:text-emerald-700 underline underline-offset-2 font-medium transition-colors">dedicated approach</Link> and{" "}
-            <Link to="/pricing" className="text-emerald-600 hover:text-emerald-700 underline underline-offset-2 font-medium transition-colors">transparent pricing</Link>.
+            <TranslatedText>Real-time inventory sync, branded unboxing experiences, and same-day shipping from Los Angeles. Scale your DTC brand without the operational headaches.</TranslatedText>{" "}
+            <TranslatedText>Learn more about our</TranslatedText>{" "}
+            <Link to="/why-choose-us" className="text-emerald-600 hover:text-emerald-700 underline underline-offset-2 font-medium transition-colors"><TranslatedText>dedicated approach</TranslatedText></Link>{" "}
+            <TranslatedText>and</TranslatedText>{" "}
+            <Link to="/pricing" className="text-emerald-600 hover:text-emerald-700 underline underline-offset-2 font-medium transition-colors"><TranslatedText>transparent pricing</TranslatedText></Link>.
           </motion.p>
 
           {/* Trust Points */}
@@ -106,7 +109,7 @@ const ShopifyChannelHero = () => {
                 className="flex items-center gap-2 px-4 py-2 bg-lime-100/80 backdrop-blur-sm rounded-full border border-lime-200/50"
               >
                 <point.icon className="w-4 h-4 text-emerald-600" />
-                <span className="text-sm text-emerald-800 font-medium">{point.text}</span>
+                <span className="text-sm text-emerald-800 font-medium"><TranslatedText>{point.text}</TranslatedText></span>
               </div>
             ))}
           </motion.div>
@@ -126,7 +129,7 @@ const ShopifyChannelHero = () => {
                 className="bg-gradient-to-r from-emerald-500 to-lime-500 hover:from-emerald-600 hover:to-lime-600 text-white px-8 py-6 text-base font-bold shadow-xl shadow-emerald-500/25 hover:scale-105 transition-all duration-300 group"
               >
                 <Link to="/contact">
-                  Get Your Custom Quote
+                  <TranslatedText>Get Your Custom Quote</TranslatedText>
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
@@ -136,7 +139,7 @@ const ShopifyChannelHero = () => {
                 variant="outline"
                 className="border-2 border-emerald-500 text-emerald-700 hover:bg-emerald-50 px-8 py-6 text-base font-bold"
               >
-                <Link to="/pricing">View Pricing</Link>
+                <Link to="/pricing"><TranslatedText>View Pricing</TranslatedText></Link>
               </Button>
             </div>
 
@@ -144,15 +147,15 @@ const ShopifyChannelHero = () => {
             <div className="flex items-center gap-6 lg:gap-8 justify-center lg:justify-start lg:border-l lg:border-slate-200 lg:pl-10">
               <div className="text-center lg:text-left">
                 <div className="text-2xl md:text-3xl font-bold text-emerald-600">500K+</div>
-                <div className="text-xs text-slate-500">Orders Shipped</div>
+                <div className="text-xs text-slate-500"><TranslatedText>Orders Shipped</TranslatedText></div>
               </div>
               <div className="text-center lg:text-left">
                 <div className="text-2xl md:text-3xl font-bold text-emerald-600">12hr</div>
-                <div className="text-xs text-slate-500">Avg Lead Time</div>
+                <div className="text-xs text-slate-500"><TranslatedText>Avg Lead Time</TranslatedText></div>
               </div>
               <div className="text-center lg:text-left">
                 <div className="text-2xl md:text-3xl font-bold text-emerald-600">150+</div>
-                <div className="text-xs text-slate-500">Shopify Brands</div>
+                <div className="text-xs text-slate-500"><TranslatedText>Shopify Brands</TranslatedText></div>
               </div>
             </div>
           </motion.div>

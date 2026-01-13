@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyChannelServices = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -65,10 +66,10 @@ const ShopifyChannelServices = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[hsl(var(--shopify-page-primary))]">
-            Complete Shopify Fulfillment Services
+            <TranslatedText>Complete Shopify Fulfillment Services</TranslatedText>
           </h2>
           <p className="text-muted-foreground text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-            From the moment your products arrive at our Los Angeles warehouse to the second they land on your customer's doorstep, we handle every step with care. Each service is designed specifically for DTC Shopify brands who demand quality.
+            <TranslatedText>From the moment your products arrive at our Los Angeles warehouse to the second they land on your customer's doorstep, we handle every step with care. Each service is designed specifically for DTC Shopify brands who demand quality.</TranslatedText>
           </p>
         </motion.div>
 
@@ -86,15 +87,15 @@ const ShopifyChannelServices = () => {
                   <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-[hsl(var(--shopify-page-accent))]/15 to-[hsl(var(--shopify-page-accent))]/25 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <service.icon className="h-7 w-7 text-[hsl(var(--shopify-page-accent))]" />
                   </div>
-                  <CardTitle className="text-xl">{service.title}</CardTitle>
+                  <CardTitle className="text-xl"><TranslatedText>{service.title}</TranslatedText></CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-muted-foreground leading-relaxed text-sm">{service.description}</p>
+                  <p className="text-muted-foreground leading-relaxed text-sm"><TranslatedText>{service.description}</TranslatedText></p>
                   <Link 
                     to={service.link}
                     className="inline-block text-sm font-medium text-[hsl(var(--shopify-page-accent))] hover:text-[hsl(var(--shopify-page-primary))] transition-colors"
                   >
-                    {service.linkText}
+                    <TranslatedText>{service.linkText}</TranslatedText>
                   </Link>
                 </CardContent>
               </Card>

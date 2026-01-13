@@ -2,6 +2,7 @@ import { Upload, Package, ClipboardCheck, Camera, Truck, Bell } from "lucide-rea
 import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyChannelTimeline = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -63,10 +64,10 @@ const ShopifyChannelTimeline = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[hsl(var(--shopify-page-primary))]">
-            From Connection to First Shipment
+            <TranslatedText>From Connection to First Shipment</TranslatedText>
           </h2>
           <p className="text-muted-foreground text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-            Getting started with Westfield is simple. Most Shopify stores are fully operational within 48 hours of connecting. Here's exactly what happens at each step of the onboarding process.
+            <TranslatedText>Getting started with Westfield is simple. Most Shopify stores are fully operational within 48 hours of connecting. Here's exactly what happens at each step of the onboarding process.</TranslatedText>
           </p>
         </motion.div>
 
@@ -86,20 +87,20 @@ const ShopifyChannelTimeline = () => {
                 {/* Number badge */}
                 <div className="relative z-10 flex-shrink-0 h-[120px] w-[120px] rounded-2xl bg-gradient-to-br from-[hsl(var(--shopify-page-accent))] to-[hsl(var(--shopify-page-primary))] flex flex-col items-center justify-center text-white shadow-lg group-hover:scale-105 group-hover:shadow-xl transition-all duration-300">
                   <step.icon className="h-8 w-8 mb-2" />
-                  <span className="text-lg font-bold">Step {step.number}</span>
+                  <span className="text-lg font-bold"><TranslatedText>Step</TranslatedText> {step.number}</span>
                 </div>
                 
                 {/* Content */}
                 <div className="flex-1 bg-white rounded-xl p-6 shadow-md border border-border/50 group-hover:border-[hsl(var(--shopify-page-accent))]/40 group-hover:shadow-xl transition-all duration-300">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xl font-bold text-[hsl(var(--shopify-page-primary))]">
-                      {step.title}
+                      <TranslatedText>{step.title}</TranslatedText>
                     </h3>
                     <span className="text-xs font-medium px-3 py-1 rounded-full bg-[hsl(var(--shopify-page-accent))]/10 text-[hsl(var(--shopify-page-accent))]">
-                      {step.time}
+                      <TranslatedText>{step.time}</TranslatedText>
                     </span>
                   </div>
-                  <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                  <p className="text-muted-foreground leading-relaxed"><TranslatedText>{step.description}</TranslatedText></p>
                 </div>
               </motion.div>
             ))}
