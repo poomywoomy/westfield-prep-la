@@ -67,13 +67,38 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
 
       if (adjError) throw adjError;
 
-      // Fetch low stock items
-      const { data: lowStockItems, error: lowStockError } = await supabase
+      // Fetch low stock items - separate queries to avoid join issues
+      const { data: inventorySummary, error: invError } = await supabase
         .from('inventory_summary')
-        .select('sku_id, client_sku, title, available, skus!inner(low_stock_threshold), clients!inner(default_low_stock_threshold)')
+        .select('sku_id, client_sku, available')
         .eq('client_id', clientId);
 
-      if (lowStockError) console.error('Error fetching low stock:', lowStockError);
+      if (invError) console.error('Error fetching inventory summary:', invError);
+
+      // Fetch SKU details and client threshold
+      const skuIds = inventorySummary?.map(i => i.sku_id) || [];
+      let lowStockItems: any[] = [];
+      
+      if (skuIds.length > 0) {
+        const [skuResult, clientResult] = await Promise.all([
+          supabase.from('skus').select('id, title, low_stock_threshold').in('id', skuIds),
+          supabase.from('clients').select('default_low_stock_threshold').eq('id', clientId).single()
+        ]);
+        
+        const skuMap = new Map(skuResult.data?.map(s => [s.id, s]) || []);
+        const defaultThreshold = clientResult.data?.default_low_stock_threshold || 10;
+        
+        lowStockItems = inventorySummary?.map(inv => {
+          const sku = skuMap.get(inv.sku_id);
+          return {
+            sku_id: inv.sku_id,
+            client_sku: inv.client_sku,
+            title: sku?.title || '',
+            available: inv.available || 0,
+            threshold: sku?.low_stock_threshold || defaultThreshold
+          };
+        }).filter(item => item.available < item.threshold) || [];
+      }
 
       const entries: ActivityLogEntry[] = [];
       
@@ -155,14 +180,13 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
 
       // Add low stock alerts
       lowStockItems?.forEach((item: any) => {
-        const threshold = item.skus?.low_stock_threshold || item.clients?.default_low_stock_threshold || 10;
-        if (item.available < threshold && item.available > 0) {
+        if (item.available > 0) {
           entries.push({
             id: `low-stock-${item.sku_id}`,
             timestamp: new Date().toISOString(),
             type: 'low_stock',
             skuCode: item.client_sku,
-            message: `Low stock alert: ${item.title} - Only ${item.available} units remaining (threshold: ${threshold})`
+            message: `Low stock alert: ${item.title} - Only ${item.available} units remaining (threshold: ${item.threshold})`
           });
         }
       });

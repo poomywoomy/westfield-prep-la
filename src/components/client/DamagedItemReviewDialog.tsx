@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -133,6 +133,9 @@ export function DamagedItemReviewDialog({
               <AlertTriangle className="h-5 w-5 text-yellow-600" />
               Review Damaged Items
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Review QC photos and decide what to do with damaged items
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6">
