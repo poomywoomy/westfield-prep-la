@@ -171,7 +171,7 @@ export const OperationalAlertsPanel = ({
                       <td className="px-6 py-4 font-medium">{item.client_sku}</td>
                       <td className="px-6 py-4 text-muted-foreground">{item.title}</td>
                       <td className="px-6 py-4">
-                        <span className="text-red-600 dark:text-red-400 font-bold">{item.quantity}</span>
+                        <span className="text-red-600 dark:text-red-400 font-bold">{item.available}</span>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <Button

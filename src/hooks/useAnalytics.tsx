@@ -152,10 +152,10 @@ export const useAnalytics = (clientId: string, dateRange: DateRange) => {
           .eq("id", clientId)
           .single(),
         
-        // Low stock
+        // Low stock - fetch inventory summary
         supabase
           .from("inventory_summary")
-          .select("sku_id, client_sku, title, image_url, available, skus(low_stock_threshold)")
+          .select("sku_id, client_sku, available")
           .eq("client_id", clientId),
         
         // Current inventory
@@ -224,17 +224,40 @@ export const useAnalytics = (clientId: string, dateRange: DateRange) => {
 
       const defaultThreshold = clientData.data?.default_low_stock_threshold || 10;
 
+      // Fetch SKU details for low stock items (separate query to avoid join issues)
+      const inventorySkuIds = lowStockData.data?.map((i: any) => i.sku_id) || [];
+      let skuDetailsMap = new Map<string, { title: string; image_url: string | null; low_stock_threshold: number | null }>();
+      
+      if (inventorySkuIds.length > 0) {
+        const { data: skuDetails } = await supabase
+          .from("skus")
+          .select("id, title, image_url, low_stock_threshold")
+          .in("id", inventorySkuIds);
+        
+        skuDetails?.forEach((sku: any) => {
+          skuDetailsMap.set(sku.id, {
+            title: sku.title || "",
+            image_url: sku.image_url,
+            low_stock_threshold: sku.low_stock_threshold
+          });
+        });
+      }
+
       const lowStock =
         lowStockData.data
-          ?.map((item: any) => ({
-            sku_id: item.sku_id,
-            client_sku: item.client_sku || "",
-            title: item.title || "",
-            image_url: item.image_url,
-            available: item.available || 0,
-            threshold: item.skus?.low_stock_threshold || defaultThreshold,
-            last_activity: null,
-          }))
+          ?.map((item: any) => {
+            const skuDetail = skuDetailsMap.get(item.sku_id);
+            const threshold = skuDetail?.low_stock_threshold || defaultThreshold;
+            return {
+              sku_id: item.sku_id,
+              client_sku: item.client_sku || "",
+              title: skuDetail?.title || "",
+              image_url: skuDetail?.image_url || null,
+              available: item.available || 0,
+              threshold,
+              last_activity: null,
+            };
+          })
           .filter((item) => item.available < item.threshold) || [];
 
       const currentInventory =

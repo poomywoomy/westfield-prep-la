@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -241,6 +241,9 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
             ASN Details: {header?.asn_number || "..."}
             {header && getStatusBadge(header.status)}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            View ASN details including SKUs and QC photos
+          </DialogDescription>
         </DialogHeader>
 
         {loading ? (
