@@ -271,7 +271,7 @@ const ClientDashboard = () => {
 
       {/* Main Content - with left margin for fixed sidebar */}
       <main className="flex-1 ml-64 overflow-auto">
-        <div className="container mx-auto p-6">
+        <div className="w-full px-8 py-6">
           {/* Minimized Welcome Banner */}
           {clientName && (
             <div className="mb-6 bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-lg p-4">

@@ -80,7 +80,7 @@ export const ClientAnalyticsDashboard = ({ clientId }: ClientAnalyticsDashboardP
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Simple Stats Row */}
       <DashboardStatsRow 
         salesToday={todayData.data?.orders || 0}
