@@ -23,12 +23,7 @@ const COMMON_CARRIERS = [
   "USPS",
   "DHL",
   "Amazon Logistics",
-  "OnTrac",
-  "LaserShip",
   "Freight",
-  "LTL",
-  "Ocean Freight",
-  "Air Freight",
 ] as const;
 
 type Client = Database["public"]["Tables"]["clients"]["Row"];
