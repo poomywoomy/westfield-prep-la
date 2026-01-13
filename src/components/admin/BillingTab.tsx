@@ -52,7 +52,7 @@ const BillingTab = () => {
           *,
           quotes(id, status)
         `)
-        .eq("status", "active")
+        .in("status", ["active", "pending"])
         .order("company_name");
 
       if (clientsError) throw clientsError;
