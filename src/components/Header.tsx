@@ -103,21 +103,21 @@ const Header = () => {
                         </div>
                         
                         <Link 
-                          to="/sales-channels" 
+                          to="/sales-channels/shopify" 
                           className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent cursor-pointer"
                         >
                           <SiShopify className="mr-2 h-4 w-4 text-[#5E8E3E]" />
                           Shopify
                         </Link>
                         <Link 
-                          to="/sales-channels" 
+                          to="/sales-channels/amazon" 
                           className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent cursor-pointer"
                         >
                           <SiAmazon className="mr-2 h-4 w-4 text-[#FF9900]" />
                           Amazon
                         </Link>
                         <Link 
-                          to="/sales-channels" 
+                          to="/sales-channels/tiktok-shop" 
                           className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent cursor-pointer"
                         >
                           <SiTiktok className="mr-2 h-4 w-4" />
@@ -131,21 +131,21 @@ const Header = () => {
                         </div>
                         
                         <Link 
-                          to="/sales-channels" 
+                          to="/sales-channels/walmart" 
                           className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent cursor-pointer"
                         >
                           <SiWalmart className="mr-2 h-4 w-4 text-[#0057A0]" />
                           Walmart
                         </Link>
                         <Link 
-                          to="/sales-channels" 
+                          to="/sales-channels/etsy" 
                           className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent cursor-pointer"
                         >
                           <SiEtsy className="mr-2 h-4 w-4 text-[#D5581D]" />
                           Etsy
                         </Link>
                         <Link 
-                          to="/sales-channels" 
+                          to="/sales-channels/woocommerce" 
                           className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent cursor-pointer"
                         >
                           <SiWoo className="mr-2 h-4 w-4 text-[#674399]" />
