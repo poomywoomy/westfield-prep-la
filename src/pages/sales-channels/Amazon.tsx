@@ -16,6 +16,7 @@ import AmazonChannelFAQ from "@/components/amazon/AmazonChannelFAQ";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Shield, Zap, BarChart3, CheckCircle, DollarSign } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 const faqs = [
   {
@@ -82,16 +83,18 @@ const Amazon = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">
-                  Why Amazon Sellers Choose a{" "}
+                  <TranslatedText>Why Amazon Sellers Choose a</TranslatedText>{" "}
                   <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
-                    Dedicated 3PL
+                    <TranslatedText>Dedicated 3PL</TranslatedText>
                   </span>
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8 text-center max-w-3xl mx-auto">
-                  Amazon's marketplace is one of the most competitive sales channels in the world. 
-                  Winning Buy Box placement, fast delivery windows, and flawless inventory management 
-                  can make the difference between plateauing and scaling 10x. But managing FBA prep 
-                  in-house comes with significant challenges that drain your time and resources.
+                  <TranslatedText>
+                    Amazon's marketplace is one of the most competitive sales channels in the world. 
+                    Winning Buy Box placement, fast delivery windows, and flawless inventory management 
+                    can make the difference between plateauing and scaling 10x. But managing FBA prep 
+                    in-house comes with significant challenges that drain your time and resources.
+                  </TranslatedText>
                 </p>
                 <div className="grid md:grid-cols-2 gap-6 mb-8">
                   {[
@@ -104,17 +107,19 @@ const Amazon = () => {
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg border border-orange-100">
                       <Shield className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                      <span className="font-medium text-foreground">{item}</span>
+                      <span className="font-medium text-foreground"><TranslatedText>{item}</TranslatedText></span>
                     </div>
                   ))}
                 </div>
                 <p className="text-muted-foreground text-center">
-                  For many brands, trying to juggle these tasks in-house leads to errors, delays, 
-                  and lost buy-boxes. That's where a specialized{" "}
+                  <TranslatedText>
+                    For many brands, trying to juggle these tasks in-house leads to errors, delays, 
+                    and lost buy-boxes. That's where a specialized
+                  </TranslatedText>{" "}
                   <Link to="/amazon-fba-prep" className="text-orange-600 hover:underline font-medium">
-                    Amazon Prep Center
+                    <TranslatedText>Amazon Prep Center</TranslatedText>
                   </Link>{" "}
-                  becomes essential for sustainable growth.
+                  <TranslatedText>becomes essential for sustainable growth.</TranslatedText>
                 </p>
               </div>
             </div>
@@ -125,16 +130,18 @@ const Amazon = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">
-                  What Is{" "}
+                  <TranslatedText>What Is</TranslatedText>{" "}
                   <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
-                    Amazon FBA Prep?
+                    <TranslatedText>Amazon FBA Prep?</TranslatedText>
                   </span>
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8 text-center">
-                  Amazon FBA prep refers to the services required to get your inventory ready to be 
-                  accepted into an Amazon Fulfillment Network (FBA) distribution center. Every product 
-                  category has specific requirements, and failing to meet them results in rejected 
-                  shipments, chargebacks, and potential account suspensions.
+                  <TranslatedText>
+                    Amazon FBA prep refers to the services required to get your inventory ready to be 
+                    accepted into an Amazon Fulfillment Network (FBA) distribution center. Every product 
+                    category has specific requirements, and failing to meet them results in rejected 
+                    shipments, chargebacks, and potential account suspensions.
+                  </TranslatedText>
                 </p>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                   {[
@@ -147,15 +154,17 @@ const Amazon = () => {
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 p-4 bg-card rounded-lg border border-border hover:border-orange-200 transition-colors">
                       <CheckCircle className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                      <span className="text-sm font-medium">{item}</span>
+                      <span className="text-sm font-medium"><TranslatedText>{item}</TranslatedText></span>
                     </div>
                   ))}
                 </div>
                 <p className="text-center text-muted-foreground">
-                  Our team stays current with Amazon's ever-evolving prep guidelines across all 
-                  product categories. Learn more about our{" "}
+                  <TranslatedText>
+                    Our team stays current with Amazon's ever-evolving prep guidelines across all 
+                    product categories. Learn more about our
+                  </TranslatedText>{" "}
                   <Link to="/labeling-compliance" className="text-orange-600 hover:underline font-medium">
-                    labeling and compliance services
+                    <TranslatedText>labeling and compliance services</TranslatedText>
                   </Link>.
                 </p>
               </div>
@@ -170,9 +179,9 @@ const Amazon = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-5xl mx-auto">
                 <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
-                  How Westfield Helps You{" "}
+                  <TranslatedText>How Westfield Helps You</TranslatedText>{" "}
                   <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
-                    Win on Amazon
+                    <TranslatedText>Win on Amazon</TranslatedText>
                   </span>
                 </h2>
                 <div className="grid md:grid-cols-2 gap-8">
@@ -180,30 +189,34 @@ const Amazon = () => {
                     <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center mb-6">
                       <Shield className="h-7 w-7 text-orange-600" />
                     </div>
-                    <h3 className="text-xl font-bold mb-4">Error-Free FBA Prep & Compliance</h3>
+                    <h3 className="text-xl font-bold mb-4"><TranslatedText>Error-Free FBA Prep & Compliance</TranslatedText></h3>
                     <p className="text-muted-foreground mb-4">
-                      Amazon is constantly updating its requirements, and one misprinted label or 
-                      missing prep instruction can trigger chargebacks. Our team stays current with 
-                      all FBA inbound shipment requirements, unique prep instructions per category, 
-                      and ASIN-specific compliance rules. We validate every unit before it ships.
+                      <TranslatedText>
+                        Amazon is constantly updating its requirements, and one misprinted label or 
+                        missing prep instruction can trigger chargebacks. Our team stays current with 
+                        all FBA inbound shipment requirements, unique prep instructions per category, 
+                        and ASIN-specific compliance rules. We validate every unit before it ships.
+                      </TranslatedText>
                     </p>
                     <p className="text-sm font-medium text-orange-600">
-                      Result: Near-zero chargeback rate across all client shipments.
+                      <TranslatedText>Result: Near-zero chargeback rate across all client shipments.</TranslatedText>
                     </p>
                   </div>
                   <div className="p-8 bg-card rounded-2xl border border-border hover:border-orange-200 hover:shadow-lg transition-all duration-300">
                     <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center mb-6">
                       <Zap className="h-7 w-7 text-orange-600" />
                     </div>
-                    <h3 className="text-xl font-bold mb-4">Fast Turnaround + Same-Day Receiving</h3>
+                    <h3 className="text-xl font-bold mb-4"><TranslatedText>Fast Turnaround + Same-Day Receiving</TranslatedText></h3>
                     <p className="text-muted-foreground mb-4">
-                      Speed matters on Amazon. Our warehouse processes inbound pallets and cartons 
-                      quickly with 24-hour receiving turn times (often faster), real-time inventory 
-                      syncing to your Seller Central dashboard, and notifications as soon as inventory 
-                      is available for shipment to FBA.
+                      <TranslatedText>
+                        Speed matters on Amazon. Our warehouse processes inbound pallets and cartons 
+                        quickly with 24-hour receiving turn times (often faster), real-time inventory 
+                        syncing to your Seller Central dashboard, and notifications as soon as inventory 
+                        is available for shipment to FBA.
+                      </TranslatedText>
                     </p>
                     <p className="text-sm font-medium text-orange-600">
-                      Result: Keep your Buy Box presence strong with faster inventory velocity.
+                      <TranslatedText>Result: Keep your Buy Box presence strong with faster inventory velocity.</TranslatedText>
                     </p>
                   </div>
                 </div>
@@ -230,23 +243,25 @@ const Amazon = () => {
                   </div>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">
-                  Real-Time Reporting &{" "}
+                  <TranslatedText>Real-Time Reporting &</TranslatedText>{" "}
                   <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
-                    Inventory Sync
+                    <TranslatedText>Inventory Sync</TranslatedText>
                   </span>
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8 text-center">
-                  Your Amazon inventory is dynamic. We offer two-way API integration with Seller Central, 
-                  live updates on received inventory, real-time photo proof and scan records, and automatic 
-                  exception handling for damaged or mismatched SKUs. No more guessing stock on hand—we 
-                  sync with your backend so Amazon supply never goes dark.
+                  <TranslatedText>
+                    Your Amazon inventory is dynamic. We offer two-way API integration with Seller Central, 
+                    live updates on received inventory, real-time photo proof and scan records, and automatic 
+                    exception handling for damaged or mismatched SKUs. No more guessing stock on hand—we 
+                    sync with your backend so Amazon supply never goes dark.
+                  </TranslatedText>
                 </p>
                 <div className="flex justify-center">
                   <Button
                     asChild
                     className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
                   >
-                    <Link to="/integrations">See Our Integrations</Link>
+                    <Link to="/integrations"><TranslatedText>See Our Integrations</TranslatedText></Link>
                   </Button>
                 </div>
               </div>
@@ -263,15 +278,17 @@ const Amazon = () => {
                   </div>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                  Cost-Efficiency{" "}
+                  <TranslatedText>Cost-Efficiency</TranslatedText>{" "}
                   <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
-                    Built for Growth
+                    <TranslatedText>Built for Growth</TranslatedText>
                   </span>
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8">
-                  With a specialized Amazon 3PL, you only pay for what you use. No overhead for labor 
-                  or warehouse equipment, fewer chargebacks due to compliance errors, and reduced risk 
-                  of stranded inventory eating into your margins.
+                  <TranslatedText>
+                    With a specialized Amazon 3PL, you only pay for what you use. No overhead for labor 
+                    or warehouse equipment, fewer chargebacks due to compliance errors, and reduced risk 
+                    of stranded inventory eating into your margins.
+                  </TranslatedText>
                 </p>
                 <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8">
                   {[
@@ -282,17 +299,19 @@ const Amazon = () => {
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 p-4 bg-card rounded-lg border border-border">
                       <CheckCircle className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                      <span className="text-sm font-medium text-left">{item}</span>
+                      <span className="text-sm font-medium text-left"><TranslatedText>{item}</TranslatedText></span>
                     </div>
                   ))}
                 </div>
                 <p className="text-muted-foreground">
-                  All of this translates to better profit margins, fewer operational headaches, and 
-                  freedom to sell more and worry less. Check our{" "}
+                  <TranslatedText>
+                    All of this translates to better profit margins, fewer operational headaches, and 
+                    freedom to sell more and worry less. Check our
+                  </TranslatedText>{" "}
                   <Link to="/pricing" className="text-orange-600 hover:underline font-medium">
-                    transparent pricing
+                    <TranslatedText>transparent pricing</TranslatedText>
                   </Link>{" "}
-                  for details.
+                  <TranslatedText>for details.</TranslatedText>
                 </p>
               </div>
             </div>
@@ -308,10 +327,12 @@ const Amazon = () => {
           <section className="py-24 bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 text-white">
             <div className="container mx-auto px-4 text-center">
               <h2 className="text-3xl md:text-5xl font-bold mb-6">
-                Ready to Scale Your Amazon Business?
+                <TranslatedText>Ready to Scale Your Amazon Business?</TranslatedText>
               </h2>
               <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Join 500+ Amazon sellers who trust Westfield for compliant, fast, and reliable FBA prep services.
+                <TranslatedText>
+                  Join 500+ Amazon sellers who trust Westfield for compliant, fast, and reliable FBA prep services.
+                </TranslatedText>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -319,7 +340,7 @@ const Amazon = () => {
                   size="lg"
                   className="px-10 py-7 text-lg font-bold bg-white text-orange-600 hover:bg-white/90 shadow-lg"
                 >
-                  <Link to="/contact">Get Your Free Quote</Link>
+                  <Link to="/contact"><TranslatedText>Get Your Free Quote</TranslatedText></Link>
                 </Button>
                 <Button
                   asChild
@@ -327,7 +348,7 @@ const Amazon = () => {
                   size="lg"
                   className="px-10 py-7 text-lg font-bold border-2 border-white text-white bg-transparent hover:bg-white/10"
                 >
-                  <Link to="/pricing">View Pricing</Link>
+                  <Link to="/pricing"><TranslatedText>View Pricing</TranslatedText></Link>
                 </Button>
               </div>
             </div>
