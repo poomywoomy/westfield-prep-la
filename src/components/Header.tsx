@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Phone, Calendar, ChevronDown } from "lucide-react";
+import { Phone, Calendar, ChevronDown, Menu, X } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -9,6 +9,20 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { SiShopify, SiAmazon, SiTiktok, SiWalmart, SiEtsy, SiWoo } from "react-icons/si";
 import logo from "@/assets/westfield-logo.png";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,6 +34,7 @@ import { TranslatedText } from "./TranslatedText";
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [calendlyOpen, setCalendlyOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, role } = useAuth();
@@ -51,6 +66,11 @@ const Header = () => {
     setCalendlyOpen(true);
   };
 
+  const handleMobileNavClick = (path: string) => {
+    setMobileMenuOpen(false);
+    navigate(path);
+  };
+
   // Hide header on dashboard/settings routes
   const dashboardRoutes = ['/admin/dashboard', '/client/dashboard', '/admin/settings', '/client/settings'];
   const isDashboardRoute = dashboardRoutes.includes(location.pathname);
@@ -58,6 +78,15 @@ const Header = () => {
   if (user && role && isDashboardRoute) {
     return null;
   }
+
+  const salesChannels = [
+    { path: "/sales-channels/shopify", name: "Shopify", icon: SiShopify, color: "text-[#5E8E3E]" },
+    { path: "/sales-channels/amazon", name: "Amazon", icon: SiAmazon, color: "text-[#FF9900]" },
+    { path: "/sales-channels/tiktok-shop", name: "TikTok Shop", icon: SiTiktok, color: "text-foreground" },
+    { path: "/sales-channels/walmart", name: "Walmart", icon: SiWalmart, color: "text-[#0057A0]" },
+    { path: "/sales-channels/etsy", name: "Etsy", icon: SiEtsy, color: "text-[#D5581D]" },
+    { path: "/sales-channels/woocommerce", name: "WooCommerce", icon: SiWoo, color: "text-[#674399]" },
+  ];
 
   return (
     <>
@@ -210,7 +239,144 @@ const Header = () => {
               <LanguageSwitcher variant="compact" />
             </div>
 
-            <div className="flex lg:hidden items-center gap-3">
+            {/* Mobile/Tablet Navigation */}
+            <div className="flex lg:hidden items-center gap-2">
+              {/* Hamburger Menu */}
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-10 w-10"
+                    aria-label="Open navigation menu"
+                  >
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[300px] sm:w-[350px] flex flex-col p-0">
+                  <SheetHeader className="border-b p-4">
+                    <SheetTitle className="flex items-center justify-between">
+                      <img 
+                        src={logo} 
+                        alt="Westfield Prep Center" 
+                        className="h-8 w-auto object-contain" 
+                      />
+                    </SheetTitle>
+                  </SheetHeader>
+                  
+                  {/* Navigation Links */}
+                  <nav className="flex-1 overflow-y-auto p-4">
+                    <div className="flex flex-col gap-1">
+                      <button
+                        onClick={() => handleMobileNavClick("/")}
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
+                      >
+                        <TranslatedText>Home</TranslatedText>
+                      </button>
+                      
+                      <button
+                        onClick={() => handleMobileNavClick("/pricing")}
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left text-secondary"
+                      >
+                        <TranslatedText>See Your Savings</TranslatedText>
+                      </button>
+                      
+                      {/* Sales Channels Accordion */}
+                      <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="sales-channels" className="border-none">
+                          <AccordionTrigger className="px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:no-underline [&[data-state=open]]:bg-accent/50">
+                            <TranslatedText>Sales Channels</TranslatedText>
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-0">
+                            <div className="flex flex-col gap-1 pl-3">
+                              {salesChannels.map((channel) => (
+                                <button
+                                  key={channel.path}
+                                  onClick={() => handleMobileNavClick(channel.path)}
+                                  className="flex items-center px-3 py-2.5 text-sm rounded-lg hover:bg-accent transition-colors text-left"
+                                >
+                                  <channel.icon className={`mr-3 h-4 w-4 ${channel.color}`} />
+                                  {channel.name}
+                                </button>
+                              ))}
+                              <button
+                                onClick={() => handleMobileNavClick("/sales-channels")}
+                                className="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors text-left text-primary"
+                              >
+                                <TranslatedText>View All Channels</TranslatedText> →
+                              </button>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                      
+                      <button
+                        onClick={() => handleMobileNavClick("/integrations")}
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
+                      >
+                        <TranslatedText>Integrations</TranslatedText>
+                      </button>
+                      
+                      <button
+                        onClick={() => handleMobileNavClick("/why-choose-us")}
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
+                      >
+                        <TranslatedText>Why Choose Us</TranslatedText>
+                      </button>
+                      
+                      <button
+                        onClick={() => handleMobileNavClick("/testimonials")}
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
+                      >
+                        <TranslatedText>Testimonials</TranslatedText>
+                      </button>
+                      
+                      <button
+                        onClick={() => handleMobileNavClick("/blog")}
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
+                      >
+                        <TranslatedText>Blog</TranslatedText>
+                      </button>
+                    </div>
+                  </nav>
+                  
+                  {/* Contact Section */}
+                  <div className="border-t p-4 space-y-3">
+                    <a 
+                      href="tel:+18189355478" 
+                      className="flex items-center gap-3 px-3 py-2 text-primary hover:text-secondary transition-colors"
+                    >
+                      <Phone className="h-5 w-5" />
+                      <span className="font-bold">1.818.935.5478</span>
+                    </a>
+                    
+                    <Button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleScheduleCall();
+                      }}
+                      variant="outline"
+                      className="w-full border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-semibold"
+                    >
+                      <Calendar className="w-4 h-4 mr-2" />
+                      <TranslatedText>Schedule a Call</TranslatedText>
+                    </Button>
+                    
+                    <Button
+                      onClick={() => handleMobileNavClick("/contact")}
+                      className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+                    >
+                      <TranslatedText>Get a Quote</TranslatedText>
+                    </Button>
+                    
+                    <div className="flex justify-center pt-2">
+                      <LanguageSwitcher variant="compact" />
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Quick Action Buttons */}
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-1 text-primary hover:text-secondary transition-colors"
@@ -221,7 +387,7 @@ const Header = () => {
                 onClick={handleScheduleCall}
                 variant="outline"
                 size="sm"
-                className="border-secondary text-secondary"
+                className="border-secondary text-secondary hidden sm:flex"
               >
                 <Calendar className="w-4 h-4" />
               </Button>
@@ -232,7 +398,6 @@ const Header = () => {
               >
                 <TranslatedText>Get Quote</TranslatedText>
               </Button>
-              <LanguageSwitcher variant="compact" />
             </div>
           </div>
         </div>
