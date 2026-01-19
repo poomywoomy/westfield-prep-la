@@ -57,7 +57,7 @@ const Shopify = () => {
         <title>Shopify Fulfillment Center with Expert Order Management</title>
         <meta
           name="description"
-          content=" Westfield Prep Center is a Shopify fulfillment center that offers efficient Shopify order management, inventory control, and scalable fulfillment solutions."
+          content="Westfield Prep Center is a Shopify fulfillment center that offers efficient Shopify order management, inventory control, and scalable fulfillment solutions."
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels/shopify" />
         <meta property="og:title" content="Shopify Fulfillment Services | Westfield Prep Center" />
