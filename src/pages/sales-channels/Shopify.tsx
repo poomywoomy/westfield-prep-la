@@ -16,13 +16,34 @@ import ShopifyChannelCTA from "@/components/shopify-channel/ShopifyChannelCTA";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 
 const faqData = [
-  { question: "How quickly can I get started with Shopify fulfillment?", answer: "Most Shopify stores are fully operational within 48 hours of connecting." },
-  { question: "What happens when I get a sudden surge in orders?", answer: "We're built for scale. We've processed 10x normal volume during Black Friday without delays." },
-  { question: "Can you match my current branded packaging?", answer: "Absolutely. We work with custom mailer boxes, branded tissue paper, thank-you cards, and gift wrapping." },
-  { question: "How does inventory sync work?", answer: "Our integration syncs in real-time. When we receive inventory, your Shopify stock updates automatically." },
-  { question: "What are your shipping carrier options?", answer: "We offer discounted rates across USPS, UPS, FedEx, and regional carriers with automatic selection." },
-  { question: "How do you handle returns?", answer: "Full returns processing including receiving, inspection, photography, and automatic restocking." },
-  { question: "Is there a minimum order volume?", answer: "No minimums and no long-term contracts. We work with brands doing 50 to 50,000+ orders monthly." },
+  {
+    question: "How quickly can I get started with Shopify fulfillment?",
+    answer: "Most Shopify stores are fully operational within 48 hours of connecting.",
+  },
+  {
+    question: "What happens when I get a sudden surge in orders?",
+    answer: "We're built for scale. We've processed 10x normal volume during Black Friday without delays.",
+  },
+  {
+    question: "Can you match my current branded packaging?",
+    answer: "Absolutely. We work with custom mailer boxes, branded tissue paper, thank-you cards, and gift wrapping.",
+  },
+  {
+    question: "How does inventory sync work?",
+    answer: "Our integration syncs in real-time. When we receive inventory, your Shopify stock updates automatically.",
+  },
+  {
+    question: "What are your shipping carrier options?",
+    answer: "We offer discounted rates across USPS, UPS, FedEx, and regional carriers with automatic selection.",
+  },
+  {
+    question: "How do you handle returns?",
+    answer: "Full returns processing including receiving, inspection, photography, and automatic restocking.",
+  },
+  {
+    question: "Is there a minimum order volume?",
+    answer: "No minimums and no long-term contracts. We work with brands doing 50 to 50,000+ orders monthly.",
+  },
 ];
 
 const Shopify = () => {
@@ -33,20 +54,38 @@ const Shopify = () => {
   return (
     <>
       <Helmet>
-        <title>Shopify Fulfillment Services Los Angeles | 3PL for DTC Brands | Westfield</title>
-        <meta name="description" content="Shopify fulfillment with real-time inventory sync, branded packaging, and same-day shipping. 99.6% accuracy, 12hr lead time. No minimums. Get a free quote." />
+        <title>Shopify Fulfillment Center with Expert Order Management</title>
+        <meta
+          name="description"
+          content="Shopify fulfillment with real-time inventory sync, branded packaging, and same-day shipping. 99.6% accuracy, 12hr lead time. No minimums. Get a free quote."
+        />
         <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels/shopify" />
         <meta property="og:title" content="Shopify Fulfillment Services | Westfield Prep Center" />
-        <meta property="og:description" content="Professional Shopify 3PL fulfillment with real-time sync, branded packaging, and same-day shipping from Los Angeles." />
+        <meta
+          property="og:description"
+          content="Professional Shopify 3PL fulfillment with real-time sync, branded packaging, and same-day shipping from Los Angeles."
+        />
         <meta property="og:url" content="https://westfieldprepcenter.com/sales-channels/shopify" />
       </Helmet>
 
-      <StructuredData type="service" data={{ name: "Shopify Fulfillment Services", description: "Professional Shopify order fulfillment with real-time inventory sync, branded packaging, and same-day shipping from Los Angeles." }} />
+      <StructuredData
+        type="service"
+        data={{
+          name: "Shopify Fulfillment Services",
+          description:
+            "Professional Shopify order fulfillment with real-time inventory sync, branded packaging, and same-day shipping from Los Angeles.",
+        }}
+      />
       <StructuredData type="faq" data={faqData} />
 
       <Header />
-      <Breadcrumbs items={[{ label: "Sales Channels", path: "/sales-channels" }, { label: "Shopify", path: "/sales-channels/shopify" }]} />
-      
+      <Breadcrumbs
+        items={[
+          { label: "Sales Channels", path: "/sales-channels" },
+          { label: "Shopify", path: "/sales-channels/shopify" },
+        ]}
+      />
+
       <main>
         <ShopifyChannelHero />
         <ShopifyChannelValueGrid />
