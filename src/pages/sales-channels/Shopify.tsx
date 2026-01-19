@@ -54,10 +54,10 @@ const Shopify = () => {
   return (
     <>
       <Helmet>
-        <title>Shopify Fulfillment Center with Expert Order Management</title>
+        <title>Shopify Fulfillment Services Los Angeles | 3PL for DTC Brands | Westfield</title>
         <meta
           name="description"
-          content="Westfield Prep Center is a Shopify fulfillment center that offers efficient Shopify order management, inventory control, and scalable fulfillment solutions."
+          content="Shopify fulfillment with real-time inventory sync, branded packaging, and same-day shipping. 99.6% accuracy, 12hr lead time. No minimums. Get a free quote."
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels/shopify" />
         <meta property="og:title" content="Shopify Fulfillment Services | Westfield Prep Center" />
