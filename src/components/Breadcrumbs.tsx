@@ -15,7 +15,10 @@ interface BreadcrumbsProps {
 const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
   const baseUrl = "https://westfieldprepcenter.com";
   
-  const breadcrumbSchema = {
+  // Only generate schema if we have valid items
+  const shouldRenderSchema = items && items.length > 0;
+  
+  const breadcrumbSchema = shouldRenderSchema ? {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
@@ -32,15 +35,17 @@ const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
         item: `${baseUrl}${item.path}`
       }))
     ]
-  };
+  } : null;
 
   return (
     <>
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(breadcrumbSchema)}
-        </script>
-      </Helmet>
+      {shouldRenderSchema && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify(breadcrumbSchema)}
+          </script>
+        </Helmet>
+      )}
       
       <nav aria-label="Breadcrumb" className="bg-muted/30 py-3">
         <div className="container mx-auto px-4">

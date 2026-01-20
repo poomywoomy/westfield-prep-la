@@ -17,11 +17,8 @@ const AmazonChannelFAQ = () => {
   const entry = useIntersectionObserver(ref, { threshold: 0.1 });
   const isVisible = !!entry?.isIntersecting;
 
-  const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) };
-
   return (
     <section className="py-20 bg-gradient-to-b from-background to-orange-50/30">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="container mx-auto px-4">
         <motion.div ref={ref} initial={{ opacity: 0, y: 20 }} animate={isVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5 }} className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4"><TranslatedText>Frequently Asked</TranslatedText>{" "}<span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent"><TranslatedText>Questions</TranslatedText></span></h2>

@@ -34,25 +34,9 @@ const ReceivingFAQ = () => {
     }
   ];
 
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": faqs.map(faq => ({
-      "@type": "Question",
-      "name": faq.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.answer
-      }
-    }))
-  };
-
   return (
     <section className="py-20 bg-background">
       <div className="container">
-        <script type="application/ld+json">
-          {JSON.stringify(faqSchema)}
-        </script>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

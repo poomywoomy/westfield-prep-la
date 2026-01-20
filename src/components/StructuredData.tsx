@@ -223,7 +223,11 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
     }
 
     if (type === "faq" && data) {
-      const faqArray = Array.isArray(data) ? data : data.questions || [];
+      const faqArray = Array.isArray(data) ? data : data.questions || data.faqs || [];
+      // Only output schema if we have valid FAQ items with required fields
+      if (!faqArray.length || !faqArray.every((faq: any) => faq.question && faq.answer)) {
+        return null;
+      }
       return {
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -245,10 +249,13 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
 
     // Breadcrumb schema
     if (type === "breadcrumb" && data) {
+      const items = data.items || [];
+      // Only output schema if we have valid breadcrumb items
+      if (!items.length) return null;
       return {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
-        itemListElement: data.items?.map((item: { label: string; path: string }, index: number) => ({
+        itemListElement: items.map((item: { label: string; path: string }, index: number) => ({
           "@type": "ListItem",
           position: index + 1,
           name: item.label,
