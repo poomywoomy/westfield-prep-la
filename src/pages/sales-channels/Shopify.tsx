@@ -54,7 +54,7 @@ const Shopify = () => {
   return (
     <>
       <Helmet>
-        <title>Shopify Fulfillment Services Los Angeles | 3PL for DTC Brands | Westfield</title>
+        <title>Shopify Fulfillment Center with Expert Order Management</title>
         <meta
           name="description"
           content="Shopify fulfillment with real-time inventory sync, branded packaging, and same-day shipping. 99.6% accuracy, 12hr lead time. No minimums. Get a free quote."
