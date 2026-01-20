@@ -42,26 +42,8 @@ const TikTokChannelFAQ = () => {
   const entry = useIntersectionObserver(ref, { threshold: 0.1 });
   const isVisible = !!entry?.isIntersecting;
 
-  // Schema.org FAQ structured data
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((faq) => ({
-      "@type": "Question",
-      name: faq.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: faq.answer,
-      },
-    })),
-  };
-
   return (
     <section className="py-20 bg-gradient-to-b from-background to-pink-50/30">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
 
       <div className="container mx-auto px-4">
         <motion.div
