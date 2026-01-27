@@ -85,7 +85,7 @@ const Index = () => {
         <title>Los Angeles Fulfillment Center for Shopify and Amazon</title>
         <meta
           name="description"
-          content="Westfield is a nationwide 3PL providing Shopify fulfillment, Amazon FBA prep, and DTC logistics. Transparent pricing, real-time integrations, and 24-hour turnaround."
+          content="Westfield Prep Center is a Los Angeles fulfillment center offering Shopify Amazon fulfillment, FBA prep, storage, &amp; fast ecommerce shipping. Get started today."
         />
         <meta name="robots" content="index, follow" />
         <meta
