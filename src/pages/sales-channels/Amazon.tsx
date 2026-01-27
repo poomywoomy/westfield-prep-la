@@ -47,7 +47,8 @@ const Amazon = () => {
         <title>Amazon FBA Prep Center Los Angeles | Westfield Prep Center</title>
         <meta
           name="description"
-          content="Professional Amazon FBA prep center in Los Angeles offering labeling, packaging, and compliant services with fast turnaround for sellers. Get started today."
+          content="Professional Amazon FBA prep center in Los Angeles offering labeling,
+packaging, and compliant services with fast turnaround for sellers. Get started today."
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels/amazon" />
         <meta property="og:title" content="Amazon FBA Prep Center Los Angeles | Westfield 3PL" />
