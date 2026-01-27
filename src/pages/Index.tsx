@@ -37,66 +37,86 @@ const Index = () => {
   useEffect(() => {
     // Redirect logged-in users to their dashboard
     if (!loading && user && role) {
-      if (role === 'admin') {
-        navigate('/admin/dashboard', { replace: true });
-      } else if (role === 'client') {
-        navigate('/client/dashboard', { replace: true });
+      if (role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else if (role === "client") {
+        navigate("/client/dashboard", { replace: true });
       }
     }
   }, [user, role, loading, navigate]);
 
   // Memoize FAQ data to prevent regeneration - SAB-compliant questions
-  const faqData = useMemo(() => ({
-    questions: [
-      {
-        question: "Do you operate as a Los Angeles 3PL?",
-        answer: "Yes, Westfield Prep Center is a service-area-based 3PL operating from Los Angeles, California. We serve e-commerce businesses nationwide, handling their inventory, fulfillment, and prep services from our LA facility. Our strategic location near major ports provides shipping advantages for West Coast distribution."
-      },
-      {
-        question: "Do clients visit your warehouse?",
-        answer: "Our facility is not open for public visits. As a service-area business, we handle all client inventory remotely. Clients manage their accounts through our secure online portal and communicate with their dedicated account manager for any needs."
-      },
-      {
-        question: "What areas do you serve from Los Angeles?",
-        answer: "While strategically located in Los Angeles for port proximity and West Coast shipping advantages, we serve e-commerce businesses across all 50 states. Clients ship their inventory to us, and we handle fulfillment to their customers nationwide."
-      },
-      {
-        question: "Do you offer Amazon FBA prep in Los Angeles?",
-        answer: "Yes! We provide complete Amazon FBA prep services including labeling, poly-bagging, bubble wrapping, inspection, and shipping to Amazon fulfillment centers. Our LA location offers fast transit times to West Coast Amazon warehouses."
-      },
-      {
-        question: "Do you support Shopify fulfillment?",
-        answer: "Absolutely! We specialize in Shopify fulfillment with native integration, same-day processing, custom branding options, and full photo documentation. Orders sync automatically and ship with real-time tracking updates."
-      }
-    ]
-  }), []);
+  const faqData = useMemo(
+    () => ({
+      questions: [
+        {
+          question: "Do you operate as a Los Angeles 3PL?",
+          answer:
+            "Yes, Westfield Prep Center is a service-area-based 3PL operating from Los Angeles, California. We serve e-commerce businesses nationwide, handling their inventory, fulfillment, and prep services from our LA facility. Our strategic location near major ports provides shipping advantages for West Coast distribution.",
+        },
+        {
+          question: "Do clients visit your warehouse?",
+          answer:
+            "Our facility is not open for public visits. As a service-area business, we handle all client inventory remotely. Clients manage their accounts through our secure online portal and communicate with their dedicated account manager for any needs.",
+        },
+        {
+          question: "What areas do you serve from Los Angeles?",
+          answer:
+            "While strategically located in Los Angeles for port proximity and West Coast shipping advantages, we serve e-commerce businesses across all 50 states. Clients ship their inventory to us, and we handle fulfillment to their customers nationwide.",
+        },
+        {
+          question: "Do you offer Amazon FBA prep in Los Angeles?",
+          answer:
+            "Yes! We provide complete Amazon FBA prep services including labeling, poly-bagging, bubble wrapping, inspection, and shipping to Amazon fulfillment centers. Our LA location offers fast transit times to West Coast Amazon warehouses.",
+        },
+        {
+          question: "Do you support Shopify fulfillment?",
+          answer:
+            "Absolutely! We specialize in Shopify fulfillment with native integration, same-day processing, custom branding options, and full photo documentation. Orders sync automatically and ship with real-time tracking updates.",
+        },
+      ],
+    }),
+    [],
+  );
 
   return (
     <>
       <Helmet>
-        <title>3PL Fulfillment for Shopify, Amazon & DTC Brands | Westfield</title>
-        <meta name="description" content="Westfield is a nationwide 3PL providing Shopify fulfillment, Amazon FBA prep, and DTC logistics. Transparent pricing, real-time integrations, and 24-hour turnaround." />
+        <title>Los Angeles Fulfillment Center for Shopify and Amazon</title>
+        <meta
+          name="description"
+          content="Westfield is a nationwide 3PL providing Shopify fulfillment, Amazon FBA prep, and DTC logistics. Transparent pricing, real-time integrations, and 24-hour turnaround."
+        />
         <meta name="robots" content="index, follow" />
-        <meta name="keywords" content="3pl shopify, shopify fulfillment center, amazon prep center, FBA prep center los angeles, 3pl pricing, DTC fulfillment, los angeles 3pl" />
+        <meta
+          name="keywords"
+          content="3pl shopify, shopify fulfillment center, amazon prep center, FBA prep center los angeles, 3pl pricing, DTC fulfillment, los angeles 3pl"
+        />
         <link rel="canonical" href="https://westfieldprepcenter.com/" />
         <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.position" content="34.0522;-118.2437" />
-        
+
         {/* Open Graph tags */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
         <meta property="og:site_name" content="Westfield Prep Center" />
         <meta property="og:title" content="3PL Fulfillment for Shopify, Amazon & DTC Brands" />
-        <meta property="og:description" content="Shopify fulfillment, FBA prep & DTC logistics with real-time integrations. $1–2.50/unit." />
+        <meta
+          property="og:description"
+          content="Shopify fulfillment, FBA prep & DTC logistics with real-time integrations. $1–2.50/unit."
+        />
         <meta property="og:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-        
+
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Westfield3PL" />
         <meta name="twitter:creator" content="@Westfield3PL" />
         <meta name="twitter:title" content="3PL Fulfillment for Shopify, Amazon & DTC Brands" />
-        <meta name="twitter:description" content="Westfield is a nationwide 3PL providing Shopify fulfillment, Amazon FBA prep, and DTC logistics. Transparent pricing and 24-hour turnaround." />
+        <meta
+          name="twitter:description"
+          content="Westfield is a nationwide 3PL providing Shopify fulfillment, Amazon FBA prep, and DTC logistics. Transparent pricing and 24-hour turnaround."
+        />
         <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
       </Helmet>
       <StructuredData type="organization" />
@@ -104,78 +124,148 @@ const Index = () => {
       <StructuredData type="localBusiness" />
       <StructuredData type="faq" data={faqData} />
       <div className="min-h-screen">
-      <Header />
-      <div className="pt-20">
-        <PremiumHero />
-        
-        
-        {/* Stats Strip */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-64 w-full" /></div>}>
-          <StatsStrip />
-        </Suspense>
-        
-        {/* Use Case Section - NEW CRO Component */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <UseCaseSection />
-        </Suspense>
-        
-        {/* Phase 3: Value Proposition */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <ValueProposition />
-        </Suspense>
-        
-        {/* Phase 4: Services Overview */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <Services />
-        </Suspense>
-        
-        {/* Phase 5: How It Works */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <HowItWorksProcess />
-        </Suspense>
-        
-        {/* Phase 6: Platform Compatibility */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <PlatformCompatibility />
-        </Suspense>
-        
-        {/* Phase 7: Testimonials */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <Reviews />
-        </Suspense>
-        
-        {/* Phase 8: LA Location */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <LocationShowcase />
-        </Suspense>
-        
-        {/* Blog Preview - NEW */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <BlogPreview />
-        </Suspense>
-        
-        
-        {/* Phase 10: FAQ */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <FAQAccordion />
-        </Suspense>
-        
-        {/* Phase 11: Final CTA */}
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-96 w-full" /></div>}>
-          <FinalCTA />
-        </Suspense>
-        
-        <Suspense fallback={<div className="container py-16"><Skeleton className="h-64 w-full" /></div>}>
-          <Compliance />
-        </Suspense>
-        
-        {/* Sticky Mobile CTA - NEW */}
-        <Suspense fallback={null}>
-          <StickyMobileCTA />
-        </Suspense>
+        <Header />
+        <div className="pt-20">
+          <PremiumHero />
+
+          {/* Stats Strip */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-64 w-full" />
+              </div>
+            }
+          >
+            <StatsStrip />
+          </Suspense>
+
+          {/* Use Case Section - NEW CRO Component */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <UseCaseSection />
+          </Suspense>
+
+          {/* Phase 3: Value Proposition */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <ValueProposition />
+          </Suspense>
+
+          {/* Phase 4: Services Overview */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <Services />
+          </Suspense>
+
+          {/* Phase 5: How It Works */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <HowItWorksProcess />
+          </Suspense>
+
+          {/* Phase 6: Platform Compatibility */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <PlatformCompatibility />
+          </Suspense>
+
+          {/* Phase 7: Testimonials */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <Reviews />
+          </Suspense>
+
+          {/* Phase 8: LA Location */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <LocationShowcase />
+          </Suspense>
+
+          {/* Blog Preview - NEW */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <BlogPreview />
+          </Suspense>
+
+          {/* Phase 10: FAQ */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <FAQAccordion />
+          </Suspense>
+
+          {/* Phase 11: Final CTA */}
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-96 w-full" />
+              </div>
+            }
+          >
+            <FinalCTA />
+          </Suspense>
+
+          <Suspense
+            fallback={
+              <div className="container py-16">
+                <Skeleton className="h-64 w-full" />
+              </div>
+            }
+          >
+            <Compliance />
+          </Suspense>
+
+          {/* Sticky Mobile CTA - NEW */}
+          <Suspense fallback={null}>
+            <StickyMobileCTA />
+          </Suspense>
+        </div>
       </div>
-      </div>
-        
+
       <Footer />
     </>
   );
