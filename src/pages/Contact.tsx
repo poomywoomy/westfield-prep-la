@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import ContactForm from "@/components/ContactForm";
 import StructuredData from "@/components/StructuredData";
