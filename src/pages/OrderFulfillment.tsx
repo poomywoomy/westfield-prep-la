@@ -21,8 +21,8 @@ const OrderFulfillment = () => {
   }, []);
 
   const meta = generateMetaTags(
-    "Order Fulfillment Services | Los Angeles 3PL & E-commerce Prep Center",
-    "Fast order fulfillment from our LA 3PL prep center. Same-day processing, 99.8% accuracy, multi-channel support for Shopify, Amazon, and TikTok Shop.",
+    "Order Fulfillment Services for Businesses with a Custom",
+    "Westfield Prep Center provides reliable order fulfillment services for businesses of all sizes. From storage to packing & shipping, we handle orders with care.",
     "/order-fulfillment"
   );
 

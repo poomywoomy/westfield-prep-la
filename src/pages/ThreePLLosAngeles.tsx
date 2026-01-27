@@ -11,8 +11,8 @@ import { TranslatedText } from "@/components/TranslatedText";
 
 const ThreePLLosAngeles = () => {
   const meta = generateMetaTags(
-    "3PL Los Angeles | Premium Fulfillment Center in Los Angeles",
-    "Premium Los Angeles 3PL for fast Shopify fulfillment, same-day receiving, and precise inventory handling. Scale your brand with a reliable LA-based logistics partner.",
+    "3PL Fulfillment Services at West Coast 3PL Warehouse",
+    "3PL fulfillment services at our West Coast 3PL warehouse help your e-commerce business grow. Fast, accurate, and reliable shipping. Get started with us today!",
     "/3pl-los-angeles",
     "/la-port-logistics.jpg"
   );
