@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import StructuredData from "@/components/StructuredData";
 import { Link } from "react-router-dom";
 import { TranslatedText } from "@/components/TranslatedText";
