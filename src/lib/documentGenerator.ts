@@ -1,6 +1,20 @@
 import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
 
+export interface ClientDetails {
+  companyName: string;
+  contactName: string;
+  contactTitle?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  email?: string;
+  phone?: string;
+  contactName2?: string;
+  contactTitle2?: string;
+}
+
 const DOCUMENT_CONTENT = {
   master_agreement: {
     title: "CLIENT SERVICE AGREEMENT (MASTER AGREEMENT)",
@@ -156,8 +170,7 @@ This Agreement may be executed electronically and in counterparts.`
 
 export const generateDocumentPDF = async (
   documentType: string,
-  clientName1: string,
-  clientName2?: string
+  clientDetails: ClientDetails
 ) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -193,33 +206,50 @@ export const generateDocumentPDF = async (
   yPosition += 4;
   doc.text(`Effective Date: ${formattedDate}`, pageWidth / 2, yPosition, { align: "center" });
 
-  // Add content
+  // Add content with hierarchical font sizes
   yPosition += 10;
-  doc.setFontSize(9);
   const lines = doc.splitTextToSize(content.content, maxWidth);
   
+  // Regex patterns for section detection
+  const mainSectionPattern = /^\d+\.\s+[A-Z]/;
+  const subsectionPattern = /^\d+\.\d+\s+/;
+  
   lines.forEach((line: string) => {
+    // Check for page break
     if (yPosition > pageHeight - 25) {
       doc.addPage();
       yPosition = margin;
     }
     
-    // Check if line is a section header (starts with number and period)
-    if (/^\d+\.\s+[A-Z]/.test(line) || /^\d+\.\d+\s+/.test(line)) {
+    // Determine line type and apply appropriate styling
+    if (mainSectionPattern.test(line)) {
+      // Main section header (e.g., "1. SERVICES")
+      yPosition += 4; // Extra space before main sections
+      doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
+      doc.text(line, margin, yPosition);
+      yPosition += 6;
+    } else if (subsectionPattern.test(line)) {
+      // Subsection header (e.g., "1.1 Scope of Services")
+      yPosition += 2; // Small extra space before subsections
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.text(line, margin, yPosition);
+      yPosition += 5;
     } else {
+      // Body text
+      doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
+      doc.text(line, margin, yPosition);
+      yPosition += 4.5;
     }
-    
-    doc.text(line, margin, yPosition);
-    yPosition += 4.5;
   });
 
   // Add signature section
   yPosition += 20;
   
   // Check if we need a new page for signatures
-  if (yPosition > pageHeight - 100) {
+  if (yPosition > pageHeight - 120) {
     doc.addPage();
     yPosition = margin + 10;
   }
@@ -273,28 +303,61 @@ export const generateDocumentPDF = async (
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   
-  // Display client name(s)
-  const clientNames = clientName2 ? `${clientName1} & ${clientName2}` : clientName1;
-  doc.text(clientNames, rightX, rightY);
-  rightY += 12;
+  // Display company name
+  doc.text(clientDetails.companyName, rightX, rightY);
+  rightY += 5;
+
+  // Display address if provided
+  if (clientDetails.address) {
+    doc.text(clientDetails.address, rightX, rightY);
+    rightY += 5;
+  }
+
+  // Display city, state, zip if provided
+  const cityStateZip = [
+    clientDetails.city,
+    clientDetails.state,
+    clientDetails.zip
+  ].filter(Boolean).join(", ");
+  if (cityStateZip) {
+    doc.text(cityStateZip, rightX, rightY);
+    rightY += 5;
+  }
+
+  rightY += 7;
 
   doc.text("Signature:", rightX, rightY);
   doc.line(rightX + 20, rightY, rightX + 80, rightY);
   rightY += 10;
 
   doc.text("Name:", rightX, rightY);
+  // Pre-fill contact name if provided
+  if (clientDetails.contactName) {
+    doc.text(clientDetails.contactName, rightX + 15, rightY);
+  }
   doc.line(rightX + 15, rightY, rightX + 80, rightY);
   rightY += 10;
 
   doc.text("Title:", rightX, rightY);
+  // Pre-fill title if provided
+  if (clientDetails.contactTitle) {
+    doc.text(clientDetails.contactTitle, rightX + 12, rightY);
+  }
   doc.line(rightX + 12, rightY, rightX + 80, rightY);
   rightY += 10;
+
+  // Email line
+  if (clientDetails.email) {
+    doc.text("Email:", rightX, rightY);
+    doc.text(clientDetails.email, rightX + 14, rightY);
+    rightY += 10;
+  }
 
   doc.text("Date:", rightX, rightY);
   doc.line(rightX + 12, rightY, rightX + 80, rightY);
 
-  // If there's a second client, add another signature block
-  if (clientName2) {
+  // If there's a second client contact, add another signature block
+  if (clientDetails.contactName2) {
     rightY += 20;
     
     doc.setFontSize(10);
@@ -304,7 +367,7 @@ export const generateDocumentPDF = async (
 
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
-    doc.text(clientName2, rightX, rightY);
+    doc.text(clientDetails.companyName, rightX, rightY);
     rightY += 12;
 
     doc.text("Signature:", rightX, rightY);
@@ -312,10 +375,14 @@ export const generateDocumentPDF = async (
     rightY += 10;
 
     doc.text("Name:", rightX, rightY);
+    doc.text(clientDetails.contactName2, rightX + 15, rightY);
     doc.line(rightX + 15, rightY, rightX + 80, rightY);
     rightY += 10;
 
     doc.text("Title:", rightX, rightY);
+    if (clientDetails.contactTitle2) {
+      doc.text(clientDetails.contactTitle2, rightX + 12, rightY);
+    }
     doc.line(rightX + 12, rightY, rightX + 80, rightY);
     rightY += 10;
 
