@@ -1070,31 +1070,58 @@ export type Database = {
       }
       generated_documents: {
         Row: {
+          address: string | null
+          city: string | null
           client_name_1: string | null
           client_name_2: string | null
+          company_name: string | null
+          contact_title: string | null
+          contact_title_2: string | null
           created_at: string
           document_type: string
+          email: string | null
           generated_by: string | null
           generated_date: string
           id: string
+          phone: string | null
+          state: string | null
+          zip: string | null
         }
         Insert: {
+          address?: string | null
+          city?: string | null
           client_name_1?: string | null
           client_name_2?: string | null
+          company_name?: string | null
+          contact_title?: string | null
+          contact_title_2?: string | null
           created_at?: string
           document_type: string
+          email?: string | null
           generated_by?: string | null
           generated_date?: string
           id?: string
+          phone?: string | null
+          state?: string | null
+          zip?: string | null
         }
         Update: {
+          address?: string | null
+          city?: string | null
           client_name_1?: string | null
           client_name_2?: string | null
+          company_name?: string | null
+          contact_title?: string | null
+          contact_title_2?: string | null
           created_at?: string
           document_type?: string
+          email?: string | null
           generated_by?: string | null
           generated_date?: string
           id?: string
+          phone?: string | null
+          state?: string | null
+          zip?: string | null
         }
         Relationships: []
       }
