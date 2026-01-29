@@ -1,80 +1,165 @@
 
 
-## Replace Admin Document Generator with New Client Service Agreement
+## Improve Document Generator: Font Hierarchy and Extended Client Fields
 
 ### Overview
-Replace the existing three documents (CSA, Exhibit A, Exhibit B) with a single comprehensive "Client Service Agreement (Master Agreement)" document, with proper Westfield branding and signature fields.
+Enhance the PDF document generator with clear visual hierarchy for section numbering and expand the form to capture all necessary contract details beyond just client names.
 
-### Changes Required
+---
 
-#### 1. Update Document Content (`src/lib/documentGenerator.ts`)
+### Part 1: PDF Font Hierarchy for Section Numbers
 
-**Remove:**
-- `csa` document content
-- `exhibit_a` document content  
-- `exhibit_b` document content
+**Current Issue:** All sections and subsections use the same 9pt font size, making them blend together.
 
-**Add:**
-- New `master_agreement` document with the complete 16-section Client Service Agreement content provided
+**Solution:** Implement a three-tier font hierarchy:
 
-#### 2. Update Document Generator Tab (`src/components/admin/DocumentGeneratorTab.tsx`)
+| Element | Font Size | Style | Example |
+|---------|-----------|-------|---------|
+| Main Sections | 12pt | Bold | "1. SERVICES" |
+| Subsections | 10pt | Bold | "1.1 Scope of Services" |
+| Body Text | 9pt | Normal | Paragraph content |
+
+**Detection Logic:**
+```text
+Main Section: /^\d+\.\s+[A-Z]/  (e.g., "1. SERVICES")
+Subsection: /^\d+\.\d+\s+/      (e.g., "1.1 Scope of Services")
+Body: Everything else
+```
+
+**Additional spacing:** Add extra vertical space before main sections for better separation.
+
+---
+
+### Part 2: Extended Client Information Fields
+
+**New Form Fields:**
+
+| Field | Required | Purpose |
+|-------|----------|---------|
+| Company/Business Name | Yes | Legal entity name for the agreement |
+| Contact Name | Yes | Primary signer name |
+| Title/Position | No | Signer's role (e.g., "Owner", "CEO") |
+| Address | No | Business address |
+| City, State, ZIP | No | Location details |
+| Email | No | Contact email |
+| Phone | No | Contact phone |
+| Second Contact Name | No | Additional signer if needed |
+| Second Contact Title | No | Second signer's role |
+
+---
+
+### Part 3: Database Migration
+
+Add new columns to `generated_documents` table:
+
+```sql
+ALTER TABLE generated_documents
+ADD COLUMN company_name TEXT,
+ADD COLUMN contact_title TEXT,
+ADD COLUMN address TEXT,
+ADD COLUMN city TEXT,
+ADD COLUMN state TEXT,
+ADD COLUMN zip TEXT,
+ADD COLUMN email TEXT,
+ADD COLUMN phone TEXT,
+ADD COLUMN contact_title_2 TEXT;
+```
+
+Rename existing columns for clarity:
+- `client_name_1` stays as primary contact name
+- `client_name_2` stays as secondary contact name
+
+---
+
+### Part 4: Updated Signature Section in PDF
 
 **Current:**
-```javascript
-const DOCUMENT_TYPES = {
-  csa: "Client Service Agreement (CSA)",
-  exhibit_a: "EXHIBIT A — Terms and Conditions Addendum",
-  exhibit_b: "EXHIBIT B — Liability Waiver and Hold Harmless Agreement"
-};
+```text
+CLIENT:
+[Client Name]
+
+Signature: _______________
+Name: _______________
+Title: _______________
+Date: _______________
 ```
 
-**New:**
-```javascript
-const DOCUMENT_TYPES = {
-  master_agreement: "Client Service Agreement (Master Agreement)"
-};
+**New (with filled data):**
+```text
+CLIENT:
+[Company Name]
+[Address]
+[City, State ZIP]
+
+Signature: _______________
+Name: [Contact Name]
+Title: [Contact Title] (or blank line if not provided)
+Email: [Email]
+Date: _______________
 ```
 
-#### 3. PDF Formatting Updates
+---
 
-The PDF will include:
-- Westfield logo centered at top (existing)
-- Title: "CLIENT SERVICE AGREEMENT (MASTER AGREEMENT)"
-- Current date
-- All 16 sections of the agreement properly formatted
-- **Signature Section at End:**
-  - SERVICE PROVIDER: Sathatham LLC dba Westfield Prep Center with signature line
-  - CLIENT: Dynamic client name(s) with signature line
-  - Date field
+### Technical Implementation
 
-### Document Structure (16 Sections)
+#### File Changes:
 
-1. Services (Scope, No Fiduciary, Written Instructions Required)
-2. Quality Control (Complimentary)
-3. Client Responsibilities and Representations
-4. Regulated and High-Risk Goods
-5. Fees and Payment ($500 setup fee, late fees)
-6. Storage and Abandonment (30-day disposal notice)
-7. Risk of Loss and Carriers
-8. Insurance
-9. Limitation of Liability (60-day fee cap)
-10. Assumption of Risk and Release
-11. Indemnification
-12. Bailment Limitation
-13. Dispute Resolution (CA law, LA arbitration, class waiver)
-14. Term and Termination (30-day notice)
-15. Miscellaneous
-16. Execution
+1. **`src/lib/documentGenerator.ts`**
+   - Update function signature to accept a client details object instead of separate strings
+   - Implement font size switching based on section type
+   - Add spacing before main sections
+   - Update signature section to display all provided client information
 
-### Technical Details
+2. **`src/components/admin/DocumentGeneratorTab.tsx`**
+   - Replace simple input fields with comprehensive form
+   - Group fields logically (Company Info, Contact 1, Contact 2)
+   - Update state management for all new fields
+   - Update database insert to include all fields
+   - Update history display to show company name
 
-- Font: Helvetica (consistent with current)
-- Logo: Centered Westfield logo from `westfield-logo-pdf.jpg`
-- Page handling: Auto-pagination when content exceeds page
-- Signature layout: Two-column format (Service Provider left, Client right)
-- File naming: `Client_Service_Agreement_Master_Agreement_MM-DD-YYYY.pdf`
+3. **Database Migration**
+   - Add new columns for extended client information
 
-### Database Compatibility
+---
 
-The `generated_documents` table already supports custom document types via `document_type` text field, so no database migration needed. Historical records will reference old document types while new ones use `master_agreement`.
+### Form Layout Preview
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  COMPANY INFORMATION                                     │
+│  ┌────────────────────────────────────────────────────┐ │
+│  │ Company/Business Name *                            │ │
+│  └────────────────────────────────────────────────────┘ │
+│  ┌──────────────────────┐  ┌────────────────────────┐  │
+│  │ Address              │  │ City                   │  │
+│  └──────────────────────┘  └────────────────────────┘  │
+│  ┌────────────┐  ┌──────────────┐                      │
+│  │ State      │  │ ZIP          │                      │
+│  └────────────┘  └──────────────┘                      │
+├─────────────────────────────────────────────────────────┤
+│  PRIMARY CONTACT                                         │
+│  ┌────────────────────────┐  ┌──────────────────────┐  │
+│  │ Contact Name *         │  │ Title                │  │
+│  └────────────────────────┘  └──────────────────────┘  │
+│  ┌────────────────────────┐  ┌──────────────────────┐  │
+│  │ Email                  │  │ Phone                │  │
+│  └────────────────────────┘  └──────────────────────┘  │
+├─────────────────────────────────────────────────────────┤
+│  SECONDARY CONTACT (Optional)                            │
+│  ┌────────────────────────┐  ┌──────────────────────┐  │
+│  │ Contact Name           │  │ Title                │  │
+│  └────────────────────────┘  └──────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Summary of Deliverables
+
+1. PDF with clear visual hierarchy (12pt/10pt/9pt fonts)
+2. Additional vertical spacing before main sections
+3. Extended form with 10+ customizable fields
+4. Updated signature block showing all provided client details
+5. Database schema update to persist all fields
+6. Backward compatible with existing document history
 
