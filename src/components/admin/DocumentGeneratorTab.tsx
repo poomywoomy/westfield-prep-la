@@ -11,9 +11,7 @@ import { FileText, Download } from "lucide-react";
 import { generateDocumentPDF } from "@/lib/documentGenerator";
 
 const DOCUMENT_TYPES = {
-  csa: "Client Service Agreement (CSA)",
-  exhibit_a: "EXHIBIT A — Terms and Conditions Addendum",
-  exhibit_b: "EXHIBIT B — Liability Waiver and Hold Harmless Agreement"
+  master_agreement: "Client Service Agreement (Master Agreement)"
 };
 
 const DocumentGeneratorTab = () => {
