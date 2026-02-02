@@ -1,619 +1,689 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Shield, Camera, Clock, Heart, MapPin, Award, TrendingUp, CheckCircle, Package, ClipboardCheck, Tag, Warehouse, Headphones, Truck, X } from "lucide-react";
-import { TranslatedText } from "@/components/TranslatedText";
+  CheckCircle2,
+  Camera,
+  MapPin,
+  X,
+  ArrowRight,
+  Palette,
+  Globe,
+  ShoppingBag,
+  Truck,
+  Box,
+  AlertTriangle,
+  Anchor,
+  TrendingUp,
+  Server,
+  RefreshCw,
+  ChevronDown,
+  ChevronUp,
+  ShieldCheck,
+} from "lucide-react";
 
-const processSteps = [
-  {
-    number: 1,
-    title: "Receiving & Check-In",
-    icon: Truck,
-    description: "Your shipment arrives and our team springs into action—scanning, photographing, and updating your portal in real-time. You'll know exactly what came in before we even finish unpacking.",
-    details: [
-      { title: "ASN Verification", description: "Cross-check your Advanced Ship Notice with actual shipment contents" },
-      { title: "Barcode Scanning", description: "Scan every item into our system for real-time tracking" },
-      { title: "Photo Documentation", description: "Timestamped photos of boxes, labels, and condition" },
-      { title: "Discrepancy Handling", description: "Immediate notification if quantities or items don't match" },
-      { title: "Portal Update", description: "You see real-time updates as we check in each item" }
-    ],
-    timeline: "2-4 hours for standard shipments",
-    clientVisibility: "Real-time portal updates + photo gallery"
-  },
-  {
-    number: 2,
-    title: "Quality Control & Inspection",
-    icon: ClipboardCheck,
-    description: "100% inspection rate. Not random sampling, not spot checks—we examine every unit that comes through our doors. Because one damaged item reaching your customer is one too many.",
-    details: [
-      { title: "Visual Inspection", description: "Check for damage, defects, functionality issues, and presentation quality" },
-      { title: "Photo Documentation", description: "Multiple angles, close-ups of any concerns, before/after comparisons" },
-      { title: "Multi-Channel Compliance", description: "Verify requirements for Amazon FBA, Shopify stores, DTC orders, and TikTok Shop" },
-      { title: "Product Safety & Labeling", description: "California Prop 65, choking hazards, material compliance across all channels" },
-      { title: "QC Report Generation", description: "Detailed report with timestamped photos sent to your dashboard" }
-    ],
-    timeline: "24-48 hours depending on volume",
-    clientVisibility: "Timestamped QC report + hi-res photos"
-  },
-  {
-    number: 3,
-    title: "Custom Prep & Branding",
-    icon: Tag,
-    description: "From Amazon barcodes to branded unboxing experiences—we prep for every channel you sell on.",
-    details: [
-      { title: "Multi-Channel Labeling", description: "Amazon FNSKU barcodes, Shopify SKU labels, and custom brand tags" },
-      { title: "Branded Packaging Setup", description: "Insert thank you cards, promotional flyers, tissue paper, and stickers" },
-      { title: "FBA Compliance Prep", description: "Poly bagging with suffocation warnings, bubble wrapping, box content labels" },
-      { title: "DTC-Ready Enhancements", description: "Gift wrapping, personalized notes, bundle assembly, and tamper-evident sealing" },
-      { title: "Documentation & Tracking", description: "Photo proof of every prep task with SKU-level tracking" }
-    ],
-    timeline: "Same day or next business day",
-    clientVisibility: "Real-time prep status + before/after photos"
-  },
-  {
-    number: 4,
-    title: "Storage & Inventory Management",
-    icon: Warehouse,
-    description: "Your inventory lives in climate-controlled comfort with 24/7 security. Organized by SKU, tracked in real-time, and always ready to ship at a moment's notice.",
-    details: [
-      { title: "Climate Control", description: "Temperature and humidity regulated storage" },
-      { title: "SKU Organization", description: "Logical bin locations for fast picking" },
-      { title: "Real-Time Tracking", description: "Live inventory counts in your portal" },
-      { title: "FIFO/LIFO Management", description: "Expiration date tracking and rotation" },
-      { title: "Security Monitoring", description: "24/7 surveillance and access control" }
-    ],
-    timeline: "Ongoing",
-    clientVisibility: "Live inventory dashboard"
-  },
-  {
-    number: 5,
-    title: "Pick, Pack & Ship",
-    icon: Package,
-    description: "Hit our 2 PM PST cutoff and your orders ship today—not tomorrow, not 'we'll try.' Today. That's how we keep your customers happy and your reviews glowing.",
-    details: [
-      { title: "Order Picking", description: "99.8% accuracy rate across Shopify, Amazon, TikTok Shop, and direct orders" },
-      { title: "Custom Packaging", description: "Your branded boxes, tissue paper, inserts, thank you cards—the full experience" },
-      { title: "Final QC Check", description: "Double-check item, quantity, address, and presentation before sealing" },
-      { title: "Smart Carrier Selection", description: "Best rates and delivery speed via our negotiated USPS, UPS, FedEx accounts" },
-      { title: "Automatic Tracking Updates", description: "Tracking syncs to your sales channels automatically—Shopify, Amazon, TikTok Shop, or custom integrations" }
-    ],
-    timeline: "Same-day shipping (2 PM PST cutoff)",
-    clientVisibility: "Real-time order status + tracking"
-  },
-  {
-    number: 6,
-    title: "Post-Ship Support & Analytics",
-    icon: Headphones,
-    description: "The relationship doesn't end at the dock door. We're monitoring tracking, processing returns, and analyzing your fulfillment data to help you scale smarter.",
-    details: [
-      { title: "Tracking Monitoring", description: "We watch for delivery issues" },
-      { title: "Return Processing", description: "Handle returns and restocking" },
-      { title: "Issue Resolution", description: "Direct line to our team, no ticket systems" },
-      { title: "Performance Analytics", description: "Monthly reports on speed, accuracy, cost" },
-      { title: "Process Optimization", description: "We proactively suggest improvements" }
-    ],
-    timeline: "Ongoing",
-    clientVisibility: "Monthly analytics dashboard"
-  }
-];
+// --- CUSTOM GRAPHIC COMPONENT: The "Old Way" vs "Westfield Way" ---
+const ComparisonGraphic = () => (
+  <div className="grid md:grid-cols-2 gap-8 my-16">
+    <div className="bg-red-900/10 border border-red-900/30 p-8 rounded-2xl relative overflow-hidden">
+      <div className="absolute -right-10 -top-10 text-red-900/10 opacity-20">
+        <AlertTriangle size={200} />
+      </div>
+      <h3 className="text-xl font-bold text-red-400 mb-6 flex items-center gap-2">
+        <X size={24} /> The "Black Box" 3PL
+      </h3>
+      <ul className="space-y-4 relative z-10">
+        <li className="flex gap-4 items-start text-gray-400">
+          <div className="mt-1 min-w-[20px]">
+            <X size={16} className="text-red-500" />
+          </div>
+          <p>
+            <strong>Blind Receiving:</strong> Your stock sits on a dock for 5 days. You don't know it arrived until it's "checked in" a week later.
+          </p>
+        </li>
+        <li className="flex gap-4 items-start text-gray-400">
+          <div className="mt-1 min-w-[20px]">
+            <X size={16} className="text-red-500" />
+          </div>
+          <p>
+            <strong>Ghosting Support:</strong> You submit a ticket for a missing order. You get an automated reply. You wait 48 hours for a real human.
+          </p>
+        </li>
+        <li className="flex gap-4 items-start text-gray-400">
+          <div className="mt-1 min-w-[20px]">
+            <X size={16} className="text-red-500" />
+          </div>
+          <p>
+            <strong>Hidden Fees:</strong> "Account Management Fee," "Setup Fee," "Technology Fee." The invoice is always higher than the quote.
+          </p>
+        </li>
+      </ul>
+    </div>
+
+    <div className="bg-green-900/10 border border-green-900/30 p-8 rounded-2xl relative overflow-hidden">
+      <div className="absolute -right-10 -top-10 text-green-900/10 opacity-20">
+        <CheckCircle2 size={200} />
+      </div>
+      <h3 className="text-xl font-bold text-green-400 mb-6 flex items-center gap-2">
+        <CheckCircle2 size={24} /> The Westfield Standard
+      </h3>
+      <ul className="space-y-4 relative z-10">
+        <li className="flex gap-4 items-start text-gray-300">
+          <div className="mt-1 min-w-[20px]">
+            <CheckCircle2 size={16} className="text-green-500" />
+          </div>
+          <p>
+            <strong>24hr Intake:</strong> We scan your ASN within 24 hours. You get a notification (and photos) the moment it hits our dock.
+          </p>
+        </li>
+        <li className="flex gap-4 items-start text-gray-300">
+          <div className="mt-1 min-w-[20px]">
+            <CheckCircle2 size={16} className="text-green-500" />
+          </div>
+          <p>
+            <strong>Direct Slack Access:</strong> You talk to the person packing your boxes. Real-time problem solving, not ticket queues.
+          </p>
+        </li>
+        <li className="flex gap-4 items-start text-gray-300">
+          <div className="mt-1 min-w-[20px]">
+            <CheckCircle2 size={16} className="text-green-500" />
+          </div>
+          <p>
+            <strong>Flat Pricing:</strong> One prep fee. One pick fee. One storage fee. If we didn't quote it, we don't bill it.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </div>
+);
+
+// --- CUSTOM GRAPHIC COMPONENT: The Tech Stack Integration ---
+const TechStackGraphic = () => (
+  <div className="relative p-10 bg-[hsl(var(--wcu-bg-secondary))] rounded-2xl border border-white/5 my-12 overflow-hidden">
+    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:30px_30px]" />
+    <div className="relative z-10 flex flex-col items-center">
+      {/* Central Hub */}
+      <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-orange-700 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(249,115,22,0.4)] mb-12 z-20">
+        <Server size={40} className="text-white" />
+      </div>
+
+      {/* Connection Lines (CSS borders) */}
+      <div className="absolute top-[88px] left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
+      <div className="absolute top-[88px] left-[10%] w-[1px] h-[60px] bg-gradient-to-b from-orange-500/50 to-transparent" />
+      <div className="absolute top-[88px] right-[10%] w-[1px] h-[60px] bg-gradient-to-b from-orange-500/50 to-transparent" />
+
+      {/* Nodes */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-4xl">
+        {[
+          { icon: ShoppingBag, label: "Shopify/Plus", desc: "Real-time bi-directional sync" },
+          { icon: Box, label: "Amazon FBA", desc: "FNSKU & prep compliance" },
+          { icon: TrendingUp, label: "TikTok Shop", desc: "48hr SLA adherence" },
+          { icon: Globe, label: "B2B / EDI", desc: "Retail routing guides" },
+        ].map((item, i) => (
+          <div
+            key={i}
+            className="bg-[hsl(var(--wcu-bg-dark-card))] p-6 rounded-xl border border-white/10 text-center hover:border-orange-500/30 transition-all group"
+          >
+            <div className="mx-auto w-10 h-10 bg-white/5 rounded-full flex items-center justify-center mb-3 group-hover:bg-orange-500/20 group-hover:text-orange-500 transition-colors">
+              <item.icon size={20} />
+            </div>
+            <div className="font-bold text-white text-sm mb-1">{item.label}</div>
+            <div className="text-xs text-gray-500">{item.desc}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <div className="text-center mt-8">
+      <p className="text-gray-400 text-sm">
+        + Native Integrations for Walmart, eBay, Etsy, WooCommerce, and 50+ others via middleware.
+      </p>
+    </div>
+  </div>
+);
+
+// --- FAQ Item Component ---
+const FAQItem = ({ q, a }: { q: string; a: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-white/10 last:border-0">
+      <button
+        className="w-full py-6 text-left flex items-center justify-between hover:text-orange-400 transition-colors focus:outline-none"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="font-semibold text-lg pr-8">{q}</span>
+        {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+      </button>
+      {isOpen && (
+        <div className="pb-6 text-gray-400 leading-relaxed animate-in fade-in slide-in-from-top-2">
+          {a}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const WhyChooseUs = () => {
   const navigate = useNavigate();
-  const [orderAccuracy, setOrderAccuracy] = useState(0);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    
-    // Animate counter on load
-    let current = 0;
-    const target = 99.8;
-    const increment = target / 50;
-    
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        setOrderAccuracy(target);
-        clearInterval(timer);
-      } else {
-        setOrderAccuracy(Math.round(current * 10) / 10);
-      }
-    }, 30);
-    
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <>
       <Helmet>
         <title>Why Choose Our Los Angeles Prep Center | Westfield Prep Center</title>
-        <meta name="description" content="Discover why e-commerce sellers choose Westfield Prep Center in Los Angeles. Photo-proof QC, same-day processing, boutique service, and full insurance coverage. Learn what makes us different." />
+        <meta
+          name="description"
+          content="Discover why e-commerce sellers choose Westfield Prep Center in Los Angeles. Photo-proof QC, same-day processing, boutique service, and full insurance coverage. Learn what makes us different."
+        />
         <link rel="canonical" href="https://westfieldprepcenter.com/why-choose-us/" />
-        
+
         {/* Open Graph tags */}
         <meta property="og:title" content="Why Choose Our Los Angeles Prep Center | Westfield Prep Center" />
-        <meta property="og:description" content="Discover why e-commerce sellers choose Westfield Prep Center in Los Angeles. Photo-proof QC, same-day processing, boutique service, and full insurance coverage." />
+        <meta
+          property="og:description"
+          content="Discover why e-commerce sellers choose Westfield Prep Center in Los Angeles. Photo-proof QC, same-day processing, boutique service, and full insurance coverage."
+        />
         <meta property="og:url" content="https://westfieldprepcenter.com/why-choose-us/" />
-        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+        <meta
+          property="og:image"
+          content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
+        />
         <meta property="og:type" content="website" />
-        
+
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Why Choose Our Los Angeles Prep Center | Westfield Prep Center" />
-        <meta name="twitter:description" content="Discover why e-commerce sellers choose Westfield Prep Center. Photo-proof QC, same-day processing, boutique service, and full insurance coverage." />
-        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+        <meta
+          name="twitter:description"
+          content="Discover why e-commerce sellers choose Westfield Prep Center. Photo-proof QC, same-day processing, boutique service, and full insurance coverage."
+        />
+        <meta
+          name="twitter:image"
+          content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
+        />
       </Helmet>
-      
-      <StructuredData type="service" data={{
-        name: "Boutique Fulfillment Services",
-        description: "White-glove prep center and fulfillment services in Los Angeles. Specializing in Amazon FBA prep, Shopify fulfillment, and multi-channel e-commerce logistics with same-day processing and photo-proof QC."
-      }} />
-      
-      <StructuredData type="breadcrumb" data={[
-        { name: "Home", url: "https://westfieldprepcenter.com/" },
-        { name: "Why Choose Us", url: "https://westfieldprepcenter.com/why-choose-us/" }
-      ]} />
-      
-      <div className="min-h-screen">
+
+      <StructuredData
+        type="service"
+        data={{
+          name: "Boutique Fulfillment Services",
+          description:
+            "White-glove prep center and fulfillment services in Los Angeles. Specializing in Amazon FBA prep, Shopify fulfillment, and multi-channel e-commerce logistics with same-day processing and photo-proof QC.",
+        }}
+      />
+
+      <StructuredData
+        type="breadcrumb"
+        data={[
+          { name: "Home", url: "https://westfieldprepcenter.com/" },
+          { name: "Why Choose Us", url: "https://westfieldprepcenter.com/why-choose-us/" },
+        ]}
+      />
+
+      <div className="min-h-screen bg-[hsl(var(--wcu-bg-primary))] text-white font-sans selection:bg-orange-500 selection:text-white">
         <Header />
-        
-        <main className="pt-16">
-          {/* Hero Section - Fun & Spontaneous */}
-          <section className="relative py-20 bg-gradient-to-br from-primary/20 via-secondary/10 to-background overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),transparent)]" />
-            <div className="absolute top-10 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-10 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-            
-            <div className="container mx-auto px-4 relative z-10">
-              <div className="max-w-4xl mx-auto text-center">
-                <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
-                  <TranslatedText>We're Not Your Average</TranslatedText><br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                    <TranslatedText>Prep Center</TranslatedText>
-                  </span>
-                </h1>
-                <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in delay-200">
-                  <TranslatedText>Whether you're selling on Amazon, Shopify, or direct—your brand gets VIP treatment</TranslatedText> ✨
-                </p>
-                <Button 
-                  size="lg" 
+
+        <main className="pt-20">
+          {/* --- HERO SECTION --- */}
+          <section className="relative pt-24 pb-20 overflow-hidden">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-orange-500/20 blur-[120px] rounded-full pointer-events-none opacity-40"></div>
+            <div className="container mx-auto px-6 relative z-10 text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-orange-400 mb-8 backdrop-blur-sm">
+                <ShieldCheck size={16} />
+                <span>99.8% Order Accuracy Guaranteed</span>
+              </div>
+              <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6 tracking-tight">
+                The Infrastructure Your <br className="hidden md:block" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
+                  Brand Deserves.
+                </span>
+              </h1>
+              <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+                E-commerce has evolved. Your fulfillment partner shouldn't be stuck in 2010. We combine strategic{" "}
+                <strong className="text-white">LA port access</strong>,{" "}
+                <strong className="text-white">proprietary technology</strong>, and{" "}
+                <strong className="text-white">boutique care</strong> to turn your logistics from a cost center into a
+                growth engine.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                <button
                   onClick={() => navigate("/contact")}
-                  className="bg-secondary hover:bg-secondary/90 hover:scale-105 transition-all duration-300"
+                  className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all shadow-lg hover:shadow-orange-500/25 flex items-center justify-center gap-2"
                 >
-                  <TranslatedText>Let's Talk</TranslatedText> →
-                </Button>
+                  Start Shipping Now <ArrowRight size={20} />
+                </button>
+                <button
+                  onClick={() => navigate("/pricing")}
+                  className="w-full sm:w-auto bg-transparent border border-white/20 hover:bg-white/5 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all"
+                >
+                  View Our Pricing
+                </button>
+              </div>
+
+              {/* Social Proof Bar */}
+              <div className="border-t border-white/10 pt-10 flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <span className="text-xl font-bold font-serif">SHOPIFY PLUS</span>
+                <span className="text-xl font-bold tracking-tighter">
+                  amazon<span className="italic">FBA</span>
+                </span>
+                <span className="text-xl font-bold">Walmart Marketplace</span>
+                <span className="text-xl font-bold flex items-center gap-1">
+                  <span className="bg-white text-black p-0.5 text-xs rounded">Tik</span>Tok Shop
+                </span>
               </div>
             </div>
           </section>
 
-          {/* Channels We Support */}
-          <section className="py-16 bg-gradient-to-br from-primary/5 to-secondary/5">
-            <div className="container mx-auto px-4">
-              <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-3"><TranslatedText>We Fulfill for Every Channel You Sell On</TranslatedText></h2>
-                <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  <TranslatedText>One prep center. All your sales channels. Seamless multi-channel fulfillment.</TranslatedText>
+          {/* --- SECTION 1: THE PROBLEM --- */}
+          <section className="py-20 bg-[hsl(var(--wcu-bg-secondary))]">
+            <div className="container mx-auto px-6">
+              <div className="max-w-4xl mx-auto text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-6">Why Most Brands Leave Their 3PL</h2>
+                <p className="text-gray-400 text-lg">
+                  The logistics industry is plagued by "black box" operations. You send inventory in, and you lose
+                  visibility until the customer complains. We built Westfield to fix the three biggest pain points in
+                  modern fulfillment.
                 </p>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-                <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
-                      <Package className="h-6 w-6 text-white" />
-                    </div>
-                    <p className="font-semibold"><TranslatedText>Amazon FBA</TranslatedText></p>
-                    <p className="text-xs text-muted-foreground mt-1"><TranslatedText>Full prep & compliance</TranslatedText></p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <div className="h-12 w-12 bg-gradient-to-br from-secondary to-secondary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
-                      <Package className="h-6 w-6 text-white" />
-                    </div>
-                    <p className="font-semibold"><TranslatedText>Shopify Stores</TranslatedText></p>
-                    <p className="text-xs text-muted-foreground mt-1"><TranslatedText>Direct fulfillment</TranslatedText></p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
-                      <Package className="h-6 w-6 text-white" />
-                    </div>
-                    <p className="font-semibold"><TranslatedText>TikTok Shop</TranslatedText></p>
-                    <p className="text-xs text-muted-foreground mt-1"><TranslatedText>Fast turnaround</TranslatedText></p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <div className="h-12 w-12 bg-gradient-to-br from-secondary to-secondary/70 rounded-lg flex items-center justify-center mx-auto mb-3">
-                      <Package className="h-6 w-6 text-white" />
-                    </div>
-                    <p className="font-semibold"><TranslatedText>Direct to Customer</TranslatedText></p>
-                    <p className="text-xs text-muted-foreground mt-1"><TranslatedText>Branded packaging</TranslatedText></p>
-                  </CardContent>
-                </Card>
-              </div>
+              <ComparisonGraphic />
             </div>
           </section>
 
-          {/* Key Differentiators - Asymmetric Masonry Layout */}
-          <section className="py-20 bg-background">
-            <div className="container mx-auto px-4">
-              <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4"><TranslatedText>What Makes Us Different</TranslatedText></h2>
-                <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  <TranslatedText>Boutique service meets enterprise-grade capabilities</TranslatedText>
-                </p>
-              </div>
-              <div className="grid md:grid-cols-6 gap-6 max-w-6xl mx-auto">
-                <Card className="md:col-span-2 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:rotate-1 border-l-4 border-l-primary">
-                  <CardHeader>
-                    <div className="h-14 w-14 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center mb-4">
-                      <Heart className="h-7 w-7 text-white" />
+          {/* --- SECTION 2: THE 4 PILLARS OF EXCELLENCE (Deep Dive) --- */}
+          <section className="py-24 container mx-auto px-6">
+            <div className="text-center mb-20">
+              <h2 className="text-3xl md:text-5xl font-bold mb-6">Built for High-Growth Brands</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+                We don't just "store and ship." We engineer a workflow that protects your margins and enhances your
+                brand experience.
+              </p>
+            </div>
+
+            <div className="space-y-24">
+              {/* Deep Dive 1: The Tech */}
+              <div className="flex flex-col lg:flex-row items-center gap-16">
+                <div className="lg:w-1/2">
+                  <div className="inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold mb-4">
+                    PROPRIETARY TECHNOLOGY
+                  </div>
+                  <h3 className="text-3xl font-bold mb-6">A Dashboard That Tells the Truth.</h3>
+                  <p className="text-gray-400 text-lg mb-6 leading-relaxed">
+                    Stop emailing spreadsheets back and forth. Our custom-built WMS (Warehouse Management System) acts
+                    as your central command center.
+                  </p>
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-start gap-3">
+                      <div className="mt-1 bg-blue-500/20 p-1 rounded">
+                        <Camera size={16} className="text-blue-400" />
+                      </div>
+                      <div>
+                        <span className="font-bold block text-white">Visual Validation</span>
+                        <span className="text-sm text-gray-500">
+                          Every damaged item is photographed and uploaded instantly. You decide: discard, discount, or
+                          return.
+                        </span>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="mt-1 bg-blue-500/20 p-1 rounded">
+                        <RefreshCw size={16} className="text-blue-400" />
+                      </div>
+                      <div>
+                        <span className="font-bold block text-white">Real-Time Sync</span>
+                        <span className="text-sm text-gray-500">
+                          Inventory levels sync across Shopify, Amazon, and TikTok every 5 minutes. No overselling.
+                        </span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div className="lg:w-1/2 w-full">
+                  {/* Complex Dashboard Visual Component */}
+                  <div className="bg-[hsl(var(--wcu-bg-card))] rounded-xl border border-white/10 shadow-2xl overflow-hidden transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                    <div className="h-8 bg-[hsl(var(--wcu-bg-primary))] border-b border-white/10 flex items-center px-4 gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
                     </div>
-                    <CardTitle className="text-xl"><TranslatedText>Boutique Service</TranslatedText></CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>Big 3PLs treat you like a number. We treat you like the business owner you are.</TranslatedText></p>
-                  </CardContent>
-                </Card>
-
-                <Card className="md:col-span-2 md:row-span-2 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:-rotate-1 border-l-4 border-l-secondary">
-                  <CardHeader>
-                    <div className="h-14 w-14 bg-gradient-to-br from-secondary to-secondary/70 rounded-xl flex items-center justify-center mb-4">
-                      <Clock className="h-7 w-7 text-white" />
-                    </div>
-                    <CardTitle className="text-xl"><TranslatedText>Same-Day Processing</TranslatedText></CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground leading-relaxed mb-4"><TranslatedText>Orders placed before 2 PM PST ship the same business day. No backlog, no delays, no excuses.</TranslatedText></p>
-                    <p className="text-sm text-muted-foreground"><TranslatedText>While other prep centers make you wait 2-3 days, we're already shipping your orders.</TranslatedText></p>
-                  </CardContent>
-                </Card>
-
-                <Card className="md:col-span-2 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-l-4 border-l-primary">
-                  <CardHeader>
-                    <div className="h-14 w-14 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center mb-4">
-                      <Camera className="h-7 w-7 text-white" />
-                    </div>
-                    <CardTitle className="text-xl"><TranslatedText>Photo-Proof QC</TranslatedText></CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>Every shipment documented with timestamped photos. Complete transparency.</TranslatedText></p>
-                  </CardContent>
-                </Card>
-
-                <Card className="md:col-span-3 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:rotate-1 border-l-4 border-l-secondary">
-                  <CardHeader>
-                    <div className="h-14 w-14 bg-gradient-to-br from-secondary to-secondary/70 rounded-xl flex items-center justify-center mb-4">
-                      <Shield className="h-7 w-7 text-white" />
-                    </div>
-                    <CardTitle className="text-xl"><TranslatedText>Full Insurance Coverage</TranslatedText></CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground leading-relaxed"><TranslatedText>$2M general liability and cargo insurance. Your inventory is protected at every stage.</TranslatedText></p>
-                  </CardContent>
-                </Card>
-
-                <Card className="md:col-span-3 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:-rotate-1 border-l-4 border-l-primary">
-                  <CardHeader>
-                    <div className="h-14 w-14 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center mb-4">
-                      <MapPin className="h-7 w-7 text-white" />
-                    </div>
-                    <CardTitle className="text-xl"><TranslatedText>Strategic LA Location</TranslatedText></CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                     <p className="text-muted-foreground leading-relaxed"><TranslatedText>Los Angeles location means easy access to LA/Long Beach ports and fast West Coast shipping.</TranslatedText></p>
-                   </CardContent>
-                 </Card>
-               </div>
-             </div>
-           </section>
-
-           {/* OUR PROCESS - DETAILED WITH ACCORDIONS */}
-           <section className="py-20 bg-gradient-to-br from-background via-muted/30 to-background">
-            <div className="container mx-auto px-4">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                  <TranslatedText>How We Make It Happen</TranslatedText>
-                </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            <TranslatedText>Ever wonder what actually happens between 'order placed' and 'delivered'? We document every step. Here's the full behind-the-scenes.</TranslatedText>
-          </p>
-              </div>
-
-              <div className="max-w-6xl mx-auto space-y-12">
-                {processSteps.map((step, index) => {
-                  const IconComponent = step.icon;
-                  return (
-                    <Card key={step.number} className="overflow-hidden hover:shadow-2xl transition-all duration-500">
-                      <div className={`grid md:grid-cols-2 gap-0 ${index % 2 === 1 ? 'md:grid-flow-dense' : ''}`}>
-                        {/* Image side with placeholder gradient */}
-                        <div className={`relative h-64 md:h-auto ${index % 2 === 1 ? 'md:col-start-2' : ''}`}>
-                          <div className={`w-full h-full flex items-center justify-center ${index % 2 === 0 ? 'bg-gradient-to-br from-primary/20 to-secondary/20' : 'bg-gradient-to-br from-secondary/20 to-primary/20'}`}>
-                            <IconComponent className="h-24 w-24 text-primary opacity-50" />
+                    <div className="p-6">
+                      <div className="flex justify-between items-end mb-8">
+                        <div>
+                          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                            Total Inventory Value
                           </div>
-                          {/* Overlay badge with step number */}
-                          <div className="absolute top-4 left-4 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                            {step.number}
-                          </div>
+                          <div className="text-3xl font-mono text-white">$1,240,590.00</div>
                         </div>
+                        <div className="text-green-400 text-sm flex items-center gap-1">
+                          +12% <TrendingUp size={14} />
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                          <div className="h-full w-[70%] bg-blue-500"></div>
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-500 font-mono">
+                          <span>Available: 14,203</span>
+                          <span>Reserved: 2,400</span>
+                        </div>
+                      </div>
+                      <div className="mt-8 grid grid-cols-3 gap-4">
+                        <div className="bg-gray-800/50 p-3 rounded border border-white/5">
+                          <div className="text-[10px] text-gray-500">Orders Today</div>
+                          <div className="text-xl font-bold">142</div>
+                        </div>
+                        <div className="bg-gray-800/50 p-3 rounded border border-white/5">
+                          <div className="text-[10px] text-gray-500">Pending</div>
+                          <div className="text-xl font-bold text-yellow-500">4</div>
+                        </div>
+                        <div className="bg-gray-800/50 p-3 rounded border border-white/5">
+                          <div className="text-[10px] text-gray-500">Shipped</div>
+                          <div className="text-xl font-bold text-green-500">138</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                        {/* Content side */}
-                        <div className="p-8">
-                          <h3 className="text-2xl md:text-3xl font-bold mb-4 flex items-center gap-3">
-                            <IconComponent className="h-8 w-8 text-primary" />
-                            <TranslatedText>{step.title}</TranslatedText>
-                          </h3>
-                          <p className="text-muted-foreground text-lg mb-6">
-                            <TranslatedText>{step.description}</TranslatedText>
-                          </p>
+              {/* Deep Dive 2: The Location */}
+              <div className="flex flex-col lg:flex-row-reverse items-center gap-16">
+                <div className="lg:w-1/2">
+                  <div className="inline-block px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-bold mb-4">
+                    STRATEGIC GEOGRAPHY
+                  </div>
+                  <h3 className="text-3xl font-bold mb-6">The Los Angeles Advantage.</h3>
+                  <p className="text-gray-400 text-lg mb-6 leading-relaxed">
+                    Location isn't just about shipping cost; it's about <strong className="text-white">velocity</strong>
+                    . Being minutes from the Port of Los Angeles allows us to receive ocean freight days (sometimes
+                    weeks) faster than inland warehouses.
+                  </p>
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-start gap-3">
+                      <div className="mt-1 bg-purple-500/20 p-1 rounded">
+                        <Anchor size={16} className="text-purple-400" />
+                      </div>
+                      <div>
+                        <span className="font-bold block text-white">Faster Restocks</span>
+                        <span className="text-sm text-gray-500">
+                          Drayage from the port takes hours, not days. We unload containers and make inventory sellable
+                          within 24-48 hours.
+                        </span>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="mt-1 bg-purple-500/20 p-1 rounded">
+                        <Truck size={16} className="text-purple-400" />
+                      </div>
+                      <div>
+                        <span className="font-bold block text-white">Zone Skipping</span>
+                        <span className="text-sm text-gray-500">
+                          We utilize major carrier hubs in Southern California to inject packages deep into the network,
+                          lowering zone costs.
+                        </span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div className="lg:w-1/2 w-full relative h-[400px] bg-[hsl(var(--wcu-bg-dark-card))] rounded-2xl overflow-hidden border border-white/5">
+                  {/* Abstract Map Graphic */}
+                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-700 via-gray-900 to-black"></div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-10">
+                    <MapPin size={48} className="text-orange-500 mx-auto mb-2 animate-bounce" />
+                    <div className="text-2xl font-bold">Westfield Prep</div>
+                    <div className="text-sm text-gray-400">Los Angeles, CA</div>
+                  </div>
+                  {/* Radiating Rings */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] border border-orange-500/20 rounded-full animate-ping"></div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-orange-500/10 rounded-full"></div>
+                </div>
+              </div>
 
-                          {/* Expandable accordion with detailed steps */}
-                          <Accordion type="single" collapsible className="w-full">
-                            <AccordionItem value="details" className="border-none">
-                              <AccordionTrigger className="text-primary hover:no-underline py-3 bg-primary/5 px-4 rounded-lg hover:bg-primary/10 transition-colors">
-                                <span className="font-semibold"><TranslatedText>See the full process →</TranslatedText></span>
-                              </AccordionTrigger>
-                              <AccordionContent className="px-4 pt-4">
-                                <ul className="space-y-4">
-                                  {step.details.map((detail, idx) => (
-                                    <li key={idx} className="flex items-start gap-3">
-                                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                      <div>
-                                        <p className="font-medium text-foreground"><TranslatedText>{detail.title}</TranslatedText></p>
-                                        <p className="text-sm text-muted-foreground mt-1"><TranslatedText>{detail.description}</TranslatedText></p>
-                                      </div>
-                        </li>
-                      ))}
+              {/* Deep Dive 3: The Integrations */}
+              <div>
+                <div className="text-center max-w-2xl mx-auto mb-10">
+                  <div className="inline-block px-3 py-1 rounded-full bg-orange-500/10 text-orange-400 text-xs font-bold mb-4">
+                    ECOSYSTEM
+                  </div>
+                  <h3 className="text-3xl font-bold mb-4">We Speak "E-Commerce" Fluently.</h3>
+                  <p className="text-gray-400">
+                    Whether you sell D2C, wholesale, or on marketplaces, our system standardizes your orders into a
+                    single flow.
+                  </p>
+                </div>
+                <TechStackGraphic />
+              </div>
+            </div>
+          </section>
+
+          {/* --- SECTION 3: FBA MASTERY --- */}
+          <section className="py-24 bg-[hsl(var(--wcu-bg-primary))] border-y border-white/5">
+            <div className="container mx-auto px-6">
+              <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                    Amazon FBA Prep: <br />
+                    <span className="text-orange-500">Zero Compliance Errors.</span>
+                  </h2>
+                  <p className="text-gray-400 text-lg mb-6">
+                    Amazon's receiving standards are strict. One missing barcode or wrong box size can result in
+                    chargebacks or inventory rejection. We are FBA specialists.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+                    <div className="bg-[hsl(var(--wcu-bg-card))] p-4 rounded-lg border border-white/5">
+                      <div className="font-bold text-white mb-1">FNSKU Labeling</div>
+                      <div className="text-sm text-gray-500">
+                        Precise covering of UPCs with Amazon-compliant barcodes.
+                      </div>
+                    </div>
+                    <div className="bg-[hsl(var(--wcu-bg-card))] p-4 rounded-lg border border-white/5">
+                      <div className="font-bold text-white mb-1">Polybagging</div>
+                      <div className="text-sm text-gray-500">
+                        Suffocation warnings applied to all apparel and plush items.
+                      </div>
+                    </div>
+                    <div className="bg-[hsl(var(--wcu-bg-card))] p-4 rounded-lg border border-white/5">
+                      <div className="font-bold text-white mb-1">Kitting/Bundling</div>
+                      <div className="text-sm text-gray-500">
+                        Creating "Sold as Set" bundles with shrink wrap and do-not-separate labels.
+                      </div>
+                    </div>
+                    <div className="bg-[hsl(var(--wcu-bg-card))] p-4 rounded-lg border border-white/5">
+                      <div className="font-bold text-white mb-1">Carton Forwarding</div>
+                      <div className="text-sm text-gray-500">
+                        Direct SPD and LTL handoffs to Amazon Fulfillment Centers.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  {/* Visual representation of a perfect box */}
+                  <div className="aspect-square bg-[hsl(var(--wcu-bg-dark-card))] rounded-2xl p-8 flex flex-col items-center justify-center relative border border-dashed border-gray-600">
+                    <Box size={120} className="text-gray-600" />
+                    <div className="absolute top-10 right-10 bg-white text-black text-xs font-mono p-1 transform rotate-3">
+                      FNSKU: X00293JKA
+                      <br />
+                      <span className="text-xl tracking-widest">|| ||| || |||</span>
+                    </div>
+                    <div className="absolute bottom-10 left-10 bg-yellow-500 text-black text-[10px] font-bold px-2 py-1 rounded">
+                      HEAVY PACKAGE
+                    </div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-green-500 bg-green-900/20 px-4 py-2 rounded-full border border-green-500/50 flex items-center gap-2 backdrop-blur-md">
+                      <CheckCircle2 size={16} /> Compliant
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* --- SECTION 4: LAUNCHPAD (Expanded) --- */}
+          <section className="py-24 bg-gradient-to-b from-[hsl(var(--wcu-bg-secondary))] to-[hsl(var(--wcu-bg-primary))] relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute right-0 top-0 w-1/3 h-full bg-blue-500/5 blur-3xl pointer-events-none"></div>
+
+            <div className="container mx-auto px-6 relative z-10">
+              <div className="text-center mb-16">
+                <div className="inline-block px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-wider uppercase mb-4">
+                  Westfield Launchpad
+                </div>
+                <h2 className="text-3xl md:text-5xl font-bold mb-4">
+                  Don't Have a Brand Yet? <br />
+                  We'll Build One For You.
+                </h2>
+                <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                  You don't need to be a logistics client to access our creative studio. We take you from "napkin idea"
+                  to "first sale" in weeks, not months.
+                </p>
+              </div>
+
+              <div className="bg-[hsl(var(--wcu-bg-card))] border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row gap-12 items-center">
+                <div className="md:w-1/2 space-y-8">
+                  <h3 className="text-3xl font-bold text-white">Complete E-Commerce Incubation.</h3>
+                  <p className="text-gray-400 leading-relaxed">
+                    Most agencies just design a logo. We build <strong className="text-white">businesses</strong>. Our
+                    team includes Amazon sellers, Shopify experts, and supply chain veterans who know exactly what
+                    converts.
+                  </p>
+                  <div className="space-y-6">
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-pink-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-pink-400">
+                        <Palette size={24} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-lg">Identity & Packaging</h4>
+                        <p className="text-sm text-gray-400">
+                          Logos, color systems, and unboxing experiences that look premium on Instagram.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-green-400">
+                        <Globe size={24} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-lg">Store Development</h4>
+                        <p className="text-sm text-gray-400">
+                          High-conversion Shopify 2.0 themes and Amazon Storefronts optimized for mobile.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-yellow-400">
+                        <ShoppingBag size={24} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-lg">Marketplace Setup</h4>
+                        <p className="text-sm text-gray-400">
+                          Amazon Seller Central registration, brand registry, and category approval handling.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => navigate("/services/ecommerce-creative")}
+                    className="text-white border-b border-orange-500 pb-1 hover:text-orange-500 transition-colors inline-flex items-center gap-2 pt-4"
+                  >
+                    Explore Creative Services <ArrowRight size={16} />
+                  </button>
+                </div>
+
+                <div className="md:w-1/2 bg-black/40 rounded-xl p-8 border border-white/5 w-full relative">
+                  <div className="absolute -top-4 -right-4 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                    Most Popular
+                  </div>
+                  <div className="flex flex-col gap-4 text-center">
+                    <h4 className="text-gray-300 font-medium tracking-widest text-sm uppercase">
+                      The "Zero to One" Package
+                    </h4>
+                    <div className="text-5xl font-bold text-white tracking-tight my-4">
+                      $2,499<span className="text-lg text-gray-500 font-normal">/project</span>
+                    </div>
+                    <ul className="text-left text-sm text-gray-400 space-y-2 mb-6 mx-auto inline-block">
+                      <li className="flex gap-2">
+                        <CheckCircle2 size={16} className="text-blue-500" /> Logo & Style Guide
+                      </li>
+                      <li className="flex gap-2">
+                        <CheckCircle2 size={16} className="text-blue-500" /> Shopify Website Build
+                      </li>
+                      <li className="flex gap-2">
+                        <CheckCircle2 size={16} className="text-blue-500" /> 5 Product Listings
+                      </li>
+                      <li className="flex gap-2">
+                        <CheckCircle2 size={16} className="text-blue-500" /> Domain & Email Setup
+                      </li>
                     </ul>
 
-                    {/* Pro Tip callout */}
-                    {step.number === 1 && (
-                      <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-primary mb-1"><TranslatedText>💡 Pro Tip</TranslatedText></p>
-                        <p className="text-sm text-muted-foreground">
-                          <TranslatedText>Send us an ASN (Advanced Ship Notice) before your shipment arrives and we'll prioritize your check-in for same-day processing.</TranslatedText>
-                        </p>
-                      </div>
-                    )}
-                    {step.number === 2 && (
-                      <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-secondary mb-1"><TranslatedText>⚡ Quality Promise</TranslatedText></p>
-                        <p className="text-sm text-muted-foreground">
-                          <TranslatedText>Whether you're shipping to Amazon FBA, fulfilling Shopify orders, or sending gifts directly—we catch defects before they reach your customers. Fewer returns, higher satisfaction.</TranslatedText>
-                        </p>
-                      </div>
-                    )}
-                    {step.number === 3 && (
-                      <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-primary mb-1"><TranslatedText>🎨 Brand Boost</TranslatedText></p>
-                        <p className="text-sm text-muted-foreground">
-                          <TranslatedText>Branded unboxing experiences increase repeat purchases by 32%. Let us handle your inserts, thank you cards, and custom packaging.</TranslatedText>
-                        </p>
-                      </div>
-                    )}
-                    {step.number === 4 && (
-                      <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-secondary mb-1"><TranslatedText>🔒 Security First</TranslatedText></p>
-                        <p className="text-sm text-muted-foreground">
-                          <TranslatedText>24/7 surveillance, restricted access zones, and comprehensive insurance. Your inventory is as safe as it would be in a bank vault.</TranslatedText>
-                        </p>
-                      </div>
-                    )}
-                    {step.number === 5 && (
-                      <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-primary mb-1"><TranslatedText>📦 Speed Matters</TranslatedText></p>
-                        <p className="text-sm text-muted-foreground">
-                          <TranslatedText>Our 2 PM cutoff means your orders get to customers faster. Faster delivery = happier customers = better reviews = more sales.</TranslatedText>
-                        </p>
-                      </div>
-                    )}
-                    {step.number === 6 && (
-                      <div className="bg-secondary/10 border-l-4 border-secondary p-3 rounded-r-lg mt-4">
-                        <p className="text-sm font-semibold text-secondary mb-1"><TranslatedText>📊 Data-Driven</TranslatedText></p>
-                        <p className="text-sm text-muted-foreground">
-                          <TranslatedText>We track every metric—speed, accuracy, cost per order. Monthly reports help you identify trends and optimize your operations.</TranslatedText>
-                        </p>
-                      </div>
-                    )}
-                    
-                    {/* Additional info boxes */}
-                                <div className="grid md:grid-cols-2 gap-4 mt-6 pt-6 border-t">
-                                  <div className="bg-primary/5 p-4 rounded-lg">
-                                    <p className="text-xs uppercase tracking-wide text-primary font-semibold mb-1"><TranslatedText>Timeline</TranslatedText></p>
-                                    <p className="text-foreground font-medium"><TranslatedText>{step.timeline}</TranslatedText></p>
-                                  </div>
-                                  <div className="bg-secondary/5 p-4 rounded-lg">
-                                    <p className="text-xs uppercase tracking-wide text-secondary font-semibold mb-1"><TranslatedText>You'll See</TranslatedText></p>
-                                    <p className="text-foreground font-medium"><TranslatedText>{step.clientVisibility}</TranslatedText></p>
-                                  </div>
-                                </div>
-                              </AccordionContent>
-                            </AccordionItem>
-                          </Accordion>
-                        </div>
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* Comparison: Boutique vs Large 3PL */}
-          <section className="py-20 bg-background">
-            <div className="container mx-auto px-4">
-              <div className="max-w-5xl mx-auto">
-                <h2 className="text-4xl font-bold text-center mb-12"><TranslatedText>Boutique Prep Center vs. Large 3PL</TranslatedText></h2>
-                <div className="grid md:grid-cols-2 gap-8">
-                  <Card className="border-2 border-primary/20">
-                    <CardHeader>
-                      <CardTitle className="text-2xl text-primary"><TranslatedText>Westfield Prep Center</TranslatedText></CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-              {[
-                "🎯 Direct access to team",
-                "⚡ Same-day processing",
-                "📸 Photo-proof QC on every order",
-                "🛒 Multi-channel fulfillment (Amazon, Shopify, TikTok)",
-                "🎨 Custom branded packaging for DTC",
-                "💬 Personalized support",
-                "💰 Flexible pricing",
-                "✅ Fast decision-making",
-              ].map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                          <p className="text-sm"><TranslatedText>{item}</TranslatedText></p>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-2 border-muted">
-                    <CardHeader>
-                      <CardTitle className="text-2xl text-muted-foreground"><TranslatedText>Large 3PL</TranslatedText></CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {[
-                        "Ticket-based support system",
-                        "2-3 day processing times",
-                        "Limited quality documentation",
-                        "One-size-fits-all approach",
-                        "Generic customer service",
-                        "Rigid pricing structures",
-                        "Slow approval processes",
-                      ].map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <X className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-                          <p className="text-sm text-muted-foreground line-through"><TranslatedText>{item}</TranslatedText></p>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Location Advantages */}
-          <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <h2 className="text-4xl font-bold text-center mb-12"><TranslatedText>Los Angeles Location Advantages</TranslatedText></h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <MapPin className="h-5 w-5 text-primary" />
-                        <TranslatedText>Port Proximity</TranslatedText>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground"><TranslatedText>Close to LA/Long Beach ports for fast receiving of international shipments. Reduce transit time and get products to market faster.</TranslatedText></p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-primary" />
-                        <TranslatedText>West Coast Shipping</TranslatedText>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground"><TranslatedText>Strategic location enables 1-2 day shipping to the entire West Coast and fast delivery to all US markets.</TranslatedText></p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Award className="h-5 w-5 text-primary" />
-                        <TranslatedText>Local Support</TranslatedText>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground"><TranslatedText>Based in Los Angeles with a local team that understands e-commerce sellers and their unique needs.</TranslatedText></p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Shield className="h-5 w-5 text-primary" />
-                        <TranslatedText>E-Commerce Compliance Experts</TranslatedText>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground"><TranslatedText>Expert in multi-channel regulations: California Prop 65, product safety labeling, customs documentation, and compliance requirements for Amazon, Shopify, and DTC brands.</TranslatedText></p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Success Metrics */}
-          <section className="py-20 bg-background">
-            <div className="container mx-auto px-4">
-              <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4"><TranslatedText>By the Numbers</TranslatedText></h2>
-                <p className="text-muted-foreground text-lg"><TranslatedText>Why sellers trust us with their fulfillment</TranslatedText></p>
-              </div>
-              <div className="grid md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2">
-                    {orderAccuracy}%
+                    <button
+                      onClick={() => navigate("/contact")}
+                      className="w-full bg-white text-[hsl(var(--wcu-bg-primary))] hover:bg-gray-200 font-bold py-3 rounded-lg transition-colors"
+                    >
+                      Book a Discovery Call
+                    </button>
+                    <p className="text-xs text-gray-500 mt-2">
+                      *Receive $500 in shipping credits if you sign with Westfield Fulfillment.
+                    </p>
                   </div>
-                  <p className="text-muted-foreground"><TranslatedText>Order Accuracy</TranslatedText></p>
-                </div>
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2">2PM</div>
-                  <p className="text-muted-foreground"><TranslatedText>Same-Day Cutoff</TranslatedText></p>
-                </div>
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2">$2M</div>
-                  <p className="text-muted-foreground"><TranslatedText>Insurance Coverage</TranslatedText></p>
-                </div>
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2"><TranslatedText>7 Days</TranslatedText></div>
-                  <p className="text-muted-foreground"><TranslatedText>Support Available</TranslatedText></p>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Enhanced CTA */}
-          <section className="py-20 bg-gradient-to-br from-primary via-primary/90 to-secondary">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white"><TranslatedText>Ready to Experience the Difference?</TranslatedText></h2>
-              <p className="text-xl mb-4 text-white/90 max-w-2xl mx-auto">
-                <TranslatedText>Join 500+ e-commerce sellers who trust us with their fulfillment.</TranslatedText>
+          {/* --- SECTION 5: FAQ --- */}
+          <section className="py-24 container mx-auto px-6 max-w-4xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Common Questions</h2>
+              <p className="text-gray-400">Transparency starts with answering the hard questions.</p>
+            </div>
+
+            <div className="bg-[hsl(var(--wcu-bg-card))] border border-white/10 rounded-2xl p-8 space-y-2">
+              <FAQItem
+                q="Do you have monthly minimums?"
+                a="We believe in growing with you. While we don't have strict 'minimum orders per month,' we do have a minimum monthly storage/account fee of $250 to ensure we can dedicate resources to your account. This is usually easily met by active sellers."
+              />
+              <FAQItem
+                q="How fast is your receiving process?"
+                a="Our SLA is 24-48 hours from the moment the truck hits our dock. For urgent restocks, we offer a 'Hot Receive' service to get inventory sellable within 4 hours."
+              />
+              <FAQItem
+                q="Do you handle returns?"
+                a="Yes. Returns are a huge pain point for e-commerce. We inspect every return, photograph it, and grade it based on your criteria (Sellable, Damaged, Refurbish). You see the photo on the dashboard before we restock it."
+              />
+              <FAQItem
+                q="Can you use my branded boxes?"
+                a="Absolutely. We specialize in branded unboxing experiences. Tissue paper, stickers, inserts, custom tape—we do it all. We charge a small surcharge for complex pack-outs, but standard branded box usage is often included in the pick/pack fee."
+              />
+              <FAQItem
+                q="What if you make a mistake?"
+                a="We own it. If we mis-ship an order, we pay for the shipping cost of the replacement and the return label. Our accuracy rate is 99.8%, but we are accountable for the 0.2%."
+              />
+            </div>
+          </section>
+
+          {/* --- FOOTER CTA --- */}
+          <section className="py-24 relative overflow-hidden">
+            <div className="absolute inset-0 bg-orange-600 opacity-10"></div>
+            <div className="container mx-auto px-6 relative z-10 text-center">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">Stop settling for "Good Enough" logistics.</h2>
+              <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+                Your brand is premium. Your fulfillment should be too. Let's build a supply chain that customers rave
+                about.
               </p>
-              <p className="text-lg mb-8 text-white/80 max-w-xl mx-auto">
-                <TranslatedText>Get a custom quote in 24 hours. Limited onboarding slots available.</TranslatedText>
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all" onClick={() => navigate("/contact")}>
-                  <TranslatedText>Get a Quote</TranslatedText>
-                </Button>
-                <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10" onClick={() => navigate("/shopify-fulfillment")}>
-                  <TranslatedText>View Services</TranslatedText>
-                </Button>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <button
+                  onClick={() => navigate("/contact")}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-orange-500/40 transition-all transform hover:-translate-y-1"
+                >
+                  Get Your Custom Quote
+                </button>
+                <button
+                  onClick={() => navigate("/contact")}
+                  className="bg-[hsl(var(--wcu-bg-dark-card))] hover:bg-[hsl(217_33%_22%)] text-white px-10 py-4 rounded-lg font-bold text-lg transition-all border border-white/10"
+                >
+                  Talk to an Expert
+                </button>
               </div>
             </div>
           </section>
