@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
+import { ShopifyIcon, AmazonIcon, WalmartIcon, TikTokIcon } from "@/components/BrandIcons";
 import {
   CheckCircle2,
   Camera,
@@ -263,15 +264,23 @@ const WhyChooseUs = () => {
               </div>
 
               {/* Social Proof Bar */}
-              <div className="border-t border-white/10 pt-10 flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                <span className="text-xl font-bold font-serif">SHOPIFY PLUS</span>
-                <span className="text-xl font-bold tracking-tighter">
-                  amazon<span className="italic">FBA</span>
-                </span>
-                <span className="text-xl font-bold">Walmart Marketplace</span>
-                <span className="text-xl font-bold flex items-center gap-1">
-                  <span className="bg-white text-black p-0.5 text-xs rounded">Tik</span>Tok Shop
-                </span>
+              <div className="border-t border-white/10 pt-10 flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-70 hover:opacity-100 transition-all duration-500">
+                <div className="flex items-center gap-2">
+                  <ShopifyIcon size={32} className="text-[#96BF48]" />
+                  <span className="text-lg font-semibold text-white/80">Shopify Plus</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AmazonIcon size={32} className="text-[#FF9900]" />
+                  <span className="text-lg font-semibold text-white/80">Amazon FBA</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <WalmartIcon size={32} className="text-[#0071DC]" />
+                  <span className="text-lg font-semibold text-white/80">Walmart</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <TikTokIcon size={32} className="text-white" />
+                  <span className="text-lg font-semibold text-white/80">TikTok Shop</span>
+                </div>
               </div>
             </div>
           </section>
