@@ -1,181 +1,72 @@
 
-# Why Choose Us Page Redesign - Implementation Plan
+# Replace Text Logos with Proper Brand Icons
 
 ## Overview
-Complete redesign of the `/why-choose-us` page content while preserving the existing Header, Footer, and Logo components exactly as they are.
+Replace the text-based platform logos in the Social Proof Bar with the actual SVG brand icons that already exist in the codebase.
 
-## What Will NOT Change
-- **Header component** (`src/components/Header.tsx`) - untouched
-- **Footer component** (`src/components/Footer.tsx`) - untouched  
-- **Logo assets** - untouched
-- **SEO metadata** (Helmet tags) - preserved
-- **Structured data** - preserved
-- **Route configuration** - unchanged
-
-## What Will Change
-Complete replacement of the main content between `<main>` and `</main>` tags with the new design.
-
----
-
-## New Page Architecture
-
-### 1. Hero Section
-- Dark background (`#0B1121`)
-- Orange gradient glow effect
-- "99.8% Order Accuracy Guaranteed" badge
-- Headline: "The Infrastructure Your Brand Deserves."
-- Orange gradient text treatment
-- Dual CTA buttons (Start Shipping Now / View Our Pricing)
-- Social proof bar with platform logos (text-based, not images)
-
-### 2. Problem Section - "Why Most Brands Leave Their 3PL"
-- Two-column comparison cards:
-  - **Left (Red)**: "The Black Box 3PL" with pain points
-  - **Right (Green)**: "The Westfield Standard" with solutions
-- Large background icons for visual interest
-
-### 3. Deep Dive Section - "Built for High-Growth Brands"
-Three alternating content blocks:
-
-**A. Proprietary Technology**
-- Dashboard mockup visualization
-- Visual Validation & Real-Time Sync features
-- Fake dashboard with metrics (inventory value, orders, etc.)
-
-**B. Strategic Geography - Los Angeles Advantage**  
-- Abstract map with pulsing location marker
-- Faster Restocks & Zone Skipping benefits
-- Radiating rings animation
-
-**C. Ecosystem Integration**
-- Central hub graphic with connection lines
-- 4 integration cards (Shopify, Amazon FBA, TikTok Shop, B2B/EDI)
-- "50+ other integrations" note
-
-### 4. Amazon FBA Prep Section
-- "Zero Compliance Errors" headline
-- 2x2 grid of prep services (FNSKU, Polybagging, Kitting, Carton Forwarding)
-- Visual box mockup with compliance badges
-
-### 5. Launchpad Section (Creative Services)
-- "Don't Have a Brand Yet? We'll Build One For You."
-- Three service offerings (Identity, Store Dev, Marketplace Setup)
-- Pricing card: "Zero to One" Package at $2,499
-- Call to action for discovery call
-
-### 6. FAQ Section
-- Expandable accordion with 5 common questions
-- Styled with orange highlight on active question
-- Dark card container with subtle border
-
-### 7. Final CTA Section
-- "Stop settling for 'Good Enough' logistics"
-- Dual CTA buttons
-
----
-
-## Technical Implementation
-
-### New CSS Variables
-Add to `index.css`:
-```css
-/* Why Choose Us Dark Theme */
---wcu-bg-primary: 215 50% 7%;      /* #0B1121 */
---wcu-bg-secondary: 217 37% 12%;   /* #0F172A */
---wcu-bg-card: 218 33% 15%;        /* #131C31 */
---wcu-bg-dark-card: 217 33% 13%;   /* #1E293B */
+## Current State (Lines 266-275 in WhyChooseUs.tsx)
+```jsx
+<div className="border-t border-white/10 pt-10 flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+  <span className="text-xl font-bold font-serif">SHOPIFY PLUS</span>
+  <span className="text-xl font-bold tracking-tighter">
+    amazon<span className="italic">FBA</span>
+  </span>
+  <span className="text-xl font-bold">Walmart Marketplace</span>
+  <span className="text-xl font-bold flex items-center gap-1">
+    <span className="bg-white text-black p-0.5 text-xs rounded">Tik</span>Tok Shop
+  </span>
+</div>
 ```
 
-### Component Structure
-```text
-WhyChooseUs.tsx
-├── Helmet (SEO - unchanged)
-├── StructuredData (unchanged)
-├── Header (imported, unchanged)
-├── <main>
-│   ├── HeroSection (new)
-│   ├── ProblemSection with ComparisonGraphic (new)
-│   ├── DeepDiveSection (new)
-│   │   ├── TechnologyBlock with DashboardMockup
-│   │   ├── GeographyBlock with MapVisualization  
-│   │   └── EcosystemBlock with TechStackGraphic
-│   ├── AmazonFBASection (new)
-│   ├── LaunchpadSection (new)
-│   ├── FAQSection with accordion (new)
-│   └── FinalCTASection (new)
-├── Footer (imported, unchanged)
+## Solution
+Use the existing `BrandIcons` from `src/components/BrandIcons.tsx`:
+- `ShopifyIcon`
+- `AmazonIcon`
+- `WalmartIcon`
+- `TikTokIcon`
+
+## Implementation Details
+
+### File: `src/pages/WhyChooseUs.tsx`
+
+**Add Import:**
+```tsx
+import { ShopifyIcon, AmazonIcon, WalmartIcon, TikTokIcon } from "@/components/BrandIcons";
 ```
 
-### Key Components to Create Inline
+**Replace Social Proof Bar:**
+```tsx
+{/* Social Proof Bar */}
+<div className="border-t border-white/10 pt-10 flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-70 hover:opacity-100 transition-all duration-500">
+  <div className="flex items-center gap-2">
+    <ShopifyIcon size={32} className="text-[#96BF48]" />
+    <span className="text-lg font-semibold text-white/80">Shopify Plus</span>
+  </div>
+  <div className="flex items-center gap-2">
+    <AmazonIcon size={32} className="text-[#FF9900]" />
+    <span className="text-lg font-semibold text-white/80">Amazon FBA</span>
+  </div>
+  <div className="flex items-center gap-2">
+    <WalmartIcon size={32} className="text-[#0071DC]" />
+    <span className="text-lg font-semibold text-white/80">Walmart</span>
+  </div>
+  <div className="flex items-center gap-2">
+    <TikTokIcon size={32} className="text-white" />
+    <span className="text-lg font-semibold text-white/80">TikTok Shop</span>
+  </div>
+</div>
+```
 
-**ComparisonGraphic**: Two-column comparison ("Black Box 3PL" vs "Westfield Standard")
+## Visual Design
+- **Icon Size:** 32px for clear visibility
+- **Brand Colors:**
+  - Shopify: `#96BF48` (green)
+  - Amazon: `#FF9900` (orange)
+  - Walmart: `#0071DC` (blue)
+  - TikTok: White (standard on dark backgrounds)
+- **Typography:** `text-lg font-semibold text-white/80` for labels
+- **Spacing:** `gap-2` between icon and text, `gap-8 md:gap-12` between logo groups
+- **Hover Effect:** Changed from grayscale filter to opacity transition (70% → 100%) for a cleaner effect with colored icons
 
-**TechStackGraphic**: Central hub with connection nodes for integrations
-
-**DashboardMockup**: Fake WMS dashboard with metrics display
-
-**MapVisualization**: Abstract LA location with pulsing rings
-
-**FAQItem**: Collapsible accordion component for FAQ section
-
----
-
-## Styling Approach
-
-### Color Palette
-| Element | Color |
-|---------|-------|
-| Page background | `#0B1121` |
-| Card background | `#131C31` / `#0F172A` |
-| Primary accent | Orange (`#F97316` / `orange-500`) |
-| Success/Positive | Green (`#22C55E`) |
-| Error/Negative | Red (`#EF4444`) |
-| Text primary | White |
-| Text secondary | Gray-400 (`#9CA3AF`) |
-
-### Typography
-- Headlines: Bold, white, large sizes (text-5xl to text-7xl)
-- Subheadings: Semibold, white
-- Body: Regular, gray-400
-- Labels: Uppercase, tracking-wide, small
-
-### Effects
-- Orange glow effects using blur
-- Subtle hover transitions
-- Gradient text using `bg-clip-text`
-- Pulse animations for map rings
-
----
-
-## Navigation Integration
-- CTAs link to `/contact` and `/pricing` using `useNavigate`
-- "Explore Creative Services" links to future creative services page
-- Internal links use React Router
-
----
-
-## File Changes
-
-### Modified Files
-1. `src/pages/WhyChooseUs.tsx` - Complete content replacement (preserve Header/Footer imports, Helmet, StructuredData)
-2. `src/index.css` - Add dark theme variables for this page
-
-### No Changes To
-- `src/components/Header.tsx`
-- `src/components/Footer.tsx`
-- `src/assets/westfield-logo.png`
-- Any other existing components
-
----
-
-## Accessibility Considerations
-- Maintain proper heading hierarchy (h1 > h2 > h3)
-- Ensure color contrast ratios meet WCAG standards
-- Keyboard navigation for FAQ accordions
-- Focus states on interactive elements
-- Semantic HTML structure
-
-## Performance
-- No external images (all visual elements are CSS/SVG-based)
-- Animations use CSS transforms (GPU-accelerated)
-- Lazy loading maintained via existing route structure
+## Files to Modify
+1. `src/pages/WhyChooseUs.tsx` - Add import and update social proof bar section
