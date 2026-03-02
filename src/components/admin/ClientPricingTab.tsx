@@ -23,11 +23,15 @@ interface FulfillmentSection {
 }
 
 const STANDARD_SERVICES = [
-  "Monthly Deposit",
+  "Account Startup Fee",
   "Pallet Receiving",
   "Carton Receiving",
-  "Cubic Feet Storage",
+  "Pallet Storage",
+  "Small Bin Storage",
+  "Medium Bin Storage",
+  "Large Bin Storage",
   "Shelf Storage",
+  "Returns Handling",
   "Custom Entry"
 ];
 
@@ -39,6 +43,8 @@ const MARKETPLACE_SERVICES = [
   "Kitting",
   "Additional Label",
   "Shipment Box",
+  "Polybag Usage",
+  "Carton Usage",
   "Custom Entry"
 ];
 
@@ -48,8 +54,28 @@ const SELF_FULFILLMENT_SERVICES = [
   "Bundling",
   "Kitting",
   "Bubble Wrapping",
+  "Polybag Usage",
+  "Carton Usage",
   "Custom Entry"
 ];
+
+const AUTO_NOTES: Record<string, string> = {
+  "Account Startup Fee": "One-time charge for WMS training, WMS usage, and account support",
+  "Returns Handling": "Covers receiving, inspection, client consultation on disposition, and processing of return actions",
+  "Polybag Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
+  "Carton Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
+  "Small Bin Storage": "Per small bin, per month",
+  "Medium Bin Storage": "Per medium bin, per month",
+  "Large Bin Storage": "Per large bin, per month",
+  "Pallet Storage": "Per pallet, per month",
+};
+
+const DEFAULT_PRICES: Record<string, number> = {
+  "Account Startup Fee": 500,
+  "Small Bin Storage": 4,
+  "Medium Bin Storage": 5,
+  "Large Bin Storage": 6,
+};
 
 interface ClientPricingTabProps {
   clientId: string;
@@ -122,9 +148,20 @@ export const ClientPricingTab = ({ clientId, onSuccess }: ClientPricingTabProps)
   };
 
   const updateStandardItem = (id: string, field: keyof PricingItem, value: any) => {
-    setStandardItems(standardItems.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
-    ));
+    setStandardItems(standardItems.map(item => {
+      if (item.id !== id) return item;
+      const updated = { ...item, [field]: value };
+      // Auto-fill notes and default price when service is selected
+      if (field === 'service_name') {
+        if (!item.notes && AUTO_NOTES[value]) {
+          updated.notes = AUTO_NOTES[value];
+        }
+        if (item.price_per_unit === 0 && DEFAULT_PRICES[value]) {
+          updated.price_per_unit = DEFAULT_PRICES[value];
+        }
+      }
+      return updated;
+    }));
     setIsDirty(true);
   };
 
@@ -171,9 +208,19 @@ export const ClientPricingTab = ({ clientId, onSuccess }: ClientPricingTabProps)
       section.id === sectionId 
         ? { 
             ...section, 
-            items: section.items.map(item => 
-              item.id === itemId ? { ...item, [field]: value } : item
-            )
+            items: section.items.map(item => {
+              if (item.id !== itemId) return item;
+              const updated = { ...item, [field]: value };
+              if (field === 'service_name') {
+                if (!item.notes && AUTO_NOTES[value]) {
+                  updated.notes = AUTO_NOTES[value];
+                }
+                if (item.price_per_unit === 0 && DEFAULT_PRICES[value]) {
+                  updated.price_per_unit = DEFAULT_PRICES[value];
+                }
+              }
+              return updated;
+            })
           }
         : section
     ));

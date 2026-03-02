@@ -252,12 +252,12 @@ const BillingEntryDialog = ({
     updated[index].quantity = newQuantity;
     setBillingItems(updated);
 
-    // Special handling for "Monthly Deposit" - auto-create payment
-    if (updated[index].service_name === "Monthly Deposit" && currentCycle) {
+    // Special handling for "Account Startup Fee" - auto-create payment
+    if (updated[index].service_name === "Account Startup Fee" && currentCycle) {
       const depositAmount = updated[index].unit_price * newQuantity;
       
       // Check if monthly deposit payment already exists
-      const existingDepositPayment = payments.find(p => p.payment_name === "Monthly Deposit");
+      const existingDepositPayment = payments.find(p => p.payment_name === "Account Startup Fee");
       
       if (depositAmount > 0) {
         if (existingDepositPayment) {
@@ -286,7 +286,7 @@ const BillingEntryDialog = ({
             .insert({
               client_id: client.id,
               cycle_id: currentCycle.id,
-              payment_name: "Monthly Deposit",
+              payment_name: "Account Startup Fee",
               amount: depositAmount,
               payment_method: "Deposit",
               payment_date: new Date().toISOString().split('T')[0],
@@ -351,8 +351,8 @@ const BillingEntryDialog = ({
   const calculateSubtotal = () => {
     return billingItems.reduce(
       (sum, item) => {
-        // Exclude "Monthly Deposit" from charges as it's a payment
-        if (item.service_name === "Monthly Deposit") return sum;
+        // Exclude "Account Startup Fee" from charges as it's a payment
+        if (item.service_name === "Account Startup Fee") return sum;
         return sum + item.unit_price * item.quantity;
       },
       0
