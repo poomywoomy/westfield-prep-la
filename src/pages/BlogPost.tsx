@@ -115,6 +115,7 @@ const BlogPost = () => {
         <title>{post.title} | Westfield Prep Center Blog</title>
         <meta name="description" content={post.meta_description || post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
         <link rel="canonical" href={`https://westfieldprepcenter.com/blog/${post.slug}`} />
+        <meta name="robots" content="index, follow" />
         
         {/* Open Graph tags */}
         <meta property="og:title" content={post.title} />
