@@ -38,6 +38,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
     { id: "seo-audit", label: "SEO Audit", icon: Globe },
     { id: "industry-news", label: "Industry News", icon: Newspaper },
     { id: "translations", label: "Translations", icon: Languages },
+    { id: "leads", label: "Leads", icon: UserPlus },
     { id: "documents", label: "Documents", icon: FileSignature },
   ];
 

@@ -162,6 +162,9 @@ const AdminDashboard = () => {
               <TabsContent value="translations">
                 <Suspense fallback={tabSpinner}><TranslationsTab /></Suspense>
               </TabsContent>
+              <TabsContent value="leads">
+                <Suspense fallback={tabSpinner}><LeadsTab /></Suspense>
+              </TabsContent>
             </Tabs>
 
             <Button
