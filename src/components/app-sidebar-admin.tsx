@@ -1,4 +1,4 @@
-import { Users, FileText, DollarSign, Package, AlertTriangle, Store, ShoppingCart, PenSquare, FileSignature, History, Activity, Truck, LifeBuoy, Search, Globe, Newspaper, Languages } from "lucide-react";
+import { Users, DollarSign, Package, PenSquare, FileSignature, History, Search, Globe, Newspaper, Languages } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -10,37 +10,21 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Badge } from "@/components/ui/badge";
-import { usePendingShipmentRequestsCount } from "@/hooks/useShipmentRequests";
-import { useOpenSupportTicketsCount } from "@/hooks/useSupportTickets";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface AppSidebarAdminProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  discrepancyCount: number;
-  shipmentRequestsCount?: number;
-  supportTicketsCount?: number;
 }
 
-export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount, shipmentRequestsCount: propShipmentCount, supportTicketsCount: propSupportCount }: AppSidebarAdminProps) {
+export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const queryClient = useQueryClient();
-  
-  const { data: fetchedShipmentCount = 0 } = usePendingShipmentRequestsCount();
-  const { data: fetchedSupportCount = 0 } = useOpenSupportTicketsCount();
-  
-  const shipmentRequestsCount = propShipmentCount ?? fetchedShipmentCount;
-  const supportTicketsCount = propSupportCount ?? fetchedSupportCount;
 
-  // Prefetch handlers for hover-based data loading
   const prefetchHandlers: Record<string, () => void> = {
     clients: () => queryClient.prefetchQuery({ queryKey: ['clients'], staleTime: 60000 }),
-    inventory: () => queryClient.prefetchQuery({ queryKey: ['skus'], staleTime: 60000 }),
     shipments: () => queryClient.prefetchQuery({ queryKey: ['outbound-shipments'], staleTime: 60000 }),
-    orders: () => queryClient.prefetchQuery({ queryKey: ['shopify-orders'], staleTime: 60000 }),
-    discrepancies: () => queryClient.prefetchQuery({ queryKey: ['discrepancies'], staleTime: 60000 }),
     billing: () => queryClient.prefetchQuery({ queryKey: ['bills'], staleTime: 60000 }),
   };
 
@@ -48,13 +32,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount, ship
     { id: "clients", label: "Clients", icon: Users },
     { id: "billing", label: "Billing", icon: DollarSign },
     { id: "billing-history", label: "Bill History", icon: History },
-    { id: "inventory", label: "Inventory", icon: Package },
-    { id: "discrepancies", label: "Discrepancies", icon: AlertTriangle, badge: discrepancyCount },
     { id: "shipments", label: "Shipments", icon: Package },
-    { id: "shopify-sync-center", label: "Shopify Sync Center", icon: Store },
-    { id: "orders", label: "Orders", icon: ShoppingCart },
-    { id: "shipment-requests", label: "Shipment Requests", icon: Truck, badge: shipmentRequestsCount },
-    { id: "support-tickets", label: "Support Tickets", icon: LifeBuoy, badge: supportTicketsCount },
     { id: "blog", label: "Blog", icon: PenSquare },
     { id: "blog-research", label: "Blog Research", icon: Search },
     { id: "seo-audit", label: "SEO Audit", icon: Globe },
@@ -80,11 +58,6 @@ export function AppSidebarAdmin({ activeTab, onTabChange, discrepancyCount, ship
                   >
                     <item.icon className="h-4 w-4" />
                     {!collapsed && <span>{item.label}</span>}
-                    {!collapsed && item.badge !== undefined && item.badge > 0 && (
-                      <Badge className="ml-auto h-5 px-1.5 bg-red-500 text-white text-xs">
-                        {item.badge}
-                      </Badge>
-                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
