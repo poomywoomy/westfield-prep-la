@@ -1,26 +1,31 @@
 
-# Fix Blank Screen - React Deduplication
 
-## Problem
-The app shows a blank screen with zero console logs or errors, meaning React itself isn't mounting. This is a known issue caused by duplicate React instances in the dependency tree. When multiple copies of React exist, hooks receive a null dispatcher and the app silently fails to render.
+## Plan: Remove WMS-Related Tabs from Admin Dashboard
 
-## Fix
-Add a `dedupe` property to the `resolve` section in `vite.config.ts` to force Vite to use a single React instance:
+Since you now have your own WMS, we'll remove these 5 tabs from the admin sidebar and dashboard:
+1. **Shipment Requests**
+2. **Support Tickets**
+3. **Shopify Sync Center**
+4. **Orders**
+5. **Discrepancies**
+6. **Inventory**
 
-**File: `vite.config.ts`**
+### Changes
 
-Add `dedupe` inside the existing `resolve` block (alongside `alias`):
+**1. `src/components/app-sidebar-admin.tsx`**
+- Remove menu items: `inventory`, `discrepancies`, `shopify-sync-center`, `orders`, `shipment-requests`, `support-tickets`
+- Remove badge counts for discrepancies, shipment requests, support tickets
+- Remove imports for `usePendingShipmentRequestsCount` and `useOpenSupportTicketsCount`
+- Remove related prefetch handlers
+- Remove unused icons from imports
 
-```typescript
-resolve: {
-  alias: {
-    "@": path.resolve(__dirname, "./src"),
-  },
-  dedupe: ["react", "react-dom", "react/jsx-runtime"],
-},
-```
+**2. `src/pages/AdminDashboard.tsx`**
+- Remove lazy imports for: `InventoryTab`, `DiscrepanciesTab`, `ShopifySyncCenter`, `OrdersTab`, `ShipmentRequestsTab`, `SupportTicketsTab`
+- Remove corresponding `<TabsContent>` blocks for all 6 tabs
+- Remove imports for `usePendingDiscrepancyCount`, `usePendingShipmentRequestsCount`, `useOpenSupportTicketsCount`
+- Remove related state variables and props passed to `AppSidebarAdmin`
+- Remove the `discrepancyCount`, `shipmentRequestsCount`, `supportTicketsCount` props from the sidebar component
 
-This is a one-line addition. No other files need to change.
+### Remaining Admin Tabs
+After removal, the admin dashboard will keep: Clients, Billing, Bill History, Shipments, Blog, Blog Research, SEO Audit, Industry News, Translations, Documents.
 
-## Why This Works
-Several dependencies (framer-motion, tiptap, radix-ui, etc.) may bundle or resolve their own React copy. The `dedupe` directive forces Vite to resolve all imports of these packages to a single location, preventing the silent crash.
