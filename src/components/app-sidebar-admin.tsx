@@ -1,4 +1,4 @@
-import { Users, DollarSign, Package, PenSquare, FileSignature, History, Search, Globe, Newspaper, Languages } from "lucide-react";
+import { Users, DollarSign, Package, PenSquare, FileSignature, History, Search, Globe, Newspaper, Languages, UserPlus } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -38,6 +38,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
     { id: "seo-audit", label: "SEO Audit", icon: Globe },
     { id: "industry-news", label: "Industry News", icon: Newspaper },
     { id: "translations", label: "Translations", icon: Languages },
+    { id: "leads", label: "Leads", icon: UserPlus },
     { id: "documents", label: "Documents", icon: FileSignature },
   ];
 
