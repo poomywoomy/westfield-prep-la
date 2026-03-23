@@ -1522,6 +1522,36 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          ai_analysis: string | null
+          company_name: string
+          created_at: string
+          id: string
+          raw_data: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ai_analysis?: string | null
+          company_name?: string
+          created_at?: string
+          id?: string
+          raw_data: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_analysis?: string | null
+          company_name?: string
+          created_at?: string
+          id?: string
+          raw_data?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           client_id: string | null
