@@ -112,7 +112,7 @@ const BlogPost = () => {
   return (
     <>
       <Helmet>
-        <title>{post.slug === 'why-3pl-fulfillment-is-essential-for-startups-scaling-with-amazon-fba' ? '3PL for Startups | Scale Faster with Westfield Prep Center' : `${post.title} | Westfield Prep Center Blog`}</title>
+        <title>{post.slug === 'why-3pl-fulfillment-is-essential-for-startups-scaling-with-amazon-fba' ? '3PL Fulfillment for Startups Scaling with Amazon FBA' : `${post.title} | Westfield Prep Center Blog`}</title>
         <meta name="description" content={post.meta_description || post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={`https://westfieldprepcenter.com/blog/${post.slug}`} />
