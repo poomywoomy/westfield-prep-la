@@ -8,9 +8,14 @@ interface BlogPostRendererProps {
 export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
   // Convert markdown to HTML before rendering
   const htmlContent = parseMarkdown(content);
+
+  // Ensure a single H1 on the page (hero keeps H1, body H1s become H2)
+  const normalizedHeadingHtml = htmlContent
+    .replace(/<h1(\b[^>]*)>/gi, '<h2$1>')
+    .replace(/<\/h1>/gi, '</h2>');
   
   // Add lazy loading to all images
-  const htmlWithLazyLoad = htmlContent.replace(
+  const htmlWithLazyLoad = normalizedHeadingHtml.replace(
     /<img /g,
     '<img loading="lazy" '
   );
@@ -18,7 +23,7 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
   // Sanitize HTML to prevent XSS attacks (defense-in-depth)
   const enhancedHtml = DOMPurify.sanitize(htmlWithLazyLoad, {
     ALLOWED_TAGS: [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'h2', 'h3', 'h4', 'h5', 'h6',
       'p', 'a', 'ul', 'ol', 'li', 
       'code', 'pre', 'img', 'blockquote',
       'strong', 'em', 'br', 'hr',
