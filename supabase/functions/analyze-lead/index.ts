@@ -144,6 +144,7 @@ serve(async (req) => {
 
     const aiData = await aiResponse.json();
     const analysis = aiData.choices?.[0]?.message?.content || 'No analysis generated.';
+    const ediDetected = detectEDI(raw_data);
 
     // Save to database
     const { data: lead, error: dbError } = await supabase
