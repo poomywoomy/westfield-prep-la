@@ -7,6 +7,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const EDI_KEYWORDS = ['edi', 'edi integration', 'edi compliance', 'edi capable', 'edi required', 'edi 856', 'edi 810', 'edi 850', 'edi 940', 'edi 945', 'edi 997', 'electronic data interchange', 'as2', 'sps commerce', 'true commerce'];
+
+function detectEDI(text: string): boolean {
+  const lower = text.toLowerCase();
+  return EDI_KEYWORDS.some(kw => lower.includes(kw));
+}
+
 const SYSTEM_PROMPT = `You are a sales analyst for Westfield Prep Center, a Los Angeles-based fulfillment and prep center.
 
 ## ABOUT WESTFIELD PREP CENTER
@@ -137,6 +144,7 @@ serve(async (req) => {
 
     const aiData = await aiResponse.json();
     const analysis = aiData.choices?.[0]?.message?.content || 'No analysis generated.';
+    const ediDetected = detectEDI(raw_data);
 
     // Save to database
     const { data: lead, error: dbError } = await supabase
@@ -152,13 +160,12 @@ serve(async (req) => {
 
     if (dbError) {
       console.error('[analyze-lead] DB error:', dbError);
-      // Still return analysis even if DB save fails
-      return new Response(JSON.stringify({ analysis, saved: false }), {
+      return new Response(JSON.stringify({ analysis, edi_detected: ediDetected, saved: false }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    return new Response(JSON.stringify({ analysis, lead, saved: true }), {
+    return new Response(JSON.stringify({ analysis, edi_detected: ediDetected, lead, saved: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
 

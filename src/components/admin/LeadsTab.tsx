@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Copy, Check, Sparkles, Eye, Trash2 } from "lucide-react";
+import { Loader2, Copy, Check, Sparkles, Eye, Trash2, AlertTriangle } from "lucide-react";
 import { formatDateTimePT } from "@/lib/dateFormatters";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ReactMarkdown from "react-markdown";
@@ -27,6 +27,7 @@ export function LeadsTab() {
   const [rawData, setRawData] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [analysis, setAnalysis] = useState("");
+  const [ediDetected, setEdiDetected] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -81,6 +82,7 @@ export function LeadsTab() {
 
       const result = await response.json();
       setAnalysis(result.analysis);
+      setEdiDetected(result.edi_detected || false);
       if (result.saved) fetchLeads();
       toast({ title: "Analysis complete", description: `Lead "${result.lead?.company_name || companyName}" analyzed successfully.` });
     } catch (err: any) {
@@ -156,13 +158,26 @@ export function LeadsTab() {
               {analyzing ? "Analyzing..." : "Analyze Lead"}
             </Button>
             {rawData && (
-              <Button variant="outline" onClick={() => { setRawData(""); setCompanyName(""); setAnalysis(""); }}>
+              <Button variant="outline" onClick={() => { setRawData(""); setCompanyName(""); setAnalysis(""); setEdiDetected(false); }}>
                 Clear
               </Button>
             )}
           </div>
         </CardContent>
       </Card>
+
+      {/* EDI Warning */}
+      {ediDetected && (
+        <Card className="border-red-400 bg-red-50 dark:bg-red-950/30 dark:border-red-800">
+          <CardContent className="flex items-center gap-3 py-4">
+            <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <div>
+              <p className="font-semibold text-red-800 dark:text-red-300">⚠️ EDI Requirement Detected</p>
+              <p className="text-sm text-red-700 dark:text-red-400">This lead mentions EDI integration in their requirements. Confirm EDI capability before accepting.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Analysis Result */}
       {analysis && (() => {
