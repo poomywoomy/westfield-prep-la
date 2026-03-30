@@ -158,7 +158,7 @@ export function LeadsTab() {
               {analyzing ? "Analyzing..." : "Analyze Lead"}
             </Button>
             {rawData && (
-              <Button variant="outline" onClick={() => { setRawData(""); setCompanyName(""); setAnalysis(""); }}>
+              <Button variant="outline" onClick={() => { setRawData(""); setCompanyName(""); setAnalysis(""); setEdiDetected(false); }}>
                 Clear
               </Button>
             )}
