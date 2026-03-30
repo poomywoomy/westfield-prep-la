@@ -160,13 +160,12 @@ serve(async (req) => {
 
     if (dbError) {
       console.error('[analyze-lead] DB error:', dbError);
-      // Still return analysis even if DB save fails
-      return new Response(JSON.stringify({ analysis, saved: false }), {
+      return new Response(JSON.stringify({ analysis, edi_detected: ediDetected, saved: false }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    return new Response(JSON.stringify({ analysis, lead, saved: true }), {
+    return new Response(JSON.stringify({ analysis, edi_detected: ediDetected, lead, saved: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
 
