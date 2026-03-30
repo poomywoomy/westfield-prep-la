@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Copy, Check, Sparkles, Eye, Trash2 } from "lucide-react";
+import { Loader2, Copy, Check, Sparkles, Eye, Trash2, AlertTriangle } from "lucide-react";
 import { formatDateTimePT } from "@/lib/dateFormatters";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ReactMarkdown from "react-markdown";
