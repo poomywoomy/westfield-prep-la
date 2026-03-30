@@ -1,41 +1,29 @@
 
 
-## Plan: Lead Analyzer Tab
+## Plan: Revamp Lead Analyzer Output
 
-Build a new "Leads" tab in the admin dashboard where you can paste lead information, and AI generates a personalized "why we're a good fit" response.
+### Changes
 
-### What You'll Get
+**1. Update AI system prompt (`supabase/functions/analyze-lead/index.ts`)**
 
-- A new **Leads** tab in the admin sidebar
-- A textarea to paste the raw lead info (like the examples you shared)
-- An **Analyze Lead** button that sends the data to AI
-- AI generates a structured response covering: why Westfield is a good fit, relevant services, location advantage, scalability, and a recommended acceptance message
-- A **Copy to Clipboard** button for the generated response
-- A table of past analyzed leads saved to the database for reference
+Replace the current 5-section output format with a simpler 2-section format:
 
-### Technical Changes
+- **Section 1: Quick Summary** — 3-4 sentences covering who the lead is, what they need, volume, and any notable details
+- **Section 2: Acceptance Response** — A ready-to-copy professional message (2-3 paragraphs) that leads with how Westfield can serve them, mentions relevant capabilities naturally without bragging, and ends with a soft next-step invite. Tone: service-oriented, confident but not self-congratulatory.
 
-**1. Database: `leads` table** (migration)
-- Columns: `id`, `company_name`, `raw_data` (text), `ai_analysis` (text), `status` (pending/accepted/rejected), `created_at`, `updated_at`
-- RLS: admin-only access
+Update the prompt instructions to emphasize: "Do not brag or list awards. Focus on how you can help them specifically. Be warm, professional, and solution-focused."
 
-**2. Edge function: `analyze-lead/index.ts`**
-- Takes the raw lead text, sends it to Lovable AI with a system prompt that knows Westfield's services (LA location, FBA/FBM/DTC prep, storage, kitting, returns, Shopify fulfillment, etc.)
-- Returns a structured "why we're a good fit" analysis with specific talking points matched to the lead's needs
+**2. Update UI to visually separate the response (`src/components/admin/LeadsTab.tsx`)**
 
-**3. New component: `src/components/admin/LeadsTab.tsx`**
-- Paste area for raw lead data
-- "Analyze" button → calls edge function → displays AI response
-- Copy button for the generated text
-- History table showing past leads with company name, date, status
-- Click a past lead to view its analysis again
+- Parse the AI output to split the summary and the copy-paste response into two distinct sections
+- Render the **summary** in a normal card
+- Render the **acceptance response** in a visually distinct block with a colored background (e.g., `bg-emerald-50 border-emerald-200` or similar green-tinted card) and a dedicated "Copy Response" button on that section only
+- This makes it immediately obvious where to start copy-pasting
 
-**4. Wire into admin dashboard**
-- Add lazy import + `TabsContent` in `AdminDashboard.tsx`
-- Add "Leads" menu item with `UserPlus` icon in `app-sidebar-admin.tsx`
+### Technical Details
 
-### AI System Prompt Will Include
-- Westfield Prep Center's location (Los Angeles), services, capabilities
-- Instructions to match the lead's specific needs to Westfield's offerings
-- Output format: acceptance reason, key selling points, recommended response
+- The edge function prompt will instruct the AI to use a `---RESPONSE---` separator between summary and response sections
+- The frontend splits on that separator to render two distinct UI blocks
+- The "Copy" button on the response section copies only the acceptance message (plain text, no markdown)
+- Keep the existing history table and view dialog unchanged
 
