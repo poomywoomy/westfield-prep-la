@@ -7,6 +7,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const EDI_KEYWORDS = ['edi', 'edi integration', 'edi compliance', 'edi capable', 'edi required', 'edi 856', 'edi 810', 'edi 850', 'edi 940', 'edi 945', 'edi 997', 'electronic data interchange', 'as2', 'sps commerce', 'true commerce'];
+
+function detectEDI(text: string): boolean {
+  const lower = text.toLowerCase();
+  return EDI_KEYWORDS.some(kw => lower.includes(kw));
+}
+
 const SYSTEM_PROMPT = `You are a sales analyst for Westfield Prep Center, a Los Angeles-based fulfillment and prep center.
 
 ## ABOUT WESTFIELD PREP CENTER
