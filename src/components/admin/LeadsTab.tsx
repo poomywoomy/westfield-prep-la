@@ -27,6 +27,7 @@ export function LeadsTab() {
   const [rawData, setRawData] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [analysis, setAnalysis] = useState("");
+  const [ediDetected, setEdiDetected] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
