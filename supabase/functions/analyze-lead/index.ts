@@ -7,14 +7,45 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const EDI_KEYWORDS = ['edi', 'edi integration', 'edi compliance', 'edi capable', 'edi required', 'edi 856', 'edi 810', 'edi 850', 'edi 940', 'edi 945', 'edi 997', 'electronic data interchange', 'as2', 'sps commerce', 'true commerce'];
+const EDI_KEYWORDS = ['edi integration', 'edi compliance', 'edi capable', 'edi required', 'edi 856', 'edi 810', 'edi 850', 'edi 940', 'edi 945', 'edi 997', 'electronic data interchange', 'as2', 'sps commerce', 'true commerce'];
+const EDI_NEGATIVE_VALUES = /^(?:—|-|none|no|n\/a|na|not required|not needed|nil|false|0)$/i;
 
 function detectEDI(text: string): boolean {
-  const lower = text.toLowerCase();
-  return EDI_KEYWORDS.some(kw => {
+  const normalized = text.replace(/\r/g, '');
+
+  const strongSignals = EDI_KEYWORDS.some((kw) => {
     const pattern = new RegExp(`\\b${kw.replace(/\s+/g, '\\s+')}\\b`, 'i');
-    return pattern.test(lower);
+    return pattern.test(normalized);
   });
+
+  if (strongSignals) return true;
+
+  const lines = normalized
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (!/\bedi\b/i.test(line)) continue;
+
+    if (/^edi(?:\s+(?:description|requirements?|details?))?\s*:?$/i.test(line)) {
+      const nextValue = lines[i + 1]?.trim() ?? '';
+      if (nextValue && !EDI_NEGATIVE_VALUES.test(nextValue)) {
+        return true;
+      }
+      continue;
+    }
+
+    if (/\b(?:no|none|not required|not needed|without)\s+edi\b/i.test(line)) {
+      continue;
+    }
+
+    return true;
+  }
+
+  return false;
 }
 
 const SYSTEM_PROMPT = `You are a sales analyst for Westfield Prep Center, a Los Angeles-based fulfillment and prep center.
