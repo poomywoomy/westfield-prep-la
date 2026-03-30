@@ -166,6 +166,19 @@ export function LeadsTab() {
         </CardContent>
       </Card>
 
+      {/* EDI Warning */}
+      {ediDetected && (
+        <Card className="border-red-400 bg-red-50 dark:bg-red-950/30 dark:border-red-800">
+          <CardContent className="flex items-center gap-3 py-4">
+            <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <div>
+              <p className="font-semibold text-red-800 dark:text-red-300">⚠️ EDI Requirement Detected</p>
+              <p className="text-sm text-red-700 dark:text-red-400">This lead mentions EDI integration in their requirements. Confirm EDI capability before accepting.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Analysis Result */}
       {analysis && (() => {
         const parts = analysis.split('---RESPONSE---');
