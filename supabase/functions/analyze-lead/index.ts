@@ -11,7 +11,10 @@ const EDI_KEYWORDS = ['edi', 'edi integration', 'edi compliance', 'edi capable',
 
 function detectEDI(text: string): boolean {
   const lower = text.toLowerCase();
-  return EDI_KEYWORDS.some(kw => lower.includes(kw));
+  return EDI_KEYWORDS.some(kw => {
+    const pattern = new RegExp(`\\b${kw.replace(/\s+/g, '\\s+')}\\b`, 'i');
+    return pattern.test(lower);
+  });
 }
 
 const SYSTEM_PROMPT = `You are a sales analyst for Westfield Prep Center, a Los Angeles-based fulfillment and prep center.
