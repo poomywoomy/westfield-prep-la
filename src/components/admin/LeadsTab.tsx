@@ -281,11 +281,37 @@ export function LeadsTab() {
           <DialogHeader>
             <DialogTitle>{viewLead?.company_name}</DialogTitle>
           </DialogHeader>
-          {viewLead?.ai_analysis && (
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              <ReactMarkdown>{viewLead.ai_analysis}</ReactMarkdown>
-            </div>
-          )}
+          {viewLead?.ai_analysis && (() => {
+            const parts = viewLead.ai_analysis.split('---RESPONSE---');
+            const summary = parts[0]?.trim() || '';
+            const responseText = parts[1]?.trim() || '';
+            return (
+              <div className="space-y-4">
+                {summary && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Summary</h4>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{summary}</p>
+                  </div>
+                )}
+                {responseText ? (
+                  <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-sm text-emerald-800 dark:text-emerald-300">Acceptance Response</h4>
+                      <Button variant="outline" size="sm" onClick={() => handleCopy(responseText)} className="border-emerald-300 dark:border-emerald-700">
+                        {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                        {copied ? "Copied" : "Copy"}
+                      </Button>
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap">{responseText}</p>
+                  </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown>{viewLead.ai_analysis}</ReactMarkdown>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>
