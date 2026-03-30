@@ -82,6 +82,7 @@ export function LeadsTab() {
 
       const result = await response.json();
       setAnalysis(result.analysis);
+      setEdiDetected(result.edi_detected || false);
       if (result.saved) fetchLeads();
       toast({ title: "Analysis complete", description: `Lead "${result.lead?.company_name || companyName}" analyzed successfully.` });
     } catch (err: any) {
