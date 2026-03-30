@@ -165,22 +165,55 @@ export function LeadsTab() {
       </Card>
 
       {/* Analysis Result */}
-      {analysis && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">AI Analysis</CardTitle>
-            <Button variant="outline" size="sm" onClick={() => handleCopy(analysis)}>
-              {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-              {copied ? "Copied" : "Copy"}
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              <ReactMarkdown>{analysis}</ReactMarkdown>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {analysis && (() => {
+        const parts = analysis.split('---RESPONSE---');
+        const summary = parts[0]?.trim() || '';
+        const response = parts[1]?.trim() || '';
+        return (
+          <div className="space-y-4">
+            {summary && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{summary}</p>
+                </CardContent>
+              </Card>
+            )}
+            {response && (
+              <Card className="border-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="text-lg text-emerald-800 dark:text-emerald-300">Ready to Copy</CardTitle>
+                  <Button variant="outline" size="sm" onClick={() => handleCopy(response)} className="border-emerald-300 hover:bg-emerald-100 dark:border-emerald-700 dark:hover:bg-emerald-900">
+                    {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                    {copied ? "Copied" : "Copy Response"}
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm whitespace-pre-wrap">{response}</p>
+                </CardContent>
+              </Card>
+            )}
+            {!response && summary && (
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="text-lg">AI Analysis</CardTitle>
+                  <Button variant="outline" size="sm" onClick={() => handleCopy(analysis)}>
+                    {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                    {copied ? "Copied" : "Copy"}
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown>{analysis}</ReactMarkdown>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        );
+      })()}
 
       {/* History */}
       <Card>
