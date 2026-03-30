@@ -1,29 +1,27 @@
 
 
-## Plan: Revamp Lead Analyzer Output
+## Plan: Fix False-Positive EDI Detection
 
-### Changes
+### Problem
+The EDI keyword `'edi'` matches any text containing those 3 letters (e.g., "credit", "medium", "immediately", "editing"). This causes the red EDI warning to trigger on nearly every lead.
 
-**1. Update AI system prompt (`supabase/functions/analyze-lead/index.ts`)**
+### Fix
 
-Replace the current 5-section output format with a simpler 2-section format:
+**File: `supabase/functions/analyze-lead/index.ts`**
 
-- **Section 1: Quick Summary** — 3-4 sentences covering who the lead is, what they need, volume, and any notable details
-- **Section 2: Acceptance Response** — A ready-to-copy professional message (2-3 paragraphs) that leads with how Westfield can serve them, mentions relevant capabilities naturally without bragging, and ends with a soft next-step invite. Tone: service-oriented, confident but not self-congratulatory.
+Change `detectEDI` to use word-boundary regex matching instead of simple `includes()`:
 
-Update the prompt instructions to emphasize: "Do not brag or list awards. Focus on how you can help them specifically. Be warm, professional, and solution-focused."
+```typescript
+function detectEDI(text: string): boolean {
+  const lower = text.toLowerCase();
+  return EDI_KEYWORDS.some(kw => {
+    const pattern = new RegExp(`\\b${kw.replace(/\s+/g, '\\s+')}\\b`, 'i');
+    return pattern.test(lower);
+  });
+}
+```
 
-**2. Update UI to visually separate the response (`src/components/admin/LeadsTab.tsx`)**
+This ensures `'edi'` only matches the standalone word "EDI", not substrings inside other words. All multi-word keywords like "edi integration" and "sps commerce" continue to work as before.
 
-- Parse the AI output to split the summary and the copy-paste response into two distinct sections
-- Render the **summary** in a normal card
-- Render the **acceptance response** in a visually distinct block with a colored background (e.g., `bg-emerald-50 border-emerald-200` or similar green-tinted card) and a dedicated "Copy Response" button on that section only
-- This makes it immediately obvious where to start copy-pasting
-
-### Technical Details
-
-- The edge function prompt will instruct the AI to use a `---RESPONSE---` separator between summary and response sections
-- The frontend splits on that separator to render two distinct UI blocks
-- The "Copy" button on the response section copies only the acceptance message (plain text, no markdown)
-- Keep the existing history table and view dialog unchanged
+Single file change, edge function redeploy only.
 
