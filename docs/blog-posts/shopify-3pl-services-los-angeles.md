@@ -156,7 +156,7 @@ Industry data from [Statista](https://www.statista.com/) shows that top-performi
 
 Speed matters. Every day of delay increases the chance your customer cancels or leaves a bad review.
 
-A quality Shopify 3PL in Los Angeles will fulfill orders in **24-48 hours** from order placement. That means:
+A quality Shopify [3PL in Los Angeles](/blog/shopify-3pl-services-los-angeles) will fulfill orders in **24-48 hours** from order placement. That means:
 
 - **Orders placed Monday morning ship Monday afternoon** or Tuesday morning
 - **99% on-time shipment** rates during normal seasons
