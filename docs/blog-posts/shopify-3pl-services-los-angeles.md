@@ -215,7 +215,7 @@ At Westfield, we've helped Shopify sellers scale from **200 orders per month to 
 
 ---
 
-## How to Choose the Best Shopify 3PL in Los Angeles
+## How to Choose the Best Shopify [3PL in Los Angeles](/blog/shopify-3pl-services-los-angeles)
 
 Not all 3PLs are created equal. Here's your checklist:
 
