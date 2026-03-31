@@ -612,7 +612,7 @@ Ready to upgrade your fulfillment operation?
 
 ## Your Shopify Fulfillment Upgrade Starts Here
 
-Stop struggling with fulfillment. Let a specialized Shopify 3PL in Los Angeles handle it while you focus on growing your brand.
+Stop struggling with fulfillment. Let a specialized Shopify [3PL in Los Angeles](/blog/shopify-3pl-services-los-angeles) handle it while you focus on growing your brand.
 
 **Get Your Free Shopify Fulfillment Audit:**
 
