@@ -1,0 +1,1 @@
+UPDATE blog_posts SET content = replace(content, 'relying on FBA prep services', 'relying on [FBA prep](/blog/amazon-ending-fba-prep-services-2026-sellers-guide) services') WHERE slug = 'amazon-ending-fba-prep-services-2026-sellers-guide';
