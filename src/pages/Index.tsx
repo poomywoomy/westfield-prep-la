@@ -26,7 +26,7 @@ const StatsStrip = lazy(() => import("@/components/StatsStrip"));
 const BlogPreview = lazy(() => import("@/components/BlogPreview"));
 const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA"));
 
-const Index = () => {
+const Index = () => { 
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
 
