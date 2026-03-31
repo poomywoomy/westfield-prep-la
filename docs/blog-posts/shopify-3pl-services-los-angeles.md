@@ -181,7 +181,7 @@ Running your own fulfillment operation is expensive. You're paying for:
 - **Insurance** and security
 - **Management time** overseeing operations
 
-A Shopify 3PL in Los Angeles spreads these costs across multiple clients. You only pay for what you use. Most sellers save **30-50% on fulfillment costs** by outsourcing to a specialized 3PL.
+A Shopify [3PL in Los Angeles](/blog/shopify-3pl-services-los-angeles) spreads these costs across multiple clients. You only pay for what you use. Most sellers save **30-50% on fulfillment costs** by outsourcing to a specialized 3PL.
 
 Check out our [transparent pricing](/pricing) to see exactly what you'll pay.
 
