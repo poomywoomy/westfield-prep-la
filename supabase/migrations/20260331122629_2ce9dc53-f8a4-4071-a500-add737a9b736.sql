@@ -1,0 +1,1 @@
+UPDATE blog_posts SET content = replace(content, 'You need a Shopify 3PL in Los Angeles.', 'You need a Shopify [3PL in Los Angeles](/blog/shopify-3pl-services-los-angeles).') WHERE slug = 'shopify-3pl-services-los-angeles';
