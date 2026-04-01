@@ -21,9 +21,9 @@ const Footer = () => {
                   className="h-8 w-auto"
                 />
               </div>
-              <h1 className="text-sm text-white/80 leading-relaxed font-normal">
+              <p className="text-sm text-white/80 leading-relaxed font-normal">
                 <TranslatedText>Los Angeles's Premier E-Commerce Fulfillment & 3PL Partner</TranslatedText>
-              </h1>
+              </p>
               <div className="pt-2">
                 <p className="text-sm text-secondary font-semibold">
                   <TranslatedText>Open 7 Days a Week</TranslatedText>
