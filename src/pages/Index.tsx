@@ -27,13 +27,6 @@ const StatsStrip = lazy(() => import("@/components/StatsStrip"));
 
 const BlogPreview = lazy(() => import("@/components/BlogPreview"));
 const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA"));
-const normalizePathname = (pathname: string) => {
-  if (pathname === "/") return pathname;
-
-  return pathname.replace(/\/+$/, "");
-};
-const { pathname } = useLocation();
-const canonicalUrl = getCanonicalUrl(normalizePathname(pathname));
 const Index = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
