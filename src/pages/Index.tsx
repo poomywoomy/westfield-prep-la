@@ -8,9 +8,7 @@ import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
-import RouteCanonical from "@/components/RouteCanonical";
-import { useLocation } from "react-router-dom";
-import { getCanonicalUrl } from "@/utils/seo";
+// Lazy load below-the-fold components
 // Lazy load below-the-fold components
 const PlatformCompatibility = lazy(() => import("@/components/PlatformCompatibility"));
 const ValueProposition = lazy(() => import("@/components/ValueProposition"));
