@@ -8,6 +8,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { ChatBot } from "@/components/ChatBot";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { TranslationLoadingOverlay } from "@/components/TranslationLoadingOverlay";
+import RouteCanonical from "@/components/RouteCanonical";
 
 // Lazy load routes for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -70,6 +71,7 @@ const App = () => {
               v7_relativeSplatPath: true
             }}
           >
+            <RouteCanonical />
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
               <Routes>
                 <Route path="/" element={<Index />} />
