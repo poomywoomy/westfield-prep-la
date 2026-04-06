@@ -100,11 +100,11 @@ const Index = () => {
           name="keywords"
           content="3pl shopify, shopify fulfillment center, amazon prep center, FBA prep center los angeles, 3pl pricing, DTC fulfillment, los angeles 3pl"
         />
+        alert(canonicalUrl)
         <link rel="canonical" href={canonicalUrl} />
         <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.position" content="34.0522;-118.2437" />
-
         {/* Open Graph tags */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://westfieldprepcenter.com/" />
@@ -115,7 +115,6 @@ const Index = () => {
           content="Shopify fulfillment, FBA prep & DTC logistics with real-time integrations. $1–2.50/unit."
         />
         <meta property="og:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Westfield3PL" />
