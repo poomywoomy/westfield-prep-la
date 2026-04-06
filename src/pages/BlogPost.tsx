@@ -111,14 +111,25 @@ const BlogPost = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{post.slug === 'why-3pl-fulfillment-is-essential-for-startups-scaling-with-amazon-fba' ? '3PL Fulfillment for Startups Scaling with Amazon FBA' : post.slug === '3pl-fulfillment-startups-scaling-amazon-fba' ? '3PL Fulfillment for Startups Scaling with Amazon FBA' : post.slug === 'fulfillment-center-los-angeles-growing-ecommerce-brands' ? 'Fulfillment Center Los Angeles for Growing Ecommerce Brands' : post.title}</title>
+      <Helmet prioritizeSeoTags>
+        <title>{(() => {
+          const slugTitles: Record<string, string> = {
+            'why-3pl-fulfillment-is-essential-for-startups-scaling-with-amazon-fba': '3PL Fulfillment for Startups Scaling with Amazon FBA',
+            '3pl-fulfillment-startups-scaling-amazon-fba': '3PL Fulfillment for Startups Scaling with Amazon FBA',
+            'fulfillment-center-los-angeles-growing-ecommerce-brands': 'Fulfillment Center Los Angeles for Growing Ecommerce Brands',
+          };
+          if (slugTitles[post.slug]) return slugTitles[post.slug];
+          return post.title.replace(/\s*\|.*$/, '');
+        })()}</title>
         <meta name="description" content={post.meta_description || post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={`https://westfieldprepcenter.com/blog/${post.slug}`} />
+        {(post as any).tags && (post as any).tags.length > 0 && (
+          <meta name="keywords" content={(post as any).tags.join(', ')} />
+        )}
         
         {/* Open Graph tags */}
-        <meta property="og:title" content={post.title} />
+        <meta property="og:title" content={post.title.replace(/\s*\|.*$/, '')} />
         <meta property="og:description" content={post.meta_description || post.excerpt || ""} />
         <meta property="og:url" content={`https://westfieldprepcenter.com/blog/${post.slug}`} />
         {post.cover_image_url && (
@@ -130,7 +141,7 @@ const BlogPost = () => {
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:title" content={post.title.replace(/\s*\|.*$/, '')} />
         <meta name="twitter:description" content={post.meta_description || post.excerpt || `Read ${post.title} on Westfield Prep Center blog`} />
         {post.cover_image_url && (
           <meta name="twitter:image" content={post.cover_image_url.startsWith('http') ? post.cover_image_url : `${window.location.origin}${post.cover_image_url}`} />
