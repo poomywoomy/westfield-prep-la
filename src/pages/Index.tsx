@@ -8,9 +8,7 @@ import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
-import RouteCanonical from "@/components/RouteCanonical";
-import { useLocation } from "react-router-dom";
-import { getCanonicalUrl } from "@/utils/seo";
+// Lazy load below-the-fold components
 // Lazy load below-the-fold components
 const PlatformCompatibility = lazy(() => import("@/components/PlatformCompatibility"));
 const ValueProposition = lazy(() => import("@/components/ValueProposition"));
@@ -27,13 +25,6 @@ const StatsStrip = lazy(() => import("@/components/StatsStrip"));
 
 const BlogPreview = lazy(() => import("@/components/BlogPreview"));
 const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA"));
-const normalizePathname = (pathname: string) => {
-  if (pathname === "/") return pathname;
-
-  return pathname.replace(/\/+$/, "");
-};
-const { pathname } = useLocation();
-const canonicalUrl = getCanonicalUrl(normalizePathname(pathname));
 const Index = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
@@ -100,7 +91,7 @@ const Index = () => {
           name="keywords"
           content="3pl shopify, shopify fulfillment center, amazon prep center, FBA prep center los angeles, 3pl pricing, DTC fulfillment, los angeles 3pl"
         />
-        <link rel="canonical" href={canonicalUrl} />
+        
         <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.position" content="34.0522;-118.2437" />
