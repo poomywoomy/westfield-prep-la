@@ -11,7 +11,7 @@ const normalizePathname = (pathname: string) => {
 const RouteCanonical = () => {
   const { pathname } = useLocation();
   const canonicalUrl = getCanonicalUrl(normalizePathname(pathname));
-
+  alert(canonicalUrl);
   return (
     <Helmet prioritizeSeoTags>
       <link rel="canonical" href={canonicalUrl} />
