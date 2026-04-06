@@ -100,7 +100,6 @@ const Index = () => {
           name="keywords"
           content="3pl shopify, shopify fulfillment center, amazon prep center, FBA prep center los angeles, 3pl pricing, DTC fulfillment, los angeles 3pl"
         />
-        alert(canonicalUrl)
         <link rel="canonical" href={canonicalUrl} />
         <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
         <meta name="geo.region" content="US-CA" />
