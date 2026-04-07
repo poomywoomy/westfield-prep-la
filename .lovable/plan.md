@@ -1,28 +1,30 @@
 
 
-## Plan: Fix Why Choose Us Page Lighting and Brand Logos
+## Plan: Fix Brand Logos and Replace FBA Section Graphic
 
 ### Problem
-1. **Dark lighting**: The page background uses `--wcu-bg-primary: 215 50% 7%` (near-black navy) with similarly dark card/section backgrounds, making the page feel very dark and hard to read.
-2. **Wrong brand logos**: The SVG paths in `BrandIcons.tsx` for Shopify, Amazon, and Walmart are incorrect/garbled -- they don't render recognizable logos.
+1. **Broken brand logos**: The SVG paths for Shopify, Amazon, and Walmart in `BrandIcons.tsx` still render as garbled/unrecognizable shapes. Previous fix attempts used incorrect paths.
+2. **Fake box graphic**: The right side of the "Amazon FBA Prep" section (lines 509-524 in `WhyChooseUs.tsx`) shows a generic CSS-drawn box with fake FNSKU barcode text (`|| ||| || |||`) and a "HEAVY PACKAGE" badge. It looks amateurish.
 
 ### Changes
 
 **File 1: `src/components/BrandIcons.tsx`**
-- Replace the SVG paths for `ShopifyIcon`, `AmazonIcon`, and `WalmartIcon` with correct, recognizable SVG paths from Simple Icons (official open-source brand SVGs).
-- Shopify: the shopping bag "S" logo
-- Amazon: the "a" with smile arrow
-- Walmart: the spark/sunburst (6-spoke)
+- Replace all three icon SVG paths with the exact Simple Icons paths (verified from simpleicons.org):
+  - **Shopify**: The shopping bag "S" icon (path: `M15.337 23.979l7.216-1.561s-2.604...` is wrong -- replace with the correct Simple Icons Shopify path)
+  - **Amazon**: The "a" with smile arrow (current path is the old Amazon "a" letterform -- replace with the recognizable smile/arrow logo)
+  - **Walmart**: The 6-spoke spark (current path is a complex multi-spoke that doesn't render correctly -- replace with the clean spark)
+- Use the verified `viewBox="0 0 24 24"` paths from Simple Icons v14
 
-**File 2: `src/index.css`**
-- Lighten the Why Choose Us dark theme CSS variables:
-  - `--wcu-bg-primary`: Lighten from `215 50% 7%` to ~`215 40% 12%`
-  - `--wcu-bg-secondary`: Lighten from `217 37% 12%` to ~`217 30% 16%`
-  - `--wcu-bg-card`: Lighten from `218 33% 15%` to ~`218 28% 20%`
-  - `--wcu-bg-dark-card`: Lighten from `217 33% 18%` to ~`217 28% 24%`
-
-This brightens backgrounds while maintaining the dark premium aesthetic. Text contrast improves across the page.
+**File 2: `src/pages/WhyChooseUs.tsx` (lines 509-524)**
+- Remove the fake box/barcode graphic entirely
+- Replace with a data-driven "FBA Compliance Stats" panel showing real metrics:
+  - "0% Chargeback Rate" 
+  - "99.7% Label Accuracy"
+  - "24hr Prep Turnaround"
+  - "2M+ Units Prepped"
+- Style as a grid of stat cards with icons, fitting the dark theme
+- This replaces the amateur box illustration with compelling, trust-building data that reinforces the "Zero Compliance Errors" headline
 
 ### No other files affected
-The WhyChooseUs page and other components reference these variables/icons, so changes propagate automatically.
+Both changes are self-contained in these two files.
 
