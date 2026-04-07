@@ -506,21 +506,26 @@ const WhyChooseUs = () => {
                     </div>
                   </div>
                 </div>
-                <div className="relative">
-                  {/* Visual representation of a perfect box */}
-                  <div className="aspect-square bg-[hsl(var(--wcu-bg-dark-card))] rounded-2xl p-8 flex flex-col items-center justify-center relative border border-dashed border-gray-600">
-                    <Box size={120} className="text-gray-600" />
-                    <div className="absolute top-10 right-10 bg-white text-black text-xs font-mono p-1 transform rotate-3">
-                      FNSKU: X00293JKA
-                      <br />
-                      <span className="text-xl tracking-widest">|| ||| || |||</span>
-                    </div>
-                    <div className="absolute bottom-10 left-10 bg-yellow-500 text-black text-[10px] font-bold px-2 py-1 rounded">
-                      HEAVY PACKAGE
-                    </div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-green-500 bg-green-900/20 px-4 py-2 rounded-full border border-green-500/50 flex items-center gap-2 backdrop-blur-md">
-                      <CheckCircle2 size={16} /> Compliant
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-[hsl(var(--wcu-bg-dark-card))] rounded-xl p-6 border border-white/5 text-center">
+                    <CheckCircle2 size={28} className="text-green-400 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-white">0%</div>
+                    <div className="text-sm text-gray-400">Chargeback Rate</div>
+                  </div>
+                  <div className="bg-[hsl(var(--wcu-bg-dark-card))] rounded-xl p-6 border border-white/5 text-center">
+                    <Tag size={28} className="text-orange-400 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-white">99.7%</div>
+                    <div className="text-sm text-gray-400">Label Accuracy</div>
+                  </div>
+                  <div className="bg-[hsl(var(--wcu-bg-dark-card))] rounded-xl p-6 border border-white/5 text-center">
+                    <Clock size={28} className="text-blue-400 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-white">24hr</div>
+                    <div className="text-sm text-gray-400">Prep Turnaround</div>
+                  </div>
+                  <div className="bg-[hsl(var(--wcu-bg-dark-card))] rounded-xl p-6 border border-white/5 text-center">
+                    <Box size={28} className="text-purple-400 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-white">2M+</div>
+                    <div className="text-sm text-gray-400">Units Prepped</div>
                   </div>
                 </div>
               </div>
