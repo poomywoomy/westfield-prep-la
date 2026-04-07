@@ -85,10 +85,10 @@ All colors MUST be HSL.
     --blog-shadow-glow: 0 12px 24px hsla(28, 100%, 50%, 0.25);
 
     /* Why Choose Us Dark Theme */
-    --wcu-bg-primary: 215 50% 7%;
-    --wcu-bg-secondary: 217 37% 12%;
-    --wcu-bg-card: 218 33% 15%;
-    --wcu-bg-dark-card: 217 33% 18%;
+    --wcu-bg-primary: 215 40% 12%;
+    --wcu-bg-secondary: 217 30% 16%;
+    --wcu-bg-card: 218 28% 20%;
+    --wcu-bg-dark-card: 217 28% 24%;
   }
 
   .dark {
