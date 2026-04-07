@@ -24,6 +24,8 @@ import {
   ChevronDown,
   ChevronUp,
   ShieldCheck,
+  Tag,
+  Clock,
 } from "lucide-react";
 
 // --- CUSTOM GRAPHIC COMPONENT: The "Old Way" vs "Westfield Way" ---
