@@ -65,7 +65,7 @@ As eCommerce continues to grow, efficient logistics becomes more important than 
 
 The right fulfillment partner not only improves efficiency but also helps build a strong foundation for long-term success.
 
-## Frequently Asked Questions
+## FAQs
 
 <details>
 <summary>What is a fulfillment center in Los Angeles?</summary>
