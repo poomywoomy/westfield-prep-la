@@ -1,30 +1,47 @@
 
 
-## Plan: Fix Brand Logos and Replace FBA Section Graphic
+## Plan: Create New Blog Post from PDF
 
-### Problem
-1. **Broken brand logos**: The SVG paths for Shopify, Amazon, and Walmart in `BrandIcons.tsx` still render as garbled/unrecognizable shapes. Previous fix attempts used incorrect paths.
-2. **Fake box graphic**: The right side of the "Amazon FBA Prep" section (lines 509-524 in `WhyChooseUs.tsx`) shows a generic CSS-drawn box with fake FNSKU barcode text (`|| ||| || |||`) and a "HEAVY PACKAGE" badge. It looks amateurish.
+### What We're Building
+A new blog post based on the uploaded PDF "How to Grow Your Business with a Prep Center for Amazon FBA", rewritten in Westfield's conversational style with proper SEO, internal links, interactive elements, and FAQs.
 
-### Changes
+### Content Strategy
 
-**File 1: `src/components/BrandIcons.tsx`**
-- Replace all three icon SVG paths with the exact Simple Icons paths (verified from simpleicons.org):
-  - **Shopify**: The shopping bag "S" icon (path: `M15.337 23.979l7.216-1.561s-2.604...` is wrong -- replace with the correct Simple Icons Shopify path)
-  - **Amazon**: The "a" with smile arrow (current path is the old Amazon "a" letterform -- replace with the recognizable smile/arrow logo)
-  - **Walmart**: The 6-spoke spark (current path is a complex multi-spoke that doesn't render correctly -- replace with the clean spark)
-- Use the verified `viewBox="0 0 24 24"` paths from Simple Icons v14
+**Meta Data:**
+- Title: `Prep Center for Amazon FBA to Grow Your Ecommerce Business`
+- Meta Description: `Westfield Prep Center offers prep center for Amazon FBA with fast processing, accurate labeling, and scalable fulfillment solutions for growing brands.`
+- Slug: `prep-center-for-amazon-fba-grow-ecommerce-business`
+- Category: `Amazon FBA`
 
-**File 2: `src/pages/WhyChooseUs.tsx` (lines 509-524)**
-- Remove the fake box/barcode graphic entirely
-- Replace with a data-driven "FBA Compliance Stats" panel showing real metrics:
-  - "0% Chargeback Rate" 
-  - "99.7% Label Accuracy"
-  - "24hr Prep Turnaround"
-  - "2M+ Units Prepped"
-- Style as a grid of stat cards with icons, fitting the dark theme
-- This replaces the amateur box illustration with compelling, trust-building data that reinforces the "Zero Compliance Errors" headline
+**Required Hyperlinks (from user):**
+1. "prep center for Amazon FBA" → `https://westfieldprepcenter.com/amazon-fba-prep`
+2. "los angeles fulfillment center" → `https://westfieldprepcenter.com`
+3. "order fulfillment solutions" → `https://westfieldprepcenter.com/order-fulfillment`
 
-### No other files affected
-Both changes are self-contained in these two files.
+**Additional Internal Links (per blog guidelines, 6-8 total):**
+4. "Westfield Prep Center" → homepage
+5. "Contact us today" → `/contact`
+6. "pricing" or related → `/pricing`
+7. "Shopify fulfillment" → `/shopify-fulfillment`
+8. "labeling and compliance" → `/labeling-compliance`
+
+**Interactive Elements (3-4 collapsible sections):**
+- Cost comparison calculator
+- Checklist for choosing a prep center
+- Before/after scenario
+
+**FAQs:** 5 questions from the PDF, formatted with `<details>/<summary>` tags for automatic FAQPage schema generation.
+
+### Steps
+
+1. **Save cover image** from extracted PDF image to `public/blog-images/`
+2. **Create markdown file** at `docs/blog-posts/prep-center-for-amazon-fba-grow-ecommerce-business.md` with rewritten content (conversational style, no em dashes, E-E-A-T signals, keyword density)
+3. **Insert blog post into database** via the `import-blog-post` edge function or direct SQL insert with all frontmatter fields
+4. **Update sitemap** in `public/sitemap.xml` with the new blog URL
+5. **Verify** the post renders correctly at `/blog/prep-center-for-amazon-fba-grow-ecommerce-business`
+
+### Technical Details
+- Content stored in `blog_posts` table (slug, title, content, meta_description, category, tags, etc.)
+- BlogPostSchema component auto-generates Article + FAQPage JSON-LD from `<details>` blocks
+- BlogPostRenderer converts markdown to styled HTML
 
