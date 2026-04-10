@@ -85,6 +85,8 @@ Instead of struggling with logistics, you can focus on what truly matters expand
 
 ---
 
+## FAQs
+
 <details>
 <summary>❓ What is a prep center for Amazon FBA?</summary>
 
