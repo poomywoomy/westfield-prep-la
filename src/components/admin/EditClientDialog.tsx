@@ -170,49 +170,8 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
     }
   };
 
-  const validateLocation = async () => {
-    if (!formData.shopify_location_id) {
-      toast({ 
-        title: "Enter a location ID to validate", 
-        variant: "destructive" 
-      });
-      return;
-    }
-    
-    setValidatingLocation(true);
-    setLocationStatus(null);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke(
-        'shopify-validate-location',
-        { body: { client_id: client.id, location_id: formData.shopify_location_id } }
-      );
-      
-      if (error) throw error;
-      setLocationStatus(data);
-      
-      if (data.valid) {
-        toast({ 
-          title: "✅ Location is valid and active",
-          description: `Location: ${data.location_name}`
-        });
-      } else {
-        toast({ 
-          title: "Invalid Location", 
-          description: data.error,
-          variant: "destructive" 
-        });
-      }
-    } catch (err: any) {
-      toast({ 
-        title: "Validation failed", 
-        description: err.message || "Unknown error",
-        variant: "destructive" 
-      });
-    } finally {
-      setValidatingLocation(false);
-    }
-  };
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
