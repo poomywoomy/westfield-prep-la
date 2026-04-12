@@ -91,64 +91,6 @@ const ClientSettings = () => {
     }
   };
 
-  const validateLocation = async () => {
-    if (!locationId) {
-      toast({
-        title: "Error",
-        description: "Please enter a location ID first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setValidating(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('shopify-validate-location', {
-        body: { client_id: clientData.id, location_id: locationId }
-      });
-
-      if (error) throw error;
-      setLocationStatus(data);
-
-      toast({
-        title: data.valid ? "Valid Location" : "Invalid Location",
-        description: data.valid ? data.location_name : data.error,
-        variant: data.valid ? "default" : "destructive",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Validation Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-      setLocationStatus({ valid: false, error: error.message });
-    } finally {
-      setValidating(false);
-    }
-  };
-
-  const saveLocationId = async () => {
-    try {
-      const { error } = await supabase
-        .from('clients')
-        .update({ shopify_location_id: locationId || null })
-        .eq('id', clientData.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Location ID saved successfully",
-      });
-      setLocationStatus(null);
-    } catch (error: any) {
-      toast({
-        title: "Save Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
