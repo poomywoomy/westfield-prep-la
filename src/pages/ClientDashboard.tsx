@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { 
-  Home, Package, ShoppingCart, FileText, Truck, Activity, DollarSign, 
+  Home, Package, FileText, Truck, Activity, DollarSign, 
   Settings, LogOut, RotateCcw 
 } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
@@ -19,7 +19,7 @@ import type { Database } from "@/integrations/supabase/types";
 // Lazy load tab components for better performance
 const ClientBillsView = lazy(() => import("@/components/client/ClientBillsView"));
 const ClientProductsTab = lazy(() => import("@/components/client/ClientProductsTab"));
-const ClientOrdersTab = lazy(() => import("@/components/client/ClientOrdersTab"));
+
 const ClientShipmentsTab = lazy(() => import("@/components/client/ClientShipmentsTab").then(m => ({ default: m.ClientShipmentsTab })));
 const ClientInventoryActivityLog = lazy(() => import("@/components/client/ClientInventoryActivityLog").then(m => ({ default: m.ClientInventoryActivityLog })));
 const ClientAnalyticsDashboard = lazy(() => import("@/components/client/ClientAnalyticsDashboard").then(m => ({ default: m.ClientAnalyticsDashboard })));
@@ -35,7 +35,7 @@ const ClientDashboard = () => {
   const [clientId, setClientId] = useState<string>("");
   const [showSKUDialog, setShowSKUDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("analytics");
-  const [hasShopifyStore, setHasShopifyStore] = useState(false);
+  
 
   // Prefetch handlers for hover-based data loading
   const prefetchHandlers: Record<string, () => void> = {
@@ -54,18 +54,7 @@ const ClientDashboard = () => {
     }
   }, [user]);
 
-  // Detect Shopify OAuth success callback
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('shopify_connected') === 'true') {
-      toast({
-        title: "Success!",
-        description: "Your Shopify store has been connected.",
-      });
-      // Clean up URL
-      window.history.replaceState({}, '', '/client/dashboard');
-    }
-  }, [toast]);
+
 
   const fetchClientName = async () => {
     try {
@@ -78,16 +67,6 @@ const ClientDashboard = () => {
       if (!error && data) {
         setClientId(data.id);
         setClientName(data.contact_name);
-        
-        // Check if client has active Shopify store
-        const { data: shopifyStore } = await supabase
-          .from("shopify_stores")
-          .select("id")
-          .eq("client_id", data.id)
-          .eq("is_active", true)
-          .maybeSingle();
-        
-        setHasShopifyStore(!!shopifyStore);
         
         // Only update status once on first login using localStorage flag
         const statusUpdateKey = `client_status_updated_${user?.id}`;
@@ -176,17 +155,8 @@ const ClientDashboard = () => {
             <Package className="h-5 w-5" />
             Products
           </Button>
-          {hasShopifyStore && (
-            <Button
-              variant="ghost"
-              className={`w-full justify-start gap-3 ${activeTab === 'orders' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
-              onClick={() => setActiveTab('orders')}
-              onMouseEnter={() => prefetchHandlers.orders?.()}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              Orders
-            </Button>
-          )}
+
+
           <Button
             variant="ghost"
             className={`w-full justify-start gap-3 ${activeTab === 'asns' ? 'bg-muted text-primary' : 'hover:bg-muted'}`}
@@ -283,7 +253,7 @@ const ClientDashboard = () => {
             <TabsList className="hidden">
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="products">Products</TabsTrigger>
-              <TabsTrigger value="orders">Orders</TabsTrigger>
+              
               <TabsTrigger value="asns">ASNs</TabsTrigger>
               <TabsTrigger value="returns">Returns</TabsTrigger>
               <TabsTrigger value="shipments">Shipments</TabsTrigger>
@@ -314,11 +284,8 @@ const ClientDashboard = () => {
               </Suspense>
             </TabsContent>
 
-            <TabsContent value="orders" forceMount className="data-[state=inactive]:hidden">
-              <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
-                <ClientOrdersTab />
-              </Suspense>
-            </TabsContent>
+
+
 
             <TabsContent value="asns" forceMount className="data-[state=inactive]:hidden">
               <Suspense fallback={<div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>

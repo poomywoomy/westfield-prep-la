@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, FileText, Loader2 } from "lucide-react";
+import { Upload, X, FileText } from "lucide-react";
 import { validatePricingDocument } from "@/lib/fileValidation";
 import { sanitizeError } from "@/lib/errorHandler";
 import { clientUpdateSchema } from "@/lib/clientValidation";
@@ -28,8 +28,6 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [existingFileUrl, setExistingFileUrl] = useState<string>("");
-  const [validatingLocation, setValidatingLocation] = useState(false);
-  const [locationStatus, setLocationStatus] = useState<any>(null);
   const [formData, setFormData] = useState({
     company_name: "",
     first_name: "",
@@ -43,7 +41,6 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
     storage_method: "" as "shelf_storage" | "cubic_foot_storage" | "",
     admin_notes: "",
     fulfillment_services: [] as Array<"fba_prep" | "wfs_prep" | "tiktok_prep" | "self_fulfilled" | "shopify" | "returns_processing">,
-    shopify_location_id: "",
   });
   const { toast } = useToast();
 
@@ -62,11 +59,9 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
         storage_method: client.storage_method || "",
         admin_notes: client.admin_notes || "",
         fulfillment_services: client.fulfillment_services || [],
-        shopify_location_id: client.shopify_location_id || "",
       });
       setExistingFileUrl(client.pricing_document_url || "");
       setSelectedFile(null);
-      setLocationStatus(null);
     }
   }, [client]);
 
@@ -249,7 +244,6 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
         admin_notes: formData.admin_notes,
         fulfillment_services: formData.fulfillment_services,
         pricing_document_url: documentUrl || null,
-        shopify_location_id: formData.shopify_location_id || null,
       };
 
       // Validate data with zod schema
@@ -350,49 +344,6 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
                 onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                 required
               />
-            </div>
-
-            <div className="space-y-2 col-span-2">
-              <Label htmlFor="shopify_location_id">
-                Shopify Location ID 
-                <span className="text-xs text-muted-foreground ml-2">(Optional)</span>
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="shopify_location_id"
-                  value={formData.shopify_location_id}
-                  onChange={(e) => {
-                    setFormData({ ...formData, shopify_location_id: e.target.value });
-                    setLocationStatus(null);
-                  }}
-                  placeholder="Auto-selected if empty"
-                />
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={validateLocation}
-                  disabled={validatingLocation || !formData.shopify_location_id}
-                >
-                  {validatingLocation ? <Loader2 className="h-4 w-4 animate-spin" /> : "Validate"}
-                </Button>
-              </div>
-              {locationStatus && (
-                <div className={`text-sm p-2 rounded border ${
-                  locationStatus.valid 
-                    ? 'bg-green-50 border-green-200 text-green-800' 
-                    : 'bg-red-50 border-red-200 text-red-800'
-                }`}>
-                  {locationStatus.valid 
-                    ? `✅ Valid: ${locationStatus.location_name} (Active)` 
-                    : `❌ ${locationStatus.error}`
-                  }
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Leave empty to auto-select your store's primary fulfillment location. 
-                If Westfield Prep is your 3PL warehouse, create a separate Shopify location 
-                and enter its ID here for accurate inventory sync.
-              </p>
             </div>
 
             <div className="space-y-2">
@@ -513,21 +464,6 @@ const EditClientDialog = ({ open, onOpenChange, client, onSuccess }: EditClientD
                   }}
                 />
                 <Label htmlFor="self_fulfilled" className="font-normal cursor-pointer">Self-Fulfilled Shipment</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="shopify"
-                  checked={formData.fulfillment_services.includes('shopify')}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'shopify'] });
-                    } else {
-                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'shopify') });
-                    }
-                  }}
-                />
-                <Label htmlFor="shopify" className="font-normal cursor-pointer">Shopify</Label>
               </div>
               
               <div className="flex items-center space-x-2">

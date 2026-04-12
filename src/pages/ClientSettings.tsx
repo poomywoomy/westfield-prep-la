@@ -8,10 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, User, Store, Loader2, CheckCircle, XCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ArrowLeft, User } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
-import ClientShopifyTab from "@/components/client/ClientShopifyTab";
 
 const ClientSettings = () => {
   const { user, role, loading } = useAuth();
@@ -42,14 +40,10 @@ const ClientSettings = () => {
     }
   }, [user]);
 
-  const [locationId, setLocationId] = useState<string>("");
-  const [validating, setValidating] = useState(false);
-  const [locationStatus, setLocationStatus] = useState<any>(null);
-
   const fetchClientData = async () => {
     const { data, error } = await supabase
       .from("clients")
-      .select("id, first_name, last_name, company_name, email, phone_number, default_low_stock_threshold, shopify_location_id")
+      .select("id, first_name, last_name, company_name, email, phone_number, default_low_stock_threshold")
       .eq("user_id", user?.id)
       .single();
 
@@ -60,7 +54,6 @@ const ClientSettings = () => {
       setCompanyName(data.company_name || "");
       setPhoneNumber(data.phone_number || "");
       setLowStockThreshold(data.default_low_stock_threshold || 10);
-      setLocationId(data.shopify_location_id || "");
       setHasSetPassword(true);
     }
   };
@@ -267,14 +260,10 @@ const ClientSettings = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="account" className="space-y-6">
-          <TabsList className="grid grid-cols-2 w-full max-w-2xl">
+          <TabsList className="w-full max-w-2xl">
             <TabsTrigger value="account">
               <User className="mr-2 h-4 w-4" />
               Account
-            </TabsTrigger>
-            <TabsTrigger value="shopify">
-              <Store className="mr-2 h-4 w-4" />
-              Shopify
             </TabsTrigger>
           </TabsList>
 
@@ -395,74 +384,6 @@ const ClientSettings = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Shopify Integration Settings</CardTitle>
-              <CardDescription>
-                Configure your Shopify location for accurate inventory sync
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="shopify_location_id">
-                  Shopify Location ID
-                  <span className="text-muted-foreground ml-2">(Optional)</span>
-                </Label>
-
-                <div className="flex gap-2">
-                  <Input
-                    id="shopify_location_id"
-                    value={locationId}
-                    onChange={(e) => setLocationId(e.target.value)}
-                    placeholder="Auto-selected if empty"
-                    className="flex-1"
-                  />
-                  <Button 
-                    variant="outline"
-                    onClick={validateLocation}
-                    disabled={validating || !locationId}
-                  >
-                    {validating ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Validate"
-                    )}
-                  </Button>
-                </div>
-
-                {locationStatus && (
-                  <Alert className={locationStatus.valid ? "border-green-500 bg-green-50 dark:bg-green-950" : "border-red-500 bg-red-50 dark:bg-red-950"}>
-                    <AlertDescription className="flex items-center gap-2">
-                      {locationStatus.valid ? (
-                        <>
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                          <span className="text-green-900 dark:text-green-100">
-                            Valid: {locationStatus.location_name}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="h-4 w-4 text-red-600" />
-                          <span className="text-red-900 dark:text-red-100">{locationStatus.error}</span>
-                        </>
-                      )}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <p className="text-sm text-muted-foreground">
-                  Leave empty to auto-select your store's primary fulfillment location. 
-                  If Westfield Prep is your 3PL warehouse, create a separate Shopify 
-                  location and enter its ID here for accurate inventory sync.
-                </p>
-              </div>
-
-              <Button onClick={saveLocationId}>
-                Save Location Settings
-              </Button>
-            </CardContent>
-          </Card>
-
           <Card className="border-destructive">
             <CardHeader>
               <CardTitle className="text-destructive">Delete Account</CardTitle>
@@ -480,7 +401,7 @@ const ClientSettings = () => {
                   <li>All inventory records and history</li>
                   <li>All shipments and orders</li>
                   <li>All billing information</li>
-                  <li>All Shopify integrations</li>
+                  
                   <li>All account settings and preferences</li>
                 </ul>
               </div>
@@ -526,9 +447,8 @@ const ClientSettings = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="shopify">
-            <ClientShopifyTab />
-          </TabsContent>
+
+
         </Tabs>
       </main>
     </div>

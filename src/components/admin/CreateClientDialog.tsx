@@ -307,21 +307,6 @@ const CreateClientDialog = ({ open, onOpenChange, onSuccess }: CreateClientDialo
               
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="shopify"
-                  checked={formData.fulfillment_services.includes('shopify')}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setFormData({ ...formData, fulfillment_services: [...formData.fulfillment_services, 'shopify'] });
-                    } else {
-                      setFormData({ ...formData, fulfillment_services: formData.fulfillment_services.filter(s => s !== 'shopify') });
-                    }
-                  }}
-                />
-                <Label htmlFor="shopify" className="font-normal cursor-pointer">Shopify</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
                   id="returns_processing"
                   checked={formData.fulfillment_services.includes('returns_processing')}
                   onCheckedChange={(checked) => {
