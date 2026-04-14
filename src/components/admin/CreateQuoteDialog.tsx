@@ -303,7 +303,11 @@ export function CreateQuoteDialog({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen) resetForm();
+      if (!isOpen) {
+        resetForm();
+      } else if (standardItems.length === 0 && !isTeamQuote) {
+        setStandardItems(generateDefaultStandardItems());
+      }
       onOpenChange(isOpen);
     }}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
