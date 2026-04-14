@@ -21,83 +21,11 @@ verify_jwt = true
 [functions.check-rate-limit]
 verify_jwt = false
 
-[functions.shopify-oauth-start]
-verify_jwt = false
-
-[functions.shopify-oauth-callback]
-verify_jwt = false
-
-[functions.shopify-sync-products]
-verify_jwt = true
-
-[functions.shopify-enable-auto-sync]
-verify_jwt = true
-
-[functions.shopify-webhook-handler]
-verify_jwt = false
-
-[functions.shopify-test-connection]
-verify_jwt = true
-
-[functions.shopify-disconnect-store]
-verify_jwt = true
-
-[functions.shopify-sync-inventory]
-verify_jwt = true
-
-[functions.shopify-sync-orders]
-verify_jwt = true
-
-[functions.shopify-register-webhook]
-verify_jwt = true
-
-[functions.shopify-buy-label]
-verify_jwt = true
-
-[functions.shopify-get-shipping-rates]
-verify_jwt = true
-
-[functions.shopify-push-inventory-single]
-verify_jwt = true
-
-[functions.shopify-process-return]
-verify_jwt = true
-
-[functions.shopify-comprehensive-sync]
-verify_jwt = true
-
-[[functions.shopify-comprehensive-sync.schedule]]
-cron = "*/5 * * * *"
-
 [functions.cleanup-old-webhooks]
 verify_jwt = false
 
 [[functions.cleanup-old-webhooks.schedule]]
 cron = "0 2 * * *"
-
-[functions.shopify-activate-location-inventory]
-verify_jwt = true
-
-[functions.shopify-reconcile-inventory-bulk]
-verify_jwt = true
-
-[functions.shopify-inventory-audit]
-verify_jwt = true
-
-[[functions.shopify-inventory-audit.schedule]]
-cron = "0 2 * * *"
-
-[functions.shopify-validate-sku-mapping]
-verify_jwt = true
-
-[functions.shopify-backfill-variant-aliases]
-verify_jwt = true
-
-[functions.shopify-sync-locations]
-verify_jwt = true
-
-[functions.shopify-fulfill-order]
-verify_jwt = true
 
 [functions.barcode-lookup]
 verify_jwt = true
@@ -110,9 +38,6 @@ verify_jwt = true
 
 [functions.process-lead-magnet]
 verify_jwt = false
-
-[functions.shopify-validate-location]
-verify_jwt = true
 
 [functions.chat-assistant]
 verify_jwt = false
