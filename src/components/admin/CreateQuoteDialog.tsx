@@ -102,6 +102,19 @@ const SELF_FULFILLMENT_SERVICES = [
   "Custom Entry"
 ];
 
+const B2B_SERVICES = [
+  "Pick & Pack",
+  "Palletizing",
+  "Bundling",
+  "Kitting",
+  "Shrink Wrapping",
+  "Bubble Wrapping",
+  "Additional Label",
+  "Shipment Box",
+  "Carton Usage",
+  "Custom Entry"
+];
+
 const MINIMUM_SPEND_TIERS: Record<string, string> = {
   "250_then_500": "$250/mo for 3 months, then $500/mo",
   "500": "$500/mo flat",
