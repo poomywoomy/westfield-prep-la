@@ -71,6 +71,8 @@ const DEFAULT_PRICES: Record<string, number> = {
   "Small Bin Storage": 4,
   "Medium Bin Storage": 5,
   "Large Bin Storage": 6,
+  "Pallet Storage": 25,
+  "Shelf Storage": 20,
   "Returns Handling": 1,
   "Carton Receiving": 3,
   "Pallet Receiving": 50,
@@ -118,7 +120,7 @@ export function CreateQuoteDialog({
   const [manualContactName, setManualContactName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
   const [manualPhone, setManualPhone] = useState("");
-  const [minimumSpendTier, setMinimumSpendTier] = useState("");
+  const [minimumSpendTier, setMinimumSpendTier] = useState("250_then_500");
 
   const [standardItems, setStandardItems] = useState<LineItem[]>([]);
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
@@ -296,7 +298,7 @@ export function CreateQuoteDialog({
     setManualContactName("");
     setManualEmail("");
     setManualPhone("");
-    setMinimumSpendTier("");
+    setMinimumSpendTier("250_then_500");
     setStandardItems(generateDefaultStandardItems());
     setFulfillmentSections([]);
     setAdditionalComments("");
