@@ -556,6 +556,9 @@ export function CreateQuoteDialog({
                     <Button type="button" size="sm" variant="secondary" onClick={() => addFulfillmentSection("Self Fulfillment")}>
                       <Plus className="h-4 w-4 mr-1" /> Self Fulfillment
                     </Button>
+                    <Button type="button" size="sm" variant="secondary" onClick={() => addFulfillmentSection("B2B")}>
+                      <Plus className="h-4 w-4 mr-1" /> B2B
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
