@@ -298,7 +298,7 @@ export function CreateQuoteDialog({
     setManualContactName("");
     setManualEmail("");
     setManualPhone("");
-    setMinimumSpendTier("");
+    setMinimumSpendTier("250_then_500");
     setStandardItems(generateDefaultStandardItems());
     setFulfillmentSections([]);
     setAdditionalComments("");
