@@ -1083,7 +1083,9 @@ export type Database = {
           generated_by: string | null
           generated_date: string
           id: string
+          minimum_spend_tier: string | null
           phone: string | null
+          setup_fee_refundable: boolean | null
           state: string | null
           zip: string | null
         }
@@ -1101,7 +1103,9 @@ export type Database = {
           generated_by?: string | null
           generated_date?: string
           id?: string
+          minimum_spend_tier?: string | null
           phone?: string | null
+          setup_fee_refundable?: boolean | null
           state?: string | null
           zip?: string | null
         }
@@ -1119,7 +1123,9 @@ export type Database = {
           generated_by?: string | null
           generated_date?: string
           id?: string
+          minimum_spend_tier?: string | null
           phone?: string | null
+          setup_fee_refundable?: boolean | null
           state?: string | null
           zip?: string | null
         }

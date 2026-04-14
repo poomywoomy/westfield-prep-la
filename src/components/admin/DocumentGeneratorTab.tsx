@@ -14,14 +14,26 @@ const DOCUMENT_TYPES = {
   master_agreement: "Client Service Agreement (Master Agreement)"
 };
 
+const MINIMUM_SPEND_TIERS = {
+  "250_then_500": "$250/mo for 3 months, then $500/mo",
+  "500_flat": "$500/mo flat",
+  "1000_flat": "$1,000/mo flat"
+};
+
+const SETUP_FEE_OPTIONS = {
+  refundable: "$500 Refundable",
+  non_refundable: "$500 Non-Refundable"
+};
+
 const DocumentGeneratorTab = () => {
   const [selectedDocument, setSelectedDocument] = useState<string>("");
+  const [minimumSpendTier, setMinimumSpendTier] = useState<string>("");
+  const [setupFeeOption, setSetupFeeOption] = useState<string>("");
   const [generating, setGenerating] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Client details state
   const [clientDetails, setClientDetails] = useState<ClientDetails>({
     companyName: "",
     contactName: "",
@@ -63,29 +75,33 @@ const DocumentGeneratorTab = () => {
 
   const handleGenerate = async () => {
     if (!selectedDocument) {
-      toast({
-        title: "Error",
-        description: "Please select a document type",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Please select a document type", variant: "destructive" });
       return;
     }
-
+    if (!minimumSpendTier) {
+      toast({ title: "Error", description: "Please select a minimum monthly spend tier", variant: "destructive" });
+      return;
+    }
+    if (!setupFeeOption) {
+      toast({ title: "Error", description: "Please select a setup fee option", variant: "destructive" });
+      return;
+    }
     if (!clientDetails.companyName || !clientDetails.contactName) {
-      toast({
-        title: "Error",
-        description: "Please enter company name and contact name",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Please enter company name and contact name", variant: "destructive" });
       return;
     }
 
     setGenerating(true);
     try {
-      // Generate PDF
-      await generateDocumentPDF(selectedDocument, clientDetails);
+      const isRefundable = setupFeeOption === "refundable";
+      const detailsWithOptions: ClientDetails = {
+        ...clientDetails,
+        minimumSpendTier,
+        setupFeeRefundable: isRefundable
+      };
 
-      // Save to history
+      await generateDocumentPDF(selectedDocument, detailsWithOptions);
+
       const { error } = await supabase
         .from("generated_documents")
         .insert({
@@ -101,40 +117,24 @@ const DocumentGeneratorTab = () => {
           phone: clientDetails.phone || null,
           client_name_2: clientDetails.contactName2 || null,
           contact_title_2: clientDetails.contactTitle2 || null,
+          minimum_spend_tier: minimumSpendTier,
+          setup_fee_refundable: isRefundable,
         });
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Document generated and downloaded successfully",
-      });
-
-      // Refresh history
+      toast({ title: "Success", description: "Document generated and downloaded successfully" });
       fetchHistory();
 
-      // Reset form
       setClientDetails({
-        companyName: "",
-        contactName: "",
-        contactTitle: "",
-        address: "",
-        city: "",
-        state: "",
-        zip: "",
-        email: "",
-        phone: "",
-        contactName2: "",
-        contactTitle2: ""
+        companyName: "", contactName: "", contactTitle: "", address: "", city: "", state: "", zip: "", email: "", phone: "", contactName2: "", contactTitle2: ""
       });
       setSelectedDocument("");
+      setMinimumSpendTier("");
+      setSetupFeeOption("");
     } catch (error: any) {
       console.error("Error generating document:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate document",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: error.message || "Failed to generate document", variant: "destructive" });
     } finally {
       setGenerating(false);
     }
@@ -154,22 +154,16 @@ const DocumentGeneratorTab = () => {
         email: doc.email || "",
         phone: doc.phone || "",
         contactName2: doc.client_name_2 || "",
-        contactTitle2: doc.contact_title_2 || ""
+        contactTitle2: doc.contact_title_2 || "",
+        minimumSpendTier: doc.minimum_spend_tier || "250_then_500",
+        setupFeeRefundable: doc.setup_fee_refundable ?? false,
       };
 
       await generateDocumentPDF(doc.document_type, details);
-
-      toast({
-        title: "Success",
-        description: "Document regenerated and downloaded successfully",
-      });
+      toast({ title: "Success", description: "Document regenerated and downloaded successfully" });
     } catch (error: any) {
       console.error("Error regenerating document:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to regenerate document",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: error.message || "Failed to regenerate document", variant: "destructive" });
     } finally {
       setGenerating(false);
     }
@@ -177,12 +171,10 @@ const DocumentGeneratorTab = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric",
-    });
+    return date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" });
   };
+
+  const isFormValid = selectedDocument && minimumSpendTier && setupFeeOption && clientDetails.companyName && clientDetails.contactName;
 
   return (
     <div className="space-y-6">
@@ -206,13 +198,46 @@ const DocumentGeneratorTab = () => {
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(DOCUMENT_TYPES).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>
-                    {label}
-                  </SelectItem>
+                  <SelectItem key={key} value={key}>{label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
+
+          {/* Agreement Options */}
+          {selectedDocument && (
+            <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+              <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Agreement Options</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Minimum Monthly Spend *</Label>
+                  <Select value={minimumSpendTier} onValueChange={setMinimumSpendTier}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select minimum spend tier" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(MINIMUM_SPEND_TIERS).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Account Setup Fee *</Label>
+                  <Select value={setupFeeOption} onValueChange={setSetupFeeOption}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select setup fee type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(SETUP_FEE_OPTIONS).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Company Information Section */}
           <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
@@ -220,61 +245,31 @@ const DocumentGeneratorTab = () => {
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="companyName">Company/Business Name *</Label>
-                <Input
-                  id="companyName"
-                  placeholder="Enter company or business name"
-                  value={clientDetails.companyName}
-                  onChange={(e) => updateField("companyName", e.target.value)}
-                />
+                <Input id="companyName" placeholder="Enter company or business name" value={clientDetails.companyName} onChange={(e) => updateField("companyName", e.target.value)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  placeholder="Street address"
-                  value={clientDetails.address}
-                  onChange={(e) => updateField("address", e.target.value)}
-                />
+                <Input id="address" placeholder="Street address" value={clientDetails.address} onChange={(e) => updateField("address", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="city">City</Label>
-                <Input
-                  id="city"
-                  placeholder="City"
-                  value={clientDetails.city}
-                  onChange={(e) => updateField("city", e.target.value)}
-                />
+                <Input id="city" placeholder="City" value={clientDetails.city} onChange={(e) => updateField("city", e.target.value)} />
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="state">State</Label>
-                <Input
-                  id="state"
-                  placeholder="CA"
-                  value={clientDetails.state}
-                  onChange={(e) => updateField("state", e.target.value)}
-                />
+                <Input id="state" placeholder="CA" value={clientDetails.state} onChange={(e) => updateField("state", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="zip">ZIP</Label>
-                <Input
-                  id="zip"
-                  placeholder="90001"
-                  value={clientDetails.zip}
-                  onChange={(e) => updateField("zip", e.target.value)}
-                />
+                <Input id="zip" placeholder="90001" value={clientDetails.zip} onChange={(e) => updateField("zip", e.target.value)} />
               </div>
               <div className="space-y-2 col-span-2">
                 <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  placeholder="(555) 123-4567"
-                  value={clientDetails.phone}
-                  onChange={(e) => updateField("phone", e.target.value)}
-                />
+                <Input id="phone" placeholder="(555) 123-4567" value={clientDetails.phone} onChange={(e) => updateField("phone", e.target.value)} />
               </div>
             </div>
           </div>
@@ -285,33 +280,17 @@ const DocumentGeneratorTab = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="contactName">Contact Name *</Label>
-                <Input
-                  id="contactName"
-                  placeholder="Full name of primary signer"
-                  value={clientDetails.contactName}
-                  onChange={(e) => updateField("contactName", e.target.value)}
-                />
+                <Input id="contactName" placeholder="Full name of primary signer" value={clientDetails.contactName} onChange={(e) => updateField("contactName", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="contactTitle">Title/Position</Label>
-                <Input
-                  id="contactTitle"
-                  placeholder="e.g., Owner, CEO, Manager"
-                  value={clientDetails.contactTitle}
-                  onChange={(e) => updateField("contactTitle", e.target.value)}
-                />
+                <Input id="contactTitle" placeholder="e.g., Owner, CEO, Manager" value={clientDetails.contactTitle} onChange={(e) => updateField("contactTitle", e.target.value)} />
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="contact@company.com"
-                  value={clientDetails.email}
-                  onChange={(e) => updateField("email", e.target.value)}
-                />
+                <Input id="email" type="email" placeholder="contact@company.com" value={clientDetails.email} onChange={(e) => updateField("email", e.target.value)} />
               </div>
             </div>
           </div>
@@ -322,30 +301,16 @@ const DocumentGeneratorTab = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="contactName2">Contact Name</Label>
-                <Input
-                  id="contactName2"
-                  placeholder="Full name of secondary signer"
-                  value={clientDetails.contactName2}
-                  onChange={(e) => updateField("contactName2", e.target.value)}
-                />
+                <Input id="contactName2" placeholder="Full name of secondary signer" value={clientDetails.contactName2} onChange={(e) => updateField("contactName2", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="contactTitle2">Title/Position</Label>
-                <Input
-                  id="contactTitle2"
-                  placeholder="e.g., Co-Owner, CFO"
-                  value={clientDetails.contactTitle2}
-                  onChange={(e) => updateField("contactTitle2", e.target.value)}
-                />
+                <Input id="contactTitle2" placeholder="e.g., Co-Owner, CFO" value={clientDetails.contactTitle2} onChange={(e) => updateField("contactTitle2", e.target.value)} />
               </div>
             </div>
           </div>
 
-          <Button
-            onClick={handleGenerate}
-            disabled={generating || !selectedDocument || !clientDetails.companyName || !clientDetails.contactName}
-            className="w-full md:w-auto"
-          >
+          <Button onClick={handleGenerate} disabled={generating || !isFormValid} className="w-full md:w-auto">
             <FileText className="mr-2 h-4 w-4" />
             {generating ? "Generating..." : "Generate PDF"}
           </Button>
@@ -369,6 +334,7 @@ const DocumentGeneratorTab = () => {
                   <TableHead>Date</TableHead>
                   <TableHead>Document Type</TableHead>
                   <TableHead>Company / Contact</TableHead>
+                  <TableHead>Options</TableHead>
                   <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
@@ -386,12 +352,13 @@ const DocumentGeneratorTab = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRegenerate(doc)}
-                        disabled={generating}
-                      >
+                      <div className="flex flex-col text-xs">
+                        <span>{MINIMUM_SPEND_TIERS[doc.minimum_spend_tier as keyof typeof MINIMUM_SPEND_TIERS] || "N/A"}</span>
+                        <span className="text-muted-foreground">{doc.setup_fee_refundable ? "Refundable" : "Non-Refundable"}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm" onClick={() => handleRegenerate(doc)} disabled={generating}>
                         <Download className="h-4 w-4" />
                       </Button>
                     </TableCell>
