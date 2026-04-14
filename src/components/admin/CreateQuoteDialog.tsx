@@ -9,8 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Download, Check, Edit2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import jsPDF from "jspdf";
 import westfieldLogo from "@/assets/westfield-logo-pdf.jpg";
+import { generateQuotePDF } from "@/lib/quotePdfGenerator";
 
 interface LineItem {
   id: string;
@@ -39,7 +39,6 @@ const STANDARD_SERVICES = [
   "Custom Entry"
 ];
 
-// Billing notes for storage services
 const STORAGE_BILLING_NOTES: Record<string, string> = {
   "Small Bin Storage": "Per small bin, per month",
   "Medium Bin Storage": "Per medium bin, per month",
@@ -87,6 +86,12 @@ const SELF_FULFILLMENT_SERVICES = [
   "Custom Entry"
 ];
 
+const MINIMUM_SPEND_TIERS: Record<string, string> = {
+  "250_then_500": "$250/mo for 3 months, then $500/mo",
+  "500": "$500/mo flat",
+  "1000": "$1,000/mo flat"
+};
+
 interface CreateQuoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -98,23 +103,20 @@ export function CreateQuoteDialog({
 }: CreateQuoteDialogProps) {
   const { toast } = useToast();
 
-  // Manual entry fields (always active now)
   const [manualClientName, setManualClientName] = useState("");
   const [manualContactName, setManualContactName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
   const [manualPhone, setManualPhone] = useState("");
+  const [minimumSpendTier, setMinimumSpendTier] = useState("");
 
-  // Service items state
   const [standardItems, setStandardItems] = useState<LineItem[]>([]);
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
   const [additionalComments, setAdditionalComments] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Team Quote mode
   const [isTeamQuote, setIsTeamQuote] = useState(false);
   const [teamQuoteItems, setTeamQuoteItems] = useState<LineItem[]>([]);
 
-  // Standard operations handlers
   const addStandardItem = () => {
     setStandardItems([...standardItems, { 
       id: crypto.randomUUID(), 
@@ -145,7 +147,6 @@ export function CreateQuoteDialog({
     }));
   };
 
-  // Fulfillment sections handlers
   const addFulfillmentSection = (type: FulfillmentSection["type"]) => {
     setFulfillmentSections([...fulfillmentSections, {
       id: crypto.randomUUID(),
@@ -203,306 +204,25 @@ export function CreateQuoteDialog({
     ));
   };
 
-  const generatePDF = async () => {
+  const handleGeneratePDF = async () => {
     try {
       setIsSubmitting(true);
 
       const clientName = manualClientName.trim() || `Quote-${new Date().getTime()}`;
 
-      const doc = new jsPDF();
-      
-      // Load and add logo
-      const img = new Image();
-      img.src = westfieldLogo;
-      await new Promise((resolve) => { img.onload = resolve; });
-      
-      // Add logo at top center
-      const logoWidth = 30;
-      const logoHeight = (img.height / img.width) * logoWidth;
-      doc.addImage(img, 'JPEG', (210 - logoWidth) / 2, 10, logoWidth, logoHeight);
-      
-      // SERVICE QUOTE header
-      const headerY = 10 + logoHeight + 5;
-      doc.setFontSize(16);
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(13, 33, 66);
-      doc.text("SERVICE QUOTE", 105, headerY, { align: "center" });
-      
-      // Business and Customer info section
-      const infoStartY = headerY + 12;
-      
-      // Left side - Business info
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(0, 0, 0);
-      doc.text("Westfield Prep Center", 20, infoStartY);
-      
-      doc.setFont(undefined, 'normal');
-      doc.text("Navapoom Sathatham", 20, infoStartY + 5);
-      doc.text("info@westfieldprepcenter.com", 20, infoStartY + 10);
-      doc.text("818-935-5478", 20, infoStartY + 15);
-      
-      // Customer info (right side)
-      const rightX = 140;
-      doc.setFont(undefined, 'bold');
-      doc.text(manualClientName || 'Prospective Client', rightX, infoStartY);
-      
-      doc.setFont(undefined, 'normal');
-      let customerInfoY = infoStartY + 5;
-      
-      if (manualContactName) {
-        doc.text(manualContactName, rightX, customerInfoY);
-        customerInfoY += 5;
-      }
-      if (manualEmail) {
-        doc.text(manualEmail, rightX, customerInfoY);
-        customerInfoY += 5;
-      }
-      if (manualPhone) {
-        doc.text(manualPhone, rightX, customerInfoY);
-        customerInfoY += 5;
-      }
-      
-      if (!manualContactName && !manualEmail && !manualPhone) {
-        doc.setFontSize(9);
-        doc.setTextColor(150, 150, 150);
-        doc.text("Contact information not provided", rightX, customerInfoY);
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(10);
-      }
-      
-      // Date
-      const dateY = Math.max(infoStartY + 20, customerInfoY);
-      doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, dateY + 5);
-
-      let y = dateY + 15;
-
-      // Team Quote Mode - Only custom services
-      if (isTeamQuote) {
-        doc.setFontSize(13);
-        doc.setFont(undefined, 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text("Team Quote Services", 20, y);
-        y += 5;
-        
-        doc.setFontSize(9);
-        doc.setFont(undefined, 'italic');
-        doc.setTextColor(80, 80, 80);
-        doc.text("Custom services and pricing for your team.", 20, y);
-        y += 4;
-        
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.3);
-        doc.line(20, y, 190, y);
-        y += 5;
-        
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'normal');
-        doc.setTextColor(0, 0, 0);
-        
-        teamQuoteItems.forEach(item => {
-          if (y > 270) {
-            doc.addPage();
-            y = 20;
-          }
-          
-          doc.setFont(undefined, 'bold');
-          doc.text(item.service_name, 20, y);
-          if (item.notes) {
-            doc.text(`Qty: ${item.notes}`, 120, y);
-          }
-          doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
-          doc.setFont(undefined, 'normal');
-          y += 7;
-        });
-        
-        y += 8;
-      } else {
-        // Standard Operations
-        if (standardItems.length > 0) {
-          doc.setFontSize(13);
-          doc.setFont(undefined, 'bold');
-          doc.setTextColor(0, 0, 0);
-          doc.text("Standard Operations", 20, y);
-          y += 5;
-          
-          doc.setFontSize(9);
-          doc.setFont(undefined, 'italic');
-          doc.setTextColor(80, 80, 80);
-          doc.text("Basic warehouse intake and account setup fees.", 20, y);
-          y += 4;
-          
-          doc.setDrawColor(200, 200, 200);
-          doc.setLineWidth(0.3);
-          doc.line(20, y, 190, y);
-          y += 5;
-          
-          doc.setFontSize(10);
-          doc.setFont(undefined, 'normal');
-          doc.setTextColor(0, 0, 0);
-          
-          standardItems.forEach(item => {
-            if (y > 270) {
-              doc.addPage();
-              y = 20;
-            }
-            
-            // Service name in bold
-            doc.setFont(undefined, 'bold');
-            doc.text(item.service_name, 20, y);
-            doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
-            y += 5;
-            
-            // Billing note (if applicable)
-            if (STORAGE_BILLING_NOTES[item.service_name]) {
-              doc.setFontSize(8);
-              doc.setFont(undefined, 'normal');
-              doc.setTextColor(120, 120, 120);
-              doc.text(STORAGE_BILLING_NOTES[item.service_name], 25, y);
-              y += 4;
-              doc.setFontSize(10);
-              doc.setTextColor(0, 0, 0);
-            } else {
-              doc.setFont(undefined, 'normal');
-            }
-            
-            // Item notes
-            if (item.notes) {
-              doc.setFontSize(8);
-              doc.setTextColor(100, 100, 100);
-              const splitNotes = doc.splitTextToSize(`Notes: ${item.notes}`, 150);
-              doc.text(splitNotes, 25, y);
-              y += (splitNotes.length * 3) + 2;
-              doc.setFontSize(10);
-              doc.setTextColor(0, 0, 0);
-            }
-            
-            y += 2;
-          });
-          
-          y += 8;
-        }
-
-        // Fulfillment Sections
-        fulfillmentSections.forEach(section => {
-          if (section.items.length > 0) {
-            if (y > 270) {
-              doc.addPage();
-              y = 20;
-            }
-            
-            doc.setFontSize(13);
-            doc.setFont(undefined, 'bold');
-            doc.setTextColor(0, 0, 0);
-            doc.text(section.type, 20, y);
-            y += 5;
-            
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'italic');
-            doc.setTextColor(80, 80, 80);
-            
-            if (section.type === "Amazon FBA") {
-              doc.text("Standard prep services for FBA shipments.", 20, y);
-            } else if (section.type === "Self Fulfillment") {
-              doc.text("Prep, pack, and ship for non-FBA or DTC orders.", 20, y);
-            }
-            y += 4;
-            
-            doc.setDrawColor(200, 200, 200);
-            doc.setLineWidth(0.3);
-            doc.line(20, y, 190, y);
-            y += 5;
-            
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'normal');
-            doc.setTextColor(0, 0, 0);
-            
-            section.items.forEach(item => {
-              if (y > 270) {
-                doc.addPage();
-                y = 20;
-              }
-              
-              // Service name in bold
-              doc.setFont(undefined, 'bold');
-              doc.text(item.service_name, 20, y);
-              doc.text(`$${item.service_price.toFixed(2)}`, 170, y, { align: "right" });
-              y += 5;
-              
-              // Billing note (if applicable)
-              if (STORAGE_BILLING_NOTES[item.service_name]) {
-                doc.setFontSize(8);
-                doc.setFont(undefined, 'normal');
-                doc.setTextColor(120, 120, 120);
-                doc.text(STORAGE_BILLING_NOTES[item.service_name], 25, y);
-                y += 4;
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-              } else {
-                doc.setFont(undefined, 'normal');
-              }
-              
-              // Item notes
-              if (item.notes) {
-                doc.setFontSize(8);
-                doc.setTextColor(100, 100, 100);
-                const splitNotes = doc.splitTextToSize(`Notes: ${item.notes}`, 150);
-                doc.text(splitNotes, 25, y);
-                y += (splitNotes.length * 3) + 2;
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-              }
-              
-              y += 2;
-            });
-            
-            y += 8;
-          }
-        });
-      }
-
-      // Additional Comments
-      if (additionalComments) {
-        if (y > 250) {
-          doc.addPage();
-          y = 20;
-        }
-        
-        doc.setFontSize(13);
-        doc.setFont(undefined, 'bold');
-        doc.text("Additional Comments", 20, y);
-        y += 7;
-        
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'normal');
-        const splitComments = doc.splitTextToSize(additionalComments, 170);
-        doc.text(splitComments, 20, y);
-        y += (splitComments.length * 5) + 5;
-      }
-      
-      // Disclaimers
-      if (y > 230) {
-        doc.addPage();
-        y = 20;
-      }
-      
-      doc.setFontSize(9);
-      doc.setFont(undefined, 'italic');
-      doc.setTextColor(80, 80, 80);
-      
-      const disclaimer1 = "All pricing provided in this quote is based on the unit volumes disclosed at the time of issuance. If the number of units received, stored, or processed fluctuates materially (up or down), Westfield Prep Center reserves the right to adjust pricing to reflect the updated volume and service requirements. Please contact us if your monthly inbound or stored unit counts change and you wish to request a re-evaluation of this quote.";
-      const splitDisclaimer1 = doc.splitTextToSize(disclaimer1, 170);
-      doc.text(splitDisclaimer1, 20, y);
-      y += (splitDisclaimer1.length * 4) + 5;
-      
-      if (y > 260) {
-        doc.addPage();
-        y = 20;
-      }
-      
-      const disclaimer2 = "If there is any materials that we are missing that will be used in your brands shipment operations, or if we are missing anything/ made any mistake, please let us know so we can adjust the quote accordingly.";
-      const splitDisclaimer2 = doc.splitTextToSize(disclaimer2, 170);
-      doc.text(splitDisclaimer2, 20, y);
+      const doc = await generateQuotePDF({
+        clientName,
+        contactName: manualContactName || undefined,
+        email: manualEmail || undefined,
+        phone: manualPhone || undefined,
+        date: new Date().toLocaleDateString(),
+        standardOperations: standardItems.map(i => ({ service_name: i.service_name, service_price: i.service_price, notes: i.notes })),
+        fulfillmentSections: fulfillmentSections.map(s => ({ type: s.type, items: s.items.map(i => ({ service_name: i.service_name, service_price: i.service_price, notes: i.notes })) })),
+        teamQuoteItems: teamQuoteItems.map(i => ({ service_name: i.service_name, service_price: i.service_price, notes: i.notes })),
+        additionalComments: additionalComments || undefined,
+        minimumSpendTier: minimumSpendTier || undefined,
+        isTeamQuote,
+      }, westfieldLogo);
 
       doc.save(`quote-${clientName.replace(/\s/g, '-')}-${Date.now()}.pdf`);
       
@@ -547,6 +267,7 @@ export function CreateQuoteDialog({
     setManualContactName("");
     setManualEmail("");
     setManualPhone("");
+    setMinimumSpendTier("");
     setStandardItems([]);
     setFulfillmentSections([]);
     setAdditionalComments("");
@@ -584,7 +305,6 @@ export function CreateQuoteDialog({
               onCheckedChange={(checked) => {
                 setIsTeamQuote(checked);
                 if (checked) {
-                  // Clear standard operations and fulfillment sections
                   setStandardItems([]);
                   setFulfillmentSections([]);
                 }
@@ -633,6 +353,26 @@ export function CreateQuoteDialog({
             </div>
           </div>
 
+          {/* Minimum Monthly Spend Dropdown */}
+          <div className="space-y-2 border rounded-lg p-4 bg-muted/30">
+            <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Minimum Monthly Spend</Label>
+            <Select value={minimumSpendTier} onValueChange={setMinimumSpendTier}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select minimum spend tier (optional)" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(MINIMUM_SPEND_TIERS).map(([key, label]) => (
+                  <SelectItem key={key} value={key}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {minimumSpendTier && (
+              <Button variant="ghost" size="sm" className="text-xs" onClick={() => setMinimumSpendTier("")}>
+                Clear selection
+              </Button>
+            )}
+          </div>
+
           {/* Standard Operations Section - Hidden in Team Quote Mode */}
           {!isTeamQuote && (
             <Card>
@@ -658,20 +398,10 @@ export function CreateQuoteDialog({
                           )}
                         </div>
                         <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleItemEdit(item.id, true)}
-                          >
+                          <Button type="button" variant="ghost" size="sm" onClick={() => toggleItemEdit(item.id, true)}>
                             <Edit2 className="h-4 w-4" />
                           </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeStandardItem(item.id)}
-                          >
+                          <Button type="button" variant="ghost" size="sm" onClick={() => removeStandardItem(item.id)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -724,23 +454,11 @@ export function CreateQuoteDialog({
                           </div>
                           <div className="flex gap-1">
                             {item.service_name && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleItemEdit(item.id, true)}
-                                className="mt-6"
-                              >
+                              <Button type="button" variant="ghost" size="sm" onClick={() => toggleItemEdit(item.id, true)} className="mt-6">
                                 <Check className="h-4 w-4" />
                               </Button>
                             )}
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeStandardItem(item.id)}
-                              className="mt-6"
-                            >
+                            <Button type="button" variant="ghost" size="sm" onClick={() => removeStandardItem(item.id)} className="mt-6">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -769,41 +487,17 @@ export function CreateQuoteDialog({
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <CardTitle>Fulfillment Services</CardTitle>
                   <div className="flex gap-2 flex-wrap">
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      variant="secondary"
-                      onClick={() => addFulfillmentSection("Amazon FBA")}
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      Amazon FBA
+                    <Button type="button" size="sm" variant="secondary" onClick={() => addFulfillmentSection("Amazon FBA")}>
+                      <Plus className="h-4 w-4 mr-1" /> Amazon FBA
                     </Button>
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      variant="secondary"
-                      onClick={() => addFulfillmentSection("Walmart WFS")}
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      Walmart WFS
+                    <Button type="button" size="sm" variant="secondary" onClick={() => addFulfillmentSection("Walmart WFS")}>
+                      <Plus className="h-4 w-4 mr-1" /> Walmart WFS
                     </Button>
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      variant="secondary"
-                      onClick={() => addFulfillmentSection("TikTok Shop")}
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      TikTok Shop
+                    <Button type="button" size="sm" variant="secondary" onClick={() => addFulfillmentSection("TikTok Shop")}>
+                      <Plus className="h-4 w-4 mr-1" /> TikTok Shop
                     </Button>
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      variant="secondary"
-                      onClick={() => addFulfillmentSection("Self Fulfillment")}
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      Self Fulfillment
+                    <Button type="button" size="sm" variant="secondary" onClick={() => addFulfillmentSection("Self Fulfillment")}>
+                      <Plus className="h-4 w-4 mr-1" /> Self Fulfillment
                     </Button>
                   </div>
                 </div>
@@ -814,21 +508,10 @@ export function CreateQuoteDialog({
                     <div className="flex items-center justify-between">
                       <Label className="font-semibold">{section.type}</Label>
                       <div className="flex gap-2">
-                        <Button 
-                          type="button" 
-                          size="sm" 
-                          variant="secondary"
-                          onClick={() => addFulfillmentItem(section.id)}
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add Service
+                        <Button type="button" size="sm" variant="secondary" onClick={() => addFulfillmentItem(section.id)}>
+                          <Plus className="h-4 w-4 mr-1" /> Add Service
                         </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeFulfillmentSection(section.id)}
-                        >
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removeFulfillmentSection(section.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -846,20 +529,10 @@ export function CreateQuoteDialog({
                               )}
                             </div>
                             <div className="flex gap-2">
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleItemEdit(item.id, false, section.id)}
-                              >
+                              <Button type="button" variant="ghost" size="sm" onClick={() => toggleItemEdit(item.id, false, section.id)}>
                                 <Edit2 className="h-4 w-4" />
                               </Button>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeFulfillmentItem(section.id, item.id)}
-                              >
+                              <Button type="button" variant="ghost" size="sm" onClick={() => removeFulfillmentItem(section.id, item.id)}>
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
@@ -912,23 +585,11 @@ export function CreateQuoteDialog({
                               </div>
                               <div className="flex gap-1">
                                 {item.service_name && (
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => toggleItemEdit(item.id, false, section.id)}
-                                    className="mt-6"
-                                  >
+                                  <Button type="button" variant="ghost" size="sm" onClick={() => toggleItemEdit(item.id, false, section.id)} className="mt-6">
                                     <Check className="h-4 w-4" />
                                   </Button>
                                 )}
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeFulfillmentItem(section.id, item.id)}
-                                  className="mt-6"
-                                >
+                                <Button type="button" variant="ghost" size="sm" onClick={() => removeFulfillmentItem(section.id, item.id)} className="mt-6">
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1054,7 +715,7 @@ export function CreateQuoteDialog({
 
         <DialogFooter className="gap-2">
           <Button
-            onClick={generatePDF}
+            onClick={handleGeneratePDF}
             disabled={isSubmitting}
           >
             <Download className="w-4 h-4 mr-2" />
