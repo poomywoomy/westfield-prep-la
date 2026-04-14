@@ -103,13 +103,13 @@ const SELF_FULFILLMENT_SERVICES = [
 ];
 
 const B2B_SERVICES = [
+  "Base Order Fee",
+  "Per-Unit Pick Fee",
+  "Case/Carton Picking",
+  "Hourly Rate (VAS/B2B Prep)",
   "Pick & Pack",
   "Palletizing",
-  "Bundling",
-  "Kitting",
-  "Shrink Wrapping",
   "Bubble Wrapping",
-  "Additional Label",
   "Shipment Box",
   "Carton Usage",
   "Custom Entry"
