@@ -63,6 +63,9 @@ const AUTO_NOTES: Record<string, string> = {
   "Single Product": "Per order, pick and pack for single-item orders",
   "Kitting": "Per kit assembled, combining components into a single unit",
   "Bubble Wrapping": "Per unit, bubble wrapped for shipping protection",
+  "Palletizing": "Per pallet, building and wrapping pallets for B2B or wholesale shipments",
+  "Pick & Pack": "Per order, picking items and packing for shipment",
+  "Shrink Wrapping": "Per unit, shrink wrapped for retail or wholesale presentation",
   ...STORAGE_BILLING_NOTES,
 };
 
