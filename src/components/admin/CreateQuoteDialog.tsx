@@ -120,7 +120,7 @@ export function CreateQuoteDialog({
   const [manualContactName, setManualContactName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
   const [manualPhone, setManualPhone] = useState("");
-  const [minimumSpendTier, setMinimumSpendTier] = useState("");
+  const [minimumSpendTier, setMinimumSpendTier] = useState("250_then_500");
 
   const [standardItems, setStandardItems] = useState<LineItem[]>([]);
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
