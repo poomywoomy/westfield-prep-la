@@ -282,7 +282,13 @@ export function CreateQuoteDialog({
       }));
   };
 
-  const resetForm = () => {
+  useEffect(() => {
+    if (open && standardItems.length === 0 && !isTeamQuote) {
+      setStandardItems(generateDefaultStandardItems());
+    }
+  }, [open]);
+
+
     setManualClientName("");
     setManualContactName("");
     setManualEmail("");
