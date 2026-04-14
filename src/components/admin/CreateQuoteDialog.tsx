@@ -71,6 +71,9 @@ const DEFAULT_PRICES: Record<string, number> = {
   "Small Bin Storage": 4,
   "Medium Bin Storage": 5,
   "Large Bin Storage": 6,
+  "Returns Handling": 1,
+  "Carton Receiving": 3,
+  "Pallet Receiving": 50,
 };
 
 const MARKETPLACE_SERVICES = [
