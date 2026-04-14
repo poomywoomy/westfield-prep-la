@@ -65,7 +65,10 @@ const AUTO_NOTES: Record<string, string> = {
   "Bubble Wrapping": "Per unit, bubble wrapped for shipping protection",
   "Palletizing": "Per pallet, building and wrapping pallets for B2B or wholesale shipments",
   "Pick & Pack": "Per order, picking items and packing for shipment",
-  "Shrink Wrapping": "Per unit, shrink wrapped for retail or wholesale presentation",
+  "Base Order Fee": "Covers dropping the order, printing the packing slip, and staging the box",
+  "Per-Unit Pick Fee": "Per unit picked from inventory for B2B orders",
+  "Case/Carton Picking": "Per master carton picked, for shipping full sealed cartons without opening",
+  "Hourly Rate (VAS/B2B Prep)": "Per hour for value-added services, big-box retail compliance, EDI integration, and custom prep",
   ...STORAGE_BILLING_NOTES,
 };
 
@@ -79,6 +82,10 @@ const DEFAULT_PRICES: Record<string, number> = {
   "Returns Handling": 1,
   "Carton Receiving": 3,
   "Pallet Receiving": 50,
+  "Base Order Fee": 10,
+  "Per-Unit Pick Fee": 0.15,
+  "Case/Carton Picking": 3,
+  "Hourly Rate (VAS/B2B Prep)": 45,
 };
 
 const MARKETPLACE_SERVICES = [
@@ -103,13 +110,13 @@ const SELF_FULFILLMENT_SERVICES = [
 ];
 
 const B2B_SERVICES = [
+  "Base Order Fee",
+  "Per-Unit Pick Fee",
+  "Case/Carton Picking",
+  "Hourly Rate (VAS/B2B Prep)",
   "Pick & Pack",
   "Palletizing",
-  "Bundling",
-  "Kitting",
-  "Shrink Wrapping",
   "Bubble Wrapping",
-  "Additional Label",
   "Shipment Box",
   "Carton Usage",
   "Custom Entry"
