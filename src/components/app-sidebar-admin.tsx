@@ -1,4 +1,4 @@
-import { Users, DollarSign, Package, PenSquare, FileSignature, History, Search, Globe, Newspaper, Languages, UserPlus } from "lucide-react";
+import { Users, PenSquare, FileSignature, Search, Globe, Newspaper, Languages, UserPlus } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -24,15 +24,10 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
 
   const prefetchHandlers: Record<string, () => void> = {
     clients: () => queryClient.prefetchQuery({ queryKey: ['clients'], staleTime: 60000 }),
-    shipments: () => queryClient.prefetchQuery({ queryKey: ['outbound-shipments'], staleTime: 60000 }),
-    billing: () => queryClient.prefetchQuery({ queryKey: ['bills'], staleTime: 60000 }),
   };
 
   const menuItems = [
     { id: "clients", label: "Clients", icon: Users },
-    { id: "billing", label: "Billing", icon: DollarSign },
-    { id: "billing-history", label: "Bill History", icon: History },
-    { id: "shipments", label: "Shipments", icon: Package },
     { id: "blog", label: "Blog", icon: PenSquare },
     { id: "blog-research", label: "Blog Research", icon: Search },
     { id: "seo-audit", label: "SEO Audit", icon: Globe },
