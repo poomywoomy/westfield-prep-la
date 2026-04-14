@@ -77,7 +77,6 @@ const MARKETPLACE_SERVICES = [
 
 const SELF_FULFILLMENT_SERVICES = [
   "Single Product",
-  "Oversized Product",
   "Bundling",
   "Kitting",
   "Bubble Wrapping",
