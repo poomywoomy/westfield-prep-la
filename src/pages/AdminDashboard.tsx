@@ -12,14 +12,12 @@ import { QuickScanModal } from "@/components/admin/QuickScanModal";
 import { AppSidebarAdmin } from "@/components/app-sidebar-admin";
 
 const ClientsTab = lazy(() => import("@/components/admin/ClientsTab"));
-const BillingTab = lazy(() => import("@/components/admin/BillingTab"));
-const BillingHistoryTab = lazy(() => import("@/components/admin/BillingHistoryTab").then(m => ({ default: m.BillingHistoryTab })));
 const DocumentGeneratorTab = lazy(() => import("@/components/admin/DocumentGeneratorTab"));
 const BlogTab = lazy(() => import("@/components/admin/BlogTab").then(m => ({ default: m.BlogTab })));
 const BlogResearchTab = lazy(() => import("@/components/admin/BlogResearchTab"));
 const SEOAuditTab = lazy(() => import("@/components/admin/SEOAuditTab"));
 const IndustryNewsTab = lazy(() => import("@/components/admin/IndustryNewsTab"));
-const ShipmentsTab = lazy(() => import("@/components/admin/ShipmentsTab").then(m => ({ default: m.ShipmentsTab })));
+
 const TranslationsTab = lazy(() => import("@/components/admin/TranslationsTab"));
 const LeadsTab = lazy(() => import("@/components/admin/LeadsTab").then(m => ({ default: m.LeadsTab })));
 
@@ -134,15 +132,6 @@ const AdminDashboard = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <TabsContent value="clients">
                 <Suspense fallback={tabSpinner}><ClientsTab /></Suspense>
-              </TabsContent>
-              <TabsContent value="billing">
-                <Suspense fallback={tabSpinner}><BillingTab /></Suspense>
-              </TabsContent>
-              <TabsContent value="billing-history">
-                <Suspense fallback={tabSpinner}><BillingHistoryTab /></Suspense>
-              </TabsContent>
-              <TabsContent value="shipments">
-                <Suspense fallback={tabSpinner}><ShipmentsTab /></Suspense>
               </TabsContent>
               <TabsContent value="blog">
                 <Suspense fallback={tabSpinner}><BlogTab /></Suspense>
