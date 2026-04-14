@@ -22,7 +22,7 @@ interface LineItem {
 
 interface FulfillmentSection {
   id: string;
-  type: "Amazon FBA" | "Walmart WFS" | "TikTok Shop" | "Self Fulfillment";
+  type: "Amazon FBA" | "Walmart WFS" | "TikTok Shop" | "Self Fulfillment" | "B2B";
   items: LineItem[];
 }
 
@@ -63,6 +63,9 @@ const AUTO_NOTES: Record<string, string> = {
   "Single Product": "Per order, pick and pack for single-item orders",
   "Kitting": "Per kit assembled, combining components into a single unit",
   "Bubble Wrapping": "Per unit, bubble wrapped for shipping protection",
+  "Palletizing": "Per pallet, building and wrapping pallets for B2B or wholesale shipments",
+  "Pick & Pack": "Per order, picking items and packing for shipment",
+  "Shrink Wrapping": "Per unit, shrink wrapped for retail or wholesale presentation",
   ...STORAGE_BILLING_NOTES,
 };
 
@@ -95,6 +98,19 @@ const SELF_FULFILLMENT_SERVICES = [
   "Kitting",
   "Bubble Wrapping",
   "Polybag Usage",
+  "Carton Usage",
+  "Custom Entry"
+];
+
+const B2B_SERVICES = [
+  "Pick & Pack",
+  "Palletizing",
+  "Bundling",
+  "Kitting",
+  "Shrink Wrapping",
+  "Bubble Wrapping",
+  "Additional Label",
+  "Shipment Box",
   "Carton Usage",
   "Custom Entry"
 ];
@@ -309,6 +325,7 @@ export function CreateQuoteDialog({
   const getServiceOptions = (sectionType?: FulfillmentSection["type"]) => {
     if (!sectionType) return STANDARD_SERVICES;
     if (sectionType === "Self Fulfillment" || sectionType === "TikTok Shop") return SELF_FULFILLMENT_SERVICES;
+    if (sectionType === "B2B") return B2B_SERVICES;
     return MARKETPLACE_SERVICES;
   };
 
@@ -538,6 +555,9 @@ export function CreateQuoteDialog({
                     </Button>
                     <Button type="button" size="sm" variant="secondary" onClick={() => addFulfillmentSection("Self Fulfillment")}>
                       <Plus className="h-4 w-4 mr-1" /> Self Fulfillment
+                    </Button>
+                    <Button type="button" size="sm" variant="secondary" onClick={() => addFulfillmentSection("B2B")}>
+                      <Plus className="h-4 w-4 mr-1" /> B2B
                     </Button>
                   </div>
                 </div>
