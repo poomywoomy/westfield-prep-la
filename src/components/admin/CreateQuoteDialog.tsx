@@ -22,7 +22,7 @@ interface LineItem {
 
 interface FulfillmentSection {
   id: string;
-  type: "Amazon FBA" | "Walmart WFS" | "TikTok Shop" | "Self Fulfillment";
+  type: "Amazon FBA" | "Walmart WFS" | "TikTok Shop" | "Self Fulfillment" | "B2B";
   items: LineItem[];
 }
 
