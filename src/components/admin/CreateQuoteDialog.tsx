@@ -325,6 +325,7 @@ export function CreateQuoteDialog({
   const getServiceOptions = (sectionType?: FulfillmentSection["type"]) => {
     if (!sectionType) return STANDARD_SERVICES;
     if (sectionType === "Self Fulfillment" || sectionType === "TikTok Shop") return SELF_FULFILLMENT_SERVICES;
+    if (sectionType === "B2B") return B2B_SERVICES;
     return MARKETPLACE_SERVICES;
   };
 
