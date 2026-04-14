@@ -20,7 +20,7 @@ export interface ClientDetails {
 const getSection5_1 = (refundable: boolean): string => {
   if (refundable) {
     return `5.1 Account Setup Fee
-Prior to commencement of Services, Client shall pay a one-time account setup fee of Five Hundred U.S. Dollars ($500), which covers WMS account creation, system configuration, training, and ongoing technical support. This setup fee is fully refundable upon the termination of this Agreement, provided that Westfield reserves the right to deduct any outstanding balances, late fees, or product removal fees (as outlined in Section 14.2) from this refund prior to disbursement.`;
+Prior to commencement of Services, Client shall pay a one-time account setup fee of Five Hundred U.S. Dollars ($500), which covers WMS account creation, system configuration, training, and ongoing technical support. This setup fee is fully refundable and will be wired back to Client upon the closure of Client's account and settlement of all outstanding balances.`;
   }
   return `5.1 Account Setup Fee
 Prior to commencement of Services, Client shall pay a one-time, non-refundable account setup fee of Five Hundred U.S. Dollars ($500), which covers WMS account creation, system configuration, training, and ongoing technical support.`;
@@ -51,7 +51,7 @@ const getSection14 = (refundable: boolean): string => {
 This Agreement remains in effect until terminated by either Party upon thirty (30) days' written notice. Westfield may terminate or suspend Services immediately for non-payment or material breach.
 
 14.2 Post-Termination Removal Fee
-Upon the termination of this Agreement for any reason, Client shall be charged an ad-hoc fee for the labor, handling, and processing required to remove and prepare any of Client's remaining products for outbound transfer from the warehouse. This fee must be paid in full (or deducted from the refundable setup fee) prior to the release of the remaining inventory.`;
+Upon the termination of this Agreement for any reason, Client shall be charged an ad-hoc fee for the labor, handling, and processing required to remove and prepare any of Client's remaining products for outbound transfer from the warehouse. This fee must be paid in full prior to the release of the remaining inventory. Upon satisfaction of all outstanding balances, including the Post-Termination Removal Fee, the full Five Hundred U.S. Dollar ($500) account setup fee shall be refunded and wired back to Client.`;
   }
   return `14. TERM AND TERMINATION
 
