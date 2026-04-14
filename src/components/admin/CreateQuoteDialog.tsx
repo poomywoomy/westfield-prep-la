@@ -455,7 +455,12 @@ export function CreateQuoteDialog({
                                 <SelectContent>
                                   {STANDARD_SERVICES.map((service) => (
                                     <SelectItem key={service} value={service}>
-                                      {service}
+                                      <div>
+                                        <div>{service}</div>
+                                        {AUTO_NOTES[service] && (
+                                          <div className="text-xs text-muted-foreground">{AUTO_NOTES[service]}</div>
+                                        )}
+                                      </div>
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -586,7 +591,12 @@ export function CreateQuoteDialog({
                                     <SelectContent>
                                       {getServiceOptions(section.type).map((service) => (
                                         <SelectItem key={service} value={service}>
-                                          {service}
+                                          <div>
+                                            <div>{service}</div>
+                                            {AUTO_NOTES[service] && (
+                                              <div className="text-xs text-muted-foreground">{AUTO_NOTES[service]}</div>
+                                            )}
+                                          </div>
                                         </SelectItem>
                                       ))}
                                     </SelectContent>
