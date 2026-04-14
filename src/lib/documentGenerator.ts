@@ -13,12 +13,61 @@ export interface ClientDetails {
   phone?: string;
   contactName2?: string;
   contactTitle2?: string;
+  minimumSpendTier?: string;
+  setupFeeRefundable?: boolean;
 }
 
-const DOCUMENT_CONTENT = {
-  master_agreement: {
-    title: "CLIENT SERVICE AGREEMENT (MASTER AGREEMENT)",
-    content: `This Client Service Agreement (the "Agreement") is entered into as of the Effective Date by and between Sathatham LLC dba Westfield Prep Center, a California limited liability company with its principal place of business in Los Angeles, California ("Westfield," "Service Provider," or "Company"), and the undersigned client ("Client").
+const getSection5_1 = (refundable: boolean): string => {
+  if (refundable) {
+    return `5.1 Account Setup Fee
+Prior to commencement of Services, Client shall pay a one-time account setup fee of Five Hundred U.S. Dollars ($500), which covers WMS account creation, system configuration, training, and ongoing technical support. This setup fee is fully refundable upon the termination of this Agreement, provided that Westfield reserves the right to deduct any outstanding balances, late fees, or product removal fees (as outlined in Section 14.2) from this refund prior to disbursement.`;
+  }
+  return `5.1 Account Setup Fee
+Prior to commencement of Services, Client shall pay a one-time, non-refundable account setup fee of Five Hundred U.S. Dollars ($500), which covers WMS account creation, system configuration, training, and ongoing technical support.`;
+};
+
+const getSection5_5 = (tier: string): string => {
+  const exclusion = `For the avoidance of doubt, shipping fees, carton usage fees, and polybag usage fees are not inclusive of, and shall not be credited toward, the minimum monthly payment requirement. These charges are billed separately based on actual usage.`;
+  const shortfall = `If the actual fees for Services rendered in any given month fall below the applicable minimum threshold, Client will be billed the difference to satisfy this minimum requirement.`;
+
+  let tierText = "";
+  if (tier === "250_then_500") {
+    tierText = `Client agrees to a minimum monthly payment requirement for the Services. For the first three (3) months following the Effective Date, the minimum payment shall be Two Hundred Fifty U.S. Dollars ($250) per month. Following this initial three-month period, the minimum payment requirement shall increase to Five Hundred U.S. Dollars ($500) per month.`;
+  } else if (tier === "500_flat") {
+    tierText = `Client agrees to a minimum monthly payment of Five Hundred U.S. Dollars ($500) for the Services.`;
+  } else if (tier === "1000_flat") {
+    tierText = `Client agrees to a minimum monthly payment of One Thousand U.S. Dollars ($1,000) for the Services.`;
+  }
+
+  return `5.5 Minimum Monthly Payments
+${tierText} ${exclusion} ${shortfall}`;
+};
+
+const getSection14 = (refundable: boolean): string => {
+  if (refundable) {
+    return `14. TERM AND TERMINATION
+
+14.1 Notice and Breach
+This Agreement remains in effect until terminated by either Party upon thirty (30) days' written notice. Westfield may terminate or suspend Services immediately for non-payment or material breach.
+
+14.2 Post-Termination Removal Fee
+Upon the termination of this Agreement for any reason, Client shall be charged an ad-hoc fee for the labor, handling, and processing required to remove and prepare any of Client's remaining products for outbound transfer from the warehouse. This fee must be paid in full (or deducted from the refundable setup fee) prior to the release of the remaining inventory.`;
+  }
+  return `14. TERM AND TERMINATION
+
+14.1 Notice and Breach
+This Agreement remains in effect until terminated by either Party upon thirty (30) days' written notice. Westfield may terminate or suspend Services immediately for non-payment or material breach.
+
+14.2 Post-Termination Removal Fee
+Upon the termination of this Agreement for any reason, Client shall be charged an ad-hoc fee for the labor, handling, and processing required to remove and prepare any of Client's remaining products for outbound transfer from the warehouse. This fee must be paid in full prior to the release of the remaining inventory.`;
+};
+
+const buildAgreementContent = (details: ClientDetails): string => {
+  const section5_1 = getSection5_1(details.setupFeeRefundable ?? false);
+  const section5_5 = details.minimumSpendTier ? getSection5_5(details.minimumSpendTier) : "";
+  const section14 = getSection14(details.setupFeeRefundable ?? false);
+
+  return `This Client Service Agreement (the "Agreement") is entered into as of the Effective Date by and between Sathatham LLC dba Westfield Prep Center, a California limited liability company with its principal place of business in Los Angeles, California ("Westfield," "Service Provider," or "Company"), and the undersigned client ("Client").
 
 Westfield and Client may be referred to individually as a "Party" and collectively as the "Parties."
 
@@ -63,8 +112,7 @@ This provision applies without limitation to food, dietary supplements, cosmetic
 
 5. FEES AND PAYMENT
 
-5.1 Account Setup Fee
-Prior to commencement of Services, Client shall pay a one-time, non-refundable account setup fee of Five Hundred U.S. Dollars ($500), which covers WMS account creation, system configuration, training, and ongoing technical support.
+${section5_1}
 
 5.2 Invoices
 All invoices are due upon receipt unless otherwise stated in writing.
@@ -74,6 +122,8 @@ Late payments accrue a five percent (5%) per-day late fee, capped at fifteen per
 
 5.4 Suspension of Services
 Westfield may suspend Services or withhold release of inventory until all outstanding balances are paid in full.
+
+${section5_5}
 
 6. STORAGE AND ABANDONMENT
 
@@ -144,9 +194,7 @@ Any dispute shall be resolved by binding arbitration in Los Angeles County, Cali
 13.3 Class Action Waiver
 All claims must be brought on an individual basis only. Class, collective, representative, or private attorney general actions are expressly waived.
 
-14. TERM AND TERMINATION
-
-This Agreement remains in effect until terminated by either Party upon thirty (30) days' written notice. Westfield may terminate or suspend Services immediately for non-payment or material breach.
+${section14}
 
 15. MISCELLANEOUS
 
@@ -164,8 +212,7 @@ This Agreement constitutes the entire agreement between the Parties and supersed
 
 16. EXECUTION
 
-This Agreement may be executed electronically and in counterparts.`
-  }
+This Agreement may be executed electronically and in counterparts.`;
 };
 
 export const generateDocumentPDF = async (
@@ -178,10 +225,12 @@ export const generateDocumentPDF = async (
   const margin = 15;
   const maxWidth = pageWidth - 2 * margin;
   
-  const content = DOCUMENT_CONTENT[documentType as keyof typeof DOCUMENT_CONTENT];
-  if (!content) {
+  if (documentType !== "master_agreement") {
     throw new Error("Invalid document type");
   }
+
+  const title = "CLIENT SERVICE AGREEMENT (MASTER AGREEMENT)";
+  const content = buildAgreementContent(clientDetails);
 
   // Add logo (centered)
   const logoWidth = 40;
@@ -191,7 +240,7 @@ export const generateDocumentPDF = async (
   // Add title
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  const titleLines = doc.splitTextToSize(content.title, maxWidth);
+  const titleLines = doc.splitTextToSize(title, maxWidth);
   let yPosition = 30;
   titleLines.forEach((line: string) => {
     doc.text(line, pageWidth / 2, yPosition, { align: "center" });
@@ -208,7 +257,7 @@ export const generateDocumentPDF = async (
 
   // Add content with hierarchical font sizes
   yPosition += 10;
-  const lines = doc.splitTextToSize(content.content, maxWidth);
+  const lines = doc.splitTextToSize(content, maxWidth);
   
   // Regex patterns for section detection
   const mainSectionPattern = /^\d+\.\s+[A-Z]/;
