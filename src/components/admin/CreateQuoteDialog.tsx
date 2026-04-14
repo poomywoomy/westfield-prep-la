@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,9 +49,20 @@ const STORAGE_BILLING_NOTES: Record<string, string> = {
 
 const AUTO_NOTES: Record<string, string> = {
   "Account Startup Fee": "One-time charge for WMS training, WMS usage, and account support",
+  "Pallet Receiving": "Per pallet received and checked into warehouse",
+  "Carton Receiving": "Per carton received and checked into warehouse",
   "Returns Handling": "Covers receiving, inspection, client consultation on disposition, and processing of return actions",
+  "FNSKU Label": "Per unit, applied to each product for Amazon FBA compliance",
+  "Polybox+Label": "Per unit, polybagged and labeled for marketplace compliance",
+  "Bubble Wrap": "Per unit, bubble wrapped for protection during transit",
+  "Bundling": "Per bundle, combining multiple items into a single sellable unit",
+  "Additional Label": "Per label, any extra labeling beyond standard requirements",
+  "Shipment Box": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Polybag Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Carton Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
+  "Single Product": "Per order, pick and pack for single-item orders",
+  "Kitting": "Per kit assembled, combining components into a single unit",
+  "Bubble Wrapping": "Per unit, bubble wrapped for shipping protection",
   ...STORAGE_BILLING_NOTES,
 };
 
@@ -67,10 +78,8 @@ const MARKETPLACE_SERVICES = [
   "Polybox+Label",
   "Bubble Wrap",
   "Bundling",
-  "Kitting",
   "Additional Label",
   "Shipment Box",
-  "Polybag Usage",
   "Carton Usage",
   "Custom Entry"
 ];
@@ -261,13 +270,31 @@ export function CreateQuoteDialog({
     }
   };
 
+  const generateDefaultStandardItems = (): LineItem[] => {
+    return STANDARD_SERVICES
+      .filter(s => s !== "Custom Entry")
+      .map(service => ({
+        id: crypto.randomUUID(),
+        service_name: service,
+        service_price: DEFAULT_PRICES[service] || 0,
+        notes: AUTO_NOTES[service] || "",
+        isEditing: false,
+      }));
+  };
+
+  useEffect(() => {
+    if (open && standardItems.length === 0 && !isTeamQuote) {
+      setStandardItems(generateDefaultStandardItems());
+    }
+  }, [open]);
+
   const resetForm = () => {
     setManualClientName("");
     setManualContactName("");
     setManualEmail("");
     setManualPhone("");
     setMinimumSpendTier("");
-    setStandardItems([]);
+    setStandardItems(generateDefaultStandardItems());
     setFulfillmentSections([]);
     setAdditionalComments("");
     setIsTeamQuote(false);
@@ -282,7 +309,11 @@ export function CreateQuoteDialog({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen) resetForm();
+      if (!isOpen) {
+        resetForm();
+      } else if (standardItems.length === 0 && !isTeamQuote) {
+        setStandardItems(generateDefaultStandardItems());
+      }
       onOpenChange(isOpen);
     }}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -434,7 +465,12 @@ export function CreateQuoteDialog({
                                 <SelectContent>
                                   {STANDARD_SERVICES.map((service) => (
                                     <SelectItem key={service} value={service}>
-                                      {service}
+                                      <div>
+                                        <div>{service}</div>
+                                        {AUTO_NOTES[service] && (
+                                          <div className="text-xs text-muted-foreground">{AUTO_NOTES[service]}</div>
+                                        )}
+                                      </div>
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -565,7 +601,12 @@ export function CreateQuoteDialog({
                                     <SelectContent>
                                       {getServiceOptions(section.type).map((service) => (
                                         <SelectItem key={service} value={service}>
-                                          {service}
+                                          <div>
+                                            <div>{service}</div>
+                                            {AUTO_NOTES[service] && (
+                                              <div className="text-xs text-muted-foreground">{AUTO_NOTES[service]}</div>
+                                            )}
+                                          </div>
                                         </SelectItem>
                                       ))}
                                     </SelectContent>
