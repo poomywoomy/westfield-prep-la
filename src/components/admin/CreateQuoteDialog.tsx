@@ -288,7 +288,7 @@ export function CreateQuoteDialog({
     }
   }, [open]);
 
-
+  const resetForm = () => {
     setManualClientName("");
     setManualContactName("");
     setManualEmail("");
