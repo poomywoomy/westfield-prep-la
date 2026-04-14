@@ -1,27 +1,48 @@
 
 
-## Plan: Update Default Prices for Returns Handling, Carton Receiving, and Pallet Receiving
+## Plan: Update B2B Services List and Pricing from Screenshot
 
 ### Summary
-Add three entries to the `DEFAULT_PRICES` map so these services auto-fill with the correct prices.
+Remove Additional Label, Shrink Wrapping, Kitting, and Bundling from B2B services. Add new B2B-specific services matching the screenshot pricing structure: Base Order Fee, Per-Unit Pick Fee, Case/Carton Picking, and Hourly Rate (VAS/B2B Prep).
 
 ### Changes
 
 **File: `src/components/admin/CreateQuoteDialog.tsx`**
 
-Update `DEFAULT_PRICES` (line 69-74) to add the three new defaults:
-
+**1. Update `B2B_SERVICES` array:**
 ```typescript
-const DEFAULT_PRICES: Record<string, number> = {
-  "Account Startup Fee": 500,
-  "Small Bin Storage": 4,
-  "Medium Bin Storage": 5,
-  "Large Bin Storage": 6,
-  "Returns Handling": 1,
-  "Carton Receiving": 3,
-  "Pallet Receiving": 50,
-};
+const B2B_SERVICES = [
+  "Base Order Fee",
+  "Per-Unit Pick Fee",
+  "Case/Carton Picking",
+  "Hourly Rate (VAS/B2B Prep)",
+  "Pick & Pack",
+  "Palletizing",
+  "Bubble Wrapping",
+  "Shipment Box",
+  "Carton Usage",
+  "Custom Entry"
+];
 ```
 
-This ensures these three services pre-fill with the correct dollar amounts when selected or when the dialog opens with pre-populated standard items.
+**2. Add `AUTO_NOTES` for new services:**
+```typescript
+"Base Order Fee": "Covers dropping the order, printing the packing slip, and staging the box",
+"Per-Unit Pick Fee": "Per unit picked from inventory for B2B orders",
+"Case/Carton Picking": "Per master carton picked, for shipping full sealed cartons without opening",
+"Hourly Rate (VAS/B2B Prep)": "Per hour for value-added services, big-box retail compliance, EDI integration, and custom prep",
+```
+
+**3. Add `DEFAULT_PRICES` for new services:**
+```typescript
+"Base Order Fee": 10,
+"Per-Unit Pick Fee": 0.15,
+"Case/Carton Picking": 3,
+"Hourly Rate (VAS/B2B Prep)": 45,
+```
+
+### What stays
+- Pick & Pack, Palletizing, Bubble Wrapping, Shipment Box, Carton Usage, Custom Entry remain in B2B list
+- All other service lists (marketplace, self fulfillment, TikTok Shop) unchanged
+- Standard operations unchanged
 
