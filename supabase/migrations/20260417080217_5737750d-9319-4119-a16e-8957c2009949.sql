@@ -1,0 +1,1 @@
+UPDATE public.blog_posts SET cover_image_url = 'https://gqnvkecmxjijrxhggcro.supabase.co/storage/v1/object/public/blog-images/3pl-prep-center-services-amazon-ecommerce-cover.jpg' WHERE slug = '3pl-prep-center-services-amazon-ecommerce-sellers';
