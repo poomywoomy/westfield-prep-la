@@ -125,7 +125,8 @@ const B2B_SERVICES = [
 const MINIMUM_SPEND_TIERS: Record<string, string> = {
   "250_then_500": "$250/mo for 3 months, then $500/mo",
   "500": "$500/mo flat",
-  "1000": "$1,000/mo flat"
+  "1000": "$1,000/mo flat",
+  "custom": "Custom Amount (enter $)"
 };
 
 interface CreateQuoteDialogProps {
@@ -144,6 +145,7 @@ export function CreateQuoteDialog({
   const [manualEmail, setManualEmail] = useState("");
   const [manualPhone, setManualPhone] = useState("");
   const [minimumSpendTier, setMinimumSpendTier] = useState("250_then_500");
+  const [customMinimumAmount, setCustomMinimumAmount] = useState("");
 
   const [standardItems, setStandardItems] = useState<LineItem[]>([]);
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
@@ -242,6 +244,21 @@ export function CreateQuoteDialog({
 
   const handleGeneratePDF = async () => {
     try {
+      // Validate custom minimum
+      let resolvedMinimumTier = minimumSpendTier || undefined;
+      if (minimumSpendTier === "custom") {
+        const amt = parseInt(customMinimumAmount, 10);
+        if (!amt || amt < 1) {
+          toast({
+            title: "Invalid custom amount",
+            description: "Enter a whole-dollar minimum spend (numbers only).",
+            variant: "destructive"
+          });
+          return;
+        }
+        resolvedMinimumTier = `custom:${amt}`;
+      }
+
       setIsSubmitting(true);
 
       const clientName = manualClientName.trim() || `Quote-${new Date().getTime()}`;
@@ -256,7 +273,7 @@ export function CreateQuoteDialog({
         fulfillmentSections: fulfillmentSections.map(s => ({ type: s.type, items: s.items.map(i => ({ service_name: i.service_name, service_price: i.service_price, notes: i.notes })) })),
         teamQuoteItems: teamQuoteItems.map(i => ({ service_name: i.service_name, service_price: i.service_price, notes: i.notes })),
         additionalComments: additionalComments || undefined,
-        minimumSpendTier: minimumSpendTier || undefined,
+        minimumSpendTier: resolvedMinimumTier,
         isTeamQuote,
       }, westfieldLogo);
 
@@ -322,6 +339,7 @@ export function CreateQuoteDialog({
     setManualEmail("");
     setManualPhone("");
     setMinimumSpendTier("250_then_500");
+    setCustomMinimumAmount("");
     setStandardItems(generateDefaultStandardItems());
     setFulfillmentSections([]);
     setAdditionalComments("");
@@ -415,7 +433,7 @@ export function CreateQuoteDialog({
           {/* Minimum Monthly Spend Dropdown */}
           <div className="space-y-2 border rounded-lg p-4 bg-muted/30">
             <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Minimum Monthly Spend</Label>
-            <Select value={minimumSpendTier} onValueChange={setMinimumSpendTier}>
+            <Select value={minimumSpendTier} onValueChange={(v) => { setMinimumSpendTier(v); if (v !== "custom") setCustomMinimumAmount(""); }}>
               <SelectTrigger>
                 <SelectValue placeholder="Select minimum spend tier (optional)" />
               </SelectTrigger>
@@ -425,8 +443,22 @@ export function CreateQuoteDialog({
                 ))}
               </SelectContent>
             </Select>
+            {minimumSpendTier === "custom" && (
+              <div className="space-y-1 pt-2">
+                <Label htmlFor="custom-min-amount" className="text-xs">Custom Monthly Minimum ($)</Label>
+                <Input
+                  id="custom-min-amount"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="e.g. 750"
+                  value={customMinimumAmount}
+                  onChange={(e) => setCustomMinimumAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                />
+                <p className="text-xs text-muted-foreground">Whole dollars only. Numerical characters.</p>
+              </div>
+            )}
             {minimumSpendTier && (
-              <Button variant="ghost" size="sm" className="text-xs" onClick={() => setMinimumSpendTier("")}>
+              <Button variant="ghost" size="sm" className="text-xs" onClick={() => { setMinimumSpendTier(""); setCustomMinimumAmount(""); }}>
                 Clear selection
               </Button>
             )}

@@ -17,7 +17,18 @@ const DOCUMENT_TYPES = {
 const MINIMUM_SPEND_TIERS = {
   "250_then_500": "$250/mo for 3 months, then $500/mo",
   "500_flat": "$500/mo flat",
-  "1000_flat": "$1,000/mo flat"
+  "1000_flat": "$1,000/mo flat",
+  "custom": "Custom Amount (enter $)"
+};
+
+const formatMinimumTierLabel = (tier: string | null | undefined): string => {
+  if (!tier) return "N/A";
+  if (tier.startsWith("custom:")) {
+    const amt = parseInt(tier.slice(7), 10);
+    if (amt && amt >= 1) return `$${amt.toLocaleString("en-US")}/mo flat (custom)`;
+    return "Custom (invalid)";
+  }
+  return MINIMUM_SPEND_TIERS[tier as keyof typeof MINIMUM_SPEND_TIERS] || "N/A";
 };
 
 const SETUP_FEE_OPTIONS = {
@@ -28,6 +39,7 @@ const SETUP_FEE_OPTIONS = {
 const DocumentGeneratorTab = () => {
   const [selectedDocument, setSelectedDocument] = useState<string>("");
   const [minimumSpendTier, setMinimumSpendTier] = useState<string>("");
+  const [customMinimumAmount, setCustomMinimumAmount] = useState<string>("");
   const [setupFeeOption, setSetupFeeOption] = useState<string>("");
   const [generating, setGenerating] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
