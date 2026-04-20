@@ -121,7 +121,7 @@ const OneTimeQuotesTab = () => {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold">{d.project_name || "Untitled Project"}</h3>
-                          <Badge variant="outline" className="bg-blue-500/10 text-blue-700 border-blue-500/20">
+                          <Badge variant="secondary">
                             One-Time Project Quote
                           </Badge>
                           {quote.client_id ? (
