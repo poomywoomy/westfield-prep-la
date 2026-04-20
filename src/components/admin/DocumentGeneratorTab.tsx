@@ -94,6 +94,15 @@ const DocumentGeneratorTab = () => {
       toast({ title: "Error", description: "Please select a minimum monthly spend tier", variant: "destructive" });
       return;
     }
+    let resolvedMinimumTier = minimumSpendTier;
+    if (minimumSpendTier === "custom") {
+      const amt = parseInt(customMinimumAmount, 10);
+      if (!amt || amt < 1) {
+        toast({ title: "Invalid custom amount", description: "Enter a whole-dollar minimum spend (numbers only).", variant: "destructive" });
+        return;
+      }
+      resolvedMinimumTier = `custom:${amt}`;
+    }
     if (!setupFeeOption) {
       toast({ title: "Error", description: "Please select a setup fee option", variant: "destructive" });
       return;
@@ -108,7 +117,7 @@ const DocumentGeneratorTab = () => {
       const isRefundable = setupFeeOption === "refundable";
       const detailsWithOptions: ClientDetails = {
         ...clientDetails,
-        minimumSpendTier,
+        minimumSpendTier: resolvedMinimumTier,
         setupFeeRefundable: isRefundable
       };
 
@@ -129,7 +138,7 @@ const DocumentGeneratorTab = () => {
           phone: clientDetails.phone || null,
           client_name_2: clientDetails.contactName2 || null,
           contact_title_2: clientDetails.contactTitle2 || null,
-          minimum_spend_tier: minimumSpendTier,
+          minimum_spend_tier: resolvedMinimumTier,
           setup_fee_refundable: isRefundable,
         });
 
@@ -143,6 +152,7 @@ const DocumentGeneratorTab = () => {
       });
       setSelectedDocument("");
       setMinimumSpendTier("");
+      setCustomMinimumAmount("");
       setSetupFeeOption("");
     } catch (error: any) {
       console.error("Error generating document:", error);
