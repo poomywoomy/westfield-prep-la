@@ -1,73 +1,42 @@
 
 
-## Plan: Add a "Custom Amount" Option to the Minimum Monthly Spend
+## Plan: Auto-Update Homepage Blog Preview with Latest 3 Posts
 
 ### Goal
-Keep the three existing minimum-spend presets ($250 → $500, $500 flat, $1,000 flat) and add a fourth **"Custom Amount"** option. When selected, a numeric-only input appears so you can type any dollar value (e.g. `750`, `1500`, `2500`). The custom number flows correctly into both:
-- **Quote PDFs** (`quotePdfGenerator.ts`)
-- **Master Agreement PDFs** (`documentGenerator.ts` Section 5.5)
+Replace the hardcoded 3 articles in `BlogPreview.tsx` with a live query that pulls the **3 most recently published blog posts** from the database, including their real cover images. Whenever you publish a new post in the admin Blog Editor, the homepage section refreshes automatically — no code change needed.
 
-### Where it appears
-Both places that currently show the minimum-spend dropdown will get the new option:
-1. **Create Quote dialog** (`src/components/admin/CreateQuoteDialog.tsx`) — for prospect/recurring quotes.
-2. **Document Generator tab** (`src/components/admin/DocumentGeneratorTab.tsx`) — for the Master Agreement contract.
+### What changes
 
-The existing 3 presets stay exactly as they are.
+**`src/components/BlogPreview.tsx`** — full rewrite of the data layer (UI/layout stays identical):
 
-### Behavior
+1. Use `@tanstack/react-query` (already in the project) to fetch the latest 3 posts:
+   ```ts
+   supabase
+     .from("blog_posts")
+     .select("id, title, slug, excerpt, category, cover_image_url, published_at")
+     .eq("published", true)
+     .order("published_at", { ascending: false })
+     .limit(3)
+   ```
+2. Replace the placeholder 📦 emoji block with the real `cover_image_url`:
+   - If `cover_image_url` exists → render `<img>` with `loading="lazy"`, alt = post title.
+   - If missing → keep the existing gradient + 📦 fallback so the layout never breaks.
+3. Render states:
+   - **Loading:** 3 skeleton cards (uses existing `Skeleton` UI component) so the section doesn't pop in empty.
+   - **Empty (no published posts yet):** hide the section entirely (return `null`) — avoids showing an awkward blank grid.
+   - **Loaded:** map the 3 posts into the existing card markup (Badge → Title → Excerpt → Read More arrow).
+4. Keep the section header, container, grid, hover/animation classes, and `TranslatedText` wrappers exactly as they are.
+5. Remove the hardcoded `articles` array.
 
-1. Dropdown gets a new entry: **"Custom Amount (enter $)"**.
-2. When selected, a numeric `<Input>` appears directly below the dropdown:
-   - `inputMode="numeric"`, `pattern="[0-9]*"`
-   - `onChange` strips anything that isn't `0–9` before updating state (typo-proof — letters, symbols, spaces, decimals are ignored)
-   - Min value 1; empty input blocks PDF generation with a toast
-   - Helper text: "Whole dollars only. Numerical characters."
-3. Generate button stays disabled until a valid custom number is entered (when "Custom Amount" is selected).
-
-### Data flow
-
-We'll encode the custom value inside the same `minimumSpendTier` string field — no DB migration needed. Format:
-
-```
-"custom:750"   →  $750/mo flat
-"custom:1500"  →  $1,500/mo flat
-```
-
-Existing values (`250_then_500`, `500`, `500_flat`, `1000`, `1000_flat`) keep working unchanged. Old saved documents/quotes regenerate identically.
-
-### PDF rendering changes
-
-**`src/lib/quotePdfGenerator.ts`** — replace the static `MINIMUM_SPEND_TEXT` lookup with a helper:
-```ts
-function getMinimumSpendText(tier: string): string | null {
-  if (tier.startsWith("custom:")) {
-    const amount = parseInt(tier.slice(7), 10);
-    if (!amount || amount < 1) return null;
-    const formatted = amount.toLocaleString("en-US");
-    return `Client agrees to a minimum monthly service spend of $${formatted}.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.`;
-  }
-  return MINIMUM_SPEND_TEXT[tier] ?? null;
-}
-```
-
-**`src/lib/documentGenerator.ts`** — extend `getSection5_5()` with the same `custom:` branch, producing properly worded legal text:
-> *"Client agrees to a minimum monthly payment of [Amount in Words] U.S. Dollars ($X,XXX) per month for the Services."*
-
-The amount is also written out in words for legal clarity (e.g. `$750` → "Seven Hundred Fifty U.S. Dollars ($750)") using a small `numberToWords` helper added to `documentGenerator.ts`.
-
-### History/regenerate
-
-`DocumentGeneratorTab` history table already shows the tier label. We'll update the lookup so `custom:NNN` displays as `"$750/mo flat (custom)"` in the table and regenerates correctly.
-
-### Files affected
-
-- **Edit:** `src/components/admin/CreateQuoteDialog.tsx` — add "Custom Amount" select item + numeric input + validation.
-- **Edit:** `src/components/admin/DocumentGeneratorTab.tsx` — same additions; update history-display lookup.
-- **Edit:** `src/lib/quotePdfGenerator.ts` — helper for `custom:` tier; wire into the callout-box renderer.
-- **Edit:** `src/lib/documentGenerator.ts` — helper for `custom:` tier in Section 5.5 + small `numberToWords()` util.
+### Auto-update behavior
+- React Query cache: `staleTime: 5 minutes`. Visitors landing on the homepage after a new post is published will see it within 5 minutes (or immediately on a hard refresh).
+- No webhook or manual trigger needed — every page load re-checks the database when the cache expires.
 
 ### Out of scope
-- No DB migration (existing `minimum_spend_tier text` column already accepts `custom:NNN`).
-- No changes to the One-Time Project Quote dialog (it has no minimum spend by design).
-- No decimals/cents in custom amounts — whole dollars only, per typo-safety requirement.
+- No DB schema changes (table already has everything we need).
+- No changes to the admin blog editor or the `/blog` listing page.
+- No changes to the `Index.tsx` lazy-load wrapper.
+
+### Files affected
+- **Edit:** `src/components/BlogPreview.tsx` (only file touched)
 
