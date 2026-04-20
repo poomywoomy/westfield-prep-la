@@ -12,6 +12,7 @@ import { QuickScanModal } from "@/components/admin/QuickScanModal";
 import { AppSidebarAdmin } from "@/components/app-sidebar-admin";
 
 const ClientsTab = lazy(() => import("@/components/admin/ClientsTab"));
+const OneTimeQuotesTab = lazy(() => import("@/components/admin/OneTimeQuotesTab"));
 const DocumentGeneratorTab = lazy(() => import("@/components/admin/DocumentGeneratorTab"));
 const BlogTab = lazy(() => import("@/components/admin/BlogTab").then(m => ({ default: m.BlogTab })));
 const BlogResearchTab = lazy(() => import("@/components/admin/BlogResearchTab"));
@@ -132,6 +133,9 @@ const AdminDashboard = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <TabsContent value="clients">
                 <Suspense fallback={tabSpinner}><ClientsTab /></Suspense>
+              </TabsContent>
+              <TabsContent value="one-time-quotes">
+                <Suspense fallback={tabSpinner}><OneTimeQuotesTab /></Suspense>
               </TabsContent>
               <TabsContent value="blog">
                 <Suspense fallback={tabSpinner}><BlogTab /></Suspense>
