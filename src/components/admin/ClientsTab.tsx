@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, RefreshCw } from "lucide-react";
 import CreateClientDialog from "./CreateClientDialog";
 import { CreateQuoteDialog } from "./CreateQuoteDialog";
+import { CreateOneTimeQuoteDialog } from "./CreateOneTimeQuoteDialog";
 import ClientsList from "./ClientsList";
 
 const ClientsTab = () => {
@@ -13,6 +14,7 @@ const ClientsTab = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showQuoteDialog, setShowQuoteDialog] = useState(false);
+  const [showOneTimeQuoteDialog, setShowOneTimeQuoteDialog] = useState(false);
   const { toast } = useToast();
 
   const fetchClients = async () => {
@@ -85,6 +87,10 @@ const ClientsTab = () => {
               <Plus className="mr-2 h-4 w-4" />
               Create Quote (Prospect)
             </Button>
+            <Button onClick={() => setShowOneTimeQuoteDialog(true)} variant="outline">
+              <Plus className="mr-2 h-4 w-4" />
+              Create One-Time Quote
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -105,6 +111,11 @@ const ClientsTab = () => {
       <CreateQuoteDialog
         open={showQuoteDialog}
         onOpenChange={setShowQuoteDialog}
+      />
+
+      <CreateOneTimeQuoteDialog
+        open={showOneTimeQuoteDialog}
+        onOpenChange={setShowOneTimeQuoteDialog}
       />
     </Card>
   );
