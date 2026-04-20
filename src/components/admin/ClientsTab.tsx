@@ -87,7 +87,7 @@ const ClientsTab = () => {
               <Plus className="mr-2 h-4 w-4" />
               Create Quote (Prospect)
             </Button>
-            <Button onClick={() => setShowOneTimeQuoteDialog(true)} variant="outline" className="border-blue-500/40 text-blue-700 hover:bg-blue-500/10">
+            <Button onClick={() => setShowOneTimeQuoteDialog(true)} variant="outline">
               <Plus className="mr-2 h-4 w-4" />
               Create One-Time Quote
             </Button>
