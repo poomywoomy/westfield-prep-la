@@ -17,7 +17,18 @@ const DOCUMENT_TYPES = {
 const MINIMUM_SPEND_TIERS = {
   "250_then_500": "$250/mo for 3 months, then $500/mo",
   "500_flat": "$500/mo flat",
-  "1000_flat": "$1,000/mo flat"
+  "1000_flat": "$1,000/mo flat",
+  "custom": "Custom Amount (enter $)"
+};
+
+const formatMinimumTierLabel = (tier: string | null | undefined): string => {
+  if (!tier) return "N/A";
+  if (tier.startsWith("custom:")) {
+    const amt = parseInt(tier.slice(7), 10);
+    if (amt && amt >= 1) return `$${amt.toLocaleString("en-US")}/mo flat (custom)`;
+    return "Custom (invalid)";
+  }
+  return MINIMUM_SPEND_TIERS[tier as keyof typeof MINIMUM_SPEND_TIERS] || "N/A";
 };
 
 const SETUP_FEE_OPTIONS = {
@@ -28,6 +39,7 @@ const SETUP_FEE_OPTIONS = {
 const DocumentGeneratorTab = () => {
   const [selectedDocument, setSelectedDocument] = useState<string>("");
   const [minimumSpendTier, setMinimumSpendTier] = useState<string>("");
+  const [customMinimumAmount, setCustomMinimumAmount] = useState<string>("");
   const [setupFeeOption, setSetupFeeOption] = useState<string>("");
   const [generating, setGenerating] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
@@ -82,6 +94,15 @@ const DocumentGeneratorTab = () => {
       toast({ title: "Error", description: "Please select a minimum monthly spend tier", variant: "destructive" });
       return;
     }
+    let resolvedMinimumTier = minimumSpendTier;
+    if (minimumSpendTier === "custom") {
+      const amt = parseInt(customMinimumAmount, 10);
+      if (!amt || amt < 1) {
+        toast({ title: "Invalid custom amount", description: "Enter a whole-dollar minimum spend (numbers only).", variant: "destructive" });
+        return;
+      }
+      resolvedMinimumTier = `custom:${amt}`;
+    }
     if (!setupFeeOption) {
       toast({ title: "Error", description: "Please select a setup fee option", variant: "destructive" });
       return;
@@ -96,7 +117,7 @@ const DocumentGeneratorTab = () => {
       const isRefundable = setupFeeOption === "refundable";
       const detailsWithOptions: ClientDetails = {
         ...clientDetails,
-        minimumSpendTier,
+        minimumSpendTier: resolvedMinimumTier,
         setupFeeRefundable: isRefundable
       };
 
@@ -117,7 +138,7 @@ const DocumentGeneratorTab = () => {
           phone: clientDetails.phone || null,
           client_name_2: clientDetails.contactName2 || null,
           contact_title_2: clientDetails.contactTitle2 || null,
-          minimum_spend_tier: minimumSpendTier,
+          minimum_spend_tier: resolvedMinimumTier,
           setup_fee_refundable: isRefundable,
         });
 
@@ -131,6 +152,7 @@ const DocumentGeneratorTab = () => {
       });
       setSelectedDocument("");
       setMinimumSpendTier("");
+      setCustomMinimumAmount("");
       setSetupFeeOption("");
     } catch (error: any) {
       console.error("Error generating document:", error);
@@ -174,7 +196,8 @@ const DocumentGeneratorTab = () => {
     return date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" });
   };
 
-  const isFormValid = selectedDocument && minimumSpendTier && setupFeeOption && clientDetails.companyName && clientDetails.contactName;
+  const customAmountValid = minimumSpendTier !== "custom" || (parseInt(customMinimumAmount, 10) >= 1);
+  const isFormValid = selectedDocument && minimumSpendTier && customAmountValid && setupFeeOption && clientDetails.companyName && clientDetails.contactName;
 
   return (
     <div className="space-y-6">
@@ -211,7 +234,7 @@ const DocumentGeneratorTab = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Minimum Monthly Spend *</Label>
-                  <Select value={minimumSpendTier} onValueChange={setMinimumSpendTier}>
+                  <Select value={minimumSpendTier} onValueChange={(v) => { setMinimumSpendTier(v); if (v !== "custom") setCustomMinimumAmount(""); }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select minimum spend tier" />
                     </SelectTrigger>
@@ -221,6 +244,18 @@ const DocumentGeneratorTab = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  {minimumSpendTier === "custom" && (
+                    <div className="space-y-1 pt-1">
+                      <Input
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        placeholder="Enter custom $ amount (e.g. 750)"
+                        value={customMinimumAmount}
+                        onChange={(e) => setCustomMinimumAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                      />
+                      <p className="text-xs text-muted-foreground">Whole dollars only. Numerical characters.</p>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>Account Setup Fee *</Label>
@@ -353,7 +388,7 @@ const DocumentGeneratorTab = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col text-xs">
-                        <span>{MINIMUM_SPEND_TIERS[doc.minimum_spend_tier as keyof typeof MINIMUM_SPEND_TIERS] || "N/A"}</span>
+                        <span>{formatMinimumTierLabel(doc.minimum_spend_tier)}</span>
                         <span className="text-muted-foreground">{doc.setup_fee_refundable ? "Refundable" : "Non-Refundable"}</span>
                       </div>
                     </TableCell>
