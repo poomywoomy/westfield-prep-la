@@ -196,7 +196,8 @@ const DocumentGeneratorTab = () => {
     return date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" });
   };
 
-  const isFormValid = selectedDocument && minimumSpendTier && setupFeeOption && clientDetails.companyName && clientDetails.contactName;
+  const customAmountValid = minimumSpendTier !== "custom" || (parseInt(customMinimumAmount, 10) >= 1);
+  const isFormValid = selectedDocument && minimumSpendTier && customAmountValid && setupFeeOption && clientDetails.companyName && clientDetails.contactName;
 
   return (
     <div className="space-y-6">
@@ -233,7 +234,7 @@ const DocumentGeneratorTab = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Minimum Monthly Spend *</Label>
-                  <Select value={minimumSpendTier} onValueChange={setMinimumSpendTier}>
+                  <Select value={minimumSpendTier} onValueChange={(v) => { setMinimumSpendTier(v); if (v !== "custom") setCustomMinimumAmount(""); }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select minimum spend tier" />
                     </SelectTrigger>
@@ -243,6 +244,18 @@ const DocumentGeneratorTab = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  {minimumSpendTier === "custom" && (
+                    <div className="space-y-1 pt-1">
+                      <Input
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        placeholder="Enter custom $ amount (e.g. 750)"
+                        value={customMinimumAmount}
+                        onChange={(e) => setCustomMinimumAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                      />
+                      <p className="text-xs text-muted-foreground">Whole dollars only. Numerical characters.</p>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>Account Setup Fee *</Label>
@@ -375,7 +388,7 @@ const DocumentGeneratorTab = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col text-xs">
-                        <span>{MINIMUM_SPEND_TIERS[doc.minimum_spend_tier as keyof typeof MINIMUM_SPEND_TIERS] || "N/A"}</span>
+                        <span>{formatMinimumTierLabel(doc.minimum_spend_tier)}</span>
                         <span className="text-muted-foreground">{doc.setup_fee_refundable ? "Refundable" : "Non-Refundable"}</span>
                       </div>
                     </TableCell>
