@@ -26,6 +26,28 @@ Prior to commencement of Services, Client shall pay a one-time account setup fee
 Prior to commencement of Services, Client shall pay a one-time, non-refundable account setup fee of Five Hundred U.S. Dollars ($500), which covers WMS account creation, system configuration, training, and ongoing technical support.`;
 };
 
+const ONES = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+const TENS = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+function chunkToWords(n: number): string {
+  if (n === 0) return "";
+  if (n < 20) return ONES[n];
+  if (n < 100) return TENS[Math.floor(n / 10)] + (n % 10 ? " " + ONES[n % 10] : "");
+  return ONES[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + chunkToWords(n % 100) : "");
+}
+
+function numberToWords(n: number): string {
+  if (n === 0) return "Zero";
+  const parts: string[] = [];
+  const million = Math.floor(n / 1_000_000);
+  const thousand = Math.floor((n % 1_000_000) / 1000);
+  const rest = n % 1000;
+  if (million) parts.push(chunkToWords(million) + " Million");
+  if (thousand) parts.push(chunkToWords(thousand) + " Thousand");
+  if (rest) parts.push(chunkToWords(rest));
+  return parts.join(" ").trim();
+}
+
 const getSection5_5 = (tier: string): string => {
   const exclusion = `For the avoidance of doubt, shipping fees, carton usage fees, and polybag usage fees are not inclusive of, and shall not be credited toward, the minimum monthly payment requirement. These charges are billed separately based on actual usage.`;
   const shortfall = `If the actual fees for Services rendered in any given month fall below the applicable minimum threshold, Client will be billed the difference to satisfy this minimum requirement.`;
@@ -33,10 +55,17 @@ const getSection5_5 = (tier: string): string => {
   let tierText = "";
   if (tier === "250_then_500") {
     tierText = `Client agrees to a minimum monthly payment requirement for the Services. For the first three (3) months following the Effective Date, the minimum payment shall be Two Hundred Fifty U.S. Dollars ($250) per month. Following this initial three-month period, the minimum payment requirement shall increase to Five Hundred U.S. Dollars ($500) per month.`;
-  } else if (tier === "500_flat") {
+  } else if (tier === "500_flat" || tier === "500") {
     tierText = `Client agrees to a minimum monthly payment of Five Hundred U.S. Dollars ($500) for the Services.`;
-  } else if (tier === "1000_flat") {
+  } else if (tier === "1000_flat" || tier === "1000") {
     tierText = `Client agrees to a minimum monthly payment of One Thousand U.S. Dollars ($1,000) for the Services.`;
+  } else if (tier.startsWith("custom:")) {
+    const amount = parseInt(tier.slice(7), 10);
+    if (amount && amount >= 1) {
+      const words = numberToWords(amount);
+      const formatted = amount.toLocaleString("en-US");
+      tierText = `Client agrees to a minimum monthly payment of ${words} U.S. Dollars ($${formatted}) per month for the Services.`;
+    }
   }
 
   return `5.5 Minimum Monthly Payments
