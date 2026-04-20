@@ -1,63 +1,73 @@
 
 
-## Plan: Add Service Catalog Dropdown to One-Time Quote Line Items
+## Plan: Add a "Custom Amount" Option to the Minimum Monthly Spend
 
 ### Goal
-Make the One-Time Project Quote dialog use the same service catalog as the recurring quote dialog (so you don't have to type service names manually), but:
-- **Exclude** services that don't make sense for a one-off project: `Account Startup Fee`, all storage tiers, and `Returns Handling`.
-- **Auto-fill the description** with project-appropriate wording (rephrased so it reads as a one-time engagement, not a monthly recurring service).
-- **Auto-suggest** a default unit price, but allow you to fully override it per line item to set a flat fee (the Qty × Unit Price total still renders, but you can also enter Qty = 1 with any flat price).
+Keep the three existing minimum-spend presets ($250 → $500, $500 flat, $1,000 flat) and add a fourth **"Custom Amount"** option. When selected, a numeric-only input appears so you can type any dollar value (e.g. `750`, `1500`, `2500`). The custom number flows correctly into both:
+- **Quote PDFs** (`quotePdfGenerator.ts`)
+- **Master Agreement PDFs** (`documentGenerator.ts` Section 5.5)
 
-### What you'll see in the UI
+### Where it appears
+Both places that currently show the minimum-spend dropdown will get the new option:
+1. **Create Quote dialog** (`src/components/admin/CreateQuoteDialog.tsx`) — for prospect/recurring quotes.
+2. **Document Generator tab** (`src/components/admin/DocumentGeneratorTab.tsx`) — for the Master Agreement contract.
 
-In `CreateOneTimeQuoteDialog.tsx`, the line-items section changes:
+The existing 3 presets stay exactly as they are.
 
-1. The **Service / Description** text field becomes a **Select dropdown** of allowed services (plus `Custom Entry` for free-text).
-2. Selecting a service auto-fills:
-   - **Notes** field with the one-time project description for that service (see mapping below).
-   - **Unit Price** with the default rate.
-3. Both Notes and Unit Price remain **fully editable** after auto-fill, so you can override either.
-4. Choosing `Custom Entry` clears the auto-fill and lets you type your own service name + notes + price.
-5. The Project Total at the bottom continues to show `Σ(qty × unit_price)` and remains a dumb sum (no tier/minimum logic).
+### Behavior
 
-### Service catalog for one-time quotes
+1. Dropdown gets a new entry: **"Custom Amount (enter $)"**.
+2. When selected, a numeric `<Input>` appears directly below the dropdown:
+   - `inputMode="numeric"`, `pattern="[0-9]*"`
+   - `onChange` strips anything that isn't `0–9` before updating state (typo-proof — letters, symbols, spaces, decimals are ignored)
+   - Min value 1; empty input blocks PDF generation with a toast
+   - Helper text: "Whole dollars only. Numerical characters."
+3. Generate button stays disabled until a valid custom number is entered (when "Custom Amount" is selected).
 
-**Included** (drawn from the recurring catalog, with project-appropriate descriptions):
+### Data flow
 
-| Service | One-Time Description | Default Price |
-|---|---|---|
-| Pallet Receiving | One-time receipt and check-in of pallet(s) for this project | $50 |
-| Carton Receiving | One-time receipt and check-in of carton(s) for this project | $3 |
-| FNSKU Label | Per-unit FNSKU labeling applied during this project | $0.30 |
-| Polybox+Label | Per-unit polybag + label applied during this project | $0.50 |
-| Bubble Wrap | Per-unit bubble wrapping for this project | $0.40 |
-| Bundling | Per-bundle assembly for this project | $0.75 |
-| Additional Label | Per-unit additional labeling beyond standard for this project | $0.15 |
-| Kitting | Per-kit assembly for this project | $1.00 |
-| Palletizing | Per-pallet build & wrap for this project | $25 |
-| Pick & Pack | Per-order pick & pack for this project | $2.50 |
-| Single Product | Per-order single-item pick & pack for this project | $1.50 |
-| Hourly Rate (VAS / Project Labor) | Per-hour project labor for value-added services | $45 |
-| Materials (Boxes / Cartons / Polybags) | Project materials charged at Westfield pricing | $0 (you set) |
-| Custom Entry | Free-text: define your own service for this project | $0 |
+We'll encode the custom value inside the same `minimumSpendTier` string field — no DB migration needed. Format:
 
-**Excluded** (per your spec): `Account Startup Fee`, `Pallet Storage`, `Small/Medium/Large Bin Storage`, `Shelf Storage`, `Returns Handling`.
+```
+"custom:750"   →  $750/mo flat
+"custom:1500"  →  $1,500/mo flat
+```
 
-### Override behavior
-- Default price is suggested only when `unit_price === 0` at the moment of selection (matches recurring-quote behavior).
-- You can change `unit_price` to any value at any time, including a single flat charge (e.g. set Qty = 1, Unit Price = $850 for a one-shot project fee).
-- You can edit the auto-filled Notes to anything.
+Existing values (`250_then_500`, `500`, `500_flat`, `1000`, `1000_flat`) keep working unchanged. Old saved documents/quotes regenerate identically.
+
+### PDF rendering changes
+
+**`src/lib/quotePdfGenerator.ts`** — replace the static `MINIMUM_SPEND_TEXT` lookup with a helper:
+```ts
+function getMinimumSpendText(tier: string): string | null {
+  if (tier.startsWith("custom:")) {
+    const amount = parseInt(tier.slice(7), 10);
+    if (!amount || amount < 1) return null;
+    const formatted = amount.toLocaleString("en-US");
+    return `Client agrees to a minimum monthly service spend of $${formatted}.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.`;
+  }
+  return MINIMUM_SPEND_TEXT[tier] ?? null;
+}
+```
+
+**`src/lib/documentGenerator.ts`** — extend `getSection5_5()` with the same `custom:` branch, producing properly worded legal text:
+> *"Client agrees to a minimum monthly payment of [Amount in Words] U.S. Dollars ($X,XXX) per month for the Services."*
+
+The amount is also written out in words for legal clarity (e.g. `$750` → "Seven Hundred Fifty U.S. Dollars ($750)") using a small `numberToWords` helper added to `documentGenerator.ts`.
+
+### History/regenerate
+
+`DocumentGeneratorTab` history table already shows the tier label. We'll update the lookup so `custom:NNN` displays as `"$750/mo flat (custom)"` in the table and regenerates correctly.
 
 ### Files affected
 
-- **Edit:** `src/components/admin/CreateOneTimeQuoteDialog.tsx`
-  - Add `ONE_TIME_SERVICES`, `ONE_TIME_NOTES`, `ONE_TIME_DEFAULT_PRICES` constants at the top.
-  - Replace the free-text `service_name` Input with a `<Select>` dropdown.
-  - When `service_name` changes and value !== "Custom Entry", auto-fill notes (if blank) and unit_price (if 0). When value === "Custom Entry", swap the dropdown for a text Input so you can type a custom service name.
-  - Keep the existing override-friendly Notes textarea and Unit Price number input untouched.
+- **Edit:** `src/components/admin/CreateQuoteDialog.tsx` — add "Custom Amount" select item + numeric input + validation.
+- **Edit:** `src/components/admin/DocumentGeneratorTab.tsx` — same additions; update history-display lookup.
+- **Edit:** `src/lib/quotePdfGenerator.ts` — helper for `custom:` tier; wire into the callout-box renderer.
+- **Edit:** `src/lib/documentGenerator.ts` — helper for `custom:` tier in Section 5.5 + small `numberToWords()` util.
 
 ### Out of scope
-- No DB changes (still stored in `quotes.quote_data.line_items`).
-- No changes to the PDF generator — it already renders `service_name`, `quantity`, `unit_price`, and `notes` exactly as captured.
-- No changes to the recurring quote dialog.
+- No DB migration (existing `minimum_spend_tier text` column already accepts `custom:NNN`).
+- No changes to the One-Time Project Quote dialog (it has no minimum spend by design).
+- No decimals/cents in custom amounts — whole dollars only, per typo-safety requirement.
 
