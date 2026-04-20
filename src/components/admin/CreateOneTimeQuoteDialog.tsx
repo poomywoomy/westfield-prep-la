@@ -373,7 +373,8 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-              ))}
+                );
+              })}
               <div className="flex justify-end pt-2">
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground uppercase">Project Total</p>
