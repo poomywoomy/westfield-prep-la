@@ -239,7 +239,7 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
         projectDescription: projectDescription || undefined,
         estimatedStartDate: startDate || undefined,
         estimatedEndDate: endDate || undefined,
-        lineItems: lineItems.map(({ id, ...rest }) => rest),
+        lineItems: lineItems.map(({ id, ...rest }: any) => { const { is_custom, ...clean } = rest; return clean; }),
         additionalComments: additionalComments || undefined,
       }, westfieldLogo);
 
