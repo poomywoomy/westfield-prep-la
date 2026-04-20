@@ -336,12 +336,30 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
               {lineItems.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">No line items yet. Click "Add Item" to begin.</p>
               )}
-              {lineItems.map((item) => (
+              {lineItems.map((item: any) => {
+                const isCustom = item.is_custom || (item.service_name && !ONE_TIME_SERVICES.includes(item.service_name as any));
+                const selectValue = isCustom ? "Custom Entry" : (item.service_name || "");
+                return (
                 <div key={item.id} className="grid grid-cols-[1fr,80px,100px,auto] gap-2 items-start border-b pb-3">
                   <div className="space-y-1">
-                    <Label className="text-xs">Service / Description</Label>
-                    <Input value={item.service_name} onChange={(e) => updateLineItem(item.id, "service_name", e.target.value)} placeholder="Service name" />
-                    <Textarea value={item.notes || ""} onChange={(e) => updateLineItem(item.id, "notes", e.target.value)} placeholder="Notes (optional)" rows={1} className="text-xs" />
+                    <Label className="text-xs">Service</Label>
+                    <Select value={selectValue} onValueChange={(v) => handleServiceSelect(item.id, v)}>
+                      <SelectTrigger className="h-9"><SelectValue placeholder="Select a service..." /></SelectTrigger>
+                      <SelectContent className="bg-popover z-50">
+                        {ONE_TIME_SERVICES.map(s => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {isCustom && (
+                      <Input
+                        value={item.service_name}
+                        onChange={(e) => updateLineItem(item.id, "service_name", e.target.value)}
+                        placeholder="Custom service name"
+                        className="text-xs"
+                      />
+                    )}
+                    <Textarea value={item.notes || ""} onChange={(e) => updateLineItem(item.id, "notes", e.target.value)} placeholder="Notes / description (auto-filled, editable)" rows={2} className="text-xs" />
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">Qty</Label>
