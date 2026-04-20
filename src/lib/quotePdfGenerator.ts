@@ -15,8 +15,20 @@ const STORAGE_BILLING_NOTES: Record<string, string> = {
 const MINIMUM_SPEND_TEXT: Record<string, string> = {
   "250_then_500": "Client agrees to a minimum monthly service spend of $250.00 per month for the first three (3) months, increasing to $500.00 per month thereafter. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
   "500": "Client agrees to a minimum monthly service spend of $500.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
+  "500_flat": "Client agrees to a minimum monthly service spend of $500.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
   "1000": "Client agrees to a minimum monthly service spend of $1,000.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
+  "1000_flat": "Client agrees to a minimum monthly service spend of $1,000.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
 };
+
+function getMinimumSpendText(tier: string): string | null {
+  if (tier.startsWith("custom:")) {
+    const amount = parseInt(tier.slice(7), 10);
+    if (!amount || amount < 1) return null;
+    const formatted = amount.toLocaleString("en-US");
+    return `Client agrees to a minimum monthly service spend of $${formatted}.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.`;
+  }
+  return MINIMUM_SPEND_TEXT[tier] ?? null;
+}
 
 interface QuotePDFData {
   clientName: string;
@@ -219,7 +231,8 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
   }
 
   // ── Minimum Monthly Spend callout ──
-  if (data.minimumSpendTier && MINIMUM_SPEND_TEXT[data.minimumSpendTier]) {
+  const spendText = data.minimumSpendTier ? getMinimumSpendText(data.minimumSpendTier) : null;
+  if (spendText) {
     y = checkPageBreak(doc, y, 240);
     
     // Bordered callout box
@@ -227,7 +240,6 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
     doc.setLineWidth(0.8);
     doc.setFillColor(250, 251, 255);
     
-    const spendText = MINIMUM_SPEND_TEXT[data.minimumSpendTier];
     const splitSpend = doc.splitTextToSize(spendText, 155);
     const boxHeight = 12 + (splitSpend.length * 4);
     
