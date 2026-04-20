@@ -16,6 +16,55 @@ interface LineItem extends OneTimeQuoteLineItem {
   id: string;
 }
 
+const ONE_TIME_SERVICES = [
+  "Pallet Receiving",
+  "Carton Receiving",
+  "FNSKU Label",
+  "Polybox+Label",
+  "Bubble Wrap",
+  "Bundling",
+  "Additional Label",
+  "Kitting",
+  "Palletizing",
+  "Pick & Pack",
+  "Single Product",
+  "Hourly Rate (VAS / Project Labor)",
+  "Materials (Boxes / Cartons / Polybags)",
+  "Custom Entry",
+] as const;
+
+const ONE_TIME_NOTES: Record<string, string> = {
+  "Pallet Receiving": "One-time receipt and check-in of pallet(s) for this project",
+  "Carton Receiving": "One-time receipt and check-in of carton(s) for this project",
+  "FNSKU Label": "Per-unit FNSKU labeling applied during this project",
+  "Polybox+Label": "Per-unit polybag + label applied during this project",
+  "Bubble Wrap": "Per-unit bubble wrapping for this project",
+  "Bundling": "Per-bundle assembly for this project",
+  "Additional Label": "Per-unit additional labeling beyond standard for this project",
+  "Kitting": "Per-kit assembly for this project",
+  "Palletizing": "Per-pallet build & wrap for this project",
+  "Pick & Pack": "Per-order pick & pack for this project",
+  "Single Product": "Per-order single-item pick & pack for this project",
+  "Hourly Rate (VAS / Project Labor)": "Per-hour project labor for value-added services",
+  "Materials (Boxes / Cartons / Polybags)": "Project materials charged at Westfield pricing",
+};
+
+const ONE_TIME_DEFAULT_PRICES: Record<string, number> = {
+  "Pallet Receiving": 50,
+  "Carton Receiving": 3,
+  "FNSKU Label": 0.30,
+  "Polybox+Label": 0.50,
+  "Bubble Wrap": 0.40,
+  "Bundling": 0.75,
+  "Additional Label": 0.15,
+  "Kitting": 1.00,
+  "Palletizing": 25,
+  "Pick & Pack": 2.50,
+  "Single Product": 1.50,
+  "Hourly Rate (VAS / Project Labor)": 45,
+  "Materials (Boxes / Cartons / Polybags)": 0,
+};
+
 interface CreateOneTimeQuoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -94,11 +143,30 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
   };
 
   const addLineItem = () => {
-    setLineItems([...lineItems, { id: crypto.randomUUID(), service_name: "", quantity: 1, unit_price: 0, notes: "" }]);
+    setLineItems([...lineItems, { id: crypto.randomUUID(), service_name: "", quantity: 1, unit_price: 0, notes: "", is_custom: false } as LineItem & { is_custom?: boolean }]);
   };
 
-  const updateLineItem = (id: string, field: keyof LineItem, value: any) => {
+  const updateLineItem = (id: string, field: keyof LineItem | "is_custom", value: any) => {
     setLineItems(lineItems.map(i => i.id === id ? { ...i, [field]: value } : i));
+  };
+
+  const handleServiceSelect = (id: string, selected: string) => {
+    setLineItems(prev => prev.map(i => {
+      if (i.id !== id) return i;
+      if (selected === "Custom Entry") {
+        return { ...i, service_name: "", is_custom: true } as any;
+      }
+      const next: any = { ...i, service_name: selected, is_custom: false };
+      // Auto-fill notes only if blank
+      if (!i.notes || i.notes.trim() === "") {
+        next.notes = ONE_TIME_NOTES[selected] || "";
+      }
+      // Auto-fill price only if 0
+      if (!i.unit_price || i.unit_price === 0) {
+        next.unit_price = ONE_TIME_DEFAULT_PRICES[selected] ?? 0;
+      }
+      return next;
+    }));
   };
 
   const removeLineItem = (id: string) => {
@@ -118,7 +186,7 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
     estimated_start_date: startDate,
     estimated_end_date: endDate,
     additional_comments: additionalComments,
-    line_items: lineItems.map(({ id, ...rest }) => rest),
+    line_items: lineItems.map(({ id, ...rest }: any) => { const { is_custom, ...clean } = rest; return clean; }),
     total,
   });
 
@@ -171,7 +239,7 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
         projectDescription: projectDescription || undefined,
         estimatedStartDate: startDate || undefined,
         estimatedEndDate: endDate || undefined,
-        lineItems: lineItems.map(({ id, ...rest }) => rest),
+        lineItems: lineItems.map(({ id, ...rest }: any) => { const { is_custom, ...clean } = rest; return clean; }),
         additionalComments: additionalComments || undefined,
       }, westfieldLogo);
 
@@ -268,12 +336,30 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
               {lineItems.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">No line items yet. Click "Add Item" to begin.</p>
               )}
-              {lineItems.map((item) => (
+              {lineItems.map((item: any) => {
+                const isCustom = item.is_custom || (item.service_name && !ONE_TIME_SERVICES.includes(item.service_name as any));
+                const selectValue = isCustom ? "Custom Entry" : (item.service_name || "");
+                return (
                 <div key={item.id} className="grid grid-cols-[1fr,80px,100px,auto] gap-2 items-start border-b pb-3">
                   <div className="space-y-1">
-                    <Label className="text-xs">Service / Description</Label>
-                    <Input value={item.service_name} onChange={(e) => updateLineItem(item.id, "service_name", e.target.value)} placeholder="Service name" />
-                    <Textarea value={item.notes || ""} onChange={(e) => updateLineItem(item.id, "notes", e.target.value)} placeholder="Notes (optional)" rows={1} className="text-xs" />
+                    <Label className="text-xs">Service</Label>
+                    <Select value={selectValue} onValueChange={(v) => handleServiceSelect(item.id, v)}>
+                      <SelectTrigger className="h-9"><SelectValue placeholder="Select a service..." /></SelectTrigger>
+                      <SelectContent className="bg-popover z-50">
+                        {ONE_TIME_SERVICES.map(s => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {isCustom && (
+                      <Input
+                        value={item.service_name}
+                        onChange={(e) => updateLineItem(item.id, "service_name", e.target.value)}
+                        placeholder="Custom service name"
+                        className="text-xs"
+                      />
+                    )}
+                    <Textarea value={item.notes || ""} onChange={(e) => updateLineItem(item.id, "notes", e.target.value)} placeholder="Notes / description (auto-filled, editable)" rows={2} className="text-xs" />
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">Qty</Label>
@@ -287,7 +373,8 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-              ))}
+                );
+              })}
               <div className="flex justify-end pt-2">
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground uppercase">Project Total</p>
