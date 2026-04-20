@@ -186,7 +186,7 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
     estimated_start_date: startDate,
     estimated_end_date: endDate,
     additional_comments: additionalComments,
-    line_items: lineItems.map(({ id, ...rest }) => rest),
+    line_items: lineItems.map(({ id, ...rest }: any) => { const { is_custom, ...clean } = rest; return clean; }),
     total,
   });
 
