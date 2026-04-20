@@ -16,6 +16,55 @@ interface LineItem extends OneTimeQuoteLineItem {
   id: string;
 }
 
+const ONE_TIME_SERVICES = [
+  "Pallet Receiving",
+  "Carton Receiving",
+  "FNSKU Label",
+  "Polybox+Label",
+  "Bubble Wrap",
+  "Bundling",
+  "Additional Label",
+  "Kitting",
+  "Palletizing",
+  "Pick & Pack",
+  "Single Product",
+  "Hourly Rate (VAS / Project Labor)",
+  "Materials (Boxes / Cartons / Polybags)",
+  "Custom Entry",
+] as const;
+
+const ONE_TIME_NOTES: Record<string, string> = {
+  "Pallet Receiving": "One-time receipt and check-in of pallet(s) for this project",
+  "Carton Receiving": "One-time receipt and check-in of carton(s) for this project",
+  "FNSKU Label": "Per-unit FNSKU labeling applied during this project",
+  "Polybox+Label": "Per-unit polybag + label applied during this project",
+  "Bubble Wrap": "Per-unit bubble wrapping for this project",
+  "Bundling": "Per-bundle assembly for this project",
+  "Additional Label": "Per-unit additional labeling beyond standard for this project",
+  "Kitting": "Per-kit assembly for this project",
+  "Palletizing": "Per-pallet build & wrap for this project",
+  "Pick & Pack": "Per-order pick & pack for this project",
+  "Single Product": "Per-order single-item pick & pack for this project",
+  "Hourly Rate (VAS / Project Labor)": "Per-hour project labor for value-added services",
+  "Materials (Boxes / Cartons / Polybags)": "Project materials charged at Westfield pricing",
+};
+
+const ONE_TIME_DEFAULT_PRICES: Record<string, number> = {
+  "Pallet Receiving": 50,
+  "Carton Receiving": 3,
+  "FNSKU Label": 0.30,
+  "Polybox+Label": 0.50,
+  "Bubble Wrap": 0.40,
+  "Bundling": 0.75,
+  "Additional Label": 0.15,
+  "Kitting": 1.00,
+  "Palletizing": 25,
+  "Pick & Pack": 2.50,
+  "Single Product": 1.50,
+  "Hourly Rate (VAS / Project Labor)": 45,
+  "Materials (Boxes / Cartons / Polybags)": 0,
+};
+
 interface CreateOneTimeQuoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
