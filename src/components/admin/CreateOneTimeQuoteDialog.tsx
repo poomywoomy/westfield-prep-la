@@ -143,11 +143,30 @@ export function CreateOneTimeQuoteDialog({ open, onOpenChange, existingQuote, on
   };
 
   const addLineItem = () => {
-    setLineItems([...lineItems, { id: crypto.randomUUID(), service_name: "", quantity: 1, unit_price: 0, notes: "" }]);
+    setLineItems([...lineItems, { id: crypto.randomUUID(), service_name: "", quantity: 1, unit_price: 0, notes: "", is_custom: false } as LineItem & { is_custom?: boolean }]);
   };
 
-  const updateLineItem = (id: string, field: keyof LineItem, value: any) => {
+  const updateLineItem = (id: string, field: keyof LineItem | "is_custom", value: any) => {
     setLineItems(lineItems.map(i => i.id === id ? { ...i, [field]: value } : i));
+  };
+
+  const handleServiceSelect = (id: string, selected: string) => {
+    setLineItems(prev => prev.map(i => {
+      if (i.id !== id) return i;
+      if (selected === "Custom Entry") {
+        return { ...i, service_name: "", is_custom: true } as any;
+      }
+      const next: any = { ...i, service_name: selected, is_custom: false };
+      // Auto-fill notes only if blank
+      if (!i.notes || i.notes.trim() === "") {
+        next.notes = ONE_TIME_NOTES[selected] || "";
+      }
+      // Auto-fill price only if 0
+      if (!i.unit_price || i.unit_price === 0) {
+        next.unit_price = ONE_TIME_DEFAULT_PRICES[selected] ?? 0;
+      }
+      return next;
+    }));
   };
 
   const removeLineItem = (id: string) => {
