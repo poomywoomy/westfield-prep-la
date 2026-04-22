@@ -17,6 +17,12 @@ import { AuthorBio } from "@/components/blog/AuthorBio";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { parseMarkdown } from "@/lib/markdownParser";
 import { TranslatedText } from "@/components/TranslatedText";
+import {
+  getOptimizedImageUrl,
+  getResponsiveSrcSet,
+  getBlogImageSizes,
+  buildWebpFallbackOnError,
+} from "@/lib/imageOptimization";
 
 // Blog post page component
 interface BlogPost {
@@ -183,10 +189,25 @@ const BlogPost = () => {
               <>
                 <div className="absolute inset-0">
                   <img
-                    src={post.cover_image_url}
+                    src={getOptimizedImageUrl(post.cover_image_url) || post.cover_image_url}
+                    srcSet={getResponsiveSrcSet(post.cover_image_url)}
+                    sizes={getBlogImageSizes("hero")}
                     alt={`${post.title} - Westfield Prep Center blog cover image`}
+                    width={1600}
+                    height={900}
                     className="w-full h-full object-cover"
-                    onError={(e) => { e.currentTarget.src = "/hero-warehouse-optimized.webp"; }}
+                    loading="eager"
+                    decoding="async"
+                    // @ts-expect-error - lowercase fetchpriority is the correct HTML attribute
+                    fetchpriority="high"
+                    onError={(e) => {
+                      const fallback = buildWebpFallbackOnError(post.cover_image_url);
+                      if (fallback) {
+                        fallback(e);
+                      } else {
+                        e.currentTarget.src = "/hero-warehouse-optimized.webp";
+                      }
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-transparent" />
                 </div>

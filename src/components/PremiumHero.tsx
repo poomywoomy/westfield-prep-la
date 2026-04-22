@@ -53,18 +53,17 @@ const PremiumHero = () => {
       <section className="relative min-h-[90vh] w-full overflow-hidden">
         {/* Background Warehouse Image */}
         <div className="absolute inset-0 z-0">
-          <picture>
-            <source srcSet="/hero-warehouse-optimized.webp" type="image/webp" />
-            <img
-              src="/warehouse-hero-bg.jpg"
-              alt="Modern Los Angeles 3PL warehouse facility with loading docks, semi-trucks, palm trees, and mountain views - Westfield Prep Center"
-              width="1920"
-              height="1080"
-              className="w-full h-full object-cover object-center"
-              loading="eager"
-              fetchPriority="high"
-            />
-          </picture>
+          <img
+            src="/hero-warehouse-optimized.webp"
+            alt="Modern Los Angeles 3PL warehouse facility with loading docks, semi-trucks, palm trees, and mountain views - Westfield Prep Center"
+            width={1920}
+            height={1080}
+            className="w-full h-full object-cover object-center"
+            loading="eager"
+            decoding="async"
+            // @ts-expect-error - lowercase fetchpriority is the correct HTML attribute
+            fetchpriority="high"
+          />
         </div>
 
         {/* Multi-layer Gradient Overlay */}

@@ -159,6 +159,7 @@ const Blog = () => {
                     authorName={filteredPosts[0].author_name}
                     coverImageUrl={filteredPosts[0].cover_image_url || undefined}
                     isFeatured={true}
+                    priority={true}
                   />
                 </div>
               )}

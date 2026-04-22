@@ -6,6 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TranslatedText } from "@/components/TranslatedText";
+import {
+  getOptimizedImageUrl,
+  getResponsiveSrcSet,
+  getBlogImageSizes,
+  buildWebpFallbackOnError,
+} from "@/lib/imageOptimization";
 
 interface LatestPost {
   id: string;
@@ -78,9 +84,15 @@ const BlogPreview = () => {
                     <div className="aspect-video bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/5 overflow-hidden">
                       {article.cover_image_url ? (
                         <img
-                          src={article.cover_image_url}
+                          src={getOptimizedImageUrl(article.cover_image_url)}
+                          srcSet={getResponsiveSrcSet(article.cover_image_url)}
+                          sizes={getBlogImageSizes("card")}
                           alt={article.title}
+                          width={800}
+                          height={450}
                           loading="lazy"
+                          decoding="async"
+                          onError={buildWebpFallbackOnError(article.cover_image_url)}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
