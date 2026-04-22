@@ -126,133 +126,61 @@ const Index = () => {
           <PremiumHero />
 
           {/* Stats Strip */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-64 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[280px]" aria-hidden="true" />}>
             <StatsStrip />
           </Suspense>
 
           {/* Use Case Section - NEW CRO Component */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <UseCaseSection />
           </Suspense>
 
           {/* Phase 3: Value Proposition */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <ValueProposition />
           </Suspense>
 
           {/* Phase 4: Services Overview */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <Services />
           </Suspense>
 
           {/* Phase 5: How It Works */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <HowItWorksProcess />
           </Suspense>
 
           {/* Phase 6: Platform Compatibility */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <PlatformCompatibility />
           </Suspense>
 
           {/* Phase 7: Testimonials */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <Reviews />
           </Suspense>
 
           {/* Phase 8: LA Location */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <LocationShowcase />
           </Suspense>
 
           {/* Blog Preview - NEW */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <BlogPreview />
           </Suspense>
 
           {/* Phase 10: FAQ */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <FAQAccordion />
           </Suspense>
 
           {/* Phase 11: Final CTA */}
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-96 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[300px]" aria-hidden="true" />}>
             <FinalCTA />
           </Suspense>
 
-          <Suspense
-            fallback={
-              <div className="container py-16">
-                <Skeleton className="h-64 w-full" />
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}>
             <Compliance />
           </Suspense>
 
