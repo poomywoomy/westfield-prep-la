@@ -18,13 +18,23 @@ const MINIMUM_SPEND_TIERS = {
   "250_then_500": "$250/mo for 3 months, then $500/mo",
   "500_flat": "$500/mo flat",
   "1000_flat": "$1,000/mo flat",
-  "custom": "Custom Amount (enter $)"
+  "custom": "Custom Tier (intro + ongoing)"
 };
 
 const formatMinimumTierLabel = (tier: string | null | undefined): string => {
   if (!tier) return "N/A";
   if (tier.startsWith("custom:")) {
-    const amt = parseInt(tier.slice(7), 10);
+    const payload = tier.slice(7);
+    if (payload.includes("_then_")) {
+      const [introStr, ongoingStr] = payload.split("_then_");
+      const intro = parseInt(introStr, 10);
+      const ongoing = parseInt(ongoingStr, 10);
+      if (intro >= 1 && ongoing >= 1) {
+        return `$${intro.toLocaleString("en-US")}/mo for 3 mo, then $${ongoing.toLocaleString("en-US")}/mo (custom)`;
+      }
+      return "Custom (invalid)";
+    }
+    const amt = parseInt(payload, 10);
     if (amt && amt >= 1) return `$${amt.toLocaleString("en-US")}/mo flat (custom)`;
     return "Custom (invalid)";
   }
