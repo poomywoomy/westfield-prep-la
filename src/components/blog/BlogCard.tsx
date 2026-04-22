@@ -62,7 +62,7 @@ const getPattern = (variant?: string) => {
   return 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)';
 };
 
-export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, authorName, isFeatured = false, variant = 'standard', coverImageUrl }: BlogCardProps) => {
+export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, authorName, isFeatured = false, variant = 'standard', coverImageUrl, priority = false }: BlogCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const gradient = getCategoryGradient(category);
@@ -70,14 +70,34 @@ export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, auth
   const categoryIcon = getCategoryIcon(category);
   const titleNumber = extractNumber(title);
   const effectiveImageUrl = imageError || !coverImageUrl ? undefined : coverImageUrl;
-  
+  const optimizedImageUrl = getOptimizedImageUrl(effectiveImageUrl);
+  const responsiveSrcSet = getResponsiveSrcSet(effectiveImageUrl);
+  const onImgError = buildWebpFallbackOnError(effectiveImageUrl);
+
   if (isFeatured) {
     return (
       <Link to={`/blog/${slug}`} className="group relative block bg-white rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_25px_80px_-15px_rgba(0,0,0,0.3)] transition-all duration-700 ease-out hover:-translate-y-3 border-2 border-[hsl(var(--border))]">
         {effectiveImageUrl ? (
           <div className="relative h-[480px] overflow-hidden">
             <AspectRatio ratio={16/9} className="h-full">
-              <img src={effectiveImageUrl} alt={`${title} - Westfield Prep Center blog cover image`} width="1200" height="675" className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} loading="eager" onLoad={() => setImageLoaded(true)} onError={() => setImageError(true)} />
+              <img
+                src={optimizedImageUrl}
+                srcSet={responsiveSrcSet}
+                sizes={getBlogImageSizes("featured")}
+                alt={`${title} - Westfield Prep Center blog cover image`}
+                width={1200}
+                height={675}
+                className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                loading={priority ? "eager" : "lazy"}
+                decoding="async"
+                // @ts-expect-error - lowercase fetchpriority is the correct HTML attribute
+                fetchpriority={priority ? "high" : "auto"}
+                onLoad={() => setImageLoaded(true)}
+                onError={(e) => {
+                  if (onImgError) onImgError(e);
+                  setImageError(true);
+                }}
+              />
               {!imageLoaded && <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
               <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '4px 4px' }} />
@@ -125,7 +145,22 @@ export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, auth
       {effectiveImageUrl ? (
         <div className="relative overflow-hidden">
           <AspectRatio ratio={4/3}>
-            <img src={effectiveImageUrl} alt={`${title} - Westfield Prep Center blog cover image`} width="800" height="600" className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.04] ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" decoding="async" onLoad={() => setImageLoaded(true)} onError={() => setImageError(true)} />
+            <img
+              src={optimizedImageUrl}
+              srcSet={responsiveSrcSet}
+              sizes={getBlogImageSizes("card")}
+              alt={`${title} - Westfield Prep Center blog cover image`}
+              width={800}
+              height={600}
+              className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.04] ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              loading="lazy"
+              decoding="async"
+              onLoad={() => setImageLoaded(true)}
+              onError={(e) => {
+                if (onImgError) onImgError(e);
+                setImageError(true);
+              }}
+            />
             {!imageLoaded && <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: variant === 'side-accent' ? 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)' : 'repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.1) 8px, rgba(255,255,255,0.1) 16px)', backgroundSize: variant === 'side-accent' ? '4px 4px' : 'auto' }} />
