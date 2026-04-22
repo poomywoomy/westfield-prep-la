@@ -49,6 +49,7 @@ function numberToWords(n: number): string {
 }
 
 const getSection5_5 = (tier: string): string => {
+  const palletPrefix = `The minimum monthly payment is dictated by the stored pallet amount.`;
   const exclusion = `For the avoidance of doubt, shipping fees, carton usage fees, and polybag usage fees are not inclusive of, and shall not be credited toward, the minimum monthly payment requirement. These charges are billed separately based on actual usage.`;
   const shortfall = `If the actual fees for Services rendered in any given month fall below the applicable minimum threshold, Client will be billed the difference to satisfy this minimum requirement.`;
 
@@ -60,16 +61,26 @@ const getSection5_5 = (tier: string): string => {
   } else if (tier === "1000_flat" || tier === "1000") {
     tierText = `Client agrees to a minimum monthly payment of One Thousand U.S. Dollars ($1,000) for the Services.`;
   } else if (tier.startsWith("custom:")) {
-    const amount = parseInt(tier.slice(7), 10);
-    if (amount && amount >= 1) {
-      const words = numberToWords(amount);
-      const formatted = amount.toLocaleString("en-US");
-      tierText = `Client agrees to a minimum monthly payment of ${words} U.S. Dollars ($${formatted}) per month for the Services.`;
+    const payload = tier.slice(7);
+    if (payload.includes("_then_")) {
+      const [introStr, ongoingStr] = payload.split("_then_");
+      const intro = parseInt(introStr, 10);
+      const ongoing = parseInt(ongoingStr, 10);
+      if (intro >= 1 && ongoing >= 1) {
+        tierText = `Client agrees to a minimum monthly payment requirement for the Services. For the first three (3) months following the Effective Date, the minimum payment shall be ${numberToWords(intro)} U.S. Dollars ($${intro.toLocaleString("en-US")}) per month. Following this initial three-month period, the minimum payment requirement shall increase to ${numberToWords(ongoing)} U.S. Dollars ($${ongoing.toLocaleString("en-US")}) per month.`;
+      }
+    } else {
+      const amount = parseInt(payload, 10);
+      if (amount && amount >= 1) {
+        const words = numberToWords(amount);
+        const formatted = amount.toLocaleString("en-US");
+        tierText = `Client agrees to a minimum monthly payment of ${words} U.S. Dollars ($${formatted}) per month for the Services.`;
+      }
     }
   }
 
   return `5.5 Minimum Monthly Payments
-${tierText} ${exclusion} ${shortfall}`;
+${palletPrefix} ${tierText} ${exclusion} ${shortfall}`;
 };
 
 const getSection14 = (refundable: boolean): string => {

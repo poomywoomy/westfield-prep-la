@@ -12,22 +12,35 @@ const STORAGE_BILLING_NOTES: Record<string, string> = {
   "Shelf Storage": "Per shelf, per month"
 };
 
+const PALLET_PREFIX = "The minimum monthly payment is dictated by the stored pallet amount. ";
+const EXCLUSION_SUFFIX = " Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.";
+
 const MINIMUM_SPEND_TEXT: Record<string, string> = {
-  "250_then_500": "Client agrees to a minimum monthly service spend of $250.00 per month for the first three (3) months, increasing to $500.00 per month thereafter. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
-  "500": "Client agrees to a minimum monthly service spend of $500.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
-  "500_flat": "Client agrees to a minimum monthly service spend of $500.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
-  "1000": "Client agrees to a minimum monthly service spend of $1,000.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
-  "1000_flat": "Client agrees to a minimum monthly service spend of $1,000.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.",
+  "250_then_500": "Client agrees to a minimum monthly service spend of $250.00 per month for the first three (3) months, increasing to $500.00 per month thereafter.",
+  "500": "Client agrees to a minimum monthly service spend of $500.00 per month.",
+  "500_flat": "Client agrees to a minimum monthly service spend of $500.00 per month.",
+  "1000": "Client agrees to a minimum monthly service spend of $1,000.00 per month.",
+  "1000_flat": "Client agrees to a minimum monthly service spend of $1,000.00 per month.",
 };
 
 function getMinimumSpendText(tier: string): string | null {
   if (tier.startsWith("custom:")) {
-    const amount = parseInt(tier.slice(7), 10);
+    const payload = tier.slice(7);
+    if (payload.includes("_then_")) {
+      const [introStr, ongoingStr] = payload.split("_then_");
+      const intro = parseInt(introStr, 10);
+      const ongoing = parseInt(ongoingStr, 10);
+      if (!intro || intro < 1 || !ongoing || ongoing < 1) return null;
+      return `${PALLET_PREFIX}Client agrees to a minimum monthly service spend of $${intro.toLocaleString("en-US")}.00 per month for the first three (3) months, increasing to $${ongoing.toLocaleString("en-US")}.00 per month thereafter.${EXCLUSION_SUFFIX}`;
+    }
+    const amount = parseInt(payload, 10);
     if (!amount || amount < 1) return null;
     const formatted = amount.toLocaleString("en-US");
-    return `Client agrees to a minimum monthly service spend of $${formatted}.00 per month. Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.`;
+    return `${PALLET_PREFIX}Client agrees to a minimum monthly service spend of $${formatted}.00 per month.${EXCLUSION_SUFFIX}`;
   }
-  return MINIMUM_SPEND_TEXT[tier] ?? null;
+  const base = MINIMUM_SPEND_TEXT[tier];
+  if (!base) return null;
+  return `${PALLET_PREFIX}${base}${EXCLUSION_SUFFIX}`;
 }
 
 interface QuotePDFData {
