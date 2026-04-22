@@ -1,72 +1,114 @@
 
 
-## Plan: Site-Wide Performance & Image Loading Audit
+## Plan: Pallet-Based Minimum Spend with Customizable Intro Period
 
-Site is slow primarily because of **giant unoptimized blog images** (some 1.5–1.9 MB JPGs), a **hero `<picture>` that downloads the JPG fallback even when WebP works**, and **blog images served from local `/public` instead of cloud storage** (no CDN, no WebP, no responsive variants). Console confirms LCP > 13s on the homepage.
+### Goal
+Update the Master Agreement contract and Quote PDF so the minimum-spend section:
+1. States that the **monthly minimum is dictated by the stored pallet amount**.
+2. Keeps all existing presets (`$250→$500`, `$500 flat`, `$1,000 flat`).
+3. Adds a new **"Custom Tier"** option where you enter **two separate numeric fields**:
+   - **Intro period amount** (optional — months 1–3)
+   - **Ongoing amount** (required — month 4+)
+4. If the intro field is left blank, the contract/quote shows **only** the flat ongoing amount with no intro-period language.
 
-### Findings (root causes)
+### Where the change lives
+Same two surfaces as before — both already share an encoded `minimumSpendTier` string:
+- **Quote builder:** `src/components/admin/CreateQuoteDialog.tsx` → `src/lib/quotePdfGenerator.ts`
+- **Contract generator:** `src/components/admin/DocumentGeneratorTab.tsx` → `src/lib/documentGenerator.ts`
 
-1. **Hero image double-download** — `PremiumHero.tsx` uses `<picture>` with a 230 KB WebP source and a separate 230 KB JPG `<img>`. The `<img>` `src` (`/warehouse-hero-bg.jpg`) downloads even when the browser supports WebP, doubling LCP bytes. Console also flags `fetchPriority` (must be `fetchpriority` lowercase).
-2. **Blog images are huge and JPG-only** — `public/blog-images/` is **16 MB total** with 6 files over 500 KB (worst: 1.9 MB). Served from the app bundle (not Supabase Storage / CDN), no WebP, no responsive `srcset`, no `width`/`height` on body images → causes layout shift and slow paints when reading articles.
-3. **Featured `BlogCard` uses `loading="eager"`** on the cover image even when offscreen, fighting the browser's prioritization for the real LCP element.
-4. **Blog body images get `loading="lazy"` injected but no `decoding="async"`, no dimensions, no WebP variant** — large images stall main thread on decode.
-5. **Vite config still uses `@vitejs/plugin-react-swc`** while project memory mandates `@vitejs/plugin-react` (Babel) for stability/dedupe; SWC has caused dedupe regressions before.
-6. **Homepage waterfalls Supabase calls** (BlogPreview query, language detection RPC, supported_languages query) with no `<link rel="preconnect">` priority for the `blog-images` domain (the supabase storage one IS preconnected — good).
-7. **`Skeleton` placeholders for every Suspense section** are full-width 64–96 height blocks that briefly render then re-layout when each lazy chunk lands → contributes to perceived slowness on the homepage (CLS is 0, but perceived "popping in" is heavy).
+### Encoding (no DB migration)
+We extend the existing `custom:` convention so the `minimum_spend_tier text` column keeps working unchanged:
 
-### What we'll change
+```
+custom:750              → flat $750/mo, no intro period
+custom:500_then_1000    → $500/mo for 3 months, then $1,000/mo
+```
 
-**A. Fix the hero (biggest LCP win, ~50% bytes saved)**
-- `src/components/PremiumHero.tsx`: drop `<picture>`, use a single `<img src="/hero-warehouse-optimized.webp">` with `fetchpriority="high"` (lowercase), `decoding="async"`, explicit `width`/`height`. Keeps the existing preload in `index.html` working as the LCP image.
-- Delete the now-unused `public/warehouse-hero-bg.jpg` (230 KB) from the deploy.
+Existing values (`250_then_500`, `500`, `500_flat`, `1000`, `1000_flat`) keep working unchanged. Old saved documents/quotes regenerate identically.
 
-**B. Compress & convert blog images to WebP (biggest overall win, ~75% bytes saved)**
-- One-time script (run in default mode) using `nix run nixpkgs#libwebp` + `nixpkgs#imagemagick`:
-  - Convert every `public/blog-images/*.{jpg,png}` → `*.webp` at quality 80, max-width 1600px.
-  - Also generate a `*-800w.webp` responsive variant for cards.
-  - Keep original `.jpg` as fallback for legacy linked images.
-- Expected: 16 MB → ~3 MB total. Largest file (1.9 MB JPG) → ~250 KB WebP.
+### UI changes (both dialogs)
 
-**C. Update components that render images to prefer WebP + responsive**
-- `BlogPreview.tsx`, `BlogCard.tsx`, `BlogPost.tsx`, and `BlogPostRenderer.tsx`:
-  - Helper `getOptimizedImageUrl(url)` that swaps `.jpg`/`.png` → `.webp` when the URL points to `/blog-images/...` (or to the Supabase `blog-images` bucket — same filename pattern).
-  - Add `srcset` for 800 w / 1600 w variants and a `sizes` attribute matching the card layout.
-  - Add `width`/`height` (intrinsic 4:3 or 16:9) to every image to eliminate CLS.
-  - Add `decoding="async"` everywhere.
-  - **Featured BlogCard**: keep `loading="eager"` only for the very first card (the LCP candidate on `/blog`), switch all others (including `BlogPreview` cards) to `loading="lazy"`.
-- `BlogPostRenderer.tsx` regex enhancement: when injecting attributes into body `<img>`, also add `decoding="async"` and rewrite `/blog-images/foo.jpg` → `/blog-images/foo.webp` with the original as a fallback in `onerror`.
+The "Custom Amount (enter $)" option becomes **"Custom Tier (intro + ongoing)"**. When selected, two numeric inputs appear instead of one:
 
-**D. Fix React/Vite warnings & dedupe**
-- `PremiumHero.tsx`: rename `fetchPriority` prop → `fetchpriority` (lowercase) to silence the React DOM warning shown in console.
-- `vite.config.ts`: switch `@vitejs/plugin-react-swc` → `@vitejs/plugin-react` per project memory (matches existing `dedupe` config and known-good builds).
+```
+┌─ Minimum Monthly Spend ───────────────────┐
+│ [ Custom Tier (intro + ongoing)      ▼ ]  │
+│                                           │
+│ Intro Period Amount ($) — optional        │
+│ [ e.g. 500          ]                     │
+│ Leave blank for no intro period.          │
+│                                           │
+│ Ongoing Amount ($) — required after 3 mo  │
+│ [ e.g. 1000         ]                     │
+│ Whole dollars only. Numerical characters. │
+└───────────────────────────────────────────┘
+```
 
-**E. Lighter homepage Suspense fallbacks**
-- `src/pages/Index.tsx`: replace the 6 large `Skeleton h-96 w-full` fallbacks with `null` (or a tiny `min-h-[400px]` spacer) so the lazy chunks don't trigger huge skeleton paints that get immediately replaced. Reserves space (no CLS) without the visual "flash of skeletons."
+- Both inputs strip non-numeric characters on change (`/[^0-9]/g`) — typo-safe.
+- Generate button stays disabled until **Ongoing** is a valid whole number ≥ 1.
+- Intro field is purely optional; empty = flat tier.
 
-**F. Preconnect blog image origin**
-- `index.html`: add `<link rel="preconnect" href="https://gqnvkecmxjijrxhggcro.supabase.co" crossorigin>` is already present — confirm the blog images bucket served from there benefits. Add `<link rel="dns-prefetch">` for `https://www.googletagmanager.com` (currently a render-blocker).
-- Make the GTM `<script>` `defer` instead of inline-blocking (currently top of `<head>`).
+### PDF text changes
+
+**Both PDFs** get a new opening sentence in the minimum-spend block:
+
+> *"The minimum monthly payment is dictated by the stored pallet amount."*
+
+Then the tier-specific text follows.
+
+**`src/lib/documentGenerator.ts` — Section 5.5**
+
+Extended `custom:` parser handles both shapes:
+
+```ts
+// custom:1000              → flat
+// custom:500_then_1000     → intro + ongoing
+if (tier.startsWith("custom:")) {
+  const payload = tier.slice(7);
+  const palletPrefix = "The minimum monthly payment is dictated by the stored pallet amount. ";
+
+  if (payload.includes("_then_")) {
+    const [intro, ongoing] = payload.split("_then_").map(n => parseInt(n, 10));
+    if (intro >= 1 && ongoing >= 1) {
+      tierText = palletPrefix +
+        `For the first three (3) months following the Effective Date, the minimum payment shall be ${numberToWords(intro)} U.S. Dollars ($${intro.toLocaleString("en-US")}) per month. Following this initial three-month period, the minimum payment requirement shall increase to ${numberToWords(ongoing)} U.S. Dollars ($${ongoing.toLocaleString("en-US")}) per month.`;
+    }
+  } else {
+    const amount = parseInt(payload, 10);
+    if (amount >= 1) {
+      tierText = palletPrefix +
+        `Client agrees to a minimum monthly payment of ${numberToWords(amount)} U.S. Dollars ($${amount.toLocaleString("en-US")}) per month for the Services.`;
+    }
+  }
+}
+```
+
+The pallet-prefix sentence is **also prepended** to all preset tiers (`250_then_500`, `500_flat`, `1000_flat`) so every contract — preset or custom — opens with the pallet language.
+
+**`src/lib/quotePdfGenerator.ts` — `getMinimumSpendText`**
+
+Same logic, plus the pallet prefix is added to every entry in `MINIMUM_SPEND_TEXT` and the custom branches.
+
+### History display
+
+`DocumentGeneratorTab.tsx` `formatMinimumTierLabel()` extended:
+
+```
+custom:750              → "$750/mo flat (custom)"
+custom:500_then_1000    → "$500/mo for 3 mo, then $1,000/mo (custom)"
+```
+
+Regenerate-from-history works because the encoded string round-trips cleanly.
 
 ### Files affected
-
-- **Edit**: `src/components/PremiumHero.tsx`, `src/components/BlogPreview.tsx`, `src/components/blog/BlogCard.tsx`, `src/components/blog/BlogPostRenderer.tsx`, `src/pages/BlogPost.tsx`, `src/pages/Index.tsx`, `src/pages/Blog.tsx`, `vite.config.ts`, `index.html`
-- **New util**: `src/lib/imageOptimization.ts` — `getOptimizedImageUrl()`, `getResponsiveSrcSet()`, `getBlogImageSizes()`
-- **One-time scripted asset work** (run in default mode):
-  - Convert all 38 files in `public/blog-images/` to WebP (keep originals as fallback)
-  - Delete unused `public/warehouse-hero-bg.jpg`
-- **No DB changes**, **no edge function changes**, **no Supabase Storage migration** (we keep existing URLs working; new posts can keep uploading `.jpg` and our helper will request the WebP variant when present, falling back via `onerror` if not).
-
-### Expected impact
-
-- Homepage **LCP**: ~13 s → target ≤ 2.5 s (single optimized hero image, no double-download, lighter Suspense paint).
-- Blog page initial load: **16 MB → ~3 MB** image budget.
-- Individual blog posts: 1–2 MB cover images → 200–300 KB; body images lazy-load with WebP.
-- Eliminates the React `fetchPriority` console warning.
-- No visual changes — same images, same layout, same hover effects.
+- **Edit** `src/components/admin/CreateQuoteDialog.tsx` — split custom input into intro + ongoing, validate ongoing required, encode as `custom:N` or `custom:N_then_M`.
+- **Edit** `src/components/admin/DocumentGeneratorTab.tsx` — same UI split + same encoding + extend `formatMinimumTierLabel`.
+- **Edit** `src/lib/documentGenerator.ts` — prepend pallet sentence to all tier text; parse `custom:N_then_M`.
+- **Edit** `src/lib/quotePdfGenerator.ts` — prepend pallet sentence to all tier text; parse `custom:N_then_M`.
 
 ### Out of scope
-
-- Migrating already-uploaded blog images from `/public/blog-images/` into the Supabase `blog-images` bucket (separate project; keep existing URLs working).
-- Changing the admin Blog Editor upload pipeline (future enhancement: auto-generate WebP on upload via edge function with `EdgeRuntime.waitUntil`).
-- Switching translation/Supabase architecture.
+- No DB schema changes (existing `minimum_spend_tier text` column accepts the new shape).
+- No changes to One-Time Project Quote dialog (no minimum spend by design).
+- No decimals/cents — whole dollars only.
+- The intro period stays fixed at 3 months (matches all existing presets and current legal language).
 
