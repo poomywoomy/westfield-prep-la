@@ -5,6 +5,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useState } from "react";
+import {
+  getOptimizedImageUrl,
+  getResponsiveSrcSet,
+  getBlogImageSizes,
+  buildWebpFallbackOnError,
+} from "@/lib/imageOptimization";
 
 interface BlogCardProps {
   id: string;
@@ -17,6 +23,8 @@ interface BlogCardProps {
   isFeatured?: boolean;
   variant?: 'standard' | 'accent-border' | 'side-accent';
   coverImageUrl?: string;
+  /** When true, this card is the LCP candidate and should load eagerly. */
+  priority?: boolean;
 }
 
 const getCategoryGradient = (category?: string) => {

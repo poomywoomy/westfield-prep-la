@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(), 
+    react(),
     mode === "development" && componentTagger(),
     mode === "production" && visualizer({
       filename: 'dist/stats.html',
@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => ({
         manualChunks: {
           // Core React
           'react-core': ['react', 'react-dom', 'react-router-dom'],
-          
+
           // UI Components
           'ui-radix': [
             '@radix-ui/react-dialog',
@@ -41,16 +41,16 @@ export default defineConfig(({ mode }) => ({
             '@radix-ui/react-select',
             '@radix-ui/react-popover'
           ],
-          
+
           // Form & Validation
           'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
-          
+
           // Data Fetching
           'data': ['@tanstack/react-query', '@supabase/supabase-js'],
-          
+
           // Icons
           'icons': ['lucide-react'],
-          
+
           // Rich Text & Markdown
           'editor': [
             '@tiptap/react',
@@ -58,10 +58,10 @@ export default defineConfig(({ mode }) => ({
             '@tiptap/extension-color',
             '@tiptap/extension-link'
           ],
-          
+
           // Charts & Visualization
           'charts': ['recharts'],
-          
+
           // Date & Time
           'date': ['date-fns', 'date-fns-tz', 'react-day-picker']
         },
