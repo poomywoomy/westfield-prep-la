@@ -126,7 +126,7 @@ const MINIMUM_SPEND_TIERS: Record<string, string> = {
   "250_then_500": "$250/mo for 3 months, then $500/mo",
   "500": "$500/mo flat",
   "1000": "$1,000/mo flat",
-  "custom": "Custom Amount (enter $)"
+  "custom": "Custom Tier (intro + ongoing)"
 };
 
 interface CreateQuoteDialogProps {
@@ -146,6 +146,7 @@ export function CreateQuoteDialog({
   const [manualPhone, setManualPhone] = useState("");
   const [minimumSpendTier, setMinimumSpendTier] = useState("250_then_500");
   const [customMinimumAmount, setCustomMinimumAmount] = useState("");
+  const [customIntroAmount, setCustomIntroAmount] = useState("");
 
   const [standardItems, setStandardItems] = useState<LineItem[]>([]);
   const [fulfillmentSections, setFulfillmentSections] = useState<FulfillmentSection[]>([]);
@@ -247,16 +248,30 @@ export function CreateQuoteDialog({
       // Validate custom minimum
       let resolvedMinimumTier = minimumSpendTier || undefined;
       if (minimumSpendTier === "custom") {
-        const amt = parseInt(customMinimumAmount, 10);
-        if (!amt || amt < 1) {
+        const ongoing = parseInt(customMinimumAmount, 10);
+        if (!ongoing || ongoing < 1) {
           toast({
-            title: "Invalid custom amount",
-            description: "Enter a whole-dollar minimum spend (numbers only).",
+            title: "Invalid ongoing amount",
+            description: "Enter a whole-dollar ongoing minimum spend (numbers only).",
             variant: "destructive"
           });
           return;
         }
-        resolvedMinimumTier = `custom:${amt}`;
+        const introRaw = customIntroAmount.trim();
+        if (introRaw === "") {
+          resolvedMinimumTier = `custom:${ongoing}`;
+        } else {
+          const intro = parseInt(introRaw, 10);
+          if (!intro || intro < 1) {
+            toast({
+              title: "Invalid intro amount",
+              description: "Leave intro blank for no intro period, or enter a whole-dollar amount.",
+              variant: "destructive"
+            });
+            return;
+          }
+          resolvedMinimumTier = `custom:${intro}_then_${ongoing}`;
+        }
       }
 
       setIsSubmitting(true);
@@ -340,6 +355,7 @@ export function CreateQuoteDialog({
     setManualPhone("");
     setMinimumSpendTier("250_then_500");
     setCustomMinimumAmount("");
+    setCustomIntroAmount("");
     setStandardItems(generateDefaultStandardItems());
     setFulfillmentSections([]);
     setAdditionalComments("");
@@ -433,7 +449,7 @@ export function CreateQuoteDialog({
           {/* Minimum Monthly Spend Dropdown */}
           <div className="space-y-2 border rounded-lg p-4 bg-muted/30">
             <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Minimum Monthly Spend</Label>
-            <Select value={minimumSpendTier} onValueChange={(v) => { setMinimumSpendTier(v); if (v !== "custom") setCustomMinimumAmount(""); }}>
+            <Select value={minimumSpendTier} onValueChange={(v) => { setMinimumSpendTier(v); if (v !== "custom") { setCustomMinimumAmount(""); setCustomIntroAmount(""); } }}>
               <SelectTrigger>
                 <SelectValue placeholder="Select minimum spend tier (optional)" />
               </SelectTrigger>
@@ -444,21 +460,35 @@ export function CreateQuoteDialog({
               </SelectContent>
             </Select>
             {minimumSpendTier === "custom" && (
-              <div className="space-y-1 pt-2">
-                <Label htmlFor="custom-min-amount" className="text-xs">Custom Monthly Minimum ($)</Label>
-                <Input
-                  id="custom-min-amount"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  placeholder="e.g. 750"
-                  value={customMinimumAmount}
-                  onChange={(e) => setCustomMinimumAmount(e.target.value.replace(/[^0-9]/g, ""))}
-                />
-                <p className="text-xs text-muted-foreground">Whole dollars only. Numerical characters.</p>
+              <div className="space-y-3 pt-2">
+                <div className="space-y-1">
+                  <Label htmlFor="custom-intro-amount" className="text-xs">Intro Period Amount ($) — optional</Label>
+                  <Input
+                    id="custom-intro-amount"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="e.g. 500"
+                    value={customIntroAmount}
+                    onChange={(e) => setCustomIntroAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                  />
+                  <p className="text-xs text-muted-foreground">Leave blank for no intro period. Applies to months 1–3.</p>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="custom-min-amount" className="text-xs">Ongoing Amount ($) — required after 3 months</Label>
+                  <Input
+                    id="custom-min-amount"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="e.g. 1000"
+                    value={customMinimumAmount}
+                    onChange={(e) => setCustomMinimumAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                  />
+                  <p className="text-xs text-muted-foreground">Whole dollars only. Numerical characters.</p>
+                </div>
               </div>
             )}
             {minimumSpendTier && (
-              <Button variant="ghost" size="sm" className="text-xs" onClick={() => { setMinimumSpendTier(""); setCustomMinimumAmount(""); }}>
+              <Button variant="ghost" size="sm" className="text-xs" onClick={() => { setMinimumSpendTier(""); setCustomMinimumAmount(""); setCustomIntroAmount(""); }}>
                 Clear selection
               </Button>
             )}
