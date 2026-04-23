@@ -1,114 +1,67 @@
 
 
-## Plan: Pallet-Based Minimum Spend with Customizable Intro Period
+## Plan: Add "Warehousing and Fulfillment" Blog Post (Image in Supabase Storage)
 
 ### Goal
-Update the Master Agreement contract and Quote PDF so the minimum-spend section:
-1. States that the **monthly minimum is dictated by the stored pallet amount**.
-2. Keeps all existing presets (`$250→$500`, `$500 flat`, `$1,000 flat`).
-3. Adds a new **"Custom Tier"** option where you enter **two separate numeric fields**:
-   - **Intro period amount** (optional — months 1–3)
-   - **Ongoing amount** (required — month 4+)
-4. If the intro field is left blank, the contract/quote shows **only** the flat ongoing amount with no intro-period language.
+Add the new blog post from the PDF, with the cover image uploaded to the Supabase **`blog-images`** public bucket (matching the URL format you referenced: `https://gqnvkecmxjijrxhggcro.supabase.co/storage/v1/object/public/blog-images/{filename}.jpg`) — not stored locally in `/public/blog-images/`.
 
-### Where the change lives
-Same two surfaces as before — both already share an encoded `minimumSpendTier` string:
-- **Quote builder:** `src/components/admin/CreateQuoteDialog.tsx` → `src/lib/quotePdfGenerator.ts`
-- **Contract generator:** `src/components/admin/DocumentGeneratorTab.tsx` → `src/lib/documentGenerator.ts`
+### Cover image
+- Source: page 1 hero image from the PDF (warehouse worker in yellow hard hat with clipboard).
+- Upload to Supabase bucket `blog-images` as: `warehousing-and-fulfillment-warehouse-worker.jpg`
+- Final public URL stored in `blog_posts.cover_image_url`:
+  ```
+  https://gqnvkecmxjijrxhggcro.supabase.co/storage/v1/object/public/blog-images/warehousing-and-fulfillment-warehouse-worker.jpg
+  ```
 
-### Encoding (no DB migration)
-We extend the existing `custom:` convention so the `minimum_spend_tier text` column keeps working unchanged:
+### Blog post metadata (from PDF, exact)
+| Field | Value |
+|---|---|
+| `title` | Warehousing and Fulfillment for Fast Growing Online Brands |
+| `slug` | `warehousing-and-fulfillment-efficient-order-handling` |
+| `meta_description` | Warehousing and fulfillment solutions for fast growing online brands. Speed up deliveries, simplify inventory tracking, and scale operations with ease. |
+| `category` | Fulfillment |
+| `tags` | warehousing and fulfillment, fulfillment center Los Angeles, ecommerce fulfillment, order handling, 3PL Los Angeles, multi-channel fulfillment |
+| `cover_image_url` | Supabase public URL above |
+| `author_name` | Westfield Team |
+| `published` | true |
+| `read_time_minutes` | 5 |
 
-```
-custom:750              → flat $750/mo, no intro period
-custom:500_then_1000    → $500/mo for 3 months, then $1,000/mo
-```
+### Required hyperlinks (per your instructions)
+1. **Introduction** — phrase *"warehousing and fulfillment"* → `https://westfieldprepcenter.com/storage-warehousing`
+2. **The Advantage of a Fulfillment Center in Los Angeles** — phrase *"a fulfillment center los angeles"* → `https://westfieldprepcenter.com/shopify-fulfillment`
 
-Existing values (`250_then_500`, `500`, `500_flat`, `1000`, `1000_flat`) keep working unchanged. Old saved documents/quotes regenerate identically.
+No other links added — content stays exactly as the PDF.
 
-### UI changes (both dialogs)
+### Content structure (matches PDF section-for-section, verbatim)
+- H2 Introduction
+- H3 What is Warehousing and Fulfillment?
+- H3 Why Efficient Order Handling Matters
+- H3 Key Components of a Strong Fulfillment System (4 numbered subsections)
+- H2 The Advantage of a Fulfillment Center in Los Angeles
+- H2 Transparency and Cost Control
+- H2 Scalability Without Limitations
+- H2 Multi-Channel Fulfillment Made Easy
+- H2 Technology and Real-Time Visibility
+- H2 Building a Reliable Fulfillment Strategy
+- H2 Why Location and Efficiency Go Hand in Hand
+- H2 FAQs (5 collapsible `<details>` items, exact PDF wording)
 
-The "Custom Amount (enter $)" option becomes **"Custom Tier (intro + ongoing)"**. When selected, two numeric inputs appear instead of one:
+### FAQ schema
+The 5 FAQs are added as `<details><summary>` blocks. The site's existing `BlogPostSchema.tsx` automatically generates the `FAQPage` JSON-LD schema from these blocks — no manual schema work needed, and it will match the schema in the PDF appendix.
 
-```
-┌─ Minimum Monthly Spend ───────────────────┐
-│ [ Custom Tier (intro + ongoing)      ▼ ]  │
-│                                           │
-│ Intro Period Amount ($) — optional        │
-│ [ e.g. 500          ]                     │
-│ Leave blank for no intro period.          │
-│                                           │
-│ Ongoing Amount ($) — required after 3 mo  │
-│ [ e.g. 1000         ]                     │
-│ Whole dollars only. Numerical characters. │
-└───────────────────────────────────────────┘
-```
-
-- Both inputs strip non-numeric characters on change (`/[^0-9]/g`) — typo-safe.
-- Generate button stays disabled until **Ongoing** is a valid whole number ≥ 1.
-- Intro field is purely optional; empty = flat tier.
-
-### PDF text changes
-
-**Both PDFs** get a new opening sentence in the minimum-spend block:
-
-> *"The minimum monthly payment is dictated by the stored pallet amount."*
-
-Then the tier-specific text follows.
-
-**`src/lib/documentGenerator.ts` — Section 5.5**
-
-Extended `custom:` parser handles both shapes:
-
-```ts
-// custom:1000              → flat
-// custom:500_then_1000     → intro + ongoing
-if (tier.startsWith("custom:")) {
-  const payload = tier.slice(7);
-  const palletPrefix = "The minimum monthly payment is dictated by the stored pallet amount. ";
-
-  if (payload.includes("_then_")) {
-    const [intro, ongoing] = payload.split("_then_").map(n => parseInt(n, 10));
-    if (intro >= 1 && ongoing >= 1) {
-      tierText = palletPrefix +
-        `For the first three (3) months following the Effective Date, the minimum payment shall be ${numberToWords(intro)} U.S. Dollars ($${intro.toLocaleString("en-US")}) per month. Following this initial three-month period, the minimum payment requirement shall increase to ${numberToWords(ongoing)} U.S. Dollars ($${ongoing.toLocaleString("en-US")}) per month.`;
-    }
-  } else {
-    const amount = parseInt(payload, 10);
-    if (amount >= 1) {
-      tierText = palletPrefix +
-        `Client agrees to a minimum monthly payment of ${numberToWords(amount)} U.S. Dollars ($${amount.toLocaleString("en-US")}) per month for the Services.`;
-    }
-  }
-}
-```
-
-The pallet-prefix sentence is **also prepended** to all preset tiers (`250_then_500`, `500_flat`, `1000_flat`) so every contract — preset or custom — opens with the pallet language.
-
-**`src/lib/quotePdfGenerator.ts` — `getMinimumSpendText`**
-
-Same logic, plus the pallet prefix is added to every entry in `MINIMUM_SPEND_TEXT` and the custom branches.
-
-### History display
-
-`DocumentGeneratorTab.tsx` `formatMinimumTierLabel()` extended:
-
-```
-custom:750              → "$750/mo flat (custom)"
-custom:500_then_1000    → "$500/mo for 3 mo, then $1,000/mo (custom)"
-```
-
-Regenerate-from-history works because the encoded string round-trips cleanly.
+### Execution steps (default mode)
+1. Copy the PDF page-1 image from `parsed-documents://` → `/tmp/`, then upload to Supabase Storage bucket `blog-images` as `warehousing-and-fulfillment-warehouse-worker.jpg` (public, `cache-control: 31536000`).
+2. Create `docs/blog-posts/warehousing-and-fulfillment-efficient-order-handling.md` with the verbatim PDF content + the two required hyperlinks + the FAQ `<details>` blocks. Frontmatter `cover_image_url` points to the Supabase public URL.
+3. Run a Supabase migration that `INSERT`s the row into `public.blog_posts` with `published = true`, `published_at = now()`, idempotent via `ON CONFLICT (slug) DO UPDATE`.
 
 ### Files affected
-- **Edit** `src/components/admin/CreateQuoteDialog.tsx` — split custom input into intro + ongoing, validate ongoing required, encode as `custom:N` or `custom:N_then_M`.
-- **Edit** `src/components/admin/DocumentGeneratorTab.tsx` — same UI split + same encoding + extend `formatMinimumTierLabel`.
-- **Edit** `src/lib/documentGenerator.ts` — prepend pallet sentence to all tier text; parse `custom:N_then_M`.
-- **Edit** `src/lib/quotePdfGenerator.ts` — prepend pallet sentence to all tier text; parse `custom:N_then_M`.
+- **New** `docs/blog-posts/warehousing-and-fulfillment-efficient-order-handling.md`
+- **New asset in Supabase Storage** `blog-images/warehousing-and-fulfillment-warehouse-worker.jpg`
+- **New migration** inserting the post into `blog_posts`
 
 ### Out of scope
-- No DB schema changes (existing `minimum_spend_tier text` column accepts the new shape).
-- No changes to One-Time Project Quote dialog (no minimum spend by design).
-- No decimals/cents — whole dollars only.
-- The intro period stays fixed at 3 months (matches all existing presets and current legal language).
+- No code changes to `BlogPostSchema.tsx` (FAQ JSON-LD already auto-generated from `<details>` blocks).
+- No edits to existing blog posts, `/blog` listing, or routing.
+- No local `/public/blog-images/` copy — image lives only in Supabase per your request.
+- No content rewriting — PDF content is reproduced as-is.
 
