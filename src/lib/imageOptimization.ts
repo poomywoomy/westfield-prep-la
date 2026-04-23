@@ -11,6 +11,9 @@ const BLOG_IMAGE_PATH = "/blog-images/";
 
 const isBlogImage = (url: string): boolean => {
   if (!url) return false;
+  // Only treat locally-hosted /blog-images/ assets as optimizable.
+  // Remote URLs (e.g. Supabase Storage) don't have pre-generated WebP variants.
+  if (/^https?:\/\//i.test(url)) return false;
   return url.includes(BLOG_IMAGE_PATH);
 };
 
