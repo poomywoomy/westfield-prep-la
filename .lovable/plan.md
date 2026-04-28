@@ -1,67 +1,75 @@
+## Goal
 
+1. Redesign the existing `/why-choose-us` page with a more modern, premium feel.
+2. Keep the Launchpad section visible there as a teaser, but rewrite the messaging — it should NOT say "We'll build your brand for you."
+3. Create a brand-new dedicated page for the Launchpad services covering Shopify dashboard setup, Amazon Seller Central setup, A+ content, product 3D imaging, model/photo shoot coordination, and general "get-your-product-off-the-ground" support.
+4. Add the new page to the header navigation.
 
-## Plan: Add "Warehousing and Fulfillment" Blog Post (Image in Supabase Storage)
+## New Messaging Direction
 
-### Goal
-Add the new blog post from the PDF, with the cover image uploaded to the Supabase **`blog-images`** public bucket (matching the URL format you referenced: `https://gqnvkecmxjijrxhggcro.supabase.co/storage/v1/object/public/blog-images/{filename}.jpg`) — not stored locally in `/public/blog-images/`.
+Instead of "Don't have a brand yet? We'll build one for you," the new positioning is a **support / launch services studio**:
 
-### Cover image
-- Source: page 1 hero image from the PDF (warehouse worker in yellow hard hat with clipboard).
-- Upload to Supabase bucket `blog-images` as: `warehousing-and-fulfillment-warehouse-worker.jpg`
-- Final public URL stored in `blog_posts.cover_image_url`:
-  ```
-  https://gqnvkecmxjijrxhggcro.supabase.co/storage/v1/object/public/blog-images/warehousing-and-fulfillment-warehouse-worker.jpg
-  ```
+- Headline option: **"Launch Faster. Sell Smarter."**
+- Sub: "From your first Shopify dashboard to A+ content on Amazon and pro-grade product imagery — we help you get your product off the ground without hiring five agencies."
 
-### Blog post metadata (from PDF, exact)
-| Field | Value |
-|---|---|
-| `title` | Warehousing and Fulfillment for Fast Growing Online Brands |
-| `slug` | `warehousing-and-fulfillment-efficient-order-handling` |
-| `meta_description` | Warehousing and fulfillment solutions for fast growing online brands. Speed up deliveries, simplify inventory tracking, and scale operations with ease. |
-| `category` | Fulfillment |
-| `tags` | warehousing and fulfillment, fulfillment center Los Angeles, ecommerce fulfillment, order handling, 3PL Los Angeles, multi-channel fulfillment |
-| `cover_image_url` | Supabase public URL above |
-| `author_name` | Westfield Team |
-| `published` | true |
-| `read_time_minutes` | 5 |
+We position Westfield as a partner that *helps you launch and scale* (not as a brand-creation agency).
 
-### Required hyperlinks (per your instructions)
-1. **Introduction** — phrase *"warehousing and fulfillment"* → `https://westfieldprepcenter.com/storage-warehousing`
-2. **The Advantage of a Fulfillment Center in Los Angeles** — phrase *"a fulfillment center los angeles"* → `https://westfieldprepcenter.com/shopify-fulfillment`
+## Page 1 — Redesign `/why-choose-us` (`src/pages/WhyChooseUs.tsx`)
 
-No other links added — content stays exactly as the PDF.
+Modernize the existing sections with refreshed visuals (lighter card surfaces, glassmorphism accents, gradient orbs, sharper typography hierarchy) while keeping all current content blocks: Hero, Old Way vs Westfield Way, Stats, Trust/Compliance, FAQ.
 
-### Content structure (matches PDF section-for-section, verbatim)
-- H2 Introduction
-- H3 What is Warehousing and Fulfillment?
-- H3 Why Efficient Order Handling Matters
-- H3 Key Components of a Strong Fulfillment System (4 numbered subsections)
-- H2 The Advantage of a Fulfillment Center in Los Angeles
-- H2 Transparency and Cost Control
-- H2 Scalability Without Limitations
-- H2 Multi-Channel Fulfillment Made Easy
-- H2 Technology and Real-Time Visibility
-- H2 Building a Reliable Fulfillment Strategy
-- H2 Why Location and Efficiency Go Hand in Hand
-- H2 FAQs (5 collapsible `<details>` items, exact PDF wording)
+**Launchpad section (lines 537–648) — rewrite:**
+- New eyebrow chip: **WESTFIELD LAUNCHPAD**
+- New H2: **"Launch Faster. Sell Smarter."**
+- New sub-copy: "Shopify setup, Amazon Seller Central, A+ content, 3D product imagery, and pro photography — all under one roof. We help your product look launch-ready from day one."
+- Replace the 3 service cards with 4 quick highlights:
+  - **Shopify Dashboard Setup** — Store build, theme config, app stack, payments.
+  - **Amazon Account & A+ Content** — Seller Central registration, brand registry, A+ modules, storefront.
+  - **3D Product Imaging** — Photoreal renders that look like studio shots, no physical samples needed.
+  - **Photo & Model Shoots** — Coordinated studio sessions with models, props, and lifestyle sets.
+- Replace the "$2,499 Zero to One Package" pricing card with a softer **"What we help with"** support panel + a single CTA: **"Explore Launchpad Services"** → routes to new `/launchpad` page. Secondary CTA: "Book a Discovery Call" → `/contact`.
+- Remove the "$500 shipping credits" copy.
 
-### FAQ schema
-The 5 FAQs are added as `<details><summary>` blocks. The site's existing `BlogPostSchema.tsx` automatically generates the `FAQPage` JSON-LD schema from these blocks — no manual schema work needed, and it will match the schema in the PDF appendix.
+Visual refresh of the rest of the page: tighter spacing, animated entry on scroll (framer-motion already in project), updated comparison cards with hover lift, new gradient hero accent. No content removed — only restyled.
 
-### Execution steps (default mode)
-1. Copy the PDF page-1 image from `parsed-documents://` → `/tmp/`, then upload to Supabase Storage bucket `blog-images` as `warehousing-and-fulfillment-warehouse-worker.jpg` (public, `cache-control: 31536000`).
-2. Create `docs/blog-posts/warehousing-and-fulfillment-efficient-order-handling.md` with the verbatim PDF content + the two required hyperlinks + the FAQ `<details>` blocks. Frontmatter `cover_image_url` points to the Supabase public URL.
-3. Run a Supabase migration that `INSERT`s the row into `public.blog_posts` with `published = true`, `published_at = now()`, idempotent via `ON CONFLICT (slug) DO UPDATE`.
+## Page 2 — New `/launchpad` page
 
-### Files affected
-- **New** `docs/blog-posts/warehousing-and-fulfillment-efficient-order-handling.md`
-- **New asset in Supabase Storage** `blog-images/warehousing-and-fulfillment-warehouse-worker.jpg`
-- **New migration** inserting the post into `blog_posts`
+Create `src/pages/Launchpad.tsx` (modeled after `Hero` + section components — uses Header & Footer, single H1).
 
-### Out of scope
-- No code changes to `BlogPostSchema.tsx` (FAQ JSON-LD already auto-generated from `<details>` blocks).
-- No edits to existing blog posts, `/blog` listing, or routing.
-- No local `/public/blog-images/` copy — image lives only in Supabase per your request.
-- No content rewriting — PDF content is reproduced as-is.
+### Structure
 
+1. **Hero** — Eyebrow "WESTFIELD LAUNCHPAD" • H1 "Launch Faster. Sell Smarter." • Sub-copy + dual CTAs ("Book a Discovery Call" → `/contact`, "View Pricing" → `/pricing`). Dark gradient background, floating platform chips (Shopify, Amazon, TikTok).
+2. **What We Help With** — 6-card grid:
+   - Shopify Dashboard Build
+   - Amazon Seller Central Setup
+   - A+ Content & Storefront
+   - Product 3D Imaging
+   - Studio Photo & Model Shoots
+   - Listing Optimization & Copy
+3. **3D Imaging vs Studio Shoots** — Split section explaining when to use renders vs real photo shoots; visual comparison block.
+4. **How It Works** — 4-step timeline: Discovery → Asset Plan → Production → Launch.
+5. **Why Sellers Use Launchpad** — 3 outcome metrics (faster launch, fewer vendors, conversion-ready assets).
+6. **FAQ** — 5 questions (turnaround, do you need to be a fulfillment client, do you ship to studio, file formats delivered, ownership of assets).
+7. **CTA Strip** — "Ready to launch?" → `/contact`.
+
+Includes proper SEO via `Helmet` + `generateMetaTags` (`/launchpad`), single `<h1>`, `RouteCanonical`, all images alt-tagged, all section H2s.
+
+## Routing & Navigation
+
+- `src/App.tsx` — Add lazy import + `<Route path="/launchpad" element={<Launchpad />} />`.
+- `src/components/Header.tsx` — Add **Launchpad** link to the desktop nav (next to Why Choose Us) and to the mobile menu using the same pattern as `/why-choose-us`.
+- `public/sitemap.xml` — Add `/launchpad` entry.
+
+## Constraints respected
+
+- Header, Footer, and Logo untouched (only adding one nav link, not modifying structure).
+- Single H1 per page.
+- Address remains "Los Angeles, CA".
+- No em dashes in copy.
+- Uses existing brand colors (Midnight Navy / Orange) and Tailwind tokens.
+- No new dependencies.
+
+## Files
+
+- Modify: `src/pages/WhyChooseUs.tsx`, `src/App.tsx`, `src/components/Header.tsx`, `public/sitemap.xml`
+- Create: `src/pages/Launchpad.tsx`
