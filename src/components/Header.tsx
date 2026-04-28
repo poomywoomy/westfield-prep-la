@@ -203,6 +203,10 @@ const Header = () => {
                 <TranslatedText>Why Choose Us</TranslatedText>
               </Link>
 
+              <Link to="/launchpad" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
+                <TranslatedText>Launchpad</TranslatedText>
+              </Link>
+
               <Link to="/testimonials" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Testimonials</TranslatedText>
               </Link>
