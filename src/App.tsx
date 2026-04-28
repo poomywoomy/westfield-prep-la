@@ -37,6 +37,7 @@ const Testimonials = lazy(() => import("./pages/Testimonials"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const WhyChooseUs = lazy(() => import("./pages/WhyChooseUs"));
+const Launchpad = lazy(() => import("./pages/Launchpad"));
 const SalesChannels = lazy(() => import("./pages/SalesChannels"));
 const SalesChannelAmazon = lazy(() => import("./pages/sales-channels/Amazon"));
 const SalesChannelShopify = lazy(() => import("./pages/sales-channels/Shopify"));
