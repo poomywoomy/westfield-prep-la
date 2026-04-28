@@ -534,114 +534,88 @@ const WhyChooseUs = () => {
             </div>
           </section>
 
-          {/* --- SECTION 4: LAUNCHPAD (Expanded) --- */}
+          {/* --- SECTION 4: LAUNCHPAD (Teaser) --- */}
           <section className="py-24 bg-gradient-to-b from-[hsl(var(--wcu-bg-secondary))] to-[hsl(var(--wcu-bg-primary))] relative overflow-hidden">
-            {/* Background decoration */}
             <div className="absolute right-0 top-0 w-1/3 h-full bg-blue-500/5 blur-3xl pointer-events-none"></div>
+            <div className="absolute left-0 bottom-0 w-1/3 h-full bg-orange-500/5 blur-3xl pointer-events-none"></div>
 
             <div className="container mx-auto px-6 relative z-10">
               <div className="text-center mb-16">
-                <div className="inline-block px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-wider uppercase mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-wider uppercase mb-4">
                   Westfield Launchpad
                 </div>
                 <h2 className="text-3xl md:text-5xl font-bold mb-4">
-                  Don't Have a Brand Yet? <br />
-                  We'll Build One For You.
+                  Launch Faster. <br />
+                  Sell Smarter.
                 </h2>
                 <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                  You don't need to be a logistics client to access our creative studio. We take you from "napkin idea"
-                  to "first sale" in weeks, not months.
+                  Shopify setup, Amazon Seller Central, A+ content, 3D product imaging, and pro
+                  studio photography. All under one roof. We help your product look launch ready
+                  from day one.
                 </p>
               </div>
 
-              <div className="bg-[hsl(var(--wcu-bg-card))] border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row gap-12 items-center">
-                <div className="md:w-1/2 space-y-8">
-                  <h3 className="text-3xl font-bold text-white">Complete E-Commerce Incubation.</h3>
-                  <p className="text-gray-400 leading-relaxed">
-                    Most agencies just design a logo. We build <strong className="text-white">businesses</strong>. Our
-                    team includes Amazon sellers, Shopify experts, and supply chain veterans who know exactly what
-                    converts.
-                  </p>
-                  <div className="space-y-6">
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-pink-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-pink-400">
-                        <Palette size={24} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-lg">Identity & Packaging</h4>
-                        <p className="text-sm text-gray-400">
-                          Logos, color systems, and unboxing experiences that look premium on Instagram.
-                        </p>
-                      </div>
+              <div className="bg-[hsl(var(--wcu-bg-card))] border border-white/10 rounded-2xl p-8 md:p-12">
+                <div className="grid md:grid-cols-2 gap-6 mb-10">
+                  <div className="flex gap-4 p-5 rounded-xl bg-black/30 border border-white/5">
+                    <div className="w-12 h-12 bg-emerald-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-emerald-400">
+                      <ShoppingBag size={24} />
                     </div>
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-green-400">
-                        <Globe size={24} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-lg">Store Development</h4>
-                        <p className="text-sm text-gray-400">
-                          High-conversion Shopify 2.0 themes and Amazon Storefronts optimized for mobile.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-yellow-400">
-                        <ShoppingBag size={24} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-lg">Marketplace Setup</h4>
-                        <p className="text-sm text-gray-400">
-                          Amazon Seller Central registration, brand registry, and category approval handling.
-                        </p>
-                      </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-white">Shopify Dashboard Setup</h3>
+                      <p className="text-sm text-gray-400">
+                        Store build, theme config, app stack, and payments dialed in.
+                      </p>
                     </div>
                   </div>
-
-                  <button
-                    onClick={() => navigate("/services/ecommerce-creative")}
-                    className="text-white border-b border-orange-500 pb-1 hover:text-orange-500 transition-colors inline-flex items-center gap-2 pt-4"
-                  >
-                    Explore Creative Services <ArrowRight size={16} />
-                  </button>
+                  <div className="flex gap-4 p-5 rounded-xl bg-black/30 border border-white/5">
+                    <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-amber-400">
+                      <Tag size={24} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-white">Amazon Account & A+ Content</h3>
+                      <p className="text-sm text-gray-400">
+                        Seller Central registration, brand registry, A+ modules, and storefront.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 p-5 rounded-xl bg-black/30 border border-white/5">
+                    <div className="w-12 h-12 bg-fuchsia-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-fuchsia-400">
+                      <Box size={24} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-white">3D Product Imaging</h3>
+                      <p className="text-sm text-gray-400">
+                        Photoreal renders that look like studio shots. No physical samples needed.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 p-5 rounded-xl bg-black/30 border border-white/5">
+                    <div className="w-12 h-12 bg-rose-500/10 rounded-lg flex items-center justify-center flex-shrink-0 text-rose-400">
+                      <Camera size={24} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-white">Studio Photo & Model Shoots</h3>
+                      <p className="text-sm text-gray-400">
+                        Coordinated sessions with models, props, and lifestyle sets in LA.
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="md:w-1/2 bg-black/40 rounded-xl p-8 border border-white/5 w-full relative">
-                  <div className="absolute -top-4 -right-4 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                    Most Popular
-                  </div>
-                  <div className="flex flex-col gap-4 text-center">
-                    <h4 className="text-gray-300 font-medium tracking-widest text-sm uppercase">
-                      The "Zero to One" Package
-                    </h4>
-                    <div className="text-5xl font-bold text-white tracking-tight my-4">
-                      $2,499<span className="text-lg text-gray-500 font-normal">/project</span>
-                    </div>
-                    <ul className="text-left text-sm text-gray-400 space-y-2 mb-6 mx-auto inline-block">
-                      <li className="flex gap-2">
-                        <CheckCircle2 size={16} className="text-blue-500" /> Logo & Style Guide
-                      </li>
-                      <li className="flex gap-2">
-                        <CheckCircle2 size={16} className="text-blue-500" /> Shopify Website Build
-                      </li>
-                      <li className="flex gap-2">
-                        <CheckCircle2 size={16} className="text-blue-500" /> 5 Product Listings
-                      </li>
-                      <li className="flex gap-2">
-                        <CheckCircle2 size={16} className="text-blue-500" /> Domain & Email Setup
-                      </li>
-                    </ul>
-
-                    <button
-                      onClick={() => navigate("/contact")}
-                      className="w-full bg-white text-[hsl(var(--wcu-bg-primary))] hover:bg-gray-200 font-bold py-3 rounded-lg transition-colors"
-                    >
-                      Book a Discovery Call
-                    </button>
-                    <p className="text-xs text-gray-500 mt-2">
-                      *Receive $500 in shipping credits if you sign with Westfield Fulfillment.
-                    </p>
-                  </div>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 border-t border-white/5">
+                  <button
+                    onClick={() => navigate("/launchpad")}
+                    className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg font-bold transition-all hover:-translate-y-0.5 shadow-lg shadow-orange-500/20"
+                  >
+                    Explore Launchpad Services <ArrowRight size={16} />
+                  </button>
+                  <button
+                    onClick={() => navigate("/contact")}
+                    className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-8 py-3 rounded-lg font-semibold border border-white/10 transition-colors"
+                  >
+                    Book a Discovery Call
+                  </button>
                 </div>
               </div>
             </div>
