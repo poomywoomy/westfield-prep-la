@@ -203,6 +203,10 @@ const Header = () => {
                 <TranslatedText>Why Choose Us</TranslatedText>
               </Link>
 
+              <Link to="/launchpad" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
+                <TranslatedText>Launchpad</TranslatedText>
+              </Link>
+
               <Link to="/testimonials" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Testimonials</TranslatedText>
               </Link>
@@ -322,6 +326,13 @@ const Header = () => {
                         className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
                       >
                         <TranslatedText>Why Choose Us</TranslatedText>
+                      </button>
+
+                      <button
+                        onClick={() => handleMobileNavClick("/launchpad")}
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
+                      >
+                        <TranslatedText>Launchpad</TranslatedText>
                       </button>
                       
                       <button
