@@ -327,6 +327,13 @@ const Header = () => {
                       >
                         <TranslatedText>Why Choose Us</TranslatedText>
                       </button>
+
+                      <button
+                        onClick={() => handleMobileNavClick("/launchpad")}
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
+                      >
+                        <TranslatedText>Launchpad</TranslatedText>
+                      </button>
                       
                       <button
                         onClick={() => handleMobileNavClick("/testimonials")}
