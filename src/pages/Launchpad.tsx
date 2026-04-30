@@ -28,46 +28,35 @@ const meta = generateMetaTags(
   "/launchpad"
 );
 
+// Premium creative palette: warm cream, rich charcoal, terracotta accent
 const services = [
   {
     icon: ShoppingBag,
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10",
     title: "Shopify Dashboard Build",
     desc: "Theme setup, app stack, payments, shipping zones, and a clean admin you actually understand.",
   },
   {
     icon: Store,
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
     title: "Amazon Seller Central Setup",
     desc: "Account registration, brand registry, category approvals, and listing infrastructure done right.",
   },
   {
     icon: FileImage,
-    color: "text-sky-400",
-    bg: "bg-sky-500/10",
     title: "A+ Content & Storefront",
     desc: "Premium A+ modules, comparison charts, and Amazon Storefronts that lift conversion and AOV.",
   },
   {
     icon: BoxIcon,
-    color: "text-fuchsia-400",
-    bg: "bg-fuchsia-500/10",
     title: "Product 3D Imaging",
     desc: "Photoreal renders that look like studio shots. No samples to ship, infinite angles and colorways.",
   },
   {
     icon: Camera,
-    color: "text-rose-400",
-    bg: "bg-rose-500/10",
     title: "Studio Photo & Model Shoots",
     desc: "Coordinated sessions with models, props, and lifestyle sets right here in Los Angeles.",
   },
   {
     icon: PenTool,
-    color: "text-orange-400",
-    bg: "bg-orange-500/10",
     title: "Listing Optimization & Copy",
     desc: "Titles, bullets, backend keywords, and conversion copy written by people who actually sell.",
   },
@@ -135,72 +124,77 @@ const Launchpad = () => {
         </script>
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#f6f1ea]">
         <Header />
 
         <main>
           {/* HERO */}
-          <section className="relative overflow-hidden pt-32 pb-24 md:pt-40 md:pb-32 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+          <section className="relative overflow-hidden pt-32 pb-28 md:pt-44 md:pb-36 bg-[#f6f1ea]">
+            {/* Soft warm gradient wash */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#f6f1ea] via-[#efe7db] to-[#e8dcc9]" />
+            {/* Editorial grid texture */}
             <div
-              className="absolute inset-0 opacity-10"
+              className="absolute inset-0 opacity-[0.04]"
               style={{
-                backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-                backgroundSize: "40px 40px",
+                backgroundImage:
+                  "linear-gradient(#1a1a1a 1px, transparent 1px), linear-gradient(90deg, #1a1a1a 1px, transparent 1px)",
+                backgroundSize: "80px 80px",
               }}
             />
-            <div className="absolute top-1/3 left-1/4 w-[480px] h-[480px] bg-primary/20 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 right-1/4 w-[420px] h-[420px] bg-secondary/20 rounded-full blur-3xl" />
+            {/* Terracotta glow */}
+            <div className="absolute top-1/4 -right-32 w-[520px] h-[520px] bg-[#c97b54]/15 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 -left-32 w-[420px] h-[420px] bg-[#d4a574]/20 rounded-full blur-[100px]" />
 
             <div className="container mx-auto px-6 relative z-10">
               <div className="max-w-4xl mx-auto text-center">
                 <motion.div
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-secondary/40 bg-secondary/10 text-secondary text-xs font-bold uppercase tracking-widest mb-6"
+                  transition={{ duration: 0.6 }}
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1a1a1a]/15 bg-white/60 backdrop-blur-sm text-[#1a1a1a] text-[11px] font-semibold uppercase tracking-[0.2em] mb-8"
                 >
-                  <Sparkles className="h-3.5 w-3.5" />
+                  <Sparkles className="h-3.5 w-3.5 text-[#c97b54]" />
                   Westfield Launchpad
                 </motion.div>
 
                 <motion.h1
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6"
+                  transition={{ duration: 0.7, delay: 0.1 }}
+                  className="text-5xl md:text-7xl lg:text-[5.5rem] font-semibold tracking-[-0.03em] leading-[0.95] text-[#1a1a1a] mb-8"
                 >
-                  Launch Faster.{" "}
-                  <span className="bg-gradient-to-r from-secondary via-orange-400 to-secondary bg-clip-text text-transparent">
-                    Sell Smarter.
-                  </span>
+                  Launch faster.
+                  <br />
+                  <span className="italic font-light text-[#c97b54]">Sell smarter.</span>
                 </motion.h1>
 
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10"
+                  transition={{ duration: 0.7, delay: 0.2 }}
+                  className="text-lg md:text-xl text-[#3a3a3a] max-w-2xl mx-auto mb-12 leading-relaxed font-light"
                 >
-                  Shopify dashboards, Amazon Seller Central, A+ content, 3D product imaging, and pro
-                  studio photography. We help your product look launch ready from day one, all from our
-                  Los Angeles studio and warehouse.
+                  Shopify dashboards, Amazon Seller Central, A+ content, 3D product imaging, and
+                  studio photography. We make your product look launch ready from day one, all from
+                  our Los Angeles studio and warehouse.
                 </motion.p>
 
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex flex-col sm:flex-row justify-center gap-4 mb-12"
+                  transition={{ duration: 0.7, delay: 0.3 }}
+                  className="flex flex-col sm:flex-row justify-center gap-3 mb-14"
                 >
                   <button
                     onClick={() => navigate("/contact")}
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold text-base shadow-lg shadow-secondary/20 transition-all hover:-translate-y-0.5"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#1a1a1a] hover:bg-[#2a2a2a] text-[#f6f1ea] font-medium text-base transition-all hover:-translate-y-0.5"
                   >
                     Book a Discovery Call
                     <ArrowRight className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => navigate("/pricing")}
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg bg-white/10 hover:bg-white/15 text-white font-semibold text-base border border-white/20 backdrop-blur-sm transition-all"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-transparent hover:bg-[#1a1a1a]/5 text-[#1a1a1a] font-medium text-base border border-[#1a1a1a]/20 transition-all"
                   >
                     View Pricing
                   </button>
@@ -209,8 +203,8 @@ const Launchpad = () => {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.45 }}
-                  className="flex items-center justify-center gap-3 flex-wrap"
+                  transition={{ duration: 0.7, delay: 0.5 }}
+                  className="flex items-center justify-center gap-2 flex-wrap"
                 >
                   {[
                     { Icon: ShopifyIcon, label: "Shopify" },
@@ -220,7 +214,7 @@ const Launchpad = () => {
                   ].map(({ Icon, label }) => (
                     <div
                       key={label}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 backdrop-blur-sm text-slate-300 text-xs font-medium"
+                      className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/50 border border-[#1a1a1a]/10 backdrop-blur-sm text-[#3a3a3a] text-xs font-medium"
                     >
                       <Icon className="h-4 w-4" />
                       {label}
@@ -232,35 +226,38 @@ const Launchpad = () => {
           </section>
 
           {/* WHAT WE HELP WITH */}
-          <section className="py-24 bg-slate-950">
+          <section className="py-28 md:py-32 bg-[#f6f1ea]">
             <div className="container mx-auto px-6">
-              <div className="text-center max-w-2xl mx-auto mb-14">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                  What We Help With
+              <div className="max-w-2xl mb-16">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#c97b54] mb-4">
+                  Our Services
+                </div>
+                <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[#1a1a1a] mb-5">
+                  What we help with
                 </h2>
-                <p className="text-slate-400 text-lg">
-                  Everything you need to look like a real brand on every channel, without juggling five
-                  different agencies.
+                <p className="text-[#5a5a5a] text-lg leading-relaxed font-light">
+                  Everything you need to look like a real brand on every channel, without juggling
+                  five different agencies.
                 </p>
               </div>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#1a1a1a]/10 border border-[#1a1a1a]/10">
                 {services.map((s, idx) => (
                   <motion.div
                     key={s.title}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="group relative bg-white/[0.03] border border-white/10 rounded-2xl p-7 hover:bg-white/[0.06] hover:border-white/20 transition-all"
+                    transition={{ duration: 0.6, delay: idx * 0.05 }}
+                    className="group relative bg-[#f6f1ea] hover:bg-white transition-all p-10"
                   >
-                    <div
-                      className={`w-12 h-12 rounded-xl ${s.bg} flex items-center justify-center mb-5`}
-                    >
-                      <s.icon className={`h-6 w-6 ${s.color}`} />
+                    <div className="w-11 h-11 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-6 group-hover:bg-[#c97b54] transition-colors">
+                      <s.icon className="h-5 w-5 text-[#f6f1ea]" />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">{s.title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">{s.desc}</p>
+                    <h3 className="text-xl font-semibold tracking-[-0.01em] text-[#1a1a1a] mb-3">
+                      {s.title}
+                    </h3>
+                    <p className="text-[#5a5a5a] text-[15px] leading-relaxed font-light">{s.desc}</p>
                   </motion.div>
                 ))}
               </div>
@@ -268,25 +265,28 @@ const Launchpad = () => {
           </section>
 
           {/* 3D vs STUDIO */}
-          <section className="py-24 bg-gradient-to-b from-slate-950 to-slate-900">
+          <section className="py-28 md:py-32 bg-[#1a1a1a] text-[#f6f1ea]">
             <div className="container mx-auto px-6">
-              <div className="text-center max-w-2xl mx-auto mb-14">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                  3D Renders or Studio Shoots? Both.
+              <div className="max-w-2xl mb-16">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#c97b54] mb-4">
+                  Imaging & Photography
+                </div>
+                <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] mb-5">
+                  3D renders or studio shoots? <span className="italic font-light text-[#c97b54]">Both.</span>
                 </h2>
-                <p className="text-slate-400 text-lg">
+                <p className="text-[#b8b3aa] text-lg leading-relaxed font-light">
                   We pick the right tool for your product. Sometimes a render is faster and sharper.
                   Sometimes a model shot is the only thing that converts.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8">
-                  <div className="w-12 h-12 rounded-xl bg-fuchsia-500/10 flex items-center justify-center mb-5">
-                    <BoxIcon className="h-6 w-6 text-fuchsia-400" />
+              <div className="grid md:grid-cols-2 gap-6 max-w-6xl">
+                <div className="bg-[#262624] border border-white/5 rounded-2xl p-10">
+                  <div className="w-11 h-11 rounded-full bg-[#c97b54] flex items-center justify-center mb-6">
+                    <BoxIcon className="h-5 w-5 text-[#1a1a1a]" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">3D Product Imaging</h3>
-                  <ul className="space-y-3 text-slate-300 text-sm">
+                  <h3 className="text-2xl font-semibold tracking-[-0.01em] mb-4">3D Product Imaging</h3>
+                  <ul className="space-y-3 text-[#d4cfc4] text-[15px] font-light">
                     {[
                       "No physical sample required",
                       "Unlimited angles, colorways, and variants",
@@ -294,19 +294,19 @@ const Launchpad = () => {
                       "Cleaner than studio for tech, packaging, and accessories",
                     ].map((item) => (
                       <li key={item} className="flex gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-fuchsia-400 flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="h-5 w-5 text-[#c97b54] flex-shrink-0 mt-0.5" />
                         {item}
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8">
-                  <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center mb-5">
-                    <Camera className="h-6 w-6 text-rose-400" />
+                <div className="bg-[#262624] border border-white/5 rounded-2xl p-10">
+                  <div className="w-11 h-11 rounded-full bg-[#d4a574] flex items-center justify-center mb-6">
+                    <Camera className="h-5 w-5 text-[#1a1a1a]" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">Studio Photo & Model Shoots</h3>
-                  <ul className="space-y-3 text-slate-300 text-sm">
+                  <h3 className="text-2xl font-semibold tracking-[-0.01em] mb-4">Studio Photo & Model Shoots</h3>
+                  <ul className="space-y-3 text-[#d4cfc4] text-[15px] font-light">
                     {[
                       "Lifestyle context that drives social and PDP conversion",
                       "Models, props, and styled sets coordinated for you",
@@ -314,7 +314,7 @@ const Launchpad = () => {
                       "Delivered ready for Amazon, Shopify, and ads",
                     ].map((item) => (
                       <li key={item} className="flex gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-rose-400 flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="h-5 w-5 text-[#d4a574] flex-shrink-0 mt-0.5" />
                         {item}
                       </li>
                     ))}
@@ -325,30 +325,37 @@ const Launchpad = () => {
           </section>
 
           {/* HOW IT WORKS */}
-          <section className="py-24 bg-slate-900">
+          <section className="py-28 md:py-32 bg-[#efe7db]">
             <div className="container mx-auto px-6">
-              <div className="text-center max-w-2xl mx-auto mb-14">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">How It Works</h2>
-                <p className="text-slate-400 text-lg">
+              <div className="max-w-2xl mb-16">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#c97b54] mb-4">
+                  Process
+                </div>
+                <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[#1a1a1a] mb-5">
+                  How it works
+                </h2>
+                <p className="text-[#5a5a5a] text-lg leading-relaxed font-light">
                   A simple, transparent path from first call to first sale.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              <div className="grid md:grid-cols-4 gap-px bg-[#1a1a1a]/10 border border-[#1a1a1a]/10">
                 {steps.map((step, idx) => (
                   <motion.div
                     key={step.n}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.08 }}
-                    className="relative bg-white/[0.03] border border-white/10 rounded-2xl p-6"
+                    transition={{ duration: 0.6, delay: idx * 0.08 }}
+                    className="bg-[#efe7db] hover:bg-[#f6f1ea] transition-all p-8"
                   >
-                    <div className="text-secondary text-sm font-bold tracking-widest mb-3">
+                    <div className="text-[#c97b54] text-sm font-semibold tracking-[0.15em] mb-4">
                       {step.n}
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                    <p className="text-slate-400 text-sm">{step.desc}</p>
+                    <h3 className="text-xl font-semibold tracking-[-0.01em] text-[#1a1a1a] mb-3">
+                      {step.title}
+                    </h3>
+                    <p className="text-[#5a5a5a] text-[15px] leading-relaxed font-light">{step.desc}</p>
                   </motion.div>
                 ))}
               </div>
@@ -356,18 +363,21 @@ const Launchpad = () => {
           </section>
 
           {/* WHY SELLERS USE LAUNCHPAD */}
-          <section className="py-24 bg-slate-950">
+          <section className="py-28 md:py-32 bg-[#f6f1ea]">
             <div className="container mx-auto px-6">
-              <div className="text-center max-w-2xl mx-auto mb-14">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                  Why Sellers Use Launchpad
+              <div className="max-w-2xl mb-16">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#c97b54] mb-4">
+                  Why Launchpad
+                </div>
+                <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[#1a1a1a] mb-5">
+                  Why sellers use Launchpad
                 </h2>
-                <p className="text-slate-400 text-lg">
+                <p className="text-[#5a5a5a] text-lg leading-relaxed font-light">
                   One team, one timeline, one invoice. Built by operators who actually run stores.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              <div className="grid md:grid-cols-3 gap-6 max-w-6xl">
                 {[
                   {
                     Icon: Rocket,
@@ -390,16 +400,18 @@ const Launchpad = () => {
                 ].map((m) => (
                   <div
                     key={m.label}
-                    className="bg-white/[0.03] border border-white/10 rounded-2xl p-7 text-center"
+                    className="bg-white border border-[#1a1a1a]/10 rounded-2xl p-10"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mx-auto mb-5">
-                      <m.Icon className="h-6 w-6 text-secondary" />
+                    <div className="w-11 h-11 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-6">
+                      <m.Icon className="h-5 w-5 text-[#f6f1ea]" />
                     </div>
-                    <div className="text-3xl font-bold text-white mb-1">{m.stat}</div>
-                    <div className="text-secondary text-sm font-semibold uppercase tracking-wider mb-3">
+                    <div className="text-4xl font-semibold tracking-[-0.02em] text-[#1a1a1a] mb-1">
+                      {m.stat}
+                    </div>
+                    <div className="text-[#c97b54] text-[11px] font-semibold uppercase tracking-[0.2em] mb-4">
                       {m.label}
                     </div>
-                    <p className="text-slate-400 text-sm">{m.desc}</p>
+                    <p className="text-[#5a5a5a] text-[15px] leading-relaxed font-light">{m.desc}</p>
                   </div>
                 ))}
               </div>
@@ -407,37 +419,42 @@ const Launchpad = () => {
           </section>
 
           {/* FAQ */}
-          <section className="py-24 bg-slate-900">
+          <section className="py-28 md:py-32 bg-[#efe7db]">
             <div className="container mx-auto px-6 max-w-3xl">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                  Launchpad Questions
+              <div className="mb-14">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#c97b54] mb-4">
+                  FAQ
+                </div>
+                <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[#1a1a1a] mb-5">
+                  Launchpad questions
                 </h2>
-                <p className="text-slate-400 text-lg">Straight answers, no filler.</p>
+                <p className="text-[#5a5a5a] text-lg font-light">Straight answers, no filler.</p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {faqs.map((f, idx) => {
                   const open = openFaq === idx;
                   return (
                     <div
                       key={f.q}
-                      className="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden"
+                      className="bg-[#f6f1ea] border border-[#1a1a1a]/10 rounded-xl overflow-hidden"
                     >
                       <button
                         onClick={() => setOpenFaq(open ? null : idx)}
-                        className="w-full flex items-center justify-between p-5 text-left hover:bg-white/[0.05] transition-colors"
+                        className="w-full flex items-center justify-between p-6 text-left hover:bg-white transition-colors"
                         aria-expanded={open}
                       >
-                        <span className="font-semibold text-white pr-6">{f.q}</span>
+                        <span className="font-medium text-[#1a1a1a] pr-6 text-[15px]">{f.q}</span>
                         <ChevronDown
-                          className={`h-5 w-5 text-slate-400 flex-shrink-0 transition-transform ${
+                          className={`h-5 w-5 text-[#c97b54] flex-shrink-0 transition-transform ${
                             open ? "rotate-180" : ""
                           }`}
                         />
                       </button>
                       {open && (
-                        <div className="px-5 pb-5 text-slate-400 text-sm leading-relaxed">{f.a}</div>
+                        <div className="px-6 pb-6 text-[#5a5a5a] text-[15px] leading-relaxed font-light">
+                          {f.a}
+                        </div>
                       )}
                     </div>
                   );
@@ -447,27 +464,28 @@ const Launchpad = () => {
           </section>
 
           {/* CTA */}
-          <section className="relative py-24 overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-            <div className="absolute inset-0 bg-secondary/5" />
+          <section className="relative py-28 md:py-36 overflow-hidden bg-[#1a1a1a]">
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#c97b54]/20 rounded-full blur-[140px]" />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#d4a574]/15 rounded-full blur-[120px]" />
             <div className="container mx-auto px-6 relative z-10 text-center max-w-3xl">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-5">
-                Ready to launch your product?
+              <h2 className="text-4xl md:text-6xl font-semibold tracking-[-0.02em] text-[#f6f1ea] mb-6 leading-[1.05]">
+                Ready to launch your <span className="italic font-light text-[#c97b54]">product?</span>
               </h2>
-              <p className="text-lg text-slate-400 mb-10">
+              <p className="text-lg text-[#b8b3aa] mb-12 font-light max-w-xl mx-auto">
                 Book a 20 minute call. We will look at your product, your channel, and tell you
                 exactly what it takes to get to first sale.
               </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <div className="flex flex-col sm:flex-row justify-center gap-3">
                 <button
                   onClick={() => navigate("/contact")}
-                  className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-lg bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold text-base shadow-lg shadow-secondary/20 transition-all hover:-translate-y-0.5"
+                  className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-[#c97b54] hover:bg-[#b86c47] text-[#1a1a1a] font-semibold text-base transition-all hover:-translate-y-0.5"
                 >
                   Book a Discovery Call
                   <ArrowRight className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => navigate("/why-choose-us")}
-                  className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-lg bg-white/10 hover:bg-white/15 text-white font-semibold text-base border border-white/20 transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-transparent hover:bg-white/5 text-[#f6f1ea] font-medium text-base border border-white/20 transition-all"
                 >
                   Why Choose Westfield
                 </button>
