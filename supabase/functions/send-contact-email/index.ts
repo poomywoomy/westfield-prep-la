@@ -94,17 +94,19 @@ function formatTimeline(value: string): string {
 }
 
 interface ContactEmailRequest {
+  serviceType: "3pl" | "launchpad" | "both";
   name: string;
   email: string;
   phone: string;
   business: string;
-  unitsPerMonth: string;
-  skuCount: string;
-  marketplaces: string[];
+  unitsPerMonth?: string;
+  skuCount?: string;
+  marketplaces?: string[];
   otherMarketplace?: string;
-  packagingRequirements: string;
-  timeline: string;
-  comments?: string;
+  receivingMethod?: "cartons" | "pallets" | "both";
+  packagingRequirements?: "unbranded" | "custom" | "own";
+  timeline?: string;
+  comments: string;
   recipientEmail: string;
 }
 
@@ -115,79 +117,79 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const body = await req.json();
-    
-    // Validate input
+
     const validationResult = contactEmailSchema.safeParse(body);
     if (!validationResult.success) {
       console.error("Validation error:", validationResult.error);
       return new Response(
-        JSON.stringify({ 
-          error: "Invalid input provided. Please check your information and try again."
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ error: "Invalid input provided. Please check your information and try again." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, otherMarketplace, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data;
-    
-    // Rate limiting check (5 submissions per hour per IP)
+
+    const { serviceType, name, email, phone, business, unitsPerMonth, skuCount, marketplaces, otherMarketplace, receivingMethod, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data as ContactEmailRequest;
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
     const rateLimitKey = `contact_form:${clientIp}`;
-    const windowStart = new Date(Date.now() - 3600000); // 1 hour ago
-    
+    const windowStart = new Date(Date.now() - 3600000);
+
     const { data: existingAttempts } = await supabase
       .from('rate_limits')
       .select('request_count, window_start')
       .eq('key', rateLimitKey)
       .gte('window_start', windowStart.toISOString())
       .maybeSingle();
-    
+
     if (existingAttempts && existingAttempts.request_count >= 5) {
       console.warn(`Rate limit exceeded for IP: ${clientIp}`);
       return new Response(
-        JSON.stringify({ 
-          error: "Too many requests. Please try again later."
-        }),
-        {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    // Update rate limit counter
-    await supabase
-      .from('rate_limits')
-      .upsert({
-        key: rateLimitKey,
-        request_count: (existingAttempts?.request_count || 0) + 1,
-        window_start: existingAttempts ? existingAttempts.window_start : new Date().toISOString()
-      });
-    
-    // Escape HTML to prevent XSS
+
+    await supabase.from('rate_limits').upsert({
+      key: rateLimitKey,
+      request_count: (existingAttempts?.request_count || 0) + 1,
+      window_start: existingAttempts ? existingAttempts.window_start : new Date().toISOString()
+    });
+
+    const safeServiceType = escapeHtml(formatServiceType(serviceType));
     const safeName = escapeHtml(name);
     const safeEmail = escapeHtml(email);
     const safePhone = escapeHtml(phone);
     const safeBusiness = escapeHtml(business);
-    const safeUnitsPerMonth = escapeHtml(formatUnitsPerMonth(unitsPerMonth));
-    const safeSkuCount = escapeHtml(skuCount);
-    
-    // Build marketplaces string with "Other" details if provided
-    let marketplacesDisplay = marketplaces.map(m => escapeHtml(m)).join(", ");
-    if (marketplaces.includes("Other") && otherMarketplace && otherMarketplace.trim()) {
-      marketplacesDisplay = marketplacesDisplay.replace("Other", `Other (${escapeHtml(otherMarketplace.trim())})`);
-    }
-    const safeMarketplaces = marketplacesDisplay;
-    
-    const safePackaging = escapeHtml(packagingRequirements);
-    const safeTimeline = escapeHtml(formatTimeline(timeline));
-    const safeComments = comments ? escapeHtml(comments) : "None provided";
+    const safeComments = escapeHtml(comments);
 
-    // Send notification email to business
+    const show3PL = serviceType !== "launchpad";
+
+    let safeMarketplaces = "";
+    if (show3PL && marketplaces && marketplaces.length > 0) {
+      let display = marketplaces.map(m => escapeHtml(m)).join(", ");
+      if (marketplaces.includes("Other") && otherMarketplace && otherMarketplace.trim()) {
+        display = display.replace("Other", `Other (${escapeHtml(otherMarketplace.trim())})`);
+      }
+      safeMarketplaces = display;
+    }
+
+    const safeUnitsPerMonth = show3PL && unitsPerMonth ? escapeHtml(formatUnitsPerMonth(unitsPerMonth)) : "";
+    const safeSkuCount = show3PL && skuCount ? escapeHtml(skuCount) : "";
+    const safeReceiving = show3PL ? escapeHtml(formatReceivingMethod(receivingMethod)) : "";
+    const safePackaging = show3PL ? escapeHtml(formatPackaging(packagingRequirements)) : "";
+    const safeTimeline = show3PL && timeline ? escapeHtml(formatTimeline(timeline)) : "";
+
+    const threePLBlock = show3PL ? `
+      <hr>
+      <h3>3PL / Fulfillment Details</h3>
+      <p><strong>Units Sold per Month:</strong> ${safeUnitsPerMonth}</p>
+      <p><strong>SKU Count:</strong> ${safeSkuCount}</p>
+      <p><strong>Marketplaces:</strong> ${safeMarketplaces}</p>
+      <p><strong>Receiving Method:</strong> ${safeReceiving}</p>
+      <p><strong>Packaging Requirements:</strong> ${safePackaging}</p>
+      <p><strong>Timeline:</strong> ${safeTimeline}</p>
+    ` : "";
+
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -198,22 +200,20 @@ const handler = async (req: Request): Promise<Response> => {
         from: "Westfield 3PL <info@westfieldprepcenter.com>",
         to: [recipientEmail],
         reply_to: email,
-        subject: `New Contact Form Submission from ${name}`,
+        subject: `New ${formatServiceType(serviceType)} Inquiry from ${name}`,
         html: `
           <h2>New Contact Form Submission</h2>
+          <p style="background:#FF7A00;color:#fff;padding:10px 14px;border-radius:6px;display:inline-block;font-weight:600;">
+            Service Requested: ${safeServiceType}
+          </p>
+          <h3>Contact</h3>
           <p><strong>Name:</strong> ${safeName}</p>
           <p><strong>Email:</strong> ${safeEmail}</p>
           <p><strong>Phone:</strong> ${safePhone}</p>
           <p><strong>Business:</strong> ${safeBusiness}</p>
+          ${threePLBlock}
           <hr>
-          <h3>Business Details</h3>
-          <p><strong>Units Sold per Month:</strong> ${safeUnitsPerMonth}</p>
-          <p><strong>SKU Count:</strong> ${safeSkuCount}</p>
-          <p><strong>Marketplaces:</strong> ${safeMarketplaces}</p>
-          <p><strong>Packaging Requirements:</strong> ${safePackaging}</p>
-          <p><strong>Timeline:</strong> ${safeTimeline}</p>
-          <hr>
-          <h3>Additional Comments</h3>
+          <h3>Comments</h3>
           <p>${safeComments}</p>
           <hr>
           <p style="color: #666; font-size: 12px;">You can reply directly to this email to respond to ${safeName}</p>
