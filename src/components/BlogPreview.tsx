@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TranslatedText } from "@/components/TranslatedText";
-import { WcuSectionHeading } from "./wcu/WcuPrimitives";
+import { SectionHeading } from "./home/HomePrimitives";
 import {
   getOptimizedImageUrl,
   getResponsiveSrcSet,
@@ -45,10 +45,10 @@ const BlogPreview = () => {
   if (!isLoading && (!posts || posts.length === 0)) return null;
 
   return (
-    <section className="relative py-24" style={{ background: "hsl(var(--wcu-linen))" }}>
+    <section className="relative py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          <WcuSectionHeading
+          <SectionHeading
             eyebrow="Insights"
             title={<TranslatedText>E-Commerce Insights & Resources</TranslatedText>}
             subtitle={<TranslatedText>Expert guidance on 3PL logistics, fulfillment optimization, and scaling your online business.</TranslatedText>}
@@ -57,7 +57,7 @@ const BlogPreview = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {isLoading
               ? Array.from({ length: 3 }).map((_, i) => (
-                  <Card key={i} className="overflow-hidden bg-white border-[hsl(var(--wcu-line))]">
+                  <Card key={i} className="overflow-hidden bg-background border-border">
                     <Skeleton className="aspect-video w-full rounded-none" />
                     <div className="p-6 space-y-3">
                       <Skeleton className="h-5 w-24" />
@@ -71,10 +71,9 @@ const BlogPreview = () => {
                   <div
                     key={article.id}
                     onClick={() => navigate(`/blog/${article.slug}`)}
-                    className="group cursor-pointer overflow-hidden rounded-[24px] bg-white border border-[hsl(var(--wcu-line))] shadow-[0_3px_0_0_hsl(var(--wcu-line))] hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_hsl(var(--wcu-sunset)/0.3)] transition-all"
-                    style={{ outline: "1.5px dashed hsl(var(--wcu-peach-deep))", outlineOffset: "-8px" }}
+                    className="group cursor-pointer overflow-hidden rounded-2xl bg-background border border-border shadow-sm hover:-translate-y-1 hover:shadow-xl hover:border-secondary/40 transition-all"
                   >
-                    <div className="aspect-video bg-[hsl(var(--wcu-peach))] overflow-hidden">
+                    <div className="aspect-video bg-muted overflow-hidden">
                       {article.cover_image_url ? (
                         <img
                           src={getOptimizedImageUrl(article.cover_image_url)}
@@ -89,25 +88,25 @@ const BlogPreview = () => {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-6xl text-[hsl(var(--wcu-sunset))/0.4]">📦</div>
+                        <div className="w-full h-full flex items-center justify-center text-6xl text-secondary/30">📦</div>
                       )}
                     </div>
 
                     <div className="p-6 space-y-3">
                       {article.category && (
-                        <Badge className="bg-[hsl(var(--wcu-peach))] text-[hsl(var(--wcu-sunset-deep))] hover:bg-[hsl(var(--wcu-peach))] border-0 font-bold text-[10px] uppercase tracking-widest">
+                        <Badge className="bg-secondary/10 text-secondary hover:bg-secondary/10 border-0 font-bold text-[10px] uppercase tracking-widest">
                           <TranslatedText>{article.category}</TranslatedText>
                         </Badge>
                       )}
-                      <h3 className="text-xl font-bold text-[hsl(var(--wcu-ink))] group-hover:text-[hsl(var(--wcu-sunset-deep))] transition-colors">
+                      <h3 className="text-xl font-bold text-primary group-hover:text-secondary transition-colors tracking-tight">
                         <TranslatedText>{article.title}</TranslatedText>
                       </h3>
                       {article.excerpt && (
-                        <p className="text-sm text-[hsl(var(--wcu-ink-soft))] line-clamp-2">
+                        <p className="text-sm text-muted-foreground line-clamp-2">
                           <TranslatedText>{article.excerpt}</TranslatedText>
                         </p>
                       )}
-                      <div className="flex items-center text-[hsl(var(--wcu-sunset-deep))] font-bold text-sm pt-2">
+                      <div className="flex items-center text-secondary font-bold text-sm pt-2">
                         <TranslatedText>Read More</TranslatedText>
                         <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </div>
@@ -119,7 +118,7 @@ const BlogPreview = () => {
           <div className="mt-12 text-center">
             <button
               onClick={() => navigate("/blog")}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[hsl(var(--wcu-ink))] text-[hsl(var(--wcu-linen))] hover:bg-[hsl(var(--wcu-sunset-deep))] font-bold transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground font-bold transition-colors"
             >
               <TranslatedText>View All Articles</TranslatedText>
               <ArrowRight className="w-4 h-4" />

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
-import { WcuSectionHeading } from "./wcu/WcuPrimitives";
+import { SectionHeading } from "./home/HomePrimitives";
 
 const FAQAccordion = () => {
   const navigate = useNavigate();
@@ -20,10 +20,10 @@ const FAQAccordion = () => {
   ];
 
   return (
-    <section className="relative py-24" style={{ background: "hsl(var(--wcu-cream))" }}>
+    <section className="relative py-24 bg-muted">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto">
-          <WcuSectionHeading
+          <SectionHeading
             eyebrow="FAQ"
             title={<TranslatedText>Frequently Asked Questions</TranslatedText>}
             subtitle={<TranslatedText>Everything you need to know about working with Westfield Prep Center</TranslatedText>}
@@ -35,10 +35,10 @@ const FAQAccordion = () => {
               return (
                 <div
                   key={index}
-                  className={`rounded-2xl border transition-all overflow-hidden ${
+                  className={`rounded-xl border transition-all overflow-hidden bg-background ${
                     isOpen
-                      ? "bg-white border-[hsl(var(--wcu-sunset))] shadow-[0_20px_40px_-15px_hsl(var(--wcu-sunset)/0.3)]"
-                      : "bg-white border-[hsl(var(--wcu-line))] hover:border-[hsl(var(--wcu-peach-deep))]"
+                      ? "border-secondary/50 shadow-md"
+                      : "border-border hover:border-secondary/30"
                   }`}
                 >
                   <button
@@ -46,27 +46,27 @@ const FAQAccordion = () => {
                     className="w-full text-left p-6 flex items-center justify-between gap-4"
                   >
                     <div className="flex items-start gap-4">
-                      <span className="text-sm font-bold text-[hsl(var(--wcu-sunset-deep))] tracking-widest flex-shrink-0 mt-0.5">
+                      <span className="text-sm font-bold text-secondary tracking-widest flex-shrink-0 mt-0.5">
                         {String(index + 1).padStart(2, "0")}
                       </span>
-                      <span className="font-bold text-[hsl(var(--wcu-ink))] text-lg">
+                      <span className="font-bold text-primary text-lg">
                         <TranslatedText>{faq.question}</TranslatedText>
                       </span>
                     </div>
                     <div
                       className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                         isOpen
-                          ? "bg-[hsl(var(--wcu-sunset))] rotate-45"
-                          : "bg-[hsl(var(--wcu-peach))]"
+                          ? "bg-secondary rotate-45"
+                          : "bg-secondary/10"
                       }`}
                     >
-                      <Plus className={`w-5 h-5 ${isOpen ? "text-white" : "text-[hsl(var(--wcu-sunset-deep))]"}`} />
+                      <Plus className={`w-5 h-5 ${isOpen ? "text-secondary-foreground" : "text-secondary"}`} />
                     </div>
                   </button>
                   {isOpen && (
                     <div className="px-6 pb-6 pl-[60px] -mt-1">
-                      <div className="pt-4 border-t border-dashed border-[hsl(var(--wcu-line))]">
-                        <p className="text-[hsl(var(--wcu-ink-soft))] leading-relaxed">
+                      <div className="pt-4 border-t border-border">
+                        <p className="text-muted-foreground leading-relaxed">
                           <TranslatedText>{faq.answer}</TranslatedText>
                         </p>
                       </div>
@@ -80,7 +80,7 @@ const FAQAccordion = () => {
           <div className="text-center mt-10">
             <button
               onClick={() => navigate("/contact")}
-              className="text-[hsl(var(--wcu-sunset-deep))] hover:underline font-bold"
+              className="text-secondary hover:underline font-bold"
             >
               <TranslatedText>Have another question? Contact Us</TranslatedText> →
             </button>

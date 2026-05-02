@@ -1,44 +1,49 @@
 import { MapPin, Anchor, TrendingUp, Globe, Building2, Handshake, Truck, Zap, Package } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TranslatedText } from "@/components/TranslatedText";
-import { WcuSectionHeading } from "./wcu/WcuPrimitives";
+import { SectionHeading, IconBadge } from "./home/HomePrimitives";
 
+// Clean monochrome California outline with Los Angeles pin
 const LaMap = () => (
-  <svg viewBox="0 0 400 240" className="w-full h-auto" aria-hidden="true">
-    {/* coastline */}
-    <path d="M0 200 C 60 180, 120 210, 180 195 S 280 170, 360 200 L 400 200 L 400 240 L 0 240 Z" fill="hsl(var(--wcu-peach))" />
-    {/* city silhouette */}
-    <g fill="hsl(var(--wcu-ink))" opacity="0.85">
-      <rect x="60" y="140" width="20" height="60" />
-      <rect x="84" y="120" width="24" height="80" />
-      <rect x="112" y="100" width="30" height="100" />
-      <rect x="146" y="130" width="22" height="70" />
-      <rect x="172" y="115" width="28" height="85" />
-      <rect x="204" y="135" width="20" height="65" />
-      <rect x="228" y="105" width="34" height="95" />
-      <rect x="266" y="125" width="22" height="75" />
-      <rect x="292" y="140" width="20" height="60" />
+  <svg viewBox="0 0 400 320" className="w-full h-auto" aria-hidden="true">
+    {/* California outline (simplified) */}
+    <path
+      d="M120 20 L 170 18 L 195 35 L 200 70 L 215 95 L 230 110 L 245 140 L 248 175 L 240 200 L 250 225 L 260 250 L 252 280 L 230 295 L 195 290 L 170 270 L 145 250 L 130 220 L 115 195 L 100 165 L 90 130 L 95 95 L 105 60 L 120 20 Z"
+      fill="hsl(var(--primary)/0.05)"
+      stroke="hsl(var(--primary))"
+      strokeWidth="2"
+      strokeLinejoin="round"
+    />
+    {/* Inner thin lines for visual interest */}
+    <path
+      d="M140 80 L 180 100 M 130 130 L 200 150 M 140 180 L 220 200 M 160 230 L 230 260"
+      stroke="hsl(var(--primary)/0.15)"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+    {/* LA Pin */}
+    <g transform="translate(200 230)">
+      <circle r="32" fill="hsl(var(--secondary)/0.15)" />
+      <circle r="20" fill="hsl(var(--secondary)/0.25)" />
+      <circle r="10" fill="hsl(var(--secondary))" />
+      <path d="M0 -4 L 0 -22 M -3 -19 L 0 -22 L 3 -19" stroke="hsl(var(--secondary))" strokeWidth="2" strokeLinecap="round" fill="none" />
     </g>
-    {/* sun */}
-    <circle cx="320" cy="60" r="32" fill="hsl(var(--wcu-sunset))" opacity="0.85" />
-    {/* star marker */}
-    <g transform="translate(140 90)">
-      <circle r="22" fill="hsl(var(--wcu-sunset))" />
-      <path d="M0 -12 L 3 -4 L 12 -4 L 5 2 L 8 11 L 0 6 L -8 11 L -5 2 L -12 -4 L -3 -4 Z" fill="white" />
+    <g transform="translate(245 235)">
+      <text fontSize="13" fontWeight="700" fill="hsl(var(--primary))">Los Angeles, CA</text>
+      <text y="16" fontSize="10" fontWeight="500" fill="hsl(var(--muted-foreground))">Westfield Prep Center</text>
     </g>
-    <text x="170" y="80" fontSize="14" fontWeight="700" fill="hsl(var(--wcu-ink))">Los Angeles, CA</text>
   </svg>
 );
 
 const Tile = ({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) => (
-  <div className="bg-white rounded-2xl p-5 border border-[hsl(var(--wcu-line))] hover:-translate-y-0.5 transition-all shadow-[0_2px_0_0_hsl(var(--wcu-line))]">
-    <div className="w-10 h-10 rounded-xl bg-[hsl(var(--wcu-peach))] flex items-center justify-center mb-3">
-      <Icon className="h-5 w-5 text-[hsl(var(--wcu-sunset-deep))]" />
-    </div>
-    <h3 className="font-bold text-sm mb-1 text-[hsl(var(--wcu-ink))]">
+  <div className="bg-background rounded-xl p-5 border border-border hover:border-secondary/40 hover:-translate-y-0.5 transition-all shadow-sm hover:shadow-md">
+    <IconBadge size="sm">
+      <Icon className="h-5 w-5" />
+    </IconBadge>
+    <h3 className="font-bold text-sm mt-3 mb-1 text-primary">
       <TranslatedText>{title}</TranslatedText>
     </h3>
-    <p className="text-xs text-[hsl(var(--wcu-ink-soft))]">
+    <p className="text-xs text-muted-foreground leading-relaxed">
       <TranslatedText>{desc}</TranslatedText>
     </p>
   </div>
@@ -46,28 +51,25 @@ const Tile = ({ icon: Icon, title, desc }: { icon: any; title: string; desc: str
 
 const LocationShowcase = () => {
   return (
-    <section className="relative py-24" style={{ background: "hsl(var(--wcu-linen))" }}>
+    <section className="relative py-24 bg-muted">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          <WcuSectionHeading
+          <SectionHeading
             eyebrow="Location"
             title={<TranslatedText>Why Los Angeles? Because Location Is Logistics.</TranslatedText>}
             subtitle={<TranslatedText>15+ years and 2M+ orders later, we know exactly why LA is the smartest place to base your fulfillment. Closer to the port. Faster to the customer.</TranslatedText>}
           />
 
-          <div className="mb-10 max-w-2xl mx-auto">
-            <div
-              className="rounded-[28px] bg-white p-6 border border-[hsl(var(--wcu-line))] shadow-[0_20px_40px_-15px_hsl(var(--wcu-sunset)/0.3)]"
-              style={{ outline: "1.5px dashed hsl(var(--wcu-peach-deep))", outlineOffset: "-8px" }}
-            >
+          <div className="mb-12 max-w-xl mx-auto">
+            <div className="rounded-2xl bg-background p-8 border border-border shadow-md">
               <LaMap />
             </div>
           </div>
 
           <Tabs defaultValue="la-benefits" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 bg-white border border-[hsl(var(--wcu-line))] rounded-full p-1">
-              <TabsTrigger value="la-benefits" className="rounded-full data-[state=active]:bg-[hsl(var(--wcu-sunset))] data-[state=active]:text-white"><TranslatedText>Los Angeles Benefits</TranslatedText></TabsTrigger>
-              <TabsTrigger value="nationwide" className="rounded-full data-[state=active]:bg-[hsl(var(--wcu-sunset))] data-[state=active]:text-white"><TranslatedText>Nationwide Coverage</TranslatedText></TabsTrigger>
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 bg-background border border-border rounded-full p-1">
+              <TabsTrigger value="la-benefits" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><TranslatedText>Los Angeles Benefits</TranslatedText></TabsTrigger>
+              <TabsTrigger value="nationwide" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"><TranslatedText>Nationwide Coverage</TranslatedText></TabsTrigger>
             </TabsList>
 
             <TabsContent value="la-benefits" className="animate-fade-in">
@@ -88,8 +90,8 @@ const LocationShowcase = () => {
                 <Tile icon={Globe} title="International Shipping" desc="Global reach from LA" />
                 <Tile icon={Truck} title="2-Day Delivery" desc="Major markets coast to coast" />
               </div>
-              <div className="rounded-2xl p-5 bg-[hsl(var(--wcu-peach))] border border-[hsl(var(--wcu-line))]">
-                <p className="text-sm text-[hsl(var(--wcu-ink))] text-center">
+              <div className="rounded-xl p-5 bg-secondary/5 border border-secondary/20">
+                <p className="text-sm text-primary text-center">
                   <strong><TranslatedText>Coast to coast</TranslatedText>:</strong>{" "}
                   <TranslatedText>NY to Alaska, FL to Hawaii—Amazon FBA fulfillment for sellers across America</TranslatedText>
                 </p>

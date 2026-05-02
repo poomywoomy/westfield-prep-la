@@ -1,5 +1,5 @@
 import { Star, Quote } from "lucide-react";
-import { WcuSectionHeading, SunburstStamp } from "./wcu/WcuPrimitives";
+import { SectionHeading } from "./home/HomePrimitives";
 
 const Reviews = () => {
   const featuredReview = {
@@ -18,43 +18,37 @@ const Reviews = () => {
   ];
 
   return (
-    <section className="relative py-24" style={{ background: "hsl(var(--wcu-cream))" }}>
+    <section className="relative py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center gap-3 mb-4">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-7 h-7 fill-[hsl(var(--wcu-sunset))] text-[hsl(var(--wcu-sunset))]" aria-hidden="true" />
+              <Star key={i} className="w-6 h-6 fill-secondary text-secondary" aria-hidden="true" />
             ))}
-            <span className="text-3xl font-bold text-[hsl(var(--wcu-ink))]">5.0</span>
+            <span className="text-2xl font-bold text-primary">5.0</span>
           </div>
 
-          <WcuSectionHeading
+          <SectionHeading
             title={<>Trusted by Growing E-Commerce Brands</>}
-            subtitle={<>⭐ 5.0/5 Stars | 6 Reviews on Google</>}
+            subtitle={<>5.0/5 Stars · 6 Reviews on Google</>}
           />
 
-          {/* Featured testimonial — paper note */}
-          <div
-            className="relative mb-10 bg-white rounded-[32px] p-10 md:p-14 border border-[hsl(var(--wcu-line))] shadow-[0_30px_60px_-20px_hsl(var(--wcu-sunset)/0.25)]"
-            style={{ outline: "1.5px dashed hsl(var(--wcu-peach-deep))", outlineOffset: "-10px" }}
-          >
-            <div className="absolute -top-6 -left-6">
-              <SunburstStamp size={84} />
-            </div>
-            <Quote className="w-14 h-14 text-[hsl(var(--wcu-sunset))] mb-4" />
-            <blockquote className="text-2xl md:text-3xl font-bold text-[hsl(var(--wcu-ink))] mb-8 leading-relaxed">
+          {/* Featured testimonial */}
+          <div className="relative mb-10 bg-background rounded-2xl p-10 md:p-14 border border-border shadow-md">
+            <Quote className="w-12 h-12 text-secondary/30 mb-4" />
+            <blockquote className="text-2xl md:text-3xl font-bold text-primary mb-8 leading-relaxed tracking-tight">
               "{featuredReview.text}"
             </blockquote>
-            <div className="flex items-center gap-5 pt-6 border-t border-dashed border-[hsl(var(--wcu-line))]">
-              <div className="w-16 h-16 rounded-full bg-[hsl(var(--wcu-peach))] border-4 border-[hsl(var(--wcu-sunset))] flex items-center justify-center">
-                <span className="text-2xl font-bold text-[hsl(var(--wcu-sunset-deep))]">
+            <div className="flex items-center gap-5 pt-6 border-t border-border">
+              <div className="w-14 h-14 rounded-full bg-secondary/10 ring-2 ring-secondary/30 flex items-center justify-center">
+                <span className="text-xl font-bold text-secondary">
                   {featuredReview.name.charAt(0)}
                 </span>
               </div>
               <div>
-                <p className="text-lg font-bold text-[hsl(var(--wcu-ink))]">{featuredReview.name}</p>
-                <p className="text-sm text-[hsl(var(--wcu-ink-soft))]">{featuredReview.role}</p>
-                <p className="text-xs text-[hsl(var(--wcu-ink-soft))]">{featuredReview.company} | {featuredReview.platform}</p>
+                <p className="text-base font-bold text-primary">{featuredReview.name}</p>
+                <p className="text-sm text-muted-foreground">{featuredReview.role}</p>
+                <p className="text-xs text-muted-foreground">{featuredReview.company} · {featuredReview.platform}</p>
               </div>
             </div>
           </div>
@@ -63,18 +57,18 @@ const Reviews = () => {
             {otherReviews.map((r, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl p-6 border border-[hsl(var(--wcu-line))] shadow-[0_3px_0_0_hsl(var(--wcu-line))] hover:-translate-y-1 transition-all"
+                className="bg-background rounded-2xl p-6 border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all"
               >
-                <Quote className="w-7 h-7 text-[hsl(var(--wcu-sunset))] mb-3" />
+                <Quote className="w-6 h-6 text-secondary/40 mb-3" />
                 <div className="flex mb-3">
                   {[...Array(r.rating)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 fill-[hsl(var(--wcu-sunset))] text-[hsl(var(--wcu-sunset))]" aria-hidden="true" />
+                    <Star key={j} className="w-4 h-4 fill-secondary text-secondary" aria-hidden="true" />
                   ))}
                 </div>
-                <p className="text-[hsl(var(--wcu-ink))] mb-5 italic leading-relaxed">"{r.text}"</p>
-                <div className="pt-4 border-t border-dashed border-[hsl(var(--wcu-line))]">
-                  <p className="font-bold text-[hsl(var(--wcu-ink))]">{r.name}</p>
-                  <p className="text-xs text-[hsl(var(--wcu-ink-soft))]">{r.company} • {r.platform}</p>
+                <p className="text-primary mb-5 leading-relaxed">"{r.text}"</p>
+                <div className="pt-4 border-t border-border">
+                  <p className="font-bold text-primary">{r.name}</p>
+                  <p className="text-xs text-muted-foreground">{r.company} · {r.platform}</p>
                 </div>
               </div>
             ))}

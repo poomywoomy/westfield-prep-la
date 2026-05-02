@@ -2,7 +2,7 @@ import { Zap, Clock, Globe, Building2, Users, Warehouse, ChevronRight } from "lu
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { TranslatedText } from "./TranslatedText";
-import { WcuSectionHeading } from "./wcu/WcuPrimitives";
+import { SectionHeading, IconBadge } from "./home/HomePrimitives";
 
 const services = [
   { icon: Zap, title: "Same-Day Shipping", description: "Order at 10am? Shipped by 3pm. That's the Westfield difference. Fast nationwide delivery from our Los Angeles hub.", bestFor: ["DTC Brands", "Time-Sensitive Products", "High-Volume Sellers"] },
@@ -27,10 +27,10 @@ const Services = () => {
   const goToService = (title: string) => navigate(serviceLinks[title] || "/contact");
 
   return (
-    <section id="services" className="relative py-24" style={{ background: "hsl(var(--wcu-linen))" }}>
+    <section id="services" className="relative py-24 bg-muted">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          <WcuSectionHeading
+          <SectionHeading
             eyebrow="What We Do"
             title={<TranslatedText>Every Fulfillment Scenario, Covered</TranslatedText>}
             subtitle={<TranslatedText>From your first 50 orders to full-scale multi-channel distribution, we've built the playbook.</TranslatedText>}
@@ -42,35 +42,35 @@ const Services = () => {
               return (
                 <div
                   key={index}
-                  className="group relative bg-white rounded-[28px] p-7 border border-[hsl(var(--wcu-line))] hover:-translate-y-1 transition-all shadow-[0_3px_0_0_hsl(var(--wcu-line))] hover:shadow-[0_20px_40px_-15px_hsl(var(--wcu-sunset)/0.3)]"
+                  className="group relative bg-background rounded-2xl p-7 border border-border hover:border-secondary/40 hover:-translate-y-1 transition-all shadow-sm hover:shadow-xl"
                 >
                   <div className="flex items-start gap-5">
                     <div className="flex-shrink-0">
-                      <span className="block text-xs font-bold text-[hsl(var(--wcu-sunset-deep))] tracking-widest mb-2">
+                      <span className="block text-[11px] font-bold text-secondary tracking-[0.18em] mb-2">
                         {String(index + 1).padStart(2, "0")}
                       </span>
-                      <div className="w-14 h-14 rounded-2xl bg-[hsl(var(--wcu-peach))] flex items-center justify-center group-hover:rotate-[-6deg] transition-transform">
-                        <Icon className="w-7 h-7 text-[hsl(var(--wcu-sunset-deep))]" />
-                      </div>
+                      <IconBadge size="lg">
+                        <Icon className="w-7 h-7" />
+                      </IconBadge>
                     </div>
 
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold mb-2 text-[hsl(var(--wcu-ink))]">
+                      <h3 className="text-xl font-bold mb-2 text-primary tracking-tight">
                         <TranslatedText>{service.title}</TranslatedText>
                       </h3>
-                      <p className="text-sm text-[hsl(var(--wcu-ink-soft))] mb-4 leading-relaxed">
+                      <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
                         <TranslatedText>{service.description}</TranslatedText>
                       </p>
                       <div className="flex flex-wrap gap-1.5 mb-4">
                         {service.bestFor.map((item, i) => (
-                          <span key={i} className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-[hsl(var(--wcu-cream))] text-[hsl(var(--wcu-ink))] border border-[hsl(var(--wcu-line))]">
+                          <span key={i} className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-muted text-primary border border-border">
                             <TranslatedText>{item}</TranslatedText>
                           </span>
                         ))}
                       </div>
                       <button
                         onClick={() => goToService(service.title)}
-                        className="inline-flex items-center gap-1 text-sm font-bold text-[hsl(var(--wcu-sunset-deep))] hover:gap-2 transition-all"
+                        className="inline-flex items-center gap-1 text-sm font-bold text-secondary hover:gap-2 transition-all"
                       >
                         <TranslatedText>Learn More</TranslatedText>
                         <ChevronRight className="w-4 h-4" />
@@ -86,7 +86,7 @@ const Services = () => {
             <Button
               size="lg"
               onClick={() => navigate("/contact")}
-              className="bg-[hsl(var(--wcu-sunset))] hover:bg-[hsl(var(--wcu-sunset-deep))] text-white font-bold px-10 py-7 text-lg shadow-lg shadow-[hsl(var(--wcu-sunset)/0.3)]"
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-10 py-7 text-lg shadow-lg shadow-secondary/30"
             >
               <TranslatedText>Explore All Services</TranslatedText>
             </Button>
