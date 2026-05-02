@@ -13,19 +13,50 @@ const corsHeaders = {
 };
 
 const contactEmailSchema = z.object({
+  serviceType: z.enum(["3pl", "launchpad", "both"]),
   name: z.string().trim().min(1).max(100),
   email: z.string().email().max(255),
   phone: z.string().trim().min(1).max(20),
   business: z.string().trim().min(1).max(200),
-  unitsPerMonth: z.string().min(1),
-  skuCount: z.string().min(1),
-  marketplaces: z.array(z.string()).min(1),
+  unitsPerMonth: z.string().optional(),
+  skuCount: z.string().optional(),
+  marketplaces: z.array(z.string()).optional(),
   otherMarketplace: z.string().trim().max(200).optional(),
-  packagingRequirements: z.string().min(1),
-  timeline: z.string().min(1),
-  comments: z.string().trim().max(1000).optional(),
+  receivingMethod: z.enum(["cartons", "pallets", "both"]).optional(),
+  packagingRequirements: z.enum(["unbranded", "custom", "own"]).optional(),
+  timeline: z.string().optional(),
+  comments: z.string().trim().min(1).max(1000),
   recipientEmail: z.string().email().max(255),
 });
+
+function formatServiceType(value: string): string {
+  const map: Record<string, string> = {
+    '3pl': '3PL Services',
+    'launchpad': 'Launchpad (Brand Services)',
+    'both': '3PL Services + Launchpad',
+  };
+  return map[value] || value;
+}
+
+function formatPackaging(value?: string): string {
+  if (!value) return '';
+  const map: Record<string, string> = {
+    'unbranded': 'Unbranded packaging',
+    'custom': 'Custom packaging',
+    'own': 'Customer-provided packaging',
+  };
+  return map[value] || value;
+}
+
+function formatReceivingMethod(value?: string): string {
+  if (!value) return '';
+  const map: Record<string, string> = {
+    'cartons': 'Cartons',
+    'pallets': 'Pallets',
+    'both': 'Both (Cartons & Pallets)',
+  };
+  return map[value] || value;
+}
 
 // HTML escape function to prevent XSS
 function escapeHtml(text: string): string {
