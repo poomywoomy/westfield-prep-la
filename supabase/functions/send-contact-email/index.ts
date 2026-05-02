@@ -278,6 +278,10 @@ const handler = async (req: Request): Promise<Response> => {
                             <h2 style="color: #0F172A; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">Your Submission Details:</h2>
                             <table width="100%" cellpadding="8" cellspacing="0">
                               <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Service Requested:</td>
+                                <td style="color: #FF7A00; font-size: 14px; font-weight: 700; padding: 8px 0;">${safeServiceType}</td>
+                              </tr>
+                              <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Name:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeName}</td>
                               </tr>
@@ -293,6 +297,7 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Business:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeBusiness}</td>
                               </tr>
+                              ${show3PL ? `
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Units Sold/Month:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeUnitsPerMonth}</td>
@@ -306,6 +311,10 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeMarketplaces}</td>
                               </tr>
                               <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Receiving Method:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeReceiving}</td>
+                              </tr>
+                              <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Packaging:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safePackaging}</td>
                               </tr>
@@ -313,13 +322,14 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Timeline:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeTimeline}</td>
                               </tr>
+                              ` : ''}
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0; vertical-align: top;">Comments:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeComments}</td>
                               </tr>
                             </table>
                           </div>
-                          
+
                           <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
                             <strong>Need to add something?</strong> Simply reply to this email directly and we'll make sure your additional information is included in your quote.
                           </p>
