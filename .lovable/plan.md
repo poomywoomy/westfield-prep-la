@@ -1,75 +1,71 @@
-## Goal
+## Contact Form Redesign — Service-Type Aware Quote Form
 
-1. Redesign the existing `/why-choose-us` page with a more modern, premium feel.
-2. Keep the Launchpad section visible there as a teaser, but rewrite the messaging — it should NOT say "We'll build your brand for you."
-3. Create a brand-new dedicated page for the Launchpad services covering Shopify dashboard setup, Amazon Seller Central setup, A+ content, product 3D imaging, model/photo shoot coordination, and general "get-your-product-off-the-ground" support.
-4. Add the new page to the header navigation.
+Update the contact form so prospects can request **3PL Services**, **Launchpad** (brand-build help), or **Both**, with fields adapting to what they actually need.
 
-## New Messaging Direction
+---
 
-Instead of "Don't have a brand yet? We'll build one for you," the new positioning is a **support / launch services studio**:
+### 1. New service-type selector (top of form)
 
-- Headline option: **"Launch Faster. Sell Smarter."**
-- Sub: "From your first Shopify dashboard to A+ content on Amazon and pro-grade product imagery — we help you get your product off the ground without hiring five agencies."
+Add a prominent 3-button segmented control at the top, defaulting to **3PL Services**, styled with brand Midnight Navy / Orange:
 
-We position Westfield as a partner that *helps you launch and scale* (not as a brand-creation agency).
+- **3PL Services** (default)
+- **Launchpad**
+- **Both**
 
-## Page 1 — Redesign `/why-choose-us` (`src/pages/WhyChooseUs.tsx`)
+---
 
-Modernize the existing sections with refreshed visuals (lighter card surfaces, glassmorphism accents, gradient orbs, sharper typography hierarchy) while keeping all current content blocks: Hero, Old Way vs Westfield Way, Stats, Trust/Compliance, FAQ.
+### 2. Conditional field structure
 
-**Launchpad section (lines 537–648) — rewrite:**
-- New eyebrow chip: **WESTFIELD LAUNCHPAD**
-- New H2: **"Launch Faster. Sell Smarter."**
-- New sub-copy: "Shopify setup, Amazon Seller Central, A+ content, 3D product imagery, and pro photography — all under one roof. We help your product look launch-ready from day one."
-- Replace the 3 service cards with 4 quick highlights:
-  - **Shopify Dashboard Setup** — Store build, theme config, app stack, payments.
-  - **Amazon Account & A+ Content** — Seller Central registration, brand registry, A+ modules, storefront.
-  - **3D Product Imaging** — Photoreal renders that look like studio shots, no physical samples needed.
-  - **Photo & Model Shoots** — Coordinated studio sessions with models, props, and lifestyle sets.
-- Replace the "$2,499 Zero to One Package" pricing card with a softer **"What we help with"** support panel + a single CTA: **"Explore Launchpad Services"** → routes to new `/launchpad` page. Secondary CTA: "Book a Discovery Call" → `/contact`.
-- Remove the "$500 shipping credits" copy.
+**Always shown (all three modes):**
+- Full Name *
+- Email *
+- Phone *
+- Business Name *
+- Comments * (now **mandatory** in all modes, min 10 chars)
 
-Visual refresh of the rest of the page: tighter spacing, animated entry on scroll (framer-motion already in project), updated comparison cards with hover lift, new gradient hero accent. No content removed — only restyled.
+**Shown for "3PL Services" and "Both" only:**
+- Units Sold per Month *
+- SKU Count *
+- Marketplaces * (Shopify, Amazon, Walmart, TikTok Shop, Other)
+- **Receiving Method *** (new) — `Cartons`, `Pallets`, `Both`
+- **Packaging Requirements *** (updated options):
+  - `Unbranded packaging`
+  - `Custom packaging`
+  - `I will provide my own packaging`
+- Timeline *
 
-## Page 2 — New `/launchpad` page
+**Launchpad-only mode** hides all 3PL operational fields. Comments label changes to: *"Tell us what you need help with — Shopify dashboard setup, Amazon account, A+ content / storefront, media content, 3D product imaging, model photoshoot, or anything else to get your brand off the ground."*
 
-Create `src/pages/Launchpad.tsx` (modeled after `Hero` + section components — uses Header & Footer, single H1).
+**Both mode** keeps all 3PL fields; comments label updates to cover both 3PL and Launchpad needs in one shared field.
 
-### Structure
+---
 
-1. **Hero** — Eyebrow "WESTFIELD LAUNCHPAD" • H1 "Launch Faster. Sell Smarter." • Sub-copy + dual CTAs ("Book a Discovery Call" → `/contact`, "View Pricing" → `/pricing`). Dark gradient background, floating platform chips (Shopify, Amazon, TikTok).
-2. **What We Help With** — 6-card grid:
-   - Shopify Dashboard Build
-   - Amazon Seller Central Setup
-   - A+ Content & Storefront
-   - Product 3D Imaging
-   - Studio Photo & Model Shoots
-   - Listing Optimization & Copy
-3. **3D Imaging vs Studio Shoots** — Split section explaining when to use renders vs real photo shoots; visual comparison block.
-4. **How It Works** — 4-step timeline: Discovery → Asset Plan → Production → Launch.
-5. **Why Sellers Use Launchpad** — 3 outcome metrics (faster launch, fewer vendors, conversion-ready assets).
-6. **FAQ** — 5 questions (turnaround, do you need to be a fulfillment client, do you ship to studio, file formats delivered, ownership of assets).
-7. **CTA Strip** — "Ready to launch?" → `/contact`.
+### 3. Validation changes (zod schema in `ContactForm.tsx`)
 
-Includes proper SEO via `Helmet` + `generateMetaTags` (`/launchpad`), single `<h1>`, `RouteCanonical`, all images alt-tagged, all section H2s.
+- Add `serviceType: z.enum(["3pl", "launchpad", "both"])`
+- Add `receivingMethod: z.enum(["cartons", "pallets", "both"])` — required only when `serviceType !== "launchpad"`
+- Update `packagingRequirements` enum to `["unbranded", "custom", "own"]` — required only when `serviceType !== "launchpad"`
+- `comments` now required: `z.string().trim().min(10).max(1000)`
+- 3PL fields (`unitsPerMonth`, `skuCount`, `marketplaces`, `timeline`) become conditional via `superRefine` based on `serviceType`
 
-## Routing & Navigation
+---
 
-- `src/App.tsx` — Add lazy import + `<Route path="/launchpad" element={<Launchpad />} />`.
-- `src/components/Header.tsx` — Add **Launchpad** link to the desktop nav (next to Why Choose Us) and to the mobile menu using the same pattern as `/why-choose-us`.
-- `public/sitemap.xml` — Add `/launchpad` entry.
+### 4. Edge function update (`supabase/functions/send-contact-email/index.ts`)
 
-## Constraints respected
+- Update zod schema to mirror frontend (conditional fields, new fields, new packaging values)
+- Update both the **admin notification email** and **client confirmation email** to:
+  - Show "Service Requested: 3PL Services / Launchpad / Both" prominently at top
+  - Show new `Receiving Method` row
+  - Use new packaging labels (Unbranded / Custom / Customer-Provided)
+  - Hide 3PL-specific rows when Launchpad-only
+- Add `formatPackaging()` and `formatReceivingMethod()` label mappers
 
-- Header, Footer, and Logo untouched (only adding one nav link, not modifying structure).
-- Single H1 per page.
-- Address remains "Los Angeles, CA".
-- No em dashes in copy.
-- Uses existing brand colors (Midnight Navy / Orange) and Tailwind tokens.
-- No new dependencies.
+---
 
-## Files
+### Technical details
 
-- Modify: `src/pages/WhyChooseUs.tsx`, `src/App.tsx`, `src/components/Header.tsx`, `public/sitemap.xml`
-- Create: `src/pages/Launchpad.tsx`
+- File: `src/components/ContactForm.tsx` — refactor to conditional rendering driven by `serviceType` state; segmented control at top using brand colors
+- File: `supabase/functions/send-contact-email/index.ts` — schema + email HTML template updates
+- Honeypot, rate limiting, analytics tracking all preserved (analytics event extended with `service_type`)
+- No DB schema changes required
+- Heading copy updated: *"Tell us what you need — 3PL fulfillment, Launchpad brand services, or both."*

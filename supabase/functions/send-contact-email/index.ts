@@ -13,19 +13,50 @@ const corsHeaders = {
 };
 
 const contactEmailSchema = z.object({
+  serviceType: z.enum(["3pl", "launchpad", "both"]),
   name: z.string().trim().min(1).max(100),
   email: z.string().email().max(255),
   phone: z.string().trim().min(1).max(20),
   business: z.string().trim().min(1).max(200),
-  unitsPerMonth: z.string().min(1),
-  skuCount: z.string().min(1),
-  marketplaces: z.array(z.string()).min(1),
+  unitsPerMonth: z.string().optional(),
+  skuCount: z.string().optional(),
+  marketplaces: z.array(z.string()).optional(),
   otherMarketplace: z.string().trim().max(200).optional(),
-  packagingRequirements: z.string().min(1),
-  timeline: z.string().min(1),
-  comments: z.string().trim().max(1000).optional(),
+  receivingMethod: z.enum(["cartons", "pallets", "both"]).optional(),
+  packagingRequirements: z.enum(["unbranded", "custom", "own"]).optional(),
+  timeline: z.string().optional(),
+  comments: z.string().trim().min(1).max(1000),
   recipientEmail: z.string().email().max(255),
 });
+
+function formatServiceType(value: string): string {
+  const map: Record<string, string> = {
+    '3pl': '3PL Services',
+    'launchpad': 'Launchpad (Brand Services)',
+    'both': '3PL Services + Launchpad',
+  };
+  return map[value] || value;
+}
+
+function formatPackaging(value?: string): string {
+  if (!value) return '';
+  const map: Record<string, string> = {
+    'unbranded': 'Unbranded packaging',
+    'custom': 'Custom packaging',
+    'own': 'Customer-provided packaging',
+  };
+  return map[value] || value;
+}
+
+function formatReceivingMethod(value?: string): string {
+  if (!value) return '';
+  const map: Record<string, string> = {
+    'cartons': 'Cartons',
+    'pallets': 'Pallets',
+    'both': 'Both (Cartons & Pallets)',
+  };
+  return map[value] || value;
+}
 
 // HTML escape function to prevent XSS
 function escapeHtml(text: string): string {
@@ -63,17 +94,19 @@ function formatTimeline(value: string): string {
 }
 
 interface ContactEmailRequest {
+  serviceType: "3pl" | "launchpad" | "both";
   name: string;
   email: string;
   phone: string;
   business: string;
-  unitsPerMonth: string;
-  skuCount: string;
-  marketplaces: string[];
+  unitsPerMonth?: string;
+  skuCount?: string;
+  marketplaces?: string[];
   otherMarketplace?: string;
-  packagingRequirements: string;
-  timeline: string;
-  comments?: string;
+  receivingMethod?: "cartons" | "pallets" | "both";
+  packagingRequirements?: "unbranded" | "custom" | "own";
+  timeline?: string;
+  comments: string;
   recipientEmail: string;
 }
 
@@ -84,79 +117,79 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const body = await req.json();
-    
-    // Validate input
+
     const validationResult = contactEmailSchema.safeParse(body);
     if (!validationResult.success) {
       console.error("Validation error:", validationResult.error);
       return new Response(
-        JSON.stringify({ 
-          error: "Invalid input provided. Please check your information and try again."
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ error: "Invalid input provided. Please check your information and try again." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    const { name, email, phone, business, unitsPerMonth, skuCount, marketplaces, otherMarketplace, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data;
-    
-    // Rate limiting check (5 submissions per hour per IP)
+
+    const { serviceType, name, email, phone, business, unitsPerMonth, skuCount, marketplaces, otherMarketplace, receivingMethod, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data as ContactEmailRequest;
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
     const rateLimitKey = `contact_form:${clientIp}`;
-    const windowStart = new Date(Date.now() - 3600000); // 1 hour ago
-    
+    const windowStart = new Date(Date.now() - 3600000);
+
     const { data: existingAttempts } = await supabase
       .from('rate_limits')
       .select('request_count, window_start')
       .eq('key', rateLimitKey)
       .gte('window_start', windowStart.toISOString())
       .maybeSingle();
-    
+
     if (existingAttempts && existingAttempts.request_count >= 5) {
       console.warn(`Rate limit exceeded for IP: ${clientIp}`);
       return new Response(
-        JSON.stringify({ 
-          error: "Too many requests. Please try again later."
-        }),
-        {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    // Update rate limit counter
-    await supabase
-      .from('rate_limits')
-      .upsert({
-        key: rateLimitKey,
-        request_count: (existingAttempts?.request_count || 0) + 1,
-        window_start: existingAttempts ? existingAttempts.window_start : new Date().toISOString()
-      });
-    
-    // Escape HTML to prevent XSS
+
+    await supabase.from('rate_limits').upsert({
+      key: rateLimitKey,
+      request_count: (existingAttempts?.request_count || 0) + 1,
+      window_start: existingAttempts ? existingAttempts.window_start : new Date().toISOString()
+    });
+
+    const safeServiceType = escapeHtml(formatServiceType(serviceType));
     const safeName = escapeHtml(name);
     const safeEmail = escapeHtml(email);
     const safePhone = escapeHtml(phone);
     const safeBusiness = escapeHtml(business);
-    const safeUnitsPerMonth = escapeHtml(formatUnitsPerMonth(unitsPerMonth));
-    const safeSkuCount = escapeHtml(skuCount);
-    
-    // Build marketplaces string with "Other" details if provided
-    let marketplacesDisplay = marketplaces.map(m => escapeHtml(m)).join(", ");
-    if (marketplaces.includes("Other") && otherMarketplace && otherMarketplace.trim()) {
-      marketplacesDisplay = marketplacesDisplay.replace("Other", `Other (${escapeHtml(otherMarketplace.trim())})`);
-    }
-    const safeMarketplaces = marketplacesDisplay;
-    
-    const safePackaging = escapeHtml(packagingRequirements);
-    const safeTimeline = escapeHtml(formatTimeline(timeline));
-    const safeComments = comments ? escapeHtml(comments) : "None provided";
+    const safeComments = escapeHtml(comments);
 
-    // Send notification email to business
+    const show3PL = serviceType !== "launchpad";
+
+    let safeMarketplaces = "";
+    if (show3PL && marketplaces && marketplaces.length > 0) {
+      let display = marketplaces.map(m => escapeHtml(m)).join(", ");
+      if (marketplaces.includes("Other") && otherMarketplace && otherMarketplace.trim()) {
+        display = display.replace("Other", `Other (${escapeHtml(otherMarketplace.trim())})`);
+      }
+      safeMarketplaces = display;
+    }
+
+    const safeUnitsPerMonth = show3PL && unitsPerMonth ? escapeHtml(formatUnitsPerMonth(unitsPerMonth)) : "";
+    const safeSkuCount = show3PL && skuCount ? escapeHtml(skuCount) : "";
+    const safeReceiving = show3PL ? escapeHtml(formatReceivingMethod(receivingMethod)) : "";
+    const safePackaging = show3PL ? escapeHtml(formatPackaging(packagingRequirements)) : "";
+    const safeTimeline = show3PL && timeline ? escapeHtml(formatTimeline(timeline)) : "";
+
+    const threePLBlock = show3PL ? `
+      <hr>
+      <h3>3PL / Fulfillment Details</h3>
+      <p><strong>Units Sold per Month:</strong> ${safeUnitsPerMonth}</p>
+      <p><strong>SKU Count:</strong> ${safeSkuCount}</p>
+      <p><strong>Marketplaces:</strong> ${safeMarketplaces}</p>
+      <p><strong>Receiving Method:</strong> ${safeReceiving}</p>
+      <p><strong>Packaging Requirements:</strong> ${safePackaging}</p>
+      <p><strong>Timeline:</strong> ${safeTimeline}</p>
+    ` : "";
+
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -167,22 +200,20 @@ const handler = async (req: Request): Promise<Response> => {
         from: "Westfield 3PL <info@westfieldprepcenter.com>",
         to: [recipientEmail],
         reply_to: email,
-        subject: `New Contact Form Submission from ${name}`,
+        subject: `New ${formatServiceType(serviceType)} Inquiry from ${name}`,
         html: `
           <h2>New Contact Form Submission</h2>
+          <p style="background:#FF7A00;color:#fff;padding:10px 14px;border-radius:6px;display:inline-block;font-weight:600;">
+            Service Requested: ${safeServiceType}
+          </p>
+          <h3>Contact</h3>
           <p><strong>Name:</strong> ${safeName}</p>
           <p><strong>Email:</strong> ${safeEmail}</p>
           <p><strong>Phone:</strong> ${safePhone}</p>
           <p><strong>Business:</strong> ${safeBusiness}</p>
+          ${threePLBlock}
           <hr>
-          <h3>Business Details</h3>
-          <p><strong>Units Sold per Month:</strong> ${safeUnitsPerMonth}</p>
-          <p><strong>SKU Count:</strong> ${safeSkuCount}</p>
-          <p><strong>Marketplaces:</strong> ${safeMarketplaces}</p>
-          <p><strong>Packaging Requirements:</strong> ${safePackaging}</p>
-          <p><strong>Timeline:</strong> ${safeTimeline}</p>
-          <hr>
-          <h3>Additional Comments</h3>
+          <h3>Comments</h3>
           <p>${safeComments}</p>
           <hr>
           <p style="color: #666; font-size: 12px;">You can reply directly to this email to respond to ${safeName}</p>
@@ -247,6 +278,10 @@ const handler = async (req: Request): Promise<Response> => {
                             <h2 style="color: #0F172A; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">Your Submission Details:</h2>
                             <table width="100%" cellpadding="8" cellspacing="0">
                               <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Service Requested:</td>
+                                <td style="color: #FF7A00; font-size: 14px; font-weight: 700; padding: 8px 0;">${safeServiceType}</td>
+                              </tr>
+                              <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Name:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeName}</td>
                               </tr>
@@ -262,6 +297,7 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Business:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeBusiness}</td>
                               </tr>
+                              ${show3PL ? `
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Units Sold/Month:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeUnitsPerMonth}</td>
@@ -275,6 +311,10 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeMarketplaces}</td>
                               </tr>
                               <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Receiving Method:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeReceiving}</td>
+                              </tr>
+                              <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Packaging:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safePackaging}</td>
                               </tr>
@@ -282,13 +322,14 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Timeline:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeTimeline}</td>
                               </tr>
+                              ` : ''}
                               <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0; vertical-align: top;">Comments:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeComments}</td>
                               </tr>
                             </table>
                           </div>
-                          
+
                           <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
                             <strong>Need to add something?</strong> Simply reply to this email directly and we'll make sure your additional information is included in your quote.
                           </p>
