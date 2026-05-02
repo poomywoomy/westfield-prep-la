@@ -63,7 +63,7 @@ const StatsStrip = () => {
               <div className="mx-auto h-1 w-10 bg-secondary rounded-full mb-5" />
 
               {/* OVERSIZED counter */}
-              <div className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-none">
+              <div className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-none tabular-nums break-words">
                 {hasAnimated ? (
                   <MetricCounter value={stat.value} duration={1500} suffix={stat.suffix} />
                 ) : (

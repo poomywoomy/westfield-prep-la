@@ -49,7 +49,7 @@ const Reviews = () => {
               </span>
               <h2 className="mt-3 text-4xl md:text-6xl font-bold text-primary leading-[0.95] tracking-tight max-w-2xl">
                 <TranslatedText>What growing brands</TranslatedText>{" "}
-                <span className="font-display italic font-normal text-secondary">say.</span>
+                <span className="text-secondary">say.</span>
               </h2>
             </div>
             <div className="flex items-center gap-2">
@@ -66,7 +66,7 @@ const Reviews = () => {
             <Quote className="absolute -top-6 -left-2 w-24 h-24 text-secondary/15" strokeWidth={1} />
             <blockquote
               key={active}
-              className="relative font-display italic text-3xl md:text-5xl lg:text-6xl text-primary leading-[1.15] tracking-tight max-w-5xl animate-fade-in"
+              className="relative text-2xl md:text-4xl lg:text-5xl font-medium text-primary leading-[1.25] tracking-tight max-w-5xl animate-fade-in"
             >
               "{featured.text}"
             </blockquote>
