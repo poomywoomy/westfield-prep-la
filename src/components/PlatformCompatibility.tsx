@@ -1,112 +1,116 @@
 import { useNavigate } from "react-router-dom";
-import { ShoppingBag, ShoppingCart, Store, Music, Package, Building2, Palette, Code, Zap } from "lucide-react";
+import { ShoppingBag, ShoppingCart, Store, Music, Package, Building2, Palette, Zap, ArrowRight } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
-import { SectionHeading } from "./home/HomePrimitives";
 
 const PlatformCompatibility = () => {
   const navigate = useNavigate();
 
-  const ecommercePlatforms = [
-    { name: "Shopify", icon: ShoppingBag, strength: "Primary Integration" },
-    { name: "WooCommerce", icon: ShoppingCart, strength: "Full Support" },
-    { name: "BigCommerce", icon: Store, strength: "Full Support" },
-    { name: "TikTok Shop", icon: Music, strength: "Growing Platform" },
+  const platforms = [
+    { name: "Shopify", icon: ShoppingBag },
+    { name: "Amazon", icon: Package },
+    { name: "WooCommerce", icon: ShoppingCart },
+    { name: "TikTok Shop", icon: Music },
+    { name: "BigCommerce", icon: Store },
+    { name: "Walmart", icon: Building2 },
+    { name: "Etsy", icon: Palette },
+    { name: "eBay", icon: Store },
   ];
 
-  const marketplaces = [
-    { name: "Amazon", icon: Package, strength: "FBA Specialist" },
-    { name: "Walmart", icon: Building2, strength: "Full Integration" },
-    { name: "Etsy", icon: Palette, strength: "Handmade Focus" },
-  ];
-
-  const PlatformTile = ({ name, icon: Icon, strength }: { name: string; icon: any; strength: string }) => (
-    <div className="group bg-background rounded-xl p-6 border border-border hover:border-secondary/40 hover:-translate-y-1 transition-all shadow-sm hover:shadow-md flex flex-col items-center text-center">
-      <div className="w-14 h-14 rounded-xl bg-primary/5 flex items-center justify-center mb-3 ring-1 ring-primary/10 group-hover:ring-secondary/30 transition">
-        <Icon className="w-7 h-7 text-primary" />
-      </div>
-      <div className="font-bold text-primary">{name}</div>
-      <div className="text-xs font-semibold text-secondary mt-1">
-        <TranslatedText>{strength}</TranslatedText>
-      </div>
-    </div>
-  );
+  // Duplicate for seamless marquee loop
+  const marqueeRow = [...platforms, ...platforms];
 
   return (
-    <section className="relative py-24 bg-muted">
-      <div className="container mx-auto px-4">
-        <div className="max-w-7xl mx-auto">
-          <SectionHeading
-            eyebrow="Integrations"
-            title={<TranslatedText>Plays Nicely With Every Platform You Sell On</TranslatedText>}
-            subtitle={<TranslatedText>Connect your store in minutes. Orders flow automatically to our warehouse for fast, accurate fulfillment.</TranslatedText>}
+    <section className="relative py-24 bg-background overflow-hidden">
+      <div className="container mx-auto px-4 mb-12">
+        <div className="max-w-3xl">
+          <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-secondary">
+            Integrations · API-first
+          </span>
+          <h2 className="mt-3 text-4xl md:text-6xl font-bold text-primary leading-[0.95] tracking-tight">
+            <TranslatedText>Plays nicely with</TranslatedText>{" "}
+            <span className="font-display italic font-normal text-secondary">
+              <TranslatedText>everything you sell on.</TranslatedText>
+            </span>
+          </h2>
+          <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
+            <TranslatedText>
+              Connect your store in minutes. Orders flow automatically, inventory syncs in real-time.
+            </TranslatedText>
+          </p>
+        </div>
+      </div>
+
+      {/* Marquee */}
+      <div className="relative">
+        {/* Edge fade masks */}
+        <div className="absolute left-0 top-0 bottom-0 w-32 z-10 pointer-events-none bg-gradient-to-r from-background to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 z-10 pointer-events-none bg-gradient-to-l from-background to-transparent" />
+
+        <div className="group flex overflow-hidden py-6">
+          <div className="flex shrink-0 animate-marquee gap-6 group-hover:[animation-play-state:paused]">
+            {marqueeRow.map((p, i) => {
+              const Icon = p.icon;
+              return (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 px-7 py-5 rounded-2xl bg-muted border border-border min-w-[220px] hover:border-secondary/40 hover:bg-background transition-all"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-background flex items-center justify-center ring-1 ring-border">
+                    <Icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-primary text-lg">{p.name}</div>
+                    <div className="text-xs text-secondary font-bold uppercase tracking-wider">
+                      <TranslatedText>Native sync</TranslatedText>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom callout band */}
+      <div className="container mx-auto px-4 mt-14">
+        <div className="max-w-6xl mx-auto rounded-3xl bg-primary text-primary-foreground p-10 md:p-14 relative overflow-hidden">
+          <div
+            className="absolute inset-0 opacity-15"
+            style={{
+              background:
+                "radial-gradient(circle at 80% 20%, hsl(var(--secondary)), transparent 55%)",
+            }}
+            aria-hidden="true"
           />
-
-          <div className="mb-10">
-            <h3 className="text-sm font-bold uppercase tracking-[0.18em] mb-5 text-secondary text-center">
-              <TranslatedText>E-Commerce Platforms</TranslatedText>
-            </h3>
-            <div className="rounded-2xl p-6 bg-background border border-border">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {ecommercePlatforms.map((p, i) => <PlatformTile key={i} {...p} />)}
+          <div className="relative grid md:grid-cols-[1.2fr_auto] gap-8 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-bold uppercase tracking-[0.18em] mb-4">
+                <Zap className="w-3 h-3 text-secondary" />
+                <TranslatedText>API · Webhook · Real-time</TranslatedText>
               </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-[0.18em] mb-5 text-secondary text-center">
-              <TranslatedText>Marketplaces</TranslatedText>
-            </h3>
-            <div className="rounded-2xl p-6 bg-background border border-border">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {marketplaces.map((p, i) => <PlatformTile key={i} {...p} />)}
-                <button onClick={() => navigate("/integrations")} className="group bg-background rounded-xl p-6 border-2 border-dashed border-border hover:border-secondary hover:-translate-y-1 transition-all flex flex-col items-center text-center">
-                  <div className="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center mb-3">
-                    <Code className="w-7 h-7 text-secondary" />
-                  </div>
-                  <div className="font-bold text-primary">
-                    <TranslatedText>Many More</TranslatedText>
-                  </div>
-                  <div className="text-xs font-semibold text-secondary mt-1">
-                    <TranslatedText>View All</TranslatedText> →
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background border border-border shadow-sm mb-8">
-              <Zap className="w-4 h-4 text-secondary" />
-              <span className="text-sm font-semibold text-primary">
-                <TranslatedText>API-First • Webhook-Enabled • Real-Time Sync</TranslatedText>
-              </span>
-            </div>
-          </div>
-
-          <div className="rounded-2xl p-10 md:p-14 text-center bg-primary text-primary-foreground relative overflow-hidden">
-            <div
-              className="absolute inset-0 opacity-10"
-              style={{
-                background:
-                  "radial-gradient(circle at 30% 30%, hsl(var(--secondary)), transparent 60%)",
-              }}
-              aria-hidden="true"
-            />
-            <div className="relative">
-              <h3 className="text-3xl font-bold mb-4 tracking-tight">
-                <TranslatedText>Selling on Multiple Channels?</TranslatedText>
+              <h3 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+                <TranslatedText>Selling on multiple channels?</TranslatedText>
               </h3>
-              <p className="text-lg text-white/80 mb-6 max-w-2xl mx-auto">
-                <TranslatedText>We manage your inventory centrally so you never oversell and always ship fast. Connect your tech stack in minutes.</TranslatedText>
+              <p className="text-white/80 text-lg max-w-2xl">
+                <TranslatedText>
+                  We manage your inventory centrally so you never oversell and always ship fast.
+                </TranslatedText>
               </p>
-              <div className="flex flex-wrap justify-center gap-3">
-                <button onClick={() => navigate("/sales-channels")} className="px-7 py-3 rounded-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold transition-colors">
-                  <TranslatedText>See All Platforms</TranslatedText> →
-                </button>
-                <button onClick={() => navigate("/integrations")} className="px-7 py-3 rounded-full bg-transparent border-2 border-white/30 text-white hover:bg-white hover:text-primary font-bold transition-colors">
-                  <TranslatedText>View Integrations & API</TranslatedText> →
-                </button>
-              </div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => navigate("/sales-channels")}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold transition-colors"
+              >
+                <TranslatedText>See platforms</TranslatedText>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => navigate("/integrations")}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-transparent border-2 border-white/30 text-white hover:bg-white hover:text-primary font-bold transition-colors"
+              >
+                <TranslatedText>View API</TranslatedText>
+              </button>
             </div>
           </div>
         </div>
