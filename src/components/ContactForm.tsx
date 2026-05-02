@@ -121,7 +121,7 @@ const ContactForm = () => {
       }
 
       const { error } = await supabase.functions.invoke("send-contact-email", {
-        body: { ...validatedData, recipientEmail: "info@westfieldprepcenter.com" },
+        body: validatedData,
       });
 
       if (error) {

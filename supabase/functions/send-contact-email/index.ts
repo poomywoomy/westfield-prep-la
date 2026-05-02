@@ -12,6 +12,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// Hardcoded recipient — never trust client input for where leads are sent
+const RECIPIENT_EMAIL = "info@westfieldprepcenter.com";
+
 const contactEmailSchema = z.object({
   serviceType: z.enum(["3pl", "launchpad", "both"]),
   name: z.string().trim().min(1).max(100),
@@ -26,7 +29,7 @@ const contactEmailSchema = z.object({
   packagingRequirements: z.enum(["unbranded", "custom", "own"]).optional(),
   timeline: z.string().optional(),
   comments: z.string().trim().min(1).max(1000),
-  recipientEmail: z.string().email().max(255),
+  recipientEmail: z.string().email().max(255).optional(),
 });
 
 function formatServiceType(value: string): string {
@@ -127,7 +130,9 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { serviceType, name, email, phone, business, unitsPerMonth, skuCount, marketplaces, otherMarketplace, receivingMethod, packagingRequirements, timeline, comments, recipientEmail }: ContactEmailRequest = validationResult.data as ContactEmailRequest;
+    const { serviceType, name, email, phone, business, unitsPerMonth, skuCount, marketplaces, otherMarketplace, receivingMethod, packagingRequirements, timeline, comments } = validationResult.data;
+    // Always send to the hardcoded internal recipient — ignore any client-supplied value
+    const recipientEmail = RECIPIENT_EMAIL;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
@@ -224,9 +229,17 @@ const handler = async (req: Request): Promise<Response> => {
     const data = await emailResponse.json();
 
     if (!emailResponse.ok) {
-      console.error("Email delivery failed");
-      throw new Error("Failed to send email");
+      console.error("Admin email delivery failed", {
+        status: emailResponse.status,
+        statusText: emailResponse.statusText,
+        resendResponse: data,
+        recipient: recipientEmail,
+        from: "info@westfieldprepcenter.com",
+      });
+      throw new Error(`Failed to send email: ${data?.message || data?.name || "unknown error"}`);
     }
+
+    console.log("Admin notification sent", { id: data?.id, to: recipientEmail });
 
     // Send confirmation email to the submitter
     const confirmationResponse = await fetch("https://api.resend.com/emails", {
@@ -365,8 +378,15 @@ const handler = async (req: Request): Promise<Response> => {
     const confirmationData = await confirmationResponse.json();
 
     if (!confirmationResponse.ok) {
-      console.error("Confirmation email delivery failed");
+      console.error("Confirmation email delivery failed", {
+        status: confirmationResponse.status,
+        statusText: confirmationResponse.statusText,
+        resendResponse: confirmationData,
+        recipient: email,
+      });
       // Don't throw here - business notification already sent
+    } else {
+      console.log("Confirmation email sent", { id: confirmationData?.id, to: email });
     }
 
     return new Response(JSON.stringify(data), {
