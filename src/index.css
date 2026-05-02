@@ -84,11 +84,26 @@ All colors MUST be HSL.
     --blog-muted-bg: 210 20% 96%;
     --blog-shadow-glow: 0 12px 24px hsla(28, 100%, 50%, 0.25);
 
-    /* Why Choose Us Dark Theme */
-    --wcu-bg-primary: 215 40% 12%;
-    --wcu-bg-secondary: 217 30% 16%;
-    --wcu-bg-card: 218 28% 20%;
-    --wcu-bg-dark-card: 217 28% 24%;
+    /* Why Choose Us — Soft Linen & Sunset (warm, premium, welcoming) */
+    --wcu-linen: 36 60% 96%;
+    --wcu-cream: 33 70% 92%;
+    --wcu-peach: 22 100% 88%;
+    --wcu-peach-deep: 20 95% 80%;
+    --wcu-sunset: 18 100% 62%;
+    --wcu-sunset-deep: 14 80% 50%;
+    --wcu-ink: 260 21% 18%;
+    --wcu-ink-soft: 260 12% 38%;
+    --wcu-line: 28 35% 84%;
+
+    /* Legacy wcu tokens remapped to the new warm palette so existing classes flip cleanly */
+    --wcu-bg-primary: 36 60% 96%;
+    --wcu-bg-secondary: 33 70% 92%;
+    --wcu-bg-card: 0 0% 100%;
+    --wcu-bg-dark-card: 22 100% 94%;
+  }
+
+  .wcu-paper-grain {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.14 0 0 0 0 0.22 0 0 0 0.45 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
   }
 
   .dark {
