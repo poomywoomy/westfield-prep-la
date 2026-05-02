@@ -1,6 +1,6 @@
 import { Package, DollarSign, MapPin, TrendingUp, CheckCircle, Users } from "lucide-react";
 import { TranslatedText } from "./TranslatedText";
-import { WcuSectionHeading } from "./wcu/WcuPrimitives";
+import { SectionHeading, IconBadge } from "./home/HomePrimitives";
 
 const ValueProposition = () => {
   const benefits = [
@@ -13,10 +13,10 @@ const ValueProposition = () => {
   ];
 
   return (
-    <section className="relative py-24" style={{ background: "hsl(var(--wcu-cream))" }}>
+    <section className="relative py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          <WcuSectionHeading
+          <SectionHeading
             eyebrow="Why Switch"
             title={<TranslatedText>Why Growing Brands Fire Their Old 3PL and Switch to Westfield</TranslatedText>}
             subtitle={<TranslatedText>We've heard the horror stories. Missed shipments. Ghost-mode support. Surprise fees. Here's why that doesn't happen here.</TranslatedText>}
@@ -24,12 +24,12 @@ const ValueProposition = () => {
 
           <div className="flex items-center justify-center gap-8 mb-12 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="h-1 w-12 bg-[hsl(var(--wcu-ink))]" />
-              <TranslatedText className="text-sm font-bold text-[hsl(var(--wcu-ink))]">100+ Brands Trust Us</TranslatedText>
+              <div className="h-1 w-12 bg-primary rounded-full" />
+              <TranslatedText className="text-sm font-bold text-primary">100+ Brands Trust Us</TranslatedText>
             </div>
             <div className="flex items-center gap-3">
-              <div className="h-1 w-12 bg-[hsl(var(--wcu-sunset))]" />
-              <TranslatedText className="text-sm font-bold text-[hsl(var(--wcu-sunset-deep))]">2M+ Orders Fulfilled this Year</TranslatedText>
+              <div className="h-1 w-12 bg-secondary rounded-full" />
+              <TranslatedText className="text-sm font-bold text-secondary">2M+ Orders Fulfilled this Year</TranslatedText>
             </div>
           </div>
 
@@ -39,21 +39,19 @@ const ValueProposition = () => {
               return (
                 <div
                   key={index}
-                  className="group relative bg-white rounded-2xl p-7 border border-[hsl(var(--wcu-line))] hover:-translate-y-1 transition-all duration-300 shadow-[0_3px_0_0_hsl(var(--wcu-line))] hover:shadow-[0_20px_40px_-15px_hsl(var(--wcu-sunset)/0.3)]"
+                  className="group relative bg-background rounded-2xl p-7 border border-border hover:border-secondary/40 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-xl"
                 >
-                  <div className="mb-5">
-                    <div className="w-14 h-14 rounded-2xl bg-[hsl(var(--wcu-peach))] flex items-center justify-center group-hover:rotate-[-6deg] transition-transform">
-                      <Icon className="w-7 h-7 text-[hsl(var(--wcu-sunset-deep))]" />
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-bold mb-3 text-[hsl(var(--wcu-ink))]">
+                  <IconBadge size="lg">
+                    <Icon className="w-7 h-7" />
+                  </IconBadge>
+                  <h3 className="text-lg font-bold mt-5 mb-3 text-primary tracking-tight">
                     <TranslatedText>{benefit.title}</TranslatedText>
                   </h3>
-                  <p className="text-[hsl(var(--wcu-ink-soft))] leading-relaxed text-sm mb-5">
+                  <p className="text-muted-foreground leading-relaxed text-sm mb-5">
                     <TranslatedText>{benefit.description}</TranslatedText>
                   </p>
-                  <div className="pt-4 border-t border-dashed border-[hsl(var(--wcu-line))]">
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-[hsl(var(--wcu-peach))] text-xs font-bold text-[hsl(var(--wcu-sunset-deep))]">
+                  <div className="pt-4 border-t border-border">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-secondary/10 text-xs font-bold text-secondary">
                       <TranslatedText>{benefit.stat}</TranslatedText>
                     </span>
                   </div>

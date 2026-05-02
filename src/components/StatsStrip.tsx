@@ -3,6 +3,7 @@ import { Package, Users, TrendingUp, Award } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { MetricCounter } from "@/components/ui/metric-counter";
 import { TranslatedText } from "./TranslatedText";
+import { IconBadge } from "./home/HomePrimitives";
 
 const StatsStrip = () => {
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -22,36 +23,32 @@ const StatsStrip = () => {
   ];
 
   return (
-    <section
-      ref={ref}
-      className="relative py-16"
-      style={{ background: "hsl(var(--wcu-linen))" }}
-    >
+    <section ref={ref} className="relative py-16 bg-background border-y border-border">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border max-w-6xl mx-auto rounded-xl overflow-hidden border border-border">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <div
                 key={index}
-                className="relative bg-white rounded-2xl p-6 border border-[hsl(var(--wcu-line))] hover:-translate-y-1 transition-all"
-                style={{ outline: "1.5px dashed hsl(var(--wcu-peach-deep))", outlineOffset: "-6px" }}
+                className="bg-background p-7 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-[hsl(var(--wcu-peach))] flex items-center justify-center">
-                    <Icon className="w-6 h-6 text-[hsl(var(--wcu-sunset-deep))]" aria-hidden="true" />
-                  </div>
-                  <div className="text-3xl md:text-4xl font-bold text-[hsl(var(--wcu-sunset-deep))]">
+                  <IconBadge size="md">
+                    <Icon className="w-5 h-5" aria-hidden="true" />
+                  </IconBadge>
+                  <div className="text-3xl md:text-4xl font-bold text-primary tracking-tight">
                     {hasAnimated ? (
                       <MetricCounter value={stat.value} duration={1500} suffix={stat.suffix} />
                     ) : (
                       <span>0{stat.suffix}</span>
                     )}
                   </div>
-                  <div className="text-sm font-bold text-[hsl(var(--wcu-ink))]">
+                  <div className="h-[3px] w-8 bg-secondary rounded-full" />
+                  <div className="text-sm font-bold text-primary">
                     <TranslatedText>{stat.label}</TranslatedText>
                   </div>
-                  <div className="text-xs text-[hsl(var(--wcu-ink-soft))] italic">
+                  <div className="text-xs text-muted-foreground">
                     <TranslatedText>{stat.subtext}</TranslatedText>
                   </div>
                 </div>

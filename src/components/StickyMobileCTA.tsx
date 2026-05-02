@@ -35,11 +35,11 @@ const StickyMobileCTA = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden p-3" style={{ background: "linear-gradient(to top, hsl(var(--wcu-linen)), transparent)" }}>
+    <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden p-3 bg-gradient-to-t from-background to-transparent">
       <Button
         onClick={handleClick}
         size="lg"
-        className="w-full bg-[hsl(var(--wcu-sunset))] hover:bg-[hsl(var(--wcu-sunset-deep))] text-white font-bold rounded-full shadow-[0_20px_40px_-10px_hsl(var(--wcu-sunset)/0.6)] py-6"
+        className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold rounded-full shadow-[0_20px_40px_-10px_hsl(var(--secondary)/0.6)] py-6"
       >
         Get Free Fulfillment Audit
         <ArrowRight className="ml-2 w-5 h-5" />
