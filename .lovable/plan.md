@@ -1,77 +1,99 @@
 ## Goal
 
-Refresh `/why-choose-us` from a dark navy SaaS look into a **premium yet welcoming** page — Soft Linen & Sunset palette (cream backgrounds, peach mid-tones, warm orange accents, deep aubergine text) — with custom hand-crafted design elements throughout. Header, Footer, and Logo stay untouched (project rule).
+Apply the warm, premium "Soft Linen & Sunset" aesthetic (already shipped on Why Choose Us) across the entire homepage. Preserve every piece of information, the live `BlogPreview`, Header, Footer, and Logo. Add a dedicated Launchpad mention section. Optimize for conversion with stronger CTAs and custom handcrafted graphics.
 
-## Color system (added to `src/index.css`)
+## Scope
 
-New `--wcu-*` tokens override the existing dark-theme ones (no other page is affected because the tokens are page-scoped via the `wcu-*` names already in use):
+Touch only homepage section components plus a tiny CSS addition. Do **not** modify Header, Footer, Logo, BlogPreview data flow, or any routing.
 
-```text
---wcu-linen        : 36 60% 96%   (#FAF5EF) — primary background
---wcu-cream        : 33 70% 92%   (warm panel)
---wcu-peach        : 22 100% 88%  (#FFD9C2) — soft accent fields
---wcu-sunset       : 18 100% 62%  (#FF7A3D) — primary accent / CTAs
---wcu-sunset-deep  : 14 80% 50%   — gradient end
---wcu-ink          : 260 21% 18%  (#2A2438) — primary text
---wcu-ink-soft     : 260 12% 38%  — secondary text
---wcu-line         : 28 35% 84%   — hairline borders
-```
+## Aesthetic System (reused from Why Choose Us)
 
-Existing dark `--wcu-bg-*` tokens are remapped to the new light palette so the entire page flips without touching every className. A few `text-white`, `text-gray-400`, `bg-black/30`, `border-white/10`, `bg-red-900/10`, `bg-green-900/10`, blue/purple/fuchsia accent classes inside the page get swapped for the new tokens (sunset, peach, ink, etc.). Body switches to `text-[hsl(var(--wcu-ink))]` and selection becomes sunset.
+- Background: `--wcu-linen` (#FAF5EF) cream with `wcu-paper-grain` texture
+- Surfaces: white + `--wcu-cream` / `--wcu-peach` cards with stitched borders
+- Accent: `--wcu-sunset` (#FF7A3D) for CTAs, underlines, icons
+- Text: `--wcu-ink` (deep aubergine), `--wcu-ink-soft` for body
+- Custom SVG primitives reused: `HandUnderline`, `OrganicDivider`, topographic backdrops, sunset gradient blobs
+- Add a few new shared graphics (sunburst badge, ribbon stamp, dotted route line, peach blob frame)
 
-## Custom design layer (the "premium handcrafted" feel)
+## Section-by-section redesign
 
-Three new in-file components plus organic dividers — all SVG, no new dependencies:
+Sections keep their copy and order, only visuals change. Files edited in `src/components/`:
 
-### 1. `<HeroBackdrop />` — replaces the navy hero
-- Linen background with a hand-drawn topographic SVG pattern (concentric soft curves, very low opacity ink) anchored bottom-left.
-- A large warm sunset gradient blob in the upper right (filtered with `feGaussianBlur`).
-- Subtle paper-grain via SVG `<feTurbulence>` overlay at 4% opacity.
-- A hand-drawn underline SVG swooshes under "Brand Deserves." in sunset orange.
-- Pill badge: linen card with peach border and sunset icon.
-- Primary CTA gradient `linen → sunset → sunset-deep` with soft inner shadow; secondary CTA is an outline button in ink.
+1. **PremiumHero.tsx** — Repaint to linen background with paper grain. Sunset gradient blobs behind a hand-illustrated warehouse skyline SVG. Headline keeps current text; accent word gets `HandUnderline`. Primary CTA = sunset solid "Get Free Fulfillment Audit", secondary = outlined "View Pricing". Trust badges become peach pill cards with stitched borders.
 
-### 2. `<OrganicDivider variant="wave|arch|notch" />`
-- Reusable SVG section divider (curved, not straight) used between major sections so transitions feel soft and editorial instead of stacked rectangles.
+2. **StatsStrip.tsx** — Cream cards with sunset numerals, hand-drawn ticks, organic divider top/bottom.
 
-### 3. `<JourneyPath />` — replaces the 3-pillar comparison's "deep dive" block on mobile/desktop with a custom 5-step hospitality-style timeline:
-- Hand-drawn meandering SVG path connecting 5 milestone nodes (Welcome → Receive → Prep → Ship → Care).
-- Each node is an oval cream card with a sunset-circle icon and short copy.
-- Path is dashed in peach with sunset milestone dots; on desktop it curves; on mobile it becomes a vertical ribbon.
-- This is the centerpiece "storytelling" graphic the user asked for.
+3. **UseCaseSection.tsx** — Persona cards as peach "polaroid" tiles with stitched edges and sunset corner stamps.
 
-### 4. Refreshed existing custom graphics
-- **`ComparisonGraphic`**: red/green panels become "Old Way" (warm taupe with peach X icons) vs "Westfield Way" (cream with sunset checkmarks). Cards get a stitched dashed border on the Westfield side.
-- **`TechStackGraphic`**: dark grid → cream grid, central hub becomes a sunset circle with a soft glow, connecting lines become hand-drawn dashed peach strokes, and node cards get rounded-3xl + ink hover ring.
-- **`Dashboard mockup`**: window chrome stays but inverted — cream panel, ink text, sunset progress bar, peach surface stats. The traffic-light dots become muted dusty colors.
-- **`LA Map graphic`**: black radial → linen with topographic rings, MapPin in sunset, city label in ink.
-- **FBA stat cards**: peach/cream tinted backgrounds, brand icons in sunset/ink, big numbers in ink with sunset accent on one of them. Adds a small custom "ribbon" SVG behind one stat to feel handcrafted.
-- **Launchpad teaser card**: cream card with peach inner panels, sunset icon chips, soft drop shadow (no harsh black).
-- **FAQ accordion**: rows on cream, sunset chevrons, hover row turns to peach-50, divider becomes the dotted line motif.
+4. **ValueProposition.tsx** — Two-column with custom SVG illustrations (boxes, conveyor belt, route line) on cream paper.
 
-## Section-by-section pass
+5. **Services.tsx** — Bento-style service cards with handcrafted icon glyphs (replace generic Lucide with bespoke SVG set), sunset hover glow.
 
-1. **Hero** — new `HeroBackdrop`, hand-drawn underline, dual CTAs, social-proof bar with the existing `Si*` brand icons (no change there) recolored ink.
-2. **Problem comparison** — refreshed warm cards as above; section background = peach gradient → linen.
-3. **Built for High-Growth Brands deep dives** — three blocks reskinned. The colored category pills (blue/purple/orange) become a single muted ink-on-cream pill style with a small sunset square accent so the page feels cohesive instead of rainbow.
-4. **NEW: Our Journey With You** — `<JourneyPath />` inserted between deep dive 2 and deep dive 3 as the storytelling centerpiece.
-5. **FBA Mastery** — linen background, refreshed feature cards + stat tiles, custom ribbon SVG behind the "2M+" stat.
-6. **Launchpad teaser** — cream-on-linen card, sunset accents only, soft shadows; gradient blobs swapped from blue/orange to peach/sunset.
-7. **FAQ** — light accordion as described.
-8. **Final CTA** — full-width sunset gradient band with cream text and a linen button; bottom and top get organic SVG dividers.
+6. **HowItWorksProcess.tsx** — Replace timeline with a meandering dotted SVG path connecting 4 numbered sunset circles (mirrors JourneyPath from WCU).
 
-## Files touched
+7. **PlatformCompatibility.tsx** — Reuse the brand SVG logos already centralized; lay them on a peach "shelf" with subtle drop shadow. Logos themselves untouched.
 
-- `src/pages/WhyChooseUs.tsx` — color + class swap, new `HeroBackdrop`, `OrganicDivider`, `JourneyPath` components, refresh of in-file graphics. All edits stay in this one page file.
-- `src/index.css` — append/override the `--wcu-*` token block under `:root` and add a small `.wcu-paper-grain` utility for the SVG noise overlay.
+8. **Reviews.tsx** — Quote cards become tan paper notes with sunset quotation marks and a wax-seal style avatar frame.
 
-## Out of scope (unchanged)
+9. **LocationShowcase.tsx** — Stylized LA map with sunset star marker, peach skyline silhouette behind.
 
-- Header, Footer, global Logo.
-- Other pages and global theme tokens.
-- SEO/Helmet/StructuredData blocks (kept as-is).
-- The H1 stays the single H1 (unchanged).
+10. **NEW: LaunchpadCallout.tsx** — Inserted between `LocationShowcase` and `BlogPreview`. Full-bleed cream-to-peach band with custom rocket-on-runway SVG, headline "Westfield Launchpad — From idea to shipping in weeks", short value bullets, sunset CTA → `/launchpad`.
 
-## Result
+11. **BlogPreview.tsx** — Wrapper restyled (linen bg, sunset section heading with `HandUnderline`); the live blog data fetch and card list logic remain unchanged so new posts continue to appear automatically. Cards get peach stitched borders.
 
-A warm, editorial "boutique hospitality meets premium logistics" page: cream paper feel, sunset accents, hand-drawn dividers and a custom journey graphic — visibly more bespoke than the current navy template, while keeping all copy, structure, and SEO intact.
+12. **FAQAccordion.tsx** — Cream accordion panels, sunset "+" toggles, hand-drawn divider between items.
+
+13. **FinalCTA.tsx** — Sunset gradient band with paper grain, oversized headline + dual CTAs (audit + pricing), confetti-dot SVG accents.
+
+14. **Compliance.tsx** — Light cream strip with stitched badge frames around compliance marks.
+
+15. **StickyMobileCTA.tsx** — Restyled to sunset pill on linen with subtle shadow.
+
+## CTAs / conversion enhancements
+
+- Every section ends with a contextual sunset CTA (audit, pricing, or contact) — no dead ends.
+- Hero, mid-page (after Services), Launchpad band, and FinalCTA = 4 conversion checkpoints.
+- Sticky mobile CTA always visible.
+- Trust badges (orders fulfilled, accuracy, years) repeat near each CTA cluster.
+
+## CSS additions (`src/index.css`)
+
+Append a small block (no token overrides):
+- `.wcu-stitched` border helper
+- `.wcu-shadow-soft` warm drop shadow
+- `@keyframes wcu-float` for hero blobs
+
+No changes to existing tokens, dark mode, or other pages.
+
+## Constraints respected
+
+- Header, Footer, Logo: untouched
+- All copy/info preserved verbatim
+- BlogPreview data source unchanged (auto-updates with new posts)
+- Single H1 per page (hero only)
+- All SVGs added to `BrandIcons.tsx` where shared, inline where one-off
+- No new routes, no DB changes, no dependencies
+
+## Files to be modified
+
+- `src/index.css` (append helpers only)
+- `src/components/PremiumHero.tsx`
+- `src/components/StatsStrip.tsx`
+- `src/components/UseCaseSection.tsx`
+- `src/components/ValueProposition.tsx`
+- `src/components/Services.tsx`
+- `src/components/HowItWorksProcess.tsx`
+- `src/components/PlatformCompatibility.tsx`
+- `src/components/Reviews.tsx`
+- `src/components/LocationShowcase.tsx`
+- `src/components/BlogPreview.tsx`
+- `src/components/FAQAccordion.tsx`
+- `src/components/FinalCTA.tsx`
+- `src/components/Compliance.tsx`
+- `src/components/StickyMobileCTA.tsx`
+- `src/components/BrandIcons.tsx` (add new shared SVGs)
+- `src/pages/Index.tsx` (insert `<LaunchpadCallout />` between LocationShowcase and BlogPreview)
+
+## Files to be created
+
+- `src/components/LaunchpadCallout.tsx`

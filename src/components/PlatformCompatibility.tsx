@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ShoppingBag, ShoppingCart, Store, Music, Package, Building2, Palette, Code, Zap } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
+import { WcuSectionHeading } from "./wcu/WcuPrimitives";
 
 const PlatformCompatibility = () => {
   const navigate = useNavigate();
@@ -18,120 +19,92 @@ const PlatformCompatibility = () => {
     { name: "Etsy", icon: Palette, strength: "Handmade Focus" },
   ];
 
+  const PlatformTile = ({ name, icon: Icon, strength }: { name: string; icon: any; strength: string }) => (
+    <div className="group relative bg-white rounded-2xl p-6 border border-[hsl(var(--wcu-line))] hover:-translate-y-1 transition-all shadow-[0_3px_0_0_hsl(var(--wcu-line))] hover:shadow-[0_20px_40px_-15px_hsl(var(--wcu-sunset)/0.3)] flex flex-col items-center text-center">
+      <div className="w-16 h-16 rounded-2xl bg-[hsl(var(--wcu-peach))] flex items-center justify-center mb-3 group-hover:rotate-[-6deg] transition-transform">
+        <Icon className="w-8 h-8 text-[hsl(var(--wcu-sunset-deep))]" />
+      </div>
+      <div className="font-bold text-[hsl(var(--wcu-ink))]">{name}</div>
+      <div className="text-xs font-semibold text-[hsl(var(--wcu-sunset-deep))] mt-1">
+        <TranslatedText>{strength}</TranslatedText>
+      </div>
+    </div>
+  );
+
   return (
-    <section className="py-24 bg-gradient-to-b from-background via-primary/5 to-background">
+    <section className="relative py-24" style={{ background: "hsl(var(--wcu-linen))" }}>
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              <TranslatedText>Seamlessly Integrates With Every Platform You Sell On</TranslatedText>
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              <TranslatedText>Connect your store in minutes. Orders flow automatically to our warehouse for fast, accurate fulfillment.</TranslatedText>
-            </p>
-          </div>
+          <WcuSectionHeading
+            eyebrow="Integrations"
+            title={<TranslatedText>Plays Nicely With Every Platform You Sell On</TranslatedText>}
+            subtitle={<TranslatedText>Connect your store in minutes. Orders flow automatically to our warehouse for fast, accurate fulfillment.</TranslatedText>}
+          />
 
-          {/* E-Commerce Platforms */}
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold mb-6 text-card-foreground text-center">
+          {/* Peach "shelf" */}
+          <div className="mb-10">
+            <h3 className="text-lg font-bold mb-5 text-[hsl(var(--wcu-ink))] text-center">
               <TranslatedText>E-Commerce Platforms</TranslatedText>
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {ecommercePlatforms.map((platform, index) => (
-                <div 
-                  key={index}
-                  className="group relative bg-gradient-to-br from-card via-card/80 to-primary/5 border-2 border-border hover:border-primary/50 rounded-3xl p-8 flex flex-col items-center justify-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  
-                  <div className="mb-4 flex justify-center relative z-10">
-                    <platform.icon className="w-16 h-16 text-primary group-hover:scale-110 transition-transform" />
-                  </div>
-                  <div className="text-center font-bold text-xl text-card-foreground mb-2 relative z-10">
-                    {platform.name}
-                  </div>
-                  <div className="text-sm text-primary font-semibold relative z-10">
-                    <TranslatedText>{platform.strength}</TranslatedText>
-                  </div>
-                </div>
-              ))}
+            <div
+              className="rounded-[28px] p-6 border border-[hsl(var(--wcu-line))]"
+              style={{ background: "hsl(var(--wcu-cream))", outline: "1.5px dashed hsl(var(--wcu-peach-deep))", outlineOffset: "-8px" }}
+            >
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {ecommercePlatforms.map((p, i) => <PlatformTile key={i} {...p} />)}
+              </div>
             </div>
           </div>
 
-          {/* Marketplaces */}
           <div>
-            <h3 className="text-2xl font-bold mb-6 text-card-foreground text-center">
+            <h3 className="text-lg font-bold mb-5 text-[hsl(var(--wcu-ink))] text-center">
               <TranslatedText>Marketplaces</TranslatedText>
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {marketplaces.map((platform, index) => (
-                <div 
-                  key={index}
-                  className="group relative bg-gradient-to-br from-card via-card/80 to-secondary/5 border-2 border-border hover:border-secondary/50 rounded-3xl p-8 flex flex-col items-center justify-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/0 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  
-                  <div className="mb-4 flex justify-center relative z-10">
-                    <platform.icon className="w-16 h-16 text-secondary group-hover:scale-110 transition-transform" />
+            <div
+              className="rounded-[28px] p-6 border border-[hsl(var(--wcu-line))]"
+              style={{ background: "hsl(var(--wcu-cream))", outline: "1.5px dashed hsl(var(--wcu-peach-deep))", outlineOffset: "-8px" }}
+            >
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {marketplaces.map((p, i) => <PlatformTile key={i} {...p} />)}
+                <button onClick={() => navigate("/integrations")} className="group relative bg-white rounded-2xl p-6 border-2 border-dashed border-[hsl(var(--wcu-sunset)/0.5)] hover:border-[hsl(var(--wcu-sunset))] hover:-translate-y-1 transition-all flex flex-col items-center text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-[hsl(var(--wcu-peach))] flex items-center justify-center mb-3">
+                    <Code className="w-8 h-8 text-[hsl(var(--wcu-sunset-deep))]" />
                   </div>
-                  <div className="text-center font-bold text-xl text-card-foreground mb-2 relative z-10">
-                    {platform.name}
+                  <div className="font-bold text-[hsl(var(--wcu-ink))]">
+                    <TranslatedText>Many More</TranslatedText>
                   </div>
-                  <div className="text-sm text-secondary font-semibold relative z-10">
-                    <TranslatedText>{platform.strength}</TranslatedText>
+                  <div className="text-xs font-semibold text-[hsl(var(--wcu-sunset-deep))] mt-1">
+                    <TranslatedText>View All</TranslatedText> →
                   </div>
-                </div>
-              ))}
-              
-              {/* Many More Button */}
-              <button 
-                onClick={() => navigate("/integrations")}
-                className="group relative bg-gradient-to-br from-card via-card/80 to-primary/5 border-2 border-dashed border-primary/50 hover:border-primary rounded-3xl p-8 flex flex-col items-center justify-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden cursor-pointer"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                
-                <div className="mb-4 flex justify-center relative z-10">
-                  <Code className="w-16 h-16 text-primary group-hover:scale-110 transition-transform" />
-                </div>
-                <div className="text-center font-bold text-xl text-card-foreground mb-2 relative z-10">
-                  <TranslatedText>Many More</TranslatedText>
-                </div>
-                <div className="text-sm text-primary font-semibold relative z-10">
-                  <TranslatedText>View All</TranslatedText> →
-                </div>
-              </button>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* API-First Messaging */}
-          <div className="mt-12 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
-              <Zap className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">
+          <div className="mt-10 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[hsl(var(--wcu-line))] mb-8 shadow-sm">
+              <Zap className="w-4 h-4 text-[hsl(var(--wcu-sunset-deep))]" />
+              <span className="text-sm font-semibold text-[hsl(var(--wcu-ink))]">
                 <TranslatedText>API-First • Webhook-Enabled • Real-Time Sync</TranslatedText>
               </span>
             </div>
           </div>
 
-          {/* Multi-Channel CTA */}
-          <div className="mt-8 text-center bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 rounded-3xl p-12 border border-border/50">
-            <h3 className="text-3xl font-bold mb-4 text-foreground">
+          <div
+            className="rounded-[28px] p-10 md:p-14 text-center border border-[hsl(var(--wcu-line))]"
+            style={{ background: "linear-gradient(135deg, hsl(var(--wcu-peach)), hsl(var(--wcu-cream)))", outline: "1.5px dashed hsl(var(--wcu-peach-deep))", outlineOffset: "-10px" }}
+          >
+            <h3 className="text-3xl font-bold mb-4 text-[hsl(var(--wcu-ink))]">
               <TranslatedText>Selling on Multiple Channels?</TranslatedText>
             </h3>
-            <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+            <p className="text-lg text-[hsl(var(--wcu-ink-soft))] mb-6 max-w-2xl mx-auto">
               <TranslatedText>We manage your inventory centrally so you never oversell and always ship fast. Connect your tech stack in minutes.</TranslatedText>
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <button 
-                onClick={() => navigate("/sales-channels")}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold hover:bg-primary/90 transition-colors text-lg"
-              >
+            <div className="flex flex-wrap justify-center gap-3">
+              <button onClick={() => navigate("/sales-channels")} className="px-7 py-3 rounded-full bg-[hsl(var(--wcu-sunset))] hover:bg-[hsl(var(--wcu-sunset-deep))] text-white font-bold transition-colors">
                 <TranslatedText>See All Platforms</TranslatedText> →
               </button>
-              <button 
-                onClick={() => navigate("/integrations")}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-transparent border-2 border-primary text-primary rounded-full font-bold hover:bg-primary/10 transition-colors text-lg"
-              >
+              <button onClick={() => navigate("/integrations")} className="px-7 py-3 rounded-full bg-transparent border-2 border-[hsl(var(--wcu-ink))] text-[hsl(var(--wcu-ink))] hover:bg-[hsl(var(--wcu-ink))] hover:text-[hsl(var(--wcu-linen))] font-bold transition-colors">
                 <TranslatedText>View Integrations & API</TranslatedText> →
               </button>
             </div>

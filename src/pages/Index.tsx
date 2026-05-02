@@ -24,6 +24,7 @@ const Compliance = lazy(() => import("@/components/Compliance"));
 const StatsStrip = lazy(() => import("@/components/StatsStrip"));
 
 const BlogPreview = lazy(() => import("@/components/BlogPreview"));
+const LaunchpadCallout = lazy(() => import("@/components/LaunchpadCallout"));
 const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA"));
 const Index = () => {
   const { user, role, loading } = useAuth();
@@ -163,6 +164,11 @@ const Index = () => {
           {/* Phase 8: LA Location */}
           <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
             <LocationShowcase />
+          </Suspense>
+
+          {/* Launchpad Callout */}
+          <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
+            <LaunchpadCallout />
           </Suspense>
 
           {/* Blog Preview - NEW */}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { DollarSign } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { trackEvent, type AnalyticsEvent } from "@/lib/analytics";
 
 const StickyMobileCTA = () => {
@@ -10,51 +10,40 @@ const StickyMobileCTA = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show CTA after scrolling past hero (approximately 85vh)
       const heroHeight = window.innerHeight * 0.85;
       const scrollPosition = window.scrollY;
-
-      // Check if quote form is in view
       const quoteForm = document.getElementById("quote-form");
       if (quoteForm) {
         const rect = quoteForm.getBoundingClientRect();
         const isQuoteFormVisible = rect.top < window.innerHeight && rect.bottom >= 0;
-        
-        // Show if past hero but hide if quote form is visible
         setIsVisible(scrollPosition > heroHeight && !isQuoteFormVisible);
       } else {
         setIsVisible(scrollPosition > heroHeight);
       }
     };
-
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Check initial state
-
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleClick = () => {
-    const event: AnalyticsEvent = 'pricing_cta_click';
-    trackEvent(event, { location: 'sticky_mobile' });
-    navigate("/pricing");
+    const event: AnalyticsEvent = "pricing_cta_click";
+    trackEvent(event, { location: "sticky_mobile" });
+    navigate("/contact");
   };
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
-      <div className="bg-[hsl(var(--shopify-page-accent))] shadow-lg border-t border-white/10">
-        <div className="container mx-auto px-4 py-3">
-          <Button
-            onClick={handleClick}
-            size="lg"
-            className="w-full bg-white text-[hsl(var(--shopify-page-accent))] hover:bg-white/90 font-semibold shadow-md"
-          >
-            <DollarSign className="mr-2 w-5 h-5" />
-            View Fulfillment Pricing
-          </Button>
-        </div>
-      </div>
+    <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden p-3" style={{ background: "linear-gradient(to top, hsl(var(--wcu-linen)), transparent)" }}>
+      <Button
+        onClick={handleClick}
+        size="lg"
+        className="w-full bg-[hsl(var(--wcu-sunset))] hover:bg-[hsl(var(--wcu-sunset-deep))] text-white font-bold rounded-full shadow-[0_20px_40px_-10px_hsl(var(--wcu-sunset)/0.6)] py-6"
+      >
+        Get Free Fulfillment Audit
+        <ArrowRight className="ml-2 w-5 h-5" />
+      </Button>
     </div>
   );
 };
