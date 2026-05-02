@@ -20,7 +20,7 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { generateMetaTags } from "@/utils/seo";
-import { ShopifyIcon, AmazonIcon, TikTokIcon, WalmartIcon } from "@/components/BrandIcons";
+import { SiShopify, SiAmazon, SiTiktok, SiWalmart } from "react-icons/si";
 
 const meta = generateMetaTags(
   "Westfield Launchpad | Shopify, Amazon & Product Media Services in LA",
@@ -207,10 +207,10 @@ const Launchpad = () => {
                   className="flex items-center justify-center gap-2 flex-wrap"
                 >
                   {[
-                    { Icon: ShopifyIcon, label: "Shopify" },
-                    { Icon: AmazonIcon, label: "Amazon" },
-                    { Icon: TikTokIcon, label: "TikTok Shop" },
-                    { Icon: WalmartIcon, label: "Walmart" },
+                    { Icon: SiShopify, label: "Shopify" },
+                    { Icon: SiAmazon, label: "Amazon" },
+                    { Icon: SiTiktok, label: "TikTok Shop" },
+                    { Icon: SiWalmart, label: "Walmart" },
                   ].map(({ Icon, label }) => (
                     <div
                       key={label}
