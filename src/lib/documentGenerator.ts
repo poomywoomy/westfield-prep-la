@@ -133,22 +133,21 @@ ${palletPrefix} ${tierText} ${exclusion} ${shortfall}`;
 const getSection14 = (refundable: boolean, fee: number): string => {
   const words = numberToWords(fee);
   const formatted = fee.toLocaleString("en-US");
-  if (refundable) {
-    return `14. TERM AND TERMINATION
+  const refundSentence = refundable
+    ? ` The Post-Termination Removal Fee and any accrued additional storage fees must be paid in full prior to the release of the remaining inventory. Upon satisfaction of all outstanding balances, the full ${words} U.S. Dollar ($${formatted}) account setup fee shall be refunded and wired back to Client.`
+    : ` The Post-Termination Removal Fee and any accrued additional storage fees must be paid in full prior to the release of the remaining inventory.`;
 
-14.1 Notice and Breach
-This Agreement remains in effect until terminated by either Party upon thirty (30) days' written notice. Westfield may terminate or suspend Services immediately for non-payment or material breach.
-
-14.2 Post-Termination Removal Fee
-Upon the termination of this Agreement for any reason, Client shall be charged an ad-hoc fee for the labor, handling, and processing required to remove and prepare any of Client's remaining products for outbound transfer from the warehouse. This fee must be paid in full prior to the release of the remaining inventory. Upon satisfaction of all outstanding balances, including the Post-Termination Removal Fee, the full ${words} U.S. Dollar ($${formatted}) account setup fee shall be refunded and wired back to Client.`;
-  }
   return `14. TERM AND TERMINATION
 
 14.1 Notice and Breach
 This Agreement remains in effect until terminated by either Party upon thirty (30) days' written notice. Westfield may terminate or suspend Services immediately for non-payment or material breach.
 
 14.2 Post-Termination Removal Fee
-Upon the termination of this Agreement for any reason, Client shall be charged an ad-hoc fee for the labor, handling, and processing required to remove and prepare any of Client's remaining products for outbound transfer from the warehouse. This fee must be paid in full prior to the release of the remaining inventory.`;
+Upon termination of this Agreement for any reason, Client's remaining inventory shall be removed from Westfield's facility on an ad-hoc basis at a flat rate of One Hundred Twenty-Five U.S. Dollars ($125.00) per pallet. Client is solely responsible for arranging and scheduling pickup of the removed inventory with a carrier of Client's choosing.
+
+If Client's products are not already stored on pallets at the time of removal, Westfield shall consolidate, palletize, and stage the products for transport, and the per-pallet removal fee shall be applied to the total number of pallets rounded up to the nearest whole pallet.
+
+Client must coordinate pickup of the staged inventory within a reasonable timeframe mutually agreed upon by both Parties. If Client fails to arrange pickup within the agreed timeframe, Westfield reserves the right to assess additional storage fees at Westfield's then-current storage rates for each day the inventory remains at the facility, until pickup is completed.${refundSentence}`;
 };
 
 // ---------------- Full Agreement Body ----------------
@@ -352,7 +351,10 @@ Loose, floor-loaded carton shipments are billed at the per-carton receiving rate
 A.3 Pilot Terms
 Where a pilot or trial period has been agreed to in writing by the Parties, the pricing and minimum-monthly terms set forth in the body of this Agreement shall govern unless expressly modified by a written pilot addendum signed by both Parties.
 
-A.4 Pricing Updates
+A.4 Post-Termination Removal
+Ad-hoc removal of remaining inventory upon termination is billed at $125.00 per pallet, rounded up to the nearest whole pallet where products are not already palletized. Client arranges and schedules carrier pickup. Additional storage fees at Westfield's then-current rates may apply if pickup is not coordinated within the timeframe mutually agreed upon by the Parties.
+
+A.5 Pricing Updates
 Specific per-unit, per-pallet, per-order, and storage rates are documented separately in Client's active pricing schedule on file with Westfield, and may be updated from time to time pursuant to Section 18 (Miscellaneous).`;
 
 // ---------------- Brand colors ----------------
@@ -452,73 +454,146 @@ export const generateDocumentPDF = async (
 
   const renderBlock = (block: string) => {
     const rawLines = block.split("\n");
-    rawLines.forEach((raw) => {
+
+    // Helper: compute wrapped height of a body/bullet/subsection line
+    const measureBody = (line: string) => doc.splitTextToSize(line, contentWidth).length * 4.8;
+    const measureBullet = (line: string) => doc.splitTextToSize(line.replace(/^•\s+/, ""), contentWidth - 6).length * 4.8;
+    const measureSubsection = (line: string) => doc.splitTextToSize(line, contentWidth).length * 5 + 1.5;
+
+    // Pre-group: collapse consecutive non-blank lines into paragraph "groups".
+    // A group is a contiguous run of non-blank lines belonging to the same
+    // logical block (heading line(s) and following paragraph lines stay together).
+    type Item =
+      | { kind: "blank" }
+      | { kind: "main"; line: string }
+      | { kind: "sub"; line: string }
+      | { kind: "bullet"; line: string }
+      | { kind: "body"; line: string };
+
+    const items: Item[] = rawLines.map((raw) => {
       const line = raw.trimEnd();
-      if (line === "") {
-        y += 2.5;
-        return;
-      }
+      if (line === "") return { kind: "blank" };
+      if (mainSectionPattern.test(line)) return { kind: "main", line };
+      if (subsectionPattern.test(line)) return { kind: "sub", line };
+      if (bulletPattern.test(line)) return { kind: "bullet", line };
+      return { kind: "body", line };
+    });
 
-      if (mainSectionPattern.test(line)) {
-        ensureSpace(14);
-        y += 3;
-        doc.setFontSize(11.5);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(...NAVY);
-        doc.text(line, margin, y);
-        // orange underline accent
-        const textW = doc.getTextWidth(line);
-        doc.setFillColor(...ORANGE);
-        doc.rect(margin, y + 1.5, Math.min(textW, 40), 0.8, "F");
-        doc.setTextColor(0, 0, 0);
-        y += 7;
-        return;
-      }
+    const renderMain = (line: string) => {
+      y += 3;
+      doc.setFontSize(11.5);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...NAVY);
+      doc.text(line, margin, y);
+      const textW = doc.getTextWidth(line);
+      doc.setFillColor(...ORANGE);
+      doc.rect(margin, y + 1.5, Math.min(textW, 40), 0.8, "F");
+      doc.setTextColor(0, 0, 0);
+      y += 7;
+    };
 
-      if (subsectionPattern.test(line)) {
-        ensureSpace(8);
-        y += 1.5;
-        doc.setFontSize(9.8);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(...GRAY_DARK);
-        const wrapped = doc.splitTextToSize(line, contentWidth);
-        wrapped.forEach((w: string) => {
-          ensureSpace(5);
-          doc.text(w, margin, y);
-          y += 5;
-        });
-        doc.setTextColor(0, 0, 0);
-        return;
-      }
+    const renderSub = (line: string) => {
+      y += 1.5;
+      doc.setFontSize(9.8);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...GRAY_DARK);
+      const wrapped = doc.splitTextToSize(line, contentWidth);
+      wrapped.forEach((w: string) => {
+        doc.text(w, margin, y);
+        y += 5;
+      });
+      doc.setTextColor(0, 0, 0);
+    };
 
-      if (bulletPattern.test(line)) {
-        const text = line.replace(/^•\s+/, "");
-        doc.setFontSize(9.5);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(...GRAY_DARK);
-        const wrapped = doc.splitTextToSize(text, contentWidth - 6);
-        wrapped.forEach((w: string, i: number) => {
-          ensureSpace(5);
-          if (i === 0) doc.text("•", margin + 1, y);
-          doc.text(w, margin + 6, y);
-          y += 4.8;
-        });
-        doc.setTextColor(0, 0, 0);
-        return;
-      }
+    const renderBullet = (line: string) => {
+      const text = line.replace(/^•\s+/, "");
+      doc.setFontSize(9.5);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...GRAY_DARK);
+      const wrapped = doc.splitTextToSize(text, contentWidth - 6);
+      wrapped.forEach((w: string, i: number) => {
+        if (i === 0) doc.text("•", margin + 1, y);
+        doc.text(w, margin + 6, y);
+        y += 4.8;
+      });
+      doc.setTextColor(0, 0, 0);
+    };
 
-      // Body paragraph
+    const renderBody = (line: string) => {
       doc.setFontSize(9.5);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...GRAY_DARK);
       const wrapped = doc.splitTextToSize(line, contentWidth);
       wrapped.forEach((w: string) => {
-        ensureSpace(5);
         doc.text(w, margin, y);
         y += 4.8;
       });
       doc.setTextColor(0, 0, 0);
-    });
+    };
+
+    const pageHeightAvail = bodyBottom - bodyTop;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      if (item.kind === "blank") {
+        y += 2.5;
+        continue;
+      }
+
+      if (item.kind === "main") {
+        // Reserve space for heading + first sub/body line so heading is never orphaned
+        let needed = 14;
+        const next = items[i + 1];
+        if (next && next.kind === "sub") needed += measureSubsection(next.line) + 6;
+        else if (next && next.kind === "body") needed += Math.min(measureBody(next.line), 14);
+        ensureSpace(needed);
+        renderMain(item.line);
+        continue;
+      }
+
+      if (item.kind === "sub") {
+        // Group subsection heading with the following paragraph (until next blank/heading)
+        let groupHeight = measureSubsection(item.line);
+        let j = i + 1;
+        while (j < items.length && items[j].kind !== "blank" && items[j].kind !== "main" && items[j].kind !== "sub") {
+          const it = items[j];
+          if (it.kind === "body") groupHeight += measureBody(it.line);
+          else if (it.kind === "bullet") groupHeight += measureBullet(it.line);
+          j++;
+        }
+        // Cap at page height (fall back to natural flow for very long groups)
+        if (groupHeight > pageHeightAvail) groupHeight = measureSubsection(item.line) + 14;
+        ensureSpace(groupHeight);
+        renderSub(item.line);
+        continue;
+      }
+
+      if (item.kind === "bullet") {
+        ensureSpace(measureBullet(item.line));
+        renderBullet(item.line);
+        continue;
+      }
+
+      // Body paragraph: render as a unit when it fits
+      const h = measureBody(item.line);
+      if (h <= pageHeightAvail) {
+        ensureSpace(h);
+        renderBody(item.line);
+      } else {
+        // Paragraph longer than a page: line-by-line fallback
+        doc.setFontSize(9.5);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...GRAY_DARK);
+        const wrapped = doc.splitTextToSize(item.line, contentWidth);
+        wrapped.forEach((w: string) => {
+          ensureSpace(5);
+          doc.text(w, margin, y);
+          y += 4.8;
+        });
+        doc.setTextColor(0, 0, 0);
+      }
+    }
   };
 
   renderBlock(buildAgreementContent(clientDetails));
