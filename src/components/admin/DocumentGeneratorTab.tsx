@@ -242,20 +242,6 @@ const DocumentGeneratorTab = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Document Type Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="document">Document Type *</Label>
-            <Select value={selectedDocument} onValueChange={setSelectedDocument}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a document" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(DOCUMENT_TYPES).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
           {/* Agreement Options */}
           {selectedDocument && (
