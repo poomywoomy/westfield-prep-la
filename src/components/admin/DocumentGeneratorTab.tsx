@@ -91,10 +91,7 @@ const DocumentGeneratorTab = () => {
   };
 
   const handleGenerate = async () => {
-    if (!selectedDocument) {
-      toast({ title: "Error", description: "Please select a document type", variant: "destructive" });
-      return;
-    }
+
     if (!minimumSpendTier) {
       toast({ title: "Error", description: "Please select a minimum monthly spend tier", variant: "destructive" });
       return;
