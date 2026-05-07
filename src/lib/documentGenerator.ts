@@ -133,22 +133,21 @@ ${palletPrefix} ${tierText} ${exclusion} ${shortfall}`;
 const getSection14 = (refundable: boolean, fee: number): string => {
   const words = numberToWords(fee);
   const formatted = fee.toLocaleString("en-US");
-  if (refundable) {
-    return `14. TERM AND TERMINATION
+  const refundSentence = refundable
+    ? ` The Post-Termination Removal Fee and any accrued additional storage fees must be paid in full prior to the release of the remaining inventory. Upon satisfaction of all outstanding balances, the full ${words} U.S. Dollar ($${formatted}) account setup fee shall be refunded and wired back to Client.`
+    : ` The Post-Termination Removal Fee and any accrued additional storage fees must be paid in full prior to the release of the remaining inventory.`;
 
-14.1 Notice and Breach
-This Agreement remains in effect until terminated by either Party upon thirty (30) days' written notice. Westfield may terminate or suspend Services immediately for non-payment or material breach.
-
-14.2 Post-Termination Removal Fee
-Upon the termination of this Agreement for any reason, Client shall be charged an ad-hoc fee for the labor, handling, and processing required to remove and prepare any of Client's remaining products for outbound transfer from the warehouse. This fee must be paid in full prior to the release of the remaining inventory. Upon satisfaction of all outstanding balances, including the Post-Termination Removal Fee, the full ${words} U.S. Dollar ($${formatted}) account setup fee shall be refunded and wired back to Client.`;
-  }
   return `14. TERM AND TERMINATION
 
 14.1 Notice and Breach
 This Agreement remains in effect until terminated by either Party upon thirty (30) days' written notice. Westfield may terminate or suspend Services immediately for non-payment or material breach.
 
 14.2 Post-Termination Removal Fee
-Upon the termination of this Agreement for any reason, Client shall be charged an ad-hoc fee for the labor, handling, and processing required to remove and prepare any of Client's remaining products for outbound transfer from the warehouse. This fee must be paid in full prior to the release of the remaining inventory.`;
+Upon termination of this Agreement for any reason, Client's remaining inventory shall be removed from Westfield's facility on an ad-hoc basis at a flat rate of One Hundred Twenty-Five U.S. Dollars ($125.00) per pallet. Client is solely responsible for arranging and scheduling pickup of the removed inventory with a carrier of Client's choosing.
+
+If Client's products are not already stored on pallets at the time of removal, Westfield shall consolidate, palletize, and stage the products for transport, and the per-pallet removal fee shall be applied to the total number of pallets rounded up to the nearest whole pallet.
+
+Client must coordinate pickup of the staged inventory within a reasonable timeframe mutually agreed upon by both Parties. If Client fails to arrange pickup within the agreed timeframe, Westfield reserves the right to assess additional storage fees at Westfield's then-current storage rates for each day the inventory remains at the facility, until pickup is completed.${refundSentence}`;
 };
 
 // ---------------- Full Agreement Body ----------------
@@ -352,7 +351,10 @@ Loose, floor-loaded carton shipments are billed at the per-carton receiving rate
 A.3 Pilot Terms
 Where a pilot or trial period has been agreed to in writing by the Parties, the pricing and minimum-monthly terms set forth in the body of this Agreement shall govern unless expressly modified by a written pilot addendum signed by both Parties.
 
-A.4 Pricing Updates
+A.4 Post-Termination Removal
+Ad-hoc removal of remaining inventory upon termination is billed at $125.00 per pallet, rounded up to the nearest whole pallet where products are not already palletized. Client arranges and schedules carrier pickup. Additional storage fees at Westfield's then-current rates may apply if pickup is not coordinated within the timeframe mutually agreed upon by the Parties.
+
+A.5 Pricing Updates
 Specific per-unit, per-pallet, per-order, and storage rates are documented separately in Client's active pricing schedule on file with Westfield, and may be updated from time to time pursuant to Section 18 (Miscellaneous).`;
 
 // ---------------- Brand colors ----------------
