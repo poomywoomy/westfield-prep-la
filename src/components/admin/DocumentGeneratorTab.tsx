@@ -39,7 +39,7 @@ const SETUP_FEE_OPTIONS = {
 };
 
 const DocumentGeneratorTab = () => {
-  const [selectedDocument, setSelectedDocument] = useState<string>("");
+  const [selectedDocument, setSelectedDocument] = useState<string>("master_agreement");
   const [minimumSpendTier, setMinimumSpendTier] = useState<string>("");
   const [customMinimumAmount, setCustomMinimumAmount] = useState<string>("");
   const [customIntroAmount, setCustomIntroAmount] = useState<string>("");
@@ -91,10 +91,7 @@ const DocumentGeneratorTab = () => {
   };
 
   const handleGenerate = async () => {
-    if (!selectedDocument) {
-      toast({ title: "Error", description: "Please select a document type", variant: "destructive" });
-      return;
-    }
+
     if (!minimumSpendTier) {
       toast({ title: "Error", description: "Please select a minimum monthly spend tier", variant: "destructive" });
       return;
@@ -245,20 +242,6 @@ const DocumentGeneratorTab = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Document Type Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="document">Document Type *</Label>
-            <Select value={selectedDocument} onValueChange={setSelectedDocument}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a document" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(DOCUMENT_TYPES).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
           {/* Agreement Options */}
           {selectedDocument && (
