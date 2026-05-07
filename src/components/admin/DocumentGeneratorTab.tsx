@@ -39,7 +39,7 @@ const SETUP_FEE_OPTIONS = {
 };
 
 const DocumentGeneratorTab = () => {
-  const [selectedDocument, setSelectedDocument] = useState<string>("");
+  const [selectedDocument, setSelectedDocument] = useState<string>("master_agreement");
   const [minimumSpendTier, setMinimumSpendTier] = useState<string>("");
   const [customMinimumAmount, setCustomMinimumAmount] = useState<string>("");
   const [customIntroAmount, setCustomIntroAmount] = useState<string>("");
