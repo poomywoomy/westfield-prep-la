@@ -454,73 +454,146 @@ export const generateDocumentPDF = async (
 
   const renderBlock = (block: string) => {
     const rawLines = block.split("\n");
-    rawLines.forEach((raw) => {
+
+    // Helper: compute wrapped height of a body/bullet/subsection line
+    const measureBody = (line: string) => doc.splitTextToSize(line, contentWidth).length * 4.8;
+    const measureBullet = (line: string) => doc.splitTextToSize(line.replace(/^•\s+/, ""), contentWidth - 6).length * 4.8;
+    const measureSubsection = (line: string) => doc.splitTextToSize(line, contentWidth).length * 5 + 1.5;
+
+    // Pre-group: collapse consecutive non-blank lines into paragraph "groups".
+    // A group is a contiguous run of non-blank lines belonging to the same
+    // logical block (heading line(s) and following paragraph lines stay together).
+    type Item =
+      | { kind: "blank" }
+      | { kind: "main"; line: string }
+      | { kind: "sub"; line: string }
+      | { kind: "bullet"; line: string }
+      | { kind: "body"; line: string };
+
+    const items: Item[] = rawLines.map((raw) => {
       const line = raw.trimEnd();
-      if (line === "") {
-        y += 2.5;
-        return;
-      }
+      if (line === "") return { kind: "blank" };
+      if (mainSectionPattern.test(line)) return { kind: "main", line };
+      if (subsectionPattern.test(line)) return { kind: "sub", line };
+      if (bulletPattern.test(line)) return { kind: "bullet", line };
+      return { kind: "body", line };
+    });
 
-      if (mainSectionPattern.test(line)) {
-        ensureSpace(14);
-        y += 3;
-        doc.setFontSize(11.5);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(...NAVY);
-        doc.text(line, margin, y);
-        // orange underline accent
-        const textW = doc.getTextWidth(line);
-        doc.setFillColor(...ORANGE);
-        doc.rect(margin, y + 1.5, Math.min(textW, 40), 0.8, "F");
-        doc.setTextColor(0, 0, 0);
-        y += 7;
-        return;
-      }
+    const renderMain = (line: string) => {
+      y += 3;
+      doc.setFontSize(11.5);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...NAVY);
+      doc.text(line, margin, y);
+      const textW = doc.getTextWidth(line);
+      doc.setFillColor(...ORANGE);
+      doc.rect(margin, y + 1.5, Math.min(textW, 40), 0.8, "F");
+      doc.setTextColor(0, 0, 0);
+      y += 7;
+    };
 
-      if (subsectionPattern.test(line)) {
-        ensureSpace(8);
-        y += 1.5;
-        doc.setFontSize(9.8);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(...GRAY_DARK);
-        const wrapped = doc.splitTextToSize(line, contentWidth);
-        wrapped.forEach((w: string) => {
-          ensureSpace(5);
-          doc.text(w, margin, y);
-          y += 5;
-        });
-        doc.setTextColor(0, 0, 0);
-        return;
-      }
+    const renderSub = (line: string) => {
+      y += 1.5;
+      doc.setFontSize(9.8);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...GRAY_DARK);
+      const wrapped = doc.splitTextToSize(line, contentWidth);
+      wrapped.forEach((w: string) => {
+        doc.text(w, margin, y);
+        y += 5;
+      });
+      doc.setTextColor(0, 0, 0);
+    };
 
-      if (bulletPattern.test(line)) {
-        const text = line.replace(/^•\s+/, "");
-        doc.setFontSize(9.5);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(...GRAY_DARK);
-        const wrapped = doc.splitTextToSize(text, contentWidth - 6);
-        wrapped.forEach((w: string, i: number) => {
-          ensureSpace(5);
-          if (i === 0) doc.text("•", margin + 1, y);
-          doc.text(w, margin + 6, y);
-          y += 4.8;
-        });
-        doc.setTextColor(0, 0, 0);
-        return;
-      }
+    const renderBullet = (line: string) => {
+      const text = line.replace(/^•\s+/, "");
+      doc.setFontSize(9.5);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...GRAY_DARK);
+      const wrapped = doc.splitTextToSize(text, contentWidth - 6);
+      wrapped.forEach((w: string, i: number) => {
+        if (i === 0) doc.text("•", margin + 1, y);
+        doc.text(w, margin + 6, y);
+        y += 4.8;
+      });
+      doc.setTextColor(0, 0, 0);
+    };
 
-      // Body paragraph
+    const renderBody = (line: string) => {
       doc.setFontSize(9.5);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...GRAY_DARK);
       const wrapped = doc.splitTextToSize(line, contentWidth);
       wrapped.forEach((w: string) => {
-        ensureSpace(5);
         doc.text(w, margin, y);
         y += 4.8;
       });
       doc.setTextColor(0, 0, 0);
-    });
+    };
+
+    const pageHeightAvail = bodyBottom - bodyTop;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      if (item.kind === "blank") {
+        y += 2.5;
+        continue;
+      }
+
+      if (item.kind === "main") {
+        // Reserve space for heading + first sub/body line so heading is never orphaned
+        let needed = 14;
+        const next = items[i + 1];
+        if (next && next.kind === "sub") needed += measureSubsection(next.line) + 6;
+        else if (next && next.kind === "body") needed += Math.min(measureBody(next.line), 14);
+        ensureSpace(needed);
+        renderMain(item.line);
+        continue;
+      }
+
+      if (item.kind === "sub") {
+        // Group subsection heading with the following paragraph (until next blank/heading)
+        let groupHeight = measureSubsection(item.line);
+        let j = i + 1;
+        while (j < items.length && items[j].kind !== "blank" && items[j].kind !== "main" && items[j].kind !== "sub") {
+          const it = items[j];
+          if (it.kind === "body") groupHeight += measureBody(it.line);
+          else if (it.kind === "bullet") groupHeight += measureBullet(it.line);
+          j++;
+        }
+        // Cap at page height (fall back to natural flow for very long groups)
+        if (groupHeight > pageHeightAvail) groupHeight = measureSubsection(item.line) + 14;
+        ensureSpace(groupHeight);
+        renderSub(item.line);
+        continue;
+      }
+
+      if (item.kind === "bullet") {
+        ensureSpace(measureBullet(item.line));
+        renderBullet(item.line);
+        continue;
+      }
+
+      // Body paragraph: render as a unit when it fits
+      const h = measureBody(item.line);
+      if (h <= pageHeightAvail) {
+        ensureSpace(h);
+        renderBody(item.line);
+      } else {
+        // Paragraph longer than a page: line-by-line fallback
+        doc.setFontSize(9.5);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...GRAY_DARK);
+        const wrapped = doc.splitTextToSize(item.line, contentWidth);
+        wrapped.forEach((w: string) => {
+          ensureSpace(5);
+          doc.text(w, margin, y);
+          y += 4.8;
+        });
+        doc.setTextColor(0, 0, 0);
+      }
+    }
   };
 
   renderBlock(buildAgreementContent(clientDetails));
