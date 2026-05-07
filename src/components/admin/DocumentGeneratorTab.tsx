@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FileText, Download } from "lucide-react";
-import { generateDocumentPDF, ClientDetails } from "@/lib/documentGenerator";
+import { generateDocumentPDF, ClientDetails, parseTier } from "@/lib/documentGenerator";
 
 const DOCUMENT_TYPES = {
   master_agreement: "Client Service Agreement (Master Agreement)"
@@ -23,27 +23,19 @@ const MINIMUM_SPEND_TIERS = {
 
 const formatMinimumTierLabel = (tier: string | null | undefined): string => {
   if (!tier) return "N/A";
-  if (tier.startsWith("custom:")) {
-    const payload = tier.slice(7);
-    if (payload.includes("_then_")) {
-      const [introStr, ongoingStr] = payload.split("_then_");
-      const intro = parseInt(introStr, 10);
-      const ongoing = parseInt(ongoingStr, 10);
-      if (intro >= 1 && ongoing >= 1) {
-        return `$${intro.toLocaleString("en-US")}/mo for 3 mo, then $${ongoing.toLocaleString("en-US")}/mo (custom)`;
-      }
-      return "Custom (invalid)";
-    }
-    const amt = parseInt(payload, 10);
-    if (amt && amt >= 1) return `$${amt.toLocaleString("en-US")}/mo flat (custom)`;
-    return "Custom (invalid)";
+  const parsed = parseTier(tier);
+  if (parsed.introAmount && parsed.ongoingAmount && parsed.introMonths) {
+    return `$${parsed.introAmount.toLocaleString("en-US")}/mo for ${parsed.introMonths} mo, then $${parsed.ongoingAmount.toLocaleString("en-US")}/mo`;
   }
-  return MINIMUM_SPEND_TIERS[tier as keyof typeof MINIMUM_SPEND_TIERS] || "N/A";
+  if (parsed.flatAmount) {
+    return `$${parsed.flatAmount.toLocaleString("en-US")}/mo flat`;
+  }
+  return MINIMUM_SPEND_TIERS[parsed.base as keyof typeof MINIMUM_SPEND_TIERS] || "N/A";
 };
 
 const SETUP_FEE_OPTIONS = {
-  refundable: "$500 Refundable",
-  non_refundable: "$500 Non-Refundable"
+  refundable: "Refundable",
+  non_refundable: "Non-Refundable"
 };
 
 const DocumentGeneratorTab = () => {
@@ -51,7 +43,9 @@ const DocumentGeneratorTab = () => {
   const [minimumSpendTier, setMinimumSpendTier] = useState<string>("");
   const [customMinimumAmount, setCustomMinimumAmount] = useState<string>("");
   const [customIntroAmount, setCustomIntroAmount] = useState<string>("");
+  const [customIntroMonths, setCustomIntroMonths] = useState<string>("3");
   const [setupFeeOption, setSetupFeeOption] = useState<string>("");
+  const [setupFeeAmount, setSetupFeeAmount] = useState<string>("500");
   const [generating, setGenerating] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,11 +115,21 @@ const DocumentGeneratorTab = () => {
           toast({ title: "Invalid intro amount", description: "Leave intro blank for no intro period, or enter a whole-dollar amount.", variant: "destructive" });
           return;
         }
-        resolvedMinimumTier = `custom:${intro}_then_${ongoing}`;
+        const months = parseInt(customIntroMonths, 10);
+        if (!months || months < 1) {
+          toast({ title: "Invalid intro length", description: "Enter the intro period length in months (1 or more).", variant: "destructive" });
+          return;
+        }
+        resolvedMinimumTier = `custom:${intro}_then_${ongoing}_for_${months}`;
       }
     }
     if (!setupFeeOption) {
       toast({ title: "Error", description: "Please select a setup fee option", variant: "destructive" });
+      return;
+    }
+    const fee = parseInt(setupFeeAmount, 10);
+    if (!fee || fee < 1) {
+      toast({ title: "Invalid setup fee", description: "Enter a whole-dollar setup fee amount.", variant: "destructive" });
       return;
     }
     if (!clientDetails.companyName || !clientDetails.contactName) {
@@ -133,12 +137,15 @@ const DocumentGeneratorTab = () => {
       return;
     }
 
+    // Encode setup fee onto tier string so we can persist without schema change
+    const tierWithFee = `${resolvedMinimumTier}|fee:${fee}`;
+
     setGenerating(true);
     try {
       const isRefundable = setupFeeOption === "refundable";
       const detailsWithOptions: ClientDetails = {
         ...clientDetails,
-        minimumSpendTier: resolvedMinimumTier,
+        minimumSpendTier: tierWithFee,
         setupFeeRefundable: isRefundable
       };
 
@@ -159,7 +166,7 @@ const DocumentGeneratorTab = () => {
           phone: clientDetails.phone || null,
           client_name_2: clientDetails.contactName2 || null,
           contact_title_2: clientDetails.contactTitle2 || null,
-          minimum_spend_tier: resolvedMinimumTier,
+          minimum_spend_tier: tierWithFee,
           setup_fee_refundable: isRefundable,
         });
 
@@ -175,7 +182,9 @@ const DocumentGeneratorTab = () => {
       setMinimumSpendTier("");
       setCustomMinimumAmount("");
       setCustomIntroAmount("");
+      setCustomIntroMonths("3");
       setSetupFeeOption("");
+      setSetupFeeAmount("500");
     } catch (error: any) {
       console.error("Error generating document:", error);
       toast({ title: "Error", description: error.message || "Failed to generate document", variant: "destructive" });
@@ -219,8 +228,9 @@ const DocumentGeneratorTab = () => {
   };
 
   const customAmountValid = minimumSpendTier !== "custom" || (parseInt(customMinimumAmount, 10) >= 1);
-  const customIntroValid = minimumSpendTier !== "custom" || customIntroAmount.trim() === "" || parseInt(customIntroAmount, 10) >= 1;
-  const isFormValid = selectedDocument && minimumSpendTier && customAmountValid && customIntroValid && setupFeeOption && clientDetails.companyName && clientDetails.contactName;
+  const customIntroValid = minimumSpendTier !== "custom" || customIntroAmount.trim() === "" || (parseInt(customIntroAmount, 10) >= 1 && parseInt(customIntroMonths, 10) >= 1);
+  const setupFeeValid = parseInt(setupFeeAmount, 10) >= 1;
+  const isFormValid = selectedDocument && minimumSpendTier && customAmountValid && customIntroValid && setupFeeOption && setupFeeValid && clientDetails.companyName && clientDetails.contactName;
 
   return (
     <div className="space-y-6">
@@ -257,7 +267,7 @@ const DocumentGeneratorTab = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Minimum Monthly Spend *</Label>
-                  <Select value={minimumSpendTier} onValueChange={(v) => { setMinimumSpendTier(v); if (v !== "custom") { setCustomMinimumAmount(""); setCustomIntroAmount(""); } }}>
+                  <Select value={minimumSpendTier} onValueChange={(v) => { setMinimumSpendTier(v); if (v !== "custom") { setCustomMinimumAmount(""); setCustomIntroAmount(""); setCustomIntroMonths("3"); } }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select minimum spend tier" />
                     </SelectTrigger>
@@ -269,19 +279,32 @@ const DocumentGeneratorTab = () => {
                   </Select>
                   {minimumSpendTier === "custom" && (
                     <div className="space-y-3 pt-2">
-                      <div className="space-y-1">
-                        <Label className="text-xs">Intro Period Amount ($) — optional</Label>
-                        <Input
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          placeholder="e.g. 500"
-                          value={customIntroAmount}
-                          onChange={(e) => setCustomIntroAmount(e.target.value.replace(/[^0-9]/g, ""))}
-                        />
-                        <p className="text-xs text-muted-foreground">Leave blank for no intro period. Applies to months 1–3.</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Intro Amount ($) — optional</Label>
+                          <Input
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            placeholder="e.g. 500"
+                            value={customIntroAmount}
+                            onChange={(e) => setCustomIntroAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Intro Length (months)</Label>
+                          <Input
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            placeholder="3"
+                            value={customIntroMonths}
+                            onChange={(e) => setCustomIntroMonths(e.target.value.replace(/[^0-9]/g, ""))}
+                            disabled={customIntroAmount.trim() === ""}
+                          />
+                        </div>
                       </div>
+                      <p className="text-xs text-muted-foreground">Leave intro blank for no intro period. Months can be 2, 3, 4, etc.</p>
                       <div className="space-y-1">
-                        <Label className="text-xs">Ongoing Amount ($) — required after 3 months</Label>
+                        <Label className="text-xs">Ongoing Amount ($) — required after intro</Label>
                         <Input
                           inputMode="numeric"
                           pattern="[0-9]*"
@@ -289,23 +312,33 @@ const DocumentGeneratorTab = () => {
                           value={customMinimumAmount}
                           onChange={(e) => setCustomMinimumAmount(e.target.value.replace(/[^0-9]/g, ""))}
                         />
-                        <p className="text-xs text-muted-foreground">Whole dollars only. Numerical characters.</p>
+                        <p className="text-xs text-muted-foreground">Whole dollars only.</p>
                       </div>
                     </div>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label>Account Setup Fee *</Label>
-                  <Select value={setupFeeOption} onValueChange={setSetupFeeOption}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select setup fee type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(SETUP_FEE_OPTIONS).map(([key, label]) => (
-                        <SelectItem key={key} value={key}>{label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select value={setupFeeOption} onValueChange={setSetupFeeOption}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(SETUP_FEE_OPTIONS).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      placeholder="500"
+                      value={setupFeeAmount}
+                      onChange={(e) => setSetupFeeAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Whole-dollar amount (default $500).</p>
                 </div>
               </div>
             </div>
@@ -411,31 +444,36 @@ const DocumentGeneratorTab = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {history.map((doc) => (
-                  <TableRow key={doc.id}>
-                    <TableCell>{formatDate(doc.generated_date)}</TableCell>
-                    <TableCell>{DOCUMENT_TYPES[doc.document_type as keyof typeof DOCUMENT_TYPES]}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{doc.company_name || doc.client_name_1}</span>
-                        {doc.company_name && doc.client_name_1 && (
-                          <span className="text-sm text-muted-foreground">{doc.client_name_1}</span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col text-xs">
-                        <span>{formatMinimumTierLabel(doc.minimum_spend_tier)}</span>
-                        <span className="text-muted-foreground">{doc.setup_fee_refundable ? "Refundable" : "Non-Refundable"}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm" onClick={() => handleRegenerate(doc)} disabled={generating}>
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {history.map((doc) => {
+                  const parsed = parseTier(doc.minimum_spend_tier);
+                  return (
+                    <TableRow key={doc.id}>
+                      <TableCell>{formatDate(doc.generated_date)}</TableCell>
+                      <TableCell>{DOCUMENT_TYPES[doc.document_type as keyof typeof DOCUMENT_TYPES]}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{doc.company_name || doc.client_name_1}</span>
+                          {doc.company_name && doc.client_name_1 && (
+                            <span className="text-sm text-muted-foreground">{doc.client_name_1}</span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col text-xs">
+                          <span>{formatMinimumTierLabel(doc.minimum_spend_tier)}</span>
+                          <span className="text-muted-foreground">
+                            Setup: ${parsed.setupFeeAmount.toLocaleString("en-US")} {doc.setup_fee_refundable ? "Refundable" : "Non-Refundable"}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm" onClick={() => handleRegenerate(doc)} disabled={generating}>
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           )}
