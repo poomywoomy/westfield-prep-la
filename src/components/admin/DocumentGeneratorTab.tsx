@@ -175,7 +175,7 @@ const DocumentGeneratorTab = () => {
       setClientDetails({
         companyName: "", contactName: "", contactTitle: "", address: "", city: "", state: "", zip: "", email: "", phone: "", contactName2: "", contactTitle2: ""
       });
-      setSelectedDocument("");
+      setSelectedDocument("master_agreement");
       setMinimumSpendTier("");
       setCustomMinimumAmount("");
       setCustomIntroAmount("");
@@ -336,26 +336,8 @@ const DocumentGeneratorTab = () => {
                 <Input id="companyName" placeholder="Enter company or business name" value={clientDetails.companyName} onChange={(e) => updateField("companyName", e.target.value)} />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" placeholder="Street address" value={clientDetails.address} onChange={(e) => updateField("address", e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
-                <Input id="city" placeholder="City" value={clientDetails.city} onChange={(e) => updateField("city", e.target.value)} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
-                <Input id="state" placeholder="CA" value={clientDetails.state} onChange={(e) => updateField("state", e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="zip">ZIP</Label>
-                <Input id="zip" placeholder="90001" value={clientDetails.zip} onChange={(e) => updateField("zip", e.target.value)} />
-              </div>
-              <div className="space-y-2 col-span-2">
                 <Label htmlFor="phone">Phone</Label>
                 <Input id="phone" placeholder="(555) 123-4567" value={clientDetails.phone} onChange={(e) => updateField("phone", e.target.value)} />
               </div>
