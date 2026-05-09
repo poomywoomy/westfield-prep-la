@@ -18,6 +18,7 @@ import { generateMetaTags } from "@/utils/seo";
 import { SiShopify, SiAmazon, SiTiktok, SiWalmart } from "react-icons/si";
 import { LAUNCHPAD_SERVICES, getServiceBySlug, type LaunchpadService } from "@/components/launchpad/launchpadServices";
 import ServiceDetailModal from "@/components/launchpad/ServiceDetailModal";
+import { ServiceCard } from "@/components/launchpad/ServiceCards";
 
 const meta = generateMetaTags(
   "Westfield Launchpad | Shopify, Amazon & Product Media Services in LA",
