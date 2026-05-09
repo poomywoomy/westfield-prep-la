@@ -1,51 +1,68 @@
 ## Goal
-Expand `/launchpad` into a richer, longer page with dedicated, uniquely styled sections per service, add a "what you actually need" bullet checklist, and wire "View Pricing" to open the contact form with **Launchpad** preselected.
 
-## 1. New service deep-dive sections (one per service, each visually distinct)
+Make Launchpad visually cohesive (one design language, no per-section color theming) and move each service's depth into a dedicated **modal**. Add **service checkboxes** to the Get a Quote screen so we capture exactly which Launchpad services the lead wants.
 
-Add a stack of full-bleed alternating sections, each with its own color theme, accent graphics, and layout. Six sections total:
+---
 
-1. **Shopify Website Creation** — emerald/mint palette, browser-frame mockup graphic, split layout (copy left, mock storefront right).
-2. **Amazon Seller Central Setup** — deep indigo + Amazon orange accent, checklist card layout, "Brand Registry / Category Approvals / Listing infrastructure" pillars.
-3. **A+ Content & Storefront Design** — warm cream + plum accent, magazine-style 3-column module preview (comparison chart, hero module, lifestyle band).
-4. **Storefront Design (Shopify theme + Amazon Storefront)** — charcoal + electric coral, large device-mockup composition (desktop + mobile).
-5. **Product Imaging (3D renders)** — midnight navy + cyan accent, isometric "infinite angles" rotating-cube graphic, bullet feature list.
-6. **Studio Photography & Model Shoots** — sandstone + terracotta, contact-sheet/film-strip motif, LA studio mention.
+## 1. Launchpad page redesign
 
-Each section uses the same primitives (eyebrow label, large heading with italic accent word, paragraph, 4-bullet feature list, CTA "Start this service →" linking to `/contact?service=launchpad&focus=<slug>`). Distinct background colors and one unique decorative SVG/graphic per section so they each feel bespoke without breaking the page rhythm.
+**Unified visual language** (drops the rainbow per-section themes from the current build):
+- Single palette: existing brand Midnight Navy / Orange on a clean light surface, consistent typography across all sections.
+- Same card treatment for every service — no emerald section, no indigo section, no terracotta section.
 
-Replace the current generic "What we help with" 6-card grid with a compact anchor-nav strip at the top of these sections (jump links to each service).
+**New structure:**
+1. Hero (kept, lightly polished — single H1).
+2. "What we build" anchor strip → smooth-scrolls to the service grid.
+3. **Service grid** — uniform 3-column card grid (responsive to 2/1) with the 7 services:
+   - Shopify Website Creation
+   - Amazon Seller Central Setup
+   - A+ Content
+   - Storefront Design
+   - Product Imaging (3D / renders)
+   - Studio Photography
+   - Listing Copy & SEO
+   
+   Each card: small icon, service name, one-line summary, "View details" button. Cards are visually identical — only the icon differs.
+4. **"Not sure what you need?" checklist** — kept, still anchors to cards but bullets now open the modal instead of scrolling.
+5. FAQ + footer (kept).
 
-## 2. "What you actually need" bullet checklist
+**Service Detail Modal** (new — one component, data-driven):
+Opens when any card or checklist item is clicked. Same layout for every service:
+- Eyebrow (`SERVICE 0X`) + service name
+- Hero summary paragraph
+- "What's included" — 4–6 checkmark bullets
+- "Deliverables" — small grid of 3–4 sub-modules (e.g. for A+: Hero Module / Comparison Chart / Lifestyle Band)
+- "How it works" — 3-step timeline
+- Primary CTA: **Get Pricing** → `/contact?service=launchpad&focus=<slug>` (closes modal, navigates)
+- Secondary: Close
 
-New section near the top (just below hero, above the deep-dives) titled **"Not sure what you need? Start here."** A two-column layout:
+Built on the existing shadcn `Dialog`. All 7 services share this one modal; content comes from a `LAUNCHPAD_SERVICES` array.
 
-- Left: short intro copy.
-- Right: bulleted checklist (checkbox-style icons, non-interactive) covering common launch needs:
-  - A live Shopify store with payments, shipping, and apps configured
-  - An Amazon Seller Central account with Brand Registry
-  - A+ Content modules and an Amazon Storefront
-  - Studio or 3D product imagery sized for every channel
-  - Listing copy, titles, bullets, and backend keywords
-  - A fulfillment partner ready to ship from day one
+---
 
-Each bullet links (anchor) to the matching deep-dive section below.
+## 2. Get a Quote screen — Launchpad service checkboxes
 
-## 3. CTA wiring — "View Pricing" → Launchpad-preselected quote
+In `src/components/ContactForm.tsx`:
+- When `serviceType` is `launchpad` (or `both`), render a new **"Which Launchpad services do you need?"** block with 7 checkboxes (one per service).
+- Pre-check the box matching the `?focus=` query param when arriving from a card/modal CTA.
+- Selected services are:
+  - Shown as chips above the comments field
+  - Submitted with the form (added to `comments` payload as a structured "Requested services: …" line, and stored on the lead row in a new `launchpad_services` text array column — or, to keep this purely frontend, prepended into `comments` only). **Default: prepend into `comments`** so no DB change is needed unless you want it stored separately.
+- Remove the auto-generated "Interested in: …" sentence — replaced by the checkbox state.
 
-- Change the hero **View Pricing** button (and any other "pricing"/"get pricing" CTAs added in the new sections) from `navigate("/pricing")` to `navigate("/contact?service=launchpad")`.
-- Update `src/components/ContactForm.tsx` to read the `service` query param on mount via `useSearchParams` and, if it equals `launchpad` (or `3pl` / `both`), seed `formData.serviceType` accordingly. Also smooth-scroll the form into view.
-- Per-section "Start this service" CTAs use `/contact?service=launchpad&focus=<service-slug>`; the focus param is appended into the comments textarea as a starter line ("Interested in: Shopify Website Creation").
+---
 
-## 4. Cleanup / consistency
+## 3. Files touched
 
-- Keep Header, Footer, and existing hero untouched (per project rule).
-- Keep the existing "3D vs Studio", "How it works", "Why Launchpad", and FAQ sections; reorder so deep-dives come after the new checklist and before "How it works".
-- Maintain the existing cream/charcoal/terracotta base palette as the page chrome — section themes are accents within full-width bands, so the page still reads as one cohesive experience.
-- Single H1 preserved (hero). All new section headings are H2.
+- `src/pages/Launchpad.tsx` — strip per-section themed blocks, replace with uniform card grid + modal trigger. Keep Hero, Header, Footer, FAQ untouched per project rules.
+- `src/components/launchpad/ServiceDetailModal.tsx` — **new**, single reusable modal.
+- `src/components/launchpad/launchpadServices.ts` — **new**, data array (slug, name, icon, summary, includes[], deliverables[], steps[]).
+- `src/components/ContactForm.tsx` — add Launchpad services checkbox group, wire `?focus=` to pre-check, include selections in submission.
 
-## Files touched
-- `src/pages/Launchpad.tsx` — major additions (checklist section + 6 deep-dive sections + anchor nav + CTA rewires).
-- `src/components/ContactForm.tsx` — read `?service=` and `?focus=` query params to preselect serviceType and prefill comments.
+No DB migration, no new dependencies.
 
-No DB, no new dependencies.
+---
+
+## Question before I build
+
+Do you want the selected Launchpad services **just added to the comments field** on submission, or **stored in a dedicated column** on the leads table so you can filter/report on them later? (Dedicated column is cleaner but needs a small migration.)
