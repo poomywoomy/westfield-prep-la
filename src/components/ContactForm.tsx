@@ -43,8 +43,17 @@ const contactSchema = z.object({
 const ContactForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialService = (() => {
+    const s = searchParams.get("service");
+    return s === "launchpad" || s === "3pl" || s === "both" ? (s as ServiceType) : ("3pl" as ServiceType);
+  })();
+  const focus = searchParams.get("focus");
+  const focusLine = focus
+    ? `Interested in: ${focus.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}\n\n`
+    : "";
   const [formData, setFormData] = useState({
-    serviceType: "3pl" as ServiceType,
+    serviceType: initialService,
     name: "",
     email: "",
     phone: "",
@@ -56,11 +65,19 @@ const ContactForm = () => {
     receivingMethod: "",
     packagingRequirements: "",
     timeline: "",
-    comments: "",
+    comments: focusLine,
     honeypot: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (initialService !== "3pl" || focus) {
+      const el = document.getElementById("contact");
+      if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 200);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
