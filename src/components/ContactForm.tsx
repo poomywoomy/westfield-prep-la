@@ -12,6 +12,7 @@ import { z } from "zod";
 import { trackEvent } from "@/lib/analytics";
 import { TranslatedText } from "@/components/TranslatedText";
 import { cn } from "@/lib/utils";
+import { LAUNCHPAD_SERVICES } from "@/components/launchpad/launchpadServices";
 
 type ServiceType = "3pl" | "launchpad" | "both";
 
@@ -49,9 +50,7 @@ const ContactForm = () => {
     return s === "launchpad" || s === "3pl" || s === "both" ? (s as ServiceType) : ("3pl" as ServiceType);
   })();
   const focus = searchParams.get("focus");
-  const focusLine = focus
-    ? `Interested in: ${focus.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}\n\n`
-    : "";
+  const initialLaunchpadServices = focus && LAUNCHPAD_SERVICES.some((s) => s.slug === focus) ? [focus] : [];
   const [formData, setFormData] = useState({
     serviceType: initialService,
     name: "",
@@ -65,7 +64,8 @@ const ContactForm = () => {
     receivingMethod: "",
     packagingRequirements: "",
     timeline: "",
-    comments: focusLine,
+    launchpadServices: initialLaunchpadServices as string[],
+    comments: "",
     honeypot: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
