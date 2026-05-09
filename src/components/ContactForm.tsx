@@ -253,7 +253,44 @@ const ContactForm = () => {
               </div>
             </div>
 
-            {/* Name and Email */}
+            {/* Launchpad service checkboxes */}
+            {(formData.serviceType === "launchpad" || formData.serviceType === "both") && (
+              <div className="rounded-lg border border-border bg-muted/30 p-5">
+                <Label className="mb-1 block">
+                  <TranslatedText>Which Launchpad services do you need?</TranslatedText>
+                </Label>
+                <p className="text-xs text-muted-foreground mb-4">
+                  <TranslatedText>Check all that apply. We'll tailor the quote to exactly these.</TranslatedText>
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {LAUNCHPAD_SERVICES.map((s) => {
+                    const checked = formData.launchpadServices.includes(s.slug);
+                    return (
+                      <label
+                        key={s.slug}
+                        htmlFor={`lp-${s.slug}`}
+                        className={cn(
+                          "flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-colors",
+                          checked ? "border-primary bg-primary/5" : "border-border bg-background hover:bg-muted/50"
+                        )}
+                      >
+                        <Checkbox
+                          id={`lp-${s.slug}`}
+                          checked={checked}
+                          onCheckedChange={() => handleLaunchpadServiceToggle(s.slug)}
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1">
+                          <div className="text-sm font-semibold text-foreground leading-tight">{s.name}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{s.summary}</div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="name"><TranslatedText>Full Name</TranslatedText> *</Label>
