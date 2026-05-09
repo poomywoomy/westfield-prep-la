@@ -198,10 +198,10 @@ const Launchpad = () => {
                     <ArrowRight className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => navigate("/pricing")}
+                    onClick={() => navigate("/contact?service=launchpad")}
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-transparent hover:bg-[#1a1a1a]/5 text-[#1a1a1a] font-medium text-base border border-[#1a1a1a]/20 transition-all"
                   >
-                    View Pricing
+                    Get Pricing
                   </button>
                 </motion.div>
 
