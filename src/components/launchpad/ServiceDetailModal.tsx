@@ -4,7 +4,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { ArrowRight, CheckCircle2, X, Box, Camera, FileText } from "lucide-react";
+import { ArrowRight, CheckCircle2, Box, Camera, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { LaunchpadService } from "./launchpadServices";
