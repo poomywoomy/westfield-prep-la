@@ -9,6 +9,32 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+export type CardVariant =
+  | "shopify"
+  | "amazon"
+  | "aplus"
+  | "storefront"
+  | "imaging"
+  | "photo"
+  | "listing";
+
+export type ModalVariant =
+  | "side-sheet"
+  | "dark-checklist"
+  | "gallery"
+  | "magazine"
+  | "render-queue"
+  | "contact-sheet"
+  | "notebook";
+
+export type LaunchpadTheme = {
+  accent: string;
+  accentSoft: string;
+  ink: string;
+  cardVariant: CardVariant;
+  modalVariant: ModalVariant;
+};
+
 export type LaunchpadService = {
   slug: string;
   number: string;
@@ -21,9 +47,62 @@ export type LaunchpadService = {
   includes: string[];
   deliverables: { title: string; desc: string }[];
   steps: { title: string; desc: string }[];
+  theme: LaunchpadTheme;
 };
 
-export const LAUNCHPAD_SERVICES: LaunchpadService[] = [
+const THEMES: Record<string, LaunchpadTheme> = {
+  "shopify-website-creation": {
+    accent: "#5E8E3E",
+    accentSoft: "#E6EFDC",
+    ink: "#0E2A12",
+    cardVariant: "shopify",
+    modalVariant: "side-sheet",
+  },
+  "amazon-seller-central-setup": {
+    accent: "#FF9900",
+    accentSoft: "#FFE6BF",
+    ink: "#131A22",
+    cardVariant: "amazon",
+    modalVariant: "dark-checklist",
+  },
+  "aplus-content-storefront": {
+    accent: "#6B2E8C",
+    accentSoft: "#EFE3F5",
+    ink: "#2A0F3A",
+    cardVariant: "aplus",
+    modalVariant: "gallery",
+  },
+  "storefront-design": {
+    accent: "#1C1C1C",
+    accentSoft: "#E8DFD0",
+    ink: "#1C1C1C",
+    cardVariant: "storefront",
+    modalVariant: "magazine",
+  },
+  "3d-product-imaging": {
+    accent: "#2B6CFF",
+    accentSoft: "#D7E3FF",
+    ink: "#08111F",
+    cardVariant: "imaging",
+    modalVariant: "render-queue",
+  },
+  "studio-photography": {
+    accent: "#C2654A",
+    accentSoft: "#F1DDD2",
+    ink: "#2A140C",
+    cardVariant: "photo",
+    modalVariant: "contact-sheet",
+  },
+  "listing-optimization-copy": {
+    accent: "#0E0E0E",
+    accentSoft: "#FFF59A",
+    ink: "#0E0E0E",
+    cardVariant: "listing",
+    modalVariant: "notebook",
+  },
+};
+
+const RAW_SERVICES: Omit<LaunchpadService, "theme">[] = [
   {
     slug: "shopify-website-creation",
     number: "01",
@@ -230,6 +309,11 @@ export const LAUNCHPAD_SERVICES: LaunchpadService[] = [
     ],
   },
 ];
+
+export const LAUNCHPAD_SERVICES: LaunchpadService[] = RAW_SERVICES.map((s) => ({
+  ...s,
+  theme: THEMES[s.slug],
+}));
 
 export const getServiceBySlug = (slug: string | null | undefined) =>
   LAUNCHPAD_SERVICES.find((s) => s.slug === slug);

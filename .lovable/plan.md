@@ -1,95 +1,67 @@
-## Redesign two sections on the Launchpad page
+## Goal
 
-Keep the page's existing palette (cream `#f6f1ea`, charcoal `#1a1a1a`, terracotta `#c97b54`) and the brand voice. Only the **"Not sure what you need?"** block and the **FAQ** block change. Hero, services grid, modals, and CTA stay as-is.
+Give each of the 7 Launchpad services its own **unique visual identity** in both:
+1. **The service card** in the "What we help with" grid
+2. **The detail modal** that opens when you click "View details"
 
----
+Right now every card and every modal looks the same (white card, black icon tile, terracotta link, identical Dialog shell). We will replace that uniform treatment with 7 distinct styles so each service feels like its own product.
 
-### 1. "Not sure what you need?" → **Service Picker Console**
+## Per-service visual identity
 
-Replace the current heading + 8 stacked checkbox rows with a more editorial, interactive layout.
+Each service gets a dedicated palette + a distinct card layout treatment + a distinct modal treatment.
 
-**New layout (desktop):**
+| # | Service | Palette | Card style | Modal style |
+|---|---|---|---|---|
+| 01 | Shopify Website Creation | Shopify green `#5E8E3E` on cream | Asymmetric card, big number `01` watermark in green | Side-sheet from the right, green accent rail, "build sprint" timeline |
+| 02 | Amazon Seller Central Setup | Amazon navy `#131A22` + orange `#FF9900` | Dark card with orange icon tile and orange underline | Centered modal, dark navy header band with orange chips, checklist layout |
+| 03 | A+ Content & Storefront | Deep plum `#3D1E4E` + soft lilac | Card with subtle plum gradient and serif headline | Wide modal, two-column "module gallery" preview |
+| 04 | Storefront Design | Charcoal `#1C1C1C` + warm sand | Editorial card, oversized typography, thin black border | Full-bleed modal with magazine grid (deliverables as image-style tiles) |
+| 05 | Product 3D Imaging | Electric blue `#2B6CFF` + near-black | Card with grid/blueprint background pattern | Dark modal with neon-blue accents, "render queue" stepper |
+| 06 | Studio Photography | Terracotta `#C2654A` + bone | Card with film-strip footer (3 placeholder frames) | Modal with horizontal scroll "contact sheet" of deliverables |
+| 07 | Listing Optimization & Copy | Ink `#0E0E0E` + highlighter yellow | Card styled like a typed page, monospace eyebrow, yellow highlight on key phrase | Modal styled like a notebook: lined background, numbered bullets, yellow marker accents |
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  START HERE                                                 │
-│  Build your launch stack.                                   │
-│  Pick what you need. We will quote it as one package.       │
-│                                                             │
-│  ┌──────────────┬──────────────────────────────────────────┐│
-│  │ [01] Shopify │  Hover/active preview pane:              ││
-│  │ [02] Amazon  │  ─ Service name + tagline                ││
-│  │ [03] A+      │  ─ One-line summary                      ││
-│  │ [04] Store…  │  ─ 3 quick "what you get" chips          ││
-│  │ [05] 3D      │  ─ "See full details →" opens modal      ││
-│  │ [06] Photo   │  ─ "Add to my stack" toggle (checkbox)   ││
-│  │ [07] Copy    │                                          ││
-│  │ [+] Fulfill. │                                          ││
-│  └──────────────┴──────────────────────────────────────────┘│
-│                                                             │
-│  Selected: [Shopify] [A+ Content] [Photo]   [Get a quote →] │
-└─────────────────────────────────────────────────────────────┘
+All palettes still live within the existing site warmth (cream `#f6f1ea` page bg stays). Service-specific colors are scoped to that service's card and modal only — global tokens are not changed.
+
+## Implementation
+
+### 1. Extend `LAUNCHPAD_SERVICES` data
+Add a `theme` object per service:
+```ts
+theme: {
+  accent: string;        // hex
+  accentSoft: string;    // hex
+  ink: string;           // hex (text on accent)
+  cardVariant: 'shopify' | 'amazon' | 'aplus' | 'storefront' | 'imaging' | 'photo' | 'listing';
+  modalVariant: 'side-sheet' | 'dark-checklist' | 'gallery' | 'magazine' | 'render-queue' | 'contact-sheet' | 'notebook';
+}
 ```
 
-**Behavior:**
-- Left rail: numbered list of all 8 items (7 services + "fulfillment partner from day one"). Hover/click sets the active item; the active row gets the terracotta accent + a thin left border.
-- Right preview pane updates instantly with that service's name, tagline, summary, and 3 deliverable chips pulled from `LAUNCHPAD_SERVICES`. Two buttons inside: **See full details** (opens existing `ServiceDetailModal`) and **Add to my stack** (toggle).
-- Bottom bar: shows pill chips of the user's selected stack with a remove "x". A primary **Get a quote** button deep-links to `/contact?service=launchpad&focus=<slug1>,<slug2>,...` (comma-joined). If nothing is selected, button shows "Not sure? Book a call" → `/contact?service=launchpad`.
-- Mobile: collapses to a single column. Tapping a row expands the preview inline (accordion-style) instead of a side pane.
+### 2. New card components (`src/components/launchpad/cards/`)
+One file per variant: `ShopifyCard.tsx`, `AmazonCard.tsx`, `APlusCard.tsx`, `StorefrontCard.tsx`, `ImagingCard.tsx`, `PhotoCard.tsx`, `ListingCard.tsx`. Each receives the `LaunchpadService` and an `onOpen` handler. The grid in `Launchpad.tsx` switches on `theme.cardVariant`.
 
-**Visual touches:**
-- Numbered `01 / 07` labels in mono-style tracking (matches site).
-- Subtle terracotta dot indicator on the active row.
-- A faint hand-drawn arrow / dotted connector graphic from the active row into the preview pane (pure CSS, on desktop only) so it feels like a console, not a list.
-- Background stays `#f6f1ea` but the picker sits inside a single rounded card (`bg-white/70`, soft shadow) so it reads as one premium component instead of 8 separate boxes.
+The cards still align to the same grid cell height so the "What we help with" section stays tidy, but the *interior* of each card is unique (background, typography, accent stripes, icon treatment, footer).
 
----
+### 3. New modal components (`src/components/launchpad/modals/`)
+One file per variant matching the table above. Each is its own Radix Dialog with custom `DialogContent` styling (different widths, side vs center, dark vs light, custom header layouts). `ServiceDetailModal.tsx` becomes a thin router that renders the right modal based on `theme.modalVariant`.
 
-### 2. FAQ → **Two-column "Operator's Notebook"**
+All modals keep the same final CTA: **Get pricing for this service** → `/contact?service=launchpad&focus=<slug>` (unchanged behavior).
 
-Replace the centered single-column accordion with a magazine/notebook layout that better matches the page's editorial tone.
+### 4. Page wiring
+`src/pages/Launchpad.tsx` "What we help with" section maps services to the right card component. Modal state (`activeService`) stays the same — only the rendered modal varies.
 
-**New layout (desktop):**
+## Out of scope
+- "Build your launch stack" picker section (left rail + preview) — untouched.
+- FAQ "Operator's Notebook" — untouched.
+- Hero, header, footer, contact form — untouched.
+- No DB / edge function / route changes.
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  FAQ · Launchpad Q&A                                        │
-│  ┌─────────────────────────┬───────────────────────────────┐│
-│  │ Sticky title block:     │  Numbered question list:      ││
-│  │ "Launchpad questions"   │  01 ─ Do I need to be a       ││
-│  │ Straight answers,       │       fulfillment client?     ││
-│  │ no filler.              │  02 ─ How long does a launch  ││
-│  │                         │       project take?           ││
-│  │ Categories pills:       │  03 ─ Do I ship product to    ││
-│  │ [All] [Setup] [Creative]│       your studio?            ││
-│  │ [Timeline] [Logistics]  │  ...                          ││
-│  │                         │                               ││
-│  │ Still stuck?            │  Each item: large numbered    ││
-│  │ → Book a 20 min call    │  question, click to slide     ││
-│  └─────────────────────────┴───────────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
-```
+## Files
 
-**Behavior:**
-- Left column (sticky on desktop): eyebrow, big title, intro line, category filter pills (All / Setup / Creative / Timeline / Logistics), and a small "Still stuck? Book a call →" CTA card.
-- Right column: each FAQ rendered as a **numbered row** (`01`, `02`, …) with a large question on a single line and a thin divider beneath. Click expands the answer below with a smooth height animation. Active item swaps the number color to terracotta and bolds the question.
-- Filter pills filter the visible list (tag each FAQ entry with one category in the data array).
-- Mobile: single column, sticky title becomes a normal header at the top. Filter pills horizontal-scroll.
+**New:**
+- `src/components/launchpad/cards/{Shopify,Amazon,APlus,Storefront,Imaging,Photo,Listing}Card.tsx` (7 files)
+- `src/components/launchpad/modals/{SideSheet,DarkChecklist,Gallery,Magazine,RenderQueue,ContactSheet,Notebook}Modal.tsx` (7 files)
 
-**Visual touches:**
-- Big tabular `01` / `02` numbers (font-light, 2xl) on the left of each question — gives it the "operator's notebook" feel instead of the standard accordion box.
-- No card chrome around each row; just dividers. The whole section feels lighter and more editorial.
-- Background stays `#efe7db`.
-
----
-
-### Files to touch
-
-- `src/pages/Launchpad.tsx` — replace the two section blocks (lines ~206–258 and ~409–452). Add a small local state for the picker's `activeSlug`, `selectedSlugs`, and FAQ `activeCategory`. Tag each FAQ entry with a `category` field.
-- No new components required, no data model changes, no DB changes. `ServiceDetailModal` and `LAUNCHPAD_SERVICES` are reused as-is.
-- `ContactForm.tsx` already parses `?focus=` — confirm it splits on commas so a multi-select stack pre-checks all matching boxes; if it currently only handles a single slug, update the focus-parsing line to `focus?.split(",")` and pre-check each.
-
-### Out of scope
-
-- Hero, services grid, modals, header, footer, CTA section — untouched.
-- No DB migration, no edge function changes.
+**Edited:**
+- `src/components/launchpad/launchpadServices.ts` — add `theme` per service
+- `src/components/launchpad/ServiceDetailModal.tsx` — becomes a variant router
+- `src/pages/Launchpad.tsx` — services grid renders per-variant card component

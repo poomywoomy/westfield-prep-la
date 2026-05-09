@@ -18,6 +18,7 @@ import { generateMetaTags } from "@/utils/seo";
 import { SiShopify, SiAmazon, SiTiktok, SiWalmart } from "react-icons/si";
 import { LAUNCHPAD_SERVICES, getServiceBySlug, type LaunchpadService } from "@/components/launchpad/launchpadServices";
 import ServiceDetailModal from "@/components/launchpad/ServiceDetailModal";
+import { ServiceCard } from "@/components/launchpad/ServiceCards";
 
 const meta = generateMetaTags(
   "Westfield Launchpad | Shopify, Amazon & Product Media Services in LA",
@@ -407,40 +408,14 @@ const Launchpad = () => {
               </div>
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {LAUNCHPAD_SERVICES.map((s, idx) => {
-                  const Icon = s.icon;
-                  return (
-                    <motion.button
-                      key={s.slug}
-                      type="button"
-                      onClick={() => openService(s)}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: idx * 0.04 }}
-                      className="group text-left bg-white border border-[#1a1a1a]/10 rounded-2xl p-7 hover:border-[#c97b54]/50 hover:shadow-lg hover:-translate-y-0.5 transition-all flex flex-col"
-                    >
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="w-11 h-11 rounded-xl bg-[#1a1a1a] group-hover:bg-[#c97b54] flex items-center justify-center transition-colors">
-                          <Icon className="h-5 w-5 text-[#f6f1ea]" />
-                        </div>
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5a5a5a]">
-                          Service {s.number}
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-semibold tracking-[-0.01em] text-[#1a1a1a] mb-2 leading-snug">
-                        {s.name}
-                      </h3>
-                      <p className="text-[#5a5a5a] text-[14px] leading-relaxed font-light mb-6 flex-1">
-                        {s.summary}
-                      </p>
-                      <div className="inline-flex items-center gap-2 text-[#c97b54] text-[13px] font-semibold">
-                        View details
-                        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                    </motion.button>
-                  );
-                })}
+                {LAUNCHPAD_SERVICES.map((s, idx) => (
+                  <ServiceCard
+                    key={s.slug}
+                    service={s}
+                    index={idx}
+                    onOpen={() => openService(s)}
+                  />
+                ))}
               </div>
             </div>
           </section>
