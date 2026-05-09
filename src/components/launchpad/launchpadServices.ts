@@ -102,7 +102,7 @@ const THEMES: Record<string, LaunchpadTheme> = {
   },
 };
 
-export const LAUNCHPAD_SERVICES: LaunchpadService[] = [
+const RAW_SERVICES: Omit<LaunchpadService, "theme">[] = [
   {
     slug: "shopify-website-creation",
     number: "01",
