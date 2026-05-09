@@ -50,7 +50,9 @@ const ContactForm = () => {
     return s === "launchpad" || s === "3pl" || s === "both" ? (s as ServiceType) : ("3pl" as ServiceType);
   })();
   const focus = searchParams.get("focus");
-  const initialLaunchpadServices = focus && LAUNCHPAD_SERVICES.some((s) => s.slug === focus) ? [focus] : [];
+  const initialLaunchpadServices = focus
+    ? focus.split(",").filter((slug) => LAUNCHPAD_SERVICES.some((s) => s.slug === slug))
+    : [];
   const [formData, setFormData] = useState({
     serviceType: initialService,
     name: "",
