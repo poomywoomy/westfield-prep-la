@@ -15,6 +15,11 @@ import {
   Layers,
   Users,
   ChevronDown,
+  Check,
+  Palette,
+  Image as ImageIcon,
+  ShieldCheck,
+  Zap,
 } from "lucide-react";
 import { useState } from "react";
 import Header from "@/components/Header";
