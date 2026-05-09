@@ -539,47 +539,115 @@ const Launchpad = () => {
             </div>
           </section>
 
-          {/* FAQ */}
+          {/* FAQ — Operator's Notebook */}
           <section className="py-28 md:py-32 bg-[#efe7db]">
-            <div className="container mx-auto px-6 max-w-3xl">
-              <div className="mb-14">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#c97b54] mb-4">
-                  FAQ
-                </div>
-                <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[#1a1a1a] mb-5">
-                  Launchpad questions
-                </h2>
-                <p className="text-[#5a5a5a] text-lg font-light">Straight answers, no filler.</p>
-              </div>
+            <div className="container mx-auto px-6 max-w-6xl">
+              <div className="grid lg:grid-cols-[360px_1fr] gap-12 lg:gap-20">
+                {/* Left sticky column */}
+                <div className="lg:sticky lg:top-28 self-start">
+                  <div className="text-[11px] font-mono tracking-[0.25em] text-[#c97b54] mb-4">
+                    FAQ · LAUNCHPAD Q&amp;A
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[#1a1a1a] mb-4 leading-[1.05]">
+                    Straight answers, <span className="italic font-light text-[#c97b54]">no filler.</span>
+                  </h2>
+                  <p className="text-[#5a5a5a] text-[15px] font-light leading-relaxed mb-8">
+                    The questions we hear most from founders the week before they pull the trigger on a launch.
+                  </p>
 
-              <div className="space-y-2">
-                {faqs.map((f, idx) => {
-                  const open = openFaq === idx;
-                  return (
-                    <div
-                      key={f.q}
-                      className="bg-[#f6f1ea] border border-[#1a1a1a]/10 rounded-xl overflow-hidden"
-                    >
-                      <button
-                        onClick={() => setOpenFaq(open ? null : idx)}
-                        className="w-full flex items-center justify-between p-6 text-left hover:bg-white transition-colors"
-                        aria-expanded={open}
-                      >
-                        <span className="font-medium text-[#1a1a1a] pr-6 text-[15px]">{f.q}</span>
-                        <ChevronDown
-                          className={`h-5 w-5 text-[#c97b54] flex-shrink-0 transition-transform ${
-                            open ? "rotate-180" : ""
+                  {/* Category pills */}
+                  <div className="flex flex-wrap gap-2 mb-8">
+                    {FAQ_CATEGORIES.map((cat) => {
+                      const active = faqCategory === cat;
+                      return (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => { setFaqCategory(cat); setOpenFaq(null); }}
+                          className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
+                            active
+                              ? "bg-[#1a1a1a] text-[#f6f1ea] border-[#1a1a1a]"
+                              : "bg-transparent text-[#3a3a3a] border-[#1a1a1a]/20 hover:border-[#c97b54] hover:text-[#1a1a1a]"
                           }`}
-                        />
-                      </button>
-                      {open && (
-                        <div className="px-6 pb-6 text-[#5a5a5a] text-[15px] leading-relaxed font-light">
-                          {f.a}
-                        </div>
-                      )}
+                        >
+                          {cat}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Stuck card */}
+                  <div className="rounded-xl border border-[#1a1a1a]/10 bg-[#f6f1ea] p-5">
+                    <div className="text-[10px] font-mono tracking-[0.2em] text-[#c97b54] mb-2">STILL STUCK?</div>
+                    <div className="text-[#1a1a1a] font-semibold text-[15px] mb-3 leading-snug">
+                      Book a 20 minute call. We will map your launch live.
                     </div>
-                  );
-                })}
+                    <button
+                      type="button"
+                      onClick={() => navigate("/contact?service=launchpad")}
+                      className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#c97b54] hover:text-[#b86c47] transition-colors"
+                    >
+                      Talk to a human <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right notebook column */}
+                <div>
+                  {visibleFaqs.length === 0 && (
+                    <div className="text-[#5a5a5a] text-[15px] font-light italic py-8">
+                      No questions in this category yet.
+                    </div>
+                  )}
+                  <ul>
+                    {visibleFaqs.map((f, idx) => {
+                      const open = openFaq === idx;
+                      const num = String(idx + 1).padStart(2, "0");
+                      return (
+                        <li key={f.q} className="border-b border-[#1a1a1a]/15 last:border-b-0">
+                          <button
+                            type="button"
+                            onClick={() => setOpenFaq(open ? null : idx)}
+                            className="w-full flex items-start gap-5 md:gap-7 py-6 md:py-7 text-left group"
+                            aria-expanded={open}
+                          >
+                            <span className={`font-mono text-[13px] md:text-[14px] tabular-nums tracking-wider mt-1 transition-colors ${
+                              open ? "text-[#c97b54]" : "text-[#5a5a5a] group-hover:text-[#c97b54]"
+                            }`}>
+                              {num}
+                            </span>
+                            <span className={`flex-1 text-[18px] md:text-[22px] tracking-[-0.01em] leading-[1.25] transition-all ${
+                              open ? "text-[#1a1a1a] font-semibold" : "text-[#1a1a1a]/80 font-medium group-hover:text-[#1a1a1a]"
+                            }`}>
+                              {f.q}
+                            </span>
+                            <span className={`mt-2 w-7 h-7 rounded-full border border-[#1a1a1a]/15 flex items-center justify-center flex-shrink-0 transition-all ${
+                              open ? "bg-[#c97b54] border-[#c97b54] rotate-180" : "bg-transparent group-hover:border-[#c97b54]"
+                            }`}>
+                              <ChevronDown className={`h-4 w-4 ${open ? "text-white" : "text-[#5a5a5a]"}`} />
+                            </span>
+                          </button>
+                          <div
+                            className={`grid transition-all duration-300 ease-out ${
+                              open ? "grid-rows-[1fr] opacity-100 pb-7" : "grid-rows-[0fr] opacity-0"
+                            }`}
+                          >
+                            <div className="overflow-hidden">
+                              <div className="pl-[44px] md:pl-[56px] pr-10 text-[#5a5a5a] text-[15px] md:text-[16px] leading-relaxed font-light">
+                                {f.a}
+                                <div className="mt-3">
+                                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#c97b54]/10 text-[#c97b54] text-[10px] font-mono tracking-wider uppercase">
+                                    {f.cat}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               </div>
             </div>
           </section>
