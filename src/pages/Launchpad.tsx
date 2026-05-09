@@ -80,6 +80,21 @@ const Launchpad = () => {
   const [activeService, setActiveService] = useState<LaunchpadService | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  // Picker console state
+  const [pickerSlug, setPickerSlug] = useState<string>(LAUNCHPAD_SERVICES[0].slug);
+  const [stack, setStack] = useState<string[]>([]);
+  const pickerService = LAUNCHPAD_SERVICES.find((s) => s.slug === pickerSlug) || LAUNCHPAD_SERVICES[0];
+  const toggleStack = (slug: string) =>
+    setStack((prev) => (prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]));
+  const goToQuote = () => {
+    if (stack.length === 0) return navigate("/contact?service=launchpad");
+    navigate(`/contact?service=launchpad&focus=${stack.join(",")}`);
+  };
+
+  // FAQ state
+  const [faqCategory, setFaqCategory] = useState<FaqCategory>("All");
+  const visibleFaqs = faqCategory === "All" ? faqs : faqs.filter((f) => f.cat === faqCategory);
+
   const openService = (service: LaunchpadService) => {
     setActiveService(service);
     setModalOpen(true);
