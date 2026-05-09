@@ -236,56 +236,156 @@ const Launchpad = () => {
             </div>
           </section>
 
-          {/* WHAT YOU NEED CHECKLIST */}
+          {/* SERVICE PICKER CONSOLE */}
           <section className="py-24 md:py-28 bg-[#f6f1ea] border-y border-[#1a1a1a]/10">
-            <div className="container mx-auto px-6">
-              <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16 max-w-6xl mx-auto items-start">
-                <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#c97b54] mb-4">
-                    Start Here
-                  </div>
-                  <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[#1a1a1a] mb-5 leading-[1.05]">
-                    Not sure what you need? <span className="italic font-light text-[#c97b54]">Start here.</span>
-                  </h2>
-                  <p className="text-[#5a5a5a] text-lg leading-relaxed font-light">
-                    Most brands need a mix of these. Tap any item to see exactly what we deliver, or
-                    just book a call and we will map it out with you.
-                  </p>
+            <div className="container mx-auto px-6 max-w-6xl">
+              <div className="mb-10 max-w-2xl">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#c97b54] mb-4">
+                  Start Here
                 </div>
-                <ul className="space-y-3">
-                  {LAUNCHPAD_SERVICES.map((s) => (
-                    <li key={s.slug}>
+                <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[#1a1a1a] mb-5 leading-[1.05]">
+                  Build your <span className="italic font-light text-[#c97b54]">launch stack.</span>
+                </h2>
+                <p className="text-[#5a5a5a] text-lg leading-relaxed font-light">
+                  Pick what you need. We will quote it as one package, run it as one project, and bill it on one invoice.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-[#1a1a1a]/10 shadow-[0_30px_80px_-30px_rgba(26,26,26,0.18)] overflow-hidden">
+                <div className="grid lg:grid-cols-[340px_1fr]">
+                  {/* Left rail */}
+                  <div className="border-b lg:border-b-0 lg:border-r border-[#1a1a1a]/10 bg-[#f6f1ea]/60 p-3">
+                    <ul className="space-y-1">
+                      {LAUNCHPAD_SERVICES.map((s) => {
+                        const isActive = pickerSlug === s.slug;
+                        const isSelected = stack.includes(s.slug);
+                        return (
+                          <li key={s.slug}>
+                            <button
+                              type="button"
+                              onMouseEnter={() => setPickerSlug(s.slug)}
+                              onClick={() => setPickerSlug(s.slug)}
+                              className={`group w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${
+                                isActive
+                                  ? "bg-white border-l-2 border-[#c97b54] shadow-sm"
+                                  : "border-l-2 border-transparent hover:bg-white/60"
+                              }`}
+                            >
+                              <span className={`text-[10px] font-mono tracking-wider ${isActive ? "text-[#c97b54]" : "text-[#5a5a5a]"}`}>
+                                {s.number}
+                              </span>
+                              <span className={`flex-1 text-[14px] font-medium ${isActive ? "text-[#1a1a1a]" : "text-[#3a3a3a]"}`}>
+                                {s.shortName}
+                              </span>
+                              {isSelected && (
+                                <span className="w-4 h-4 rounded-full bg-[#c97b54] flex items-center justify-center flex-shrink-0">
+                                  <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
+                                </span>
+                              )}
+                              {isActive && !isSelected && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#c97b54]" />
+                              )}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+
+                  {/* Right preview pane */}
+                  <div className="p-8 md:p-10 bg-white">
+                    <div className="text-[10px] font-mono tracking-[0.2em] text-[#c97b54] mb-3">
+                      {pickerService.number} · PREVIEW
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-semibold tracking-[-0.02em] text-[#1a1a1a] leading-[1.15] mb-3">
+                      {pickerService.tagline}
+                    </h3>
+                    <p className="text-[#5a5a5a] text-[15px] leading-relaxed font-light mb-6">
+                      {pickerService.summary}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 mb-8">
+                      {pickerService.deliverables.slice(0, 3).map((d) => (
+                        <span
+                          key={d.title}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f6f1ea] border border-[#1a1a1a]/10 text-[12px] font-medium text-[#1a1a1a]"
+                        >
+                          <span className="w-1 h-1 rounded-full bg-[#c97b54]" />
+                          {d.title}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <button
                         type="button"
-                        onClick={() => openService(s)}
-                        className="group w-full text-left flex items-start gap-4 p-4 rounded-xl border border-[#1a1a1a]/10 bg-white/60 hover:bg-white hover:border-[#c97b54]/40 transition-all"
+                        onClick={() => toggleStack(pickerService.slug)}
+                        className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm transition-all ${
+                          stack.includes(pickerService.slug)
+                            ? "bg-[#1a1a1a] text-[#f6f1ea] hover:bg-[#2a2a2a]"
+                            : "bg-[#c97b54] text-white hover:bg-[#b86c47]"
+                        }`}
                       >
-                        <span className="mt-0.5 w-6 h-6 rounded-md bg-[#c97b54]/10 border border-[#c97b54]/30 flex items-center justify-center flex-shrink-0">
-                          <Check className="h-3.5 w-3.5 text-[#c97b54]" />
-                        </span>
-                        <span className="text-[#1a1a1a] text-[15px] font-medium leading-snug flex-1">
-                          {s.summary}
-                        </span>
-                        <ArrowRight className="h-4 w-4 text-[#5a5a5a] group-hover:text-[#c97b54] group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+                        {stack.includes(pickerService.slug) ? (
+                          <><Check className="h-4 w-4" /> Added to stack</>
+                        ) : (
+                          <>+ Add to my stack</>
+                        )}
                       </button>
-                    </li>
-                  ))}
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => navigate("/contact?service=both")}
-                      className="group w-full text-left flex items-start gap-4 p-4 rounded-xl border border-[#1a1a1a]/10 bg-[#1a1a1a]/[0.03] hover:bg-white hover:border-[#c97b54]/40 transition-all"
-                    >
-                      <span className="mt-0.5 w-6 h-6 rounded-md bg-[#1a1a1a]/10 border border-[#1a1a1a]/20 flex items-center justify-center flex-shrink-0">
-                        <Check className="h-3.5 w-3.5 text-[#1a1a1a]" />
-                      </span>
-                      <span className="text-[#1a1a1a] text-[15px] font-medium leading-snug flex-1">
-                        A fulfillment partner ready to ship from day one
-                      </span>
-                      <ArrowRight className="h-4 w-4 text-[#5a5a5a] group-hover:text-[#c97b54] group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
-                    </button>
-                  </li>
-                </ul>
+                      <button
+                        type="button"
+                        onClick={() => openService(pickerService)}
+                        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-[#1a1a1a]/15 text-[#1a1a1a] font-medium text-sm hover:bg-[#f6f1ea] transition-all"
+                      >
+                        See full details <ArrowRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom stack bar */}
+                <div className="border-t border-[#1a1a1a]/10 bg-[#f6f1ea]/40 px-6 md:px-8 py-5 flex flex-col md:flex-row md:items-center gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-mono tracking-[0.2em] text-[#5a5a5a] mb-2">
+                      YOUR STACK · {stack.length}
+                    </div>
+                    {stack.length === 0 ? (
+                      <div className="text-[14px] text-[#5a5a5a] font-light italic">
+                        Nothing added yet. Pick a service above, or just book a call.
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {stack.map((slug) => {
+                          const s = LAUNCHPAD_SERVICES.find((x) => x.slug === slug)!;
+                          return (
+                            <span
+                              key={slug}
+                              className="inline-flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full bg-white border border-[#1a1a1a]/10 text-[13px] font-medium text-[#1a1a1a]"
+                            >
+                              {s.shortName}
+                              <button
+                                type="button"
+                                onClick={() => toggleStack(slug)}
+                                className="w-4 h-4 rounded-full bg-[#1a1a1a]/10 hover:bg-[#c97b54] hover:text-white text-[#5a5a5a] flex items-center justify-center text-[10px] leading-none transition-colors"
+                                aria-label={`Remove ${s.shortName}`}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={goToQuote}
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#1a1a1a] text-[#f6f1ea] font-semibold text-sm hover:bg-[#2a2a2a] transition-all flex-shrink-0"
+                  >
+                    {stack.length === 0 ? "Book a call" : `Get a quote (${stack.length})`}
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </section>
