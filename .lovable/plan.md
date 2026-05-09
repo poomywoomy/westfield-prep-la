@@ -1,49 +1,54 @@
+# Full-Site QA Audit Plan
 
-## Goal
+Goal: systematically crawl the live site, catch runtime errors, broken links, console/network failures, layout glitches, and code-level issues — then report findings (no fixes yet, since this is a discovery pass).
 
-Three Launchpad modals (and a few cards) currently show empty grey "IMG" boxes or blank icon-in-a-rectangle tiles where photos would go. You want those slots redesigned as **fully composed graphic + information panels** that stand on their own — no photography, no uploads, nothing for you to fill in later.
+## Scope
 
-## What changes
+Public marketing routes (logged-out) on the preview build:
+`/`, `/launchpad`, `/amazon-fba-prep`, `/shopify-fulfillment`, `/tiktok-fulfillment`, `/storage-warehousing`, `/labeling-compliance`, `/kitting-bundling`, `/pricing`, `/why-choose-us`, `/integrations`, `/contact`, `/blog`, a sample blog post, `/auth`, `/404` (bad URL), plus any other routes discovered in the router.
 
-### Modals to rebuild (`src/components/launchpad/ServiceDetailModal.tsx`)
+Authenticated dashboards are out of scope for this pass (would need credentials and risks live data).
 
-**1. `GalleryModal` (A+ Content / plum)**
-Replace the 4 deliverable tiles (currently `<aspect-16/9>` empty plum gradient + `FileText` icon) with **A+ module wireframes drawn in SVG**:
-- Module 01 "Hero Module" → SVG wireframe of a hero band: big bar of color, two text bars, a CTA pill.
-- Module 02 "Comparison Chart" → SVG wireframe of a 4-column comparison grid with check/dot rows.
-- Module 03 "Lifestyle Band" → SVG wireframe of a 3-up image-band with caption rules.
-- Module 04 "Storefront Pages" → SVG wireframe of multi-page storefront nav + tile grid.
-Each tile keeps the `MODULE 0X` label, italic serif title, description, and adds a tiny dimensions tag (e.g. `970 × 600 · DESKTOP`) and a 1-line "what it does" stat (e.g. `+18% conversion lift on PDPs`).
+## Method
 
-**2. `MagazineModal` (Storefront / cream + black)**
-Replace the 3 "IMG" squares in the "Inside this issue" grid with **typographic + diagram tiles**:
-- Design System → mini color-swatch row + type scale (`H1 / H2 / Body`) + 4-pt grid dots.
-- Page Layouts → ASCII-style wireframe of Hero / PDP / Collection stacked.
-- Responsive Build → 3 device frames drawn as nested rectangles labeled `XS / MD / XL` with breakpoint numbers.
-Keep the editorial border and bottom title; just swap the empty `IMG` square for the composed graphic.
+1. **Static pass (code)**
+   - Enumerate routes from `src/App.tsx` / router config so nothing is missed.
+   - `rg` for common red flags: `console.error`, `TODO`, `FIXME`, untyped `any` in critical paths, nested `<Helmet>`, `<a href="#">` dead links, `key` warnings in `.map`, missing `alt`, `<h1>` count per page (single-H1 rule), trailing slashes, hardcoded Duarte address.
+   - Check vite/tsconfig for known issues (react dedupe, plugin).
 
-**3. `ContactSheetModal` (Studio Photography / terracotta)**
-Replace the 5 empty "film frames" (currently dark squares with a `Camera` icon) with **a contact-sheet info strip**:
-- Each frame becomes a labeled production card: frame number, deliverable name, a small SVG glyph appropriate to it (lightbox / mannequin silhouette / flat-lay grid / model pose silhouette / color chip), shot count (`24 frames`), aspect (`1:1 · 4:5`), and a hand-drawn sprocket-hole strip top + bottom so it still reads as film.
-Add a "Production days" mini Gantt bar (Pre-Pro / Shoot / Delivery) under the strip using thin colored bars instead of just text.
+2. **Runtime pass (browser tool)**
+   For each route:
+   - `navigate_to_sandbox` to the route
+   - `read_console_logs` → capture errors/warnings
+   - `list_network_requests` → capture 4xx/5xx, failed assets, CORS
+   - `screenshot` at desktop (1440) and mobile (390) → eyeball layout/overflow/clipping
+   - `observe` key interactive elements (modals, accordions, forms, nav, footer links) and `act` on a few (open Launchpad service modals, FAQ accordion, contact form validation, mobile menu)
 
-### Cards to clean up (`src/components/launchpad/ServiceCards.tsx`)
-Audit the 7 card variants for any remaining empty image rectangles. Where they exist (likely Storefront, A+, Photo cards), swap them for the same family of composed graphics — wireframes, type specimens, swatch rows, gantt bars, sprocket strips — sized to the card.
+3. **Cross-page checks**
+   - Header/Footer links resolve (no 404s)
+   - Logo + nav consistent
+   - 404 route shows toast + redirect
+   - SEO: `<title>`, meta description, canonical, single H1 per page
+   - Image `alt` attributes present
+   - No layout shift / horizontal scroll on mobile
 
-### What I will NOT touch
-- Card grid logic, modal routing, theme tokens, contact form, FAQ, picker, copy in `launchpadServices.ts`.
-- No new dependencies, no image generation, no DB.
-- All graphics are inline SVG / divs styled with each service's existing theme colors.
+4. **Backend smoke (read-only)**
+   - `supabase--linter` for RLS / security warnings
+   - `cloud_status` to confirm backend healthy
+   - Inspect contact form submit network call (no actual spam send)
 
-## Technical notes
+## Deliverable
 
-- All wireframes are inline `<svg>` with `currentColor` or theme hex values already defined per modal — no asset imports.
-- Reusable mini components defined locally inside `ServiceDetailModal.tsx` (e.g. `<HeroWire />`, `<ComparisonWire />`, `<DeviceStack />`, `<SprocketStrip />`).
-- Tiles keep their existing aspect ratios so layout/spacing doesn't shift.
-- Responsive: graphics scale with `viewBox` so they hold up at all modal widths.
-- Accessibility: each SVG gets `role="img"` + `aria-label` matching the deliverable title.
+A categorized report:
+- **Critical** (runtime errors, broken pages, failed network calls, security findings)
+- **High** (broken links, missing data, layout breaks on mobile, SEO violations like multi-H1)
+- **Medium** (console warnings, accessibility gaps, slow assets)
+- **Low** (cosmetic polish, copy nits)
 
-## Files touched
+Each finding includes: route, evidence (console line / screenshot / file:line), and a short proposed fix. No code changes during this audit — fixes get a follow-up plan you approve.
 
-- `src/components/launchpad/ServiceDetailModal.tsx` — rebuild Gallery, Magazine, Contact Sheet tile contents.
-- `src/components/launchpad/ServiceCards.tsx` — replace any leftover empty image slots with composed graphics.
+## Notes / Limits
+
+- Won't test admin or client dashboards (need login + risk to live data).
+- Won't trigger destructive actions (form submits that email, payment flows, etc.) — will validate UI only.
+- Browser tool may be unavailable; if so, I'll fall back to code-only checks and tell you which routes weren't visually verified.
