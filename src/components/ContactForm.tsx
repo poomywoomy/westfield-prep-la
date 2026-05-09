@@ -106,6 +106,15 @@ const ContactForm = () => {
     if (errors.marketplaces) setErrors((prev) => ({ ...prev, marketplaces: "" }));
   };
 
+  const handleLaunchpadServiceToggle = (slug: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      launchpadServices: prev.launchpadServices.includes(slug)
+        ? prev.launchpadServices.filter((s) => s !== slug)
+        : [...prev.launchpadServices, slug],
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -113,7 +122,18 @@ const ContactForm = () => {
     try {
       if (formData.honeypot) return;
 
-      const { honeypot, ...submitData } = formData;
+      const { honeypot, launchpadServices, ...rest } = formData;
+
+      // Prepend selected Launchpad services into comments so they reach the lead email
+      let comments = rest.comments;
+      if ((rest.serviceType === "launchpad" || rest.serviceType === "both") && launchpadServices.length > 0) {
+        const names = launchpadServices
+          .map((slug) => LAUNCHPAD_SERVICES.find((s) => s.slug === slug)?.name || slug)
+          .join(", ");
+        comments = `Requested Launchpad services: ${names}\n\n${comments}`.trim();
+      }
+
+      const submitData = { ...rest, comments };
       const validatedData = contactSchema.parse(submitData);
 
       const { data: rateLimitData, error: rateLimitError } = await supabase.functions.invoke(
