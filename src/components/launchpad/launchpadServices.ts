@@ -310,5 +310,10 @@ const RAW_SERVICES: Omit<LaunchpadService, "theme">[] = [
   },
 ];
 
+export const LAUNCHPAD_SERVICES: LaunchpadService[] = RAW_SERVICES.map((s) => ({
+  ...s,
+  theme: THEMES[s.slug],
+}));
+
 export const getServiceBySlug = (slug: string | null | undefined) =>
   LAUNCHPAD_SERVICES.find((s) => s.slug === slug);
