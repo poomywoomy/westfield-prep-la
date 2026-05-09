@@ -199,21 +199,81 @@ const GalleryModal = ({ service, open, onOpenChange }: Props) => {
             Module gallery
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
-            {service.deliverables.map((d, i) => (
-              <div
-                key={d.title}
-                className="rounded-xl bg-white/70 backdrop-blur border border-[#6B2E8C]/20 p-5 shadow-sm"
-              >
-                <div className="aspect-[16/9] rounded-md mb-4 bg-gradient-to-br from-[#6B2E8C]/20 to-[#6B2E8C]/5 flex items-center justify-center">
-                  <FileText className="h-8 w-8 text-[#6B2E8C]/60" />
+            {service.deliverables.map((d, i) => {
+              const meta = [
+                { dim: "970 × 600 · DESKTOP", stat: "+18% PDP conversion lift" },
+                { dim: "970 × 600 · COMPARISON", stat: "Drives shoppers up the catalog" },
+                { dim: "1464 × 600 · LIFESTYLE", stat: "Builds brand trust above the fold" },
+                { dim: "MULTI-PAGE · STOREFRONT", stat: "Repeat-visit shopping experience" },
+              ][i] || { dim: "AMAZON-READY", stat: "" };
+              return (
+                <div
+                  key={d.title}
+                  className="rounded-xl bg-white/70 backdrop-blur border border-[#6B2E8C]/20 p-5 shadow-sm"
+                >
+                  <div className="aspect-[16/9] rounded-md mb-4 bg-gradient-to-br from-[#F5ECF8] to-[#E5D2EE] border border-[#6B2E8C]/15 p-3 flex items-center justify-center overflow-hidden">
+                    {i === 0 && (
+                      <svg viewBox="0 0 200 110" className="w-full h-full" role="img" aria-label="Hero module wireframe">
+                        <rect x="6" y="6" width="188" height="56" rx="3" fill="#6B2E8C" opacity="0.85" />
+                        <rect x="14" y="20" width="90" height="6" rx="1" fill="#fff" opacity="0.9" />
+                        <rect x="14" y="32" width="60" height="4" rx="1" fill="#fff" opacity="0.7" />
+                        <rect x="14" y="44" width="40" height="10" rx="5" fill="#FFD86B" />
+                        <rect x="6" y="70" width="92" height="34" rx="2" fill="#6B2E8C" opacity="0.18" />
+                        <rect x="102" y="70" width="92" height="34" rx="2" fill="#6B2E8C" opacity="0.12" />
+                      </svg>
+                    )}
+                    {i === 1 && (
+                      <svg viewBox="0 0 200 110" className="w-full h-full" role="img" aria-label="Comparison chart wireframe">
+                        {[0,1,2,3].map((c) => (
+                          <g key={c}>
+                            <rect x={8 + c*47} y="6" width="42" height="14" rx="2" fill="#6B2E8C" opacity={c===0?0.85:0.4} />
+                            {[0,1,2,3].map((r) => (
+                              <circle key={r} cx={29 + c*47} cy={32 + r*18} r="3.5" fill={r%2===c%2 ? "#6B2E8C" : "none"} stroke="#6B2E8C" strokeWidth="1" opacity="0.7" />
+                            ))}
+                          </g>
+                        ))}
+                      </svg>
+                    )}
+                    {i === 2 && (
+                      <svg viewBox="0 0 200 110" className="w-full h-full" role="img" aria-label="Lifestyle band wireframe">
+                        {[0,1,2].map((c) => (
+                          <g key={c}>
+                            <rect x={6 + c*64} y="10" width="60" height="60" rx="3" fill="#6B2E8C" opacity={0.25 + c*0.12} />
+                            <circle cx={36 + c*64} cy="34" r="6" fill="#fff" opacity="0.9" />
+                            <rect x={10 + c*64} y="76" width="40" height="3" fill="#6B2E8C" opacity="0.7" />
+                            <rect x={10 + c*64} y="84" width="52" height="2" fill="#6B2E8C" opacity="0.4" />
+                            <rect x={10 + c*64} y="90" width="32" height="2" fill="#6B2E8C" opacity="0.4" />
+                          </g>
+                        ))}
+                      </svg>
+                    )}
+                    {i === 3 && (
+                      <svg viewBox="0 0 200 110" className="w-full h-full" role="img" aria-label="Storefront pages wireframe">
+                        <rect x="6" y="6" width="188" height="14" rx="2" fill="#6B2E8C" opacity="0.85" />
+                        {[0,1,2,3,4].map((n) => (
+                          <rect key={n} x={14 + n*32} y="11" width="22" height="4" rx="1" fill="#fff" opacity="0.85" />
+                        ))}
+                        <rect x="6" y="26" width="120" height="44" rx="2" fill="#6B2E8C" opacity="0.3" />
+                        <rect x="130" y="26" width="64" height="20" rx="2" fill="#6B2E8C" opacity="0.18" />
+                        <rect x="130" y="50" width="64" height="20" rx="2" fill="#6B2E8C" opacity="0.18" />
+                        {[0,1,2,3].map((n) => (
+                          <rect key={n} x={6 + n*48} y="76" width="44" height="28" rx="2" fill="#6B2E8C" opacity="0.15" />
+                        ))}
+                      </svg>
+                    )}
+                  </div>
+                  <div className="text-[10px] font-mono text-[#6B2E8C] mb-1 flex items-center justify-between">
+                    <span>MODULE 0{i + 1}</span>
+                    <span className="opacity-70">{meta.dim}</span>
+                  </div>
+                  <div className="font-serif italic text-lg text-[#2A0F3A]">{d.title}</div>
+                  <div className="text-[13px] text-[#4A2A5C] mt-1">{d.desc}</div>
+                  {meta.stat && (
+                    <div className="text-[11px] text-[#6B2E8C] mt-2 font-semibold">↗ {meta.stat}</div>
+                  )}
                 </div>
-                <div className="text-[10px] font-mono text-[#6B2E8C] mb-1">
-                  MODULE 0{i + 1}
-                </div>
-                <div className="font-serif italic text-lg text-[#2A0F3A]">{d.title}</div>
-                <div className="text-[13px] text-[#4A2A5C] mt-1">{d.desc}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
         <div className="px-10 py-6 border-t border-[#6B2E8C]/15 grid sm:grid-cols-2 gap-4 bg-white/40">
@@ -270,16 +330,68 @@ const MagazineModal = ({ service, open, onOpenChange }: Props) => {
             <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#1C1C1C] mb-3">
               Inside this issue
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              {service.deliverables.map((d) => (
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {service.deliverables.map((d, i) => (
                 <div
                   key={d.title}
                   className="border border-[#1C1C1C] p-3 bg-[#F4ECDD]"
                 >
-                  <div className="aspect-square bg-[#1C1C1C]/10 mb-2 flex items-center justify-center">
-                    <span className="text-[#1C1C1C]/40 text-[11px] font-mono">IMG</span>
+                  <div className="aspect-square bg-white mb-2 p-2 flex items-center justify-center border border-[#1C1C1C]/20">
+                    {i === 0 && (
+                      <svg viewBox="0 0 100 100" className="w-full h-full" role="img" aria-label="Design system specimen">
+                        <rect x="6" y="6" width="14" height="14" fill="#1C1C1C" />
+                        <rect x="22" y="6" width="14" height="14" fill="#C2654A" />
+                        <rect x="38" y="6" width="14" height="14" fill="#5E8E3E" />
+                        <rect x="54" y="6" width="14" height="14" fill="#F4ECDD" stroke="#1C1C1C" />
+                        <rect x="70" y="6" width="14" height="14" fill="#FFD86B" />
+                        <text x="6" y="38" fontSize="14" fontWeight="700" fill="#1C1C1C" fontFamily="serif">H1</text>
+                        <text x="32" y="38" fontSize="10" fontWeight="600" fill="#1C1C1C">H2</text>
+                        <text x="50" y="38" fontSize="7" fill="#1C1C1C">Body</text>
+                        <text x="6" y="56" fontSize="6" fill="#1C1C1C" opacity="0.5" fontFamily="monospace">— Type scale —</text>
+                        {[0,1,2,3,4,5,6,7].map((n) => (
+                          <g key={n}>
+                            {[0,1,2,3,4,5,6,7].map((m) => (
+                              <circle key={m} cx={8 + n*11} cy={68 + m*4} r="0.7" fill="#1C1C1C" opacity="0.4" />
+                            ))}
+                          </g>
+                        ))}
+                      </svg>
+                    )}
+                    {i === 1 && (
+                      <svg viewBox="0 0 100 100" className="w-full h-full" role="img" aria-label="Page layout stack">
+                        <rect x="6" y="6" width="88" height="22" fill="#1C1C1C" opacity="0.85" />
+                        <rect x="10" y="12" width="30" height="3" fill="#F4ECDD" />
+                        <rect x="10" y="18" width="20" height="2" fill="#F4ECDD" opacity="0.7" />
+                        <rect x="60" y="14" width="28" height="8" rx="4" fill="#C2654A" />
+                        <text x="6" y="38" fontSize="5" fontFamily="monospace" fill="#1C1C1C" opacity="0.6">HERO · 1440</text>
+                        <rect x="6" y="42" width="40" height="26" fill="#1C1C1C" opacity="0.15" />
+                        <rect x="50" y="42" width="44" height="26" fill="none" stroke="#1C1C1C" />
+                        <rect x="50" y="46" width="22" height="3" fill="#1C1C1C" />
+                        <rect x="50" y="52" width="34" height="2" fill="#1C1C1C" opacity="0.5" />
+                        <rect x="50" y="56" width="28" height="2" fill="#1C1C1C" opacity="0.5" />
+                        <rect x="50" y="62" width="14" height="4" fill="#C2654A" />
+                        <text x="6" y="78" fontSize="5" fontFamily="monospace" fill="#1C1C1C" opacity="0.6">PDP · COLLECTION</text>
+                        {[0,1,2,3].map((n) => (
+                          <rect key={n} x={6 + n*22} y="82" width="20" height="12" fill="#1C1C1C" opacity="0.18" />
+                        ))}
+                      </svg>
+                    )}
+                    {i === 2 && (
+                      <svg viewBox="0 0 100 100" className="w-full h-full" role="img" aria-label="Responsive device frames">
+                        <rect x="2" y="14" width="94" height="72" rx="3" fill="none" stroke="#1C1C1C" strokeWidth="1.5" />
+                        <text x="4" y="11" fontSize="5" fontFamily="monospace" fill="#1C1C1C">XL · 1440</text>
+                        <rect x="14" y="22" width="70" height="56" rx="2" fill="none" stroke="#1C1C1C" strokeWidth="1.2" />
+                        <text x="16" y="20" fontSize="4.5" fontFamily="monospace" fill="#1C1C1C" opacity="0.8">MD · 768</text>
+                        <rect x="36" y="34" width="26" height="40" rx="2" fill="#1C1C1C" opacity="0.85" />
+                        <rect x="38" y="38" width="22" height="28" rx="1" fill="#F4ECDD" />
+                        <circle cx="49" cy="71" r="1.5" fill="#F4ECDD" />
+                        <text x="36" y="32" fontSize="4" fontFamily="monospace" fill="#1C1C1C">XS · 375</text>
+                        <text x="6" y="94" fontSize="4.5" fontFamily="monospace" fill="#1C1C1C" opacity="0.6">— breakpoints 375 · 768 · 1440 —</text>
+                      </svg>
+                    )}
                   </div>
                   <div className="text-[12px] font-semibold text-[#1C1C1C]">{d.title}</div>
+                  <div className="text-[10px] font-mono text-[#1C1C1C]/60 mt-0.5">{d.desc}</div>
                 </div>
               ))}
             </div>
@@ -405,23 +517,95 @@ const ContactSheetModal = ({ service, open, onOpenChange }: Props) => {
         </div>
         {/* Contact sheet strip */}
         <div className="bg-[#2A140C] py-5 px-6">
-          <div className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#C2654A] mb-3">
-            Contact sheet · {service.deliverables.length} frames
+          <div className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#C2654A] mb-3 flex items-center justify-between">
+            <span>Contact sheet · production card</span>
+            <span className="opacity-60">35MM · ROLL {service.number}</span>
+          </div>
+          {/* sprocket strip top */}
+          <div className="flex gap-1 mb-1">
+            {Array.from({ length: 24 }).map((_, n) => (
+              <div key={n} className="flex-1 h-2 bg-[#C2654A]/20 rounded-[1px]" />
+            ))}
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {[...service.deliverables, ...service.deliverables.slice(0, 2)].map((d, i) => (
+            {[
+              { label: "Hero Shots", count: "12 frames", aspect: "1:1 · AMZN", glyph: "hero" },
+              { label: "Lifestyle Set", count: "24 frames", aspect: "4:5 · IG", glyph: "model" },
+              { label: "Variant Coverage", count: "36 frames", aspect: "1:1 · SKU", glyph: "swatch" },
+              { label: "Flat Lay", count: "8 frames", aspect: "1:1 · PDP", glyph: "flat" },
+              { label: "Ghost Mannequin", count: "6 frames", aspect: "4:5 · APP", glyph: "ghost" },
+            ].map((f, i) => (
               <div
                 key={i}
-                className="flex-shrink-0 w-44 bg-[#3a1f15] p-1.5 rounded-sm"
+                className="flex-shrink-0 w-44 bg-[#3a1f15] p-2 rounded-sm border border-[#C2654A]/20"
               >
-                <div className="aspect-[3/4] bg-gradient-to-br from-[#C2654A]/40 to-[#2A140C] rounded-sm flex items-center justify-center mb-2">
-                  <Camera className="h-7 w-7 text-[#F1DDD2]/40" />
+                <div className="aspect-[3/4] bg-gradient-to-br from-[#5a2e1d] to-[#2A140C] rounded-sm flex items-center justify-center mb-2 relative overflow-hidden">
+                  <div className="absolute top-1 left-1 text-[8px] font-mono text-[#C2654A]/70">F-{String(i + 1).padStart(2, "0")}</div>
+                  <svg viewBox="0 0 60 80" className="w-3/4 h-3/4 text-[#F1DDD2]/55" role="img" aria-label={f.label}>
+                    {f.glyph === "hero" && (
+                      <g fill="currentColor">
+                        <rect x="8" y="14" width="44" height="44" rx="3" opacity="0.25" />
+                        <circle cx="30" cy="34" r="9" opacity="0.7" />
+                        <rect x="14" y="50" width="32" height="4" opacity="0.5" />
+                        <rect x="18" y="58" width="24" height="3" opacity="0.4" />
+                      </g>
+                    )}
+                    {f.glyph === "model" && (
+                      <g fill="currentColor">
+                        <circle cx="30" cy="22" r="7" opacity="0.8" />
+                        <path d="M18 36 Q30 32 42 36 L44 60 Q30 64 16 60 Z" opacity="0.6" />
+                        <rect x="24" y="60" width="4" height="14" opacity="0.5" />
+                        <rect x="32" y="60" width="4" height="14" opacity="0.5" />
+                      </g>
+                    )}
+                    {f.glyph === "swatch" && (
+                      <g fill="currentColor">
+                        {[0,1,2].map((r) => [0,1,2].map((c) => (
+                          <rect key={`${r}-${c}`} x={10 + c*15} y={14 + r*18} width="12" height="14" opacity={0.3 + ((r+c)%5)*0.13} />
+                        )))}
+                      </g>
+                    )}
+                    {f.glyph === "flat" && (
+                      <g fill="currentColor">
+                        <rect x="8" y="14" width="44" height="50" rx="2" opacity="0.18" />
+                        <rect x="14" y="20" width="14" height="14" opacity="0.6" />
+                        <circle cx="42" cy="27" r="7" opacity="0.55" />
+                        <rect x="14" y="38" width="32" height="3" opacity="0.4" />
+                        <rect x="14" y="44" width="20" height="3" opacity="0.4" />
+                        <rect x="14" y="52" width="32" height="8" rx="1" opacity="0.5" />
+                      </g>
+                    )}
+                    {f.glyph === "ghost" && (
+                      <g fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.7">
+                        <path d="M22 18 L18 26 L16 50 L24 56 L36 56 L44 50 L42 26 L38 18 Z" />
+                        <path d="M22 18 Q30 14 38 18" />
+                        <line x1="22" y1="32" x2="38" y2="32" strokeDasharray="2 2" opacity="0.4" />
+                      </g>
+                    )}
+                  </svg>
                 </div>
-                <div className="text-[10px] font-mono text-[#C2654A] px-1">
-                  {String(i + 1).padStart(2, "0")} · {d.title}
+                <div className="text-[10px] font-semibold text-[#F1DDD2] px-1">{f.label}</div>
+                <div className="text-[9px] font-mono text-[#C2654A] px-1 flex items-center justify-between mt-0.5">
+                  <span>{f.count}</span>
+                  <span className="opacity-70">{f.aspect}</span>
                 </div>
               </div>
             ))}
+          </div>
+          {/* sprocket strip bottom */}
+          <div className="flex gap-1 mt-1">
+            {Array.from({ length: 24 }).map((_, n) => (
+              <div key={n} className="flex-1 h-2 bg-[#C2654A]/20 rounded-[1px]" />
+            ))}
+          </div>
+          {/* mini gantt */}
+          <div className="mt-4 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[9px] font-mono text-[#C2654A] items-center">
+            <span>PRE-PRO</span>
+            <div className="h-2 rounded-sm bg-[#C2654A]/30 relative"><div className="absolute left-0 top-0 bottom-0 w-1/4 bg-[#C2654A] rounded-sm" /></div>
+            <span>SHOOT</span>
+            <div className="h-2 rounded-sm bg-[#C2654A]/30 relative"><div className="absolute left-1/4 top-0 bottom-0 w-2/4 bg-[#C2654A] rounded-sm" /></div>
+            <span>DELIVERY</span>
+            <div className="h-2 rounded-sm bg-[#C2654A]/30 relative"><div className="absolute left-3/4 top-0 bottom-0 w-1/4 bg-[#C2654A] rounded-sm" /></div>
           </div>
         </div>
         <div className="px-10 py-7 grid sm:grid-cols-2 gap-6">
