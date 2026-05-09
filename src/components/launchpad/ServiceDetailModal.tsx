@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ArrowRight, CheckCircle2, X } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { LaunchpadService } from "./launchpadServices";
@@ -24,8 +24,7 @@ const ServiceDetailModal = ({ service, open, onOpenChange }: Props) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-3xl p-0 overflow-hidden bg-[#f6f1ea] border-[#1a1a1a]/10 max-h-[90vh] overflow-y-auto"
-        hideClose
+        className="max-w-3xl p-0 overflow-hidden bg-[#f6f1ea] border-[#1a1a1a]/10 max-h-[90vh] overflow-y-auto [&>button]:text-[#f6f1ea] [&>button]:opacity-80 [&>button]:hover:opacity-100"
       >
         <VisuallyHidden>
           <DialogTitle>{service.name}</DialogTitle>
@@ -34,14 +33,6 @@ const ServiceDetailModal = ({ service, open, onOpenChange }: Props) => {
 
         {/* Header */}
         <div className="relative bg-[#1a1a1a] text-[#f6f1ea] px-8 pt-8 pb-10">
-          <button
-            onClick={() => onOpenChange(false)}
-            className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
-
           <div className="flex items-start gap-5">
             <div className="w-12 h-12 rounded-xl bg-[#c97b54] flex items-center justify-center flex-shrink-0">
               <Icon className="h-6 w-6 text-[#1a1a1a]" />
