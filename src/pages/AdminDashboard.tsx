@@ -21,6 +21,9 @@ const IndustryNewsTab = lazy(() => import("@/components/admin/IndustryNewsTab"))
 
 const TranslationsTab = lazy(() => import("@/components/admin/TranslationsTab"));
 const LeadsTab = lazy(() => import("@/components/admin/LeadsTab").then(m => ({ default: m.LeadsTab })));
+const GmailTab = lazy(() => import("@/components/admin/GmailTab"));
+const CalendarTab = lazy(() => import("@/components/admin/CalendarTab"));
+const SlidesTab = lazy(() => import("@/components/admin/SlidesTab"));
 
 const AdminDashboard = () => {
   const { user, role, loading, logout } = useAuth();
