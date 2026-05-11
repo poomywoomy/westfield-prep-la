@@ -1,4 +1,4 @@
-import { Users, PenSquare, FileSignature, Search, Globe, Newspaper, Languages, UserPlus, Receipt } from "lucide-react";
+import { Users, PenSquare, FileSignature, Search, Globe, Newspaper, Languages, UserPlus, Receipt, Mail, Calendar, Presentation } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
