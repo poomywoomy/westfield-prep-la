@@ -59,3 +59,24 @@ verify_jwt = false
 
 [functions.translate-content]
 verify_jwt = false
+
+[functions.gmail-list-messages]
+verify_jwt = true
+
+[functions.gmail-get-message]
+verify_jwt = true
+
+[functions.gmail-send-message]
+verify_jwt = true
+
+[functions.gmail-modify-message]
+verify_jwt = true
+
+[functions.calendar-list-events]
+verify_jwt = true
+
+[functions.calendar-create-event]
+verify_jwt = true
+
+[functions.slides-create-presentation]
+verify_jwt = true
