@@ -35,12 +35,6 @@ export default function GmailTab() {
   const load = async (q = "") => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("gmail-list-messages", {
-        method: "GET",
-        body: undefined,
-        // pass query via headers/url isn't supported; fallback: include in URL via query string
-      } as any);
-      // Fallback to direct call if invoke can't handle GET with params
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-list-messages?q=${encodeURIComponent(q)}&maxResults=25`;
       const session = (await supabase.auth.getSession()).data.session;
       const res = await fetch(url, {
@@ -49,7 +43,6 @@ export default function GmailTab() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed to load");
       setMessages(json.messages || []);
-      if (data === undefined && error) { /* swallow */ }
     } catch (e) {
       toast({ title: "Failed to load Gmail", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
     } finally {
