@@ -161,6 +161,15 @@ const AdminDashboard = () => {
               <TabsContent value="leads">
                 <Suspense fallback={tabSpinner}><LeadsTab /></Suspense>
               </TabsContent>
+              <TabsContent value="gmail">
+                <Suspense fallback={tabSpinner}><GmailTab /></Suspense>
+              </TabsContent>
+              <TabsContent value="calendar">
+                <Suspense fallback={tabSpinner}><CalendarTab /></Suspense>
+              </TabsContent>
+              <TabsContent value="slides">
+                <Suspense fallback={tabSpinner}><SlidesTab /></Suspense>
+              </TabsContent>
             </Tabs>
 
             <Button
