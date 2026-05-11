@@ -1,4 +1,4 @@
-import { Users, PenSquare, FileSignature, Search, Globe, Newspaper, Languages, UserPlus, Receipt } from "lucide-react";
+import { Users, PenSquare, FileSignature, Search, Globe, Newspaper, Languages, UserPlus, Receipt, Mail, Calendar, Presentation } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -36,6 +36,9 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
     { id: "translations", label: "Translations", icon: Languages },
     { id: "leads", label: "Leads", icon: UserPlus },
     { id: "documents", label: "Documents", icon: FileSignature },
+    { id: "gmail", label: "Gmail", icon: Mail },
+    { id: "calendar", label: "Calendar", icon: Calendar },
+    { id: "slides", label: "Slides", icon: Presentation },
   ];
 
   return (
