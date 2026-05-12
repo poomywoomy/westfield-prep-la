@@ -99,7 +99,7 @@ export default function GmailTab() {
       if (!res.ok) throw new Error(json.error || "Failed");
       return json.messages || [];
     },
-    staleTime: 30_000,
+    staleTime: 60_000,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
