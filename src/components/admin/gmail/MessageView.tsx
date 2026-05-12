@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -52,48 +53,55 @@ function findBody(p?: GmailPart): { html: string; text: string } {
   return { html, text };
 }
 
+async function fetchMessage(id: string) {
+  const session = (await supabase.auth.getSession()).data.session;
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-get-message?id=${encodeURIComponent(id)}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+  return res.json();
+}
+
 export function MessageView({ messageId, open, onOpenChange, onReply, onChanged }: Props) {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState<GmailFull | null>(null);
-  const [degraded, setDegraded] = useState(false);
+  const onChangedRef = useRef(onChanged);
+  onChangedRef.current = onChanged;
+  const markedReadRef = useRef<string | null>(null);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["gmail-message", messageId],
+    queryFn: () => fetchMessage(messageId!),
+    enabled: !!messageId && open,
+    staleTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+
+  const msg: GmailFull | null = data?.message ?? null;
+  const degraded = !!data?.degraded;
 
   useEffect(() => {
-    if (!open || !messageId) return;
-    setMsg(null);
-    setDegraded(false);
-    setLoading(true);
-    let cancelled = false;
-    (async () => {
-      try {
-        const session = (await supabase.auth.getSession()).data.session;
-        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-get-message?id=${encodeURIComponent(messageId)}`;
-        const res = await fetch(url, { headers: { Authorization: `Bearer ${session?.access_token}` } });
-        const data = await res.json();
-        if (cancelled) return;
-        if (!data.message) {
-          throw new Error(data.error || "Failed to load message");
-        }
-        setMsg(data.message);
-        setDegraded(!!data.degraded);
-        if (!data.degraded && data.message.labelIds?.includes("UNREAD")) {
-          await supabase.functions.invoke("gmail-modify-message", { body: { id: messageId, action: "mark_read" } });
-          onChanged();
-        }
-      } catch (e) {
-        if (cancelled) return;
-        toast({ title: "Failed to load message", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
-      } finally { if (!cancelled) setLoading(false); }
-    })();
-    return () => { cancelled = true; };
-  }, [messageId, open, onChanged, toast]);
+    if (error) {
+      toast({ title: "Failed to load message", description: error instanceof Error ? error.message : "Unknown", variant: "destructive" });
+    }
+  }, [error, toast]);
+
+  // Mark unread→read once per message id
+  useEffect(() => {
+    if (!msg || !messageId) return;
+    if (degraded) return;
+    if (markedReadRef.current === messageId) return;
+    if (!msg.labelIds?.includes("UNREAD")) return;
+    markedReadRef.current = messageId;
+    supabase.functions.invoke("gmail-modify-message", { body: { id: messageId, action: "mark_read" } })
+      .then(() => onChangedRef.current?.())
+      .catch(() => { markedReadRef.current = null; });
+  }, [msg, messageId, degraded]);
 
   const act = async (action: string) => {
     if (!messageId) return;
     try {
       await supabase.functions.invoke("gmail-modify-message", { body: { id: messageId, action } });
       toast({ title: "Updated" });
-      onChanged();
+      onChangedRef.current?.();
       if (["archive", "trash"].includes(action)) onOpenChange(false);
     } catch (e) {
       toast({ title: "Action failed", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
@@ -103,6 +111,7 @@ export function MessageView({ messageId, open, onOpenChange, onReply, onChanged 
   const headers = msg?.payload?.headers;
   const { html, text } = findBody(msg?.payload);
   const cleanHtml = html ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true } }) : "";
+  const loading = isLoading && !msg;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
