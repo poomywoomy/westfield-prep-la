@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -40,16 +42,16 @@ const getHeader = (m: GmailMessage, name: string) =>
 export default function GmailTab() {
   const { toast } = useToast();
   const { signatures } = useGmailSignatures();
+  const queryClient = useQueryClient();
 
   const [folder, setFolder] = useState<string>("INBOX");
-  const [messages, setMessages] = useState<GmailMessage[]>([]);
-  const [loading, setLoading] = useState(false);
   const [counts, setCounts] = useState<Record<string, { unread: number; total: number }>>({});
   const [labelsLoading, setLabelsLoading] = useState(false);
 
   const [queryInput, setQueryInput] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const debounceRef = useRef<number | null>(null);
+  const hoverPrefetchRef = useRef<number | null>(null);
 
   const [openMsgId, setOpenMsgId] = useState<string | null>(null);
   const [composeOpen, setComposeOpen] = useState(false);
@@ -83,35 +85,66 @@ export default function GmailTab() {
     } finally { setLabelsLoading(false); }
   };
 
-  const loadMessages = async (folderId: string, q: string) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ maxResults: "25" });
-      if (q) params.set("q", q);
-      if (folderId) params.set("labelIds", folderId);
+  const messagesQuery = useQuery({
+    queryKey: ["gmail-messages", folder, activeQuery],
+    queryFn: async (): Promise<GmailMessage[]> => {
+      const params = new URLSearchParams({ maxResults: "15" });
+      if (activeQuery) params.set("q", activeQuery);
+      if (folder) params.set("labelIds", folder);
       const session = (await supabase.auth.getSession()).data.session;
       const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-list-messages?${params}`, {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed");
-      setMessages(json.messages || []);
-    } catch (e) {
-      toast({ title: "Failed to load Gmail", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
-    } finally { setLoading(false); }
-  };
+      return json.messages || [];
+    },
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+
+  const messages = messagesQuery.data ?? [];
+  const loading = messagesQuery.isFetching;
+
+  useEffect(() => {
+    if (messagesQuery.error) {
+      toast({ title: "Failed to load Gmail", description: (messagesQuery.error as Error).message, variant: "destructive" });
+    }
+  }, [messagesQuery.error, toast]);
 
   useEffect(() => { loadLabels(); }, []);
-  useEffect(() => { loadMessages(folder, activeQuery); }, [folder, activeQuery]);
 
-  // Debounced search
+  // Debounced search (only fires for empty or 2+ chars)
   useEffect(() => {
     if (debounceRef.current) window.clearTimeout(debounceRef.current);
-    debounceRef.current = window.setTimeout(() => setActiveQuery(queryInput.trim()), 400);
+    debounceRef.current = window.setTimeout(() => {
+      const q = queryInput.trim();
+      if (q.length === 0 || q.length >= 2) setActiveQuery(q);
+    }, 400);
     return () => { if (debounceRef.current) window.clearTimeout(debounceRef.current); };
   }, [queryInput]);
 
-  const refresh = () => { loadMessages(folder, activeQuery); loadLabels(); };
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["gmail-messages"] });
+    loadLabels();
+  };
+
+  const prefetchMessage = (id: string) => {
+    if (hoverPrefetchRef.current) window.clearTimeout(hoverPrefetchRef.current);
+    hoverPrefetchRef.current = window.setTimeout(async () => {
+      queryClient.prefetchQuery({
+        queryKey: ["gmail-message", id],
+        queryFn: async () => {
+          const session = (await supabase.auth.getSession()).data.session;
+          const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-get-message?id=${encodeURIComponent(id)}`;
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+          return res.json();
+        },
+        staleTime: 60_000,
+      });
+    }, 150);
+  };
 
   const modify = async (id: string, action: string) => {
     try {
@@ -266,14 +299,30 @@ export default function GmailTab() {
           </div>
 
           <Card className="divide-y">
-            {loading && messages.length === 0 ? (
-              <div className="p-8 flex justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div>
+            {messagesQuery.isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="p-4 flex items-start gap-3">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex justify-between gap-2">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-2/3" />
+                  </div>
+                </div>
+              ))
             ) : messages.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">No messages.</div>
             ) : messages.map((m) => {
               const unread = m.labelIds?.includes("UNREAD");
               return (
-                <div key={m.id} className={`p-4 flex items-start gap-3 hover:bg-muted/50 cursor-pointer ${unread ? "font-semibold" : ""}`} onClick={() => setOpenMsgId(m.id)}>
+                <div
+                  key={m.id}
+                  className={`p-4 flex items-start gap-3 hover:bg-muted/50 cursor-pointer ${unread ? "font-semibold" : ""}`}
+                  onClick={() => setOpenMsgId(m.id)}
+                  onMouseEnter={() => prefetchMessage(m.id)}
+                >
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline gap-2">
                       <p className="truncate text-sm">{getHeader(m, folder === "SENT" ? "To" : "From") || "Unknown"}</p>
@@ -298,6 +347,11 @@ export default function GmailTab() {
                 </div>
               );
             })}
+            {messagesQuery.isFetching && !messagesQuery.isLoading && (
+              <div className="p-2 flex justify-center text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin mr-2" /> Refreshing…
+              </div>
+            )}
           </Card>
         </div>
       </div>

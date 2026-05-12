@@ -13,10 +13,11 @@ serve(async (req) => {
   try {
     const url = new URL(req.url);
     const q = url.searchParams.get('q') ?? '';
-    const maxResults = url.searchParams.get('maxResults') ?? '25';
+    const maxResults = url.searchParams.get('maxResults') ?? '15';
     const pageToken = url.searchParams.get('pageToken') ?? '';
     const labelIds = url.searchParams.get('labelIds') ?? '';
     const params = new URLSearchParams({ maxResults });
+    params.set('fields', 'messages/id,nextPageToken');
     if (q) params.set('q', q);
     if (pageToken) params.set('pageToken', pageToken);
     if (labelIds) {
@@ -34,13 +35,21 @@ serve(async (req) => {
     const listData = await listRes.json();
     if (!listRes.ok) return jsonResponse({ error: 'Gmail list failed', details: listData }, listRes.status);
 
-    const messages = listData.messages ?? [];
-    const detailed = await Promise.all(messages.slice(0, 25).map(async (m: { id: string }) => {
-      const r = await fetch(`${GATEWAY}/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Subject&metadataHeaders=Date`, { headers });
-      return await r.json();
-    }));
+    const messages = (listData.messages ?? []) as { id: string }[];
+    const fetchMeta = (id: string) =>
+      fetch(`${GATEWAY}/users/me/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Subject&metadataHeaders=Date`, { headers })
+        .then(r => r.json())
+        .catch(() => null);
 
-    return jsonResponse({ messages: detailed, nextPageToken: listData.nextPageToken ?? null });
+    const settled = await Promise.allSettled(messages.map(m => fetchMeta(m.id)));
+    const detailed = settled
+      .map(s => s.status === 'fulfilled' ? s.value : null)
+      .filter(Boolean);
+
+    return new Response(JSON.stringify({ messages: detailed, nextPageToken: listData.nextPageToken ?? null }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'private, max-age=15' },
+    });
   } catch (e) {
     return jsonResponse({ error: e instanceof Error ? e.message : 'Unknown error' }, 500);
   }

@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Reply, ReplyAll, Forward, Archive, Trash2, MailOpen, Star } from "lucide-react";
+import { Loader2, Reply, ReplyAll, Forward, Archive, Trash2, MailOpen, Star, AlertTriangle } from "lucide-react";
 import DOMPurify from "dompurify";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Props {
   messageId: string | null;
@@ -55,27 +56,36 @@ export function MessageView({ messageId, open, onOpenChange, onReply, onChanged 
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<GmailFull | null>(null);
+  const [degraded, setDegraded] = useState(false);
 
   useEffect(() => {
     if (!open || !messageId) return;
     setMsg(null);
+    setDegraded(false);
     setLoading(true);
+    let cancelled = false;
     (async () => {
       try {
         const session = (await supabase.auth.getSession()).data.session;
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-get-message?id=${encodeURIComponent(messageId)}`;
         const res = await fetch(url, { headers: { Authorization: `Bearer ${session?.access_token}` } });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed");
-        setMsg(data);
-        if (data.labelIds?.includes("UNREAD")) {
+        if (cancelled) return;
+        if (!data.message) {
+          throw new Error(data.error || "Failed to load message");
+        }
+        setMsg(data.message);
+        setDegraded(!!data.degraded);
+        if (!data.degraded && data.message.labelIds?.includes("UNREAD")) {
           await supabase.functions.invoke("gmail-modify-message", { body: { id: messageId, action: "mark_read" } });
           onChanged();
         }
       } catch (e) {
+        if (cancelled) return;
         toast({ title: "Failed to load message", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
-      } finally { setLoading(false); }
+      } finally { if (!cancelled) setLoading(false); }
     })();
+    return () => { cancelled = true; };
   }, [messageId, open, onChanged, toast]);
 
   const act = async (action: string) => {
@@ -125,8 +135,17 @@ export function MessageView({ messageId, open, onOpenChange, onReply, onChanged 
               <div><span className="text-muted-foreground">Date:</span> {getHeader(headers, "Date")}</div>
             </div>
 
-            <div className="overflow-y-auto flex-1 py-3">
-              {cleanHtml ? (
+            <div className="overflow-y-auto flex-1 py-3 space-y-3">
+              {degraded && (
+                <Alert variant="default" className="border-yellow-500/50 bg-yellow-500/5">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                  <AlertDescription className="text-xs">
+                    Read-only preview. The connected Gmail account was authorized with the metadata scope only,
+                    so message bodies are not available. Reconnect Gmail with full read access in Connectors to view full messages.
+                  </AlertDescription>
+                </Alert>
+              )}
+              {cleanHtml && !degraded ? (
                 <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: cleanHtml }} />
               ) : (
                 <pre className="whitespace-pre-wrap font-sans text-sm">{text || msg.snippet}</pre>
