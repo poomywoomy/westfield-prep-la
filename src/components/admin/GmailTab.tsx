@@ -141,7 +141,7 @@ export default function GmailTab() {
           const res = await fetch(url, { headers: { Authorization: `Bearer ${session?.access_token}` } });
           return res.json();
         },
-        staleTime: 60_000,
+        staleTime: 5 * 60_000,
       });
     }, 150);
   };
