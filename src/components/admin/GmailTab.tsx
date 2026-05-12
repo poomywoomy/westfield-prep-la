@@ -42,16 +42,16 @@ const getHeader = (m: GmailMessage, name: string) =>
 export default function GmailTab() {
   const { toast } = useToast();
   const { signatures } = useGmailSignatures();
+  const queryClient = useQueryClient();
 
   const [folder, setFolder] = useState<string>("INBOX");
-  const [messages, setMessages] = useState<GmailMessage[]>([]);
-  const [loading, setLoading] = useState(false);
   const [counts, setCounts] = useState<Record<string, { unread: number; total: number }>>({});
   const [labelsLoading, setLabelsLoading] = useState(false);
 
   const [queryInput, setQueryInput] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const debounceRef = useRef<number | null>(null);
+  const hoverPrefetchRef = useRef<number | null>(null);
 
   const [openMsgId, setOpenMsgId] = useState<string | null>(null);
   const [composeOpen, setComposeOpen] = useState(false);
@@ -85,35 +85,66 @@ export default function GmailTab() {
     } finally { setLabelsLoading(false); }
   };
 
-  const loadMessages = async (folderId: string, q: string) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ maxResults: "25" });
-      if (q) params.set("q", q);
-      if (folderId) params.set("labelIds", folderId);
+  const messagesQuery = useQuery({
+    queryKey: ["gmail-messages", folder, activeQuery],
+    queryFn: async (): Promise<GmailMessage[]> => {
+      const params = new URLSearchParams({ maxResults: "15" });
+      if (activeQuery) params.set("q", activeQuery);
+      if (folder) params.set("labelIds", folder);
       const session = (await supabase.auth.getSession()).data.session;
       const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-list-messages?${params}`, {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed");
-      setMessages(json.messages || []);
-    } catch (e) {
-      toast({ title: "Failed to load Gmail", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
-    } finally { setLoading(false); }
-  };
+      return json.messages || [];
+    },
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+
+  const messages = messagesQuery.data ?? [];
+  const loading = messagesQuery.isFetching;
+
+  useEffect(() => {
+    if (messagesQuery.error) {
+      toast({ title: "Failed to load Gmail", description: (messagesQuery.error as Error).message, variant: "destructive" });
+    }
+  }, [messagesQuery.error, toast]);
 
   useEffect(() => { loadLabels(); }, []);
-  useEffect(() => { loadMessages(folder, activeQuery); }, [folder, activeQuery]);
 
-  // Debounced search
+  // Debounced search (only fires for empty or 2+ chars)
   useEffect(() => {
     if (debounceRef.current) window.clearTimeout(debounceRef.current);
-    debounceRef.current = window.setTimeout(() => setActiveQuery(queryInput.trim()), 400);
+    debounceRef.current = window.setTimeout(() => {
+      const q = queryInput.trim();
+      if (q.length === 0 || q.length >= 2) setActiveQuery(q);
+    }, 400);
     return () => { if (debounceRef.current) window.clearTimeout(debounceRef.current); };
   }, [queryInput]);
 
-  const refresh = () => { loadMessages(folder, activeQuery); loadLabels(); };
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["gmail-messages"] });
+    loadLabels();
+  };
+
+  const prefetchMessage = (id: string) => {
+    if (hoverPrefetchRef.current) window.clearTimeout(hoverPrefetchRef.current);
+    hoverPrefetchRef.current = window.setTimeout(async () => {
+      queryClient.prefetchQuery({
+        queryKey: ["gmail-message", id],
+        queryFn: async () => {
+          const session = (await supabase.auth.getSession()).data.session;
+          const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-get-message?id=${encodeURIComponent(id)}`;
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+          return res.json();
+        },
+        staleTime: 60_000,
+      });
+    }, 150);
+  };
 
   const modify = async (id: string, action: string) => {
     try {
