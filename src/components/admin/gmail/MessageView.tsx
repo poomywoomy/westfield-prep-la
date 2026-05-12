@@ -56,27 +56,36 @@ export function MessageView({ messageId, open, onOpenChange, onReply, onChanged 
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<GmailFull | null>(null);
+  const [degraded, setDegraded] = useState(false);
 
   useEffect(() => {
     if (!open || !messageId) return;
     setMsg(null);
+    setDegraded(false);
     setLoading(true);
+    let cancelled = false;
     (async () => {
       try {
         const session = (await supabase.auth.getSession()).data.session;
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-get-message?id=${encodeURIComponent(messageId)}`;
         const res = await fetch(url, { headers: { Authorization: `Bearer ${session?.access_token}` } });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed");
-        setMsg(data);
-        if (data.labelIds?.includes("UNREAD")) {
+        if (cancelled) return;
+        if (!data.message) {
+          throw new Error(data.error || "Failed to load message");
+        }
+        setMsg(data.message);
+        setDegraded(!!data.degraded);
+        if (!data.degraded && data.message.labelIds?.includes("UNREAD")) {
           await supabase.functions.invoke("gmail-modify-message", { body: { id: messageId, action: "mark_read" } });
           onChanged();
         }
       } catch (e) {
+        if (cancelled) return;
         toast({ title: "Failed to load message", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
-      } finally { setLoading(false); }
+      } finally { if (!cancelled) setLoading(false); }
     })();
+    return () => { cancelled = true; };
   }, [messageId, open, onChanged, toast]);
 
   const act = async (action: string) => {
