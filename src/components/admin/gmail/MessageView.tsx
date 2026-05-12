@@ -135,8 +135,17 @@ export function MessageView({ messageId, open, onOpenChange, onReply, onChanged 
               <div><span className="text-muted-foreground">Date:</span> {getHeader(headers, "Date")}</div>
             </div>
 
-            <div className="overflow-y-auto flex-1 py-3">
-              {cleanHtml ? (
+            <div className="overflow-y-auto flex-1 py-3 space-y-3">
+              {degraded && (
+                <Alert variant="default" className="border-yellow-500/50 bg-yellow-500/5">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                  <AlertDescription className="text-xs">
+                    Read-only preview. The connected Gmail account was authorized with the metadata scope only,
+                    so message bodies are not available. Reconnect Gmail with full read access in Connectors to view full messages.
+                  </AlertDescription>
+                </Alert>
+              )}
+              {cleanHtml && !degraded ? (
                 <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: cleanHtml }} />
               ) : (
                 <pre className="whitespace-pre-wrap font-sans text-sm">{text || msg.snippet}</pre>
