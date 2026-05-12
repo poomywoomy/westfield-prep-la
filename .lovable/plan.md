@@ -1,78 +1,67 @@
-# Gmail Tab Upgrade Plan
+## Goals
+1. Open emails without 403 errors.
+2. Make the inbox load noticeably faster.
+3. Make the "New / Add signature" flow work and confirm save.
 
-Improve the admin Gmail experience with proper folders, working search, full message view, a rich-text composer, and reusable signatures.
+## 1. Fix "Failed to open email" (403 Metadata scope)
 
-## 1. Folders / Labels (Inbox, Sent, Drafts, etc.)
+Root cause: `gmail-get-message` always requests `format=full`. The Google Mail connector token was granted with the metadata scope, which Gmail rejects for `full`. Even though `gmail.readonly` is in the connector's configured scopes, the live token only has `gmail.metadata`, so every open throws 403.
 
-- Add a left sidebar inside `GmailTab.tsx` listing system labels: **Inbox, Starred, Sent, Drafts, Spam, Trash, All Mail**.
-- Default selection: Inbox. Selecting a folder calls `gmail-list-messages` with the matching `labelIds` query param (e.g. `SENT`, `DRAFT`, `TRASH`).
-- Update `gmail-list-messages` edge function to accept and forward `labelIds` (comma-separated) in addition to the existing `q` param.
-- Show unread count badge per folder using Gmail `labels.get` (new lightweight `gmail-list-labels` edge function or piggyback on list response).
+Changes in `supabase/functions/gmail-get-message/index.ts`:
+- First try `format=full`.
+- If response is 403 with "Metadata scope" / `PERMISSION_DENIED`, retry with `format=metadata` and request all useful headers (`From,To,Cc,Bcc,Subject,Date,Reply-To,Message-ID`).
+- Always return HTTP 200 with a structured payload `{ message, degraded: boolean, reason?: string }` so the frontend never sees a 403 and can show a friendly banner instead of a toast storm.
+- When `degraded=true`, include `snippet` from the metadata response as the only body content.
 
-## 2. Working Search Bar
+Changes in `src/components/admin/gmail/MessageView.tsx`:
+- Read the new envelope. If `degraded`, render a yellow banner: "Read-only preview. Reconnect Gmail with full access to view message bodies." with a button that triggers our existing reconnect helper (or links to Connectors).
+- Render `snippet` in place of HTML body when degraded.
+- Suppress the multiple error toasts: a single toast on real failure only.
 
-- The current search input only fires on Enter. Keep Enter, but also:
-  - Add a Search button next to the input.
-  - Debounce typing (400ms) so results refresh automatically.
-  - Show the active query as a removable chip above the list.
-- Pass the query through Gmail's `q` operator syntax (already supported by the edge function), with helper hint text under the input listing common operators (`from:`, `to:`, `subject:`, `is:unread`, `has:attachment`, `after:YYYY/MM/DD`).
+Optional follow-up surfaced to the user: offer a one-click reconnect that requests `gmail.readonly`. We will not auto-trigger reconnect, just expose the button.
 
-## 3. Open / Read Full Email
+## 2. Make Gmail load much faster
 
-- Clicking a row opens a full-message dialog (or right-side pane on wide screens) backed by `gmail-get-message` (already exists).
-- Render:
-  - Headers: From, To, Cc, Date, Subject.
-  - HTML body when available (sanitized with DOMPurify), fallback to plain text.
-  - Attachment list with download buttons (new `gmail-get-attachment` edge function returning base64 → blob).
-- Actions in the open view: **Reply, Reply all, Forward, Archive, Mark unread, Trash, Star**. Reply/Forward prefills the rich composer with quoted history.
-- Auto-mark message as read when opened (calls `gmail-modify-message` with `mark_read`).
+Current path: list returns 25 message IDs, then we issue 25 sequential-in-parallel `format=metadata` calls through the gateway before returning anything. Each gateway hop is ~300–600 ms, so first paint waits for the slowest of 25.
 
-## 4. Rich-Text Composer
+Changes in `supabase/functions/gmail-list-messages/index.ts`:
+- Drop default `maxResults` from 25 to 15.
+- Use `users.messages.list` with `?fields=messages/id,nextPageToken` to skip extra payload.
+- Fetch metadata in two waves: first 8 (returned immediately as primary list), remaining 7 fetched in the same handler but with `Promise.allSettled` so a single slow message no longer blocks the whole response.
+- Add `Cache-Control: private, max-age=15` to the JSON response so quick folder switches reuse data.
 
-- Replace the plain `<Textarea>` in the compose dialog with a TipTap editor (already used in `RichTextEditor.tsx` for blog).
-- Create a new lightweight `EmailRichTextEditor.tsx` configured with: bold, italic, underline, strikethrough, bullet list, ordered list, headings (H1–H3), font size, font family, text color, highlight color, link, blockquote, horizontal rule, undo/redo, clear formatting.
-- Store editor output as HTML.
-- Update `gmail-send-message` edge function:
-  - Accept `bodyHtml` (and keep `body` for plaintext fallback).
-  - Build a `multipart/alternative` MIME message with both `text/plain` and `text/html` parts (still base64url-encoded into `raw`).
-  - Add Cc / Bcc fields in the UI (already supported server-side).
+Changes in `src/components/admin/GmailTab.tsx`:
+- Wrap the list query in React Query with `staleTime: 30_000` and `keepPreviousData: true` so folder/search switches feel instant.
+- Render skeleton rows while loading instead of a blocking spinner.
+- Prefetch `gmail-get-message` on row hover (debounced 150 ms) so clicking a message opens instantly.
+- Limit the search debounce trigger to fire only when query length >= 2.
 
-## 5. Multiple Signatures
+## 3. Fix the "Add new signature" button + confirm save
 
-- New table `gmail_signatures` (admin-only RLS):
-  - `id uuid pk`, `user_id uuid`, `name text`, `body_html text`, `is_default boolean`, `created_at`, `updated_at`.
-  - RLS: only owner (and admins) can read/write their own rows.
-- New "Signatures" management dialog accessible from the Gmail tab header (gear icon):
-  - List signatures, create/edit/delete, mark one as default, edit body in the same rich-text editor.
-- In compose dialog:
-  - Signature dropdown above the editor (defaults to the user's default signature).
-  - Selecting a signature appends/replaces the trailing `<div class="signature">…</div>` block in the editor.
-  - Switching signatures swaps the block in place.
+Audit findings in `SignaturesDialog.tsx`:
+- The "New" button only resets local state; if the user is already on a fresh form it looks like nothing happens. The "Create" button is also disabled until `name` has text, which the user reads as broken.
+- Save uses `useGmailSignatures.create`, which requires an authenticated user; that works (RLS verified), but errors are swallowed into a toast that is easy to miss.
 
-## Technical Details
+Changes in `src/components/admin/gmail/SignaturesDialog.tsx`:
+- Replace the always-visible form with an explicit two-pane flow:
+  - Left: signature list + "+ New signature" primary button.
+  - Right: empty state ("Select a signature or click New") until New/Edit is chosen.
+- Clicking "+ New signature" opens an editable form with `name` focused and a placeholder "Untitled signature".
+- Remove the disabled state on the save button; on click, validate and show inline error under `name` if empty.
+- Surface backend errors with both a destructive toast and an inline alert at the top of the editor.
+- After successful save, keep the new signature selected (instead of resetting to blank) so the user sees it in the list with a green "Saved" pill for 2 s.
 
-**Files to add**
-- `src/components/admin/gmail/EmailRichTextEditor.tsx` — TipTap with extended toolbar (FontSize, FontFamily, Color, Highlight, Link).
-- `src/components/admin/gmail/MessageView.tsx` — full message reader with actions.
-- `src/components/admin/gmail/SignaturesDialog.tsx` — CRUD UI for signatures.
-- `src/components/admin/gmail/FolderSidebar.tsx` — label list + counts.
-- `src/hooks/useGmailSignatures.ts` — fetch/mutate signatures via supabase client.
-- `supabase/functions/gmail-list-labels/index.ts` — returns labels with unread counts.
-- `supabase/functions/gmail-get-attachment/index.ts` — fetches attachment by `messageId` + `attachmentId`.
-- Migration: create `gmail_signatures` table + RLS policies + `updated_at` trigger.
+Changes in `src/hooks/useGmailSignatures.ts`:
+- Wrap insert/update in a single transactional flow: when `is_default` is true, run the unset + insert in `Promise.all` only after confirming the user id; bubble any error.
+- Return the inserted/updated row from `create`/`update` so the dialog can select it.
 
-**Files to edit**
-- `src/components/admin/GmailTab.tsx` — split into sidebar + list + reader; wire search debounce, folder switching, signature dropdown, rich composer.
-- `supabase/functions/gmail-list-messages/index.ts` — accept `labelIds` query param, forward to Gmail.
-- `supabase/functions/gmail-send-message/index.ts` — accept `bodyHtml`, `cc`, `bcc`, build multipart MIME; keep zod validation.
+## Verification
 
-**Dependencies**
-- Add TipTap extensions not yet installed: `@tiptap/extension-font-family`, `@tiptap/extension-text-style` (already present), `dompurify` + `@types/dompurify` for safe HTML rendering. (Font-size requires a small custom TipTap extension or `tiptap-extension-font-size` package.)
+- Open an email: confirm no 403; with current scope the user sees the degraded banner and headers + snippet. After reconnect with `gmail.readonly`, full HTML renders.
+- Inbox: first paint < 1.5 s on a warm gateway, switching folders is instant from cache.
+- Signatures: create one named "Default", mark as default, reload page, confirm it persists and is preselected in compose.
 
-**Scopes**
-- Existing Gmail connection scopes already cover read/modify/send. No reconnect needed unless a 403 appears at runtime.
+## Out of scope
 
-## Out of Scope (this iteration)
-- Threaded conversation view (messages still listed individually).
-- Inline image uploads in the composer.
-- Filters, labels CRUD, scheduled send, vacation responder.
+- Building a richer fallback body parser for metadata-only responses (limited to snippet by Gmail).
+- Migrating signature storage to per-account Gmail signatures via `gmail.settings.basic`.
