@@ -15,27 +15,28 @@ serve(async (req) => {
     const q = url.searchParams.get('q') ?? '';
     const maxResults = url.searchParams.get('maxResults') ?? '25';
     const pageToken = url.searchParams.get('pageToken') ?? '';
+    const labelIds = url.searchParams.get('labelIds') ?? '';
     const params = new URLSearchParams({ maxResults });
     if (q) params.set('q', q);
     if (pageToken) params.set('pageToken', pageToken);
+    if (labelIds) {
+      for (const id of labelIds.split(',').filter(Boolean)) {
+        params.append('labelIds', id);
+      }
+    }
 
-    const listRes = await fetch(`${GATEWAY}/users/me/messages?${params}`, {
-      headers: {
-        Authorization: `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
-        'X-Connection-Api-Key': Deno.env.get('GOOGLE_MAIL_API_KEY')!,
-      },
-    });
+    const headers = {
+      Authorization: `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
+      'X-Connection-Api-Key': Deno.env.get('GOOGLE_MAIL_API_KEY')!,
+    };
+
+    const listRes = await fetch(`${GATEWAY}/users/me/messages?${params}`, { headers });
     const listData = await listRes.json();
     if (!listRes.ok) return jsonResponse({ error: 'Gmail list failed', details: listData }, listRes.status);
 
     const messages = listData.messages ?? [];
     const detailed = await Promise.all(messages.slice(0, 25).map(async (m: { id: string }) => {
-      const r = await fetch(`${GATEWAY}/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`, {
-        headers: {
-          Authorization: `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
-          'X-Connection-Api-Key': Deno.env.get('GOOGLE_MAIL_API_KEY')!,
-        },
-      });
+      const r = await fetch(`${GATEWAY}/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Subject&metadataHeaders=Date`, { headers });
       return await r.json();
     }));
 

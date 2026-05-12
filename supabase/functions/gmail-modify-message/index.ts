@@ -6,7 +6,7 @@ const GATEWAY = 'https://connector-gateway.lovable.dev/google_mail/gmail/v1';
 
 const Body = z.object({
   id: z.string().min(1).max(200),
-  action: z.enum(['mark_read', 'mark_unread', 'archive', 'trash', 'untrash']),
+  action: z.enum(['mark_read', 'mark_unread', 'archive', 'trash', 'untrash', 'star', 'unstar']),
 });
 
 serve(async (req) => {
@@ -29,6 +29,8 @@ serve(async (req) => {
       case 'archive': path = `/users/me/messages/${id}/modify`; body = { removeLabelIds: ['INBOX'] }; break;
       case 'trash': path = `/users/me/messages/${id}/trash`; break;
       case 'untrash': path = `/users/me/messages/${id}/untrash`; break;
+      case 'star': path = `/users/me/messages/${id}/modify`; body = { addLabelIds: ['STARRED'] }; break;
+      case 'unstar': path = `/users/me/messages/${id}/modify`; body = { removeLabelIds: ['STARRED'] }; break;
     }
 
     const r = await fetch(`${GATEWAY}${path}`, {

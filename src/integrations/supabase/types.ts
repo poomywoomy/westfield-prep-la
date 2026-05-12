@@ -1131,6 +1131,36 @@ export type Database = {
         }
         Relationships: []
       }
+      gmail_signatures: {
+        Row: {
+          body_html: string
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body_html?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body_html?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       intake_forms: {
         Row: {
           agreed_to_deposit: boolean
