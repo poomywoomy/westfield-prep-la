@@ -299,14 +299,30 @@ export default function GmailTab() {
           </div>
 
           <Card className="divide-y">
-            {loading && messages.length === 0 ? (
-              <div className="p-8 flex justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div>
+            {messagesQuery.isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="p-4 flex items-start gap-3">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex justify-between gap-2">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-2/3" />
+                  </div>
+                </div>
+              ))
             ) : messages.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">No messages.</div>
             ) : messages.map((m) => {
               const unread = m.labelIds?.includes("UNREAD");
               return (
-                <div key={m.id} className={`p-4 flex items-start gap-3 hover:bg-muted/50 cursor-pointer ${unread ? "font-semibold" : ""}`} onClick={() => setOpenMsgId(m.id)}>
+                <div
+                  key={m.id}
+                  className={`p-4 flex items-start gap-3 hover:bg-muted/50 cursor-pointer ${unread ? "font-semibold" : ""}`}
+                  onClick={() => setOpenMsgId(m.id)}
+                  onMouseEnter={() => prefetchMessage(m.id)}
+                >
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline gap-2">
                       <p className="truncate text-sm">{getHeader(m, folder === "SENT" ? "To" : "From") || "Unknown"}</p>
@@ -331,6 +347,11 @@ export default function GmailTab() {
                 </div>
               );
             })}
+            {messagesQuery.isFetching && !messagesQuery.isLoading && (
+              <div className="p-2 flex justify-center text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin mr-2" /> Refreshing…
+              </div>
+            )}
           </Card>
         </div>
       </div>
