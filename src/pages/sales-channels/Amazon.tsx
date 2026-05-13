@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -43,7 +43,7 @@ const Amazon = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Amazon FBA Prep Center Los Angeles | Westfield Prep Center</title>
         <meta
           name="description"
@@ -58,7 +58,7 @@ packaging, and compliant services with fast turnaround for sellers. Get started 
         />
         <meta property="og:url" content="https://westfieldprepcenter.com/sales-channels/amazon" />
         <meta property="og:type" content="website" />
-      </Helmet>
+      </Head>
 
       <StructuredData
         type="service"

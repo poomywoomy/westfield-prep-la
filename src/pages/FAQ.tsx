@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -498,7 +498,7 @@ const FAQ = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Comprehensive FAQ - Westfield Prep Center | Shopify, Amazon FBA & TikTok Shop</title>
         <meta name="description" content="Get answers to 90+ questions about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, pricing, shipping, and e-commerce operations in Los Angeles." />
         <link rel="canonical" href="https://westfieldprepcenter.com/faq" />
@@ -515,7 +515,7 @@ const FAQ = () => {
         <meta name="twitter:title" content="Comprehensive FAQ - Westfield Prep Center" />
         <meta name="twitter:description" content="Get answers to 90+ questions about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, pricing, shipping, and e-commerce operations." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-      </Helmet>
+      </Head>
       <StructuredData 
         type="faq" 
         data={faqCategories.flatMap(category => category.questions)}

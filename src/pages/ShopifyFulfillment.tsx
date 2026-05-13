@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Footer from "@/components/Footer";
@@ -62,7 +62,7 @@ const ShopifyFulfillment = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Shopify 3PL Los Angeles | DTC Fulfillment & Same-Day Shipping - Westfield</title>
         <meta
           name="description"
@@ -79,7 +79,7 @@ const ShopifyFulfillment = () => {
           property="og:description"
           content="Same-day Shopify fulfillment with QC photos and branded packaging. 400K+ orders fulfilled."
         />
-      </Helmet>
+      </Head>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
 

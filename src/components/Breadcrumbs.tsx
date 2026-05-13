@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import { TranslatedText } from "./TranslatedText";
 
 interface BreadcrumbItem {
@@ -40,11 +40,11 @@ const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
   return (
     <>
       {shouldRenderSchema && (
-        <Helmet>
+        <Head>
           <script type="application/ld+json">
             {JSON.stringify(breadcrumbSchema)}
           </script>
-        </Helmet>
+        </Head>
       )}
       
       <nav aria-label="Breadcrumb" className="bg-muted/30 py-3">

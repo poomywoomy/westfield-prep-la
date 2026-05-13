@@ -1,8 +1,8 @@
 import { useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import { motion, AnimatePresence, type Easing } from "framer-motion";
-import Lottie from "lottie-react";
+const Lottie = lazy(() => import("lottie-react"));
 import Header from "@/components/Header";
 import ContactForm from "@/components/ContactForm";
 import StructuredData from "@/components/StructuredData";
@@ -212,7 +212,7 @@ const Pricing = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>3PL Fulfillment Pricing | Shopify & Amazon Sellers | Westfield</title>
         <meta 
           name="description" 
@@ -239,7 +239,7 @@ const Pricing = () => {
         <meta name="twitter:title" content="3PL Fulfillment Pricing | Shopify & Amazon Sellers" />
         <meta name="twitter:description" content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.00–$2.50/unit. 24-hour turnaround." />
         <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-      </Helmet>
+      </Head>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
       <StructuredData type="product" />
@@ -322,11 +322,15 @@ const Pricing = () => {
               role="img"
               aria-label={tSync("3PL shipping and fulfillment animation for Shopify and Amazon sellers")}
             >
-              <Lottie 
-                animationData={shippingAnimationData} 
-                loop={true}
-                className="w-[400px] h-[400px]"
-              />
+              {typeof window !== "undefined" && (
+                <Suspense fallback={null}>
+                  <Lottie
+                    animationData={shippingAnimationData}
+                    loop={true}
+                    className="w-[400px] h-[400px]"
+                  />
+                </Suspense>
+              )}
             </div>
 
             <div className="container mx-auto px-4 text-center relative z-10">
