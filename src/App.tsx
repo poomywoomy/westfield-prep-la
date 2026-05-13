@@ -31,7 +31,6 @@ const App = () => {
           <Sonner />
           <GoogleAnalytics />
           <TranslationLoadingOverlay />
-          <ScrollToTop />
           <RouteCanonical />
           <Suspense
             fallback={
