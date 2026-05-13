@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Reviews from "@/components/Reviews";
@@ -37,13 +37,13 @@ const TikTokShopFulfillment = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>TikTok Shop Fulfillment by Expert TikTok Fulfillment Center</title>
         <meta name="description" content="Boost your TikTok shop sales with our TikTok fulfillment center. Quick, accurate, and hassle-free order processing to keep your customers happy. Contact now!" />
         <link rel="canonical" href="https://westfieldprepcenter.com/tiktok-shop-fulfillment" />
         <meta property="og:url" content="https://westfieldprepcenter.com/tiktok-shop-fulfillment" />
         <meta property="og:type" content="article" />
-      </Helmet>
+      </Head>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
       

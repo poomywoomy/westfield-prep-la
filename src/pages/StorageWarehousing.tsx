@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -86,7 +86,7 @@ const StorageWarehousing = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Warehousing and Fulfillment Services for Ecommerce USA</title>
         <meta
           name="description"
@@ -97,7 +97,7 @@ const StorageWarehousing = () => {
           content="3pl los angeles, los angeles 3pl, prep center, warehouse storage, pallet storage, climate controlled warehouse, ecommerce fulfillment"
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/storage-warehousing" />
-      </Helmet>
+      </Head>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqSchemaData} />
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, lazy, Suspense } from "react";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import PremiumHero from "@/components/PremiumHero";
@@ -81,7 +81,7 @@ const Index = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Los Angeles Fulfillment Center for Shopify and Amazon</title>
         <meta
           name="description"
@@ -116,7 +116,7 @@ const Index = () => {
           content="Westfield is a nationwide 3PL providing Shopify fulfillment, Amazon FBA prep, and DTC logistics. Transparent pricing and 24-hour turnaround."
         />
         <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-      </Helmet>
+      </Head>
       <StructuredData type="organization" />
       <StructuredData type="website" />
       <StructuredData type="localBusiness" />

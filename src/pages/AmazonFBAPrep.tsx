@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import HowItWorks from "@/components/HowItWorks";
@@ -44,13 +44,13 @@ const AmazonFBAPrep = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Amazon FBA Prep Center Los Angeles | Westfield Prep Center</title>
         <meta name="description" content="Professional Amazon FBA prep center in Los Angeles offering labeling, packaging, and compliant services with fast turnaround for sellers. Get started today." />
         <link rel="canonical" href="https://westfieldprepcenter.com/amazon-fba-prep" />
         <meta property="og:url" content="https://westfieldprepcenter.com/amazon-fba-prep" />
         <meta property="og:type" content="article" />
-      </Helmet>
+      </Head>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
       

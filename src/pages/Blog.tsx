@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -75,7 +75,7 @@ const Blog = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield</title>
         <meta name="description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
         <link rel="canonical" href="https://westfieldprepcenter.com/blog" />
@@ -92,7 +92,7 @@ const Blog = () => {
         <meta name="twitter:title" content="Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield" />
         <meta name="twitter:description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-      </Helmet>
+      </Head>
       <StructuredData type="collectionPage" data={{ posts: posts.slice(0, 10) }} />
 
       <Header />

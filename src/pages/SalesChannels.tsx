@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Head } from "vite-react-ssg";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -31,14 +31,14 @@ const SalesChannels = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Supported Sales Channels | Multi-Channel Fulfillment - Westfield Prep Center</title>
         <meta
           name="description"
           content="We support all major e-commerce platforms including Shopify, Amazon, TikTok Shop, Walmart, eBay, and more. Multi-channel fulfillment from our Los Angeles warehouse."
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels" />
-      </Helmet>
+      </Head>
       <StructuredData type="itemList" data={{ platforms: allPlatforms }} />
 
       <div className="min-h-screen flex flex-col">
