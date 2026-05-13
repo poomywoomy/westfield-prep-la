@@ -1,0 +1,111 @@
+import { jsx, jsxs } from "react/jsx-runtime";
+import { Anchor, TrendingUp, Globe, Truck, Zap, MapPin } from "lucide-react";
+import { T as TranslatedText } from "../main.mjs";
+import "vite-react-ssg";
+import "react";
+import "react-router-dom";
+import "@radix-ui/react-toast";
+import "class-variance-authority";
+import "clsx";
+import "tailwind-merge";
+import "next-themes";
+import "sonner";
+import "@radix-ui/react-tooltip";
+import "@tanstack/react-query";
+import "@supabase/supabase-js";
+import "framer-motion";
+import "@radix-ui/react-slot";
+import "@radix-ui/react-navigation-menu";
+import "@radix-ui/react-dialog";
+import "@radix-ui/react-accordion";
+import "react-icons/si";
+import "@radix-ui/react-dropdown-menu";
+const LaMap = () => /* @__PURE__ */ jsxs("svg", { viewBox: "0 0 400 400", className: "w-full h-full", "aria-hidden": "true", children: [
+  /* @__PURE__ */ jsxs("defs", { children: [
+    /* @__PURE__ */ jsxs("radialGradient", { id: "locGlow", cx: "50%", cy: "60%", r: "50%", children: [
+      /* @__PURE__ */ jsx("stop", { offset: "0%", stopColor: "hsl(var(--secondary))", stopOpacity: "0.5" }),
+      /* @__PURE__ */ jsx("stop", { offset: "100%", stopColor: "hsl(var(--secondary))", stopOpacity: "0" })
+    ] }),
+    /* @__PURE__ */ jsx("pattern", { id: "locDots", x: "0", y: "0", width: "22", height: "22", patternUnits: "userSpaceOnUse", children: /* @__PURE__ */ jsx("circle", { cx: "1", cy: "1", r: "1", fill: "white", opacity: "0.18" }) })
+  ] }),
+  /* @__PURE__ */ jsx("rect", { width: "400", height: "400", fill: "hsl(var(--primary))" }),
+  /* @__PURE__ */ jsx("rect", { width: "400", height: "400", fill: "url(#locDots)" }),
+  /* @__PURE__ */ jsx("circle", { cx: "200", cy: "240", r: "180", fill: "url(#locGlow)" }),
+  /* @__PURE__ */ jsx(
+    "path",
+    {
+      d: "M120 30 L 175 28 L 200 50 L 205 85 L 220 110 L 235 130 L 250 160 L 253 195 L 245 225 L 258 255 L 268 285 L 258 315 L 232 330 L 195 325 L 168 305 L 142 282 L 128 250 L 113 220 L 98 188 L 88 152 L 92 115 L 102 75 L 120 30 Z",
+      fill: "hsl(var(--primary)/0.5)",
+      stroke: "white",
+      strokeOpacity: "0.4",
+      strokeWidth: "1.5"
+    }
+  ),
+  /* @__PURE__ */ jsxs("g", { transform: "translate(205, 268)", children: [
+    /* @__PURE__ */ jsx("circle", { r: "60", fill: "none", stroke: "hsl(var(--secondary))", strokeOpacity: "0.3", strokeWidth: "1.5" }),
+    /* @__PURE__ */ jsx("circle", { r: "40", fill: "none", stroke: "hsl(var(--secondary))", strokeOpacity: "0.5", strokeWidth: "1.5" }),
+    /* @__PURE__ */ jsx("circle", { r: "22", fill: "hsl(var(--secondary))", fillOpacity: "0.2" }),
+    /* @__PURE__ */ jsx("circle", { r: "10", fill: "hsl(var(--secondary))" }),
+    /* @__PURE__ */ jsx("circle", { r: "4", fill: "white" })
+  ] }),
+  /* @__PURE__ */ jsxs("g", { transform: "translate(245, 270)", children: [
+    /* @__PURE__ */ jsx("text", { fontSize: "13", fontWeight: "700", fill: "white", children: "Los Angeles" }),
+    /* @__PURE__ */ jsx("text", { y: "16", fontSize: "10", fill: "white", opacity: "0.65", children: "Westfield Prep Center" })
+  ] }),
+  /* @__PURE__ */ jsxs("g", { stroke: "hsl(var(--secondary))", strokeOpacity: "0.4", strokeWidth: "1", strokeDasharray: "3 4", fill: "none", children: [
+    /* @__PURE__ */ jsx("line", { x1: "205", y1: "268", x2: "380", y2: "180" }),
+    /* @__PURE__ */ jsx("line", { x1: "205", y1: "268", x2: "380", y2: "280" }),
+    /* @__PURE__ */ jsx("line", { x1: "205", y1: "268", x2: "380", y2: "350" })
+  ] }),
+  /* @__PURE__ */ jsxs("g", { fill: "hsl(var(--secondary))", children: [
+    /* @__PURE__ */ jsx("circle", { cx: "380", cy: "180", r: "3" }),
+    /* @__PURE__ */ jsx("circle", { cx: "380", cy: "280", r: "3" }),
+    /* @__PURE__ */ jsx("circle", { cx: "380", cy: "350", r: "3" })
+  ] })
+] });
+const StatTile = ({ value, label, sub }) => /* @__PURE__ */ jsxs("div", { className: "p-5 rounded-xl bg-background border border-border", children: [
+  /* @__PURE__ */ jsx("div", { className: "text-3xl md:text-4xl font-bold text-primary tracking-tight", children: value }),
+  /* @__PURE__ */ jsx("div", { className: "mt-1 text-sm font-bold text-primary", children: /* @__PURE__ */ jsx(TranslatedText, { children: label }) }),
+  /* @__PURE__ */ jsx("div", { className: "text-xs text-muted-foreground mt-0.5", children: /* @__PURE__ */ jsx(TranslatedText, { children: sub }) })
+] });
+const LocationShowcase = () => {
+  return /* @__PURE__ */ jsx("section", { className: "relative py-0 bg-background overflow-hidden", children: /* @__PURE__ */ jsxs("div", { className: "grid lg:grid-cols-2 min-h-[640px]", children: [
+    /* @__PURE__ */ jsx("div", { className: "relative bg-primary min-h-[400px] lg:min-h-[640px]", children: /* @__PURE__ */ jsx(LaMap, {}) }),
+    /* @__PURE__ */ jsx("div", { className: "flex items-center px-6 md:px-12 lg:px-16 py-16 lg:py-20", children: /* @__PURE__ */ jsxs("div", { className: "max-w-xl", children: [
+      /* @__PURE__ */ jsx("span", { className: "text-[11px] font-bold tracking-[0.22em] uppercase text-secondary", children: "Location · 90001" }),
+      /* @__PURE__ */ jsxs("h2", { className: "mt-3 text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-[0.95] tracking-tight", children: [
+        /* @__PURE__ */ jsx(TranslatedText, { children: "Why LA?" }),
+        /* @__PURE__ */ jsx("br", {}),
+        /* @__PURE__ */ jsx("span", { className: "font-display italic font-normal text-secondary", children: /* @__PURE__ */ jsx(TranslatedText, { children: "Because location is logistics." }) })
+      ] }),
+      /* @__PURE__ */ jsx("p", { className: "mt-5 text-lg text-muted-foreground leading-relaxed", children: /* @__PURE__ */ jsx(TranslatedText, { children: "Closer to the port. Faster to the customer. 15+ years and 2M+ orders later, we know exactly why LA is the smartest place to base your fulfillment." }) }),
+      /* @__PURE__ */ jsxs("div", { className: "mt-8 grid grid-cols-2 gap-4", children: [
+        /* @__PURE__ */ jsx(StatTile, { value: "22mi", label: "To Port of LA", sub: "40% of US imports" }),
+        /* @__PURE__ */ jsx(StatTile, { value: "2-day", label: "To West Coast", sub: "Pacific region" }),
+        /* @__PURE__ */ jsx(StatTile, { value: "50", label: "States covered", sub: "All from one hub" }),
+        /* @__PURE__ */ jsx(StatTile, { value: "6+", label: "Amazon FCs", sub: "Within same-day reach" })
+      ] }),
+      /* @__PURE__ */ jsx("div", { className: "mt-7 flex flex-wrap gap-2", children: [
+        { icon: Anchor, text: "Port Adjacent" },
+        { icon: TrendingUp, text: "West Coast Hub" },
+        { icon: Globe, text: "Asia-Pacific Gateway" },
+        { icon: Truck, text: "Nationwide" },
+        { icon: Zap, text: "Same-Day Cutoff 2pm" },
+        { icon: MapPin, text: "Los Angeles, CA" }
+      ].map((b, i) => /* @__PURE__ */ jsxs(
+        "span",
+        {
+          className: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-primary text-xs font-bold border border-border",
+          children: [
+            /* @__PURE__ */ jsx(b.icon, { className: "w-3.5 h-3.5 text-secondary" }),
+            /* @__PURE__ */ jsx(TranslatedText, { children: b.text })
+          ]
+        },
+        i
+      )) })
+    ] }) })
+  ] }) });
+};
+export {
+  LocationShowcase as default
+};
