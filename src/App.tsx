@@ -9,7 +9,6 @@ import { ChatBot } from "@/components/ChatBot";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { TranslationLoadingOverlay } from "@/components/TranslationLoadingOverlay";
 import RouteCanonical from "@/components/RouteCanonical";
-import ScrollToTop from "@/components/ScrollToTop";
 
 const queryClient = new QueryClient({
   defaultOptions: {
