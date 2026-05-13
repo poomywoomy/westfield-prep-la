@@ -1,55 +1,32 @@
-## Problem
+## Goal
 
-Two compounding issues are causing the open-message flicker/reload and the slow inbox:
+Keep `https://westfieldprepcenter.com` as the canonical domain everywhere (it's your live custom domain — correct). Fix the real sitemap drift the scanner caught, and dismiss the false-positive domain warnings.
 
-### 1. Open-message re-fetch loop (the "load → re-render → load" flicker)
+## Findings — verified against `src/App.tsx`
 
-`MessageView`'s data-fetch `useEffect` depends on `[messageId, open, onChanged, toast]`. Both `onChanged` (defined inline in `GmailTab` as `refresh`) and `toast` get new identities on every render of `GmailTab`. Every time the message arrives, `setMsg` triggers a parent re-render (via `onChanged` calling `invalidateQueries` after mark-read), which produces a new `onChanged` reference, which re-runs the effect, which refetches the message, which calls mark-read again, which invalidates queries, which re-renders the parent… loop.
+**Domain warnings (false positives):** The scanner thinks your project domain is `westfield-prep-la.lovable.app` and flags every reference to `westfieldprepcenter.com`. Your custom domain is the correct canonical — nothing to change. Mark these "fixed" with an explanation.
 
-This also explains the repeated `gmail-get-message` boots in the edge logs and the multiple "loading indicator re-added" entries in the session replay (~6 reloads in 25s on the same opened message).
+**Scanner's "missing routes" — mostly wrong:**
+- `/shopify-fulfillment`, `/amazon-fba-prep`, `/tiktok-shop-fulfillment`, `/services` → these are **redirects** to `/sales-channels/*`. They should NOT be in the sitemap. The canonical `/sales-channels/*` targets are already listed. ✅ correct as-is.
+- `/labeling-fnsku` → **real route, genuinely missing** from sitemap.
 
-### 2. Slow inbox load
+**Scanner's "stale entries" — both correct:**
+- `/labeling-compliance` → no matching route (renamed to `/labeling-fnsku`).
+- `/service-breakdown` → no matching route.
 
-`gmail-list-messages` does an initial `messages.list` then issues N (=15) sequential-awaited `messages.get?format=metadata` calls. They're in `Promise.allSettled`, so they're parallel, but each one is a full HTTPS round-trip through the gateway, and there's no per-message caching across folder switches. Combined with the re-fetch loop, this makes everything feel sluggish.
+## Changes to `public/sitemap.xml`
 
-Hover prefetch in `GmailTab` also never helps the open path because `MessageView` uses raw `fetch` instead of the React Query cache the prefetch populates.
+1. Replace `/labeling-compliance` entry with `/labeling-fnsku` (priority 0.8).
+2. Remove `/service-breakdown` entry.
+3. Leave everything else (including all `westfieldprepcenter.com` URLs) alone.
 
-## Fix
+## Changes to `public/robots.txt`
 
-### MessageView (`src/components/admin/gmail/MessageView.tsx`)
+None. `Sitemap: https://westfieldprepcenter.com/sitemap.xml` is correct.
 
-Replace the manual `useEffect` + `fetch` with React Query, keyed on `messageId`. This:
+## SEO findings to mark fixed
 
-- Removes the unstable `onChanged`/`toast` deps that caused the loop.
-- Reuses the same cache the hover prefetch in `GmailTab` already populates → opening a hovered message is instant.
-- `staleTime: 5 min` so re-opens don't refetch.
-- Mark-read side effect moves into a `useEffect` that depends only on `messageId` + the loaded message's `labelIds`, guarded by a `useRef` so it fires once per message (not on every parent re-render).
+- **Crawler rules need attention** — false positive; robots.txt correctly points at custom domain.
+- **Sitemap needs attention** — fixed by the sitemap edits above (drift resolved); domain portion is a false positive.
 
-### Hover prefetch (`src/components/admin/GmailTab.tsx`)
-
-Keep the existing prefetch, but ensure its query key/shape matches what `MessageView` consumes (`["gmail-message", id]` returning the unwrapped `data.message`). Pass the prefetched `QueryClient` through context (already global). No API changes.
-
-### List performance (`supabase/functions/gmail-list-messages/index.ts`)
-
-- Drop `maxResults` default from 15 → 12 to cut metadata round-trips.
-- Add a small in-function memory cache (Map keyed on message id) with a 60s TTL so repeat list calls (folder toggles, refresh) skip the per-message gateway hit for messages we've already fetched in this isolate.
-- Bump the response `Cache-Control` from `max-age=15` to `max-age=30`.
-- Increase client-side `staleTime` on the list query from 30s to 60s so folder switches back-and-forth don't refetch.
-
-### What this does NOT change
-
-- No scope changes, no edge-function contract changes for `gmail-get-message`.
-- No UI/visual changes.
-- No changes to compose, signatures, or labels code.
-
-## Expected result
-
-- Opening an email: one fetch, no flicker, ~instant if it was hovered first.
-- Inbox first load: similar to today on cold cache, noticeably faster on warm cache and folder switches.
-- Mark-read still happens exactly once per opened unread message.
-
-## Files touched
-
-- `src/components/admin/gmail/MessageView.tsx` — rewrite data layer with React Query, stabilize mark-read effect.
-- `src/components/admin/GmailTab.tsx` — bump `staleTime`, align prefetch shape (small tweak).
-- `supabase/functions/gmail-list-messages/index.ts` — in-memory metadata cache, smaller default page, longer Cache-Control.
+Next scheduled scan re-verifies. You can also click "Rescan" in the SEO tab for instant confirmation.
