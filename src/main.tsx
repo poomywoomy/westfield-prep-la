@@ -1,19 +1,12 @@
-import { createRoot } from "react-dom/client";
-import { HelmetProvider } from "react-helmet-async";
-import App from "./App.tsx";
+import "./ssr-polyfills";
+import { ViteReactSSG } from "vite-react-ssg";
+import routes from "./routes";
 import "./index.css";
-import { LanguageProvider } from "./contexts/LanguageContext";
 
-createRoot(document.getElementById("root")!).render(
-  <HelmetProvider>
-    <LanguageProvider>
-      <App />
-    </LanguageProvider>
-  </HelmetProvider>
-);
+export const createRoot = ViteReactSSG({ routes });
 
-// Initialize Web Vitals monitoring ONLY in development
-if (import.meta.env.DEV) {
+// Initialize Web Vitals monitoring ONLY in development (browser only)
+if (typeof window !== "undefined" && import.meta.env.DEV) {
   import("./lib/webVitals").then(({ initWebVitals }) => {
     initWebVitals();
   });
