@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import StructuredData from "@/components/StructuredData";
 import { Link } from "react-router-dom";
 import { TranslatedText } from "@/components/TranslatedText";
@@ -49,7 +49,7 @@ const Testimonials = () => {
 
   return (
     <>
-      <Head>
+      <Helmet>
         <title>3PL Reviews | Los Angeles Prep Center Testimonials | Westfield</title>
         <meta 
           name="description" 
@@ -70,7 +70,7 @@ const Testimonials = () => {
         <meta name="twitter:title" content="Customer Testimonials | Westfield Prep Center Reviews" />
         <meta name="twitter:description" content="Read real reviews from satisfied customers. See why businesses trust Westfield Prep Center for fulfillment services." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-      </Head>
+      </Helmet>
       
       <StructuredData type="breadcrumb" data={[
         { name: "Home", url: "https://westfieldprepcenter.com/" },

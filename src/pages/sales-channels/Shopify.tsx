@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -53,7 +53,7 @@ const Shopify = () => {
 
   return (
     <>
-      <Head>
+      <Helmet>
         <title>Shopify Fulfillment Center with Expert Order Management</title>
         <meta
           name="description"
@@ -66,7 +66,7 @@ const Shopify = () => {
           content="Professional Shopify 3PL fulfillment with real-time sync, branded packaging, and same-day shipping from Los Angeles."
         />
         <meta property="og:url" content="https://westfieldprepcenter.com/sales-channels/shopify" />
-      </Head>
+      </Helmet>
 
       <StructuredData
         type="service"

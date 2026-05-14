@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
   Sparkles,
@@ -113,7 +113,7 @@ const Launchpad = () => {
 
   return (
     <>
-      <Head>
+      <Helmet>
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
         <link rel="canonical" href={meta.canonical} />
@@ -137,7 +137,7 @@ const Launchpad = () => {
             })),
           })}
         </script>
-      </Head>
+      </Helmet>
 
       <div className="min-h-screen bg-[#f6f1ea]">
         <Header />

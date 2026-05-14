@@ -1,4 +1,4 @@
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 
 interface StructuredDataProps {
   type: "organization" | "service" | "faq" | "reviews" | "breadcrumb" | "website" | "localBusinessWithService" | "contact" | "collectionPage" | "itemList" | "product" | "localBusiness" | "software";
@@ -425,11 +425,11 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
   if (!schema) return null;
 
   return (
-    <Head>
+    <Helmet>
       <script type="application/ld+json">
         {JSON.stringify(schema)}
       </script>
-    </Head>
+    </Helmet>
   );
 };
 

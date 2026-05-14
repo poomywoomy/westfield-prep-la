@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode, isSsrBuild }) => ({
+export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
@@ -13,7 +13,7 @@ export default defineConfig(({ mode, isSsrBuild }) => ({
   plugins: [
     react(),
     mode === "development" && componentTagger(),
-    mode === "production" && !isSsrBuild && visualizer({
+    mode === "production" && visualizer({
       filename: 'dist/stats.html',
       gzipSize: true,
       brotliSize: true
@@ -27,9 +27,12 @@ export default defineConfig(({ mode, isSsrBuild }) => ({
   },
   build: {
     rollupOptions: {
-      output: isSsrBuild ? {} : {
+      output: {
         manualChunks: {
+          // Core React
           'react-core': ['react', 'react-dom', 'react-router-dom'],
+
+          // UI Components
           'ui-radix': [
             '@radix-ui/react-dialog',
             '@radix-ui/react-dropdown-menu',
@@ -38,16 +41,28 @@ export default defineConfig(({ mode, isSsrBuild }) => ({
             '@radix-ui/react-select',
             '@radix-ui/react-popover'
           ],
+
+          // Form & Validation
           'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+
+          // Data Fetching
           'data': ['@tanstack/react-query', '@supabase/supabase-js'],
+
+          // Icons
           'icons': ['lucide-react'],
+
+          // Rich Text & Markdown
           'editor': [
             '@tiptap/react',
             '@tiptap/starter-kit',
             '@tiptap/extension-color',
             '@tiptap/extension-link'
           ],
+
+          // Charts & Visualization
           'charts': ['recharts'],
+
+          // Date & Time
           'date': ['date-fns', 'date-fns-tz', 'react-day-picker']
         },
       },

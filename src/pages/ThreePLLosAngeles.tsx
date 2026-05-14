@@ -1,4 +1,4 @@
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { generateMetaTags } from "@/utils/seo";
 import Header from "@/components/Header";
@@ -79,7 +79,7 @@ const ThreePLLosAngeles = () => {
 
   return (
     <>
-      <Head>
+      <Helmet>
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
         <link rel="canonical" href={meta.canonical} />
@@ -90,7 +90,7 @@ const ThreePLLosAngeles = () => {
         <meta name="twitter:title" content={meta.twitterTitle} />
         <meta name="twitter:description" content={meta.twitterDescription} />
         <meta name="twitter:image" content={meta.twitterImage} />
-      </Head>
+      </Helmet>
       <StructuredData type="organization" />
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />

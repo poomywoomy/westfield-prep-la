@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import ContactForm from "@/components/ContactForm";
 import StructuredData from "@/components/StructuredData";
@@ -16,7 +16,7 @@ const Contact = () => {
 
   return (
     <>
-      <Head>
+      <Helmet>
         <title>Contact Westfield Prep Center | Shopify & Amazon 3PL</title>
         <meta name="description" content="Contact Westfield Prep Center to discuss Shopify fulfillment, Amazon FBA prep, or custom 3PL solutions. Nationwide service with fast onboarding and dedicated support." />
         <meta name="robots" content="index, follow" />
@@ -36,7 +36,7 @@ const Contact = () => {
         <meta name="twitter:title" content="Contact Westfield 3PL | Get a Quote" />
         <meta name="twitter:description" content="Contact us for Shopify fulfillment & Amazon FBA prep quotes." />
         <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-      </Head>
+      </Helmet>
       <StructuredData type="contact" />
       <StructuredData type="organization" />
       <StructuredData type="breadcrumb" data={{ items: [{ label: "Home", path: "/" }, { label: "Contact", path: "/contact" }] }} />

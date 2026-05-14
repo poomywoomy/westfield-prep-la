@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -40,7 +40,7 @@ const TikTokShop = () => {
 
   return (
     <>
-      <Head>
+      <Helmet>
         <title>TikTok Shop Fulfillment by Expert TikTok Fulfillment Center</title>
         <meta
           name="description"
@@ -55,7 +55,7 @@ accurate, and hassle-free order processing to keep your customers happy. Contact
         />
         <meta property="og:url" content="https://westfieldprepcenter.com/sales-channels/tiktok-shop" />
         <meta property="og:type" content="website" />
-      </Head>
+      </Helmet>
 
       <StructuredData
         type="service"

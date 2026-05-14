@@ -27,11 +27,43 @@
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0A0A23" />
     <meta name="google-site-verification" content="3TUl8q_5reDed467WgyUtqcqunCQ-rOabHRfQbJenxg" />
     <meta name="google-site-verification" content="9UTxh_46PiNGZwI9y3NdAxSL6WEByTG8Qsx9DGlLgQQ" />
-    <meta name="author" content="Westfield Prep Center" />
+    <script>
+      (function () {
+        var baseUrl = "https://westfieldprepcenter.com";
+        var normalizePathname = function (pathname) {
+          if (!pathname || pathname === "/") return "/";
+          return pathname.replace(/\/+$/, "");
+        };
 
+        var canonicalUrl = baseUrl + normalizePathname(window.location.pathname);
+        var head = document.head || document.getElementsByTagName("head")[0];
+        var canonicalTag = head.querySelector('link[rel="canonical"]');
+
+        if (!canonicalTag) {
+          canonicalTag = document.createElement("link");
+          canonicalTag.setAttribute("rel", "canonical");
+          head.appendChild(canonicalTag);
+        }
+
+        canonicalTag.setAttribute("href", canonicalUrl);
+        canonicalTag.setAttribute("data-rh", "true");
+
+        var ogUrlTag = head.querySelector('meta[property="og:url"]');
+        if (ogUrlTag) {
+          ogUrlTag.setAttribute("content", canonicalUrl);
+        }
+      })();
+    </script>
+    <title data-rh="true">Los Angeles Fulfillment Center for Shopify and Amazon</title>
+    <meta
+      name="description"
+      content="Westfield Prep Center is a Los Angeles fulfillment center offering Shopify Amazon fulfillment, FBA prep, storage, &amp; fast ecommerce shipping. Get started today."
+      data-rh="true"
+    />
+    <meta name="author" content="Westfield Prep Center" />
+    <link rel="canonical" href="https://westfieldprepcenter.com/" data-rh="true" />
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -44,11 +76,40 @@
     <!-- Preload critical hero image for faster LCP -->
     <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" type="image/webp" fetchpriority="high" />
 
+    <!-- Open Graph Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://westfieldprepcenter.com/" />
+    <meta property="og:site_name" content="Westfield Prep Center" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:image"
+      content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
+    />
+    <meta property="og:phone_number" content="+18189355478" />
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@westfieldprep" />
+    <meta
+      name="twitter:image"
+      content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
+    />
+
     <!-- Favicon -->
     <link
       rel="icon"
       type="image/png"
       href="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/uploads/1767598432713-logo1_1200x1200.png"
+    />
+    <meta property="og:title" content="Los Angeles Fulfillment Center for Shopify and Amazon" />
+    <meta name="twitter:title" content="Los Angeles Fulfillment Center for Shopify and Amazon" />
+    <meta
+      property="og:description"
+      content="Westfield Prep Center is a Los Angeles fulfillment center offering Shopify Amazon fulfillment, FBA prep, storage, &amp; fast ecommerce shipping. Get started today."
+    />
+    <meta
+      name="twitter:description"
+      content="Westfield Prep Center is a Los Angeles fulfillment center offering Shopify Amazon fulfillment, FBA prep, storage, &amp; fast ecommerce shipping. Get started today."
     />
   </head>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
@@ -527,7 +527,7 @@ const Integrations = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Head>
+      <Helmet>
         <title>Shopify & Amazon 3PL Integrations | Westfield Prep Center</title>
         <meta
           name="description"
@@ -613,7 +613,7 @@ const Integrations = () => {
             ]
           })}
         </script>
-      </Head>
+      </Helmet>
 
       <Header />
       <Breadcrumbs items={[{ label: "Home", path: "/" }, { label: "Integrations", path: "/integrations" }]} />

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -86,7 +86,7 @@ const KittingBundling = () => {
 
   return (
     <>
-      <Head>
+      <Helmet>
         <title>Educational Kitting &amp; Bundling Services in Los Angeles CA</title>
         <meta
           name="description"
@@ -97,7 +97,7 @@ const KittingBundling = () => {
           content="3pl los angeles, kitting services, bundling, prep center, subscription box assembly, product kitting"
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/kitting-bundling" />
-      </Head>
+      </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqSchemaData} />
 

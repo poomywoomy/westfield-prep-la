@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -117,7 +117,7 @@ const BlogPost = () => {
 
   return (
     <>
-      <Head prioritizeSeoTags>
+      <Helmet prioritizeSeoTags>
         <title>{(() => {
           const slugTitles: Record<string, string> = {
             'why-3pl-fulfillment-is-essential-for-startups-scaling-with-amazon-fba': '3PL Fulfillment for Startups Scaling with Amazon FBA',
@@ -152,7 +152,7 @@ const BlogPost = () => {
         {post.cover_image_url && (
           <meta name="twitter:image" content={post.cover_image_url.startsWith('http') ? post.cover_image_url : `${window.location.origin}${post.cover_image_url}`} />
         )}
-      </Head>
+      </Helmet>
 
       {/* Enhanced 2025-compliant JSON-LD Schema for Google Rich Results */}
       <BlogPostSchema

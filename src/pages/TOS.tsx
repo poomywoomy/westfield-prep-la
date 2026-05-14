@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
@@ -24,7 +24,7 @@ const TOS = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Head>
+      <Helmet>
         <title>Terms of Service | Westfield Prep Center</title>
         <meta 
           name="description" 
@@ -32,7 +32,7 @@ const TOS = () => {
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/terms" />
         <meta name="robots" content="noindex, follow" />
-      </Head>
+      </Helmet>
       
       <header className="bg-background shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">

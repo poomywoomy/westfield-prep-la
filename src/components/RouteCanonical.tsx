@@ -1,4 +1,4 @@
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router-dom";
 import { getCanonicalUrl } from "@/utils/seo";
 
@@ -12,9 +12,9 @@ const RouteCanonical = () => {
   const { pathname } = useLocation();
   const canonicalUrl = getCanonicalUrl(normalizePathname(pathname));
   return (
-    <Head prioritizeSeoTags>
+    <Helmet prioritizeSeoTags>
       <link rel="canonical" href={canonicalUrl} />
-    </Head>
+    </Helmet>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
@@ -336,7 +336,7 @@ const WhyChooseUs = () => {
 
   return (
     <>
-      <Head>
+      <Helmet>
         <title>Why Choose Our Los Angeles Prep Center | Westfield Prep Center</title>
         <meta
           name="description"
@@ -364,7 +364,7 @@ const WhyChooseUs = () => {
           name="twitter:image"
           content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
         />
-      </Head>
+      </Helmet>
 
       <StructuredData
         type="service"

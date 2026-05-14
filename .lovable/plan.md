@@ -1,144 +1,55 @@
-# Convert site to prerendered static via `vite-react-ssg`
+## Problem
 
-Goal: every public route ships real HTML with per-page `<title>`, meta description, canonical, OG/Twitter, and JSON-LD baked in. Bing / ChatGPT / Perplexity / LinkedIn / Slack / Facebook / X will see real content per URL instead of the homepage shell.
+Two compounding issues are causing the open-message flicker/reload and the slow inbox:
 
-Pure delivery-layer refactor. No page copy, design, Supabase, edge function, sitemap, or robots.txt changes.
+### 1. Open-message re-fetch loop (the "load → re-render → load" flicker)
 
----
+`MessageView`'s data-fetch `useEffect` depends on `[messageId, open, onChanged, toast]`. Both `onChanged` (defined inline in `GmailTab` as `refresh`) and `toast` get new identities on every render of `GmailTab`. Every time the message arrives, `setMsg` triggers a parent re-render (via `onChanged` calling `invalidateQueries` after mark-read), which produces a new `onChanged` reference, which re-runs the effect, which refetches the message, which calls mark-read again, which invalidates queries, which re-renders the parent… loop.
 
-## 1. Install pinned deps
+This also explains the repeated `gmail-get-message` boots in the edge logs and the multiple "loading indicator re-added" entries in the session replay (~6 reloads in 25s on the same opened message).
 
-```
-bun add vite-react-ssg react-helmet-async@1.3.0
-```
+### 2. Slow inbox load
 
-`react-helmet-async@1.3.0` is required — newer versions break SSR.
+`gmail-list-messages` does an initial `messages.list` then issues N (=15) sequential-awaited `messages.get?format=metadata` calls. They're in `Promise.allSettled`, so they're parallel, but each one is a full HTTPS round-trip through the gateway, and there's no per-message caching across folder switches. Combined with the re-fetch loop, this makes everything feel sluggish.
 
-## 2. New file: `src/ssr-polyfills.ts`
+Hover prefetch in `GmailTab` also never helps the open path because `MessageView` uses raw `fetch` instead of the React Query cache the prefetch populates.
 
-In-memory `localStorage` and `sessionStorage` polyfills, only when undefined. The Supabase client reads `localStorage` at import time and crashes the Node build otherwise. **Do not** polyfill `window` — that flips `vite-react-ssg` into the client branch and crashes on `document`.
+## Fix
 
-## 3. New file: `src/routes.tsx`
+### MessageView (`src/components/admin/gmail/MessageView.tsx`)
 
-Export a `RouteRecord[]` for `vite-react-ssg`. One root route whose `Component` is the providers layout (the new `App.tsx`). Every current route from `src/App.tsx` listed explicitly as a child:
+Replace the manual `useEffect` + `fetch` with React Query, keyed on `messageId`. This:
 
-- Eager import: `Index` (homepage)
-- `React.lazy(() => import(...))` for every other page
-- All `<Navigate>` redirect routes preserved
-- `path: "*"` → `NotFound` last
-- `entry: "src/main.tsx"` set so the SSG knows the client entry
+- Removes the unstable `onChanged`/`toast` deps that caused the loop.
+- Reuses the same cache the hover prefetch in `GmailTab` already populates → opening a hovered message is instant.
+- `staleTime: 5 min` so re-opens don't refetch.
+- Mark-read side effect moves into a `useEffect` that depends only on `messageId` + the loaded message's `labelIds`, guarded by a `useRef` so it fires once per message (not on every parent re-render).
 
-## 4. Rewrite `src/App.tsx` as root layout
+### Hover prefetch (`src/components/admin/GmailTab.tsx`)
 
-Strip out `BrowserRouter`, `Routes`, `Route`. New shape:
+Keep the existing prefetch, but ensure its query key/shape matches what `MessageView` consumes (`["gmail-message", id]` returning the unwrapped `data.message`). Pass the prefetched `QueryClient` through context (already global). No API changes.
 
-```text
-QueryClientProvider
-  └ TooltipProvider
-    └ LanguageProvider
-      └ Toaster + Sonner + GoogleAnalytics + TranslationLoadingOverlay + RouteCanonical
-        └ <Suspense fallback={spinner}>
-            <Outlet />
-          </Suspense>
-        + <ChatBot />
-```
+### List performance (`supabase/functions/gmail-list-messages/index.ts`)
 
-No router JSX. The SSG owns the router via `routes.tsx`.
+- Drop `maxResults` default from 15 → 12 to cut metadata round-trips.
+- Add a small in-function memory cache (Map keyed on message id) with a 60s TTL so repeat list calls (folder toggles, refresh) skip the per-message gateway hit for messages we've already fetched in this isolate.
+- Bump the response `Cache-Control` from `max-age=15` to `max-age=30`.
+- Increase client-side `staleTime` on the list query from 30s to 60s so folder switches back-and-forth don't refetch.
 
-## 5. Rewrite `src/main.tsx`
+### What this does NOT change
 
-```ts
-import "./ssr-polyfills";
-import { ViteReactSSG } from "vite-react-ssg";
-import routes from "./routes";
-import "./index.css";
+- No scope changes, no edge-function contract changes for `gmail-get-message`.
+- No UI/visual changes.
+- No changes to compose, signatures, or labels code.
 
-export const createRoot = ViteReactSSG({ routes });
-```
+## Expected result
 
-No `createRoot(...).render()` — `ViteReactSSG` self-mounts in the browser and is consumed by the CLI on the server. Web Vitals dev-import preserved after the export.
+- Opening an email: one fetch, no flicker, ~instant if it was hovered first.
+- Inbox first load: similar to today on cold cache, noticeably faster on warm cache and folder switches.
+- Mark-read still happens exactly once per opened unread message.
 
-`HelmetProvider` is removed from `main.tsx` — `vite-react-ssg`'s `<Head>` manages its own provider.
+## Files touched
 
-## 6. Swap Helmet → Head across all pages
-
-Currently ~28 page/component files import `Helmet` from `react-helmet-async`. Replace each:
-
-```diff
-- import { Helmet } from "react-helmet-async";
-+ import { Head } from "vite-react-ssg";
-...
-- <Helmet>...</Helmet>
-+ <Head>...</Head>
-```
-
-Files affected:
-- `src/components/StructuredData.tsx`
-- `src/components/Breadcrumbs.tsx`
-- `src/components/GoogleAnalytics.tsx`
-- All 25 page files under `src/pages/**` that currently use `<Helmet>`
-
-Why not Helmet directly: with two helmet copies on disk the wrong one fails at SSR with `Cannot read properties of undefined (reading 'add')`. `Head` from `vite-react-ssg` is the supported API and writes into the static HTML.
-
-`react-helmet-async@1.3.0` stays installed because `vite-react-ssg` depends on it internally.
-
-## 7. Strip per-route tags from `index.html`
-
-Remove from `<head>`:
-- `<title>`
-- `<meta name="description">`
-- `<link rel="canonical">` (and the inline `<script>` that injects one client-side)
-- All `<meta property="og:*">`
-- All `<meta name="twitter:*">`
-- `<meta name="robots">` (if present)
-
-Keep:
-- charset, viewport, theme-color
-- favicons, manifest
-- font preconnects + stylesheet
-- Google Site Verification meta tags
-- GTM + gtag scripts
-
-`Head` owns everything per-route now; leftover static tags become duplicates because helmet appends rather than replaces in static HTML.
-
-## 8. Update `package.json` scripts
-
-```json
-"build": "vite-react-ssg build",
-"build:dev": "vite-react-ssg build --mode development",
-"dev": "vite"
-```
-
-`dev` stays on plain Vite — CSR in dev is fine and faster.
-
-## 9. Build + verify
-
-Run `bunx vite-react-ssg build` and confirm:
-
-- Every route from `routes.tsx` produced a `dist/<route>.html`
-- `grep -oE '<title[^>]*>[^<]*</title>' dist/<route>.html` shows the per-route title (not the homepage title) on each page
-- `grep -c 'application/ld+json' dist/<route>.html` returns the expected schema count per route
-- `grep -c 'data-server-rendered="true"' dist/<route>.html` returns `1`
-- `dist/index.html` contains rendered body markup (not just an empty `<div id="root">`)
-
-## Known failure modes (and fixes)
-
-| Error | Fix |
-|---|---|
-| `Cannot read properties of undefined (reading 'add')` | A file still imports `Helmet` from `react-helmet-async`. Swap to `Head` from `vite-react-ssg`. |
-| `Named export 'Helmet' not found` | Wrong helmet version installed. Pin `react-helmet-async@1.3.0`. |
-| `localStorage is not defined` | `ssr-polyfills` not imported, or not the first import in `main.tsx`. |
-| `document is not defined` | Something polyfilled `window`. Remove it. |
-| Page errors with a browser API at module top level | Wrap with `if (typeof window !== 'undefined')` or move into `useEffect`. |
-
-## Out of scope (explicitly untouched)
-
-- Page component logic, copy, design
-- `src/integrations/supabase/client.ts`
-- Edge functions
-- `public/sitemap.xml`, `public/robots.txt`
-- Auth flows, dashboards, billing, ASN/shipment workflows
-
-## Notes on auth routes
-
-`/login`, `/admin/**`, `/client/**` will get prerendered shells too (the gated content still loads client-side after auth check). That's harmless — they render as their pre-auth state and hydrate normally. If you want them excluded from prerender output later, we can add `entry: false` per route, but defaulting to "prerender everything" matches the stated goal.
+- `src/components/admin/gmail/MessageView.tsx` — rewrite data layer with React Query, stabilize mark-read effect.
+- `src/components/admin/GmailTab.tsx` — bump `staleTime`, align prefetch shape (small tweak).
+- `supabase/functions/gmail-list-messages/index.ts` — in-memory metadata cache, smaller default page, longer Cache-Control.

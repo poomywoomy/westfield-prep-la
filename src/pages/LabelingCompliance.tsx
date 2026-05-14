@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import StructuredData from "@/components/StructuredData";
@@ -52,7 +52,7 @@ const LabelingCompliance = () => {
 
   return (
     <>
-      <Head>
+      <Helmet>
         <title>Labeling & Compliance | Los Angeles 3PL Prep Center</title>
         <meta name="description" content="Expert labeling and compliance services at our LA prep center. 3PL FNSKU labeling, warning labels, and Amazon FBA compliance for e-commerce sellers." />
         <meta name="keywords" content="3pl los angeles, labeling services, prep center, fnsku labels, amazon fba compliance, ecommerce labeling" />
@@ -70,7 +70,7 @@ const LabelingCompliance = () => {
         <meta name="twitter:title" content="Labeling & Compliance Services | Westfield Prep Center" />
         <meta name="twitter:description" content="FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-      </Head>
+      </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
       

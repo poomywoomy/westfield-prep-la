@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { TranslatedText } from "@/components/TranslatedText";
@@ -14,7 +14,7 @@ const PrivacyPolicy = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Head>
+      <Helmet>
         <title>Privacy Policy | Westfield Prep Center</title>
         <meta 
           name="description" 
@@ -22,7 +22,7 @@ const PrivacyPolicy = () => {
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/privacy" />
         <meta name="robots" content="noindex, follow" />
-      </Head>
+      </Helmet>
       
       <Header />
 

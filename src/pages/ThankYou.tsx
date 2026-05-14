@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -16,7 +16,7 @@ const ThankYou = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Head>
+      <Helmet>
         <title>Thank You | Westfield Prep Center</title>
         <meta 
           name="description" 
@@ -24,7 +24,7 @@ const ThankYou = () => {
         />
         <link rel="canonical" href="https://westfieldprepcenter.com/thank-you" />
         <meta name="robots" content="noindex, follow" />
-      </Head>
+      </Helmet>
       <div className="max-w-md w-full text-center space-y-6">
         <div className="flex justify-center">
           <CheckCircle className="h-20 w-20 text-primary" />

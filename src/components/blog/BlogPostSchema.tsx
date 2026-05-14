@@ -1,4 +1,4 @@
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 
 interface BlogPostSchemaProps {
   title: string;
@@ -192,7 +192,7 @@ export function BlogPostSchema({
   } : null;
 
   return (
-    <Head>
+    <Helmet>
       <meta name="twitter:card" content="summary_large_image" />
       <meta property="og:type" content="article" />
       
@@ -212,6 +212,6 @@ export function BlogPostSchema({
           {JSON.stringify(howToSchema)}
         </script>
       )}
-    </Head>
+    </Helmet>
   );
 }

@@ -1,4 +1,4 @@
-import { Head } from "vite-react-ssg";
+import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 
@@ -23,7 +23,7 @@ const GoogleAnalytics = () => {
   }
 
   return (
-    <Head>
+    <Helmet>
       {/* Google Analytics 4 */}
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-H0QHBLGNQC"></script>
       <script>
@@ -37,7 +37,7 @@ const GoogleAnalytics = () => {
         `}
       </script>
       {/* Microsoft Clarity — disabled until a real project ID is configured */}
-    </Head>
+    </Helmet>
   );
 };
 
