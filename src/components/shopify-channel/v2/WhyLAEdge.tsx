@@ -39,10 +39,7 @@ const WhyLAEdge = () => {
               <TranslatedText>Why a Los Angeles 3PL is the right home for your Shopify brand.</TranslatedText>
             </h2>
             <p className="mt-5 text-lg text-[hsl(var(--surface-navy))]/65 leading-relaxed">
-              <TranslatedText>
-                Location is half the equation in DTC fulfillment. We pair port-adjacent inbound with same-day pick &
-                pack and a dedicated team that actually knows your brand. Compare our{" "}
-              </TranslatedText>
+              <TranslatedText>Location is half the equation in DTC fulfillment. We pair port-adjacent inbound with same-day pick & pack and a dedicated team that actually knows your brand. Compare our</TranslatedText>{" "}
               <Link
                 to="/why-choose-us"
                 className="text-[hsl(var(--orange-glow))] underline underline-offset-4 font-semibold"

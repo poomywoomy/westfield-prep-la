@@ -39,11 +39,7 @@ const WhyLAForFBA = () => {
               <TranslatedText>Why Los Angeles is the right base for your Amazon FBA program.</TranslatedText>
             </h2>
             <p className="mt-5 text-lg text-[hsl(var(--surface-navy))]/65 leading-relaxed">
-              <TranslatedText>
-                Half of FBA performance is geography. Port-adjacent inbound, fast carrier pickups, and proximity to
-                West Coast FCs mean lower placement fees, faster check-ins, and healthier IPI scores. See exactly how
-                we handle{" "}
-              </TranslatedText>
+              <TranslatedText>Half of FBA performance is geography. Port-adjacent inbound, fast carrier pickups, and proximity to West Coast FCs mean lower placement fees, faster check-ins, and healthier IPI scores. See exactly how we handle</TranslatedText>{" "}
               <Link
                 to="/amazon-fba-prep"
                 className="text-[hsl(var(--orange-glow))] underline underline-offset-4 font-semibold"
