@@ -54,7 +54,7 @@ const HeroBento = () => {
 
           <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.15 }} className="lg:col-span-5 relative">
             <div className="relative rounded-3xl overflow-hidden border border-white/10 aspect-[4/5] lg:aspect-auto lg:h-full min-h-[480px]">
-              <img src={heroImg} alt="Wrapped pallet of FBA-bound cartons with compliance labels in a Los Angeles prep warehouse" width={1600} height={1024} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover" />
+              <img src={heroImg} alt="Wrapped pallet of FBA-bound cartons with compliance labels in a Los Angeles prep warehouse" width={1600} height={1024} {...({ fetchpriority: "high" } as any)} className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--surface-navy))]/80 via-transparent to-transparent" />
               <div className="absolute top-5 left-5">
                 <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[hsl(var(--surface-navy))]/80 backdrop-blur-md border border-white/15 text-xs font-semibold">
