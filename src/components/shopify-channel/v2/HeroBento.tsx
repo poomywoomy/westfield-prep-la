@@ -90,7 +90,7 @@ const HeroBento = () => {
                 alt="Westfield Prep Center Los Angeles fulfillment warehouse with packers preparing branded Shopify orders at golden hour"
                 width={1600}
                 height={1024}
-                fetchPriority="high"
+                {...({ fetchpriority: "high" } as any)}
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--surface-navy))]/80 via-transparent to-transparent" />
