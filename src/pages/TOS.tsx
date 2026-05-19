@@ -57,7 +57,7 @@ const TOS = () => {
           </h1>
           
           <p className="text-muted-foreground mb-6">
-            <TranslatedText>Last Updated: September 30, 2025</TranslatedText>
+            <TranslatedText>Last Updated: May 19, 2026</TranslatedText>
           </p>
 
           <section className="mb-8">
@@ -105,7 +105,7 @@ const TOS = () => {
               <TranslatedText>All new accounts are required to maintain a $300 refundable deposit prior to the start of any services. This deposit will be applied to outstanding invoices or refunded if no balance is owed upon account closure.</TranslatedText>
             </p>
             <p className="text-foreground mb-4">
-              <TranslatedText>Services are billed on a monthly basis. An invoice summarizing all work completed during the month will be issued on the last calendar day of that month. Payment is due upon receipt of invoice. Late payments may result in service suspension and/or additional late fees. We reserve the right to hold or release client inventory until the account balance is paid in full.</TranslatedText>
+              <TranslatedText>Services are billed on a monthly basis. An invoice summarizing all work completed during the month will be issued on the last calendar day of that month. Payment is due within seven (7) days of invoice receipt. Credit card payments processed via Stripe are subject to an additional 3% processing surcharge. Late payments may result in service suspension and/or additional late fees. We reserve the right to hold or release client inventory until the account balance is paid in full.</TranslatedText>
             </p>
             <p className="text-foreground mb-4">
               <TranslatedText>Prices and minimum charges remain subject to our published pricing structure and may change with 30 days' written notice.</TranslatedText>
