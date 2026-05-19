@@ -225,7 +225,7 @@ This provision applies without limitation to food, dietary supplements, cosmetic
 ${section5_1.replace("5.1 ", "8.1 ")}
 
 8.2 Invoices
-All invoices are due upon receipt unless otherwise stated in writing.
+All invoices are due within seven (7) days of receipt unless otherwise stated in writing. Credit card payments processed via Stripe are subject to an additional three percent (3%) processing surcharge.
 
 8.3 Late Payments
 Late payments accrue a five percent (5%) per-day late fee, capped at fifteen percent (15%) of the outstanding balance.
