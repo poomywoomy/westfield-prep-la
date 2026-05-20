@@ -244,6 +244,8 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
           returnRate: inputs.returnRatePct,
           hoursSpentWeekly: inputs.hoursPerWeek,
           currentCostPerOrder: String(inputs.currentPerUnitRate),
+          currentFbaPrepPerUnit: inputs.currentFbaPrepPerUnit,
+          currentFbaStoragePerUnitMonthly: inputs.currentFbaStoragePerUnitMonthly,
           painPoints: [],
           services: [],
           specialRequirements: [],
