@@ -1,2137 +1,698 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useMemo, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { 
-  Package, 
-  TrendingUp, 
-  Clock, 
-  DollarSign, 
-  ArrowRight, 
-  ArrowLeft,
-  CheckCircle2,
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
   Calculator,
+  Info,
+  ArrowRight,
+  CheckCircle2,
   Mail,
-  User,
-  Building2,
   Sparkles,
   ShoppingCart,
-  Store,
-  Truck,
-  AlertTriangle,
-  Target,
-  BarChart3,
-  Phone,
-  FileText,
-  Tag,
-  Boxes,
-  ShieldCheck,
+  Package,
   Layers,
-  Zap,
-  Users,
-  Calendar
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
-
-// Analytics helper - can be replaced with Mixpanel/PostHog later
-const logAnalyticsEvent = (eventName: string, data?: Record<string, unknown>) => {
-  console.log(`[Analytics] ${eventName}`, { timestamp: new Date().toISOString(), ...data });
-  
-  // Track ROI calculator events via centralized analytics
-  if (eventName === "step_completed" && data?.step === 1) {
-    trackEvent('roi_calculator_started', { 
-      use_case: String(data?.useCase || 'unknown')
-    });
-  }
-};
-
-interface FormData {
-  // Step 0: Use Case
-  useCase: string;
-  
-  // Step 1: Business Profile
-  businessStage: string;
-  currentFulfillment: string;
-  revenueRange: string;
-  
-  // Step 2: Volume & Products (Standard)
-  monthlyOrders: number;
-  avgUnitsPerOrder: number;
-  skuCount: number;
-  productType: string;
-  
-  // Step 2: Volume & Products (FBA/WFS specific)
-  unitsRequiringPrep: number;
-  fnskuPolybagUnits: number;
-  bundlingOrders: number;
-  bubbleWrapUnits: number;
-  
-  // Step 3: Pain Points & Costs
-  currentErrorRate: number;
-  returnRate: number;
-  hoursSpentWeekly: number;
-  currentCostPerOrder: string;
-  painPoints: string[];
-  
-  // Step 4: Services Needed
-  services: string[];
-  fbaDtcSplit: number;
-  specialRequirements: string[];
-  
-  // Step 5: Lead Capture
-  fullName: string;
-  email: string;
-  phone: string;
-  companyName: string;
-}
-
-const initialFormData: FormData = {
-  useCase: "",
-  businessStage: "",
-  currentFulfillment: "",
-  revenueRange: "",
-  monthlyOrders: 500,
-  avgUnitsPerOrder: 2,
-  skuCount: 25,
-  productType: "",
-  unitsRequiringPrep: 1000,
-  fnskuPolybagUnits: 0,
-  bundlingOrders: 0,
-  bubbleWrapUnits: 0,
-  currentErrorRate: 5,
-  returnRate: 8,
-  hoursSpentWeekly: 20,
-  currentCostPerOrder: "",
-  painPoints: [],
-  services: [],
-  fbaDtcSplit: 50,
-  specialRequirements: [],
-  fullName: "",
-  email: "",
-  phone: "",
-  companyName: "",
-};
-
-const useCaseOptions = [
-  { id: "shopify", label: "Shopify / DTC", icon: ShoppingCart, description: "Direct-to-consumer fulfillment" },
-  { id: "amazon", label: "Amazon FBA / Walmart WFS", icon: Package, description: "FBA/WFS prep and shipping" },
-  { id: "multi-channel", label: "Multi-Channel", icon: Store, description: "Shopify + Amazon + more" },
-  { id: "b2b", label: "B2B / Wholesale", icon: Truck, description: "Bulk & wholesale fulfillment" },
-];
-
-const businessStageOptions = [
-  { id: "startup", label: "Initial Stage", description: "<$50K/year" },
-  { id: "growing", label: "Growing", description: "$50K-$500K/year" },
-  { id: "scaling", label: "Scaling Fast", description: "$500K-$2M/year" },
-  { id: "established", label: "Established", description: "$2M+/year" },
-];
-
-const fulfillmentOptions = [
-  { id: "self", label: "Self-Fulfilled", description: "Doing it yourself" },
-  { id: "other-3pl", label: "Another 3PL", description: "Looking to switch" },
-  { id: "hybrid", label: "Hybrid", description: "Mix of methods" },
-];
-
-const productTypeOptions = [
-  { id: "apparel", label: "Apparel & Fashion" },
-  { id: "electronics", label: "Electronics" },
-  { id: "beauty", label: "Beauty & Cosmetics" },
-  { id: "supplements", label: "Supplements & Health" },
-  { id: "home", label: "Home & Garden" },
-  { id: "general", label: "General Merchandise" },
-];
-
-const painPointOptions = [
-  { id: "errors", label: "High Error Rates", icon: AlertTriangle },
-  { id: "slow", label: "Slow Processing", icon: Clock },
-  { id: "expensive", label: "High Costs", icon: DollarSign },
-  { id: "scaling", label: "Can't Scale", icon: TrendingUp },
-  { id: "visibility", label: "No Visibility", icon: BarChart3 },
-  { id: "support", label: "Poor Support", icon: Phone },
-];
-
-const serviceOptions = [
-  { id: "fba-prep", label: "FBA / WFS Prep", icon: TrendingUp },
-  { id: "receiving", label: "Receiving & Inspection", icon: Package },
-  { id: "storage", label: "Storage & Warehousing", icon: Building2 },
-  { id: "pick-pack", label: "Pick & Pack", icon: Package },
-  { id: "labeling", label: "Labeling & Compliance", icon: FileText },
-  { id: "kitting", label: "Kitting & Bundling", icon: Package },
-  { id: "returns", label: "Returns Processing", icon: Package },
-];
-
-const specialRequirementOptions = [
-  { id: "fragile", label: "Fragile Items" },
-  { id: "hazmat", label: "Hazmat/ORM-D" },
-  { id: "kitting", label: "Custom Kitting" },
-  { id: "branding", label: "Custom Packaging" },
-  { id: "lotTracking", label: "Lot/Expiry Tracking" },
-];
+import { TranslatedText } from "@/components/TranslatedText";
 
 interface EnhancedROICalculatorProps {
   variant?: "pricing" | "standalone";
 }
 
-// FBA Pricing tier helper
-const getFBAPricingTier = (prepUnits: number) => {
-  let polybagRate = 1.40;
-  let bundleRate = 0.50;
-  let bubbleRate = 0.50;
-  let tierName = "Standard";
+type Channel = "shopify" | "amazon" | "both";
+type Fulfillment = "self" | "other-3pl" | "hybrid";
 
-  if (prepUnits > 5000) {
-    polybagRate = 1.00;
-    bundleRate = 0.25;
-    bubbleRate = 0.25;
-    tierName = "High Volume (5,001+)";
-  } else if (prepUnits > 3000) {
-    polybagRate = 1.10;
-    bundleRate = 0.25;
-    bubbleRate = 0.25;
-    tierName = "Volume (3,001-5,000)";
-  } else if (prepUnits > 1000) {
-    polybagRate = 1.20;
-    bundleRate = 0.50;
-    bubbleRate = 0.50;
-    tierName = "Growth (1,001-3,000)";
-  }
+interface CalcInputs {
+  channel: Channel;
+  monthlyOrders: number;
+  avgUnitsPerOrder: number;
+  fulfillment: Fulfillment;
+  currentRatePerUnit: number; // only used for other-3pl / hybrid
+  hoursPerWeek: number;
+  hourlyValue: number;
+  errorRatePct: number;
+  returnRatePct: number;
+}
 
-  return { polybagRate, bundleRate, bubbleRate, tierName };
+const defaultInputs: CalcInputs = {
+  channel: "shopify",
+  monthlyOrders: 750,
+  avgUnitsPerOrder: 2,
+  fulfillment: "self",
+  currentRatePerUnit: 2.75,
+  hoursPerWeek: 15,
+  hourlyValue: 25,
+  errorRatePct: 2,
+  returnRatePct: 5,
 };
 
-const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const [stepStartTime, setStepStartTime] = useState(Date.now());
-  const [highestStepReached, setHighestStepReached] = useState(0);
+// Westfield tiered per-unit rate (volume-based)
+const westfieldRate = (monthlyUnits: number): number => {
+  if (monthlyUnits < 1000) return 2.5;
+  if (monthlyUnits < 2500) return 2.25;
+  if (monthlyUnits < 5000) return 2.0;
+  return 1.5;
+};
 
-  const steps = [
-    { title: "Use Case", icon: Target },
-    { title: "Business Profile", icon: Building2 },
-    { title: "Volume & Products", icon: Package },
-    { title: "Pain Points", icon: AlertTriangle },
-    { title: "Services", icon: CheckCircle2 },
-    { title: "Get Quote", icon: Mail },
-  ];
+const usd = (n: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(Math.max(0, Math.round(n)));
 
-  // Track step completions
-  useEffect(() => {
-    if (currentStep > highestStepReached) {
-      setHighestStepReached(currentStep);
-      logAnalyticsEvent("step_completed", { 
-        step: currentStep, 
-        stepName: steps[currentStep - 1]?.title,
-        timeSpentMs: Date.now() - stepStartTime 
-      });
+const num = (n: number) =>
+  new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.round(n));
+
+function useRoiMath(i: CalcInputs) {
+  return useMemo(() => {
+    const monthlyUnits = Math.max(0, i.monthlyOrders * i.avgUnitsPerOrder);
+    const ourRate = westfieldRate(monthlyUnits);
+    const multiUnitSurcharge = i.avgUnitsPerOrder > 1 ? 0.5 : 0;
+    const ourEffectiveRate = ourRate + multiUnitSurcharge;
+    const estimatedMonthlyCost = monthlyUnits * ourEffectiveRate;
+
+    // Outsource share governs how much time savings is credited
+    const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
+
+    // 3PL fee delta (only when comparing against an existing 3PL)
+    let threePLDelta = 0;
+    if (i.fulfillment === "other-3pl" || i.fulfillment === "hybrid") {
+      const delta = Math.max(0, i.currentRatePerUnit - ourEffectiveRate);
+      const blended = i.fulfillment === "hybrid" ? 0.5 : 1; // hybrid only shifts half today
+      threePLDelta = delta * monthlyUnits * blended;
     }
-    setStepStartTime(Date.now());
-  }, [currentStep]);
 
-  // Auto-set hours to 0 when switching from another 3PL
-  useEffect(() => {
-    if (formData.currentFulfillment === "other-3pl" && formData.hoursSpentWeekly > 0) {
-      setFormData(prev => ({ ...prev, hoursSpentWeekly: 0 }));
-    }
-  }, [formData.currentFulfillment]);
+    // Time recovered (only when client touches fulfillment themselves)
+    const timeRecovered = i.hoursPerWeek * 4.33 * i.hourlyValue * outsourceShare;
 
-  // Calculate FBA Prep Cost with AUTHORITATIVE per-unit pricing model
-  // CORRECT MODEL: Each service adds (baseRate + serviceAddon) per unit
-  // fnskuCost = fnskuUnits × baseRate
-  // bundlingCost = bundlingUnits × (baseRate + bundleRate)
-  // bubbleCost = bubbleUnits × (baseRate + bubbleRate)
-  // Total = sum of all three (overlap allowed intentionally)
-  const calculateFBAPrepCost = useCallback(() => {
-    const { polybagRate, bundleRate, bubbleRate, tierName } = getFBAPricingTier(formData.unitsRequiringPrep);
-    
-    // Base rate from tier (FNSKU + Polybag)
-    const baseRate = polybagRate;
-    
-    // AUTHORITATIVE PRICING: Each service is priced per-unit independently
-    // FNSKU + Polybag: just the base rate
-    const fnskuCost = formData.fnskuPolybagUnits * baseRate;
-    
-    // Bundling: baseRate + bundleRate per unit
-    const bundlingCost = formData.bundlingOrders * (baseRate + bundleRate);
-    
-    // Bubble Wrap: baseRate + bubbleRate per unit
-    const bubbleCost = formData.bubbleWrapUnits * (baseRate + bubbleRate);
-    
-    // Total prep cost = sum of all (overlap accepted per business rule)
-    const totalPrepCost = fnskuCost + bundlingCost + bubbleCost;
-    
-    return {
-      fnskuCost,
-      bundlingCost,
-      bubbleCost,
-      totalPrepCost,
-      polybagRate,
-      bundleRate,
-      bubbleRate,
-      tierName,
-      baseRate,
-    };
-  }, [formData.unitsRequiringPrep, formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits]);
+    // Errors avoided: capped at a realistic 2% error rate so extreme inputs don't fantasize
+    const cappedErrorRate = Math.min(i.errorRatePct, 2) / 100;
+    const errorsAvoided = monthlyUnits * cappedErrorRate * 8;
 
-  // Check if FBA fields have any values
-  const hasFBAData = useMemo(() => {
-    return formData.fnskuPolybagUnits > 0 || 
-           formData.bundlingOrders > 0 || 
-           formData.bubbleWrapUnits > 0;
-  }, [formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits]);
+    // Returns processed cheaper: $4/return delta vs. self-handling
+    const returnsSavings = monthlyUnits * (i.returnRatePct / 100) * 4 * (outsourceShare > 0 ? 1 : 0.5);
 
-  // Check if standard fields have any values (changed from default)
-  const hasStandardData = useMemo(() => {
-    return formData.monthlyOrders > 10; // More than initial minimum
-  }, [formData.monthlyOrders]);
-
-  // Calculate ROI metrics in real-time
-  const calculateROI = useCallback(() => {
-    const isFBAOnly = formData.useCase === "amazon";
-    const isMultiChannel = formData.useCase === "multi-channel";
-    
-    // Standard order-based calculations
-    const monthlyUnits = formData.monthlyOrders * formData.avgUnitsPerOrder;
-    const currentErrorCost = monthlyUnits * (formData.currentErrorRate / 100) * 18;
-    const returnCost = monthlyUnits * (formData.returnRate / 100) * 12;
-    
-    // Time savings calculation
-    const timeSavedHours = formData.hoursSpentWeekly * 4 * 0.85;
-    const hourlyRate = 25;
-    const timeSavedValue = timeSavedHours * hourlyRate;
-    
-    // Order-volume-based pricing tiers (per unit)
-    let costPerUnit: number;
-    if (formData.monthlyOrders < 1000) costPerUnit = 2.50;
-    else if (formData.monthlyOrders < 2500) costPerUnit = 2.25;
-    else if (formData.monthlyOrders < 5000) costPerUnit = 2.00;
-    else costPerUnit = 1.50;
-    
-    // FIX: Cost per order with flat $0.50 surcharge for multi-unit orders
-    const userCostPerOrder = parseFloat(formData.currentCostPerOrder.replace(/[^0-9.]/g, '')) || 0;
-    const ourCostPerOrder = formData.avgUnitsPerOrder > 1 
-      ? costPerUnit + 0.50 
-      : costPerUnit;
-    const costSavingsPerOrder = Math.max(0, userCostPerOrder - ourCostPerOrder);
-    const standardCostSavings = costSavingsPerOrder * formData.monthlyOrders;
-    
-    // FBA Prep cost calculation
-    const fbaPrepResult = calculateFBAPrepCost();
-    const fbaTotalCost = fbaPrepResult.totalPrepCost;
-    
-    // Determine which costs to use based on use case
-    let estimatedMonthlyCost: number;
-    let totalSavings: number;
-    
-    if (isFBAOnly) {
-      // FBA Only: Use per-unit prep cost
-      estimatedMonthlyCost = fbaTotalCost;
-      // For FBA, use the user's cost per unit input for comparison
-      const userCostPerUnit = parseFloat(formData.currentCostPerOrder.replace(/[^0-9.]/g, '')) || 0;
-      const totalPrepUnits = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
-      const userTotalPrepCost = userCostPerUnit * totalPrepUnits;
-      const fbaSavings = Math.max(0, userTotalPrepCost - fbaTotalCost);
-      totalSavings = currentErrorCost + returnCost + timeSavedValue + fbaSavings;
-    } else if (isMultiChannel) {
-      // Multi-channel: Combine both standard and FBA costs
-      const standardEstimatedCost = monthlyUnits * costPerUnit;
-      estimatedMonthlyCost = standardEstimatedCost + fbaTotalCost;
-      totalSavings = currentErrorCost + returnCost + timeSavedValue + standardCostSavings;
-      // Add FBA savings if they have FBA data
-      if (hasFBAData) {
-        const userCostPerUnit = parseFloat(formData.currentCostPerOrder.replace(/[^0-9.]/g, '')) || 0;
-        const totalPrepUnits = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
-        const userTotalPrepCost = userCostPerUnit * totalPrepUnits;
-        const fbaSavings = Math.max(0, userTotalPrepCost - fbaTotalCost);
-        totalSavings += fbaSavings;
-      }
-    } else {
-      // Standard (Shopify/B2B): Use order-based cost
-      estimatedMonthlyCost = monthlyUnits * costPerUnit;
-      totalSavings = currentErrorCost + returnCost + timeSavedValue + standardCostSavings;
-    }
-    
-    const netBenefit = totalSavings - estimatedMonthlyCost;
-    
-    // ROI calculation - ALLOW NEGATIVE VALUES
-    const roi = estimatedMonthlyCost > 0 ? (totalSavings / estimatedMonthlyCost) * 100 : 0;
-    const annualSavings = totalSavings * 12;
+    const totalMonthly = threePLDelta + timeRecovered + errorsAvoided + returnsSavings;
+    const annual = totalMonthly * 12;
+    const roiPct =
+      estimatedMonthlyCost > 0 ? Math.min(500, (totalMonthly / estimatedMonthlyCost) * 100) : 0;
 
     return {
       monthlyUnits,
-      currentErrorCost: Math.round(currentErrorCost),
-      returnCost: Math.round(returnCost),
-      timeSavedHours: Math.round(timeSavedHours),
-      timeSavedValue: Math.round(timeSavedValue),
-      costSavings: Math.round(standardCostSavings),
-      estimatedMonthlyCost: Math.round(estimatedMonthlyCost),
-      totalSavings: Math.round(totalSavings),
-      netBenefit: Math.round(netBenefit),
-      roi: Math.round(roi), // Allow negative ROI
-      annualSavings: Math.round(annualSavings),
-      costPerUnit: costPerUnit.toFixed(2),
-      fbaPrepCost: Math.round(fbaTotalCost),
-      fbaTierName: fbaPrepResult.tierName,
+      ourRate,
+      ourEffectiveRate,
+      estimatedMonthlyCost,
+      threePLDelta,
+      timeRecovered,
+      errorsAvoided,
+      returnsSavings,
+      totalMonthly,
+      annual,
+      roiPct,
+      cappedErrorRate,
     };
-  }, [formData, calculateFBAPrepCost, hasFBAData]);
+  }, [i]);
+}
 
-  const roi = useMemo(() => calculateROI(), [calculateROI]);
+const channelOptions: { id: Channel; label: string; icon: typeof ShoppingCart }[] = [
+  { id: "shopify", label: "Shopify / DTC", icon: ShoppingCart },
+  { id: "amazon", label: "Amazon FBA", icon: Package },
+  { id: "both", label: "Both", icon: Layers },
+];
 
-  const handleNext = () => {
-    // Validation for multi-channel on step 2
-    if (currentStep === 2 && formData.useCase === "multi-channel") {
-      if (!hasStandardData && !hasFBAData) {
-        toast.error("Please fill out at least one fulfillment method (Standard or FBA/WFS)");
-        return;
-      }
+const fulfillmentOptions: { id: Fulfillment; label: string; help: string }[] = [
+  { id: "self", label: "We do it ourselves", help: "Picking, packing, shipping in-house" },
+  { id: "other-3pl", label: "Another 3PL", help: "Looking to switch providers" },
+  { id: "hybrid", label: "Hybrid", help: "Mix of self + outsourced" },
+];
+
+const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorProps) => {
+  const [inputs, setInputs] = useState<CalcInputs>(defaultInputs);
+  const [touched, setTouched] = useState(false);
+  const [lead, setLead] = useState({ fullName: "", email: "", companyName: "", phone: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const roi = useRoiMath(inputs);
+
+  const set = <K extends keyof CalcInputs>(k: K, v: CalcInputs[K]) => {
+    if (!touched) {
+      setTouched(true);
+      trackEvent("roi_calculator_started", { use_case: String(inputs.channel) });
     }
-    
-    // No warning for exceeding total - overlap is allowed per business rule
-    
-    if (currentStep < steps.length - 1) {
-      logAnalyticsEvent("step_navigation", { direction: "next", fromStep: currentStep });
-      setCurrentStep(currentStep + 1);
-    }
+    setInputs((prev) => ({ ...prev, [k]: v }));
   };
 
-  const handleBack = () => {
-    if (currentStep > 0) {
-      logAnalyticsEvent("step_navigation", { direction: "back", fromStep: currentStep });
-      setCurrentStep(currentStep - 1);
+  // Persist a snapshot so the Pricing page can show "your savings" in the sticky CTA
+  useEffect(() => {
+    if (!touched) return;
+    try {
+      localStorage.setItem(
+        "roiCalculatorData",
+        JSON.stringify({
+          monthlyUnits: roi.monthlyUnits,
+          estimatedSavings: Math.round(roi.totalMonthly),
+          roiPercent: Math.round(roi.roiPct),
+        })
+      );
+    } catch {
+      /* ignore */
     }
-  };
+  }, [touched, roi.monthlyUnits, roi.totalMonthly, roi.roiPct]);
 
-  const handleSubmit = async () => {
-    if (!formData.fullName || !formData.email) {
-      toast.error("Please fill in all required fields");
+  const handleEmailReport = async () => {
+    if (!lead.fullName || !lead.email) {
+      toast.error("Please add your name and email so we can send the report.");
       return;
     }
-
-    setIsSubmitting(true);
-    logAnalyticsEvent("form_submit_started", { step: currentStep });
-    
+    setSubmitting(true);
     try {
-      const calculatorResults = calculateROI();
-      
-      // Send email via edge function
-      const { error: emailError } = await supabase.functions.invoke("send-roi-report", {
+      const { error } = await supabase.functions.invoke("send-roi-report", {
         body: {
-          fullName: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          companyName: formData.companyName,
-          useCase: formData.useCase,
-          businessStage: formData.businessStage,
-          currentFulfillment: formData.currentFulfillment,
-          productType: formData.productType,
-          monthlyOrders: formData.monthlyOrders,
-          avgUnitsPerOrder: formData.avgUnitsPerOrder,
-          skuCount: formData.skuCount,
-          currentErrorRate: formData.currentErrorRate,
-          returnRate: formData.returnRate,
-          hoursSpentWeekly: formData.hoursSpentWeekly,
-          painPoints: formData.painPoints,
-          services: formData.services,
-          specialRequirements: formData.specialRequirements,
-          fbaDtcSplit: formData.fbaDtcSplit,
-          // FBA/WFS specific fields
-          unitsRequiringPrep: formData.unitsRequiringPrep,
-          fnskuPolybagUnits: formData.fnskuPolybagUnits,
-          bundlingOrders: formData.bundlingOrders,
-          bubbleWrapUnits: formData.bubbleWrapUnits,
+          fullName: lead.fullName,
+          email: lead.email,
+          phone: lead.phone,
+          companyName: lead.companyName,
+          useCase: inputs.channel === "both" ? "multi-channel" : inputs.channel,
+          currentFulfillment: inputs.fulfillment,
+          monthlyOrders: inputs.monthlyOrders,
+          avgUnitsPerOrder: inputs.avgUnitsPerOrder,
+          currentErrorRate: inputs.errorRatePct,
+          returnRate: inputs.returnRatePct,
+          hoursSpentWeekly: inputs.hoursPerWeek,
+          currentCostPerOrder: String(inputs.currentRatePerUnit),
+          painPoints: [],
+          services: [],
+          specialRequirements: [],
           roi: {
-            monthlyUnits: calculatorResults.monthlyUnits,
-            totalSavings: calculatorResults.totalSavings,
-            annualSavings: calculatorResults.annualSavings,
-            timeSavedHours: calculatorResults.timeSavedHours,
-            currentErrorCost: calculatorResults.currentErrorCost,
-            returnCost: calculatorResults.returnCost,
-            estimatedMonthlyCost: calculatorResults.estimatedMonthlyCost,
-            costPerUnit: calculatorResults.costPerUnit,
-            roiPercent: calculatorResults.roi,
-            fbaPrepCost: calculatorResults.fbaPrepCost,
+            monthlyUnits: roi.monthlyUnits,
+            totalSavings: Math.round(roi.totalMonthly),
+            annualSavings: Math.round(roi.annual),
+            timeSavedHours: Math.round(inputs.hoursPerWeek * 4.33),
+            currentErrorCost: Math.round(roi.errorsAvoided),
+            returnCost: Math.round(roi.returnsSavings),
+            estimatedMonthlyCost: Math.round(roi.estimatedMonthlyCost),
+            costPerUnit: roi.ourEffectiveRate.toFixed(2),
+            roiPercent: Math.round(roi.roiPct),
           },
         },
       });
-
-      if (emailError) {
-        console.error("Email error:", emailError);
-        toast.error("We couldn't send your estimate email. Please try again or contact us directly.");
-        setIsSubmitting(false);
-        return;
-      }
-
-      logAnalyticsEvent("form_submit_success", {
-        useCase: formData.useCase,
-        businessStage: formData.businessStage,
-        monthlyOrders: formData.monthlyOrders,
-        estimatedSavings: calculatorResults.totalSavings,
+      if (error) throw error;
+      trackEvent("roi_calculator_completed", {
+        use_case: inputs.channel,
+        monthly_orders: inputs.monthlyOrders,
+        estimated_savings: Math.round(roi.totalMonthly),
+        annual_savings: Math.round(roi.annual),
       });
-
-      // Track ROI calculator completion via centralized analytics
-      trackEvent('roi_calculator_completed', {
-        use_case: formData.useCase,
-        monthly_orders: formData.monthlyOrders,
-        estimated_savings: calculatorResults.totalSavings,
-        annual_savings: calculatorResults.annualSavings
-      });
-
-      setShowResults(true);
-      toast.success("Your personalized savings report is ready!");
-    } catch (error) {
-      console.error("Error saving lead:", error);
-      logAnalyticsEvent("form_submit_error", { error: String(error) });
-      toast.error("Something went wrong. Please try again.");
+      setSubmitted(true);
+      toast.success("Your savings report is on its way.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Couldn't send the report. Please try again or contact us directly.");
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
-  };
-
-  const handleToggle = (field: "painPoints" | "services" | "specialRequirements", id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: prev[field].includes(id)
-        ? prev[field].filter(s => s !== id)
-        : [...prev[field], id],
-    }));
-  };
-
-  const canProceed = () => {
-    switch (currentStep) {
-      case 0: return !!formData.useCase;
-      case 1: return !!formData.businessStage && !!formData.currentFulfillment;
-      case 2: 
-        // Multi-channel: needs at least one set filled
-        if (formData.useCase === "multi-channel") {
-          return hasStandardData || hasFBAData;
-        }
-        // FBA only: needs at least one prep service
-        if (formData.useCase === "amazon") {
-          return hasFBAData;
-        }
-        // Standard: needs monthly orders
-        return formData.monthlyOrders > 0;
-      case 3: return !!formData.currentCostPerOrder;
-      case 4: return formData.services.length > 0;
-      case 5: return !!formData.fullName && !!formData.email;
-      default: return false;
-    }
-  };
-
-  const slideVariants = {
-    enter: { x: 50, opacity: 0 },
-    center: { x: 0, opacity: 1 },
-    exit: { x: -50, opacity: 0 },
   };
 
   return (
-    <section className="py-12 md:py-20 relative overflow-hidden" id="savings-calculator">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-primary/5" />
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[100px] opacity-50" />
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[80px] opacity-50" />
-
-      <div className="container relative z-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-8 md:mb-12"
-        >
-          <div className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <Sparkles className="w-4 h-4" />
-            3PL Savings Calculator
+    <TooltipProvider delayDuration={150}>
+      <section
+        id="roi-calculator"
+        className={
+          variant === "pricing"
+            ? "py-12 md:py-20 bg-gradient-to-b from-background via-muted/20 to-background"
+            : "py-8"
+        }
+      >
+        <div className="container mx-auto px-4 max-w-6xl">
+          {/* Heading */}
+          <div className="text-center max-w-2xl mx-auto mb-8 md:mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF7A00]/10 text-[#FF7A00] text-xs font-semibold mb-4">
+              <Calculator className="w-3.5 h-3.5" />
+              <TranslatedText>Live ROI Calculator</TranslatedText>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+              <TranslatedText>See what fulfillment really costs you</TranslatedText>
+            </h2>
+            <p className="text-muted-foreground text-base md:text-lg">
+              <TranslatedText>
+                Numbers update live as you type. Every line is auditable — hover any figure for the formula.
+              </TranslatedText>
+            </p>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Calculate Your Fulfillment Savings
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Answer a few questions and get a personalized savings estimate in under 2 minutes
-          </p>
-        </motion.div>
 
-        {/* Main Calculator Layout */}
-        <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {/* Calculator Form - Left/Main */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="lg:col-span-2"
-          >
-            <div className="backdrop-blur-xl bg-background/90 border border-border/50 rounded-3xl p-6 md:p-8 shadow-2xl">
-              {/* Progress Steps */}
-              {!showResults && (
-                <div className="flex justify-between mb-8 relative overflow-x-auto pb-2 pt-2">
-                  <div className="absolute top-7 left-0 right-0 h-0.5 bg-muted -z-10 min-w-full" />
-                  <div 
-                    className="absolute top-7 left-0 h-0.5 bg-secondary -z-10 transition-all duration-500"
-                    style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
-                  />
-                  
-                  {steps.map((step, index) => {
-                    const Icon = step.icon;
-                    const isActive = index === currentStep;
-                    const isCompleted = index < currentStep;
-                    
+          <div className="grid lg:grid-cols-[1fr_minmax(0,420px)] gap-6 lg:gap-8 items-start">
+            {/* INPUTS */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="bg-card border rounded-2xl p-6 md:p-8 shadow-sm space-y-8"
+            >
+              {/* Channel */}
+              <div>
+                <Label className="text-sm font-semibold mb-3 block">
+                  <TranslatedText>Which channels do you sell on?</TranslatedText>
+                </Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {channelOptions.map((opt) => {
+                    const active = inputs.channel === opt.id;
+                    const Icon = opt.icon;
                     return (
-                      <div key={step.title} className="flex flex-col items-center min-w-[60px]">
-                        <motion.div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 ${
-                            isCompleted 
-                              ? "bg-secondary text-secondary-foreground" 
-                              : isActive 
-                                ? "bg-secondary text-secondary-foreground ring-4 ring-secondary/20" 
-                                : "bg-muted text-muted-foreground"
-                          }`}
-                          animate={{ scale: isActive ? 1.1 : 1 }}
-                        >
-                          {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
-                        </motion.div>
-                        <span className={`mt-2 text-xs font-medium text-center hidden md:block ${
-                          isActive ? "text-secondary" : "text-muted-foreground"
-                        }`}>
-                          {step.title}
-                        </span>
-                      </div>
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => set("channel", opt.id)}
+                        className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm font-medium transition-all ${
+                          active
+                            ? "border-[#FF7A00] bg-[#FF7A00]/5 text-[#0A0A23] shadow-sm"
+                            : "border-border hover:border-[#FF7A00]/40 hover:bg-muted/40 text-muted-foreground"
+                        }`}
+                      >
+                        <Icon className={`w-5 h-5 ${active ? "text-[#FF7A00]" : ""}`} />
+                        <TranslatedText>{opt.label}</TranslatedText>
+                      </button>
                     );
                   })}
                 </div>
-              )}
+              </div>
 
-              <AnimatePresence mode="wait">
-                {showResults ? (
-                  <ResultsView roi={roi} formData={formData} />
-                ) : (
-                  <motion.div
-                    key={currentStep}
-                    variants={slideVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    className="min-h-[400px]"
-                  >
-                    {/* Step 0: Use Case */}
-                    {currentStep === 0 && (
-                      <StepUseCase formData={formData} setFormData={setFormData} />
-                    )}
+              {/* Volume */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="monthlyOrders" className="text-sm font-semibold mb-2 block">
+                    <TranslatedText>Monthly orders</TranslatedText>
+                  </Label>
+                  <Input
+                    id="monthlyOrders"
+                    type="number"
+                    min={0}
+                    value={inputs.monthlyOrders || ""}
+                    onChange={(e) => set("monthlyOrders", Math.max(0, Number(e.target.value) || 0))}
+                    className="text-lg font-medium"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="avgUnits" className="text-sm font-semibold mb-2 block">
+                    <TranslatedText>Avg units per order</TranslatedText>
+                  </Label>
+                  <Input
+                    id="avgUnits"
+                    type="number"
+                    min={1}
+                    value={inputs.avgUnitsPerOrder || ""}
+                    onChange={(e) => set("avgUnitsPerOrder", Math.max(1, Number(e.target.value) || 1))}
+                    className="text-lg font-medium"
+                  />
+                </div>
+              </div>
 
-                    {/* Step 1: Business Profile */}
-                    {currentStep === 1 && (
-                      <StepBusinessProfile 
-                        formData={formData} 
-                        setFormData={setFormData}
-                        businessStageOptions={businessStageOptions}
-                        fulfillmentOptions={fulfillmentOptions}
-                      />
-                    )}
+              {/* Fulfillment today */}
+              <div>
+                <Label className="text-sm font-semibold mb-3 block">
+                  <TranslatedText>How are you fulfilling today?</TranslatedText>
+                </Label>
+                <RadioGroup
+                  value={inputs.fulfillment}
+                  onValueChange={(v) => set("fulfillment", v as Fulfillment)}
+                  className="grid sm:grid-cols-3 gap-2"
+                >
+                  {fulfillmentOptions.map((opt) => {
+                    const active = inputs.fulfillment === opt.id;
+                    return (
+                      <Label
+                        key={opt.id}
+                        htmlFor={`ff-${opt.id}`}
+                        className={`cursor-pointer rounded-xl border px-3 py-3 transition-all ${
+                          active
+                            ? "border-[#FF7A00] bg-[#FF7A00]/5 shadow-sm"
+                            : "border-border hover:border-[#FF7A00]/40 hover:bg-muted/40"
+                        }`}
+                      >
+                        <div className="flex items-start gap-2">
+                          <RadioGroupItem id={`ff-${opt.id}`} value={opt.id} className="mt-0.5" />
+                          <div>
+                            <div className="text-sm font-semibold">
+                              <TranslatedText>{opt.label}</TranslatedText>
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              <TranslatedText>{opt.help}</TranslatedText>
+                            </div>
+                          </div>
+                        </div>
+                      </Label>
+                    );
+                  })}
+                </RadioGroup>
+              </div>
 
-                    {/* Step 2: Volume & Products - Conditional based on use case */}
-                    {currentStep === 2 && formData.useCase === "amazon" && (
-                      <StepVolumeProductsFBA 
-                        formData={formData} 
-                        setFormData={setFormData}
-                        fbaPrepCost={calculateFBAPrepCost()}
-                      />
-                    )}
-                    
-                    {currentStep === 2 && formData.useCase === "multi-channel" && (
-                      <StepVolumeProductsMultiChannel 
-                        formData={formData} 
-                        setFormData={setFormData}
-                        roi={roi}
-                        fbaPrepCost={calculateFBAPrepCost()}
-                      />
-                    )}
-                    
-                    {currentStep === 2 && formData.useCase !== "amazon" && formData.useCase !== "multi-channel" && (
-                      <StepVolumeProducts 
-                        formData={formData} 
-                        setFormData={setFormData}
-                        roi={roi}
-                      />
-                    )}
-
-                    {/* Step 3: Pain Points */}
-                    {currentStep === 3 && (
-                      <StepPainPoints 
-                        formData={formData} 
-                        setFormData={setFormData}
-                        handleToggle={handleToggle}
-                      />
-                    )}
-
-                    {/* Step 4: Services */}
-                    {currentStep === 4 && (
-                      <StepServices 
-                        formData={formData} 
-                        setFormData={setFormData}
-                        handleToggle={handleToggle}
-                      />
-                    )}
-
-                    {/* Step 5: Lead Capture */}
-                    {currentStep === 5 && (
-                      <StepLeadCapture formData={formData} setFormData={setFormData} />
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Navigation Buttons */}
-              {!showResults && (
-                <div className="flex justify-between mt-8 pt-6 border-t border-border/50">
-                  <Button
-                    variant="ghost"
-                    onClick={handleBack}
-                    disabled={currentStep === 0}
-                    className="gap-2"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
-                  </Button>
-                  
-                  {currentStep === steps.length - 1 ? (
-                    <Button 
-                      onClick={handleSubmit} 
-                      disabled={!canProceed() || isSubmitting}
-                      className="gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-                    >
-                      {isSubmitting ? "Calculating..." : "See My Savings"}
-                      <Sparkles className="w-4 h-4" />
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={handleNext} 
-                      disabled={!canProceed()}
-                      className="gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-                    >
-                      Continue
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  )}
+              {/* Conditional: current 3PL rate */}
+              {(inputs.fulfillment === "other-3pl" || inputs.fulfillment === "hybrid") && (
+                <div className="rounded-xl bg-muted/40 border border-dashed p-4">
+                  <Label htmlFor="currentRate" className="text-sm font-semibold mb-2 block">
+                    <TranslatedText>Your current 3PL's per-unit rate</TranslatedText>
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">$</span>
+                    <Input
+                      id="currentRate"
+                      type="number"
+                      step="0.05"
+                      min={0}
+                      value={inputs.currentRatePerUnit || ""}
+                      onChange={(e) =>
+                        set("currentRatePerUnit", Math.max(0, Number(e.target.value) || 0))
+                      }
+                      className="text-lg font-medium max-w-[140px]"
+                    />
+                    <span className="text-sm text-muted-foreground">/ unit shipped</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    <TranslatedText>
+                      Used to calculate the delta vs. Westfield's tiered rate. If yours is lower, that line shows $0.
+                    </TranslatedText>
+                  </p>
                 </div>
               )}
-            </div>
-          </motion.div>
 
-          {/* Live Results Sidebar - Right */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="lg:sticky lg:top-24 h-fit"
-          >
-            <LiveResultsSidebar roi={roi} formData={formData} showResults={showResults} />
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-};
+              {/* Conditional: time inputs (skip pure 3PL) */}
+              {inputs.fulfillment !== "other-3pl" && (
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="hours" className="text-sm font-semibold mb-2 block">
+                      <TranslatedText>Hours/week you spend on fulfillment</TranslatedText>
+                    </Label>
+                    <Input
+                      id="hours"
+                      type="number"
+                      min={0}
+                      max={80}
+                      value={inputs.hoursPerWeek || ""}
+                      onChange={(e) =>
+                        set("hoursPerWeek", Math.max(0, Math.min(80, Number(e.target.value) || 0)))
+                      }
+                      className="text-lg font-medium"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="hourly" className="text-sm font-semibold mb-2 block">
+                      <TranslatedText>Your hourly value ($)</TranslatedText>
+                    </Label>
+                    <Input
+                      id="hourly"
+                      type="number"
+                      min={0}
+                      value={inputs.hourlyValue || ""}
+                      onChange={(e) => set("hourlyValue", Math.max(0, Number(e.target.value) || 0))}
+                      className="text-lg font-medium"
+                    />
+                  </div>
+                </div>
+              )}
 
-// Step Components
-const StepUseCase = ({ formData, setFormData }: { formData: FormData; setFormData: React.Dispatch<React.SetStateAction<FormData>> }) => (
-  <div className="space-y-6">
-    <div className="text-center mb-8">
-      <h3 className="text-2xl font-bold mb-2">What's your primary use case?</h3>
-      <p className="text-muted-foreground">This helps us customize your savings estimate</p>
-    </div>
-    
-    <div className="grid sm:grid-cols-2 gap-4">
-      {useCaseOptions.map((option) => {
-        const Icon = option.icon;
-        const isSelected = formData.useCase === option.id;
-        
-        return (
-          <motion.div
-            key={option.id}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => {
-              setFormData(prev => ({ ...prev, useCase: option.id }));
-              logAnalyticsEvent("use_case_selected", { useCase: option.id });
-            }}
-            className={`p-6 rounded-2xl border-2 cursor-pointer transition-all ${
-              isSelected 
-                ? "border-secondary bg-secondary/5 shadow-lg" 
-                : "border-border hover:border-secondary/50"
-            }`}
-          >
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                isSelected ? "bg-secondary text-secondary-foreground" : "bg-muted"
-              }`}>
-                <Icon className="w-7 h-7" />
+              {/* Sliders */}
+              <div className="space-y-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-sm font-semibold">
+                      <TranslatedText>Order error rate</TranslatedText>
+                    </Label>
+                    <span className="text-sm font-mono text-[#FF7A00]">
+                      {inputs.errorRatePct.toFixed(1)}%
+                    </span>
+                  </div>
+                  <Slider
+                    value={[inputs.errorRatePct]}
+                    onValueChange={([v]) => set("errorRatePct", v)}
+                    min={0}
+                    max={10}
+                    step={0.5}
+                  />
+                  {inputs.errorRatePct > 2 && (
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      <TranslatedText>
+                        Capped at 2% in the math — keeps savings credible even if your real rate is higher.
+                      </TranslatedText>
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-sm font-semibold">
+                      <TranslatedText>Return rate</TranslatedText>
+                    </Label>
+                    <span className="text-sm font-mono text-[#FF7A00]">
+                      {inputs.returnRatePct.toFixed(1)}%
+                    </span>
+                  </div>
+                  <Slider
+                    value={[inputs.returnRatePct]}
+                    onValueChange={([v]) => set("returnRatePct", v)}
+                    min={0}
+                    max={20}
+                    step={0.5}
+                  />
+                </div>
               </div>
-              <div>
-                <p className={`font-semibold ${isSelected ? "text-secondary" : ""}`}>{option.label}</p>
-                <p className="text-sm text-muted-foreground">{option.description}</p>
+            </motion.div>
+
+            {/* RESULTS */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="lg:sticky lg:top-24 space-y-4"
+            >
+              <div className="bg-[#0A0A23] text-white rounded-2xl p-6 md:p-7 shadow-lg overflow-hidden relative">
+                <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#FF7A00]/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="relative">
+                  <p className="text-xs uppercase tracking-wider text-white/60 mb-2">
+                    <TranslatedText>Estimated monthly savings</TranslatedText>
+                  </p>
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <motion.span
+                      key={Math.round(roi.totalMonthly)}
+                      initial={{ opacity: 0.4, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-5xl md:text-6xl font-bold tracking-tight text-[#FF7A00]"
+                    >
+                      {usd(roi.totalMonthly)}
+                    </motion.span>
+                    <span className="text-white/60 text-sm">/ mo</span>
+                  </div>
+                  <p className="text-sm text-white/70">
+                    <TranslatedText>≈</TranslatedText> {usd(roi.annual)}{" "}
+                    <TranslatedText>per year</TranslatedText>
+                  </p>
+                </div>
               </div>
+
+              {/* Breakdown */}
+              <div className="bg-card border rounded-2xl p-5 md:p-6">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">
+                  <TranslatedText>How we got there</TranslatedText>
+                </p>
+                <div className="divide-y divide-border">
+                  <BreakdownRow
+                    label="3PL fee delta"
+                    value={roi.threePLDelta}
+                    formula={
+                      inputs.fulfillment === "self"
+                        ? "Not applicable — you're self-fulfilling today."
+                        : `max(0, $${inputs.currentRatePerUnit.toFixed(2)} − $${roi.ourEffectiveRate.toFixed(2)}) × ${num(roi.monthlyUnits)} units${
+                            inputs.fulfillment === "hybrid" ? " × 50% (hybrid)" : ""
+                          }`
+                    }
+                  />
+                  <BreakdownRow
+                    label="Time recovered"
+                    value={roi.timeRecovered}
+                    formula={
+                      inputs.fulfillment === "other-3pl"
+                        ? "Not applicable — your time isn't tied up today."
+                        : `${inputs.hoursPerWeek} hrs/wk × 4.33 × $${inputs.hourlyValue}/hr${
+                            inputs.fulfillment === "hybrid" ? " × 50% (hybrid)" : ""
+                          }`
+                    }
+                  />
+                  <BreakdownRow
+                    label="Errors avoided"
+                    value={roi.errorsAvoided}
+                    formula={`${num(roi.monthlyUnits)} units × ${(roi.cappedErrorRate * 100).toFixed(1)}% × $8 cost-to-fix`}
+                  />
+                  <BreakdownRow
+                    label="Returns processed cheaper"
+                    value={roi.returnsSavings}
+                    formula={`${num(roi.monthlyUnits)} units × ${inputs.returnRatePct.toFixed(1)}% × $4 delta`}
+                  />
+                </div>
+              </div>
+
+              {/* Westfield cost */}
+              <div className="bg-card border rounded-2xl p-5 md:p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                      <TranslatedText>Your estimated cost with us</TranslatedText>
+                    </p>
+                    <p className="text-2xl font-bold mt-1">{usd(roi.estimatedMonthlyCost)} <span className="text-sm font-normal text-muted-foreground">/ mo</span></p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">
+                      <TranslatedText>Per-unit rate</TranslatedText>
+                    </p>
+                    <p className="text-lg font-semibold text-[#FF7A00]">
+                      ${roi.ourEffectiveRate.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  <TranslatedText>Based on volume tier.</TranslatedText>
+                  {inputs.avgUnitsPerOrder > 1 && (
+                    <> <TranslatedText>Includes $0.50 multi-unit surcharge.</TranslatedText></>
+                  )}
+                </p>
+              </div>
+
+              <Button
+                asChild
+                size="lg"
+                className="w-full bg-[#FF7A00] hover:bg-[#E66E00] text-white font-semibold"
+              >
+                <a href="/contact">
+                  <TranslatedText>Get a tailored quote</TranslatedText>
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </a>
+              </Button>
+            </motion.div>
+          </div>
+
+          {/* Email-report panel */}
+          <div className="mt-10 md:mt-12 max-w-3xl mx-auto">
+            <div className="bg-card border rounded-2xl p-6 md:p-8 shadow-sm">
+              {submitted ? (
+                <div className="text-center py-4">
+                  <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto mb-3" />
+                  <h3 className="text-xl font-bold mb-1">
+                    <TranslatedText>Report sent</TranslatedText>
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    <TranslatedText>
+                      Check your inbox. A fulfillment specialist will follow up within 24 hours.
+                    </TranslatedText>
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-start gap-3 mb-5">
+                    <div className="p-2 rounded-lg bg-[#FF7A00]/10">
+                      <Mail className="w-5 h-5 text-[#FF7A00]" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold">
+                        <TranslatedText>Email me this report</TranslatedText>
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        <TranslatedText>
+                          Get a branded PDF with the breakdown above, plus a specialist follow-up. No commitment.
+                        </TranslatedText>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3 mb-3">
+                    <Input
+                      placeholder="Full name *"
+                      value={lead.fullName}
+                      onChange={(e) => setLead((p) => ({ ...p, fullName: e.target.value }))}
+                    />
+                    <Input
+                      type="email"
+                      placeholder="Email *"
+                      value={lead.email}
+                      onChange={(e) => setLead((p) => ({ ...p, email: e.target.value }))}
+                    />
+                    <Input
+                      placeholder="Company (optional)"
+                      value={lead.companyName}
+                      onChange={(e) => setLead((p) => ({ ...p, companyName: e.target.value }))}
+                    />
+                    <Input
+                      placeholder="Phone (optional)"
+                      value={lead.phone}
+                      onChange={(e) => setLead((p) => ({ ...p, phone: e.target.value }))}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleEmailReport}
+                    disabled={submitting}
+                    className="w-full sm:w-auto bg-[#0A0A23] hover:bg-[#0A0A23]/90 text-white"
+                  >
+                    {submitting ? (
+                      <TranslatedText>Sending…</TranslatedText>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        <TranslatedText>Send my report</TranslatedText>
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
-          </motion.div>
-        );
-      })}
-    </div>
-  </div>
-);
-
-interface BusinessStageOption {
-  id: string;
-  label: string;
-  description: string;
-}
-
-interface FulfillmentOption {
-  id: string;
-  label: string;
-  description: string;
-}
-
-interface ProductTypeOption {
-  id: string;
-  label: string;
-}
-
-const StepBusinessProfile = ({ formData, setFormData, businessStageOptions, fulfillmentOptions }: {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  businessStageOptions: BusinessStageOption[];
-  fulfillmentOptions: FulfillmentOption[];
-}) => (
-  <div className="space-y-8">
-    <div className="text-center mb-6">
-      <h3 className="text-2xl font-bold mb-2">Tell us about your business</h3>
-      <p className="text-muted-foreground">Help us understand where you're at</p>
-    </div>
-    
-    <div className="space-y-6">
-      <div>
-        <Label className="text-base font-semibold mb-4 block">Business Stage</Label>
-        <div className="grid sm:grid-cols-2 gap-3">
-          {businessStageOptions.map((option) => (
-            <motion.div
-              key={option.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setFormData(prev => ({ ...prev, businessStage: option.id }))}
-              className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                formData.businessStage === option.id 
-                  ? "border-secondary bg-secondary/5" 
-                  : "border-border hover:border-secondary/50"
-              }`}
-            >
-              <p className="font-medium">{option.label}</p>
-              <p className="text-sm text-muted-foreground">{option.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <Label className="text-base font-semibold mb-4 block">Current Fulfillment Method</Label>
-        <div className="grid sm:grid-cols-3 gap-3">
-          {fulfillmentOptions.map((option) => (
-            <motion.div
-              key={option.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setFormData(prev => ({ ...prev, currentFulfillment: option.id }))}
-              className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
-                formData.currentFulfillment === option.id 
-                  ? "border-secondary bg-secondary/5" 
-                  : "border-border hover:border-secondary/50"
-              }`}
-            >
-              <p className="font-medium">{option.label}</p>
-              <p className="text-xs text-muted-foreground">{option.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-interface ROIResult {
-  monthlyUnits: number;
-  currentErrorCost: number;
-  returnCost: number;
-  timeSavedHours: number;
-  timeSavedValue: number;
-  estimatedMonthlyCost: number;
-  totalSavings: number;
-  netBenefit: number;
-  roi: number;
-  annualSavings: number;
-  costPerUnit: string;
-  fbaPrepCost?: number;
-  fbaTierName?: string;
-}
-
-interface FBAPrepCostResult {
-  fnskuCost: number;
-  bundlingCost: number;
-  bubbleCost: number;
-  totalPrepCost: number;
-  polybagRate: number;
-  bundleRate: number;
-  bubbleRate: number;
-  tierName: string;
-}
-
-// Standard Volume & Products Step (Shopify/DTC, B2B)
-const StepVolumeProducts = ({ formData, setFormData, roi }: {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  roi: ROIResult;
-}) => {
-  const [isHighVolumeMode, setIsHighVolumeMode] = useState(formData.monthlyOrders >= 10000);
-  
-  const handleOrdersChange = (value: number) => {
-    // Bi-directional mode switching
-    if (!isHighVolumeMode && value >= 10000) {
-      setIsHighVolumeMode(true);
-    } else if (isHighVolumeMode && value <= 10000) {
-      setIsHighVolumeMode(false);
-    }
-    setFormData(prev => ({ ...prev, monthlyOrders: value }));
-  };
-
-  return (
-    <div className="space-y-6">
-    <div className="text-center mb-6">
-        <h3 className="text-2xl font-bold mb-2">Volume Details</h3>
-        <p className="text-muted-foreground">Tell us about your monthly order volume</p>
-      </div>
-      
-      {/* Monthly Orders - Full Width Standalone */}
-      <div className="space-y-3">
-        <Label className="flex justify-between items-center">
-          <span className="text-lg font-semibold">Monthly Orders</span>
-          {isHighVolumeMode && (
-            <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
-              High-volume range unlocked
-            </span>
-          )}
-        </Label>
-        <div className="flex items-center gap-3">
-          <Slider
-            value={[formData.monthlyOrders]}
-            onValueChange={([value]) => handleOrdersChange(value)}
-            min={isHighVolumeMode ? 10000 : 10}
-            max={isHighVolumeMode ? 100000 : 10000}
-            step={isHighVolumeMode ? 1000 : 50}
-            className="py-4 flex-1"
-          />
-          <Input
-            type="number"
-            value={formData.monthlyOrders}
-            onChange={(e) => {
-              const value = Math.max(10, Math.min(100000, parseInt(e.target.value) || 10));
-              handleOrdersChange(value);
-            }}
-            className="w-28 h-12 text-center font-bold text-lg"
-          />
-        </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{isHighVolumeMode ? '10,000' : '10'}</span>
-          <span>{isHighVolumeMode ? '100,000+' : '10,000'}</span>
-        </div>
-      </div>
-
-      {/* Second Row: Units per Order + SKU Count */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-3">
-          <Label className="flex justify-between">
-            <span>Avg Units per Order</span>
-          </Label>
-          <div className="flex items-center gap-3">
-            <Slider
-              value={[formData.avgUnitsPerOrder]}
-              onValueChange={([value]) => setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }))}
-              min={1}
-              max={20}
-              step={0.5}
-              className="py-4 flex-1"
-            />
-            <Input
-              type="number"
-              value={formData.avgUnitsPerOrder}
-              onChange={(e) => {
-                const value = Math.max(1, Math.min(20, parseFloat(e.target.value) || 1));
-                setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }));
-              }}
-              step="0.5"
-              className="w-24 h-10 text-center font-semibold"
-            />
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>1</span>
-            <span>20</span>
           </div>
         </div>
-
-        <div className="space-y-3">
-          <Label className="flex justify-between">
-            <span>SKU Count</span>
-          </Label>
-          <div className="flex items-center gap-3">
-            <Slider
-              value={[formData.skuCount]}
-              onValueChange={([value]) => setFormData(prev => ({ ...prev, skuCount: value }))}
-              min={1}
-              max={250}
-              step={5}
-              className="py-4 flex-1"
-            />
-            <Input
-              type="number"
-              value={formData.skuCount}
-              onChange={(e) => {
-                const value = Math.max(1, Math.min(250, parseInt(e.target.value) || 1));
-                setFormData(prev => ({ ...prev, skuCount: value }));
-              }}
-              className="w-24 h-10 text-center font-semibold"
-            />
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>1</span>
-            <span>250+</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Volume Preview */}
-      <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 mt-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm">Monthly Volume</span>
-          <span className="text-xl font-bold text-secondary">
-            {roi.monthlyUnits.toLocaleString()} units
-          </span>
-        </div>
-      </div>
-    </div>
+      </section>
+    </TooltipProvider>
   );
 };
 
-// FBA/WFS Volume & Products Step - NO OVERLAP MODEL
-// Sum of all prep services cannot exceed unitsRequiringPrep
-const StepVolumeProductsFBA = ({ formData, setFormData, fbaPrepCost }: {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  fbaPrepCost: FBAPrepCostResult;
-}) => {
-  // Calculate remaining units dynamically (shared pool)
-  const totalAllocated = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
-  const remainingUnits = Math.max(0, formData.unitsRequiringPrep - totalAllocated);
-
-  // Dynamic max for each slider = current value + remaining
-  const maxFnsku = formData.fnskuPolybagUnits + remainingUnits;
-  const maxBundling = formData.bundlingOrders + remainingUnits;
-  const maxBubble = formData.bubbleWrapUnits + remainingUnits;
-
-  // Clamp prep services if unitsRequiringPrep is reduced below total allocation
-  useEffect(() => {
-    const total = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
-    if (total > formData.unitsRequiringPrep) {
-      let remaining = formData.unitsRequiringPrep;
-      
-      // Priority order: FNSKU > Bundling > Bubble (reduce from bottom up)
-      const newFnsku = Math.min(formData.fnskuPolybagUnits, remaining);
-      remaining -= newFnsku;
-      
-      const newBundling = Math.min(formData.bundlingOrders, remaining);
-      remaining -= newBundling;
-      
-      const newBubble = Math.min(formData.bubbleWrapUnits, remaining);
-      
-      setFormData(prev => ({
-        ...prev,
-        fnskuPolybagUnits: newFnsku,
-        bundlingOrders: newBundling,
-        bubbleWrapUnits: newBubble
-      }));
-    }
-  }, [formData.unitsRequiringPrep, formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits, setFormData]);
-
-  const handleFnskuChange = (value: number) => {
-    const otherTotal = formData.bundlingOrders + formData.bubbleWrapUnits;
-    const maxAllowed = formData.unitsRequiringPrep - otherTotal;
-    const clamped = Math.max(0, Math.min(maxAllowed, value));
-    setFormData(prev => ({ ...prev, fnskuPolybagUnits: clamped }));
-  };
-
-  const handleBundlingChange = (value: number) => {
-    const otherTotal = formData.fnskuPolybagUnits + formData.bubbleWrapUnits;
-    const maxAllowed = formData.unitsRequiringPrep - otherTotal;
-    const clamped = Math.max(0, Math.min(maxAllowed, value));
-    setFormData(prev => ({ ...prev, bundlingOrders: clamped }));
-  };
-
-  const handleBubbleChange = (value: number) => {
-    const otherTotal = formData.fnskuPolybagUnits + formData.bundlingOrders;
-    const maxAllowed = formData.unitsRequiringPrep - otherTotal;
-    const clamped = Math.max(0, Math.min(maxAllowed, value));
-    setFormData(prev => ({ ...prev, bubbleWrapUnits: clamped }));
-  };
-
+function BreakdownRow({
+  label,
+  value,
+  formula,
+}: {
+  label: string;
+  value: number;
+  formula: string;
+}) {
+  const isZero = Math.round(value) <= 0;
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h3 className="text-2xl font-bold mb-2">FBA/WFS Prep Volume</h3>
-        <p className="text-muted-foreground">Tell us about your prep service needs</p>
-      </div>
-      
-      {/* Monthly Units Requiring Prep - Full Width */}
-      <div className="space-y-3">
-        <Label className="flex justify-between items-center">
-          <span className="text-lg font-semibold">Monthly Units Requiring Prep</span>
-        </Label>
-        <div className="flex items-center gap-3">
-          <Slider
-            value={[formData.unitsRequiringPrep]}
-            onValueChange={([value]) => setFormData(prev => ({ ...prev, unitsRequiringPrep: value }))}
-            min={100}
-            max={20000}
-            step={100}
-            className="py-4 flex-1"
-          />
-          <Input
-            type="number"
-            value={formData.unitsRequiringPrep}
-            onChange={(e) => {
-              const value = Math.max(100, Math.min(20000, parseInt(e.target.value) || 100));
-              setFormData(prev => ({ ...prev, unitsRequiringPrep: value }));
-            }}
-            className="w-28 h-12 text-center font-bold text-lg"
-          />
-        </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>100</span>
-          <span>20,000+</span>
-        </div>
-      </div>
-
-      {/* Prep Services Applied to Units */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-medium">Prep Services Applied to Units</span>
-        </div>
-        <p className="text-xs text-muted-foreground bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
-          ⚠️ Total units across all services cannot exceed Monthly Units Requiring Prep. For simplicity, this calculator assumes each unit requires only one prep service.
-        </p>
-        <div className="grid md:grid-cols-3 gap-4">
-        {/* FNSKU + Polybag */}
-        <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
-          <Label className="flex items-center gap-2">
-            <Tag className="w-4 h-4 text-secondary" />
-            <span>FNSKU + Polybag</span>
-          </Label>
-          <div className="text-xs text-muted-foreground mb-2">
-            ${fbaPrepCost.polybagRate.toFixed(2)}/unit
-          </div>
-          <Slider
-            value={[formData.fnskuPolybagUnits]}
-            onValueChange={([value]) => handleFnskuChange(value)}
-            min={0}
-            max={maxFnsku}
-            step={50}
-            className="py-4"
-          />
-          <Input
-            type="number"
-            value={formData.fnskuPolybagUnits}
-            onChange={(e) => handleFnskuChange(parseInt(e.target.value) || 0)}
-            className="w-full h-10 text-center font-semibold"
-          />
-        </div>
-
-        {/* Bundling */}
-        <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
-          <Label className="flex items-center gap-2">
-            <Boxes className="w-4 h-4 text-secondary" />
-            <span>Bundling</span>
-          </Label>
-          <div className="text-xs text-muted-foreground mb-2">
-            +${fbaPrepCost.bundleRate.toFixed(2)}/unit (${(fbaPrepCost.polybagRate + fbaPrepCost.bundleRate).toFixed(2)} total)
-          </div>
-          <Slider
-            value={[formData.bundlingOrders]}
-            onValueChange={([value]) => handleBundlingChange(value)}
-            min={0}
-            max={maxBundling}
-            step={50}
-            className="py-4"
-          />
-          <Input
-            type="number"
-            value={formData.bundlingOrders}
-            onChange={(e) => handleBundlingChange(parseInt(e.target.value) || 0)}
-            className="w-full h-10 text-center font-semibold"
-          />
-        </div>
-
-        {/* Bubble Wrap */}
-        <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
-          <Label className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-secondary" />
-            <span>Bubble Wrap</span>
-          </Label>
-          <div className="text-xs text-muted-foreground mb-2">
-            +${fbaPrepCost.bubbleRate.toFixed(2)}/unit (${(fbaPrepCost.polybagRate + fbaPrepCost.bubbleRate).toFixed(2)} total)
-          </div>
-          <Slider
-            value={[formData.bubbleWrapUnits]}
-            onValueChange={([value]) => handleBubbleChange(value)}
-            min={0}
-            max={maxBubble}
-            step={50}
-            className="py-4"
-          />
-          <Input
-            type="number"
-            value={formData.bubbleWrapUnits}
-            onChange={(e) => handleBubbleChange(parseInt(e.target.value) || 0)}
-            className="w-full h-10 text-center font-semibold"
-          />
-        </div>
-        </div>
-      </div>
-
-      {/* Cost Preview with Breakdown */}
-      <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium">Estimated Monthly Prep Cost</span>
-          <span className="text-xl font-bold text-secondary">
-            ${fbaPrepCost.totalPrepCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
-        </div>
-        <div className="grid grid-cols-3 gap-2 text-xs">
-          <div className="bg-background/50 rounded-lg p-2 text-center">
-            <div className="text-muted-foreground">FNSKU + Polybag</div>
-            <div className="font-semibold">${fbaPrepCost.fnskuCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-          </div>
-          <div className="bg-background/50 rounded-lg p-2 text-center">
-            <div className="text-muted-foreground">Bundling</div>
-            <div className="font-semibold">${fbaPrepCost.bundlingCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-          </div>
-          <div className="bg-background/50 rounded-lg p-2 text-center">
-            <div className="text-muted-foreground">Bubble Wrap</div>
-            <div className="font-semibold">${fbaPrepCost.bubbleCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Multi-Channel Volume & Products Step - NO OVERLAP MODEL
-// Sum of all prep services cannot exceed unitsRequiringPrep
-const StepVolumeProductsMultiChannel = ({ formData, setFormData, roi, fbaPrepCost }: {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  roi: ROIResult;
-  fbaPrepCost: FBAPrepCostResult;
-}) => {
-  const [isHighVolumeMode, setIsHighVolumeMode] = useState(formData.monthlyOrders >= 10000);
-  
-  // Calculate remaining units dynamically (shared pool)
-  const totalAllocated = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
-  const remainingUnits = Math.max(0, formData.unitsRequiringPrep - totalAllocated);
-
-  // Dynamic max for each slider = current value + remaining
-  const maxFnsku = formData.fnskuPolybagUnits + remainingUnits;
-  const maxBundling = formData.bundlingOrders + remainingUnits;
-  const maxBubble = formData.bubbleWrapUnits + remainingUnits;
-
-  // Clamp prep services if unitsRequiringPrep is reduced below total allocation
-  useEffect(() => {
-    const total = formData.fnskuPolybagUnits + formData.bundlingOrders + formData.bubbleWrapUnits;
-    if (total > formData.unitsRequiringPrep) {
-      let remaining = formData.unitsRequiringPrep;
-      
-      // Priority order: FNSKU > Bundling > Bubble (reduce from bottom up)
-      const newFnsku = Math.min(formData.fnskuPolybagUnits, remaining);
-      remaining -= newFnsku;
-      
-      const newBundling = Math.min(formData.bundlingOrders, remaining);
-      remaining -= newBundling;
-      
-      const newBubble = Math.min(formData.bubbleWrapUnits, remaining);
-      
-      setFormData(prev => ({
-        ...prev,
-        fnskuPolybagUnits: newFnsku,
-        bundlingOrders: newBundling,
-        bubbleWrapUnits: newBubble
-      }));
-    }
-  }, [formData.unitsRequiringPrep, formData.fnskuPolybagUnits, formData.bundlingOrders, formData.bubbleWrapUnits, setFormData]);
-  
-  const handleOrdersChange = (value: number) => {
-    if (!isHighVolumeMode && value >= 10000) {
-      setIsHighVolumeMode(true);
-    } else if (isHighVolumeMode && value <= 10000) {
-      setIsHighVolumeMode(false);
-    }
-    setFormData(prev => ({ ...prev, monthlyOrders: value }));
-  };
-
-  const handleFnskuChange = (value: number) => {
-    const otherTotal = formData.bundlingOrders + formData.bubbleWrapUnits;
-    const maxAllowed = formData.unitsRequiringPrep - otherTotal;
-    const clamped = Math.max(0, Math.min(maxAllowed, value));
-    setFormData(prev => ({ ...prev, fnskuPolybagUnits: clamped }));
-  };
-
-  const handleBundlingChange = (value: number) => {
-    const otherTotal = formData.fnskuPolybagUnits + formData.bubbleWrapUnits;
-    const maxAllowed = formData.unitsRequiringPrep - otherTotal;
-    const clamped = Math.max(0, Math.min(maxAllowed, value));
-    setFormData(prev => ({ ...prev, bundlingOrders: clamped }));
-  };
-
-  const handleBubbleChange = (value: number) => {
-    const otherTotal = formData.fnskuPolybagUnits + formData.bundlingOrders;
-    const maxAllowed = formData.unitsRequiringPrep - otherTotal;
-    const clamped = Math.max(0, Math.min(maxAllowed, value));
-    setFormData(prev => ({ ...prev, bubbleWrapUnits: clamped }));
-  };
-
-  return (
-    <div className="space-y-8">
-      <div className="text-center mb-6">
-        <h3 className="text-2xl font-bold mb-2">Multi-Channel Volume</h3>
-        <p className="text-muted-foreground">Fill out at least one section below</p>
-      </div>
-
-      {/* SECTION 1: Standard Order Fulfillment */}
-      <div className="border border-border rounded-2xl p-5 space-y-4">
-        <div className="flex items-center gap-2 mb-2">
-          <ShoppingCart className="w-5 h-5 text-secondary" />
-          <h4 className="font-semibold text-lg">Standard Order Fulfillment</h4>
-          <span className="text-xs text-muted-foreground">(DTC, Shopify, B2B)</span>
-        </div>
-        
-        {/* Monthly Orders */}
-        <div className="space-y-3">
-          <Label className="flex justify-between items-center">
-            <span>Monthly Orders</span>
-            {isHighVolumeMode && (
-              <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
-                High-volume
-              </span>
-            )}
-          </Label>
-          <div className="flex items-center gap-3">
-            <Slider
-              value={[formData.monthlyOrders]}
-              onValueChange={([value]) => handleOrdersChange(value)}
-              min={isHighVolumeMode ? 10000 : 10}
-              max={isHighVolumeMode ? 100000 : 10000}
-              step={isHighVolumeMode ? 1000 : 50}
-              className="py-4 flex-1"
-            />
-            <Input
-              type="number"
-              value={formData.monthlyOrders}
-              onChange={(e) => {
-                const value = Math.max(10, Math.min(100000, parseInt(e.target.value) || 10));
-                handleOrdersChange(value);
-              }}
-              className="w-24 h-10 text-center font-semibold"
-            />
-          </div>
-        </div>
-
-        {/* Units per Order + SKU Count */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Avg Units per Order</Label>
-            <div className="flex items-center gap-2">
-              <Slider
-                value={[formData.avgUnitsPerOrder]}
-                onValueChange={([value]) => setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }))}
-                min={1}
-                max={20}
-                step={0.5}
-                className="py-4 flex-1"
-              />
-              <Input
-                type="number"
-                value={formData.avgUnitsPerOrder}
-                onChange={(e) => {
-                  const value = Math.max(1, Math.min(20, parseFloat(e.target.value) || 1));
-                  setFormData(prev => ({ ...prev, avgUnitsPerOrder: value }));
-                }}
-                step="0.5"
-                className="w-20 h-9 text-center font-semibold"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>SKU Count</Label>
-            <div className="flex items-center gap-2">
-              <Slider
-                value={[formData.skuCount]}
-                onValueChange={([value]) => setFormData(prev => ({ ...prev, skuCount: value }))}
-                min={1}
-                max={250}
-                step={5}
-                className="py-4 flex-1"
-              />
-              <Input
-                type="number"
-                value={formData.skuCount}
-                onChange={(e) => {
-                  const value = Math.max(1, Math.min(250, parseInt(e.target.value) || 1));
-                  setFormData(prev => ({ ...prev, skuCount: value }));
-                }}
-                className="w-20 h-9 text-center font-semibold"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Volume Preview for Standard */}
-        <div className="bg-muted/30 rounded-lg p-3 flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Standard Volume</span>
-          <span className="font-bold text-secondary">{roi.monthlyUnits.toLocaleString()} units/mo</span>
-        </div>
-      </div>
-
-      {/* SECTION 2: FBA/WFS Prep Services */}
-      <div className="border border-border rounded-2xl p-5 space-y-4">
-        <div className="flex items-center gap-2 mb-2">
-          <Package className="w-5 h-5 text-secondary" />
-          <h4 className="font-semibold text-lg">FBA/WFS Prep Services</h4>
-          <span className="text-xs text-muted-foreground">(Amazon, Walmart)</span>
-        </div>
-
-        {/* Units Requiring Prep */}
-        <div className="space-y-3">
-          <Label className="flex justify-between items-center">
-            <span>Monthly Units Requiring Prep</span>
-          </Label>
-          <div className="flex items-center gap-3">
-            <Slider
-              value={[formData.unitsRequiringPrep]}
-              onValueChange={([value]) => setFormData(prev => ({ ...prev, unitsRequiringPrep: value }))}
-              min={100}
-              max={20000}
-              step={100}
-              className="py-4 flex-1"
-            />
-            <Input
-              type="number"
-              value={formData.unitsRequiringPrep}
-              onChange={(e) => {
-                const value = Math.max(100, Math.min(20000, parseInt(e.target.value) || 100));
-                setFormData(prev => ({ ...prev, unitsRequiringPrep: value }));
-              }}
-              className="w-24 h-10 text-center font-semibold"
-            />
-          </div>
-        </div>
-
-        {/* Prep Services Applied to Units */}
-        <div className="flex items-center gap-2 mb-1">
-          <Layers className="w-3 h-3 text-muted-foreground" />
-          <span className="text-xs font-medium">Prep Services Applied to Units</span>
-        </div>
-        <p className="text-xs text-muted-foreground bg-amber-500/10 border border-amber-500/20 rounded-lg p-2 mb-3">
-          ⚠️ Total units across all services cannot exceed Monthly Units Requiring Prep.
-        </p>
-        <div className="grid md:grid-cols-3 gap-4">
-          <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
-            <Label className="flex items-center gap-2">
-              <Tag className="w-4 h-4 text-secondary" />
-              <span>FNSKU + Polybag</span>
-            </Label>
-            <div className="text-xs text-muted-foreground mb-2">
-              ${fbaPrepCost.polybagRate.toFixed(2)}/unit
-            </div>
-            <Slider
-              value={[formData.fnskuPolybagUnits]}
-              onValueChange={([value]) => handleFnskuChange(value)}
-              min={0}
-              max={maxFnsku}
-              step={50}
-              className="py-4"
-            />
-            <Input
-              type="number"
-              value={formData.fnskuPolybagUnits}
-              onChange={(e) => handleFnskuChange(parseInt(e.target.value) || 0)}
-              className="w-full h-10 text-center font-semibold"
-            />
-          </div>
-
-          <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
-            <Label className="flex items-center gap-2">
-              <Boxes className="w-4 h-4 text-secondary" />
-              <span>Bundling</span>
-            </Label>
-            <div className="text-xs text-muted-foreground mb-2">
-              +${fbaPrepCost.bundleRate.toFixed(2)}/unit
-            </div>
-            <Slider
-              value={[formData.bundlingOrders]}
-              onValueChange={([value]) => handleBundlingChange(value)}
-              min={0}
-              max={maxBundling}
-              step={50}
-              className="py-4"
-            />
-            <Input
-              type="number"
-              value={formData.bundlingOrders}
-              onChange={(e) => handleBundlingChange(parseInt(e.target.value) || 0)}
-              className="w-full h-10 text-center font-semibold"
-            />
-          </div>
-
-          <div className="space-y-3 p-4 bg-muted/30 rounded-xl">
-            <Label className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-secondary" />
-              <span>Bubble Wrap</span>
-            </Label>
-            <div className="text-xs text-muted-foreground mb-2">
-              +${fbaPrepCost.bubbleRate.toFixed(2)}/unit
-            </div>
-            <Slider
-              value={[formData.bubbleWrapUnits]}
-              onValueChange={([value]) => handleBubbleChange(value)}
-              min={0}
-              max={maxBubble}
-              step={50}
-              className="py-4"
-            />
-            <Input
-              type="number"
-              value={formData.bubbleWrapUnits}
-              onChange={(e) => handleBubbleChange(parseInt(e.target.value) || 0)}
-              className="w-full h-10 text-center font-semibold"
-            />
-          </div>
-        </div>
-
-        {/* FBA Cost Preview with Breakdown */}
-        {(formData.fnskuPolybagUnits > 0 || formData.bundlingOrders > 0 || formData.bubbleWrapUnits > 0) && (
-          <div className="bg-secondary/10 border border-secondary/20 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">FBA Prep Cost</span>
-              <span className="font-bold text-secondary">
-                ${fbaPrepCost.totalPrepCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-1 text-xs text-muted-foreground">
-              <div>FNSKU: ${fbaPrepCost.fnskuCost.toFixed(2)}</div>
-              <div>Bundling: ${fbaPrepCost.bundlingCost.toFixed(2)}</div>
-              <div>Bubble: ${fbaPrepCost.bubbleCost.toFixed(2)}</div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-
-const StepPainPoints = ({ formData, setFormData, handleToggle }: {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  handleToggle: (field: "painPoints" | "services" | "specialRequirements", id: string) => void;
-}) => (
-  <div className="space-y-6">
-    <div className="text-center mb-6">
-      <h3 className="text-2xl font-bold mb-2">Current Challenges & Costs</h3>
-      <p className="text-muted-foreground">Help us calculate your potential savings</p>
-    </div>
-    
-    <div className="grid md:grid-cols-2 gap-6">
-      <div className="space-y-3">
-        <Label className="flex justify-between">
-          <span>Current Error Rate</span>
-          <span className="text-secondary font-semibold">{formData.currentErrorRate}%</span>
-        </Label>
-        <Slider
-          value={[formData.currentErrorRate]}
-          onValueChange={([value]) => setFormData(prev => ({ ...prev, currentErrorRate: value }))}
-          min={0}
-          max={15}
-          step={0.5}
-          className="py-4"
-        />
-      </div>
-
-      <div className="space-y-3">
-        <Label className="flex justify-between">
-          <span>Return Rate</span>
-          <span className="text-secondary font-semibold">{formData.returnRate}%</span>
-        </Label>
-        <Slider
-          value={[formData.returnRate]}
-          onValueChange={([value]) => setFormData(prev => ({ ...prev, returnRate: value }))}
-          min={0}
-          max={25}
-          step={0.5}
-          className="py-4"
-        />
-      </div>
-
-      <div className="space-y-3">
-        <Label className="flex justify-between">
-          <span>Hours Spent on Fulfillment (Weekly)</span>
-          <span className={`font-semibold ${formData.currentFulfillment === "other-3pl" ? "text-muted-foreground" : "text-secondary"}`}>
-            {formData.hoursSpentWeekly}h
-          </span>
-        </Label>
-        <Slider
-          value={[formData.hoursSpentWeekly]}
-          onValueChange={([value]) => setFormData(prev => ({ ...prev, hoursSpentWeekly: value }))}
-          min={0}
-          max={60}
-          step={1}
-          className={`py-4 ${formData.currentFulfillment === "other-3pl" ? "opacity-50 cursor-not-allowed" : ""}`}
-          disabled={formData.currentFulfillment === "other-3pl"}
-        />
-        {formData.currentFulfillment === "other-3pl" && (
-          <p className="text-xs text-muted-foreground italic">
-            Time is near-zero when outsourcing to a 3PL
-          </p>
-        )}
-      </div>
-
-      <div className="space-y-3">
-        <Label htmlFor="costPerOrder" className="flex items-center gap-1">
-          {formData.useCase === "amazon" ? "Average Cost per Unit" : "Average Cost per Order"} <span className="text-destructive">*</span>
-        </Label>
-        <Input
-          id="costPerOrder"
-          type="number"
-          min="0"
-          step="0.01"
-          inputMode="decimal"
-          placeholder={formData.useCase === "amazon" ? "1.50" : "4.50"}
-          value={formData.currentCostPerOrder}
-          onChange={(e) => setFormData(prev => ({ ...prev, currentCostPerOrder: e.target.value }))}
-          onKeyDown={(e) => {
-            if (['e', 'E', '+', '-'].includes(e.key)) {
-              e.preventDefault();
-            }
-          }}
-          className="h-12"
-          required
-        />
-        <p className="text-xs text-muted-foreground">
-          {formData.useCase === "amazon" 
-            ? "Include your current prep cost per unit to calculate potential savings"
-            : "Include pick, pack, and shipping costs to calculate potential savings"
-          }
-        </p>
-      </div>
-    </div>
-
-    <div className="space-y-3">
-      <Label className="text-base font-semibold">Biggest Pain Points (select all that apply)</Label>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {painPointOptions.map((option) => {
-          const Icon = option.icon;
-          const isSelected = formData.painPoints.includes(option.id);
-          
-          return (
-            <motion.div
-              key={option.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleToggle("painPoints", option.id)}
-              className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-2 ${
-                isSelected 
-                  ? "border-secondary bg-secondary/5" 
-                  : "border-border hover:border-secondary/50"
-              }`}
-            >
-              <Checkbox checked={isSelected} className="pointer-events-none" />
-              <Icon className={`w-4 h-4 ${isSelected ? "text-secondary" : "text-muted-foreground"}`} />
-              <span className="text-sm font-medium">{option.label}</span>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  </div>
-);
-
-const StepServices = ({ formData, setFormData, handleToggle }: {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  handleToggle: (field: "painPoints" | "services" | "specialRequirements", id: string) => void;
-}) => (
-  <div className="space-y-6">
-    <div className="text-center mb-6">
-      <h3 className="text-2xl font-bold mb-2">Services You Need</h3>
-      <p className="text-muted-foreground">Select all that apply to your business</p>
-    </div>
-    
-    <div className="grid sm:grid-cols-2 gap-3">
-      {serviceOptions.map((service) => {
-        const Icon = service.icon;
-        const isSelected = formData.services.includes(service.id);
-        
-        return (
-          <motion.div
-            key={service.id}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => handleToggle("services", service.id)}
-            className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-              isSelected 
-                ? "border-secondary bg-secondary/5" 
-                : "border-border hover:border-secondary/50"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <Checkbox checked={isSelected} className="pointer-events-none" />
-              <Icon className={`w-5 h-5 ${isSelected ? "text-secondary" : "text-muted-foreground"}`} />
-              <span className={`font-medium ${isSelected ? "text-secondary" : ""}`}>{service.label}</span>
-            </div>
-          </motion.div>
-        );
-      })}
-    </div>
-
-    {formData.useCase === "multi-channel" && (
-      <div className="space-y-3 mt-6">
-        <Label className="flex justify-between">
-          <span>FBA vs DTC Split</span>
-          <span className="text-secondary font-semibold">{formData.fbaDtcSplit}% FBA / {100 - formData.fbaDtcSplit}% DTC</span>
-        </Label>
-        <Slider
-          value={[formData.fbaDtcSplit]}
-          onValueChange={([value]) => setFormData(prev => ({ ...prev, fbaDtcSplit: value }))}
-          min={0}
-          max={100}
-          step={5}
-          className="py-4"
-        />
-      </div>
-    )}
-
-    <div className="space-y-3">
-      <Label className="text-base font-semibold">Special Requirements</Label>
-      <div className="flex flex-wrap gap-2">
-        {specialRequirementOptions.map((option) => {
-          const isSelected = formData.specialRequirements.includes(option.id);
-          
-          return (
-            <Button
-              key={option.id}
+    <div className="flex items-center justify-between py-2.5">
+      <div className="flex items-center gap-1.5 min-w-0">
+        <span className={`text-sm ${isZero ? "text-muted-foreground" : "text-foreground"}`}>
+          <TranslatedText>{label}</TranslatedText>
+        </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
               type="button"
-              variant={isSelected ? "default" : "outline"}
-              onClick={() => handleToggle("specialRequirements", option.id)}
-              className={`h-auto py-2 px-3 text-sm ${
-                isSelected ? "bg-secondary text-secondary-foreground" : ""
-              }`}
+              aria-label="Formula"
+              className="text-muted-foreground/60 hover:text-muted-foreground"
             >
-              {option.label}
-            </Button>
-          );
-        })}
+              <Info className="w-3.5 h-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="left" className="max-w-[260px] text-xs">
+            {formula}
+          </TooltipContent>
+        </Tooltip>
       </div>
-    </div>
-  </div>
-);
-
-const StepLeadCapture = ({ formData, setFormData }: {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-}) => (
-  <div className="space-y-6">
-    <div className="text-center mb-6">
-      <h3 className="text-2xl font-bold mb-2">Get Your Personalized Quote</h3>
-      <p className="text-muted-foreground">We'll send your detailed savings report</p>
-    </div>
-    
-    <div className="grid md:grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <Label htmlFor="fullName">Full Name *</Label>
-        <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            id="fullName"
-            placeholder="John Smith"
-            value={formData.fullName}
-            onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-            className="h-12 pl-10"
-            required
-          />
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="email">Email Address *</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            id="email"
-            type="email"
-            placeholder="john@company.com"
-            value={formData.email}
-            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-            className="h-12 pl-10"
-            required
-          />
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number</Label>
-        <div className="relative">
-          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            id="phone"
-            type="tel"
-            placeholder="(555) 123-4567"
-            value={formData.phone}
-            onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-            className="h-12 pl-10"
-          />
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="companyName">Company Name</Label>
-        <div className="relative">
-          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            id="companyName"
-            placeholder="Your Company"
-            value={formData.companyName}
-            onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
-            className="h-12 pl-10"
-          />
-        </div>
-      </div>
-    </div>
-
-    <p className="text-xs text-muted-foreground text-center mt-4">
-      By submitting, you agree to receive communications from Westfield Prep Center. 
-      We respect your privacy and will never share your information.
-    </p>
-  </div>
-);
-
-// Live Results Sidebar Component
-const LiveResultsSidebar = ({ roi, formData, showResults }: {
-  roi: ROIResult;
-  formData: FormData;
-  showResults: boolean;
-}) => {
-  const isNegativeROI = roi.roi < 0;
-  const isFBAUseCase = formData.useCase === "amazon";
-  
-  return (
-    <div className="backdrop-blur-xl bg-background/90 border border-border/50 rounded-3xl p-6 shadow-xl">
-      <div className="flex items-center gap-2 mb-6">
-        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-        <span className="text-sm font-medium text-muted-foreground">Live Estimate</span>
-      </div>
-
-      <div className="space-y-4">
-        <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-xl p-4">
-          <p className="text-xs text-muted-foreground mb-1">Est. Monthly Savings</p>
-          <motion.p 
-            key={roi.totalSavings}
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            className="text-3xl font-bold text-green-500"
-          >
-            ${roi.totalSavings.toLocaleString()}
-          </motion.p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-muted/50 rounded-xl p-3">
-            <p className="text-xs text-muted-foreground mb-1">Time Saved</p>
-            <p className="text-lg font-bold">{roi.timeSavedHours}h/mo</p>
-          </div>
-          
-          <div className="bg-muted/50 rounded-xl p-3">
-            <p className="text-xs text-muted-foreground mb-1">Error Savings</p>
-            <p className="text-lg font-bold">${roi.currentErrorCost.toLocaleString()}</p>
-          </div>
-          
-          <div className="bg-muted/50 rounded-xl p-3">
-            <p className="text-xs text-muted-foreground mb-1">ROI</p>
-            <p className={`text-lg font-bold ${isNegativeROI ? "text-destructive" : "text-secondary"}`}>
-              {roi.roi}%
-            </p>
-          </div>
-          
-          <div className="bg-muted/50 rounded-xl p-3">
-            <p className="text-xs text-muted-foreground mb-1">
-              {isFBAUseCase ? "Est. Monthly Prep Cost" : "Est. Monthly Fulfillment Cost"}
-            </p>
-            <p className="text-lg font-bold">
-              ${(isFBAUseCase 
-                ? (roi.fbaPrepCost || 0) 
-                : roi.estimatedMonthlyCost
-              ).toLocaleString()}
-            </p>
-          </div>
-        </div>
-
-        <div className="border-t border-border pt-4 mt-4">
-          <p className="text-xs text-muted-foreground mb-1">Annual Savings Potential</p>
-          <p className="text-2xl font-bold text-secondary">${roi.annualSavings.toLocaleString()}</p>
-        </div>
-      </div>
-
-      {!showResults && (
-        <Button 
-          className="w-full mt-6 gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-          onClick={() => {
-            const element = document.getElementById("savings-calculator");
-            element?.scrollIntoView({ behavior: "smooth" });
-          }}
-        >
-          Get Full Quote
-          <ArrowRight className="w-4 h-4" />
-        </Button>
-      )}
+      <span
+        className={`text-sm font-mono font-semibold ${
+          isZero ? "text-muted-foreground" : "text-foreground"
+        }`}
+      >
+        {usd(value)}
+      </span>
     </div>
   );
-};
-
-// Results View Component
-const ResultsView = ({ roi, formData }: {
-  roi: ROIResult;
-  formData: FormData;
-}) => {
-  const isFBAUseCase = formData.useCase === "amazon" || formData.useCase === "multi-channel";
-  const roiIsPositive = roi.roi >= 0;
-  
-  const highlights = [
-    {
-      icon: Zap,
-      title: "Avg. 48-Hour Turnaround",
-      description: "Fast processing for your orders",
-      color: "text-[#F97316]"
-    },
-    {
-      icon: ShieldCheck,
-      title: "Amazon/Walmart FBA Compliance",
-      description: "Prep to marketplace standards",
-      color: "text-green-500"
-    },
-    {
-      icon: BarChart3,
-      title: "Real-Time Inventory Tracking",
-      description: "Full visibility into your stock",
-      color: "text-[#0A66C2]"
-    },
-    {
-      icon: Users,
-      title: "Hands-On Support Team",
-      description: "Dedicated fulfillment specialists",
-      color: "text-purple-500"
-    }
-  ];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="space-y-10"
-    >
-      {/* Hero Confirmation Section */}
-      <div className="text-center">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-          className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl"
-        >
-          <CheckCircle2 className="w-12 h-12 text-white" />
-        </motion.div>
-        <motion.h3 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-3xl md:text-4xl font-bold mb-3"
-        >
-          Your Savings Report is Ready
-        </motion.h3>
-        <motion.p 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="text-muted-foreground text-lg"
-        >
-          Based on {(isFBAUseCase ? formData.unitsRequiringPrep : roi.monthlyUnits).toLocaleString()} units/month, here's what we've calculated
-        </motion.p>
-        
-        {/* Animated Savings Counter */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4, type: "spring" }}
-          className="mt-8"
-        >
-          <p className="text-sm text-muted-foreground uppercase tracking-wider mb-2">Estimated Monthly Savings</p>
-          <p className="text-5xl md:text-6xl font-extrabold text-green-500">
-            ${roi.totalSavings.toLocaleString()}
-          </p>
-          <div className={`inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full text-lg font-bold ${roiIsPositive ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'}`}>
-            <TrendingUp className="w-5 h-5" />
-            {roiIsPositive ? '+' : ''}{roi.roi}% ROI
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid md:grid-cols-3 gap-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
-          className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-2xl p-6 text-center shadow-lg"
-        >
-          <DollarSign className="w-8 h-8 text-green-500 mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground mb-1">Monthly Savings</p>
-          <p className="text-3xl font-bold text-green-500">${roi.totalSavings.toLocaleString()}</p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="bg-gradient-to-br from-[#F97316]/10 to-[#F97316]/5 border border-[#F97316]/20 rounded-2xl p-6 text-center shadow-lg"
-        >
-          <TrendingUp className="w-8 h-8 text-[#F97316] mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground mb-1">Annual Savings</p>
-          <p className="text-3xl font-bold text-[#F97316]">${roi.annualSavings.toLocaleString()}</p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55 }}
-          className="bg-gradient-to-br from-[#0A66C2]/10 to-[#0A66C2]/5 border border-[#0A66C2]/20 rounded-2xl p-6 text-center shadow-lg"
-        >
-          <Clock className="w-8 h-8 text-[#0A66C2] mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground mb-1">Hours Saved/Month</p>
-          <p className="text-3xl font-bold text-[#0A66C2]">{roi.timeSavedHours}</p>
-        </motion.div>
-      </div>
-
-      {/* Highlights Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-4"
-      >
-        {highlights.map((item, index) => (
-          <motion.div
-            key={item.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65 + index * 0.05 }}
-            className="bg-white dark:bg-muted/10 rounded-2xl p-5 text-center shadow-md border border-border/50 hover:shadow-lg transition-shadow"
-          >
-            <item.icon className={`w-8 h-8 ${item.color} mx-auto mb-3`} />
-            <p className="font-semibold text-sm leading-tight">{item.title}</p>
-            <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* Trusted By Brands Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.75 }}
-        className="text-center py-8"
-      >
-        <h4 className="text-lg font-semibold text-muted-foreground mb-6">Trusted by Growing Brands</h4>
-        <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div 
-              key={i} 
-              className="w-20 h-10 md:w-24 md:h-12 bg-muted/30 rounded-lg opacity-60 hover:opacity-80 transition-opacity"
-            />
-          ))}
-        </div>
-      </motion.div>
-
-      {/* What's Next Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        className="bg-muted/30 rounded-2xl p-6 shadow-md border border-border/50"
-      >
-        <h4 className="font-semibold text-lg mb-4">What's Next?</h4>
-        <ul className="space-y-3 text-sm">
-          <li className="flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-            <span>A fulfillment specialist will contact you within 24 hours</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-            <span>We'll review your requirements and provide a detailed quote</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-            <span>No obligation – just honest pricing for your business</span>
-          </li>
-        </ul>
-      </motion.div>
-
-      {/* Sticky CTA Panel */}
-      <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.85 }}
-        className="bg-gradient-to-br from-[#0A66C2] to-[#0A66C2]/90 rounded-3xl p-8 text-white text-center shadow-2xl"
-      >
-        <Calendar className="w-10 h-10 mx-auto mb-4 text-white/80" />
-        <h4 className="text-2xl md:text-3xl font-bold mb-3">Want to Talk Numbers?</h4>
-        <p className="text-white/80 mb-6 max-w-md mx-auto text-base">
-          You're likely eligible for even greater per-unit savings. Reach out for a custom quote.
-        </p>
-        <Button 
-          size="lg" 
-          className="bg-[#F97316] hover:bg-[#EA580C] text-white font-bold px-8 py-6 text-lg rounded-xl shadow-lg transition-all hover:scale-105 gap-2"
-          asChild
-        >
-          <a 
-            href="https://calendly.com/westfieldprepcenter/30min"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Schedule a Call
-            <ArrowRight className="w-5 h-5" />
-          </a>
-        </Button>
-      </motion.div>
-    </motion.div>
-  );
-};
+}
 
 export default EnhancedROICalculator;
