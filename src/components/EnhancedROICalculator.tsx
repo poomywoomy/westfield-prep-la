@@ -41,11 +41,9 @@ interface CalcInputs {
   // 3PL pricing (only used for other-3pl / hybrid)
   currentPickPackPerOrder: number;
   currentPerUnitRate: number;
-  currentStoragePerSkuMonthly: number;
   currentMonthlyMinimum: number;
   // Amazon FBA prep 3PL pricing
   currentFbaPrepPerUnit: number;
-  currentFbaStoragePerUnitMonthly: number;
   hoursPerWeek: number;
   hourlyValue: number;
   errorRatePct: number;
@@ -56,10 +54,8 @@ interface CalcInputs {
 const industry3PLDefaults = {
   currentPickPackPerOrder: 3.5,
   currentPerUnitRate: 0.75,
-  currentStoragePerSkuMonthly: 2.0,
   currentMonthlyMinimum: 250,
-  currentFbaPrepPerUnit: 0.85,
-  currentFbaStoragePerUnitMonthly: 0.15,
+  currentFbaPrepPerUnit: 1.4,
 };
 
 const defaultInputs: CalcInputs = {
