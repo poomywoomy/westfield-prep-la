@@ -1,56 +1,37 @@
-## Goal
-Differentiate the "current 3PL pricing" inputs based on selected channel (FBA prep 3PLs price per unit, not per order) and add a callout telling visitors to reach out for deeper volume or simplicity discounts.
+## Changes to `src/components/EnhancedROICalculator.tsx`
 
-## 1. Channel-specific 3PL pricing inputs
+### 1. Pricing updates
+- `currentFbaPrepPerUnit` default: `0.85` → **`1.40`**
+- Industry autofill default for FBA prep: also **`1.40`**
+- **Remove storage entirely** from the 3PL pricing model:
+  - Remove `currentStoragePerSkuMonthly` (DTC per-SKU storage) field, input, autofill, and math
+  - Remove `currentFbaStoragePerUnitMonthly` field, input, autofill, and math
+  - Remove `skuCount` from cost math (it was only used for storage)
+  - Update formula breakdown tooltip to drop storage lines
+  - Remove storage fields from the `send-roi-report` payload
 
-Extend `CalcInputs` in `src/components/EnhancedROICalculator.tsx`:
-- `currentFbaPrepPerUnit: number` — typical FBA prep fee per unit (default `0.85`)
-- `currentFbaStoragePerUnitMonthly: number` — per-unit storage at current FBA prep 3PL (default `0.15`)
-
-Keep the existing DTC-oriented fields (`currentPickPackPerOrder`, `currentPerUnitRate`, `currentStoragePerSkuMonthly`, `currentMonthlyMinimum`) — those represent the Shopify/DTC 3PL side.
-
-Update `industry3PLDefaults` and `defaultInputs` to include the two new fields.
-
-### Render rules (inside the existing 3PL pricing panel, only shown when `fulfillment !== "self"`):
-- `channel === "shopify"` → show DTC fields only (current behavior).
-- `channel === "amazon"` → hide pick/pack-per-order and per-SKU storage; show:
-  - Current FBA prep fee per unit
-  - Current FBA storage per unit / month
-  - Monthly minimum (kept, since FBA prep 3PLs also have minimums)
-- `channel === "both"` → show both groups under subheadings "Shopify / DTC 3PL" and "Amazon FBA prep 3PL".
-
-The "Autofill industry averages" button populates whichever fields are visible.
-
-## 2. Math update in `useRoiMath`
-
-Replace the single `rawCurrent3PL` formula with a sum of the two channel-specific costs:
-
-```text
-dtc3PLCost = dtcOrders × currentPickPackPerOrder
-           + dtcUnits   × currentPerUnitRate
-           + skuCount   × currentStoragePerSkuMonthly        // only if includeDtc
-
-fba3PLCost = fbaUnits × currentFbaPrepPerUnit
-           + fbaUnits × currentFbaStoragePerUnitMonthly       // only if includeFba
-
+Resulting math:
+```
+dtc3PLCost = dtcOrders × pickPackPerOrder + dtcUnits × perUnitRate
+fba3PLCost = fbaUnits × fbaPrepPerUnit
 rawCurrent3PL = (includeDtc ? dtc3PLCost : 0) + (includeFba ? fba3PLCost : 0)
-current3PLMonthly = fulfillment === "self" ? 0 : max(rawCurrent3PL, currentMonthlyMinimum)
 ```
 
-The existing "3PL fee delta vs Westfield" and 2× sanity cap logic stays unchanged.
+### 2. Visual interactivity pass (UI only, no logic changes)
+Goal: make the calculator feel premium, animated, and engaging instead of a flat form.
 
-The breakdown formula string in the results card is updated to reflect whichever channel(s) are active, so it stays auditable.
+- **Animated step indicator**: gradient progress bar with shimmer; step pills scale + glow when active using `framer-motion`.
+- **Card polish**: glassmorphism (`backdrop-blur`, gradient border, soft shadow), Midnight Navy → Orange accent gradients on key surfaces, subtle floating orbs in the background.
+- **Channel selector**: large icon tiles (Shopify / Amazon / Both) with hover lift, selected state pulses in brand orange, animated check.
+- **Inputs**: focus-ring in orange, `motion` fade/slide as fields appear when channel changes, animated number counters where values display.
+- **Live results card**: 
+  - Big animated count-up for monthly + annual savings (CountUp-style with `motion`).
+  - Animated horizontal "savings vs current" comparison bar.
+  - ROI %, payback period, and "you save" chips with stagger animation on mount.
+- **Volume/simplicity discount callout**: keep copy, restyle as a glowing orange-bordered banner with an arrow icon that nudges on hover.
+- **Micro-interactions**: button hover scale, tooltip fades, section reveal on scroll via `whileInView`.
+- All styling via existing semantic tokens (Midnight Navy `#0A0A23`, Orange `#FF7A00`) — no hardcoded colors, no header/footer/logo changes.
 
-## 3. Volume / simplicity discount callout
-
-Add a small note directly under the results card (or under the "Email me this report" CTA) with the brand orange accent:
-
-> "Doing higher volume or just one simple SKU? Reach out — we offer deeper volume discounts and simplicity pricing that isn't reflected here."
-
-Wrap the link to `/contact` in a subtle inline anchor. Use `<TranslatedText>` for the copy.
-
-## 4. Payload
-Add `currentFbaPrepPerUnit` and `currentFbaStoragePerUnitMonthly` to the `send-roi-report` body alongside the existing pricing fields. Edge function tolerates extra fields, no function change needed.
-
-## Files touched
-- `src/components/EnhancedROICalculator.tsx` (only)
+### Out of scope
+- No backend, schema, or edge function changes beyond removing storage fields from the email payload.
+- No changes to other pages/components.
