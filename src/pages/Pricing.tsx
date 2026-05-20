@@ -954,37 +954,6 @@ const Pricing = () => {
             </div>
           </section>
 
-          {/* Trusted By Brands Section */}
-          <section className="py-12 md:py-16 bg-background">
-            <div className="container mx-auto px-4 text-center">
-              <motion.h2 
-                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-base md:text-lg font-semibold text-muted-foreground mb-8"
-              >
-                <TranslatedText>Trusted by Growing Brands</TranslatedText>
-              </motion.h2>
-              <motion.div 
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: prefersReducedMotion ? 0 : 0.2 }}
-                className="flex flex-wrap justify-center gap-6 md:gap-8"
-              >
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <motion.div 
-                    key={i}
-                    whileHover={prefersReducedMotion ? {} : { scale: 1.1, opacity: 1 }}
-                    className="w-20 md:w-24 h-10 md:h-12 bg-muted/60 rounded-lg opacity-50 hover:opacity-80 transition-all flex items-center justify-center cursor-pointer"
-                  >
-                    <span className="text-xs text-muted-foreground"><TranslatedText>Logo</TranslatedText> {i}</span>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </div>
-          </section>
-
           {/* Section Divider */}
           <SectionDivider icon={Star} />
 
