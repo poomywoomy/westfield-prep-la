@@ -43,6 +43,9 @@ interface CalcInputs {
   currentPerUnitRate: number;
   currentStoragePerSkuMonthly: number;
   currentMonthlyMinimum: number;
+  // Amazon FBA prep 3PL pricing
+  currentFbaPrepPerUnit: number;
+  currentFbaStoragePerUnitMonthly: number;
   hoursPerWeek: number;
   hourlyValue: number;
   errorRatePct: number;
@@ -55,6 +58,8 @@ const industry3PLDefaults = {
   currentPerUnitRate: 0.75,
   currentStoragePerSkuMonthly: 2.0,
   currentMonthlyMinimum: 250,
+  currentFbaPrepPerUnit: 0.85,
+  currentFbaStoragePerUnitMonthly: 0.15,
 };
 
 const defaultInputs: CalcInputs = {
@@ -112,11 +117,16 @@ function useRoiMath(i: CalcInputs) {
     // Outsource share governs how much time savings is credited
     const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
 
-    // Estimated current 3PL monthly cost — pick/pack only applies to DTC orders
-    const rawCurrent3PL =
-      dtcOrders * i.currentPickPackPerOrder +
-      monthlyUnits * i.currentPerUnitRate +
-      i.skuCount * i.currentStoragePerSkuMonthly;
+    // Estimated current 3PL monthly cost — split by channel
+    const dtc3PLCost = includeDtc
+      ? dtcOrders * i.currentPickPackPerOrder +
+        dtcUnits * i.currentPerUnitRate +
+        i.skuCount * i.currentStoragePerSkuMonthly
+      : 0;
+    const fba3PLCost = includeFba
+      ? fbaUnits * i.currentFbaPrepPerUnit + fbaUnits * i.currentFbaStoragePerUnitMonthly
+      : 0;
+    const rawCurrent3PL = dtc3PLCost + fba3PLCost;
     const current3PLMonthly =
       i.fulfillment === "self" ? 0 : Math.max(rawCurrent3PL, i.currentMonthlyMinimum);
 
@@ -234,6 +244,8 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
           returnRate: inputs.returnRatePct,
           hoursSpentWeekly: inputs.hoursPerWeek,
           currentCostPerOrder: String(inputs.currentPerUnitRate),
+          currentFbaPrepPerUnit: inputs.currentFbaPrepPerUnit,
+          currentFbaStoragePerUnitMonthly: inputs.currentFbaStoragePerUnitMonthly,
           painPoints: [],
           services: [],
           specialRequirements: [],
@@ -510,78 +522,137 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                       <TranslatedText>Autofill averages</TranslatedText>
                     </Button>
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    <div>
-                      <Label htmlFor="ppPerOrder" className="text-xs font-medium mb-1.5 block text-muted-foreground">
-                        <TranslatedText>Pick & pack / order</TranslatedText>
-                      </Label>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-muted-foreground text-sm">$</span>
-                        <Input
-                          id="ppPerOrder"
-                          type="number"
-                          step="0.05"
-                          min={0}
-                          value={inputs.currentPickPackPerOrder || ""}
-                          onChange={(e) =>
-                            set("currentPickPackPerOrder", Math.max(0, Number(e.target.value) || 0))
-                          }
-                        />
+
+                  {(inputs.channel === "shopify" || inputs.channel === "both") && (
+                    <div className="space-y-2">
+                      {inputs.channel === "both" && (
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          <TranslatedText>Shopify / DTC 3PL</TranslatedText>
+                        </p>
+                      )}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="ppPerOrder" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                            <TranslatedText>Pick & pack / order</TranslatedText>
+                          </Label>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-muted-foreground text-sm">$</span>
+                            <Input
+                              id="ppPerOrder"
+                              type="number"
+                              step="0.05"
+                              min={0}
+                              value={inputs.currentPickPackPerOrder || ""}
+                              onChange={(e) =>
+                                set("currentPickPackPerOrder", Math.max(0, Number(e.target.value) || 0))
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="perUnit" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                            <TranslatedText>Add'l unit fee</TranslatedText>
+                          </Label>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-muted-foreground text-sm">$</span>
+                            <Input
+                              id="perUnit"
+                              type="number"
+                              step="0.05"
+                              min={0}
+                              value={inputs.currentPerUnitRate || ""}
+                              onChange={(e) =>
+                                set("currentPerUnitRate", Math.max(0, Number(e.target.value) || 0))
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="storagePerSku" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                            <TranslatedText>Storage / SKU / mo</TranslatedText>
+                          </Label>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-muted-foreground text-sm">$</span>
+                            <Input
+                              id="storagePerSku"
+                              type="number"
+                              step="0.05"
+                              min={0}
+                              value={inputs.currentStoragePerSkuMonthly || ""}
+                              onChange={(e) =>
+                                set("currentStoragePerSkuMonthly", Math.max(0, Number(e.target.value) || 0))
+                              }
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <Label htmlFor="perUnit" className="text-xs font-medium mb-1.5 block text-muted-foreground">
-                        <TranslatedText>Add'l unit fee</TranslatedText>
-                      </Label>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-muted-foreground text-sm">$</span>
-                        <Input
-                          id="perUnit"
-                          type="number"
-                          step="0.05"
-                          min={0}
-                          value={inputs.currentPerUnitRate || ""}
-                          onChange={(e) =>
-                            set("currentPerUnitRate", Math.max(0, Number(e.target.value) || 0))
-                          }
-                        />
+                  )}
+
+                  {(inputs.channel === "amazon" || inputs.channel === "both") && (
+                    <div className="space-y-2">
+                      {inputs.channel === "both" && (
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          <TranslatedText>Amazon FBA prep 3PL</TranslatedText>
+                        </p>
+                      )}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="fbaPrep" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                            <TranslatedText>FBA prep fee / unit</TranslatedText>
+                          </Label>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-muted-foreground text-sm">$</span>
+                            <Input
+                              id="fbaPrep"
+                              type="number"
+                              step="0.05"
+                              min={0}
+                              value={inputs.currentFbaPrepPerUnit || ""}
+                              onChange={(e) =>
+                                set("currentFbaPrepPerUnit", Math.max(0, Number(e.target.value) || 0))
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="fbaStorage" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                            <TranslatedText>FBA storage / unit / mo</TranslatedText>
+                          </Label>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-muted-foreground text-sm">$</span>
+                            <Input
+                              id="fbaStorage"
+                              type="number"
+                              step="0.01"
+                              min={0}
+                              value={inputs.currentFbaStoragePerUnitMonthly || ""}
+                              onChange={(e) =>
+                                set("currentFbaStoragePerUnitMonthly", Math.max(0, Number(e.target.value) || 0))
+                              }
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <Label htmlFor="storagePerSku" className="text-xs font-medium mb-1.5 block text-muted-foreground">
-                        <TranslatedText>Storage / SKU / mo</TranslatedText>
-                      </Label>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-muted-foreground text-sm">$</span>
-                        <Input
-                          id="storagePerSku"
-                          type="number"
-                          step="0.05"
-                          min={0}
-                          value={inputs.currentStoragePerSkuMonthly || ""}
-                          onChange={(e) =>
-                            set("currentStoragePerSkuMonthly", Math.max(0, Number(e.target.value) || 0))
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="monthlyMin" className="text-xs font-medium mb-1.5 block text-muted-foreground">
-                        <TranslatedText>Monthly minimum</TranslatedText>
-                      </Label>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-muted-foreground text-sm">$</span>
-                        <Input
-                          id="monthlyMin"
-                          type="number"
-                          step="10"
-                          min={0}
-                          value={inputs.currentMonthlyMinimum || ""}
-                          onChange={(e) =>
-                            set("currentMonthlyMinimum", Math.max(0, Number(e.target.value) || 0))
-                          }
-                        />
-                      </div>
+                  )}
+
+                  <div>
+                    <Label htmlFor="monthlyMin" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                      <TranslatedText>Monthly minimum</TranslatedText>
+                    </Label>
+                    <div className="flex items-center gap-1.5 max-w-[200px]">
+                      <span className="text-muted-foreground text-sm">$</span>
+                      <Input
+                        id="monthlyMin"
+                        type="number"
+                        step="10"
+                        min={0}
+                        value={inputs.currentMonthlyMinimum || ""}
+                        onChange={(e) =>
+                          set("currentMonthlyMinimum", Math.max(0, Number(e.target.value) || 0))
+                        }
+                      />
                     </div>
                   </div>
                 </div>
@@ -709,7 +780,23 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                     <BreakdownRow
                       label="Your current 3PL cost (est.)"
                       value={roi.current3PLMonthly}
-                      formula={`${num(inputs.monthlyOrders)} orders × $${(inputs.currentPickPackPerOrder ?? 0).toFixed(2)} + ${num(roi.monthlyUnits)} units × $${(inputs.currentPerUnitRate ?? 0).toFixed(2)} + ${num(inputs.skuCount ?? 0)} SKUs × $${(inputs.currentStoragePerSkuMonthly ?? 0).toFixed(2)} (min $${inputs.currentMonthlyMinimum ?? 0})`}
+                      formula={(() => {
+                        const includeDtc = inputs.channel === "shopify" || inputs.channel === "both";
+                        const includeFba = inputs.channel === "amazon" || inputs.channel === "both";
+                        const parts: string[] = [];
+                        if (includeDtc) {
+                          parts.push(
+                            `${num(inputs.monthlyOrders)} orders × $${(inputs.currentPickPackPerOrder ?? 0).toFixed(2)} + ${num(inputs.monthlyOrders * inputs.avgUnitsPerOrder)} units × $${(inputs.currentPerUnitRate ?? 0).toFixed(2)} + ${num(inputs.skuCount ?? 0)} SKUs × $${(inputs.currentStoragePerSkuMonthly ?? 0).toFixed(2)}`
+                          );
+                        }
+                        if (includeFba) {
+                          const fbaUnits = inputs.monthlyPrepUnits * inputs.avgUnitsPerPreppedItem;
+                          parts.push(
+                            `${num(fbaUnits)} FBA units × ($${(inputs.currentFbaPrepPerUnit ?? 0).toFixed(2)} prep + $${(inputs.currentFbaStoragePerUnitMonthly ?? 0).toFixed(2)} storage)`
+                          );
+                        }
+                        return `${parts.join("  +  ")}  (min $${inputs.currentMonthlyMinimum ?? 0})`;
+                      })()}
                     />
                   )}
                   <BreakdownRow
@@ -857,6 +944,15 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                   </Button>
                 </>
               )}
+
+              <div className="mt-4 rounded-xl border border-[#FF7A00]/30 bg-[#FF7A00]/5 px-4 py-3 text-sm text-[#0A0A23]">
+                <TranslatedText>
+                  Doing higher volume or just one simple SKU? Reach out — we offer deeper volume discounts and simplicity pricing that isn't reflected here.
+                </TranslatedText>{" "}
+                <a href="/contact" className="font-semibold text-[#FF7A00] hover:underline">
+                  <TranslatedText>Talk to us →</TranslatedText>
+                </a>
+              </div>
             </div>
           </div>
         </div>

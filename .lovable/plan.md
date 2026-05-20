@@ -1,47 +1,56 @@
 ## Goal
-Make the ROI calculator channel-aware so Amazon FBA inputs match how sellers actually think about prep work (units, not orders), while Shopify keeps order-based inputs. When "Both" is selected, show every field.
+Differentiate the "current 3PL pricing" inputs based on selected channel (FBA prep 3PLs price per unit, not per order) and add a callout telling visitors to reach out for deeper volume or simplicity discounts.
 
-## Input changes (in `src/components/EnhancedROICalculator.tsx`)
+## 1. Channel-specific 3PL pricing inputs
 
-Add two new fields to `CalcInputs`:
-- `monthlyPrepUnits: number` — units sent into FBA per month (default `1000`)
-- `avgUnitsPerPreppedItem: number` — units packaged together as one prepped item, e.g. 2-pack bundle (default `1`)
+Extend `CalcInputs` in `src/components/EnhancedROICalculator.tsx`:
+- `currentFbaPrepPerUnit: number` — typical FBA prep fee per unit (default `0.85`)
+- `currentFbaStoragePerUnitMonthly: number` — per-unit storage at current FBA prep 3PL (default `0.15`)
 
-Keep `monthlyOrders` + `avgUnitsPerOrder` as the Shopify/DTC inputs.
+Keep the existing DTC-oriented fields (`currentPickPackPerOrder`, `currentPerUnitRate`, `currentStoragePerSkuMonthly`, `currentMonthlyMinimum`) — those represent the Shopify/DTC 3PL side.
 
-### Conditional rendering of the "Volume" section
-- `channel === "shopify"` → show only **Monthly orders** + **Avg units per order** (current behavior)
-- `channel === "amazon"` → hide DTC fields; show **Monthly units requiring prep** + **Avg units per prepped item** (default 1)
-- `channel === "both"` → show all four fields, grouped under small subheaders "Shopify / DTC" and "Amazon FBA"
+Update `industry3PLDefaults` and `defaultInputs` to include the two new fields.
 
-## Math updates in `useRoiMath`
+### Render rules (inside the existing 3PL pricing panel, only shown when `fulfillment !== "self"`):
+- `channel === "shopify"` → show DTC fields only (current behavior).
+- `channel === "amazon"` → hide pick/pack-per-order and per-SKU storage; show:
+  - Current FBA prep fee per unit
+  - Current FBA storage per unit / month
+  - Monthly minimum (kept, since FBA prep 3PLs also have minimums)
+- `channel === "both"` → show both groups under subheadings "Shopify / DTC 3PL" and "Amazon FBA prep 3PL".
+
+The "Autofill industry averages" button populates whichever fields are visible.
+
+## 2. Math update in `useRoiMath`
+
+Replace the single `rawCurrent3PL` formula with a sum of the two channel-specific costs:
 
 ```text
-dtcOrders   = channel ∈ {shopify, both} ? monthlyOrders : 0
-dtcUnits    = dtcOrders × avgUnitsPerOrder
-fbaPrepEvts = channel ∈ {amazon, both} ? monthlyPrepUnits : 0
-fbaUnits    = fbaPrepEvts × avgUnitsPerPreppedItem   // default 1 → equal to prep units
-monthlyUnits = dtcUnits + fbaUnits
+dtc3PLCost = dtcOrders × currentPickPackPerOrder
+           + dtcUnits   × currentPerUnitRate
+           + skuCount   × currentStoragePerSkuMonthly        // only if includeDtc
+
+fba3PLCost = fbaUnits × currentFbaPrepPerUnit
+           + fbaUnits × currentFbaStoragePerUnitMonthly       // only if includeFba
+
+rawCurrent3PL = (includeDtc ? dtc3PLCost : 0) + (includeFba ? fba3PLCost : 0)
+current3PLMonthly = fulfillment === "self" ? 0 : max(rawCurrent3PL, currentMonthlyMinimum)
 ```
 
-3PL cost model (per channel, so FBA isn't charged a per-order pick/pack rate it doesn't incur):
-```text
-raw3PL = dtcOrders × currentPickPackPerOrder
-       + monthlyUnits × currentPerUnitRate
-       + skuCount × currentStoragePerSkuMonthly
-```
-(Amazon prep is priced per unit by 3PLs, not per order — so we intentionally only multiply pick/pack by DTC orders.)
+The existing "3PL fee delta vs Westfield" and 2× sanity cap logic stays unchanged.
 
-The multi-unit surcharge on Westfield's effective rate should trigger if **either** `avgUnitsPerOrder > 1` **or** `avgUnitsPerPreppedItem > 1`.
+The breakdown formula string in the results card is updated to reflect whichever channel(s) are active, so it stays auditable.
 
-The lead-report payload sent to `send-roi-report` will include the new fields (`monthlyPrepUnits`, `avgUnitsPerPreppedItem`) alongside the existing ones; the edge function tolerates extra fields, so no function change is required.
+## 3. Volume / simplicity discount callout
 
-## UI details
-- Field labels use `<TranslatedText>` like the rest of the form.
-- Amazon section gets a short helper line: "One prepped item = the bundle you ship to Amazon (e.g. a 2-pack counts as 1 prepped item, 2 units)."
-- Defaults so the calc never shows $0 on first render for an Amazon selection: `monthlyPrepUnits: 1000`, `avgUnitsPerPreppedItem: 1`.
+Add a small note directly under the results card (or under the "Email me this report" CTA) with the brand orange accent:
+
+> "Doing higher volume or just one simple SKU? Reach out — we offer deeper volume discounts and simplicity pricing that isn't reflected here."
+
+Wrap the link to `/contact` in a subtle inline anchor. Use `<TranslatedText>` for the copy.
+
+## 4. Payload
+Add `currentFbaPrepPerUnit` and `currentFbaStoragePerUnitMonthly` to the `send-roi-report` body alongside the existing pricing fields. Edge function tolerates extra fields, no function change needed.
 
 ## Files touched
 - `src/components/EnhancedROICalculator.tsx` (only)
-
-No backend, schema, or PDF generator changes needed.
