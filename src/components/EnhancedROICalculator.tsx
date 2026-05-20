@@ -989,4 +989,30 @@ function BreakdownRow({
   );
 }
 
+function AnimatedDollar({ value }: { value: number }) {
+  const [display, setDisplay] = useState(value);
+  useEffect(() => {
+    const from = display;
+    const to = Math.max(0, Math.round(value));
+    if (from === to) return;
+    const start = performance.now();
+    const duration = 600;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(Math.round(from + (to - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+  return (
+    <span className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-[#FF7A00] to-[#FFB066] bg-clip-text text-transparent tabular-nums">
+      {usd(display)}
+    </span>
+  );
+}
+
 export default EnhancedROICalculator;
