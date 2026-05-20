@@ -315,19 +315,28 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                     const active = inputs.channel === opt.id;
                     const Icon = opt.icon;
                     return (
-                      <button
+                      <motion.button
                         key={opt.id}
                         type="button"
                         onClick={() => set("channel", opt.id)}
-                        className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm font-medium transition-all ${
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.97 }}
+                        className={`relative flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm font-medium transition-all overflow-hidden ${
                           active
-                            ? "border-[#FF7A00] bg-[#FF7A00]/5 text-[#0A0A23] shadow-sm"
-                            : "border-border hover:border-[#FF7A00]/40 hover:bg-muted/40 text-muted-foreground"
+                            ? "border-[#FF7A00] bg-gradient-to-br from-[#FF7A00]/10 to-[#FF7A00]/0 text-[#0A0A23] shadow-[0_8px_24px_-12px_rgba(255,122,0,0.5)]"
+                            : "border-border hover:border-[#FF7A00]/50 hover:bg-muted/40 text-muted-foreground"
                         }`}
                       >
+                        {active && (
+                          <motion.span
+                            layoutId="channel-active-glow"
+                            className="absolute inset-0 -z-10 bg-[#FF7A00]/5"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                          />
+                        )}
                         <Icon className={`w-5 h-5 ${active ? "text-[#FF7A00]" : ""}`} />
                         <TranslatedText>{opt.label}</TranslatedText>
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
