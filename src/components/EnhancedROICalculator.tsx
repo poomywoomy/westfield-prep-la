@@ -113,15 +113,11 @@ function useRoiMath(i: CalcInputs) {
     // Outsource share governs how much time savings is credited
     const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
 
-    // Estimated current 3PL monthly cost — split by channel
+    // Estimated current 3PL monthly cost — split by channel (storage excluded)
     const dtc3PLCost = includeDtc
-      ? dtcOrders * i.currentPickPackPerOrder +
-        dtcUnits * i.currentPerUnitRate +
-        i.skuCount * i.currentStoragePerSkuMonthly
+      ? dtcOrders * i.currentPickPackPerOrder + dtcUnits * i.currentPerUnitRate
       : 0;
-    const fba3PLCost = includeFba
-      ? fbaUnits * i.currentFbaPrepPerUnit + fbaUnits * i.currentFbaStoragePerUnitMonthly
-      : 0;
+    const fba3PLCost = includeFba ? fbaUnits * i.currentFbaPrepPerUnit : 0;
     const rawCurrent3PL = dtc3PLCost + fba3PLCost;
     const current3PLMonthly =
       i.fulfillment === "self" ? 0 : Math.max(rawCurrent3PL, i.currentMonthlyMinimum);
