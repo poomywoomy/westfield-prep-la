@@ -1,61 +1,47 @@
-## ROI Calculator: Deeper 3PL Pricing + SKU & Team Inputs
+## Goal
+Make the ROI calculator channel-aware so Amazon FBA inputs match how sellers actually think about prep work (units, not orders), while Shopify keeps order-based inputs. When "Both" is selected, show every field.
 
-Enhance `src/components/EnhancedROICalculator.tsx` with smarter 3PL cost modeling, autofill defaults, and two new inputs (SKU count, team size). All new fields default to sensible values so users who just want a quick estimate aren't forced to fill anything out.
+## Input changes (in `src/components/EnhancedROICalculator.tsx`)
 
-### 1. New inputs
+Add two new fields to `CalcInputs`:
+- `monthlyPrepUnits: number` — units sent into FBA per month (default `1000`)
+- `avgUnitsPerPreppedItem: number` — units packaged together as one prepped item, e.g. 2-pack bundle (default `1`)
 
-Add to `CalcInputs`:
-- `skuCount: number` (default 25) — used to nudge storage estimate and complexity tier
-- `teamSize: number` (default 1) — number of people currently helping with fulfillment
-- Expand 3PL pricing block (shown when fulfillment = `other-3pl` or `hybrid`):
-  - `currentPickPackPerOrder` (default 3.50)
-  - `currentPerUnitRate` (rename of `currentRatePerUnit`, default 0.75)
-  - `currentStoragePerSkuMonthly` (default 2.00) — per active SKU/month
-  - `currentMonthlyMinimum` (default 250)
-  - An **"Autofill industry averages"** button that one-clicks all four to defaults so users can skip the detail
+Keep `monthlyOrders` + `avgUnitsPerOrder` as the Shopify/DTC inputs.
 
-### 2. Logic updates (`useRoiMath`)
+### Conditional rendering of the "Volume" section
+- `channel === "shopify"` → show only **Monthly orders** + **Avg units per order** (current behavior)
+- `channel === "amazon"` → hide DTC fields; show **Monthly units requiring prep** + **Avg units per prepped item** (default 1)
+- `channel === "both"` → show all four fields, grouped under small subheaders "Shopify / DTC" and "Amazon FBA"
 
-**Team-adjusted time recovery:**
+## Math updates in `useRoiMath`
+
+```text
+dtcOrders   = channel ∈ {shopify, both} ? monthlyOrders : 0
+dtcUnits    = dtcOrders × avgUnitsPerOrder
+fbaPrepEvts = channel ∈ {amazon, both} ? monthlyPrepUnits : 0
+fbaUnits    = fbaPrepEvts × avgUnitsPerPreppedItem   // default 1 → equal to prep units
+monthlyUnits = dtcUnits + fbaUnits
 ```
-timeRecovered = hoursPerWeek × teamSize × 4.33 × hourlyValue × outsourceShare
+
+3PL cost model (per channel, so FBA isn't charged a per-order pick/pack rate it doesn't incur):
+```text
+raw3PL = dtcOrders × currentPickPackPerOrder
+       + monthlyUnits × currentPerUnitRate
+       + skuCount × currentStoragePerSkuMonthly
 ```
-`hoursPerWeek` becomes "hours per person per week"; team size multiplies labor cost being recovered. Cap at `teamSize ≤ 20` and `hoursPerWeek ≤ 60` to keep numbers sane.
+(Amazon prep is priced per unit by 3PLs, not per order — so we intentionally only multiply pick/pack by DTC orders.)
 
-**Richer 3PL delta** (replaces flat per-unit comparison):
-```
-currentMonthly3PLCost =
-    monthlyOrders × currentPickPackPerOrder
-  + monthlyUnits  × currentPerUnitRate
-  + skuCount      × currentStoragePerSkuMonthly
-currentMonthly3PLCost = max(currentMonthly3PLCost, currentMonthlyMinimum)
+The multi-unit surcharge on Westfield's effective rate should trigger if **either** `avgUnitsPerOrder > 1` **or** `avgUnitsPerPreppedItem > 1`.
 
-westfieldEquivalent  = monthlyUnits × ourEffectiveRate   (already computed)
-threePLDelta         = max(0, currentMonthly3PLCost - westfieldEquivalent) × blendShare
-```
-- `blendShare` = 1 for other-3pl, 0.5 for hybrid, 0 for self
-- Delta clamped at 0 so we never claim savings when Westfield is more expensive
-- Cap total monthly savings at `2 × currentMonthly3PLCost` as a sanity guard
+The lead-report payload sent to `send-roi-report` will include the new fields (`monthlyPrepUnits`, `avgUnitsPerPreppedItem`) alongside the existing ones; the edge function tolerates extra fields, so no function change is required.
 
-**Westfield cost shown** continues to include the multi-unit surcharge; no change for `self` users beyond the team-size time math.
+## UI details
+- Field labels use `<TranslatedText>` like the rest of the form.
+- Amazon section gets a short helper line: "One prepped item = the bundle you ship to Amazon (e.g. a 2-pack counts as 1 prepped item, 2 units)."
+- Defaults so the calc never shows $0 on first render for an Amazon selection: `monthlyPrepUnits: 1000`, `avgUnitsPerPreppedItem: 1`.
 
-### 3. UI changes
+## Files touched
+- `src/components/EnhancedROICalculator.tsx` (only)
 
-- Add a "Team & catalog" subsection in the inputs column with two compact numeric inputs:
-  - "How many SKUs do you stock?" (default 25)
-  - "How many people help with fulfillment?" (default 1)
-- Replace single "Current 3PL per-unit rate" field with a collapsible "Current 3PL pricing" panel containing the 4 fields above + **Autofill industry averages** button. Panel only renders when fulfillment ≠ self.
-- Results card adds a new breakdown row: **"Your current 3PL cost (est.)"** with tooltip showing the formula, plus the existing savings rows now sourced from the new delta math.
-- All new fields use `Input type="number"` with `min`/`max` and the same styling as existing inputs. Nothing else in the layout, lead form, PDF flow, or sticky behavior changes.
-
-### 4. Files
-
-- `src/components/EnhancedROICalculator.tsx` — only file edited. Defaults remain so the calculator still works untouched.
-- PDF generator (`src/lib/roiReportPdfGenerator.ts`) — add the new fields to the data passed in so the emailed report reflects them. Will inspect on implementation; if signature is generic (object passthrough) no change needed.
-
-### Technical notes
-
-- All new state lives in the existing `inputs` object — no new hooks or context.
-- Autofill button just calls `setInputs(prev => ({ ...prev, ...industryDefaults }))`.
-- Number formatting keeps `usd()` (whole dollars) for credibility.
-- ROI % cap stays at 500%; total savings cap at `2 × currentMonthly3PLCost` (or unchanged when self-fulfillment).
+No backend, schema, or PDF generator changes needed.
