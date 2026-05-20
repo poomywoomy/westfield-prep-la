@@ -33,20 +33,36 @@ interface CalcInputs {
   channel: Channel;
   monthlyOrders: number;
   avgUnitsPerOrder: number;
+  skuCount: number;
+  teamSize: number;
   fulfillment: Fulfillment;
-  currentRatePerUnit: number; // only used for other-3pl / hybrid
+  // 3PL pricing (only used for other-3pl / hybrid)
+  currentPickPackPerOrder: number;
+  currentPerUnitRate: number;
+  currentStoragePerSkuMonthly: number;
+  currentMonthlyMinimum: number;
   hoursPerWeek: number;
   hourlyValue: number;
   errorRatePct: number;
   returnRatePct: number;
 }
 
+// Industry-average 3PL pricing — used as autofill / safe defaults
+const industry3PLDefaults = {
+  currentPickPackPerOrder: 3.5,
+  currentPerUnitRate: 0.75,
+  currentStoragePerSkuMonthly: 2.0,
+  currentMonthlyMinimum: 250,
+};
+
 const defaultInputs: CalcInputs = {
   channel: "shopify",
   monthlyOrders: 750,
   avgUnitsPerOrder: 2,
+  skuCount: 25,
+  teamSize: 1,
   fulfillment: "self",
-  currentRatePerUnit: 2.75,
+  ...industry3PLDefaults,
   hoursPerWeek: 15,
   hourlyValue: 25,
   errorRatePct: 2,
@@ -82,16 +98,25 @@ function useRoiMath(i: CalcInputs) {
     // Outsource share governs how much time savings is credited
     const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
 
-    // 3PL fee delta (only when comparing against an existing 3PL)
+    // Estimated current 3PL monthly cost (pick/pack + per-unit + storage, min floor)
+    const rawCurrent3PL =
+      i.monthlyOrders * i.currentPickPackPerOrder +
+      monthlyUnits * i.currentPerUnitRate +
+      i.skuCount * i.currentStoragePerSkuMonthly;
+    const current3PLMonthly =
+      i.fulfillment === "self" ? 0 : Math.max(rawCurrent3PL, i.currentMonthlyMinimum);
+
+    // 3PL fee delta vs Westfield (clamped at 0, blended for hybrid)
     let threePLDelta = 0;
     if (i.fulfillment === "other-3pl" || i.fulfillment === "hybrid") {
-      const delta = Math.max(0, i.currentRatePerUnit - ourEffectiveRate);
-      const blended = i.fulfillment === "hybrid" ? 0.5 : 1; // hybrid only shifts half today
-      threePLDelta = delta * monthlyUnits * blended;
+      const blendShare = i.fulfillment === "hybrid" ? 0.5 : 1;
+      threePLDelta = Math.max(0, current3PLMonthly - estimatedMonthlyCost) * blendShare;
     }
 
-    // Time recovered (only when client touches fulfillment themselves)
-    const timeRecovered = i.hoursPerWeek * 4.33 * i.hourlyValue * outsourceShare;
+    // Time recovered — multiplied by team size (hrs are per-person)
+    const cappedTeam = Math.min(Math.max(1, i.teamSize), 20);
+    const cappedHours = Math.min(Math.max(0, i.hoursPerWeek), 60);
+    const timeRecovered = cappedHours * cappedTeam * 4.33 * i.hourlyValue * outsourceShare;
 
     // Errors avoided: capped at a realistic 2% error rate so extreme inputs don't fantasize
     const cappedErrorRate = Math.min(i.errorRatePct, 2) / 100;
@@ -100,7 +125,11 @@ function useRoiMath(i: CalcInputs) {
     // Returns processed cheaper: $4/return delta vs. self-handling
     const returnsSavings = monthlyUnits * (i.returnRatePct / 100) * 4 * (outsourceShare > 0 ? 1 : 0.5);
 
-    const totalMonthly = threePLDelta + timeRecovered + errorsAvoided + returnsSavings;
+    let totalMonthly = threePLDelta + timeRecovered + errorsAvoided + returnsSavings;
+    // Sanity cap: never claim more than 2× the current 3PL spend (when comparing 3PLs)
+    if (current3PLMonthly > 0) {
+      totalMonthly = Math.min(totalMonthly, current3PLMonthly * 2);
+    }
     const annual = totalMonthly * 12;
     const roiPct =
       estimatedMonthlyCost > 0 ? Math.min(500, (totalMonthly / estimatedMonthlyCost) * 100) : 0;
@@ -110,6 +139,7 @@ function useRoiMath(i: CalcInputs) {
       ourRate,
       ourEffectiveRate,
       estimatedMonthlyCost,
+      current3PLMonthly,
       threePLDelta,
       timeRecovered,
       errorsAvoided,
@@ -187,7 +217,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
           currentErrorRate: inputs.errorRatePct,
           returnRate: inputs.returnRatePct,
           hoursSpentWeekly: inputs.hoursPerWeek,
-          currentCostPerOrder: String(inputs.currentRatePerUnit),
+          currentCostPerOrder: String(inputs.currentPerUnitRate),
           painPoints: [],
           services: [],
           specialRequirements: [],
@@ -353,32 +383,137 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                 </RadioGroup>
               </div>
 
-              {/* Conditional: current 3PL rate */}
-              {(inputs.fulfillment === "other-3pl" || inputs.fulfillment === "hybrid") && (
-                <div className="rounded-xl bg-muted/40 border border-dashed p-4">
-                  <Label htmlFor="currentRate" className="text-sm font-semibold mb-2 block">
-                    <TranslatedText>Your current 3PL's per-unit rate</TranslatedText>
+              {/* Team & catalog */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="skuCount" className="text-sm font-semibold mb-2 block">
+                    <TranslatedText>Active SKUs you stock</TranslatedText>
                   </Label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">$</span>
-                    <Input
-                      id="currentRate"
-                      type="number"
-                      step="0.05"
-                      min={0}
-                      value={inputs.currentRatePerUnit || ""}
-                      onChange={(e) =>
-                        set("currentRatePerUnit", Math.max(0, Number(e.target.value) || 0))
-                      }
-                      className="text-lg font-medium max-w-[140px]"
-                    />
-                    <span className="text-sm text-muted-foreground">/ unit shipped</span>
+                  <Input
+                    id="skuCount"
+                    type="number"
+                    min={0}
+                    value={inputs.skuCount || ""}
+                    onChange={(e) => set("skuCount", Math.max(0, Number(e.target.value) || 0))}
+                    className="text-lg font-medium"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="teamSize" className="text-sm font-semibold mb-2 block">
+                    <TranslatedText>People helping with fulfillment</TranslatedText>
+                  </Label>
+                  <Input
+                    id="teamSize"
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={inputs.teamSize || ""}
+                    onChange={(e) =>
+                      set("teamSize", Math.max(1, Math.min(20, Number(e.target.value) || 1)))
+                    }
+                    className="text-lg font-medium"
+                  />
+                </div>
+              </div>
+
+              {/* Conditional: detailed 3PL pricing */}
+              {(inputs.fulfillment === "other-3pl" || inputs.fulfillment === "hybrid") && (
+                <div className="rounded-xl bg-muted/40 border border-dashed p-4 space-y-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <Label className="text-sm font-semibold block">
+                        <TranslatedText>Your current 3PL's pricing</TranslatedText>
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        <TranslatedText>
+                          Don't have the numbers handy? Hit autofill for industry averages.
+                        </TranslatedText>
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setInputs((p) => ({ ...p, ...industry3PLDefaults }))}
+                      className="shrink-0 text-xs"
+                    >
+                      <TranslatedText>Autofill averages</TranslatedText>
+                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    <TranslatedText>
-                      Used to calculate the delta vs. Westfield's tiered rate. If yours is lower, that line shows $0.
-                    </TranslatedText>
-                  </p>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="ppPerOrder" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                        <TranslatedText>Pick & pack / order</TranslatedText>
+                      </Label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground text-sm">$</span>
+                        <Input
+                          id="ppPerOrder"
+                          type="number"
+                          step="0.05"
+                          min={0}
+                          value={inputs.currentPickPackPerOrder || ""}
+                          onChange={(e) =>
+                            set("currentPickPackPerOrder", Math.max(0, Number(e.target.value) || 0))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="perUnit" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                        <TranslatedText>Add'l unit fee</TranslatedText>
+                      </Label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground text-sm">$</span>
+                        <Input
+                          id="perUnit"
+                          type="number"
+                          step="0.05"
+                          min={0}
+                          value={inputs.currentPerUnitRate || ""}
+                          onChange={(e) =>
+                            set("currentPerUnitRate", Math.max(0, Number(e.target.value) || 0))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="storagePerSku" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                        <TranslatedText>Storage / SKU / mo</TranslatedText>
+                      </Label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground text-sm">$</span>
+                        <Input
+                          id="storagePerSku"
+                          type="number"
+                          step="0.05"
+                          min={0}
+                          value={inputs.currentStoragePerSkuMonthly || ""}
+                          onChange={(e) =>
+                            set("currentStoragePerSkuMonthly", Math.max(0, Number(e.target.value) || 0))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="monthlyMin" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                        <TranslatedText>Monthly minimum</TranslatedText>
+                      </Label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground text-sm">$</span>
+                        <Input
+                          id="monthlyMin"
+                          type="number"
+                          step="10"
+                          min={0}
+                          value={inputs.currentMonthlyMinimum || ""}
+                          onChange={(e) =>
+                            set("currentMonthlyMinimum", Math.max(0, Number(e.target.value) || 0))
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -387,23 +522,23 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="hours" className="text-sm font-semibold mb-2 block">
-                      <TranslatedText>Hours/week you spend on fulfillment</TranslatedText>
+                      <TranslatedText>Hours/week per person</TranslatedText>
                     </Label>
                     <Input
                       id="hours"
                       type="number"
                       min={0}
-                      max={80}
+                      max={60}
                       value={inputs.hoursPerWeek || ""}
                       onChange={(e) =>
-                        set("hoursPerWeek", Math.max(0, Math.min(80, Number(e.target.value) || 0)))
+                        set("hoursPerWeek", Math.max(0, Math.min(60, Number(e.target.value) || 0)))
                       }
                       className="text-lg font-medium"
                     />
                   </div>
                   <div>
                     <Label htmlFor="hourly" className="text-sm font-semibold mb-2 block">
-                      <TranslatedText>Your hourly value ($)</TranslatedText>
+                      <TranslatedText>Hourly value ($)</TranslatedText>
                     </Label>
                     <Input
                       id="hourly"
@@ -500,13 +635,20 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                   <TranslatedText>How we got there</TranslatedText>
                 </p>
                 <div className="divide-y divide-border">
+                  {(inputs.fulfillment === "other-3pl" || inputs.fulfillment === "hybrid") && (
+                    <BreakdownRow
+                      label="Your current 3PL cost (est.)"
+                      value={roi.current3PLMonthly}
+                      formula={`${num(inputs.monthlyOrders)} orders × $${inputs.currentPickPackPerOrder.toFixed(2)} + ${num(roi.monthlyUnits)} units × $${inputs.currentPerUnitRate.toFixed(2)} + ${num(inputs.skuCount)} SKUs × $${inputs.currentStoragePerSkuMonthly.toFixed(2)} (min $${inputs.currentMonthlyMinimum})`}
+                    />
+                  )}
                   <BreakdownRow
                     label="3PL fee delta"
                     value={roi.threePLDelta}
                     formula={
                       inputs.fulfillment === "self"
                         ? "Not applicable — you're self-fulfilling today."
-                        : `max(0, $${inputs.currentRatePerUnit.toFixed(2)} − $${roi.ourEffectiveRate.toFixed(2)}) × ${num(roi.monthlyUnits)} units${
+                        : `max(0, ${usd(roi.current3PLMonthly)} − ${usd(roi.estimatedMonthlyCost)})${
                             inputs.fulfillment === "hybrid" ? " × 50% (hybrid)" : ""
                           }`
                     }
@@ -517,7 +659,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                     formula={
                       inputs.fulfillment === "other-3pl"
                         ? "Not applicable — your time isn't tied up today."
-                        : `${inputs.hoursPerWeek} hrs/wk × 4.33 × $${inputs.hourlyValue}/hr${
+                        : `${inputs.hoursPerWeek} hrs/wk × ${inputs.teamSize} ${inputs.teamSize === 1 ? "person" : "people"} × 4.33 × $${inputs.hourlyValue}/hr${
                             inputs.fulfillment === "hybrid" ? " × 50% (hybrid)" : ""
                           }`
                     }
