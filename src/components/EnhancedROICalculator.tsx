@@ -554,9 +554,10 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground mt-3">
-                  <TranslatedText>
-                    Based on volume tier. {inputs.avgUnitsPerOrder > 1 ? "Includes $0.50 multi-unit surcharge." : ""}
-                  </TranslatedText>
+                  <TranslatedText>Based on volume tier.</TranslatedText>
+                  {inputs.avgUnitsPerOrder > 1 && (
+                    <> <TranslatedText>Includes $0.50 multi-unit surcharge.</TranslatedText></>
+                  )}
                 </p>
               </div>
 
