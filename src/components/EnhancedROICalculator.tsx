@@ -700,29 +700,61 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
               transition={{ duration: 0.4, delay: 0.1 }}
               className="lg:sticky lg:top-24 space-y-4"
             >
-              <div className="bg-[#0A0A23] text-white rounded-2xl p-6 md:p-7 shadow-lg overflow-hidden relative">
-                <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#FF7A00]/20 rounded-full blur-3xl pointer-events-none" />
-                <div className="relative">
-                  <p className="text-xs uppercase tracking-wider text-white/60 mb-2">
-                    <TranslatedText>Estimated monthly savings</TranslatedText>
-                  </p>
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <motion.span
-                      key={Math.round(roi.totalMonthly)}
-                      initial={{ opacity: 0.4, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-5xl md:text-6xl font-bold tracking-tight text-[#FF7A00]"
-                    >
-                      {usd(roi.totalMonthly)}
-                    </motion.span>
-                    <span className="text-white/60 text-sm">/ mo</span>
+              <div className="relative rounded-2xl p-[1.5px] bg-gradient-to-br from-[#FF7A00] via-[#FF7A00]/40 to-[#0A0A23] shadow-[0_20px_60px_-15px_rgba(255,122,0,0.45)]">
+                <div className="bg-[#0A0A23] text-white rounded-[14px] p-6 md:p-7 overflow-hidden relative">
+                  <motion.div
+                    className="absolute -top-16 -right-16 w-56 h-56 bg-[#FF7A00]/30 rounded-full blur-3xl pointer-events-none"
+                    animate={{ scale: [1, 1.15, 1], opacity: [0.55, 0.85, 0.55] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.div
+                    className="absolute -bottom-20 -left-16 w-56 h-56 bg-[#FF7A00]/10 rounded-full blur-3xl pointer-events-none"
+                    animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.55, 0.3] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <div className="relative">
+                    <div className="flex items-center gap-2 mb-2">
+                      <motion.span
+                        className="inline-block w-1.5 h-1.5 rounded-full bg-[#FF7A00]"
+                        animate={{ opacity: [0.4, 1, 0.4], scale: [0.9, 1.2, 0.9] }}
+                        transition={{ duration: 1.8, repeat: Infinity }}
+                      />
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-white/60 font-semibold">
+                        <TranslatedText>Estimated monthly savings</TranslatedText>
+                      </p>
+                    </div>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <AnimatedDollar value={roi.totalMonthly} />
+                      <span className="text-white/60 text-sm">/ mo</span>
+                    </div>
+                    <p className="text-sm text-white/70">
+                      <TranslatedText>≈</TranslatedText>{" "}
+                      <span className="text-white font-semibold">{usd(roi.annual)}</span>{" "}
+                      <TranslatedText>per year</TranslatedText>
+                    </p>
+                    {/* Savings bar */}
+                    {roi.current3PLMonthly > 0 && (
+                      <div className="mt-5 pt-4 border-t border-white/10">
+                        <div className="flex justify-between text-[11px] text-white/60 mb-1.5">
+                          <span><TranslatedText>vs your current spend</TranslatedText></span>
+                          <span className="font-mono text-[#FF7A00] font-semibold">
+                            {Math.min(100, Math.round((roi.totalMonthly / roi.current3PLMonthly) * 100))}% saved
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full bg-gradient-to-r from-[#FF7A00] to-[#FFB066]"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(100, (roi.totalMonthly / roi.current3PLMonthly) * 100)}%` }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm text-white/70">
-                    <TranslatedText>≈</TranslatedText> {usd(roi.annual)}{" "}
-                    <TranslatedText>per year</TranslatedText>
-                  </p>
                 </div>
               </div>
+
 
               {/* Breakdown */}
               <div className="bg-card border rounded-2xl p-5 md:p-6">
