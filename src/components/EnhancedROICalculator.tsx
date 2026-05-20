@@ -639,7 +639,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                     <BreakdownRow
                       label="Your current 3PL cost (est.)"
                       value={roi.current3PLMonthly}
-                      formula={`${num(inputs.monthlyOrders)} orders × $${inputs.currentPickPackPerOrder.toFixed(2)} + ${num(roi.monthlyUnits)} units × $${inputs.currentPerUnitRate.toFixed(2)} + ${num(inputs.skuCount)} SKUs × $${inputs.currentStoragePerSkuMonthly.toFixed(2)} (min $${inputs.currentMonthlyMinimum})`}
+                      formula={`${num(inputs.monthlyOrders)} orders × $${(inputs.currentPickPackPerOrder ?? 0).toFixed(2)} + ${num(roi.monthlyUnits)} units × $${(inputs.currentPerUnitRate ?? 0).toFixed(2)} + ${num(inputs.skuCount ?? 0)} SKUs × $${(inputs.currentStoragePerSkuMonthly ?? 0).toFixed(2)} (min $${inputs.currentMonthlyMinimum ?? 0})`}
                     />
                   )}
                   <BreakdownRow
