@@ -635,13 +635,20 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                   <TranslatedText>How we got there</TranslatedText>
                 </p>
                 <div className="divide-y divide-border">
+                  {(inputs.fulfillment === "other-3pl" || inputs.fulfillment === "hybrid") && (
+                    <BreakdownRow
+                      label="Your current 3PL cost (est.)"
+                      value={roi.current3PLMonthly}
+                      formula={`${num(inputs.monthlyOrders)} orders × $${inputs.currentPickPackPerOrder.toFixed(2)} + ${num(roi.monthlyUnits)} units × $${inputs.currentPerUnitRate.toFixed(2)} + ${num(inputs.skuCount)} SKUs × $${inputs.currentStoragePerSkuMonthly.toFixed(2)} (min $${inputs.currentMonthlyMinimum})`}
+                    />
+                  )}
                   <BreakdownRow
                     label="3PL fee delta"
                     value={roi.threePLDelta}
                     formula={
                       inputs.fulfillment === "self"
                         ? "Not applicable — you're self-fulfilling today."
-                        : `max(0, $${inputs.currentRatePerUnit.toFixed(2)} − $${roi.ourEffectiveRate.toFixed(2)}) × ${num(roi.monthlyUnits)} units${
+                        : `max(0, ${usd(roi.current3PLMonthly)} − ${usd(roi.estimatedMonthlyCost)})${
                             inputs.fulfillment === "hybrid" ? " × 50% (hybrid)" : ""
                           }`
                     }
@@ -652,7 +659,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                     formula={
                       inputs.fulfillment === "other-3pl"
                         ? "Not applicable — your time isn't tied up today."
-                        : `${inputs.hoursPerWeek} hrs/wk × 4.33 × $${inputs.hourlyValue}/hr${
+                        : `${inputs.hoursPerWeek} hrs/wk × ${inputs.teamSize} ${inputs.teamSize === 1 ? "person" : "people"} × 4.33 × $${inputs.hourlyValue}/hr${
                             inputs.fulfillment === "hybrid" ? " × 50% (hybrid)" : ""
                           }`
                     }
