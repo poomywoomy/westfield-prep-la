@@ -43,6 +43,9 @@ interface CalcInputs {
   currentPerUnitRate: number;
   currentStoragePerSkuMonthly: number;
   currentMonthlyMinimum: number;
+  // Amazon FBA prep 3PL pricing
+  currentFbaPrepPerUnit: number;
+  currentFbaStoragePerUnitMonthly: number;
   hoursPerWeek: number;
   hourlyValue: number;
   errorRatePct: number;
@@ -55,6 +58,8 @@ const industry3PLDefaults = {
   currentPerUnitRate: 0.75,
   currentStoragePerSkuMonthly: 2.0,
   currentMonthlyMinimum: 250,
+  currentFbaPrepPerUnit: 0.85,
+  currentFbaStoragePerUnitMonthly: 0.15,
 };
 
 const defaultInputs: CalcInputs = {
@@ -112,11 +117,16 @@ function useRoiMath(i: CalcInputs) {
     // Outsource share governs how much time savings is credited
     const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
 
-    // Estimated current 3PL monthly cost — pick/pack only applies to DTC orders
-    const rawCurrent3PL =
-      dtcOrders * i.currentPickPackPerOrder +
-      monthlyUnits * i.currentPerUnitRate +
-      i.skuCount * i.currentStoragePerSkuMonthly;
+    // Estimated current 3PL monthly cost — split by channel
+    const dtc3PLCost = includeDtc
+      ? dtcOrders * i.currentPickPackPerOrder +
+        dtcUnits * i.currentPerUnitRate +
+        i.skuCount * i.currentStoragePerSkuMonthly
+      : 0;
+    const fba3PLCost = includeFba
+      ? fbaUnits * i.currentFbaPrepPerUnit + fbaUnits * i.currentFbaStoragePerUnitMonthly
+      : 0;
+    const rawCurrent3PL = dtc3PLCost + fba3PLCost;
     const current3PLMonthly =
       i.fulfillment === "self" ? 0 : Math.max(rawCurrent3PL, i.currentMonthlyMinimum);
 
