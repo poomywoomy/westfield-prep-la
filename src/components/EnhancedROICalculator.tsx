@@ -740,13 +740,13 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                         const parts: string[] = [];
                         if (includeDtc) {
                           parts.push(
-                            `${num(inputs.monthlyOrders)} orders × $${(inputs.currentPickPackPerOrder ?? 0).toFixed(2)} + ${num(inputs.monthlyOrders * inputs.avgUnitsPerOrder)} units × $${(inputs.currentPerUnitRate ?? 0).toFixed(2)} + ${num(inputs.skuCount ?? 0)} SKUs × $${(inputs.currentStoragePerSkuMonthly ?? 0).toFixed(2)}`
+                            `${num(inputs.monthlyOrders)} orders × $${(inputs.currentPickPackPerOrder ?? 0).toFixed(2)} + ${num(inputs.monthlyOrders * inputs.avgUnitsPerOrder)} units × $${(inputs.currentPerUnitRate ?? 0).toFixed(2)}`
                           );
                         }
                         if (includeFba) {
                           const fbaUnits = inputs.monthlyPrepUnits * inputs.avgUnitsPerPreppedItem;
                           parts.push(
-                            `${num(fbaUnits)} FBA units × ($${(inputs.currentFbaPrepPerUnit ?? 0).toFixed(2)} prep + $${(inputs.currentFbaStoragePerUnitMonthly ?? 0).toFixed(2)} storage)`
+                            `${num(fbaUnits)} FBA units × $${(inputs.currentFbaPrepPerUnit ?? 0).toFixed(2)} prep`
                           );
                         }
                         return `${parts.join("  +  ")}  (min $${inputs.currentMonthlyMinimum ?? 0})`;
