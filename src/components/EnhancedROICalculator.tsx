@@ -33,6 +33,8 @@ interface CalcInputs {
   channel: Channel;
   monthlyOrders: number;
   avgUnitsPerOrder: number;
+  monthlyPrepUnits: number;
+  avgUnitsPerPreppedItem: number;
   skuCount: number;
   teamSize: number;
   fulfillment: Fulfillment;
