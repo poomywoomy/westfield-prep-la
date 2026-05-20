@@ -33,6 +33,8 @@ interface CalcInputs {
   channel: Channel;
   monthlyOrders: number;
   avgUnitsPerOrder: number;
+  monthlyPrepUnits: number;
+  avgUnitsPerPreppedItem: number;
   skuCount: number;
   teamSize: number;
   fulfillment: Fulfillment;
@@ -59,6 +61,8 @@ const defaultInputs: CalcInputs = {
   channel: "shopify",
   monthlyOrders: 750,
   avgUnitsPerOrder: 2,
+  monthlyPrepUnits: 1000,
+  avgUnitsPerPreppedItem: 1,
   skuCount: 25,
   teamSize: 1,
   fulfillment: "self",
@@ -89,18 +93,28 @@ const num = (n: number) =>
 
 function useRoiMath(i: CalcInputs) {
   return useMemo(() => {
-    const monthlyUnits = Math.max(0, i.monthlyOrders * i.avgUnitsPerOrder);
+    const includeDtc = i.channel === "shopify" || i.channel === "both";
+    const includeFba = i.channel === "amazon" || i.channel === "both";
+
+    const dtcOrders = includeDtc ? Math.max(0, i.monthlyOrders) : 0;
+    const dtcUnits = dtcOrders * Math.max(1, i.avgUnitsPerOrder);
+    const fbaPrepEvents = includeFba ? Math.max(0, i.monthlyPrepUnits) : 0;
+    const fbaUnits = fbaPrepEvents * Math.max(1, i.avgUnitsPerPreppedItem);
+    const monthlyUnits = dtcUnits + fbaUnits;
+
     const ourRate = westfieldRate(monthlyUnits);
-    const multiUnitSurcharge = i.avgUnitsPerOrder > 1 ? 0.5 : 0;
+    const hasMultiUnit =
+      (includeDtc && i.avgUnitsPerOrder > 1) || (includeFba && i.avgUnitsPerPreppedItem > 1);
+    const multiUnitSurcharge = hasMultiUnit ? 0.5 : 0;
     const ourEffectiveRate = ourRate + multiUnitSurcharge;
     const estimatedMonthlyCost = monthlyUnits * ourEffectiveRate;
 
     // Outsource share governs how much time savings is credited
     const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
 
-    // Estimated current 3PL monthly cost (pick/pack + per-unit + storage, min floor)
+    // Estimated current 3PL monthly cost — pick/pack only applies to DTC orders
     const rawCurrent3PL =
-      i.monthlyOrders * i.currentPickPackPerOrder +
+      dtcOrders * i.currentPickPackPerOrder +
       monthlyUnits * i.currentPerUnitRate +
       i.skuCount * i.currentStoragePerSkuMonthly;
     const current3PLMonthly =
@@ -214,6 +228,8 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
           currentFulfillment: inputs.fulfillment,
           monthlyOrders: inputs.monthlyOrders,
           avgUnitsPerOrder: inputs.avgUnitsPerOrder,
+          monthlyPrepUnits: inputs.monthlyPrepUnits,
+          avgUnitsPerPreppedItem: inputs.avgUnitsPerPreppedItem,
           currentErrorRate: inputs.errorRatePct,
           returnRate: inputs.returnRatePct,
           hoursSpentWeekly: inputs.hoursPerWeek,
@@ -315,33 +331,87 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
               </div>
 
               {/* Volume */}
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="monthlyOrders" className="text-sm font-semibold mb-2 block">
-                    <TranslatedText>Monthly orders</TranslatedText>
-                  </Label>
-                  <Input
-                    id="monthlyOrders"
-                    type="number"
-                    min={0}
-                    value={inputs.monthlyOrders || ""}
-                    onChange={(e) => set("monthlyOrders", Math.max(0, Number(e.target.value) || 0))}
-                    className="text-lg font-medium"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="avgUnits" className="text-sm font-semibold mb-2 block">
-                    <TranslatedText>Avg units per order</TranslatedText>
-                  </Label>
-                  <Input
-                    id="avgUnits"
-                    type="number"
-                    min={1}
-                    value={inputs.avgUnitsPerOrder || ""}
-                    onChange={(e) => set("avgUnitsPerOrder", Math.max(1, Number(e.target.value) || 1))}
-                    className="text-lg font-medium"
-                  />
-                </div>
+              <div className="space-y-5">
+                {(inputs.channel === "shopify" || inputs.channel === "both") && (
+                  <div>
+                    {inputs.channel === "both" && (
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                        <TranslatedText>Shopify / DTC</TranslatedText>
+                      </p>
+                    )}
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="monthlyOrders" className="text-sm font-semibold mb-2 block">
+                          <TranslatedText>Monthly orders</TranslatedText>
+                        </Label>
+                        <Input
+                          id="monthlyOrders"
+                          type="number"
+                          min={0}
+                          value={inputs.monthlyOrders || ""}
+                          onChange={(e) => set("monthlyOrders", Math.max(0, Number(e.target.value) || 0))}
+                          className="text-lg font-medium"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="avgUnits" className="text-sm font-semibold mb-2 block">
+                          <TranslatedText>Avg units per order</TranslatedText>
+                        </Label>
+                        <Input
+                          id="avgUnits"
+                          type="number"
+                          min={1}
+                          value={inputs.avgUnitsPerOrder || ""}
+                          onChange={(e) => set("avgUnitsPerOrder", Math.max(1, Number(e.target.value) || 1))}
+                          className="text-lg font-medium"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {(inputs.channel === "amazon" || inputs.channel === "both") && (
+                  <div>
+                    {inputs.channel === "both" && (
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                        <TranslatedText>Amazon FBA</TranslatedText>
+                      </p>
+                    )}
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="monthlyPrepUnits" className="text-sm font-semibold mb-2 block">
+                          <TranslatedText>Monthly units requiring prep</TranslatedText>
+                        </Label>
+                        <Input
+                          id="monthlyPrepUnits"
+                          type="number"
+                          min={0}
+                          value={inputs.monthlyPrepUnits || ""}
+                          onChange={(e) => set("monthlyPrepUnits", Math.max(0, Number(e.target.value) || 0))}
+                          className="text-lg font-medium"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="avgUnitsPerPreppedItem" className="text-sm font-semibold mb-2 block">
+                          <TranslatedText>Avg units per prepped item</TranslatedText>
+                        </Label>
+                        <Input
+                          id="avgUnitsPerPreppedItem"
+                          type="number"
+                          min={1}
+                          value={inputs.avgUnitsPerPreppedItem || ""}
+                          onChange={(e) => set("avgUnitsPerPreppedItem", Math.max(1, Number(e.target.value) || 1))}
+                          className="text-lg font-medium"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      <TranslatedText>
+                        One prepped item = the bundle you ship to Amazon (e.g. a 2-pack counts as 1 prepped item, 2 units). Leave at 1 for single-unit SKUs.
+                      </TranslatedText>
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Fulfillment today */}
