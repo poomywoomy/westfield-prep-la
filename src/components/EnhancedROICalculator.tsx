@@ -559,10 +559,9 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                           </div>
                         </div>
                       </div>
-
-                      </div>
                     </div>
                   )}
+
 
                   {(inputs.channel === "amazon" || inputs.channel === "both") && (
                     <div className="space-y-2">
