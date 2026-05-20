@@ -942,6 +942,15 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                   </Button>
                 </>
               )}
+
+              <div className="mt-4 rounded-xl border border-[#FF7A00]/30 bg-[#FF7A00]/5 px-4 py-3 text-sm text-[#0A0A23]">
+                <TranslatedText>
+                  Doing higher volume or just one simple SKU? Reach out — we offer deeper volume discounts and simplicity pricing that isn't reflected here.
+                </TranslatedText>{" "}
+                <a href="/contact" className="font-semibold text-[#FF7A00] hover:underline">
+                  <TranslatedText>Talk to us →</TranslatedText>
+                </a>
+              </div>
             </div>
           </div>
         </div>
