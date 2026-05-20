@@ -329,33 +329,87 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
               </div>
 
               {/* Volume */}
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="monthlyOrders" className="text-sm font-semibold mb-2 block">
-                    <TranslatedText>Monthly orders</TranslatedText>
-                  </Label>
-                  <Input
-                    id="monthlyOrders"
-                    type="number"
-                    min={0}
-                    value={inputs.monthlyOrders || ""}
-                    onChange={(e) => set("monthlyOrders", Math.max(0, Number(e.target.value) || 0))}
-                    className="text-lg font-medium"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="avgUnits" className="text-sm font-semibold mb-2 block">
-                    <TranslatedText>Avg units per order</TranslatedText>
-                  </Label>
-                  <Input
-                    id="avgUnits"
-                    type="number"
-                    min={1}
-                    value={inputs.avgUnitsPerOrder || ""}
-                    onChange={(e) => set("avgUnitsPerOrder", Math.max(1, Number(e.target.value) || 1))}
-                    className="text-lg font-medium"
-                  />
-                </div>
+              <div className="space-y-5">
+                {(inputs.channel === "shopify" || inputs.channel === "both") && (
+                  <div>
+                    {inputs.channel === "both" && (
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                        <TranslatedText>Shopify / DTC</TranslatedText>
+                      </p>
+                    )}
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="monthlyOrders" className="text-sm font-semibold mb-2 block">
+                          <TranslatedText>Monthly orders</TranslatedText>
+                        </Label>
+                        <Input
+                          id="monthlyOrders"
+                          type="number"
+                          min={0}
+                          value={inputs.monthlyOrders || ""}
+                          onChange={(e) => set("monthlyOrders", Math.max(0, Number(e.target.value) || 0))}
+                          className="text-lg font-medium"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="avgUnits" className="text-sm font-semibold mb-2 block">
+                          <TranslatedText>Avg units per order</TranslatedText>
+                        </Label>
+                        <Input
+                          id="avgUnits"
+                          type="number"
+                          min={1}
+                          value={inputs.avgUnitsPerOrder || ""}
+                          onChange={(e) => set("avgUnitsPerOrder", Math.max(1, Number(e.target.value) || 1))}
+                          className="text-lg font-medium"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {(inputs.channel === "amazon" || inputs.channel === "both") && (
+                  <div>
+                    {inputs.channel === "both" && (
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                        <TranslatedText>Amazon FBA</TranslatedText>
+                      </p>
+                    )}
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="monthlyPrepUnits" className="text-sm font-semibold mb-2 block">
+                          <TranslatedText>Monthly units requiring prep</TranslatedText>
+                        </Label>
+                        <Input
+                          id="monthlyPrepUnits"
+                          type="number"
+                          min={0}
+                          value={inputs.monthlyPrepUnits || ""}
+                          onChange={(e) => set("monthlyPrepUnits", Math.max(0, Number(e.target.value) || 0))}
+                          className="text-lg font-medium"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="avgUnitsPerPreppedItem" className="text-sm font-semibold mb-2 block">
+                          <TranslatedText>Avg units per prepped item</TranslatedText>
+                        </Label>
+                        <Input
+                          id="avgUnitsPerPreppedItem"
+                          type="number"
+                          min={1}
+                          value={inputs.avgUnitsPerPreppedItem || ""}
+                          onChange={(e) => set("avgUnitsPerPreppedItem", Math.max(1, Number(e.target.value) || 1))}
+                          className="text-lg font-medium"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      <TranslatedText>
+                        One prepped item = the bundle you ship to Amazon (e.g. a 2-pack counts as 1 prepped item, 2 units). Leave at 1 for single-unit SKUs.
+                      </TranslatedText>
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Fulfillment today */}
