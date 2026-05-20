@@ -93,18 +93,28 @@ const num = (n: number) =>
 
 function useRoiMath(i: CalcInputs) {
   return useMemo(() => {
-    const monthlyUnits = Math.max(0, i.monthlyOrders * i.avgUnitsPerOrder);
+    const includeDtc = i.channel === "shopify" || i.channel === "both";
+    const includeFba = i.channel === "amazon" || i.channel === "both";
+
+    const dtcOrders = includeDtc ? Math.max(0, i.monthlyOrders) : 0;
+    const dtcUnits = dtcOrders * Math.max(1, i.avgUnitsPerOrder);
+    const fbaPrepEvents = includeFba ? Math.max(0, i.monthlyPrepUnits) : 0;
+    const fbaUnits = fbaPrepEvents * Math.max(1, i.avgUnitsPerPreppedItem);
+    const monthlyUnits = dtcUnits + fbaUnits;
+
     const ourRate = westfieldRate(monthlyUnits);
-    const multiUnitSurcharge = i.avgUnitsPerOrder > 1 ? 0.5 : 0;
+    const hasMultiUnit =
+      (includeDtc && i.avgUnitsPerOrder > 1) || (includeFba && i.avgUnitsPerPreppedItem > 1);
+    const multiUnitSurcharge = hasMultiUnit ? 0.5 : 0;
     const ourEffectiveRate = ourRate + multiUnitSurcharge;
     const estimatedMonthlyCost = monthlyUnits * ourEffectiveRate;
 
     // Outsource share governs how much time savings is credited
     const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
 
-    // Estimated current 3PL monthly cost (pick/pack + per-unit + storage, min floor)
+    // Estimated current 3PL monthly cost — pick/pack only applies to DTC orders
     const rawCurrent3PL =
-      i.monthlyOrders * i.currentPickPackPerOrder +
+      dtcOrders * i.currentPickPackPerOrder +
       monthlyUnits * i.currentPerUnitRate +
       i.skuCount * i.currentStoragePerSkuMonthly;
     const current3PLMonthly =
