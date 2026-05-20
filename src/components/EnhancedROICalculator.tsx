@@ -383,32 +383,137 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                 </RadioGroup>
               </div>
 
-              {/* Conditional: current 3PL rate */}
-              {(inputs.fulfillment === "other-3pl" || inputs.fulfillment === "hybrid") && (
-                <div className="rounded-xl bg-muted/40 border border-dashed p-4">
-                  <Label htmlFor="currentRate" className="text-sm font-semibold mb-2 block">
-                    <TranslatedText>Your current 3PL's per-unit rate</TranslatedText>
+              {/* Team & catalog */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="skuCount" className="text-sm font-semibold mb-2 block">
+                    <TranslatedText>Active SKUs you stock</TranslatedText>
                   </Label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">$</span>
-                    <Input
-                      id="currentRate"
-                      type="number"
-                      step="0.05"
-                      min={0}
-                      value={inputs.currentRatePerUnit || ""}
-                      onChange={(e) =>
-                        set("currentRatePerUnit", Math.max(0, Number(e.target.value) || 0))
-                      }
-                      className="text-lg font-medium max-w-[140px]"
-                    />
-                    <span className="text-sm text-muted-foreground">/ unit shipped</span>
+                  <Input
+                    id="skuCount"
+                    type="number"
+                    min={0}
+                    value={inputs.skuCount || ""}
+                    onChange={(e) => set("skuCount", Math.max(0, Number(e.target.value) || 0))}
+                    className="text-lg font-medium"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="teamSize" className="text-sm font-semibold mb-2 block">
+                    <TranslatedText>People helping with fulfillment</TranslatedText>
+                  </Label>
+                  <Input
+                    id="teamSize"
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={inputs.teamSize || ""}
+                    onChange={(e) =>
+                      set("teamSize", Math.max(1, Math.min(20, Number(e.target.value) || 1)))
+                    }
+                    className="text-lg font-medium"
+                  />
+                </div>
+              </div>
+
+              {/* Conditional: detailed 3PL pricing */}
+              {(inputs.fulfillment === "other-3pl" || inputs.fulfillment === "hybrid") && (
+                <div className="rounded-xl bg-muted/40 border border-dashed p-4 space-y-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <Label className="text-sm font-semibold block">
+                        <TranslatedText>Your current 3PL's pricing</TranslatedText>
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        <TranslatedText>
+                          Don't have the numbers handy? Hit autofill for industry averages.
+                        </TranslatedText>
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setInputs((p) => ({ ...p, ...industry3PLDefaults }))}
+                      className="shrink-0 text-xs"
+                    >
+                      <TranslatedText>Autofill averages</TranslatedText>
+                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    <TranslatedText>
-                      Used to calculate the delta vs. Westfield's tiered rate. If yours is lower, that line shows $0.
-                    </TranslatedText>
-                  </p>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="ppPerOrder" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                        <TranslatedText>Pick & pack / order</TranslatedText>
+                      </Label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground text-sm">$</span>
+                        <Input
+                          id="ppPerOrder"
+                          type="number"
+                          step="0.05"
+                          min={0}
+                          value={inputs.currentPickPackPerOrder || ""}
+                          onChange={(e) =>
+                            set("currentPickPackPerOrder", Math.max(0, Number(e.target.value) || 0))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="perUnit" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                        <TranslatedText>Add'l unit fee</TranslatedText>
+                      </Label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground text-sm">$</span>
+                        <Input
+                          id="perUnit"
+                          type="number"
+                          step="0.05"
+                          min={0}
+                          value={inputs.currentPerUnitRate || ""}
+                          onChange={(e) =>
+                            set("currentPerUnitRate", Math.max(0, Number(e.target.value) || 0))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="storagePerSku" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                        <TranslatedText>Storage / SKU / mo</TranslatedText>
+                      </Label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground text-sm">$</span>
+                        <Input
+                          id="storagePerSku"
+                          type="number"
+                          step="0.05"
+                          min={0}
+                          value={inputs.currentStoragePerSkuMonthly || ""}
+                          onChange={(e) =>
+                            set("currentStoragePerSkuMonthly", Math.max(0, Number(e.target.value) || 0))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="monthlyMin" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                        <TranslatedText>Monthly minimum</TranslatedText>
+                      </Label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground text-sm">$</span>
+                        <Input
+                          id="monthlyMin"
+                          type="number"
+                          step="10"
+                          min={0}
+                          value={inputs.currentMonthlyMinimum || ""}
+                          onChange={(e) =>
+                            set("currentMonthlyMinimum", Math.max(0, Number(e.target.value) || 0))
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -417,23 +522,23 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="hours" className="text-sm font-semibold mb-2 block">
-                      <TranslatedText>Hours/week you spend on fulfillment</TranslatedText>
+                      <TranslatedText>Hours/week per person</TranslatedText>
                     </Label>
                     <Input
                       id="hours"
                       type="number"
                       min={0}
-                      max={80}
+                      max={60}
                       value={inputs.hoursPerWeek || ""}
                       onChange={(e) =>
-                        set("hoursPerWeek", Math.max(0, Math.min(80, Number(e.target.value) || 0)))
+                        set("hoursPerWeek", Math.max(0, Math.min(60, Number(e.target.value) || 0)))
                       }
                       className="text-lg font-medium"
                     />
                   </div>
                   <div>
                     <Label htmlFor="hourly" className="text-sm font-semibold mb-2 block">
-                      <TranslatedText>Your hourly value ($)</TranslatedText>
+                      <TranslatedText>Hourly value ($)</TranslatedText>
                     </Label>
                     <Input
                       id="hourly"
