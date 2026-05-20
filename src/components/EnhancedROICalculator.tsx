@@ -61,6 +61,8 @@ const defaultInputs: CalcInputs = {
   channel: "shopify",
   monthlyOrders: 750,
   avgUnitsPerOrder: 2,
+  monthlyPrepUnits: 1000,
+  avgUnitsPerPreppedItem: 1,
   skuCount: 25,
   teamSize: 1,
   fulfillment: "self",
