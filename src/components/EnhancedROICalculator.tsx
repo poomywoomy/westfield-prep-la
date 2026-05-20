@@ -41,11 +41,9 @@ interface CalcInputs {
   // 3PL pricing (only used for other-3pl / hybrid)
   currentPickPackPerOrder: number;
   currentPerUnitRate: number;
-  currentStoragePerSkuMonthly: number;
   currentMonthlyMinimum: number;
   // Amazon FBA prep 3PL pricing
   currentFbaPrepPerUnit: number;
-  currentFbaStoragePerUnitMonthly: number;
   hoursPerWeek: number;
   hourlyValue: number;
   errorRatePct: number;
@@ -56,10 +54,8 @@ interface CalcInputs {
 const industry3PLDefaults = {
   currentPickPackPerOrder: 3.5,
   currentPerUnitRate: 0.75,
-  currentStoragePerSkuMonthly: 2.0,
   currentMonthlyMinimum: 250,
-  currentFbaPrepPerUnit: 0.85,
-  currentFbaStoragePerUnitMonthly: 0.15,
+  currentFbaPrepPerUnit: 1.4,
 };
 
 const defaultInputs: CalcInputs = {
@@ -117,15 +113,11 @@ function useRoiMath(i: CalcInputs) {
     // Outsource share governs how much time savings is credited
     const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
 
-    // Estimated current 3PL monthly cost — split by channel
+    // Estimated current 3PL monthly cost — split by channel (storage excluded)
     const dtc3PLCost = includeDtc
-      ? dtcOrders * i.currentPickPackPerOrder +
-        dtcUnits * i.currentPerUnitRate +
-        i.skuCount * i.currentStoragePerSkuMonthly
+      ? dtcOrders * i.currentPickPackPerOrder + dtcUnits * i.currentPerUnitRate
       : 0;
-    const fba3PLCost = includeFba
-      ? fbaUnits * i.currentFbaPrepPerUnit + fbaUnits * i.currentFbaStoragePerUnitMonthly
-      : 0;
+    const fba3PLCost = includeFba ? fbaUnits * i.currentFbaPrepPerUnit : 0;
     const rawCurrent3PL = dtc3PLCost + fba3PLCost;
     const current3PLMonthly =
       i.fulfillment === "self" ? 0 : Math.max(rawCurrent3PL, i.currentMonthlyMinimum);
@@ -245,7 +237,6 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
           hoursSpentWeekly: inputs.hoursPerWeek,
           currentCostPerOrder: String(inputs.currentPerUnitRate),
           currentFbaPrepPerUnit: inputs.currentFbaPrepPerUnit,
-          currentFbaStoragePerUnitMonthly: inputs.currentFbaStoragePerUnitMonthly,
           painPoints: [],
           services: [],
           specialRequirements: [],
@@ -324,19 +315,28 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                     const active = inputs.channel === opt.id;
                     const Icon = opt.icon;
                     return (
-                      <button
+                      <motion.button
                         key={opt.id}
                         type="button"
                         onClick={() => set("channel", opt.id)}
-                        className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm font-medium transition-all ${
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.97 }}
+                        className={`relative flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm font-medium transition-all overflow-hidden ${
                           active
-                            ? "border-[#FF7A00] bg-[#FF7A00]/5 text-[#0A0A23] shadow-sm"
-                            : "border-border hover:border-[#FF7A00]/40 hover:bg-muted/40 text-muted-foreground"
+                            ? "border-[#FF7A00] bg-gradient-to-br from-[#FF7A00]/10 to-[#FF7A00]/0 text-[#0A0A23] shadow-[0_8px_24px_-12px_rgba(255,122,0,0.5)]"
+                            : "border-border hover:border-[#FF7A00]/50 hover:bg-muted/40 text-muted-foreground"
                         }`}
                       >
+                        {active && (
+                          <motion.span
+                            layoutId="channel-active-glow"
+                            className="absolute inset-0 -z-10 bg-[#FF7A00]/5"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                          />
+                        )}
                         <Icon className={`w-5 h-5 ${active ? "text-[#FF7A00]" : ""}`} />
                         <TranslatedText>{opt.label}</TranslatedText>
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -567,27 +567,10 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                             />
                           </div>
                         </div>
-                        <div>
-                          <Label htmlFor="storagePerSku" className="text-xs font-medium mb-1.5 block text-muted-foreground">
-                            <TranslatedText>Storage / SKU / mo</TranslatedText>
-                          </Label>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-muted-foreground text-sm">$</span>
-                            <Input
-                              id="storagePerSku"
-                              type="number"
-                              step="0.05"
-                              min={0}
-                              value={inputs.currentStoragePerSkuMonthly || ""}
-                              onChange={(e) =>
-                                set("currentStoragePerSkuMonthly", Math.max(0, Number(e.target.value) || 0))
-                              }
-                            />
-                          </div>
-                        </div>
                       </div>
                     </div>
                   )}
+
 
                   {(inputs.channel === "amazon" || inputs.channel === "both") && (
                     <div className="space-y-2">
@@ -596,42 +579,22 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                           <TranslatedText>Amazon FBA prep 3PL</TranslatedText>
                         </p>
                       )}
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        <div>
-                          <Label htmlFor="fbaPrep" className="text-xs font-medium mb-1.5 block text-muted-foreground">
-                            <TranslatedText>FBA prep fee / unit</TranslatedText>
-                          </Label>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-muted-foreground text-sm">$</span>
-                            <Input
-                              id="fbaPrep"
-                              type="number"
-                              step="0.05"
-                              min={0}
-                              value={inputs.currentFbaPrepPerUnit || ""}
-                              onChange={(e) =>
-                                set("currentFbaPrepPerUnit", Math.max(0, Number(e.target.value) || 0))
-                              }
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="fbaStorage" className="text-xs font-medium mb-1.5 block text-muted-foreground">
-                            <TranslatedText>FBA storage / unit / mo</TranslatedText>
-                          </Label>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-muted-foreground text-sm">$</span>
-                            <Input
-                              id="fbaStorage"
-                              type="number"
-                              step="0.01"
-                              min={0}
-                              value={inputs.currentFbaStoragePerUnitMonthly || ""}
-                              onChange={(e) =>
-                                set("currentFbaStoragePerUnitMonthly", Math.max(0, Number(e.target.value) || 0))
-                              }
-                            />
-                          </div>
+                      <div>
+                        <Label htmlFor="fbaPrep" className="text-xs font-medium mb-1.5 block text-muted-foreground">
+                          <TranslatedText>FBA prep fee / unit</TranslatedText>
+                        </Label>
+                        <div className="flex items-center gap-1.5 max-w-[200px]">
+                          <span className="text-muted-foreground text-sm">$</span>
+                          <Input
+                            id="fbaPrep"
+                            type="number"
+                            step="0.05"
+                            min={0}
+                            value={inputs.currentFbaPrepPerUnit || ""}
+                            onChange={(e) =>
+                              set("currentFbaPrepPerUnit", Math.max(0, Number(e.target.value) || 0))
+                            }
+                          />
                         </div>
                       </div>
                     </div>
@@ -746,29 +709,61 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
               transition={{ duration: 0.4, delay: 0.1 }}
               className="lg:sticky lg:top-24 space-y-4"
             >
-              <div className="bg-[#0A0A23] text-white rounded-2xl p-6 md:p-7 shadow-lg overflow-hidden relative">
-                <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#FF7A00]/20 rounded-full blur-3xl pointer-events-none" />
-                <div className="relative">
-                  <p className="text-xs uppercase tracking-wider text-white/60 mb-2">
-                    <TranslatedText>Estimated monthly savings</TranslatedText>
-                  </p>
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <motion.span
-                      key={Math.round(roi.totalMonthly)}
-                      initial={{ opacity: 0.4, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-5xl md:text-6xl font-bold tracking-tight text-[#FF7A00]"
-                    >
-                      {usd(roi.totalMonthly)}
-                    </motion.span>
-                    <span className="text-white/60 text-sm">/ mo</span>
+              <div className="relative rounded-2xl p-[1.5px] bg-gradient-to-br from-[#FF7A00] via-[#FF7A00]/40 to-[#0A0A23] shadow-[0_20px_60px_-15px_rgba(255,122,0,0.45)]">
+                <div className="bg-[#0A0A23] text-white rounded-[14px] p-6 md:p-7 overflow-hidden relative">
+                  <motion.div
+                    className="absolute -top-16 -right-16 w-56 h-56 bg-[#FF7A00]/30 rounded-full blur-3xl pointer-events-none"
+                    animate={{ scale: [1, 1.15, 1], opacity: [0.55, 0.85, 0.55] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.div
+                    className="absolute -bottom-20 -left-16 w-56 h-56 bg-[#FF7A00]/10 rounded-full blur-3xl pointer-events-none"
+                    animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.55, 0.3] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <div className="relative">
+                    <div className="flex items-center gap-2 mb-2">
+                      <motion.span
+                        className="inline-block w-1.5 h-1.5 rounded-full bg-[#FF7A00]"
+                        animate={{ opacity: [0.4, 1, 0.4], scale: [0.9, 1.2, 0.9] }}
+                        transition={{ duration: 1.8, repeat: Infinity }}
+                      />
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-white/60 font-semibold">
+                        <TranslatedText>Estimated monthly savings</TranslatedText>
+                      </p>
+                    </div>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <AnimatedDollar value={roi.totalMonthly} />
+                      <span className="text-white/60 text-sm">/ mo</span>
+                    </div>
+                    <p className="text-sm text-white/70">
+                      <TranslatedText>≈</TranslatedText>{" "}
+                      <span className="text-white font-semibold">{usd(roi.annual)}</span>{" "}
+                      <TranslatedText>per year</TranslatedText>
+                    </p>
+                    {/* Savings bar */}
+                    {roi.current3PLMonthly > 0 && (
+                      <div className="mt-5 pt-4 border-t border-white/10">
+                        <div className="flex justify-between text-[11px] text-white/60 mb-1.5">
+                          <span><TranslatedText>vs your current spend</TranslatedText></span>
+                          <span className="font-mono text-[#FF7A00] font-semibold">
+                            {Math.min(100, Math.round((roi.totalMonthly / roi.current3PLMonthly) * 100))}% saved
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full bg-gradient-to-r from-[#FF7A00] to-[#FFB066]"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(100, (roi.totalMonthly / roi.current3PLMonthly) * 100)}%` }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm text-white/70">
-                    <TranslatedText>≈</TranslatedText> {usd(roi.annual)}{" "}
-                    <TranslatedText>per year</TranslatedText>
-                  </p>
                 </div>
               </div>
+
 
               {/* Breakdown */}
               <div className="bg-card border rounded-2xl p-5 md:p-6">
@@ -786,13 +781,13 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                         const parts: string[] = [];
                         if (includeDtc) {
                           parts.push(
-                            `${num(inputs.monthlyOrders)} orders × $${(inputs.currentPickPackPerOrder ?? 0).toFixed(2)} + ${num(inputs.monthlyOrders * inputs.avgUnitsPerOrder)} units × $${(inputs.currentPerUnitRate ?? 0).toFixed(2)} + ${num(inputs.skuCount ?? 0)} SKUs × $${(inputs.currentStoragePerSkuMonthly ?? 0).toFixed(2)}`
+                            `${num(inputs.monthlyOrders)} orders × $${(inputs.currentPickPackPerOrder ?? 0).toFixed(2)} + ${num(inputs.monthlyOrders * inputs.avgUnitsPerOrder)} units × $${(inputs.currentPerUnitRate ?? 0).toFixed(2)}`
                           );
                         }
                         if (includeFba) {
                           const fbaUnits = inputs.monthlyPrepUnits * inputs.avgUnitsPerPreppedItem;
                           parts.push(
-                            `${num(fbaUnits)} FBA units × ($${(inputs.currentFbaPrepPerUnit ?? 0).toFixed(2)} prep + $${(inputs.currentFbaStoragePerUnitMonthly ?? 0).toFixed(2)} storage)`
+                            `${num(fbaUnits)} FBA units × $${(inputs.currentFbaPrepPerUnit ?? 0).toFixed(2)} prep`
                           );
                         }
                         return `${parts.join("  +  ")}  (min $${inputs.currentMonthlyMinimum ?? 0})`;
@@ -1000,6 +995,32 @@ function BreakdownRow({
         {usd(value)}
       </span>
     </div>
+  );
+}
+
+function AnimatedDollar({ value }: { value: number }) {
+  const [display, setDisplay] = useState(value);
+  useEffect(() => {
+    const from = display;
+    const to = Math.max(0, Math.round(value));
+    if (from === to) return;
+    const start = performance.now();
+    const duration = 600;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(Math.round(from + (to - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+  return (
+    <span className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-[#FF7A00] to-[#FFB066] bg-clip-text text-transparent tabular-nums">
+      {usd(display)}
+    </span>
   );
 }
 
