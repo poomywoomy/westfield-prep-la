@@ -778,7 +778,23 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                     <BreakdownRow
                       label="Your current 3PL cost (est.)"
                       value={roi.current3PLMonthly}
-                      formula={`${num(inputs.monthlyOrders)} orders × $${(inputs.currentPickPackPerOrder ?? 0).toFixed(2)} + ${num(roi.monthlyUnits)} units × $${(inputs.currentPerUnitRate ?? 0).toFixed(2)} + ${num(inputs.skuCount ?? 0)} SKUs × $${(inputs.currentStoragePerSkuMonthly ?? 0).toFixed(2)} (min $${inputs.currentMonthlyMinimum ?? 0})`}
+                      formula={(() => {
+                        const includeDtc = inputs.channel === "shopify" || inputs.channel === "both";
+                        const includeFba = inputs.channel === "amazon" || inputs.channel === "both";
+                        const parts: string[] = [];
+                        if (includeDtc) {
+                          parts.push(
+                            `${num(inputs.monthlyOrders)} orders × $${(inputs.currentPickPackPerOrder ?? 0).toFixed(2)} + ${num(inputs.monthlyOrders * inputs.avgUnitsPerOrder)} units × $${(inputs.currentPerUnitRate ?? 0).toFixed(2)} + ${num(inputs.skuCount ?? 0)} SKUs × $${(inputs.currentStoragePerSkuMonthly ?? 0).toFixed(2)}`
+                          );
+                        }
+                        if (includeFba) {
+                          const fbaUnits = inputs.monthlyPrepUnits * inputs.avgUnitsPerPreppedItem;
+                          parts.push(
+                            `${num(fbaUnits)} FBA units × ($${(inputs.currentFbaPrepPerUnit ?? 0).toFixed(2)} prep + $${(inputs.currentFbaStoragePerUnitMonthly ?? 0).toFixed(2)} storage)`
+                          );
+                        }
+                        return `${parts.join("  +  ")}  (min $${inputs.currentMonthlyMinimum ?? 0})`;
+                      })()}
                     />
                   )}
                   <BreakdownRow
