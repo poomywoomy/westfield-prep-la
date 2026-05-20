@@ -228,6 +228,8 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
           currentFulfillment: inputs.fulfillment,
           monthlyOrders: inputs.monthlyOrders,
           avgUnitsPerOrder: inputs.avgUnitsPerOrder,
+          monthlyPrepUnits: inputs.monthlyPrepUnits,
+          avgUnitsPerPreppedItem: inputs.avgUnitsPerPreppedItem,
           currentErrorRate: inputs.errorRatePct,
           returnRate: inputs.returnRatePct,
           hoursSpentWeekly: inputs.hoursPerWeek,
