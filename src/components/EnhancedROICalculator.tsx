@@ -98,16 +98,25 @@ function useRoiMath(i: CalcInputs) {
     // Outsource share governs how much time savings is credited
     const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
 
-    // 3PL fee delta (only when comparing against an existing 3PL)
+    // Estimated current 3PL monthly cost (pick/pack + per-unit + storage, min floor)
+    const rawCurrent3PL =
+      i.monthlyOrders * i.currentPickPackPerOrder +
+      monthlyUnits * i.currentPerUnitRate +
+      i.skuCount * i.currentStoragePerSkuMonthly;
+    const current3PLMonthly =
+      i.fulfillment === "self" ? 0 : Math.max(rawCurrent3PL, i.currentMonthlyMinimum);
+
+    // 3PL fee delta vs Westfield (clamped at 0, blended for hybrid)
     let threePLDelta = 0;
     if (i.fulfillment === "other-3pl" || i.fulfillment === "hybrid") {
-      const delta = Math.max(0, i.currentRatePerUnit - ourEffectiveRate);
-      const blended = i.fulfillment === "hybrid" ? 0.5 : 1; // hybrid only shifts half today
-      threePLDelta = delta * monthlyUnits * blended;
+      const blendShare = i.fulfillment === "hybrid" ? 0.5 : 1;
+      threePLDelta = Math.max(0, current3PLMonthly - estimatedMonthlyCost) * blendShare;
     }
 
-    // Time recovered (only when client touches fulfillment themselves)
-    const timeRecovered = i.hoursPerWeek * 4.33 * i.hourlyValue * outsourceShare;
+    // Time recovered — multiplied by team size (hrs are per-person)
+    const cappedTeam = Math.min(Math.max(1, i.teamSize), 20);
+    const cappedHours = Math.min(Math.max(0, i.hoursPerWeek), 60);
+    const timeRecovered = cappedHours * cappedTeam * 4.33 * i.hourlyValue * outsourceShare;
 
     // Errors avoided: capped at a realistic 2% error rate so extreme inputs don't fantasize
     const cappedErrorRate = Math.min(i.errorRatePct, 2) / 100;
@@ -116,7 +125,11 @@ function useRoiMath(i: CalcInputs) {
     // Returns processed cheaper: $4/return delta vs. self-handling
     const returnsSavings = monthlyUnits * (i.returnRatePct / 100) * 4 * (outsourceShare > 0 ? 1 : 0.5);
 
-    const totalMonthly = threePLDelta + timeRecovered + errorsAvoided + returnsSavings;
+    let totalMonthly = threePLDelta + timeRecovered + errorsAvoided + returnsSavings;
+    // Sanity cap: never claim more than 2× the current 3PL spend (when comparing 3PLs)
+    if (current3PLMonthly > 0) {
+      totalMonthly = Math.min(totalMonthly, current3PLMonthly * 2);
+    }
     const annual = totalMonthly * 12;
     const roiPct =
       estimatedMonthlyCost > 0 ? Math.min(500, (totalMonthly / estimatedMonthlyCost) * 100) : 0;
@@ -126,6 +139,7 @@ function useRoiMath(i: CalcInputs) {
       ourRate,
       ourEffectiveRate,
       estimatedMonthlyCost,
+      current3PLMonthly,
       threePLDelta,
       timeRecovered,
       errorsAvoided,
