@@ -33,20 +33,36 @@ interface CalcInputs {
   channel: Channel;
   monthlyOrders: number;
   avgUnitsPerOrder: number;
+  skuCount: number;
+  teamSize: number;
   fulfillment: Fulfillment;
-  currentRatePerUnit: number; // only used for other-3pl / hybrid
+  // 3PL pricing (only used for other-3pl / hybrid)
+  currentPickPackPerOrder: number;
+  currentPerUnitRate: number;
+  currentStoragePerSkuMonthly: number;
+  currentMonthlyMinimum: number;
   hoursPerWeek: number;
   hourlyValue: number;
   errorRatePct: number;
   returnRatePct: number;
 }
 
+// Industry-average 3PL pricing — used as autofill / safe defaults
+const industry3PLDefaults = {
+  currentPickPackPerOrder: 3.5,
+  currentPerUnitRate: 0.75,
+  currentStoragePerSkuMonthly: 2.0,
+  currentMonthlyMinimum: 250,
+};
+
 const defaultInputs: CalcInputs = {
   channel: "shopify",
   monthlyOrders: 750,
   avgUnitsPerOrder: 2,
+  skuCount: 25,
+  teamSize: 1,
   fulfillment: "self",
-  currentRatePerUnit: 2.75,
+  ...industry3PLDefaults,
   hoursPerWeek: 15,
   hourlyValue: 25,
   errorRatePct: 2,
