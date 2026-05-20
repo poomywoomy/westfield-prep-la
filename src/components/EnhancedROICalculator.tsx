@@ -558,24 +558,8 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                             />
                           </div>
                         </div>
-                        <div>
-                          <Label htmlFor="storagePerSku" className="text-xs font-medium mb-1.5 block text-muted-foreground">
-                            <TranslatedText>Storage / SKU / mo</TranslatedText>
-                          </Label>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-muted-foreground text-sm">$</span>
-                            <Input
-                              id="storagePerSku"
-                              type="number"
-                              step="0.05"
-                              min={0}
-                              value={inputs.currentStoragePerSkuMonthly || ""}
-                              onChange={(e) =>
-                                set("currentStoragePerSkuMonthly", Math.max(0, Number(e.target.value) || 0))
-                              }
-                            />
-                          </div>
-                        </div>
+                      </div>
+
                       </div>
                     </div>
                   )}
