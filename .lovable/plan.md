@@ -1,37 +1,59 @@
-## Changes to `src/components/EnhancedROICalculator.tsx`
+# New Blog Post: 7 Ways Fulfillment Service Los Angeles Improves Delivery
 
-### 1. Pricing updates
-- `currentFbaPrepPerUnit` default: `0.85` → **`1.40`**
-- Industry autofill default for FBA prep: also **`1.40`**
-- **Remove storage entirely** from the 3PL pricing model:
-  - Remove `currentStoragePerSkuMonthly` (DTC per-SKU storage) field, input, autofill, and math
-  - Remove `currentFbaStoragePerUnitMonthly` field, input, autofill, and math
-  - Remove `skuCount` from cost math (it was only used for storage)
-  - Update formula breakdown tooltip to drop storage lines
-  - Remove storage fields from the `send-roi-report` payload
+Faithful port of the uploaded PDF into the project's blog system, following editorial standards (no em dashes, internal links, interactive FAQs, FAQ schema). All copy stays close to source — only structure and required hyperlinks are tightened.
 
-Resulting math:
-```
-dtc3PLCost = dtcOrders × pickPackPerOrder + dtcUnits × perUnitRate
-fba3PLCost = fbaUnits × fbaPrepPerUnit
-rawCurrent3PL = (includeDtc ? dtc3PLCost : 0) + (includeFba ? fba3PLCost : 0)
-```
+## Meta (from PDF)
 
-### 2. Visual interactivity pass (UI only, no logic changes)
-Goal: make the calculator feel premium, animated, and engaging instead of a flat form.
+- **Title:** `7 Ways Fulfillment Service Los Angeles Speeds Shipping` (≤60 chars)
+- **Meta description:** `Learn how fulfillment service Los Angeles improves delivery speed, order accuracy, and customer satisfaction for growing eCommerce brands in California.` (≤160 chars)
+- **Slug:** `7-ways-fulfillment-service-los-angeles-improves-delivery`
+- **Category:** Fulfillment
+- **Tags:** fulfillment service los angeles, fulfillment center los angeles california, los angeles fulfillment center, 3PL Los Angeles, multi-channel fulfillment
+- **Read time:** 6 min
 
-- **Animated step indicator**: gradient progress bar with shimmer; step pills scale + glow when active using `framer-motion`.
-- **Card polish**: glassmorphism (`backdrop-blur`, gradient border, soft shadow), Midnight Navy → Orange accent gradients on key surfaces, subtle floating orbs in the background.
-- **Channel selector**: large icon tiles (Shopify / Amazon / Both) with hover lift, selected state pulses in brand orange, animated check.
-- **Inputs**: focus-ring in orange, `motion` fade/slide as fields appear when channel changes, animated number counters where values display.
-- **Live results card**: 
-  - Big animated count-up for monthly + annual savings (CountUp-style with `motion`).
-  - Animated horizontal "savings vs current" comparison bar.
-  - ROI %, payback period, and "you save" chips with stagger animation on mount.
-- **Volume/simplicity discount callout**: keep copy, restyle as a glowing orange-bordered banner with an arrow icon that nudges on hover.
-- **Micro-interactions**: button hover scale, tooltip fades, section reveal on scroll via `whileInView`.
-- All styling via existing semantic tokens (Midnight Navy `#0A0A23`, Orange `#FF7A00`) — no hardcoded colors, no header/footer/logo changes.
+## Required hyperlinks (user-specified)
 
-### Out of scope
-- No backend, schema, or edge function changes beyond removing storage fields from the email payload.
-- No changes to other pages/components.
+- "fulfillment service Los Angeles" (Introduction) → `https://westfieldprepcenter.com/3pl-los-angeles`
+- "fulfillment center in Los Angeles, California" (Section 6 — Easy Multi-Channel Fulfillment) → `https://westfieldprepcenter.com/`
+- "Los Angeles fulfillment center" (Section 7 — Improved Customer Satisfaction) → `https://westfieldprepcenter.com/blog/fulfillment-center-los-angeles-growing-ecommerce-brands`
+
+Additional natural internal links added per editorial standards (≥6 total): `/3pl-los-angeles`, `/`, `/blog/fulfillment-center-los-angeles-growing-ecommerce-brands`, `/amazon-fba-prep`, `/shopify-fulfillment`, `/pricing`, `/contact`, `/why-choose-us`.
+
+## Cover image
+
+- Source: page-1 hero image extracted from the PDF (warehouse workers checking packages with a tablet)
+- Copy to `public/blog-images/fulfillment-service-los-angeles-improves-delivery.jpg`
+- Upload to Supabase `blog-images` bucket at the same filename
+- `cover_image_url` = the public Supabase URL (matches pattern of other blog rows)
+- Alt text: "Warehouse workers in a Los Angeles fulfillment center checking packages with a tablet"
+
+## Structure
+
+1. H1: 7 Ways Fulfillment Service Los Angeles Improves Delivery
+2. Introduction (with required hyperlink #1)
+3. Seven numbered sections (## H2 per section) — copied faithfully from PDF, lists preserved as bullet/ordered lists
+4. "Why Los Angeles Is a Smart Fulfillment Location"
+5. Conclusion
+6. FAQs — rendered with `<details>` / `<summary>` interactive blocks (5 questions verbatim from the PDF)
+
+## FAQ schema
+
+JSON-LD FAQPage block included inside the markdown content (matches existing posts and the project's `BlogPostSchema.tsx` auto-detection). Five Q&A pairs match the PDF exactly.
+
+## Files to add/change
+
+- New: `docs/blog-posts/7-ways-fulfillment-service-los-angeles-improves-delivery.md` — frontmatter + body matching the existing post format (see `8-ways-ecommerce-fulfillment-los-angeles-handles-peak-orders.md`)
+- New: `public/blog-images/fulfillment-service-los-angeles-improves-delivery.jpg`
+- DB insert into `blog_posts` (via `psql` insert — table allows insert per session permissions) with `published = true`, `published_at = NOW()`, and the cover image URL pointing to the uploaded Supabase asset.
+
+## SEO score self-check (target ≥9/10)
+
+- Primary keyword "fulfillment service Los Angeles" used 12+ times naturally
+- Secondary "fulfillment center in Los Angeles, California" used 8+ times
+- Required hyperlinks placed exactly where requested
+- FAQ schema present for rich-result eligibility
+- Single H1, semantic H2s, descriptive alt text, kebab-case slug
+- Internal link count ≥6 to commercially relevant pages
+- No em dashes, no run-on paragraphs, conversational tone preserved from source
+
+Switch to build mode and I'll write the markdown, copy the image, upload to storage, and insert the post.
