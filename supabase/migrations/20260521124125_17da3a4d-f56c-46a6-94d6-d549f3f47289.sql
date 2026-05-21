@@ -1,0 +1,1 @@
+UPDATE blog_posts SET title='7 Ways Fulfillment Service Los Angeles Speeds Shipping', content=regexp_replace(content, '^# 7 Ways Fulfillment Service Los Angeles Improves Delivery', '# 7 Ways Fulfillment Service Los Angeles Speeds Shipping') WHERE slug='7-ways-fulfillment-service-los-angeles-improves-delivery';
