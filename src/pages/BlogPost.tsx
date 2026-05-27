@@ -124,6 +124,7 @@ const BlogPost = () => {
             '3pl-fulfillment-startups-scaling-amazon-fba': '3PL Fulfillment for Startups Scaling with Amazon FBA',
             'fulfillment-center-los-angeles-growing-ecommerce-brands': 'Fulfillment Center Los Angeles for Growing Ecommerce Brands',
             '7-ways-fulfillment-service-los-angeles-improves-delivery': '7 Ways Fulfillment Service Los Angeles Speeds Shipping',
+            '8-professional-fulfillment-services-small-companies': '8 Fulfillment Services Designed for Small Business Growth',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
