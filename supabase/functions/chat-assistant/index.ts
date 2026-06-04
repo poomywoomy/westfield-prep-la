@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { checkRateLimit } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -42,6 +43,15 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Throttle abuse of the AI gateway by anonymous callers (per IP).
+  const allowed = await checkRateLimit(req, "chat_assistant", 20, 5);
+  if (!allowed) {
+    return new Response(
+      JSON.stringify({ error: 'Too many requests. Please slow down and try again shortly.' }),
+      { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const { messages } = await req.json();
 
@@ -51,6 +61,25 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Cap payload size to prevent quota-exhaustion via huge prompts.
+    if (messages.length > 30) {
+      return new Response(
+        JSON.stringify({ error: 'Conversation too long.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const totalChars = messages.reduce(
+      (sum: number, m: { content?: unknown }) => sum + (typeof m?.content === 'string' ? m.content.length : 0),
+      0
+    );
+    if (totalChars > 12000) {
+      return new Response(
+        JSON.stringify({ error: 'Message too large.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
 
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -51,6 +52,29 @@ serve(async (req) => {
       });
     }
 
+    // Validate target language against the supported allowlist to prevent
+    // arbitrary cache poisoning of the publicly-readable translations table.
+    if (targetLanguage && targetLanguage !== 'en' && !languageNames[targetLanguage]) {
+      return new Response(JSON.stringify({ error: 'Unsupported target language' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Enforce strict input caps to limit abuse / cache-poisoning scale.
+    if (texts.length > 50) {
+      return new Response(JSON.stringify({ error: 'Too many texts in a single request (max 50)' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (texts.some((t) => typeof t !== 'string' || t.length > 5000)) {
+      return new Response(JSON.stringify({ error: 'Invalid or oversized text entry' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     if (!targetLanguage || targetLanguage === 'en') {
       // Return original texts if English
       return new Response(JSON.stringify({ 
@@ -59,6 +83,16 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Throttle write-capable translation requests per IP.
+    const allowed = await checkRateLimit(req, 'translate_content', 60, 5);
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: 'Too many requests. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;

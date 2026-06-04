@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { checkRateLimit } from "../_shared/rate-limit.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -6,6 +8,16 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Escape user-supplied content before interpolating into HTML email bodies.
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 interface SupportTicketEmailRequest {
   clientId: string;
@@ -23,6 +35,43 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Require an authenticated session (support tickets come from the client dashboard).
+  const authHeader = req.headers.get("Authorization") || "";
+  const token = authHeader.replace("Bearer ", "").trim();
+  if (!token) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  try {
+    const authClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: userData, error: userErr } = await authClient.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  } catch (_e) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Throttle to prevent inbox spam.
+  if (!(await checkRateLimit(req, "support_ticket_email", 10, 10))) {
+    return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+      status: 429,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const { 
       clientId,
@@ -35,7 +84,28 @@ const handler = async (req: Request): Promise<Response> => {
       otherIssueText 
     }: SupportTicketEmailRequest = await req.json();
 
+    if (typeof message === "string" && message.length > 5000) {
+      return new Response(JSON.stringify({ error: "Message too long." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const displayIssueType = issueType === "other" ? otherIssueText : issueType;
+
+    // HTML-escaped versions for safe interpolation into email bodies.
+    const safeClientName = escapeHtml(clientName);
+    const safeClientId = escapeHtml(clientId);
+    const safeEmail = escapeHtml(email);
+    const safePhone = escapeHtml(phone);
+    const safeIssueType = escapeHtml(displayIssueType);
+    const safePreferred = escapeHtml(preferredContactMethod);
+    const safePreferredLower = escapeHtml(String(preferredContactMethod ?? "").toLowerCase());
+    const safeMessage = escapeHtml(message);
+
+
+
+
 
     // Send email to admin
     const adminEmailResponse = await fetch("https://api.resend.com/emails", {
@@ -47,28 +117,28 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Westfield Prep Center <info@westfieldprepcenter.com>",
         to: ["info@westfieldprepcenter.com"],
-        subject: `🎫 Support Ticket: ${displayIssueType} - ${clientName}`,
+        subject: `🎫 Support Ticket: ${safeIssueType} - ${safeClientName}`,
         html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">New Support Ticket</h2>
           
           <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">Client Information</h3>
-            <p><strong>Company:</strong> ${clientName}</p>
-            <p><strong>Client ID:</strong> ${clientId}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Company:</strong> ${safeClientName}</p>
+            <p><strong>Client ID:</strong> ${safeClientId}</p>
+            <p><strong>Email:</strong> ${safeEmail}</p>
+            <p><strong>Phone:</strong> ${safePhone}</p>
           </div>
 
           <div style="margin: 20px 0;">
             <h3>Ticket Details</h3>
-            <p><strong>Issue Type:</strong> ${displayIssueType}</p>
-            <p><strong>Preferred Contact Method:</strong> ${preferredContactMethod}</p>
+            <p><strong>Issue Type:</strong> ${safeIssueType}</p>
+            <p><strong>Preferred Contact Method:</strong> ${safePreferred}</p>
           </div>
 
           <div style="background: #fff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px;">
             <h3 style="margin-top: 0;">Message</h3>
-            <p style="white-space: pre-wrap;">${message}</p>
+            <p style="white-space: pre-wrap;">${safeMessage}</p>
           </div>
 
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
@@ -100,7 +170,7 @@ const handler = async (req: Request): Promise<Response> => {
         body: JSON.stringify({
           from: "Westfield Prep Center <info@westfieldprepcenter.com>",
           to: [email],
-          subject: `Support Ticket Received - ${displayIssueType}`,
+          subject: `Support Ticket Received - ${safeIssueType}`,
           html: `
           <!DOCTYPE html>
           <html>
@@ -130,7 +200,7 @@ const handler = async (req: Request): Promise<Response> => {
                           </h1>
 
                           <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #4a5568;">
-                            We've received your support ticket and our team will respond shortly via <strong style="color: #ff8000;">${preferredContactMethod.toLowerCase()}</strong>.
+                            We've received your support ticket and our team will respond shortly via <strong style="color: #ff8000;">${safePreferredLower}</strong>.
                           </p>
 
                           <!-- Ticket Details Box -->
@@ -139,10 +209,10 @@ const handler = async (req: Request): Promise<Response> => {
                               <td style="padding: 20px;">
                                 <h3 style="margin: 0 0 15px 0; font-size: 18px; color: #1a1f2e;">Your Ticket Details</h3>
                                 <p style="margin: 8px 0; font-size: 14px; color: #4a5568;">
-                                  <strong>Issue Type:</strong> <span style="color: #ff8000;">${displayIssueType}</span>
+                                  <strong>Issue Type:</strong> <span style="color: #ff8000;">${safeIssueType}</span>
                                 </p>
                                 <p style="margin: 8px 0; font-size: 14px; color: #4a5568;">
-                                  <strong>Preferred Contact:</strong> ${preferredContactMethod}
+                                  <strong>Preferred Contact:</strong> ${safePreferred}
                                 </p>
                               </td>
                             </tr>
@@ -153,7 +223,7 @@ const handler = async (req: Request): Promise<Response> => {
                             <tr>
                               <td style="padding: 20px;">
                                 <h3 style="margin: 0 0 15px 0; font-size: 16px; color: #1a1f2e;">Your Message</h3>
-                                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #4a5568; white-space: pre-wrap;">${message}</p>
+                                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #4a5568; white-space: pre-wrap;">${safeMessage}</p>
                               </td>
                             </tr>
                           </table>
@@ -169,7 +239,7 @@ const handler = async (req: Request): Promise<Response> => {
                               </tr>
                               <tr>
                                 <td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #4a5568;">
-                                  ✓ We'll contact you via ${preferredContactMethod.toLowerCase()} within 24 hours
+                                  ✓ We'll contact you via ${safePreferredLower} within 24 hours
                                 </td>
                               </tr>
                               <tr>

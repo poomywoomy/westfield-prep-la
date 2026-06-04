@@ -15,35 +15,35 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
     .replace(/<\/h1>/gi, '</h2>');
 
   // Add lazy loading + async decoding to all images and prefer WebP variants
-  // for /blog-images/ assets, with onerror fallback to the original file.
+  // for /blog-images/ assets. A native <picture> element provides the raster
+  // fallback when a .webp variant is missing — no inline event handlers needed,
+  // so DOMPurify can keep blocking all on* attributes (XSS-safe).
   const htmlWithLazyLoad = normalizedHeadingHtml.replace(
     /<img\b([^>]*?)\bsrc=(["'])([^"']+)\2([^>]*)>/gi,
     (_match, preAttrs, quote, src, postAttrs) => {
       const isBlogImage = src.includes('/blog-images/');
       const isRasterFallback = /\.(jpe?g|png)(\?.*)?$/i.test(src);
-      let finalSrc = src;
-      let extraAttrs = '';
+      const imgTag = `<img${preAttrs}src=${quote}${src}${quote}${postAttrs} loading="lazy" decoding="async">`;
       if (isBlogImage && isRasterFallback) {
-        finalSrc = src.replace(/\.(jpe?g|png)(\?.*)?$/i, '.webp$2');
-        // If the WebP variant is missing, fall back to the original raster file.
-        const safeOriginal = src.replace(/'/g, "&apos;");
-        extraAttrs += ` onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='${safeOriginal}';}"`;
+        const webpSrc = src.replace(/\.(jpe?g|png)(\?.*)?$/i, '.webp$2');
+        return `<picture><source srcset=${quote}${webpSrc}${quote} type="image/webp">${imgTag}</picture>`;
       }
-      return `<img${preAttrs}src=${quote}${finalSrc}${quote}${postAttrs} loading="lazy" decoding="async"${extraAttrs}>`;
+      return imgTag;
     }
   );
 
-  // Sanitize HTML to prevent XSS attacks (defense-in-depth)
+  // Sanitize HTML to prevent XSS attacks (defense-in-depth).
+  // No event-handler attributes (e.g. onerror) are allowed.
   const enhancedHtml = DOMPurify.sanitize(htmlWithLazyLoad, {
     ALLOWED_TAGS: [
       'h2', 'h3', 'h4', 'h5', 'h6',
       'p', 'a', 'ul', 'ol', 'li',
-      'code', 'pre', 'img', 'blockquote',
+      'code', 'pre', 'img', 'picture', 'source', 'blockquote',
       'strong', 'em', 'br', 'hr',
       'table', 'thead', 'tbody', 'tr', 'th', 'td',
       'details', 'summary'
     ],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'loading', 'decoding', 'open', 'onerror']
+    ALLOWED_ATTR: ['href', 'src', 'srcset', 'type', 'alt', 'title', 'class', 'id', 'loading', 'decoding', 'open']
   });
   
   return (
