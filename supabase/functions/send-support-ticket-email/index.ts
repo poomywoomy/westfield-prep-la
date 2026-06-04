@@ -93,6 +93,18 @@ const handler = async (req: Request): Promise<Response> => {
 
     const displayIssueType = issueType === "other" ? otherIssueText : issueType;
 
+    // HTML-escaped versions for safe interpolation into email bodies.
+    const safeClientName = escapeHtml(clientName);
+    const safeClientId = escapeHtml(clientId);
+    const safeEmail = escapeHtml(email);
+    const safePhone = escapeHtml(phone);
+    const safeIssueType = escapeHtml(displayIssueType);
+    const safePreferred = escapeHtml(preferredContactMethod);
+    const safePreferredLower = escapeHtml(String(preferredContactMethod ?? "").toLowerCase());
+    const safeMessage = escapeHtml(message);
+
+
+
 
 
     // Send email to admin
