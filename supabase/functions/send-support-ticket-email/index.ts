@@ -117,28 +117,28 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Westfield Prep Center <info@westfieldprepcenter.com>",
         to: ["info@westfieldprepcenter.com"],
-        subject: `🎫 Support Ticket: ${displayIssueType} - ${clientName}`,
+        subject: `🎫 Support Ticket: ${safeIssueType} - ${safeClientName}`,
         html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">New Support Ticket</h2>
           
           <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">Client Information</h3>
-            <p><strong>Company:</strong> ${clientName}</p>
-            <p><strong>Client ID:</strong> ${clientId}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Company:</strong> ${safeClientName}</p>
+            <p><strong>Client ID:</strong> ${safeClientId}</p>
+            <p><strong>Email:</strong> ${safeEmail}</p>
+            <p><strong>Phone:</strong> ${safePhone}</p>
           </div>
 
           <div style="margin: 20px 0;">
             <h3>Ticket Details</h3>
-            <p><strong>Issue Type:</strong> ${displayIssueType}</p>
-            <p><strong>Preferred Contact Method:</strong> ${preferredContactMethod}</p>
+            <p><strong>Issue Type:</strong> ${safeIssueType}</p>
+            <p><strong>Preferred Contact Method:</strong> ${safePreferred}</p>
           </div>
 
           <div style="background: #fff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px;">
             <h3 style="margin-top: 0;">Message</h3>
-            <p style="white-space: pre-wrap;">${message}</p>
+            <p style="white-space: pre-wrap;">${safeMessage}</p>
           </div>
 
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
