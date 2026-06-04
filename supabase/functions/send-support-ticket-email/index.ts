@@ -170,7 +170,7 @@ const handler = async (req: Request): Promise<Response> => {
         body: JSON.stringify({
           from: "Westfield Prep Center <info@westfieldprepcenter.com>",
           to: [email],
-          subject: `Support Ticket Received - ${displayIssueType}`,
+          subject: `Support Ticket Received - ${safeIssueType}`,
           html: `
           <!DOCTYPE html>
           <html>
@@ -200,7 +200,7 @@ const handler = async (req: Request): Promise<Response> => {
                           </h1>
 
                           <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #4a5568;">
-                            We've received your support ticket and our team will respond shortly via <strong style="color: #ff8000;">${preferredContactMethod.toLowerCase()}</strong>.
+                            We've received your support ticket and our team will respond shortly via <strong style="color: #ff8000;">${safePreferredLower}</strong>.
                           </p>
 
                           <!-- Ticket Details Box -->
@@ -209,10 +209,10 @@ const handler = async (req: Request): Promise<Response> => {
                               <td style="padding: 20px;">
                                 <h3 style="margin: 0 0 15px 0; font-size: 18px; color: #1a1f2e;">Your Ticket Details</h3>
                                 <p style="margin: 8px 0; font-size: 14px; color: #4a5568;">
-                                  <strong>Issue Type:</strong> <span style="color: #ff8000;">${displayIssueType}</span>
+                                  <strong>Issue Type:</strong> <span style="color: #ff8000;">${safeIssueType}</span>
                                 </p>
                                 <p style="margin: 8px 0; font-size: 14px; color: #4a5568;">
-                                  <strong>Preferred Contact:</strong> ${preferredContactMethod}
+                                  <strong>Preferred Contact:</strong> ${safePreferred}
                                 </p>
                               </td>
                             </tr>
@@ -223,7 +223,7 @@ const handler = async (req: Request): Promise<Response> => {
                             <tr>
                               <td style="padding: 20px;">
                                 <h3 style="margin: 0 0 15px 0; font-size: 16px; color: #1a1f2e;">Your Message</h3>
-                                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #4a5568; white-space: pre-wrap;">${message}</p>
+                                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #4a5568; white-space: pre-wrap;">${safeMessage}</p>
                               </td>
                             </tr>
                           </table>
@@ -239,7 +239,7 @@ const handler = async (req: Request): Promise<Response> => {
                               </tr>
                               <tr>
                                 <td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #4a5568;">
-                                  ✓ We'll contact you via ${preferredContactMethod.toLowerCase()} within 24 hours
+                                  ✓ We'll contact you via ${safePreferredLower} within 24 hours
                                 </td>
                               </tr>
                               <tr>
