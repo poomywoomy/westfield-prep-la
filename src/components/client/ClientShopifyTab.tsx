@@ -69,7 +69,7 @@ export default function ClientShopifyTab() {
       // Get store connection
       const { data: storeData } = await supabase
         .from('shopify_stores')
-        .select('*')
+        .select('id, client_id, shop_domain, scope, connected_at, updated_at, is_active')
         .eq('client_id', client.id)
         .eq('is_active', true)
         .maybeSingle();
