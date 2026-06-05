@@ -163,7 +163,7 @@ export function ShopifyManagementTab() {
       const { data, error } = await supabase
         .from("shopify_stores")
         .select(`
-          *,
+          id, client_id, shop_domain, scope, connected_at, updated_at, is_active,
           clients!inner(company_name, shopify_location_id)
         `)
         .order("connected_at", { ascending: false });
