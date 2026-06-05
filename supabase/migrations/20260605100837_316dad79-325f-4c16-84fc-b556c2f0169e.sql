@@ -1,0 +1,1 @@
+UPDATE blog_posts SET content = REPLACE(content, 'work with professional [prep centers for amazon fba](https://westfieldprepcenter.com/sales-channels/amazon)?', 'work with professional [prep centers for amazon fba](https://westfieldprepcenter.com/sales-channels/amazon).') WHERE slug = 'amazon-fba-prep-center-vs-diy-time-and-cost-compared';
