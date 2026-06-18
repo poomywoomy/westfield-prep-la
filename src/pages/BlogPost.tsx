@@ -127,6 +127,7 @@ const BlogPost = () => {
             '8-professional-fulfillment-services-small-companies': '8 Fulfillment Services Designed for Small Business Growth',
             '9-fulfillment-service-los-angeles-ideas-work-fast': '9 Fulfillment Services Los Angeles Tips for Faster Shipping',
             'shopify-fulfillment-vs-amazon-fba-for-online-sellers': 'Shopify Fulfillment vs Amazon FBA: Which Drives Growth?',
+            'ecommerce-fulfillment-los-angeles-vs-retail-logistics-hub': 'E-commerce Fulfillment Solutions vs Retail Logistics',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
