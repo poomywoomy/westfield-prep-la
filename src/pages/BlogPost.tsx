@@ -128,7 +128,7 @@ const BlogPost = () => {
             '9-fulfillment-service-los-angeles-ideas-work-fast': '9 Fulfillment Services Los Angeles Tips for Faster Shipping',
             'shopify-fulfillment-vs-amazon-fba-for-online-sellers': 'Shopify Fulfillment vs Amazon FBA: Which Drives Growth?',
             'ecommerce-fulfillment-los-angeles-vs-retail-logistics-hub': 'E-commerce Fulfillment Solutions vs Retail Logistics',
-            'tiktok-fulfillment-center-vs-traditional-warehousing-models': 'TikTok Fulfillment Center vs Traditional Warehousing Models',
+            'tiktok-fulfillment-center-vs-traditional-warehousing-models': 'TikTok Fulfillment vs Traditional Warehouse Systems',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
