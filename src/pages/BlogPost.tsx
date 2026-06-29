@@ -129,6 +129,8 @@ const BlogPost = () => {
             'shopify-fulfillment-vs-amazon-fba-for-online-sellers': 'Shopify Fulfillment vs Amazon FBA: Which Drives Growth?',
             'ecommerce-fulfillment-los-angeles-vs-retail-logistics-hub': 'E-commerce Fulfillment Solutions vs Retail Logistics',
             'tiktok-fulfillment-center-vs-traditional-warehousing-models': 'TikTok Fulfillment vs Traditional Warehouse Systems',
+            'micro-warehouses-vs-fulfillment-centers-for-small-businesses': 'Micro Warehouses vs Fulfillment Centers: Complete Guide',
+            'los-angeles-fulfillment-center-vs-local-warehousing-solutions': 'Which Is Better: Fulfillment Center or Local Warehouse?',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
