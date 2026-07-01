@@ -1,0 +1,11 @@
+[pid   308] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8[pid   322] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+[pid   322] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8[pid   308] write(2<pipe:[133]>, "{\"level\":\"info\",\"module\":\"\",\"tim"..., 256) = 256
+[pid   308] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+) = 24
+) = 24
+[pid   310] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8[pid   322] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+) = 8
+[pid   322] write(2<pipe:[133]>, "{\"level\":\"info\",\"module\":\"\",\"tim"..., 256[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   310] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   310] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---

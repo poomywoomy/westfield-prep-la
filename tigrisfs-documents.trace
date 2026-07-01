@@ -1,0 +1,80 @@
+/bin/strace: Process 302 attached with 14 threads
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] write(3<socket:[397]>, "\27\3\3\5\310\243\371\231\267\232\371\321\267\217\235e\22Bvp!\325\3364\332s\271g%\300s\27"..., 1485) = 1485
+[pid   332] write(3<socket:[397]>, "\27\3\3\5\247\277\2547v\v\212Z\371i\252\16\365\306\260\"\203=\331\216;V\264u\227\251\270n"..., 1452) = 1452
+[pid   308] write(7<socket:[448]>, "x\207\1\0\0\1\0\0\0\0\0\1 a1a943b2f1c48954819"..., 86 <unfinished ...>
+[pid   322] write(8<socket:[449]>, "\254\304\1\0\0\1\0\0\0\0\0\1 a1a943b2f1c48954819"..., 86 <unfinished ...>
+[pid   308] <... write resumed>)        = 86
+[pid   322] <... write resumed>)        = 86
+[pid   322] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   317] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   310] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   309] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   322] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+/bin/strace: Process 366 attached
+[pid   317] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   323] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   309] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   322] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   308] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   317] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   302] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   318] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+/bin/strace: Process 367 attached
+[pid   310] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   323] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   302] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   310] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   367] write(8<socket:[454]>, "\26\3\1\5\352\1\0\5\346\3\3\300-\356\215\237\324\363+\266k^{\373\17K3'\335\3660\231"..., 1519 <unfinished ...>
+[pid   332] write(7<socket:[453]>, "\26\3\1\5\352\1\0\5\346\3\3\325\347\317\274`[\273{\321\357\36\25b\"(\\w\372\350\375'"..., 1519) = 1519
+[pid   367] <... write resumed>)        = 1519
+[pid   302] write(3<socket:[397]>, "\27\3\3\5-\365>\312k\267^\35198\373\203Cf\204Y4\377\210\4\230\310\264\4\216\317\357_"..., 1330) = 1330
+[pid   367] write(8<socket:[454]>, "\24\3\3\0\1\1\27\3\3\0005\7\2048wK\201;E\335\32\1?\336&;-+\37Z\10\r"..., 64 <unfinished ...>
+[pid   332] write(7<socket:[453]>, "\24\3\3\0\1\1\27\3\3\0005\306\377\255\260\321@\374\2724\234\351\t\214dz\336*\365\303\336\234"..., 64 <unfinished ...>
+[pid   367] <... write resumed>)        = 64
+[pid   332] <... write resumed>)        = 64
+[pid   322] write(7<socket:[453]>, "\27\3\3\4\263:\335 1\225\222}\2215\206\216\235\203\30\\\316\27\313\367N\201\263\221\236p'\362"..., 1208) = 1208
+[pid   322] write(7<socket:[453]>, "\27\3\3\0\214\314\212{\307\367\\Z\367v\233\341[t\fe\35\226\272\244\215p\372\203.\"t\354"..., 145) = 145
+[pid   322] write(6</dev/fuse<char 10:229>>, "\20\0\0\0\376\377\377\377\6\0\0\0\0\0\0\0", 16) = 16
+[pid   311] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   311] writev(6</dev/fuse<char 10:229>>, [{iov_base="\240\0\0\0\0\0\0\0\10\0\0\0\0\0\0\0", iov_len=16}, {iov_base="\2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0;\0\0\0\0\0\0\0;\0\0\0\0\0\0\0"..., iov_len=128}, {iov_base="\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", iov_len=16}], 3) = 160
+[pid   311] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   302] writev(6</dev/fuse<char 10:229>>, [{iov_base="x\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0", iov_len=16}, {iov_base=";\0\0\0\0\0\0\0\206}\232;\0\0\0\0\2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., iov_len=104}], 2) = 120
+[pid   367] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   302] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   311] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   302] write(6</dev/fuse<char 10:229>>, "\20\0\0\0\0\0\0\0\f\0\0\0\0\0\0\0", 16 <unfinished ...>
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   366] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   302] <... write resumed>)        = 16
+[pid   317] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   322] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   308] write(6</dev/fuse<char 10:229>>, "\20\0\0\0\0\0\0\0\16\0\0\0\0\0\0\0", 16) = 16
+[pid   308] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   308] write(6</dev/fuse<char 10:229>>, "\20\0\0\0\0\0\0\0\20\0\0\0\0\0\0\0", 16) = 16
+[pid   332] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   332] write(7<socket:[453]>, "\27\3\3\5\274k\351\365\237\336\310\203\274\177!_\275<\23\365]\331:\1Y\222\33wa7@#"..., 1473) = 1473
+[pid   308] write(6</dev/fuse<char 10:229>>, "\20\0\0\0\0\0\0\0\22\0\0\0\0\0\0\0", 16) = 16
+[pid   322] write(7<socket:[453]>, "\27\3\3\5F\315\324\374\3669s\30\240\v \271u\235\351\300`JZPR'$\246L\215\276\305"..., 1355) = 1355
+[pid   308] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+[pid   308] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   310] write(8<socket:[454]>, "\27\3\3\0\23\n\337\31C[H2\332A\21i\237\245jq!\217u\367", 24) = 24
+[pid   308] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+[pid   308] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   308] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+[pid   308] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   310] --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=302, si_uid=0} ---
+[pid   322] write(2<pipe:[133]>, "{\"level\":\"info\",\"module\":\"\",\"tim"..., 256) = 256
+[pid   322] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+[pid   322] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+[pid   308] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+[pid   308] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+[pid   308] write(5<anon_inode:[eventfd]>, "\1\0\0\0\0\0\0\0", 8) = 8
+[pid   322] write(2<pipe:[133]>, "{\"level\":\"info\",\"module\":\"\",\"tim"..., 256) = 256
