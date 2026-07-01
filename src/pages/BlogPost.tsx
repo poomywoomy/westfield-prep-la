@@ -132,6 +132,7 @@ const BlogPost = () => {
             'micro-warehouses-vs-fulfillment-centers-for-small-businesses': 'Micro Warehouses vs Fulfillment Centers: Complete Guide',
             'los-angeles-fulfillment-center-vs-local-warehousing-solutions': 'Which Is Better: Fulfillment Center or Local Warehouse?',
             'warehousing-and-fulfillment-vs-order-fulfillment-services': 'Compare Logistics: Warehousing vs Order Fulfillment',
+            'direct-to-consumer-fulfillment-vs-multi-channel-fulfillment': 'Choosing Between DTC and Multi-Channel Fulfillment Solutions',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
