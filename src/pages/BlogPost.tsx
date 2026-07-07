@@ -133,6 +133,7 @@ const BlogPost = () => {
             'los-angeles-fulfillment-center-vs-local-warehousing-solutions': 'Which Is Better: Fulfillment Center or Local Warehouse?',
             'warehousing-and-fulfillment-vs-order-fulfillment-services': 'Compare Logistics: Warehousing vs Order Fulfillment',
             'direct-to-consumer-fulfillment-vs-multi-channel-fulfillment': 'Choosing Between DTC and Multi-Channel Fulfillment Solutions',
+            '3pl-for-amazon-fba-vs-ecommerce-fulfillment-centers': 'Choosing Between Amazon FBA 3PL and E-commerce Fulfillment',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
