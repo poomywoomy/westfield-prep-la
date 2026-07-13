@@ -135,6 +135,7 @@ const BlogPost = () => {
             'direct-to-consumer-fulfillment-vs-multi-channel-fulfillment': 'Choosing Between DTC and Multi-Channel Fulfillment Solutions',
             '3pl-for-amazon-fba-vs-ecommerce-fulfillment-centers': 'Choosing Between Amazon FBA 3PL and E-commerce Fulfillment',
             'warehouse-automation-vs-west-coast-3pl-warehouse-services': 'Warehouse Automation vs 3PL Warehouse Services Explained',
+            'automated-order-fulfillment-vs-storage-for-ecommerce': 'Automated Order Fulfillment vs Ecommerce Storage Explained',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
