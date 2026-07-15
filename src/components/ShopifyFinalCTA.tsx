@@ -62,7 +62,7 @@ const ShopifyFinalCTA = () => {
             viewport={{ once: true }}
             className="mt-8 text-sm opacity-80"
           >
-            Same-day receiving • 24-48hr turnaround • No order minimums
+            Same-day receiving • 24-48hr turnaround • Built for 1,000+ orders/mo
           </motion.p>
         </div>
       </div>

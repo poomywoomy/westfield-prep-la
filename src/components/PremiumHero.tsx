@@ -80,7 +80,7 @@ const PremiumHero = () => {
               {/* Sub */}
               <p className="mt-7 text-lg md:text-xl text-white/85 leading-relaxed max-w-2xl">
                 <TranslatedText>
-                  Full-service fulfillment & FBA prep in 24 hours. Transparent pricing. No monthly minimums.
+                  Full-service fulfillment & FBA prep in 24 hours. Transparent pricing. Built for 1,000+ orders/month.
                 </TranslatedText>
               </p>
 

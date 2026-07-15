@@ -281,7 +281,7 @@ export const generateFulfillmentGuidePDF = (): jsPDF => {
   addBullet('Complete pricing breakdown received');
   addBullet('No hidden fees confirmed');
   addBullet('Shipping rates are competitive');
-  addBullet('No unreasonable minimums');
+  
   addHeader('Contract', 2);
   addBullet('Month-to-month or short term');
   addBullet('Reasonable termination terms');

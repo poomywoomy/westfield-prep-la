@@ -825,8 +825,8 @@ const WhyChooseUs = () => {
 
             <div className="bg-white border border-[hsl(var(--wcu-line))] rounded-3xl p-6 md:p-8 shadow-[0_30px_60px_-40px_hsl(var(--wcu-ink)/0.25)]">
               <FAQItem
-                q="Do you have monthly minimums?"
-                a="We believe in growing with you. While we don't have strict minimum orders per month, we do have a minimum monthly storage and account fee of $250 to ensure we can dedicate resources to your account. This is usually easily met by active sellers."
+                q="What kind of brands do you work with?"
+                a="We're purpose-built for scaling ecommerce brands shipping 1,000+ orders per month, up to 50,000+. Our platform, pricing, and operations are designed around that volume band. We also carry a $250 monthly storage and account fee to ensure we can dedicate resources to your account, which is easily met by active sellers."
               />
               <FAQItem
                 q="How fast is your receiving process?"

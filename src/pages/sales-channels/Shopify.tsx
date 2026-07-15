@@ -52,7 +52,7 @@ const faqData = [
   {
     question: "Is there a minimum order volume?",
     answer:
-      "No hard minimums and no long-term contracts, but we're built for Shopify brands doing 1,000+ orders per month, scaling to 50,000+. Pricing is per unit and month-to-month — you only pay for what you actually use.",
+      "No long-term contracts, and we're built for Shopify brands doing 1,000+ orders per month, scaling to 50,000+. Pricing is per unit and month-to-month — you only pay for what you actually use.",
   },
 ];
 
