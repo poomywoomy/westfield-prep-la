@@ -335,11 +335,10 @@ const ContactForm = () => {
                         <SelectValue placeholder="Select monthly units" />
                       </SelectTrigger>
                       <SelectContent className="bg-background border border-border z-50">
-                        <SelectItem value="just-starting"><TranslatedText>Just Starting</TranslatedText></SelectItem>
-                        <SelectItem value="0-1000">0 – 1,000</SelectItem>
-                        <SelectItem value="1001-5000">1,001 – 5,000</SelectItem>
-                        <SelectItem value="5001-10000">5,001 – 10,000</SelectItem>
-                        <SelectItem value="10000+">10,000+</SelectItem>
+                        <SelectItem value="0-1000"><TranslatedText>Under 1,000</TranslatedText></SelectItem>
+                        <SelectItem value="1001-5000">1,000 – 5,000</SelectItem>
+                        <SelectItem value="5001-25000">5,000 – 25,000</SelectItem>
+                        <SelectItem value="25000+">25,000+</SelectItem>
                       </SelectContent>
                     </Select>
                     {errors.unitsPerMonth && <p className="text-sm text-destructive mt-1">{errors.unitsPerMonth}</p>}

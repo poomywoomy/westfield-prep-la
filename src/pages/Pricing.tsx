@@ -112,7 +112,7 @@ const Pricing = () => {
     },
     { 
       question: "Are there any setup fees or minimums?", 
-      answer: "No setup fees or long-term contracts required. We work with businesses of all sizes. While we don't have strict minimums, pricing is optimized for businesses shipping at least 100 units per month." 
+      answer: "No setup fees or long-term contracts required. We don't enforce a hard minimum, but our pricing, platform, and operations are purpose-built for brands shipping 1,000+ orders per month." 
     },
     { 
       question: "How does storage pricing work?", 
@@ -867,7 +867,7 @@ const Pricing = () => {
                   </div>
                   <h3 className="text-lg md:text-xl font-semibold mb-3"><TranslatedText>Flexible & Scalable</TranslatedText></h3>
                   <p className="text-muted-foreground text-sm md:text-base">
-                    <TranslatedText>Our pricing adapts to your business. Whether you're shipping 100 units or 10,000, we have a solution that works for your current size and future growth.</TranslatedText>
+                    <TranslatedText>Our pricing adapts to your business. Built for brands shipping 1,000+ orders per month, with solutions that scale to 50,000+ as you grow.</TranslatedText>
                   </p>
                 </motion.div>
               </motion.div>

@@ -86,8 +86,8 @@ const InventoryStorage = () => {
                 From single pallets to thousands of SKUs, we have the space and systems to keep your products organized, accessible, and ready to ship.
               </p>
               <p className="text-muted-foreground mb-6">
-                With over 25,000 square feet of warehouse space and capacity for 500+ pallets, we can accommodate 
-                everything from startup inventory to enterprise-scale operations. Our strategic location—just 
+                With over 25,000 square feet of warehouse space and capacity for 500+ pallets, we support
+                scaling brands through enterprise-scale operations. Our strategic location—just 
                 miles from the Port of Los Angeles—means your imported goods move quickly from container to shelf, 
                 ready for fulfillment within days, not weeks.
               </p>
@@ -96,7 +96,7 @@ const InventoryStorage = () => {
                 {[
                   "Secure, monitored facility 24/7",
                   "Flexible month-to-month terms",
-                  "No minimum storage requirements",
+                  "Built for brands doing 1,000+ orders/mo",
                   "Strategic LA location near major ports"
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-3">

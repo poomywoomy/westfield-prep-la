@@ -22,7 +22,7 @@ const points = [
   {
     icon: Wallet,
     title: "Transparent per-unit pricing",
-    body: "Receiving, prep, storage, and LTL forwarding are all priced per unit or per pallet — published up front. No surprise fees, no minimums, no long-term contracts to escape from later.",
+    body: "Receiving, prep, storage, and LTL forwarding are all priced per unit or per pallet — published up front. No surprise fees and no long-term contracts. Built for sellers doing 1,000+ units per month.",
   },
 ];
 

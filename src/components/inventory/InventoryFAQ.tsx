@@ -27,7 +27,7 @@ const InventoryFAQ = () => {
     },
     {
       question: "What's your minimum SKU count to work with you?",
-      answer: "There's no minimum SKU requirement. Whether you have 10 SKUs or 10,000, our system handles it the same way. We work with brands at all stages—from startups with a handful of products to established companies with complex catalogs."
+      answer: "No hard minimum SKU count, but our platform is built for scaling catalogs. Whether you have 50 SKUs or 10,000, our system handles it the same way. Our sweet spot is brands doing 1,000+ orders per month with complex, growing catalogs."
     },
     {
       question: "How do you handle inventory shrinkage or discrepancies?",
