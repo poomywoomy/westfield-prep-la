@@ -1,51 +1,106 @@
-# Publish "Amazon FBA Prep Center vs DIY" Blog Post
+# Reposition Toward 1,000+ Orders/Month (Soft Positioning)
 
-Add the uploaded PDF content as a published blog post, verbatim, with the requested hero/meta setup, hyperlinks, cover image, and FAQ schema.
+Shift public-facing copy so the site clearly **speaks to brands doing 1,000+ orders/month** as the primary audience — without hard-blocking or turning away smaller brands. Framing is "built for scaling brands, sweet spot 1,000+/mo," not "we require 1,000+."
 
-## 1. Cover image upload
-- Copy the page-1 hero image (man on floor with boxes) from the parsed PDF into the project, then upload it to the existing public `blog-images` Cloud storage bucket at:
-  `amazon-fba-prep-center-vs-diy-time-and-cost-compared.jpg`
-- Use the resulting public URL as the post's `cover_image_url`.
+**Tone rules:**
+- ✅ "Built for brands shipping 1,000+ orders/month"
+- ✅ "Our sweet spot is 1,000+ orders/mo, and we scale to 50,000+"
+- ✅ "Purpose-built for mid-market and scaling ecommerce brands"
+- ❌ No "minimum required," "we don't work with under X," or hard gates
+- ❌ Drop "no minimums / any size / your first 50 orders" small-brand language
 
-## 2. Hero + meta handling
-- `title` field = **"Amazon FBA Prep Center vs DIY: Save Time and Money"** (the PDF meta title). This renders as the hero H1 and feeds the meta `<title>`.
-- `meta_description` = the PDF meta description ("Compare Amazon FBA prep centers and DIY methods…").
-- The first content section heading will be **"Amazon FBA Prep Center vs DIY: Time and Cost Compared"** used in place of the "Introduction" heading, immediately followed by the intro paragraphs.
+**Leave untouched:** Header, Footer, Logo, all blog posts, ROI calculator, admin/billing UI, backend enums, auth flows.
 
-## 3. Content (verbatim from PDF, markdown)
-Reproduce all sections in order exactly as written:
-- Intro (under the new first heading)
-- Understanding Amazon FBA Preparation
-- What Is a DIY Amazon Prep Process?
-- What Is an Amazon FBA Prep Center?
-- Time Comparison (DIY / Prep Center)
-- Cost Comparison (DIY / Prep Center / Winner)
-- Accuracy and Compliance Comparison
-- Scalability Comparison
-- Integration with Shopify and Amazon Fulfillment
-- Why Los Angeles Is a Strategic Fulfillment Location
-- Which Option Is Best?
-- Conclusion
+---
 
-### Required hyperlinks (inline)
-- Introduction: anchor text **prep centers for amazon fba** → `https://westfieldprepcenter.com/sales-channels/amazon`
-- "What Is an Amazon FBA Prep Center?" section: anchor text **West Coast 3PL warehouse** → `https://westfieldprepcenter.com/3pl-los-angeles`
-- "Integration with Shopify and Amazon Fulfillment" section: anchor text **shopify amazon fulfillment** → `https://westfieldprepcenter.com/blog/shopify-amazon-fulfillment-scale-ecommerce-brands`
+## 1. Homepage
 
-## 4. FAQ + schema
-- Add the 5 FAQs as collapsible `<details><summary>` blocks at the end of the content. The existing `BlogPostSchema` component auto-detects `<details>/<summary>` pairs and emits valid `FAQPage` JSON-LD, so no manual schema script is needed — the schema will match the 5 Q&As from the PDF.
+**`src/components/Hero.tsx`**
+- "No Minimums" badge → "Built for 1,000+ orders/mo"
 
-## 5. Database insert
-Insert one row into `blog_posts` via a data change:
-- `slug`: `amazon-fba-prep-center-vs-diy-time-and-cost-compared`
-- `title`, `meta_description`, `excerpt`, `content`, `cover_image_url` as above
-- `category`: "Amazon FBA"
-- `tags`: ["amazon fba prep", "prep center", "3pl", "fulfillment"]
-- `published`: true, `published_at`: now
-- `author_name`: "Westfield Prep Team", standard `author_bio`
-- `read_time_minutes`: calculated from word count
+**`src/components/ValueProposition.tsx`**
+- "No minimums, no commitments. 50 or 50,000 orders" → "Purpose-built for brands shipping 1,000+ orders/month, scaling to 50,000+"
+- Stat card "Minimums: 0" → "Sweet spot: 1,000+ orders/mo"
 
-## Technical notes
-- No new components needed; `BlogPost.tsx`, `BlogPostRenderer`, and `BlogPostSchema` already render markdown, inline links, collapsible FAQs, and FAQ JSON-LD.
-- Slug confirmed not currently in use; `blog-images` bucket exists and is public.
-- After publishing, the post is reachable at `/blog/amazon-fba-prep-center-vs-diy-time-and-cost-compared`.
+**`src/components/Services.tsx`**
+- "From your first 50 orders to full-scale multi-channel distribution" → "Built for brands doing 1,000+ orders/month, scaling to full multi-channel distribution"
+
+---
+
+## 2. Service & Channel Pages
+
+Replace small-brand framing ("at least 100 units," "50 to 50,000+," "any size") with 1,000+ sweet-spot language in:
+
+- `src/pages/Pricing.tsx`
+- `src/pages/ThreePLLosAngeles.tsx`
+- `src/pages/OrderFulfillment.tsx`
+- `src/pages/KittingBundling.tsx`
+- `src/pages/InventoryManagement.tsx`
+- `src/pages/sales-channels/Shopify.tsx`
+- `src/pages/sales-channels/Amazon.tsx`
+- `src/pages/ShopifyFulfillment.tsx`
+
+Shopify channel v2 sections:
+- `src/components/shopify-channel/ShopifyChannelFAQ.tsx` — rewrite "Do you have minimums?" answer to: no hard minimum, but the platform, pricing, and ops are designed for brands doing 1,000+ orders/mo
+- `src/components/shopify-channel/ShopifyChannelValueGrid.tsx`
+- `src/components/shopify-channel/ShopifyFinalCTA.tsx`
+- `src/components/shopify-channel/ValueBento.tsx`
+- `src/components/shopify-channel/TrustMarquee.tsx`
+- `src/components/shopify-channel/FinalCTA.tsx`
+
+Amazon:
+- `src/components/amazon/WhyLAForFBA.tsx`
+- `src/components/amazon/FinalCTA.tsx`
+
+Inventory:
+- `src/components/inventory/InventoryFAQ.tsx`
+- `src/components/inventory/InventoryStorage.tsx`
+
+---
+
+## 3. Contact Form (silent capture, no gate)
+
+**`src/components/ContactForm.tsx`**
+- Remove "Just Starting" from the monthly-volume dropdown
+- New tiers: `Under 1,000`, `1,000–5,000`, `5,000–25,000`, `25,000+`
+- `Under 1,000` stays as an option — sub-threshold leads still submit and are captured silently. No warning, no decline, no redirect.
+- Submit logic and backend unchanged.
+
+---
+
+## 4. Chatbot
+
+**`src/lib/chatKnowledge.ts`** — rewrite the ~5 answers that lean on "any size / no minimums":
+- Positioning answers → "built for 1,000+ orders/mo, sweet spot for scaling brands"
+- Smaller-brand askers still get a full, helpful answer and are captured — no soft-decline, no redirect.
+
+---
+
+## 5. Platform / Integration Data
+
+**`src/data/platformsData.ts`** and **`src/data/supportedPlatforms.ts`**
+- Retag entries currently labeled "Small Businesses / Startups" (e.g., Wix) → "Scaling brands" / "Mid-market" tags.
+
+---
+
+## 6. Generated PDFs
+
+**`src/lib/faqPdfGenerator.ts`**, **`src/lib/fulfillmentGuidePdfGenerator.ts`**
+- Rewrite tier and "no minimums / just starting" mentions to 1,000+ sweet-spot framing.
+
+*(Skipping `roiReportPdfGenerator.ts` per your instruction not to touch the calculator.)*
+
+---
+
+## Not Touching
+- Header, Footer, Logo (locked per project memory)
+- All blog posts (SEO — locked)
+- ROI calculator UI + logic
+- Admin dashboards, billing labels, quote templates
+- Backend enums, DB values, edge functions
+- Auth, RLS, security
+
+---
+
+## Verification
+After edits, grep for old phrases (`no minimums`, `first 50`, `100 units`, `any size`, `Just Starting`) to confirm nothing public-facing was missed, then screenshot Home hero, Pricing, and Shopify channel page to confirm the new positioning reads correctly.
