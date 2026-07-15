@@ -330,10 +330,10 @@ const ContactForm = () => {
                 {/* Units & SKU */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <Label htmlFor="unitsPerMonth"><TranslatedText>Units Sold per Month</TranslatedText> *</Label>
+                    <Label htmlFor="unitsPerMonth"><TranslatedText>Orders per Month</TranslatedText> *</Label>
                     <Select value={formData.unitsPerMonth} onValueChange={(v) => handleSelectChange("unitsPerMonth", v)}>
                       <SelectTrigger className={errors.unitsPerMonth ? "border-destructive" : ""}>
-                        <SelectValue placeholder="Select monthly units" />
+                        <SelectValue placeholder="Select monthly orders" />
                       </SelectTrigger>
                       <SelectContent className="bg-background border border-border z-50">
                         <SelectItem value="0-1000"><TranslatedText>Under 1,000</TranslatedText></SelectItem>
