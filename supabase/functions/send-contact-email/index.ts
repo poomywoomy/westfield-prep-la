@@ -187,7 +187,7 @@ const handler = async (req: Request): Promise<Response> => {
     const threePLBlock = show3PL ? `
       <hr>
       <h3>3PL / Fulfillment Details</h3>
-      <p><strong>Units Sold per Month:</strong> ${safeUnitsPerMonth}</p>
+      <p><strong>Orders per Month:</strong> ${safeUnitsPerMonth}</p>
       <p><strong>SKU Count:</strong> ${safeSkuCount}</p>
       <p><strong>Marketplaces:</strong> ${safeMarketplaces}</p>
       <p><strong>Receiving Method:</strong> ${safeReceiving}</p>
@@ -213,9 +213,9 @@ const handler = async (req: Request): Promise<Response> => {
           </p>
           <h3>Contact</h3>
           <p><strong>Name:</strong> ${safeName}</p>
+          <p><strong>Business:</strong> ${safeBusiness}</p>
           <p><strong>Email:</strong> ${safeEmail}</p>
           <p><strong>Phone:</strong> ${safePhone}</p>
-          <p><strong>Business:</strong> ${safeBusiness}</p>
           ${threePLBlock}
           <hr>
           <h3>Comments</h3>
