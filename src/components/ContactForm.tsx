@@ -301,28 +301,29 @@ const ContactForm = () => {
                 {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
               </div>
               <div>
-                <Label htmlFor="email"><TranslatedText>Email Address</TranslatedText> *</Label>
-                <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange}
-                  className={errors.email ? "border-destructive" : ""} placeholder="john@example.com" />
-                {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
-              </div>
-            </div>
-
-            {/* Phone and Business */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="phone"><TranslatedText>Phone Number</TranslatedText> *</Label>
-                <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange}
-                  className={errors.phone ? "border-destructive" : ""} placeholder="(555) 123-4567" />
-                {errors.phone && <p className="text-sm text-destructive mt-1">{errors.phone}</p>}
-              </div>
-              <div>
                 <Label htmlFor="business"><TranslatedText>Business Name</TranslatedText> *</Label>
                 <Input id="business" name="business" value={formData.business} onChange={handleChange}
                   className={errors.business ? "border-destructive" : ""} placeholder="Your Company LLC" />
                 {errors.business && <p className="text-sm text-destructive mt-1">{errors.business}</p>}
               </div>
             </div>
+
+            {/* Email and Phone */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="email"><TranslatedText>Email Address</TranslatedText> *</Label>
+                <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange}
+                  className={errors.email ? "border-destructive" : ""} placeholder="john@example.com" />
+                {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
+              </div>
+              <div>
+                <Label htmlFor="phone"><TranslatedText>Phone Number</TranslatedText> *</Label>
+                <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange}
+                  className={errors.phone ? "border-destructive" : ""} placeholder="(555) 123-4567" />
+                {errors.phone && <p className="text-sm text-destructive mt-1">{errors.phone}</p>}
+              </div>
+            </div>
+
 
             {show3PLFields && (
               <>
