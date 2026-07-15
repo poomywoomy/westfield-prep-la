@@ -56,7 +56,7 @@ const faqData = [
   {
     question: "What are your FBA prep pricing and fees?",
     answer:
-      "Transparent per-unit pricing with no hidden fees. We publish service rates on our pricing page and provide a custom quote within 24 hours based on your catalog, prep needs, and monthly volume — no minimums, no long-term contract.",
+      "Transparent per-unit pricing with no hidden fees. We publish service rates on our pricing page and provide a custom quote within 24 hours based on your catalog, prep needs, and monthly volume. Built for sellers doing 1,000+ units per month, no long-term contract.",
   },
 ];
 

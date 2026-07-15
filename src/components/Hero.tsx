@@ -21,7 +21,7 @@ const Hero = () => {
   const trustBadges = [
     { icon: Shield, text: "Same-Day Receiving" },
     { icon: Clock, text: "24-48hr Turnaround" },
-    { icon: Award, text: "No Minimums" },
+    { icon: Award, text: "Built for 1,000+ Orders/mo" },
     { icon: TrendingUp, text: "100% Transparent Pricing" },
   ];
 

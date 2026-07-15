@@ -191,7 +191,7 @@ Our Magento integration adapts to your custom setup, ensuring seamless fulfillme
     description: "Website builder with integrated e-commerce",
     fullDescription: `Wix combines website building with e-commerce capabilities, making it easy for businesses to sell online without technical expertise. We provide straightforward fulfillment services that integrate with Wix stores, handling your orders while you focus on growing your business.
 
-Perfect for small businesses and entrepreneurs, our Wix integration is simple to set up and reliable to operate.`,
+Built for scaling brands running Wix storefronts, our integration is simple to set up and reliable at volume.`,
     features: [
       "Simple Wix store integration",
       "Automatic order synchronization",
@@ -199,7 +199,7 @@ Perfect for small businesses and entrepreneurs, our Wix integration is simple to
       "Small business-friendly service",
       "Scalable as your business grows"
     ],
-    bestFor: ["Small Businesses", "Startups", "Service-Based Sellers", "New E-commerce"],
+    bestFor: ["Scaling Brands", "Service-Based Sellers", "Multi-Channel Sellers", "Mid-Market E-commerce"],
     integration: "Wix eCommerce API integration",
     setupTime: "1-2 business days"
   },

@@ -178,7 +178,7 @@ export const supportedPlatforms: PlatformData[] = [
       "Small business friendly",
       "Scalable solutions",
     ],
-    bestFor: ["Small Businesses", "Startups", "Service-Based", "New E-commerce"],
+    bestFor: ["Scaling Brands", "Service-Based", "Multi-Channel Sellers", "Mid-Market E-commerce"],
     setupTime: "< 10 min",
     brandColor: "#0C6EFC",
   },

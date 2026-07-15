@@ -62,7 +62,7 @@ const KittingBundling = () => {
         name: "What's the minimum order for kitting?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "No minimum order required. We handle everything from 10-kit test runs to 10,000+ unit production runs.",
+          text: "Built for scaling brands. We handle production runs from 1,000 to 100,000+ units, with the systems and staffing to keep up.",
         },
       },
       {

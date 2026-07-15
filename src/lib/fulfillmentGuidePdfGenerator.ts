@@ -319,7 +319,7 @@ export const generateFulfillmentGuidePDF = (): jsPDF => {
   addBullet('Same-day receiving - Inventory processed the day it arrives');
   addBullet('24-48 hour turnaround - Fast order processing');
   addBullet('Transparent pricing - No hidden fees, no surprises');
-  addBullet('No minimums - We grow with you from startup to scale');
+  addBullet('Built for scale - Purpose-built for brands shipping 1,000+ orders per month');
   addBullet('Multi-platform support - Shopify, Amazon, WooCommerce, and more');
   addBullet('Strategic LA location - Near Port of LA for import advantages');
   addSpace(10);

@@ -17,7 +17,7 @@ const FinalCTA = () => {
               <TranslatedText>Stop losing inventory to Amazon rejections.</TranslatedText>
             </h2>
             <p className="mt-5 text-white/70 text-lg">
-              <TranslatedText>Custom FBA prep quote in 24 hours. No minimums. Photo-proof every step.</TranslatedText>
+              <TranslatedText>Custom FBA prep quote in 24 hours. Built for 1,000+ units/mo. Photo-proof every step.</TranslatedText>
             </p>
             <div className="mt-10 flex flex-wrap gap-3 justify-center">
               <Link to="/contact" className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[hsl(var(--orange-glow))] text-white font-bold hover:-translate-y-0.5 transition-all shadow-[0_20px_60px_-15px_hsl(var(--orange-glow)/0.6)]">

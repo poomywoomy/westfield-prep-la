@@ -15,7 +15,7 @@ const ValueProposition = () => {
   const small = [
     { icon: DollarSign, title: "No 'gotcha' invoices", description: "Know exactly what you'll pay before you sign. Zero hidden fees.", stat: "0", statLabel: "Hidden fees" },
     { icon: MapPin, title: "The LA advantage", description: "Minutes from the Port of LA — lower import costs, faster West Coast.", stat: "22mi", statLabel: "To Port of LA" },
-    { icon: TrendingUp, title: "Grow without growing pains", description: "No minimums, no commitments. 50 or 50,000 orders — we flex with you.", stat: "0", statLabel: "Minimums" },
+    { icon: TrendingUp, title: "Built for scaling brands", description: "Purpose-built for brands shipping 1,000+ orders/month, scaling to 50,000+.", stat: "1,000+", statLabel: "Orders/mo sweet spot" },
     { icon: CheckCircle, title: "99.8% accuracy, obsessively", description: "Our specialists treat your products like their own. One mis-ship is one too many.", stat: "99.8%", statLabel: "Accuracy" },
     { icon: Users, title: "A team that responds", description: "Direct access to your account team. No ticket queues. No bots. No ghosting.", stat: "<2hr", statLabel: "Response time" },
   ];

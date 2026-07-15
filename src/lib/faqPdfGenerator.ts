@@ -28,11 +28,11 @@ const faqCategories = [
       },
       {
         question: "Is there a minimum order quantity or monthly volume requirement?",
-        answer: "We work with brands of all sizes and don't have strict minimum order requirements. Whether you're just starting out or scaling rapidly, we'll create a custom pricing plan that fits your volume and needs."
+        answer: "No hard minimum, but our platform, pricing, and operations are purpose-built for brands shipping 1,000+ orders per month. If you're scaling toward that volume, we'd still love to talk."
       },
       {
         question: "Can you handle large volumes?",
-        answer: "Absolutely! We work with sellers of all sizes, from startups to established brands. We can scale our services to meet your growing business needs. Contact us to discuss volume discounts."
+        answer: "Absolutely. Our sweet spot is brands doing 1,000 to 50,000+ orders per month, and we scale to enterprise-level volume. Contact us to discuss volume pricing."
       }
     ]
   },

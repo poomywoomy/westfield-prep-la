@@ -69,14 +69,14 @@ const ValueBento = () => {
             </p>
           </BentoTile>
 
-          {/* No minimums — wide light tile */}
-          <BentoTile variant="light" className="md:col-span-3 lg:col-span-2 min-h-[220px]" eyebrow="05 · Flexibility" delay={0.2}>
+          {/* Built for scale — wide light tile */}
+          <BentoTile variant="light" className="md:col-span-3 lg:col-span-2 min-h-[220px]" eyebrow="05 · Built to scale" delay={0.2}>
             <InfinityIcon className="h-7 w-7 text-[hsl(var(--orange-glow))]" />
             <h3 className="mt-auto text-2xl md:text-3xl font-bold tracking-tight">
-              <TranslatedText>No minimums. No lock-in.</TranslatedText>
+              <TranslatedText>Built for 1,000+ orders/mo.</TranslatedText>
             </h3>
             <p className="mt-2 text-[hsl(var(--surface-navy))]/70 max-w-md">
-              <TranslatedText>Ship 50 or 50,000 orders a month. Month-to-month, transparent per-unit pricing.</TranslatedText>
+              <TranslatedText>Purpose-built for scaling brands doing 1,000 to 50,000+ orders per month. Month-to-month, transparent per-unit pricing.</TranslatedText>
             </p>
           </BentoTile>
         </div>

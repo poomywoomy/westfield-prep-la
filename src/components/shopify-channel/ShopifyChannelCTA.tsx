@@ -88,7 +88,7 @@ const ShopifyChannelCTA = () => {
           >
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-white" />
-              <TranslatedText>No minimums</TranslatedText>
+              <TranslatedText>Built for 1,000+ orders/mo</TranslatedText>
             </span>
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-white" />

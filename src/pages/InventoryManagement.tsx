@@ -71,7 +71,7 @@ const InventoryManagement = () => {
         "name": "What's your minimum SKU count to work with you?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "There's no minimum SKU requirement. Whether you have 10 SKUs or 10,000, our system handles it the same way."
+          "text": "No hard minimum SKU requirement, but our platform is built for scaling catalogs. Whether you have 50 SKUs or 10,000, our system handles it — and our sweet spot is brands doing 1,000+ orders per month."
         }
       },
       {

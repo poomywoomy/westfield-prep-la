@@ -38,7 +38,7 @@ const ShopifyChannelFAQ = () => {
     },
     {
       question: "Is there a minimum order volume requirement?",
-      answer: "No minimums and no long-term contracts. We work with brands doing 50 orders per month and brands doing 50,000+. Pricing scales as you grow. You're never locked into volume commitments you can't meet."
+      answer: "No hard minimum and no long-term contracts, but our platform, pricing, and operations are purpose-built for brands shipping 1,000+ orders per month, scaling to 50,000+. Pricing scales as you grow, and you're never locked into volume commitments."
     },
   ];
 

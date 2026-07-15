@@ -52,12 +52,12 @@ export const APPROVED_FAQ: FAQItem[] = [
   { 
     category: "Getting Started", 
     question: "Is there a minimum order quantity?", 
-    answer: "We work with brands of all sizes and don't have strict minimum order requirements. Whether you're just starting out or scaling rapidly, we'll create a custom pricing plan that fits your volume and needs." 
+    answer: "No hard minimum, but our platform, pricing, and operations are purpose-built for brands shipping 1,000+ orders per month, scaling to 50,000+. If you're scaling toward that volume, we'd still love to talk." 
   },
   { 
     category: "Getting Started", 
     question: "Can you handle large volumes?", 
-    answer: "Absolutely! We work with sellers of all sizes, from startups to established brands. We can scale our services to meet your growing business needs." 
+    answer: "Absolutely. Our sweet spot is scaling brands doing 1,000 to 50,000+ orders per month, and we handle enterprise-level volume from there." 
   },
   
   // Services

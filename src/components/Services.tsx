@@ -45,7 +45,7 @@ const Services = () => {
               </h2>
               <p className="mt-5 text-lg text-muted-foreground max-w-xl">
                 <TranslatedText>
-                  From your first 50 orders to full-scale multi-channel distribution — the playbook is built.
+                  Built for brands shipping 1,000+ orders per month, scaling to full multi-channel distribution — the playbook is built.
                 </TranslatedText>
               </p>
             </div>
