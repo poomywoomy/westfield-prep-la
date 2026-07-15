@@ -11,7 +11,7 @@ const KittingContent = () => {
     { q: "How long does kit assembly take?", a: "Standard kits are assembled same-day. Complex kits with 10+ components typically take 1-2 business days. Rush assembly available for urgent needs." },
     { q: "Do you photograph completed kits?", a: "Yes, every kit is photographed during QC. Photos are uploaded to your dashboard so you can verify assembly accuracy before shipping." },
     { q: "Can I provide custom packaging materials?", a: "Absolutely. Ship us your branded boxes, tissue paper, inserts, and we'll use them. We can also source packaging materials for you." },
-    { q: "What's the minimum order for kitting?", a: "No strict minimums. We work with brands assembling 50 kits per month up to thousands. Pricing scales with volume." },
+    { q: "What's the minimum order for kitting?", a: "Built for scaling brands. We assemble runs from 1,000 up to 100,000+ kits, with pricing that scales to your volume." },
     { q: "How do you handle kit component shortages?", a: "We track component inventory in real-time. You're notified before stock runs out so kits are never delayed. We can hold partial kits until components arrive." },
     { q: "Can you store kit components separately?", a: "Yes. Components are stored individually and pulled for assembly as orders come in. This is ideal for subscription boxes with rotating items." }
   ];

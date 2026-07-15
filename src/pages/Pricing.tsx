@@ -108,11 +108,11 @@ const Pricing = () => {
     },
     { 
       question: "How does your DTC fulfillment pricing compare to big-box 3PLs?", 
-      answer: "Unlike big-box 3PLs with $3K+ minimums and tiered fees, we offer flexible pricing starting at $1.00/unit with no monthly minimums. You get dedicated support and 24-hour turnaround at a fraction of the cost." 
+      answer: "Unlike big-box 3PLs with $3K+ minimums and tiered fees, we offer flexible pricing starting at $1.00/unit, built for brands doing 1,000+ orders per month. You get dedicated support and 24-hour turnaround at a fraction of the cost." 
     },
     { 
-      question: "Are there any setup fees or minimums?", 
-      answer: "No setup fees or long-term contracts required. We don't enforce a hard minimum, but our pricing, platform, and operations are purpose-built for brands shipping 1,000+ orders per month." 
+      question: "Are there any setup fees or contracts?", 
+      answer: "No setup fees or long-term contracts required. Our pricing, platform, and operations are purpose-built for brands shipping 1,000+ orders per month." 
     },
     { 
       question: "How does storage pricing work?", 
@@ -715,27 +715,6 @@ const Pricing = () => {
                         </td>
                       </tr>
 
-                      {/* Monthly Minimums */}
-                      <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-sm"><TranslatedText>Monthly Minimums</TranslatedText></td>
-                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
-                          <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                            <span className="text-sm"><TranslatedText>N/A</TranslatedText></span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 md:px-6 md:py-4 text-center">
-                          <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
-                            <X className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm">$3K+</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 md:px-6 md:py-4 text-center bg-green-50/30 dark:bg-green-900/5">
-                          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
-                            <Check className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-sm font-semibold"><TranslatedText>Low/None</TranslatedText></span>
-                          </div>
-                        </td>
-                      </tr>
 
                       {/* Liability Exposure */}
                       <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">

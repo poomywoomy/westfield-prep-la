@@ -7,7 +7,7 @@ const items = [
   "Real-time Shopify sync",
   "Branded unboxing",
   "QC photo proof",
-  "No order minimums",
+  "Built for 1,000+ orders/mo",
   "Los Angeles, CA",
 ];
 

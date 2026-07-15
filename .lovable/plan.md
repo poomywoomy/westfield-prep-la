@@ -1,106 +1,44 @@
-# Reposition Toward 1,000+ Orders/Month (Soft Positioning)
+# Remove All "No Monthly Minimums" Language
 
-Shift public-facing copy so the site clearly **speaks to brands doing 1,000+ orders/month** as the primary audience — without hard-blocking or turning away smaller brands. Framing is "built for scaling brands, sweet spot 1,000+/mo," not "we require 1,000+."
+Strip every public-facing statement that we don't have minimums. Replace with "built for 1,000+ orders/mo" positioning, or delete the line entirely where it adds no value.
 
-**Tone rules:**
-- ✅ "Built for brands shipping 1,000+ orders/month"
-- ✅ "Our sweet spot is 1,000+ orders/mo, and we scale to 50,000+"
-- ✅ "Purpose-built for mid-market and scaling ecommerce brands"
-- ❌ No "minimum required," "we don't work with under X," or hard gates
-- ❌ Drop "no minimums / any size / your first 50 orders" small-brand language
+## Edits
 
-**Leave untouched:** Header, Footer, Logo, all blog posts, ROI calculator, admin/billing UI, backend enums, auth flows.
+**`src/components/PremiumHero.tsx`** (line 83)
+- "…Transparent pricing. No monthly minimums." → "…Transparent pricing. Built for 1,000+ orders/month."
 
----
+**`src/components/FAQAccordion.tsx`** (lines 12, 19)
+- Q "Do you have minimum order requirements?" answer → "We're purpose-built for brands shipping 1,000+ orders per month, scaling to 50,000+. No hard cap on either end — pricing scales with your volume, so you only pay for what you use."
+- Line 19: drop "Plus, we don't require minimums — we're built for growing brands at every stage." → replace with "Plus, we're purpose-built for scaling brands doing 1,000+ orders per month."
 
-## 1. Homepage
+**`src/components/ShopifyFinalCTA.tsx`** (line 65)
+- "Same-day receiving • 24-48hr turnaround • No order minimums" → "Same-day receiving • 24-48hr turnaround • Built for 1,000+ orders/mo"
 
-**`src/components/Hero.tsx`**
-- "No Minimums" badge → "Built for 1,000+ orders/mo"
+**`src/components/shopify-channel/v2/TrustMarquee.tsx`** (line 10)
+- "No order minimums" → "Built for 1,000+ orders/mo"
 
-**`src/components/ValueProposition.tsx`**
-- "No minimums, no commitments. 50 or 50,000 orders" → "Purpose-built for brands shipping 1,000+ orders/month, scaling to 50,000+"
-- Stat card "Minimums: 0" → "Sweet spot: 1,000+ orders/mo"
+**`src/components/kitting/KittingContent.tsx`** (line 14)
+- Answer rewritten: "Built for scaling brands. We assemble runs from 1,000 up to 100,000+ kits, with pricing that scales to your volume."
 
-**`src/components/Services.tsx`**
-- "From your first 50 orders to full-scale multi-channel distribution" → "Built for brands doing 1,000+ orders/month, scaling to full multi-channel distribution"
+**`src/pages/sales-channels/Shopify.tsx`** (line 55)
+- Strip "No hard minimums and" prefix → "No long-term contracts, and we're built for Shopify brands doing 1,000+ orders per month…"
 
----
+**`src/pages/Pricing.tsx`**
+- Line 111 answer: remove "with no monthly minimums" → "…flexible pricing starting at $1.00/unit, built for brands doing 1,000+ orders per month. You get dedicated support and 24-hour turnaround at a fraction of the cost."
+- Line 114 question: "Are there any setup fees or minimums?" → "Are there any setup fees or contracts?"
+- Lines 718–738 comparison-table "Monthly Minimums" row: delete entire row (removes the "we have none vs $3K+" claim).
 
-## 2. Service & Channel Pages
+**`src/pages/WhyChooseUs.tsx`** (lines 827–830)
+- Rewrite FAQ:
+  - Q: "What kind of brands do you work with?"
+  - A: "We're purpose-built for scaling ecommerce brands shipping 1,000+ orders per month, up to 50,000+. Our platform, pricing, and operations are designed around that volume band. We also carry a $250 monthly storage and account minimum to ensure we can dedicate resources to your account — easily met by active sellers."
 
-Replace small-brand framing ("at least 100 units," "50 to 50,000+," "any size") with 1,000+ sweet-spot language in:
-
-- `src/pages/Pricing.tsx`
-- `src/pages/ThreePLLosAngeles.tsx`
-- `src/pages/OrderFulfillment.tsx`
-- `src/pages/KittingBundling.tsx`
-- `src/pages/InventoryManagement.tsx`
-- `src/pages/sales-channels/Shopify.tsx`
-- `src/pages/sales-channels/Amazon.tsx`
-- `src/pages/ShopifyFulfillment.tsx`
-
-Shopify channel v2 sections:
-- `src/components/shopify-channel/ShopifyChannelFAQ.tsx` — rewrite "Do you have minimums?" answer to: no hard minimum, but the platform, pricing, and ops are designed for brands doing 1,000+ orders/mo
-- `src/components/shopify-channel/ShopifyChannelValueGrid.tsx`
-- `src/components/shopify-channel/ShopifyFinalCTA.tsx`
-- `src/components/shopify-channel/ValueBento.tsx`
-- `src/components/shopify-channel/TrustMarquee.tsx`
-- `src/components/shopify-channel/FinalCTA.tsx`
-
-Amazon:
-- `src/components/amazon/WhyLAForFBA.tsx`
-- `src/components/amazon/FinalCTA.tsx`
-
-Inventory:
-- `src/components/inventory/InventoryFAQ.tsx`
-- `src/components/inventory/InventoryStorage.tsx`
-
----
-
-## 3. Contact Form (silent capture, no gate)
-
-**`src/components/ContactForm.tsx`**
-- Remove "Just Starting" from the monthly-volume dropdown
-- New tiers: `Under 1,000`, `1,000–5,000`, `5,000–25,000`, `25,000+`
-- `Under 1,000` stays as an option — sub-threshold leads still submit and are captured silently. No warning, no decline, no redirect.
-- Submit logic and backend unchanged.
-
----
-
-## 4. Chatbot
-
-**`src/lib/chatKnowledge.ts`** — rewrite the ~5 answers that lean on "any size / no minimums":
-- Positioning answers → "built for 1,000+ orders/mo, sweet spot for scaling brands"
-- Smaller-brand askers still get a full, helpful answer and are captured — no soft-decline, no redirect.
-
----
-
-## 5. Platform / Integration Data
-
-**`src/data/platformsData.ts`** and **`src/data/supportedPlatforms.ts`**
-- Retag entries currently labeled "Small Businesses / Startups" (e.g., Wix) → "Scaling brands" / "Mid-market" tags.
-
----
-
-## 6. Generated PDFs
-
-**`src/lib/faqPdfGenerator.ts`**, **`src/lib/fulfillmentGuidePdfGenerator.ts`**
-- Rewrite tier and "no minimums / just starting" mentions to 1,000+ sweet-spot framing.
-
-*(Skipping `roiReportPdfGenerator.ts` per your instruction not to touch the calculator.)*
-
----
+**`src/lib/fulfillmentGuidePdfGenerator.ts`** (line 284)
+- "No unreasonable minimums" → delete this bullet.
 
 ## Not Touching
-- Header, Footer, Logo (locked per project memory)
-- All blog posts (SEO — locked)
-- ROI calculator UI + logic
-- Admin dashboards, billing labels, quote templates
-- Backend enums, DB values, edge functions
-- Auth, RLS, security
+- `documentGenerator.ts` / `quotePdfGenerator.ts` — `minimumSpendTier` is internal quote generation logic (admin-facing), not public marketing.
+- Header, Footer, Logo, blogs, ROI calculator, admin/client dashboards, backend enums.
 
----
-
-## Verification
-After edits, grep for old phrases (`no minimums`, `first 50`, `100 units`, `any size`, `Just Starting`) to confirm nothing public-facing was missed, then screenshot Home hero, Pricing, and Shopify channel page to confirm the new positioning reads correctly.
+## Verify
+`rg -i "no minimum|monthly minimum|order minimum|no.*minimums"` across `src/` (excluding blog/admin/client) returns nothing in public-facing files.
