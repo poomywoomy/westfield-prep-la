@@ -299,6 +299,10 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeName}</td>
                               </tr>
                               <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Business:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeBusiness}</td>
+                              </tr>
+                              <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Email:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeEmail}</td>
                               </tr>
@@ -306,13 +310,9 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Phone:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safePhone}</td>
                               </tr>
-                              <tr>
-                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Business:</td>
-                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeBusiness}</td>
-                              </tr>
                               ${show3PL ? `
                               <tr>
-                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Units Sold/Month:</td>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Orders/Month:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeUnitsPerMonth}</td>
                               </tr>
                               <tr>
