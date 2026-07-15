@@ -187,7 +187,7 @@ const handler = async (req: Request): Promise<Response> => {
     const threePLBlock = show3PL ? `
       <hr>
       <h3>3PL / Fulfillment Details</h3>
-      <p><strong>Units Sold per Month:</strong> ${safeUnitsPerMonth}</p>
+      <p><strong>Orders per Month:</strong> ${safeUnitsPerMonth}</p>
       <p><strong>SKU Count:</strong> ${safeSkuCount}</p>
       <p><strong>Marketplaces:</strong> ${safeMarketplaces}</p>
       <p><strong>Receiving Method:</strong> ${safeReceiving}</p>
@@ -213,9 +213,9 @@ const handler = async (req: Request): Promise<Response> => {
           </p>
           <h3>Contact</h3>
           <p><strong>Name:</strong> ${safeName}</p>
+          <p><strong>Business:</strong> ${safeBusiness}</p>
           <p><strong>Email:</strong> ${safeEmail}</p>
           <p><strong>Phone:</strong> ${safePhone}</p>
-          <p><strong>Business:</strong> ${safeBusiness}</p>
           ${threePLBlock}
           <hr>
           <h3>Comments</h3>
@@ -299,6 +299,10 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeName}</td>
                               </tr>
                               <tr>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Business:</td>
+                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeBusiness}</td>
+                              </tr>
+                              <tr>
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Email:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeEmail}</td>
                               </tr>
@@ -306,13 +310,9 @@ const handler = async (req: Request): Promise<Response> => {
                                 <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Phone:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safePhone}</td>
                               </tr>
-                              <tr>
-                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Business:</td>
-                                <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeBusiness}</td>
-                              </tr>
                               ${show3PL ? `
                               <tr>
-                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Units Sold/Month:</td>
+                                <td style="color: #64748b; font-size: 14px; font-weight: 600; padding: 8px 0;">Orders/Month:</td>
                                 <td style="color: #334155; font-size: 14px; padding: 8px 0;">${safeUnitsPerMonth}</td>
                               </tr>
                               <tr>

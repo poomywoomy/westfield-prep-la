@@ -1,44 +1,40 @@
-# Remove All "No Monthly Minimums" Language
+# Contact Form: Orders (not Units) + Reorder Fields + Email Sync
 
-Strip every public-facing statement that we don't have minimums. Replace with "built for 1,000+ orders/mo" positioning, or delete the line entirely where it adds no value.
+## 1. Rename "Units Sold per Month" → "Orders per Month"
 
-## Edits
+**`src/components/ContactForm.tsx`**
+- Label text: "Units Sold per Month" → "Orders per Month"
+- Error message: "Units sold per month is required" → "Orders per month is required"
+- Placeholder: "Select monthly units" → "Select monthly orders"
 
-**`src/components/PremiumHero.tsx`** (line 83)
-- "…Transparent pricing. No monthly minimums." → "…Transparent pricing. Built for 1,000+ orders/month."
+**`supabase/functions/send-contact-email/index.ts`**
+- Email HTML labels: `Units Sold per Month:` → `Orders per Month:` and `Units Sold/Month:` → `Orders/Month:`
+- Rename local `safeUnitsPerMonth` → `safeOrdersPerMonth` and formatter `formatUnitsPerMonth` → `formatOrdersPerMonth` (values map unchanged).
+- Deploy the edge function.
 
-**`src/components/FAQAccordion.tsx`** (lines 12, 19)
-- Q "Do you have minimum order requirements?" answer → "We're purpose-built for brands shipping 1,000+ orders per month, scaling to 50,000+. No hard cap on either end — pricing scales with your volume, so you only pay for what you use."
-- Line 19: drop "Plus, we don't require minimums — we're built for growing brands at every stage." → replace with "Plus, we're purpose-built for scaling brands doing 1,000+ orders per month."
+*Keeping the field key `unitsPerMonth` and DB column `units_per_month` unchanged to avoid breaking historical leads and schema — only the user-visible label changes.*
 
-**`src/components/ShopifyFinalCTA.tsx`** (line 65)
-- "Same-day receiving • 24-48hr turnaround • No order minimums" → "Same-day receiving • 24-48hr turnaround • Built for 1,000+ orders/mo"
+## 2. Reorder Fields Left-to-Right
 
-**`src/components/shopify-channel/v2/TrustMarquee.tsx`** (line 10)
-- "No order minimums" → "Built for 1,000+ orders/mo"
+Current order (two rows of two):
+- Row 1: Full Name | Email
+- Row 2: Phone | Business Name
 
-**`src/components/kitting/KittingContent.tsx`** (line 14)
-- Answer rewritten: "Built for scaling brands. We assemble runs from 1,000 up to 100,000+ kits, with pricing that scales to your volume."
+New order (single logical L→R sequence, still two rows of two):
+- Row 1: **Full Name** | **Business Name**
+- Row 2: **Email** | **Phone Number**
 
-**`src/pages/sales-channels/Shopify.tsx`** (line 55)
-- Strip "No hard minimums and" prefix → "No long-term contracts, and we're built for Shopify brands doing 1,000+ orders per month…"
+Edit the two `<div className="grid grid-cols-1 md:grid-cols-2 gap-6">` blocks in `ContactForm.tsx` (lines ~296–325) to swap Email ↔ Business Name.
 
-**`src/pages/Pricing.tsx`**
-- Line 111 answer: remove "with no monthly minimums" → "…flexible pricing starting at $1.00/unit, built for brands doing 1,000+ orders per month. You get dedicated support and 24-hour turnaround at a fraction of the cost."
-- Line 114 question: "Are there any setup fees or minimums?" → "Are there any setup fees or contracts?"
-- Lines 718–738 comparison-table "Monthly Minimums" row: delete entire row (removes the "we have none vs $3K+" claim).
+## 3. Sync Order in Admin Email Template
 
-**`src/pages/WhyChooseUs.tsx`** (lines 827–830)
-- Rewrite FAQ:
-  - Q: "What kind of brands do you work with?"
-  - A: "We're purpose-built for scaling ecommerce brands shipping 1,000+ orders per month, up to 50,000+. Our platform, pricing, and operations are designed around that volume band. We also carry a $250 monthly storage and account minimum to ensure we can dedicate resources to your account — easily met by active sellers."
-
-**`src/lib/fulfillmentGuidePdfGenerator.ts`** (line 284)
-- "No unreasonable minimums" → delete this bullet.
+**`supabase/functions/send-contact-email/index.ts`** — reorder the contact-details rows in the HTML email so they read: Full Name, Business, Email, Phone, then Orders/Month, etc.
 
 ## Not Touching
-- `documentGenerator.ts` / `quotePdfGenerator.ts` — `minimumSpendTier` is internal quote generation logic (admin-facing), not public marketing.
-- Header, Footer, Logo, blogs, ROI calculator, admin/client dashboards, backend enums.
+- Field storage keys (`unitsPerMonth`, `units_per_month` in DB) — internal only.
+- Zod schema field names.
+- Any other form logic, validation rules, or downstream tables.
 
 ## Verify
-`rg -i "no minimum|monthly minimum|order minimum|no.*minimums"` across `src/` (excluding blog/admin/client) returns nothing in public-facing files.
+- Preview `/contact` shows Full Name | Business, Email | Phone; select label reads "Orders per Month."
+- Send a test contact — admin email shows "Orders per Month" and matching field order.
