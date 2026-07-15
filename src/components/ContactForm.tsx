@@ -32,7 +32,7 @@ const contactSchema = z.object({
   comments: z.string().trim().min(10, "Please share at least a brief description (10+ characters)").max(1000),
 }).superRefine((data, ctx) => {
   if (data.serviceType !== "launchpad") {
-    if (!data.unitsPerMonth) ctx.addIssue({ code: "custom", path: ["unitsPerMonth"], message: "Units sold per month is required" });
+    if (!data.unitsPerMonth) ctx.addIssue({ code: "custom", path: ["unitsPerMonth"], message: "Orders per month is required" });
     if (!data.skuCount) ctx.addIssue({ code: "custom", path: ["skuCount"], message: "SKU count is required" });
     if (!data.marketplaces || data.marketplaces.length === 0) ctx.addIssue({ code: "custom", path: ["marketplaces"], message: "Select at least one marketplace" });
     if (!data.receivingMethod) ctx.addIssue({ code: "custom", path: ["receivingMethod"], message: "Receiving method is required" });
