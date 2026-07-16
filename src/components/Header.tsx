@@ -91,12 +91,13 @@ const Header = () => {
   return (
     <>
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 overflow-x-hidden ${
           isScrolled ? "bg-background shadow-md" : "bg-background/95 backdrop-blur-sm"
         }`}
       >
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center justify-between gap-4 2xl:gap-6">
+
             <Link 
               to="/" 
               className="flex items-center flex-shrink-0 cursor-pointer py-2 px-2 rounded-md hover:bg-accent/50 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
@@ -109,7 +110,7 @@ const Header = () => {
               />
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-5 xl:gap-6 2xl:gap-8">
               <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Home</TranslatedText>
               </Link>
@@ -216,7 +217,7 @@ const Header = () => {
               </Link>
             </nav>
 
-            <div className="hidden xl:flex items-center gap-4 ml-6">
+            <div className="hidden xl:flex items-center gap-3 ml-4 2xl:gap-4 2xl:ml-6">
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-2 text-primary hover:text-secondary transition-colors group"
@@ -228,7 +229,7 @@ const Header = () => {
                 onClick={handleScheduleCall}
                 variant="outline"
                 size="default"
-                className="border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-semibold"
+                className="border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-semibold px-3 2xl:px-4"
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 <TranslatedText>Schedule a Call</TranslatedText>
@@ -236,12 +237,13 @@ const Header = () => {
               <Button
                 onClick={() => navigate("/contact")}
                 size="default"
-                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold px-3 2xl:px-4"
               >
                 <TranslatedText>Get a Quote</TranslatedText>
               </Button>
               <LanguageSwitcher variant="compact" />
             </div>
+
 
             {/* Mobile/Tablet Navigation */}
             <div className="flex lg:hidden items-center gap-2">
