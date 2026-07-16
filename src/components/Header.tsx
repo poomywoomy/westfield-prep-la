@@ -217,7 +217,7 @@ const Header = () => {
               </Link>
             </nav>
 
-            <div className="hidden xl:flex items-center gap-4 ml-6">
+            <div className="hidden xl:flex items-center gap-3 ml-4 2xl:gap-4 2xl:ml-6">
               <a 
                 href="tel:+18189355478" 
                 className="flex items-center gap-2 text-primary hover:text-secondary transition-colors group"
@@ -229,7 +229,7 @@ const Header = () => {
                 onClick={handleScheduleCall}
                 variant="outline"
                 size="default"
-                className="border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-semibold"
+                className="border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-semibold px-3 2xl:px-4"
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 <TranslatedText>Schedule a Call</TranslatedText>
@@ -237,12 +237,13 @@ const Header = () => {
               <Button
                 onClick={() => navigate("/contact")}
                 size="default"
-                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold px-3 2xl:px-4"
               >
                 <TranslatedText>Get a Quote</TranslatedText>
               </Button>
               <LanguageSwitcher variant="compact" />
             </div>
+
 
             {/* Mobile/Tablet Navigation */}
             <div className="flex lg:hidden items-center gap-2">
