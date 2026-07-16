@@ -110,7 +110,7 @@ const Header = () => {
               />
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-5 xl:gap-6 2xl:gap-8">
               <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Home</TranslatedText>
               </Link>
