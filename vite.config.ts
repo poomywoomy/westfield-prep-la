@@ -21,9 +21,12 @@ const getFaqRouteSchemaHtml = () => {
     throw new Error("Unable to extract FAQ categories for static FAQ schema source.");
   }
 
-  const faqCategories = new Function(
-    `return (${faqPageSource.slice(start + startNeedle.length, end)});`
-  )() as Array<{
+  const faqCategoriesSource = faqPageSource
+    .slice(start + startNeedle.length, end)
+    .trim()
+    .replace(/;$/, "");
+
+  const faqCategories = new Function(`return (${faqCategoriesSource});`)() as Array<{
     title: string;
     questions: Array<{ question: string; answer: string }>;
   }>;
