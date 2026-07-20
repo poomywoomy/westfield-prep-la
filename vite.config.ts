@@ -1,8 +1,110 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import fs from "fs";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { visualizer } from "rollup-plugin-visualizer";
+
+const FAQ_SCHEMA_MARKER = "<!-- FAQ_ROUTE_SCHEMAS -->";
+const FAQ_SCHEMA_ATTRIBUTE = "data-faq-route-schema";
+
+const getFaqRouteSchemaHtml = () => {
+  const faqPagePath = path.resolve(__dirname, "src/pages/FAQ.tsx");
+  const faqPageSource = fs.readFileSync(faqPagePath, "utf8");
+  const startNeedle = "  const faqCategories = ";
+  const start = faqPageSource.indexOf(startNeedle);
+  const end = faqPageSource.indexOf("\n\n  return (", start);
+
+  if (start === -1 || end === -1) {
+    throw new Error("Unable to extract FAQ categories for static FAQ schema source.");
+  }
+
+  const faqCategories = new Function(
+    `return (${faqPageSource.slice(start + startNeedle.length, end)});`
+  )() as Array<{
+    title: string;
+    questions: Array<{ question: string; answer: string }>;
+  }>;
+
+  return faqCategories
+    .map((category) => {
+      const schema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        name: `${category.title} FAQs`,
+        mainEntity: category.questions.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        })),
+      };
+
+      return `    <script type="application/ld+json" ${FAQ_SCHEMA_ATTRIBUTE}="true">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`;
+    })
+    .join("\n");
+};
+
+const injectFaqRouteSchemas = (html: string) => {
+  if (html.includes(FAQ_SCHEMA_ATTRIBUTE)) return html;
+
+  const schemaHtml = getFaqRouteSchemaHtml();
+  if (html.includes(FAQ_SCHEMA_MARKER)) {
+    return html.replace(FAQ_SCHEMA_MARKER, schemaHtml);
+  }
+
+  return html.replace("</head>", `${schemaHtml}\n  </head>`);
+};
+
+const faqStaticSourcePlugin = () => ({
+  name: "faq-static-source",
+  transformIndexHtml: {
+    order: "post" as const,
+    handler(html: string, ctx: { path?: string }) {
+      if (["/faq", "/faq/", "/faq.html"].includes(ctx.path || "")) {
+        return injectFaqRouteSchemas(html);
+      }
+
+      return html;
+    },
+  },
+  configureServer(server) {
+    server.middlewares.use(async (req, res, next) => {
+      const requestPath = (req.url || "").split("?")[0];
+
+      if (!["/faq", "/faq/"].includes(requestPath)) {
+        next();
+        return;
+      }
+
+      try {
+        const faqHtml = fs.readFileSync(path.resolve(__dirname, "faq.html"), "utf8");
+        const transformedHtml = await server.transformIndexHtml(req.url || "/faq", faqHtml);
+
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.end(transformedHtml);
+      } catch (error) {
+        next(error as Error);
+      }
+    });
+  },
+  generateBundle(_, bundle) {
+    const faqAsset = Object.values(bundle).find(
+      (asset) => asset.type === "asset" && asset.fileName === "faq.html"
+    );
+
+    if (faqAsset?.type === "asset") {
+      this.emitFile({
+        type: "asset",
+        fileName: "faq/index.html",
+        source: faqAsset.source,
+      });
+    }
+  },
+});
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -11,6 +113,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
+    faqStaticSourcePlugin(),
     react(),
     mode === "development" && componentTagger(),
     mode === "production" && visualizer({
@@ -27,6 +130,10 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, "index.html"),
+        faq: path.resolve(__dirname, "faq.html"),
+      },
       output: {
         manualChunks: {
           // Core React
