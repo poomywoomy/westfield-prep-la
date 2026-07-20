@@ -1,7 +1,9 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import react from "@vitejs/plugin-react";
 import fs from "fs";
+import type { IncomingMessage, ServerResponse } from "http";
 import path from "path";
+import type { OutputAsset, OutputBundle } from "rollup";
 import { componentTagger } from "lovable-tagger";
 import { visualizer } from "rollup-plugin-visualizer";
 
@@ -58,7 +60,7 @@ const injectFaqRouteSchemas = (html: string) => {
   return html.replace("</head>", `${schemaHtml}\n  </head>`);
 };
 
-const faqStaticSourcePlugin = () => ({
+const faqStaticSourcePlugin = (): Plugin => ({
   name: "faq-static-source",
   transformIndexHtml: {
     order: "post" as const,
@@ -70,8 +72,8 @@ const faqStaticSourcePlugin = () => ({
       return html;
     },
   },
-  configureServer(server) {
-    server.middlewares.use(async (req, res, next) => {
+  configureServer(server: ViteDevServer) {
+    server.middlewares.use(async (req: IncomingMessage, res: ServerResponse, next: (error?: Error) => void) => {
       const requestPath = (req.url || "").split("?")[0];
 
       if (!["/faq", "/faq/"].includes(requestPath)) {
@@ -91,9 +93,9 @@ const faqStaticSourcePlugin = () => ({
       }
     });
   },
-  generateBundle(_, bundle) {
+  generateBundle(_options: unknown, bundle: OutputBundle) {
     const faqAsset = Object.values(bundle).find(
-      (asset) => asset.type === "asset" && asset.fileName === "faq.html"
+      (asset): asset is OutputAsset => asset.type === "asset" && asset.fileName === "faq.html"
     );
 
     if (faqAsset?.type === "asset") {
