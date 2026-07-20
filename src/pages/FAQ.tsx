@@ -515,7 +515,24 @@ const FAQ = () => {
         <meta name="twitter:title" content="Comprehensive FAQ - Westfield Prep Center" />
         <meta name="twitter:description" content="Get answers to 90+ questions about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, pricing, shipping, and e-commerce operations." />
         <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
+
+        {/* Per-category FAQPage JSON-LD schemas */}
+        {faqCategories.map((cat, i) => (
+          <script key={`faq-schema-${i}`} type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "name": `${cat.title} FAQs`,
+              "mainEntity": cat.questions.map((q) => ({
+                "@type": "Question",
+                "name": q.question,
+                "acceptedAnswer": { "@type": "Answer", "text": q.answer },
+              })),
+            })}
+          </script>
+        ))}
       </Helmet>
+
       <StructuredData 
         type="faq" 
         data={faqCategories.flatMap(category => category.questions)}

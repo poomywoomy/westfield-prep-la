@@ -1,19 +1,30 @@
-## Problem
+## Goal
+Add all 12 FAQPage JSON-LD schemas (one per category) into the `<head>` of `/faq`, matching the schemas provided in the PDF.
 
-At ~1765px viewport the header row overflows past the container. `nav` (8 links with `gap-8` + `whitespace-nowrap`) plus the CTA cluster (phone + Schedule a Call + Get a Quote + LanguageSwitcher with `ml-6` and `gap-4`) is wider than the container, so the "Get a Quote" button gets clipped on the right edge. No page has `overflow-x: hidden`, so it visibly bleeds off-screen.
+## Approach
+The `faqCategories` array in `src/pages/FAQ.tsx` already contains all questions/answers verbatim matching the PDF schemas. Rather than hardcoding 12 duplicate blocks, generate one JSON-LD `<script>` per category dynamically inside the existing `<Helmet>` block.
 
-## Fix (Header.tsx only)
+## Change
+In `src/pages/FAQ.tsx`, inside the existing `<Helmet>` (lines 501–518), append:
 
-Tighten the desktop header so it fits comfortably at 1280–1920px without touching Footer, Logo, or unrelated components.
+```tsx
+{faqCategories.map((cat, i) => (
+  <script key={i} type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "name": `${cat.title} FAQs`,
+      "mainEntity": cat.questions.map(q => ({
+        "@type": "Question",
+        "name": q.question,
+        "acceptedAnswer": { "@type": "Answer", "text": q.answer }
+      }))
+    })}
+  </script>
+))}
+```
 
-1. **Reduce nav spacing** — change `<nav className="hidden lg:flex items-center gap-8">` to `gap-6` at lg and `gap-8` only at 2xl (`lg:gap-6 2xl:gap-8`).
-2. **Tighten CTA cluster** — change `hidden xl:flex items-center gap-4 ml-6` to `hidden xl:flex items-center gap-3 ml-4 2xl:gap-4 2xl:ml-6`.
-3. **Reduce outer row gap** — change the row `flex items-center justify-between gap-6` to `gap-4 2xl:gap-6`.
-4. **Compact CTA buttons at xl** — add `xl:px-3 2xl:px-4` (and matching text sizing if needed) to the Schedule a Call and Get a Quote buttons so both fit at xl breakpoints; keep full padding at 2xl.
-5. **Safety net** — add `overflow-x-hidden` to the `<header>` element so any residual overflow can never clip past the viewport.
-
-No copy changes, no logic changes, no layout restructure. Mobile/tablet menu untouched.
+This emits 12 separate FAQPage schemas (Getting Started, General Operations, Shipping & Receiving, Shopify & DTC, Amazon FBA, TikTok Shop, Pricing & Payment, Turnaround Times, Quality Control, Location & Logistics, Insurance & Security, Special Handling) covering every Q&A in the PDF, since react-helmet-async supports children `<script>` tags and hoists them into `<head>`.
 
 ## Verification
-
-- Screenshot the `/contact` route at 1280, 1440, 1600, 1765, 1920 widths via Playwright and confirm the "Get a Quote" button is fully visible and nothing wraps.
+Load `/faq`, inspect `document.head` for 12 `script[type="application/ld+json"]` blocks with `@type: FAQPage`.
