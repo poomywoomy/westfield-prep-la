@@ -136,6 +136,7 @@ const BlogPost = () => {
             '3pl-for-amazon-fba-vs-ecommerce-fulfillment-centers': 'Choosing Between Amazon FBA 3PL and E-commerce Fulfillment',
             'warehouse-automation-vs-west-coast-3pl-warehouse-services': 'Warehouse Automation vs 3PL Warehouse Services Explained',
             'automated-order-fulfillment-vs-storage-for-ecommerce': 'Automated Order Fulfillment vs Ecommerce Storage Explained',
+            'amazon-fba-prep-center-vs-3pl-fulfillment-which-supports-business-growth': 'Amazon FBA Prep Center vs 3PL Fulfillment for Growth',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
