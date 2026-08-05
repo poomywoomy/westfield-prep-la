@@ -138,6 +138,7 @@ const BlogPost = () => {
             'warehouse-automation-vs-west-coast-3pl-warehouse-services': 'Warehouse Automation vs 3PL Warehouse Services Explained',
             'automated-order-fulfillment-vs-storage-for-ecommerce': 'Automated Order Fulfillment vs Ecommerce Storage Explained',
             'amazon-fba-prep-center-vs-3pl-fulfillment-which-supports-business-growth': 'Amazon FBA Prep Center vs 3PL Fulfillment for Growth',
+            'why-3pl-warehousing-los-angeles-smart-business-investment': '3PL Warehousing Los Angeles Is a Smart Business Investment',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
