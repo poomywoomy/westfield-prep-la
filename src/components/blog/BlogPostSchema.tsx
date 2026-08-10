@@ -195,7 +195,7 @@ export function BlogPostSchema({
     });
   };
 
-  const faqs = detectFAQs();
+  const faqs = FAQ_OVERRIDES[slug] ?? detectFAQs();
   const howToSteps = detectHowTo();
 
   // FAQ Schema
