@@ -6,9 +6,38 @@ import path from "path";
 import type { OutputAsset, OutputBundle } from "rollup";
 import { componentTagger } from "lovable-tagger";
 import { visualizer } from "rollup-plugin-visualizer";
+import { BLOG_FAQ_OVERRIDES } from "./src/data/blogFaqOverrides";
 
 const FAQ_SCHEMA_MARKER = "<!-- FAQ_ROUTE_SCHEMAS -->";
 const FAQ_SCHEMA_ATTRIBUTE = "data-faq-route-schema";
+const STATIC_BLOG_SLUG = "why-3pl-warehousing-los-angeles-smart-business-investment";
+const STATIC_BLOG_PATH = `/blog/${STATIC_BLOG_SLUG}`;
+const BLOG_SCHEMA_ATTRIBUTE = "data-blog-faq-schema";
+
+const getBlogFaqSchemaHtml = () => {
+  const faqs = BLOG_FAQ_OVERRIDES[STATIC_BLOG_SLUG];
+  if (!faqs) throw new Error(`Missing FAQ schema override for ${STATIC_BLOG_SLUG}.`);
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
+  return `    <script type="application/ld+json" ${BLOG_SCHEMA_ATTRIBUTE}="true">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`;
+};
+
+const injectBlogFaqSchema = (html: string) => {
+  if (html.includes(BLOG_SCHEMA_ATTRIBUTE)) return html;
+  return html.replace("</head>", `${getBlogFaqSchemaHtml()}\n  </head>`);
+};
 
 const getFaqRouteSchemaHtml = () => {
   const faqPagePath = path.resolve(__dirname, "src/pages/FAQ.tsx");
@@ -68,6 +97,10 @@ const faqStaticSourcePlugin = (): Plugin => ({
   transformIndexHtml: {
     order: "post" as const,
     handler(html: string, ctx: { path?: string }) {
+      if ([STATIC_BLOG_PATH, `${STATIC_BLOG_PATH}/`].includes(ctx.path || "")) {
+        return injectBlogFaqSchema(html);
+      }
+
       if (["/faq", "/faq/", "/faq.html"].includes(ctx.path || "")) {
         return injectFaqRouteSchemas(html);
       }
@@ -78,6 +111,20 @@ const faqStaticSourcePlugin = (): Plugin => ({
   configureServer(server: ViteDevServer) {
     server.middlewares.use(async (req: IncomingMessage, res: ServerResponse, next: (error?: Error) => void) => {
       const requestPath = (req.url || "").split("?")[0];
+
+      if ([STATIC_BLOG_PATH, `${STATIC_BLOG_PATH}/`].includes(requestPath)) {
+        try {
+          const blogHtml = fs.readFileSync(path.resolve(__dirname, "index.html"), "utf8");
+          const transformedHtml = await server.transformIndexHtml(req.url || STATIC_BLOG_PATH, blogHtml);
+
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "text/html; charset=utf-8");
+          res.end(transformedHtml);
+        } catch (error) {
+          next(error as Error);
+        }
+        return;
+      }
 
       if (!["/faq", "/faq/"].includes(requestPath)) {
         next();
@@ -106,6 +153,22 @@ const faqStaticSourcePlugin = (): Plugin => ({
         type: "asset",
         fileName: "faq/index.html",
         source: faqAsset.source,
+      });
+    }
+
+    const indexAsset = Object.values(bundle).find(
+      (asset): asset is OutputAsset => asset.type === "asset" && asset.fileName === "index.html"
+    );
+
+    if (indexAsset?.type === "asset") {
+      const source = typeof indexAsset.source === "string"
+        ? indexAsset.source
+        : Buffer.from(indexAsset.source).toString("utf8");
+
+      this.emitFile({
+        type: "asset",
+        fileName: `blog/${STATIC_BLOG_SLUG}/index.html`,
+        source: injectBlogFaqSchema(source),
       });
     }
   },
