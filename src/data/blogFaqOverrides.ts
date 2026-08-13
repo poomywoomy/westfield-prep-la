@@ -59,4 +59,31 @@ export const BLOG_FAQ_OVERRIDES: Record<string, BlogFaqItem[]> = {
         "Los Angeles offers fast access to major ports, highways, and shipping carriers, which helps reduce delivery times for customers across the West Coast and the rest of the U.S.",
     },
   ],
+  "why-los-angeles-smart-base-ecommerce-companies-3pls": [
+    {
+      question: "What is a prep center for Amazon FBA?",
+      answer:
+        "A prep center for Amazon FBA prepares your products to meet Amazon's specific labeling, packaging, and shipping requirements before they are sent into Amazon's fulfillment network. This helps sellers avoid delays and compliance issues.",
+    },
+    {
+      question: "Why do ecommerce companies choose to base their operations in Los Angeles?",
+      answer:
+        "Los Angeles offers fast access to major ports, highways, and shipping carriers. This helps reduce delivery times and supply chain delays for both imported goods and outgoing customer orders.",
+    },
+    {
+      question: "What does an ecommerce fulfillment 3PL actually do?",
+      answer:
+        "A 3PL, or third-party logistics provider, handles storage, order packing, and shipping on behalf of your business. This allows sellers to avoid the cost and complexity of running their own warehouse.",
+    },
+    {
+      question: "How does Shopify order management work with a fulfillment partner?",
+      answer:
+        "Fulfillment partners typically integrate directly with your Shopify store, automatically syncing orders, updating tracking information, and keeping inventory counts accurate in real time.",
+    },
+    {
+      question: "Is Los Angeles a good location for a small or growing online business?",
+      answer:
+        "Yes. Los Angeles gives smaller businesses access to the same shipping speed, infrastructure, and skilled workforce that larger companies rely on, without requiring them to build their own warehouse network.",
+    },
+  ],
 };
