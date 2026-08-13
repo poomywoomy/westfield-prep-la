@@ -100,8 +100,9 @@ const faqStaticSourcePlugin = (): Plugin => ({
   transformIndexHtml: {
     order: "post" as const,
     handler(html: string, ctx: { path?: string }) {
-      if ([STATIC_BLOG_PATH, `${STATIC_BLOG_PATH}/`].includes(ctx.path || "")) {
-        return injectBlogFaqSchema(html);
+      const ctxSlug = blogPathToSlug((ctx.path || "").split("?")[0]);
+      if (ctxSlug) {
+        return injectBlogFaqSchema(html, ctxSlug);
       }
 
       if (["/faq", "/faq/", "/faq.html"].includes(ctx.path || "")) {
