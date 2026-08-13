@@ -116,10 +116,11 @@ const faqStaticSourcePlugin = (): Plugin => ({
     server.middlewares.use(async (req: IncomingMessage, res: ServerResponse, next: (error?: Error) => void) => {
       const requestPath = (req.url || "").split("?")[0];
 
-      if ([STATIC_BLOG_PATH, `${STATIC_BLOG_PATH}/`].includes(requestPath)) {
+      const blogSlug = blogPathToSlug(requestPath);
+      if (blogSlug) {
         try {
           const blogHtml = fs.readFileSync(path.resolve(__dirname, "index.html"), "utf8");
-          const transformedHtml = await server.transformIndexHtml(req.url || STATIC_BLOG_PATH, blogHtml);
+          const transformedHtml = await server.transformIndexHtml(req.url || `/blog/${blogSlug}`, blogHtml);
 
           res.statusCode = 200;
           res.setHeader("Content-Type", "text/html; charset=utf-8");
