@@ -170,11 +170,13 @@ const faqStaticSourcePlugin = (): Plugin => ({
         ? indexAsset.source
         : Buffer.from(indexAsset.source).toString("utf8");
 
-      this.emitFile({
-        type: "asset",
-        fileName: `blog/${STATIC_BLOG_SLUG}/index.html`,
-        source: injectBlogFaqSchema(source),
-      });
+      for (const slug of STATIC_BLOG_SLUGS) {
+        this.emitFile({
+          type: "asset",
+          fileName: `blog/${slug}/index.html`,
+          source: injectBlogFaqSchema(source, slug),
+        });
+      }
     }
   },
 });
