@@ -1,0 +1,1 @@
+UPDATE public.blog_posts SET published_at = '2026-08-12T00:00:00-07:00' WHERE slug = 'how-fulfillment-center-los-angeles-california-supports-business-growth';
