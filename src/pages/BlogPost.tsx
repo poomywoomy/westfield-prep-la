@@ -277,14 +277,25 @@ const BlogPost = () => {
                     {post.title}
                   </h1>
                   <div className="flex flex-wrap items-center gap-4 md:gap-6 text-muted-foreground">
-                    {post.published_at && (
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <time dateTime={post.published_at} className="text-sm">
-                          {format(new Date(post.published_at), "MMMM dd, yyyy")}
-                        </time>
-                      </div>
-                      )}
+                    {(() => {
+                      const slugDates: Record<string, { dateTime: string; display: string }> = {
+                        'how-fulfillment-center-los-angeles-california-supports-business-growth': {
+                          dateTime: '2026-08-12',
+                          display: 'August 12, 2026'
+                        }
+                      };
+                      const override = slugDates[post.slug];
+                      const dateTime = override?.dateTime || post.published_at;
+                      const display = override?.display || (post.published_at ? format(new Date(post.published_at), "MMMM dd, yyyy") : null);
+                      return dateTime && display ? (
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          <time dateTime={dateTime} className="text-sm">
+                            {display}
+                          </time>
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
               </div>
