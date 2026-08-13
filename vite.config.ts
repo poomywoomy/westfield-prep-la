@@ -10,13 +10,16 @@ import { BLOG_FAQ_OVERRIDES } from "./src/data/blogFaqOverrides";
 
 const FAQ_SCHEMA_MARKER = "<!-- FAQ_ROUTE_SCHEMAS -->";
 const FAQ_SCHEMA_ATTRIBUTE = "data-faq-route-schema";
-const STATIC_BLOG_SLUG = "why-3pl-warehousing-los-angeles-smart-business-investment";
-const STATIC_BLOG_PATH = `/blog/${STATIC_BLOG_SLUG}`;
+const STATIC_BLOG_SLUGS = Object.keys(BLOG_FAQ_OVERRIDES);
+const blogPathToSlug = (requestPath: string) => {
+  const normalized = requestPath.replace(/\/$/, "");
+  return STATIC_BLOG_SLUGS.find((slug) => normalized === `/blog/${slug}`);
+};
 const BLOG_SCHEMA_ATTRIBUTE = "data-blog-faq-schema";
 
-const getBlogFaqSchemaHtml = () => {
-  const faqs = BLOG_FAQ_OVERRIDES[STATIC_BLOG_SLUG];
-  if (!faqs) throw new Error(`Missing FAQ schema override for ${STATIC_BLOG_SLUG}.`);
+const getBlogFaqSchemaHtml = (slug: string) => {
+  const faqs = BLOG_FAQ_OVERRIDES[slug];
+  if (!faqs) throw new Error(`Missing FAQ schema override for ${slug}.`);
 
   const schema = {
     "@context": "https://schema.org",
