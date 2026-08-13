@@ -37,9 +37,9 @@ const getBlogFaqSchemaHtml = (slug: string) => {
   return `    <script type="application/ld+json" ${BLOG_SCHEMA_ATTRIBUTE}="true">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`;
 };
 
-const injectBlogFaqSchema = (html: string) => {
+const injectBlogFaqSchema = (html: string, slug: string) => {
   if (html.includes(BLOG_SCHEMA_ATTRIBUTE)) return html;
-  return html.replace("</head>", `${getBlogFaqSchemaHtml()}\n  </head>`);
+  return html.replace("</head>", `${getBlogFaqSchemaHtml(slug)}\n  </head>`);
 };
 
 const getFaqRouteSchemaHtml = () => {
