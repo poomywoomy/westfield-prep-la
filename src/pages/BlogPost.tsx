@@ -140,6 +140,8 @@ const BlogPost = () => {
             'amazon-fba-prep-center-vs-3pl-fulfillment-which-supports-business-growth': 'Amazon FBA Prep Center vs 3PL Fulfillment for Growth',
             'why-3pl-warehousing-los-angeles-smart-business-investment': '3PL Warehousing Los Angeles Is a Smart Business Investment',
             'how-fulfillment-center-los-angeles-california-supports-business-growth': 'How Fulfillment Center Los Angeles California Boosts Growth',
+            'why-los-angeles-smart-base-ecommerce-companies-3pls': 'Why Los Angeles Is Ideal for Ecommerce Companies and 3PLs',
+
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
