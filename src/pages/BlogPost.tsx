@@ -139,6 +139,7 @@ const BlogPost = () => {
             'automated-order-fulfillment-vs-storage-for-ecommerce': 'Automated Order Fulfillment vs Ecommerce Storage Explained',
             'amazon-fba-prep-center-vs-3pl-fulfillment-which-supports-business-growth': 'Amazon FBA Prep Center vs 3PL Fulfillment for Growth',
             'why-3pl-warehousing-los-angeles-smart-business-investment': '3PL Warehousing Los Angeles Is a Smart Business Investment',
+            'how-fulfillment-center-los-angeles-california-supports-business-growth': 'How Fulfillment Center Los Angeles California Boosts Growth',
           };
           if (slugTitles[post.slug]) return slugTitles[post.slug];
           return post.title.replace(/\s*\|.*$/, '');
