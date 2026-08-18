@@ -17,8 +17,20 @@ export default {
         inter: ['Inter', 'sans-serif'],
         serif: ['"Fraunces"', 'Georgia', 'serif'],
         display: ['"Fraunces"', 'Georgia', 'serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
+
       colors: {
+        wc: {
+          paper: "hsl(var(--wc-paper))",
+          "paper-alt": "hsl(var(--wc-paper-alt))",
+          hairline: "hsl(var(--wc-hairline))",
+          "hairline-strong": "hsl(var(--wc-hairline-strong))",
+          ink: "hsl(var(--wc-ink))",
+          "ink-soft": "hsl(var(--wc-ink-soft))",
+          accent: "hsl(var(--wc-accent))",
+        },
+
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

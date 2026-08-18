@@ -295,13 +295,29 @@ const faqData = [
 
 /* ------------------------------- subcomponents ------------------------------ */
 
-const SectionHeading = ({ title, subtitle }: { title: string; subtitle?: string }) => (
-  <div className="text-center mb-12 md:mb-14">
-    <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+const Label = ({ children }: { children: React.ReactNode }) => (
+  <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-wc-accent">{children}</span>
+);
+
+const SectionHeading = ({
+  index,
+  title,
+  subtitle,
+}: {
+  index: string;
+  title: string;
+  subtitle?: string;
+}) => (
+  <div className="mb-12 md:mb-14 max-w-3xl">
+    <div className="flex items-center gap-4 mb-5">
+      <Label>[{index}]</Label>
+      <span className="h-px flex-1 bg-wc-hairline" aria-hidden="true" />
+    </div>
+    <h2 className="text-3xl md:text-[2.75rem] font-bold tracking-[-0.02em] leading-[1.08] text-wc-ink mb-4">
       <TranslatedText>{title}</TranslatedText>
     </h2>
     {subtitle && (
-      <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+      <p className="text-base md:text-lg text-wc-ink-soft leading-relaxed">
         <TranslatedText>{subtitle}</TranslatedText>
       </p>
     )}
@@ -309,11 +325,14 @@ const SectionHeading = ({ title, subtitle }: { title: string; subtitle?: string 
 );
 
 const Prose = ({ children }: { children: React.ReactNode }) => (
-  <div className="space-y-5 text-base md:text-lg text-muted-foreground leading-relaxed">{children}</div>
+  <div className="space-y-5 text-base md:text-lg text-wc-ink-soft leading-[1.75]">{children}</div>
 );
 
 const InlineLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
-  <Link to={to} className="text-secondary font-semibold hover:underline underline-offset-4">
+  <Link
+    to={to}
+    className="font-semibold text-wc-ink underline decoration-wc-accent decoration-2 underline-offset-4 hover:text-wc-accent transition-colors"
+  >
     {children}
   </Link>
 );
@@ -368,77 +387,104 @@ const WestCoastFulfillment = () => {
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-wc-paper text-wc-ink">
         <Header />
         <Breadcrumbs items={[{ label: "West Coast Fulfillment", path: "/west-coast-fulfillment" }]} />
 
         {/* Hero */}
-        <section className="relative pt-24 md:pt-32 pb-16 md:pb-20 overflow-hidden bg-primary">
+        <section className="relative pt-16 md:pt-24 pb-14 md:pb-16 bg-wc-paper overflow-hidden">
           <div
-            className="absolute -top-40 -right-40 w-[640px] h-[640px] rounded-full opacity-25 blur-3xl"
-            style={{ background: "radial-gradient(circle, hsl(var(--secondary)), transparent 65%)" }}
+            className="absolute inset-0 opacity-[0.5] pointer-events-none"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, hsl(var(--wc-hairline) / 0.5) 1px, transparent 1px)",
+              backgroundSize: "160px 100%",
+            }}
             aria-hidden="true"
           />
-          <div className="container mx-auto px-6 md:px-12 max-w-5xl relative">
-            <div className="text-center text-primary-foreground space-y-8">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-secondary">
-                <MapPin className="w-3.5 h-3.5" />
-                <TranslatedText>Los Angeles, California</TranslatedText>
+          <div className="container mx-auto px-6 md:px-12 max-w-6xl relative">
+            <div className="h-px w-full bg-wc-hairline-strong mb-6" aria-hidden="true" />
+
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-10">
+              <span className="inline-flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-wc-accent" />
+                <Label>West Coast Operations // Los Angeles, CA</Label>
               </span>
+              <span className="font-mono text-[11px] tracking-[0.18em] text-wc-ink-soft">
+                34.0522&deg; N, 118.2437&deg; W
+              </span>
+            </div>
 
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
-                <TranslatedText>West Coast 3PL and Fulfillment Services</TranslatedText>
-              </h1>
+            <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-end">
+              <div className="lg:col-span-7">
+                <h1 className="text-4xl md:text-5xl lg:text-[3.6rem] font-bold tracking-[-0.035em] leading-[1.0] text-wc-ink">
+                  <TranslatedText>West Coast 3PL and</TranslatedText>
+                  <br />
+                  <span className="wc-outline-text">
+                    <TranslatedText>Fulfillment Services</TranslatedText>
+                  </span>
+                </h1>
+              </div>
 
-              <p className="text-lg md:text-xl text-white/85 leading-relaxed max-w-3xl mx-auto">
-                <TranslatedText>
-                  A West Coast fulfillment center minutes from the Ports of Los Angeles and Long Beach. One to two day
-                  ground delivery across the western United States, same-day order cutoffs, and photo proof on every
-                  receipt.
-                </TranslatedText>
-              </p>
+              <div className="lg:col-span-5 space-y-8">
+                <p className="text-base md:text-lg text-wc-ink-soft leading-relaxed border-l border-wc-accent pl-5">
+                  <TranslatedText>
+                    A West Coast fulfillment center minutes from the Ports of Los Angeles and Long Beach. One to two day
+                    ground delivery across the western United States, same-day order cutoffs, and photo proof on every
+                    receipt.
+                  </TranslatedText>
+                </p>
 
-              <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-10 py-7 text-lg shadow-2xl shadow-secondary/30 hover:-translate-y-0.5 transition-all group"
-                >
-                  <Link to="/contact">
-                    <TranslatedText>Get a Custom Quote</TranslatedText>
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-white/40 bg-transparent text-white hover:bg-white hover:text-primary font-bold px-10 py-7 text-lg transition-all"
-                >
-                  <Link to="/pricing">
-                    <TranslatedText>View Pricing</TranslatedText>
-                  </Link>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="rounded-none bg-wc-ink hover:bg-wc-ink/90 text-white font-bold px-8 py-6 text-base group"
+                  >
+                    <Link to="/contact">
+                      <TranslatedText>Get a Custom Quote</TranslatedText>
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    size="lg"
+                    variant="outline"
+                    className="rounded-none border border-wc-ink/25 bg-transparent text-wc-ink hover:bg-wc-ink hover:text-white font-bold px-8 py-6 text-base transition-all"
+                  >
+                    <Link to="/pricing">
+                      <TranslatedText>View Pricing</TranslatedText>
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Trust bar */}
-        <section className="py-10 bg-white border-b border-border/40">
+        {/* Metrics strip */}
+        <section className="bg-wc-paper border-y border-wc-hairline-strong">
           <div className="container mx-auto px-6 md:px-12 max-w-6xl">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4">
               {[
                 { stat: "2M+", label: "Units processed" },
                 { stat: "100+", label: "E-commerce brands" },
                 { stat: "1 to 2 days", label: "West Coast delivery" },
                 { stat: "Same day", label: "Order turnaround" },
-              ].map((item) => (
-                <div key={item.label}>
-                  <div className="text-2xl md:text-3xl font-bold text-primary">
+              ].map((item, index) => (
+                <div
+                  key={item.label}
+                  className={`py-8 md:py-10 px-5 md:px-7 ${
+                    index !== 3 ? "md:border-r border-wc-hairline" : ""
+                  } ${index % 2 === 0 ? "border-r md:border-r" : ""} ${index < 2 ? "border-b md:border-b-0" : ""} border-wc-hairline`}
+                >
+                  <div className="font-mono text-[11px] tracking-[0.22em] text-wc-accent mb-3">
+                    [{String(index + 1).padStart(2, "0")}]
+                  </div>
+                  <div className="text-2xl md:text-3xl font-bold tracking-[-0.02em] text-wc-ink">
                     <TranslatedText>{item.stat}</TranslatedText>
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">
+                  <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-wc-ink-soft mt-2">
                     <TranslatedText>{item.label}</TranslatedText>
                   </div>
                 </div>
@@ -450,15 +496,15 @@ const WestCoastFulfillment = () => {
         {/* Jump links */}
         <nav
           aria-label="On this page"
-          className="py-5 bg-background border-b border-border/40 sticky top-20 z-30 backdrop-blur-sm bg-background/90"
+          className="py-4 bg-wc-paper/95 backdrop-blur-sm border-b border-wc-hairline sticky top-20 z-30"
         >
           <div className="container mx-auto px-6 md:px-12 max-w-6xl">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-7 overflow-x-auto scrollbar-hide">
               {jumpLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="whitespace-nowrap rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted-foreground hover:border-secondary/60 hover:text-secondary transition-colors"
+                  className="whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.16em] text-wc-ink-soft hover:text-wc-accent border-b border-transparent hover:border-wc-accent pb-1 transition-colors"
                 >
                   <TranslatedText>{link.label}</TranslatedText>
                 </a>
@@ -468,33 +514,48 @@ const WestCoastFulfillment = () => {
         </nav>
 
         {/* Transit times */}
-        <section id="transit-times" className="py-20 md:py-24 bg-background scroll-mt-32">
+        <section id="transit-times" className="py-20 md:py-24 bg-wc-paper scroll-mt-32">
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <SectionHeading
+              index="01"
               title="Ground Transit Times From Los Angeles"
               subtitle="Standard ground service, no expedited surcharge. This is the practical reason brands move inventory west."
             />
 
-            <div className="rounded-2xl border border-border overflow-hidden bg-card shadow-sm">
+            <div className="border-t-2 border-wc-hairline-strong">
+              <div className="hidden sm:flex items-center gap-6 px-1 py-3 border-b border-wc-hairline">
+                <div className="sm:w-1/3 font-mono text-[11px] uppercase tracking-[0.18em] text-wc-ink-soft">
+                  <TranslatedText>Region</TranslatedText>
+                </div>
+                <div className="sm:flex-1 font-mono text-[11px] uppercase tracking-[0.18em] text-wc-ink-soft">
+                  <TranslatedText>Metro coverage</TranslatedText>
+                </div>
+                <div className="sm:w-32 text-right font-mono text-[11px] uppercase tracking-[0.18em] text-wc-ink-soft">
+                  <TranslatedText>Ground</TranslatedText>
+                </div>
+              </div>
+
               {transitZones.map((zone, index) => (
                 <div
                   key={zone.region}
-                  className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 px-6 py-5 ${
-                    index !== transitZones.length - 1 ? "border-b border-border" : ""
-                  } ${index < 4 ? "bg-secondary/5" : ""}`}
+                  className="group flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 px-1 py-5 border-b border-wc-hairline hover:bg-wc-accent/[0.04] transition-colors"
                 >
-                  <div className="sm:w-1/3">
-                    <div className="font-semibold text-foreground">
+                  <div className="sm:w-1/3 flex items-center gap-3">
+                    <span
+                      className={`h-6 w-[2px] ${index < 4 ? "bg-wc-accent" : "bg-wc-hairline"}`}
+                      aria-hidden="true"
+                    />
+                    <span className="font-semibold text-wc-ink">
                       <TranslatedText>{zone.region}</TranslatedText>
-                    </div>
+                    </span>
                   </div>
-                  <div className="sm:flex-1 text-sm text-muted-foreground">
+                  <div className="sm:flex-1 text-sm text-wc-ink-soft pl-5 sm:pl-0">
                     <TranslatedText>{zone.states}</TranslatedText>
                   </div>
-                  <div className="sm:w-32 sm:text-right">
+                  <div className="sm:w-32 sm:text-right pl-5 sm:pl-0">
                     <span
-                      className={`inline-block rounded-full px-3 py-1 text-sm font-bold ${
-                        index < 4 ? "bg-secondary/15 text-secondary" : "bg-muted text-muted-foreground"
+                      className={`font-mono text-sm font-bold tracking-tight ${
+                        index < 4 ? "text-wc-accent" : "text-wc-ink-soft"
                       }`}
                     >
                       <TranslatedText>{zone.days}</TranslatedText>
@@ -504,7 +565,7 @@ const WestCoastFulfillment = () => {
               ))}
             </div>
 
-            <p className="text-sm text-muted-foreground text-center mt-6">
+            <p className="text-sm text-wc-ink-soft mt-6 max-w-2xl">
               <TranslatedText>
                 Transit estimates reflect standard carrier ground service in business days and exclude the day of
                 pickup. Actual times vary by carrier, service level, and destination.
@@ -514,9 +575,13 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* What is a West Coast 3PL */}
-        <section id="what-is-a-west-coast-3pl" className="py-20 md:py-24 bg-white border-y border-border/40 scroll-mt-32">
+        <section
+          id="what-is-a-west-coast-3pl"
+          className="py-20 md:py-24 bg-wc-paper-alt border-y border-wc-hairline scroll-mt-32"
+        >
           <div className="container mx-auto px-6 md:px-12 max-w-4xl">
             <SectionHeading
+              index="02"
               title="What a West Coast 3PL Actually Does"
               subtitle="The category label covers a wide range of operations. Here is the specific scope of work."
             />
@@ -561,24 +626,30 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Ports */}
-        <section id="ports" className="py-20 md:py-24 bg-background scroll-mt-32">
+        <section id="ports" className="py-20 md:py-24 bg-wc-paper scroll-mt-32">
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <SectionHeading
+              index="03"
               title="Why the San Pedro Bay Ports Matter to Your Inventory"
               subtitle="If you import, the distance between the terminal and your warehouse is a line item on every container."
             />
 
-            <div className="grid sm:grid-cols-3 gap-6 mb-12">
+            <div className="grid sm:grid-cols-3 border-t-2 border-wc-hairline-strong mb-12">
               {[
                 { stat: "10.2M", label: "TEUs handled by the Port of Los Angeles in 2025" },
                 { stat: "9.9M", label: "TEUs handled by the Port of Long Beach in 2025, a port record" },
                 { stat: "26 years", label: "Consecutive years the Port of LA has been the busiest US container port" },
-              ].map((item) => (
-                <div key={item.label} className="rounded-2xl border border-border bg-card p-7 text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-secondary mb-2">
+              ].map((item, index) => (
+                <div
+                  key={item.label}
+                  className={`py-8 pr-6 ${index !== 2 ? "sm:border-r border-wc-hairline sm:pr-8" : ""} ${
+                    index !== 2 ? "border-b sm:border-b-0 border-wc-hairline" : ""
+                  } ${index !== 0 ? "sm:pl-8" : ""}`}
+                >
+                  <div className="font-mono text-3xl md:text-4xl font-bold text-wc-accent mb-3 tracking-tight">
                     <TranslatedText>{item.stat}</TranslatedText>
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-wc-ink-soft leading-relaxed">
                     <TranslatedText>{item.label}</TranslatedText>
                   </p>
                 </div>
@@ -605,23 +676,23 @@ const WestCoastFulfillment = () => {
               </p>
             </Prose>
 
-            <p className="text-sm text-muted-foreground mt-8 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-wc-ink-soft mt-8 flex flex-wrap items-center gap-x-2 gap-y-1 pt-6 border-t border-wc-hairline">
               <TranslatedText>Sources:</TranslatedText>
               <a
                 href="https://portoflosangeles.org/business/statistics/container-statistics"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-secondary hover:underline"
+                className="inline-flex items-center gap-1 text-wc-accent hover:underline"
               >
                 Port of Los Angeles container statistics
                 <ExternalLink className="w-3 h-3" />
               </a>
-              <span>·</span>
+              <span>&middot;</span>
               <a
                 href="https://polb.com/business/port-statistics/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-secondary hover:underline"
+                className="inline-flex items-center gap-1 text-wc-accent hover:underline"
               >
                 Port of Long Beach port statistics
                 <ExternalLink className="w-3 h-3" />
@@ -631,47 +702,66 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Shipping zones */}
-        <section id="shipping-zones" className="py-20 md:py-24 bg-white border-y border-border/40 scroll-mt-32">
+        <section
+          id="shipping-zones"
+          className="py-20 md:py-24 bg-wc-paper-alt border-y border-wc-hairline scroll-mt-32"
+        >
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <SectionHeading
+              index="04"
               title="Shipping Zones: Los Angeles vs a Midwest or East Coast Origin"
               subtitle="Carriers price ground shipments by distance band. Where your inventory sits decides which band every order falls into."
             />
 
-            <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
+            <div className="overflow-x-auto border-t-2 border-wc-hairline-strong">
               <table className="w-full text-sm">
                 <caption className="sr-only">
                   Approximate parcel ground zones by destination from a Los Angeles, Midwest, or East Coast origin
                 </caption>
                 <thead>
-                  <tr className="border-b border-border bg-muted/40">
-                    <th scope="col" className="text-left font-semibold px-5 py-4">
+                  <tr className="border-b border-wc-hairline">
+                    <th
+                      scope="col"
+                      className="text-left font-mono text-[11px] uppercase tracking-[0.16em] text-wc-ink-soft px-1 py-4"
+                    >
                       <TranslatedText>Destination</TranslatedText>
                     </th>
-                    <th scope="col" className="text-left font-semibold px-5 py-4 text-secondary">
+                    <th
+                      scope="col"
+                      className="text-left font-mono text-[11px] uppercase tracking-[0.16em] text-wc-accent px-4 py-4"
+                    >
                       <TranslatedText>From Los Angeles</TranslatedText>
                     </th>
-                    <th scope="col" className="text-left font-semibold px-5 py-4">
+                    <th
+                      scope="col"
+                      className="text-left font-mono text-[11px] uppercase tracking-[0.16em] text-wc-ink-soft px-4 py-4"
+                    >
                       <TranslatedText>From Midwest</TranslatedText>
                     </th>
-                    <th scope="col" className="text-left font-semibold px-5 py-4">
+                    <th
+                      scope="col"
+                      className="text-left font-mono text-[11px] uppercase tracking-[0.16em] text-wc-ink-soft px-4 py-4"
+                    >
                       <TranslatedText>From East Coast</TranslatedText>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {zoneComparison.map((row, index) => (
-                    <tr key={row.destination} className={index !== zoneComparison.length - 1 ? "border-b border-border" : ""}>
-                      <th scope="row" className="text-left font-medium px-5 py-4">
+                  {zoneComparison.map((row) => (
+                    <tr
+                      key={row.destination}
+                      className="border-b border-wc-hairline hover:bg-wc-accent/[0.04] transition-colors"
+                    >
+                      <th scope="row" className="text-left font-semibold text-wc-ink px-1 py-4">
                         <TranslatedText>{row.destination}</TranslatedText>
                       </th>
-                      <td className="px-5 py-4 font-semibold text-secondary">
+                      <td className="px-4 py-4 font-mono font-bold text-wc-accent">
                         <TranslatedText>{row.la}</TranslatedText>
                       </td>
-                      <td className="px-5 py-4 text-muted-foreground">
+                      <td className="px-4 py-4 font-mono text-wc-ink-soft">
                         <TranslatedText>{row.midwest}</TranslatedText>
                       </td>
-                      <td className="px-5 py-4 text-muted-foreground">
+                      <td className="px-4 py-4 font-mono text-wc-ink-soft">
                         <TranslatedText>{row.east}</TranslatedText>
                       </td>
                     </tr>
@@ -704,29 +794,33 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Container timeline */}
-        <section id="container-timeline" className="py-20 md:py-24 bg-background scroll-mt-32">
+        <section id="container-timeline" className="py-20 md:py-24 bg-wc-paper scroll-mt-32">
           <div className="container mx-auto px-6 md:px-12 max-w-4xl">
             <SectionHeading
+              index="05"
               title="From Container to Sellable Inventory"
               subtitle="What actually happens between a vessel discharging and a unit becoming pickable in your portal."
             />
 
-            <div className="space-y-4">
+            <div className="border-t-2 border-wc-hairline-strong">
               {containerSteps.map((item, index) => (
-                <div key={item.step} className="flex gap-5 rounded-2xl border border-border bg-card p-6 md:p-7">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-secondary/10 text-secondary font-bold flex items-center justify-center">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-3 mb-2">
-                      <h3 className="text-lg font-bold">
-                        <TranslatedText>{item.step}</TranslatedText>
-                      </h3>
-                      <span className="rounded-full bg-muted px-3 py-0.5 text-xs font-semibold text-muted-foreground">
-                        <TranslatedText>{item.timing}</TranslatedText>
-                      </span>
+                <div
+                  key={item.step}
+                  className="grid md:grid-cols-12 gap-4 md:gap-8 py-7 border-b border-wc-hairline"
+                >
+                  <div className="md:col-span-3">
+                    <div className="font-mono text-[11px] tracking-[0.22em] text-wc-accent mb-2">
+                      [{String(index + 1).padStart(2, "0")}]
                     </div>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-wc-ink-soft">
+                      <TranslatedText>{item.timing}</TranslatedText>
+                    </div>
+                  </div>
+                  <div className="md:col-span-9">
+                    <h3 className="text-lg font-bold text-wc-ink mb-2">
+                      <TranslatedText>{item.step}</TranslatedText>
+                    </h3>
+                    <p className="text-wc-ink-soft leading-relaxed">
                       <TranslatedText>{item.detail}</TranslatedText>
                     </p>
                   </div>
@@ -734,7 +828,7 @@ const WestCoastFulfillment = () => {
               ))}
             </div>
 
-            <p className="mt-8 text-muted-foreground leading-relaxed">
+            <p className="mt-8 text-wc-ink-soft leading-relaxed">
               <TranslatedText>Full detail on intake and QC lives on our </TranslatedText>
               <InlineLink to="/receiving-inspection">receiving and inspection</InlineLink>
               <TranslatedText> page, and prep scope is covered under </TranslatedText>
@@ -745,28 +839,32 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Why West Coast */}
-        <section className="py-20 md:py-24 bg-white border-y border-border/40">
+        <section className="py-20 md:py-24 bg-wc-paper-alt border-y border-wc-hairline">
           <div className="container mx-auto px-6 md:px-12 max-w-6xl">
             <SectionHeading
+              index="06"
               title="Why Brands Choose a West Coast 3PL"
               subtitle="Location is an operating cost, not a detail. Here is where it shows up on your P&L."
             />
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {advantages.map((item) => {
+            <div className="grid md:grid-cols-2 border-t border-wc-hairline">
+              {advantages.map((item, index) => {
                 const Icon = item.icon;
                 return (
                   <div
                     key={item.title}
-                    className="rounded-2xl border border-border bg-card p-8 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                    className={`py-9 md:py-10 ${index % 2 === 0 ? "md:pr-10 md:border-r" : "md:pl-10"} border-b border-wc-hairline`}
                   >
-                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-5">
-                      <Icon className="w-6 h-6 text-secondary" />
+                    <div className="flex items-center gap-4 mb-5">
+                      <Icon className="w-5 h-5 text-wc-accent" />
+                      <span className="font-mono text-[11px] tracking-[0.22em] text-wc-accent">
+                        [{String(index + 1).padStart(2, "0")}]
+                      </span>
                     </div>
-                    <h3 className="text-xl font-bold mb-3">
+                    <h3 className="text-xl font-bold text-wc-ink mb-3 tracking-[-0.01em]">
                       <TranslatedText>{item.title}</TranslatedText>
                     </h3>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-wc-ink-soft leading-relaxed">
                       <TranslatedText>{item.description}</TranslatedText>
                     </p>
                   </div>
@@ -777,30 +875,31 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Services */}
-        <section id="services" className="py-20 md:py-24 bg-background scroll-mt-32">
+        <section id="services" className="py-20 md:py-24 bg-wc-paper scroll-mt-32">
           <div className="container mx-auto px-6 md:px-12 max-w-6xl">
             <SectionHeading
+              index="07"
               title="What We Handle From Our West Coast Warehouse"
               subtitle="One facility, one inventory pool, every channel you sell on."
             />
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 border-t border-l border-wc-hairline">
               {services.map((service) => {
                 const Icon = service.icon;
                 return (
                   <Link
                     key={service.title}
                     to={service.path}
-                    className="group rounded-2xl border border-border bg-card p-7 hover:border-secondary/50 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                    className="group border-b border-r border-wc-hairline bg-wc-paper-alt p-7 hover:bg-wc-accent/[0.04] transition-colors"
                   >
-                    <Icon className="w-7 h-7 text-secondary mb-4" />
-                    <h3 className="text-lg font-bold mb-2 group-hover:text-secondary transition-colors">
+                    <Icon className="w-6 h-6 text-wc-accent mb-5" />
+                    <h3 className="text-lg font-bold text-wc-ink mb-2 group-hover:text-wc-accent transition-colors">
                       <TranslatedText>{service.title}</TranslatedText>
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                    <p className="text-sm text-wc-ink-soft leading-relaxed mb-5">
                       <TranslatedText>{service.description}</TranslatedText>
                     </p>
-                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-secondary">
+                    <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-wc-accent">
                       <TranslatedText>Learn more</TranslatedText>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                     </span>
@@ -812,14 +911,15 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Channels */}
-        <section className="py-20 md:py-24 bg-white border-y border-border/40">
+        <section className="py-20 md:py-24 bg-wc-paper-alt border-y border-wc-hairline">
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <SectionHeading
+              index="08"
               title="Built for the Channels You Already Sell On"
               subtitle="Orders import automatically, inventory syncs in real time, and tracking writes back to the channel."
             />
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 border-t border-l border-wc-hairline">
               {[
                 {
                   name: "Shopify fulfillment",
@@ -840,31 +940,35 @@ const WestCoastFulfillment = () => {
                 <Link
                   key={channel.name}
                   to={channel.path}
-                  className="group rounded-2xl border border-border bg-card p-8 text-center hover:border-secondary/50 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                  className="group border-b border-r border-wc-hairline p-8 hover:bg-wc-accent/[0.04] transition-colors"
                 >
-                  <h3 className="text-lg font-bold mb-3 group-hover:text-secondary transition-colors">
+                  <h3 className="text-lg font-bold text-wc-ink mb-3 group-hover:text-wc-accent transition-colors">
                     <TranslatedText>{channel.name}</TranslatedText>
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-wc-ink-soft leading-relaxed">
                     <TranslatedText>{channel.copy}</TranslatedText>
                   </p>
                 </Link>
               ))}
             </div>
 
-            <div className="text-center mt-10">
-              <Link to="/integrations" className="inline-flex items-center gap-2 text-secondary font-semibold hover:underline">
+            <div className="mt-8">
+              <Link
+                to="/integrations"
+                className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-wc-accent hover:underline underline-offset-4"
+              >
                 <TranslatedText>See all integrations</TranslatedText>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
         </section>
 
         {/* Amazon FBA */}
-        <section id="amazon-fba" className="py-20 md:py-24 bg-background scroll-mt-32">
+        <section id="amazon-fba" className="py-20 md:py-24 bg-wc-paper scroll-mt-32">
           <div className="container mx-auto px-6 md:px-12 max-w-4xl">
             <SectionHeading
+              index="09"
               title="Amazon FBA From a West Coast Position"
               subtitle="Short replenishment distance changes how much inventory you have to carry."
             />
@@ -905,34 +1009,37 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* How to choose */}
-        <section id="how-to-choose" className="py-20 md:py-24 bg-white border-y border-border/40 scroll-mt-32">
+        <section
+          id="how-to-choose"
+          className="py-20 md:py-24 bg-wc-paper-alt border-y border-wc-hairline scroll-mt-32"
+        >
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <SectionHeading
+              index="10"
               title="How to Evaluate West Coast 3PL Companies"
               subtitle="Eight questions worth asking every provider on your shortlist, including us."
             />
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 border-t border-wc-hairline">
               {chooseCriteria.map((item, index) => (
-                <div key={item.title} className="rounded-2xl border border-border bg-card p-7">
-                  <div className="flex items-start gap-4">
-                    <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-secondary/10 text-secondary text-sm font-bold flex items-center justify-center">
-                      {index + 1}
-                    </span>
-                    <div>
-                      <h3 className="font-bold mb-2">
-                        <TranslatedText>{item.title}</TranslatedText>
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        <TranslatedText>{item.detail}</TranslatedText>
-                      </p>
-                    </div>
+                <div
+                  key={item.title}
+                  className={`py-7 ${index % 2 === 0 ? "md:pr-9 md:border-r" : "md:pl-9"} border-b border-wc-hairline`}
+                >
+                  <div className="font-mono text-[11px] tracking-[0.22em] text-wc-accent mb-3">
+                    [{String(index + 1).padStart(2, "0")}]
                   </div>
+                  <h3 className="font-bold text-wc-ink mb-2">
+                    <TranslatedText>{item.title}</TranslatedText>
+                  </h3>
+                  <p className="text-sm text-wc-ink-soft leading-relaxed">
+                    <TranslatedText>{item.detail}</TranslatedText>
+                  </p>
                 </div>
               ))}
             </div>
 
-            <p className="text-center text-muted-foreground mt-10">
+            <p className="text-wc-ink-soft mt-10">
               <TranslatedText>Our answers to all eight are on </TranslatedText>
               <InlineLink to="/why-choose-us">why brands choose Westfield</InlineLink>
               <TranslatedText> and in our </TranslatedText>
@@ -943,30 +1050,21 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* East vs West vs split */}
-        <section id="east-vs-west" className="relative py-24 md:py-32 overflow-hidden bg-primary scroll-mt-32">
-          <div
-            className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full opacity-20 blur-[120px]"
-            style={{ background: "hsl(var(--secondary))" }}
-            aria-hidden="true"
-          />
-          <div className="container mx-auto px-6 md:px-12 max-w-6xl relative">
-            <div className="text-center mb-16 text-primary-foreground">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-                <TranslatedText>West Coast, East Coast, or Split Inventory</TranslatedText>
-              </h2>
-              <p className="text-lg text-white/70 max-w-2xl mx-auto">
-                <TranslatedText>
-                  Three real configurations, and an honest read on when each one is the right call.
-                </TranslatedText>
-              </p>
-            </div>
+        <section id="east-vs-west" className="py-20 md:py-24 bg-wc-paper scroll-mt-32">
+          <div className="container mx-auto px-6 md:px-12 max-w-6xl">
+            <SectionHeading
+              index="11"
+              title="West Coast, East Coast, or Split Inventory"
+              subtitle="Three real configurations, and an honest read on when each one is the right call."
+            />
 
-            <div className="grid md:grid-cols-3 gap-6 mb-14">
-              <div className="rounded-2xl border border-white/15 bg-white/5 p-8 backdrop-blur-sm">
-                <h3 className="text-xl font-bold text-white mb-2">
+            <div className="grid md:grid-cols-3 border-t-2 border-wc-hairline-strong border-l border-wc-hairline">
+              <div className="border-b border-r border-wc-hairline p-8 bg-wc-accent/[0.04]">
+                <div className="font-mono text-[11px] tracking-[0.22em] text-wc-accent mb-4">[A]</div>
+                <h3 className="text-xl font-bold text-wc-ink mb-2">
                   <TranslatedText>Single West Coast node</TranslatedText>
                 </h3>
-                <p className="text-sm text-secondary font-semibold mb-5">
+                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-wc-accent mb-6 leading-relaxed">
                   <TranslatedText>Best for most brands under roughly 5,000 orders a month</TranslatedText>
                 </p>
                 <div className="space-y-3">
@@ -977,8 +1075,8 @@ const WestCoastFulfillment = () => {
                     "Low zones for western customers",
                     "Coast-to-coast ground runs 4 to 5 days",
                   ].map((item) => (
-                    <div key={item} className="flex items-start gap-3 text-white/90 text-sm">
-                      <Check className="w-4 h-4 text-secondary mt-0.5 flex-shrink-0" />
+                    <div key={item} className="flex items-start gap-3 text-sm text-wc-ink">
+                      <Check className="w-4 h-4 text-wc-accent mt-0.5 flex-shrink-0" />
                       <span>
                         <TranslatedText>{item}</TranslatedText>
                       </span>
@@ -987,11 +1085,12 @@ const WestCoastFulfillment = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8">
-                <h3 className="text-xl font-bold text-white/80 mb-2">
+              <div className="border-b border-r border-wc-hairline p-8 bg-wc-paper-alt">
+                <div className="font-mono text-[11px] tracking-[0.22em] text-wc-ink-soft mb-4">[B]</div>
+                <h3 className="text-xl font-bold text-wc-ink mb-2">
                   <TranslatedText>Single East Coast node</TranslatedText>
                 </h3>
-                <p className="text-sm text-white/50 font-semibold mb-5">
+                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-wc-ink-soft mb-6 leading-relaxed">
                   <TranslatedText>Best when orders skew Northeast and you do not import via the West Coast</TranslatedText>
                 </p>
                 <div className="space-y-3">
@@ -1002,7 +1101,7 @@ const WestCoastFulfillment = () => {
                     "Longer replenishment to California Amazon FCs",
                     "Eastern cutoffs push West Coast orders a day",
                   ].map((item) => (
-                    <div key={item} className="flex items-start gap-3 text-white/55 text-sm">
+                    <div key={item} className="flex items-start gap-3 text-sm text-wc-ink-soft">
                       <X className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
                       <span>
                         <TranslatedText>{item}</TranslatedText>
@@ -1012,11 +1111,12 @@ const WestCoastFulfillment = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-white/15 bg-white/5 p-8 backdrop-blur-sm">
-                <h3 className="text-xl font-bold text-white mb-2">
+              <div className="border-b border-r border-wc-hairline p-8 bg-wc-paper-alt">
+                <div className="font-mono text-[11px] tracking-[0.22em] text-wc-ink-soft mb-4">[C]</div>
+                <h3 className="text-xl font-bold text-wc-ink mb-2">
                   <TranslatedText>Split east and west</TranslatedText>
                 </h3>
-                <p className="text-sm text-secondary font-semibold mb-5">
+                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-wc-ink-soft mb-6 leading-relaxed">
                   <TranslatedText>Worth modeling at high volume with a genuinely national order mix</TranslatedText>
                 </p>
                 <div className="space-y-3">
@@ -1029,10 +1129,10 @@ const WestCoastFulfillment = () => {
                   ].map((item) => (
                     <div
                       key={item.text}
-                      className={`flex items-start gap-3 text-sm ${item.pro ? "text-white/90" : "text-white/55"}`}
+                      className={`flex items-start gap-3 text-sm ${item.pro ? "text-wc-ink" : "text-wc-ink-soft"}`}
                     >
                       {item.pro ? (
-                        <Check className="w-4 h-4 text-secondary mt-0.5 flex-shrink-0" />
+                        <Check className="w-4 h-4 text-wc-accent mt-0.5 flex-shrink-0" />
                       ) : (
                         <X className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
                       )}
@@ -1045,8 +1145,8 @@ const WestCoastFulfillment = () => {
               </div>
             </div>
 
-            <div className="max-w-3xl mx-auto text-center">
-              <p className="text-white/70 leading-relaxed">
+            <div className="max-w-3xl mt-10">
+              <p className="text-wc-ink-soft leading-relaxed">
                 <TranslatedText>
                   The honest test for splitting is arithmetic, not ambition: the parcel savings on the orders that move
                   to the second node have to exceed the cost of carrying duplicate safety stock across every SKU, plus
@@ -1059,14 +1159,18 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Peak season */}
-        <section id="peak-season" className="py-20 md:py-24 bg-background scroll-mt-32">
+        <section
+          id="peak-season"
+          className="py-20 md:py-24 bg-wc-paper-alt border-y border-wc-hairline scroll-mt-32"
+        >
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <SectionHeading
+              index="12"
               title="Peak Season Planning From the West Coast"
               subtitle="Two calendars drive the year for importing brands, and both run through Los Angeles."
             />
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 border-t border-l border-wc-hairline">
               {[
                 {
                   title: "Q4 and Cyber Week",
@@ -1080,19 +1184,22 @@ const WestCoastFulfillment = () => {
                   title: "Chinese New Year",
                   copy: "Factories in Asia shut for weeks and sailings compress on either side of the holiday. Brands importing through San Pedro Bay typically pull orders forward and stage extra cover in West Coast storage, which is cheaper than air freighting a stockout in March.",
                 },
-              ].map((item) => (
-                <div key={item.title} className="rounded-2xl border border-border bg-card p-7">
-                  <h3 className="text-lg font-bold mb-3">
+              ].map((item, index) => (
+                <div key={item.title} className="border-b border-r border-wc-hairline p-7">
+                  <div className="font-mono text-[11px] tracking-[0.22em] text-wc-accent mb-4">
+                    [{String(index + 1).padStart(2, "0")}]
+                  </div>
+                  <h3 className="text-lg font-bold text-wc-ink mb-3">
                     <TranslatedText>{item.title}</TranslatedText>
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-wc-ink-soft leading-relaxed">
                     <TranslatedText>{item.copy}</TranslatedText>
                   </p>
                 </div>
               ))}
             </div>
 
-            <p className="text-center text-muted-foreground mt-10">
+            <p className="text-wc-ink-soft mt-10">
               <TranslatedText>Extra cover has to go somewhere. See </TranslatedText>
               <InlineLink to="/storage-warehousing">storage and warehousing</InlineLink>
               <TranslatedText> for how we bill it, and </TranslatedText>
@@ -1103,19 +1210,25 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Who it's for */}
-        <section className="py-20 md:py-24 bg-white border-y border-border/40">
-          <div className="container mx-auto px-6 md:px-12 max-w-4xl text-center">
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
-              <TranslatedText>Purpose-Built for Brands Shipping 1,000+ Orders a Month</TranslatedText>
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-10">
-              <TranslatedText>
-                Our West Coast operation is engineered around consistency at volume: dedicated account management,
-                accurate channel integrations, disciplined cycle counts, and same-day cutoffs that hold during peak.
-                That is our sweet spot rather than a hard floor, and we look at every brand on its own merits.
-              </TranslatedText>
-            </p>
-            <div className="grid sm:grid-cols-3 gap-6 text-left">
+        <section className="py-20 md:py-24 bg-wc-paper">
+          <div className="container mx-auto px-6 md:px-12 max-w-5xl">
+            <div className="max-w-3xl mb-12">
+              <div className="flex items-center gap-4 mb-5">
+                <Label>[13]</Label>
+                <span className="h-px flex-1 bg-wc-hairline" aria-hidden="true" />
+              </div>
+              <h2 className="text-3xl md:text-[2.75rem] font-bold tracking-[-0.02em] leading-[1.08] text-wc-ink mb-5">
+                <TranslatedText>Purpose-Built for Brands Shipping 1,000+ Orders a Month</TranslatedText>
+              </h2>
+              <p className="text-base md:text-lg text-wc-ink-soft leading-relaxed">
+                <TranslatedText>
+                  Our West Coast operation is engineered around consistency at volume: dedicated account management,
+                  accurate channel integrations, disciplined cycle counts, and same-day cutoffs that hold during peak.
+                  That is our sweet spot rather than a hard floor, and we look at every brand on its own merits.
+                </TranslatedText>
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-3 border-t border-l border-wc-hairline">
               {[
                 {
                   title: "Scaling DTC brands",
@@ -1130,11 +1243,11 @@ const WestCoastFulfillment = () => {
                   copy: "Running Shopify, Amazon, and TikTok Shop off one pooled inventory position.",
                 },
               ].map((item) => (
-                <div key={item.title} className="rounded-xl border border-border bg-card p-6">
-                  <h3 className="font-bold mb-2">
+                <div key={item.title} className="border-b border-r border-wc-hairline bg-wc-paper-alt p-6">
+                  <h3 className="font-bold text-wc-ink mb-2">
                     <TranslatedText>{item.title}</TranslatedText>
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-wc-ink-soft leading-relaxed">
                     <TranslatedText>{item.copy}</TranslatedText>
                   </p>
                 </div>
@@ -1144,20 +1257,21 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Glossary */}
-        <section id="glossary" className="py-20 md:py-24 bg-background scroll-mt-32">
+        <section id="glossary" className="py-20 md:py-24 bg-wc-paper-alt border-y border-wc-hairline scroll-mt-32">
           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
             <SectionHeading
+              index="14"
               title="West Coast Logistics Glossary"
               subtitle="The terms that show up in 3PL quotes and what they actually mean."
             />
 
-            <dl className="grid md:grid-cols-2 gap-x-10 gap-y-6">
+            <dl className="grid md:grid-cols-2 gap-x-12 gap-y-8 border-t border-wc-hairline pt-8">
               {glossary.map((item) => (
-                <div key={item.term} className="border-l-2 border-secondary/40 pl-5">
-                  <dt className="font-bold mb-1">
+                <div key={item.term}>
+                  <dt className="font-mono text-[12px] uppercase tracking-[0.16em] text-wc-accent mb-2">
                     <TranslatedText>{item.term}</TranslatedText>
                   </dt>
-                  <dd className="text-sm text-muted-foreground leading-relaxed">
+                  <dd className="text-sm text-wc-ink-soft leading-relaxed border-l border-wc-hairline pl-4">
                     <TranslatedText>{item.definition}</TranslatedText>
                   </dd>
                 </div>
@@ -1167,18 +1281,21 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="py-20 md:py-24 bg-white border-y border-border/40 scroll-mt-32">
-          <div className="container mx-auto px-6 md:px-12 max-w-3xl">
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-center mb-12">
-              <TranslatedText>West Coast Fulfillment FAQ</TranslatedText>
-            </h2>
-            <Accordion type="single" collapsible className="w-full">
+        <section id="faq" className="py-20 md:py-24 bg-wc-paper scroll-mt-32">
+          <div className="container mx-auto px-6 md:px-12 max-w-4xl">
+            <SectionHeading index="15" title="West Coast Fulfillment FAQ" />
+            <Accordion type="single" collapsible className="w-full border-t-2 border-wc-hairline-strong">
               {faqData.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left text-base md:text-lg font-semibold">
-                    <TranslatedText>{faq.question}</TranslatedText>
+                <AccordionItem key={index} value={`item-${index}`} className="border-b border-wc-hairline">
+                  <AccordionTrigger className="text-left text-base md:text-lg font-semibold text-wc-ink hover:text-wc-accent hover:no-underline">
+                    <span className="flex items-baseline gap-4">
+                      <span className="font-mono text-[11px] tracking-[0.18em] text-wc-accent">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <TranslatedText>{faq.question}</TranslatedText>
+                    </span>
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                  <AccordionContent className="text-wc-ink-soft leading-relaxed md:pl-11">
                     <TranslatedText>{faq.answer}</TranslatedText>
                   </AccordionContent>
                 </AccordionItem>
@@ -1188,25 +1305,34 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Related reading */}
-        <section className="py-16 bg-background">
-          <div className="container mx-auto px-6 md:px-12 max-w-4xl text-center">
-            <p className="text-muted-foreground mb-4">
+        <section className="py-14 bg-wc-paper-alt border-y border-wc-hairline">
+          <div className="container mx-auto px-6 md:px-12 max-w-5xl">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-wc-ink-soft mb-5">
               <TranslatedText>Comparing your options across the region?</TranslatedText>
             </p>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
-              <Link to="/3pl-los-angeles" className="text-secondary font-semibold hover:underline">
+            <div className="flex flex-wrap gap-x-8 gap-y-3">
+              <Link
+                to="/3pl-los-angeles"
+                className="font-semibold text-wc-ink hover:text-wc-accent underline decoration-wc-accent decoration-2 underline-offset-4 transition-colors"
+              >
                 <TranslatedText>3PL Los Angeles</TranslatedText>
               </Link>
               <Link
                 to="/blog/west-coast-ecommerce-fulfillment-center-same-day-shipping"
-                className="text-secondary font-semibold hover:underline"
+                className="font-semibold text-wc-ink hover:text-wc-accent underline decoration-wc-accent decoration-2 underline-offset-4 transition-colors"
               >
                 <TranslatedText>West Coast same-day shipping guide</TranslatedText>
               </Link>
-              <Link to="/why-choose-us" className="text-secondary font-semibold hover:underline">
+              <Link
+                to="/why-choose-us"
+                className="font-semibold text-wc-ink hover:text-wc-accent underline decoration-wc-accent decoration-2 underline-offset-4 transition-colors"
+              >
                 <TranslatedText>Why brands choose Westfield</TranslatedText>
               </Link>
-              <Link to="/pricing" className="text-secondary font-semibold hover:underline">
+              <Link
+                to="/pricing"
+                className="font-semibold text-wc-ink hover:text-wc-accent underline decoration-wc-accent decoration-2 underline-offset-4 transition-colors"
+              >
                 <TranslatedText>Pricing</TranslatedText>
               </Link>
             </div>
@@ -1214,40 +1340,38 @@ const WestCoastFulfillment = () => {
         </section>
 
         {/* Final CTA */}
-        <section className="relative py-24 overflow-hidden bg-primary">
-          <div
-            className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full opacity-25 blur-3xl"
-            style={{ background: "radial-gradient(circle, hsl(var(--secondary)), transparent 65%)" }}
-            aria-hidden="true"
-          />
-          <div className="container mx-auto px-6 relative">
-            <div className="max-w-3xl mx-auto text-center text-primary-foreground">
-              <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight leading-[1.1]">
-                <TranslatedText>Move Your Inventory West</TranslatedText>
-              </h2>
-              <p className="text-lg text-white/85 mb-10 leading-relaxed">
-                <TranslatedText>
-                  Send us your order profile, destination mix, and SKU list. We will come back within 24 hours with a
-                  transit-time breakdown, a zone comparison against your current node, and a custom quote for your
-                  volume.
-                </TranslatedText>
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <section className="py-20 md:py-24 bg-wc-paper border-t-2 border-wc-hairline-strong">
+          <div className="container mx-auto px-6 md:px-12 max-w-5xl">
+            <div className="grid lg:grid-cols-12 gap-10 items-end">
+              <div className="lg:col-span-7">
+                <Label>Next step</Label>
+                <h2 className="text-3xl md:text-[2.75rem] font-bold tracking-[-0.025em] leading-[1.05] text-wc-ink mt-4 mb-5">
+                  <TranslatedText>Move Your Inventory West</TranslatedText>
+                </h2>
+                <p className="text-base md:text-lg text-wc-ink-soft leading-relaxed">
+                  <TranslatedText>
+                    Send us your order profile, destination mix, and SKU list. We will come back within 24 hours with a
+                    transit-time breakdown, a zone comparison against your current node, and a custom quote for your
+                    volume.
+                  </TranslatedText>
+                </p>
+              </div>
+              <div className="lg:col-span-5 flex flex-col sm:flex-row lg:justify-end gap-4">
                 <Button
                   asChild
                   size="lg"
-                  className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-10 py-7 text-lg shadow-2xl shadow-secondary/30 hover:-translate-y-0.5 transition-all group"
+                  className="rounded-none bg-wc-ink hover:bg-wc-ink/90 text-white font-bold px-8 py-6 text-base group"
                 >
                   <Link to="/contact">
                     <TranslatedText>Get a Custom Quote</TranslatedText>
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
                 <Button
                   asChild
                   size="lg"
                   variant="outline"
-                  className="border-2 border-white/40 bg-transparent text-white hover:bg-white hover:text-primary font-bold px-10 py-7 text-lg transition-all"
+                  className="rounded-none border border-wc-ink/25 bg-transparent text-wc-ink hover:bg-wc-ink hover:text-white font-bold px-8 py-6 text-base transition-all"
                 >
                   <Link to="/pricing">
                     <TranslatedText>View Pricing</TranslatedText>
@@ -1265,3 +1389,4 @@ const WestCoastFulfillment = () => {
 };
 
 export default WestCoastFulfillment;
+
