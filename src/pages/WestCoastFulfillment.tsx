@@ -552,8 +552,8 @@ const WestCoastFulfillment = () => {
                 <TranslatedText>Westfield operates as a </TranslatedText>
                 <InlineLink to="/3pl-los-angeles">3PL in Los Angeles</InlineLink>
                 <TranslatedText>
-                  {" "}serving brands nationwide, with prep, storage, DTC fulfillment, and returns handled under one
-                  roof rather than split across vendors.
+                  serving brands nationwide, with prep, storage, DTC fulfillment, and returns handled under one roof
+                  rather than split across vendors.
                 </TranslatedText>
               </p>
             </Prose>
@@ -891,12 +891,12 @@ const WestCoastFulfillment = () => {
                   Prep happens before the freight move: FNSKU labeling, polybagging with suffocation warnings, bundling,
                   carton labeling, and box content compliance. Because prep and storage sit in the same building, there
                   is no transfer between a prep vendor and a warehouse, which removes both a cost and a common source of
-                  count discrepancies. Full scope is on the{" "}
-                </TranslatedText>
+                  count discrepancies. Full scope is on the
+                </TranslatedText>{" "}
                 <InlineLink to="/sales-channels/amazon">Amazon channel page</InlineLink>
                 <TranslatedText>
-                  , and brands running both channels can pool one inventory position across FBA and{" "}
-                </TranslatedText>
+                  , and brands running both channels can pool one inventory position across FBA and
+                </TranslatedText>{" "}
                 <InlineLink to="/sales-channels/shopify">Shopify</InlineLink>
                 <TranslatedText> rather than splitting stock by channel.</TranslatedText>
               </p>
