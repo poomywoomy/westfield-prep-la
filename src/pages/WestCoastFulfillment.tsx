@@ -337,10 +337,6 @@ const InlineLink = ({ to, children }: { to: string; children: React.ReactNode })
   </Link>
 );
 
-const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <div className={`border border-wc-hairline bg-wc-paper-alt p-7 md:p-8 ${className}`}>{children}</div>
-);
-
 /* ---------------------------------- page ---------------------------------- */
 
 const WestCoastFulfillment = () => {

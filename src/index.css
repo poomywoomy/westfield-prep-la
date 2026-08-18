@@ -207,3 +207,15 @@ html {
   animation: fade-up 0.4s ease-out forwards;
   opacity: 0;
 }
+
+/* West Coast page: outlined display type (technical editorial) */
+.wc-outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px hsl(var(--wc-ink));
+  paint-order: stroke fill;
+}
+@media (max-width: 640px) {
+  .wc-outline-text {
+    -webkit-text-stroke-width: 1px;
+  }
+}
