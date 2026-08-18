@@ -1021,16 +1021,23 @@ const WestCoastFulfillment = () => {
                 </p>
                 <div className="space-y-3">
                   {[
-                    "Two-day ground to most of the country",
-                    "Lowest blended parcel cost at scale",
-                    "Requires duplicated safety stock per SKU",
-                    "Two receiving processes and two integrations",
-                    "Allocation errors get expensive quickly",
+                    { text: "Two-day ground to most of the country", pro: true },
+                    { text: "Lowest blended parcel cost at scale", pro: true },
+                    { text: "Requires duplicated safety stock per SKU", pro: false },
+                    { text: "Two receiving processes and two integrations", pro: false },
+                    { text: "Allocation errors get expensive quickly", pro: false },
                   ].map((item) => (
-                    <div key={item} className="flex items-start gap-3 text-white/90 text-sm">
-                      <Check className="w-4 h-4 text-secondary mt-0.5 flex-shrink-0" />
+                    <div
+                      key={item.text}
+                      className={`flex items-start gap-3 text-sm ${item.pro ? "text-white/90" : "text-white/55"}`}
+                    >
+                      {item.pro ? (
+                        <Check className="w-4 h-4 text-secondary mt-0.5 flex-shrink-0" />
+                      ) : (
+                        <X className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
+                      )}
                       <span>
-                        <TranslatedText>{item}</TranslatedText>
+                        <TranslatedText>{item.text}</TranslatedText>
                       </span>
                     </div>
                   ))}
