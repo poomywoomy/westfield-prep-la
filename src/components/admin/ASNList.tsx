@@ -18,9 +18,9 @@ import { AdminASNDetailDialog } from "./AdminASNDetailDialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type ASN = Database["public"]["Tables"]["asn_headers"]["Row"] & {
-  is_return?: boolean;
-  return_marketplace?: string;
-  consumer_order_number?: string;
+  is_return?: boolean | null;
+  return_marketplace?: string | null;
+  consumer_order_number?: string | null;
 };
 type Client = Database["public"]["Tables"]["clients"]["Row"];
 
