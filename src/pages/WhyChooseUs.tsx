@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";

@@ -1,6 +1,6 @@
 import { Link } from "@/lib/router-compat";
 import { ChevronRight } from "lucide-react";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import { TranslatedText } from "./TranslatedText";
 
 interface BreadcrumbItem {

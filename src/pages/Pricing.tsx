@@ -1,6 +1,6 @@
 import { useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { Link } from "@/lib/router-compat";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import { motion, AnimatePresence, type Easing } from "framer-motion";
 import Lottie from "lottie-react";
 import Header from "@/components/Header";

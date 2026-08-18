@@ -1,6 +1,6 @@
 import { useNavigate } from "@/lib/router-compat";
 import { useEffect } from "react";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { TranslatedText } from "@/components/TranslatedText";

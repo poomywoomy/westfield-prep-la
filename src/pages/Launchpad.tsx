@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "@/lib/router-compat";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import { motion } from "framer-motion";
 import {
   Sparkles,

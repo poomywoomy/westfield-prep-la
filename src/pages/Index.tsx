@@ -1,5 +1,5 @@
 import { useEffect, useMemo, lazy, Suspense } from "react";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import { useNavigate } from "@/lib/router-compat";
 import Header from "@/components/Header";
 import PremiumHero from "@/components/PremiumHero";

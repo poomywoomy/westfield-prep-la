@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "@/lib/router-compat";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Reviews from "@/components/Reviews";
