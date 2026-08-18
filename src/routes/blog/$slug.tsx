@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import BlogPost from "@/pages/BlogPost";
-import { BLOG_FAQ_OVERRIDES } from "@/data/blogFaqOverrides";
 import { getBlogSeoTitle } from "@/data/blogTitleOverrides";
 import { blogPostQueryOptions } from "@/lib/blogPostQuery";
+import { buildBlogPostSchemas } from "@/lib/blogSchemas";
 
 const SITE = "https://westfieldprepcenter.com";
 
@@ -14,28 +14,27 @@ export const Route = createFileRoute("/blog/$slug")({
     context.queryClient.ensureQueryData(blogPostQueryOptions(params.slug)),
   head: ({ params, loaderData }) => {
     const canonical = `${SITE}/blog/${params.slug}`;
-    const faqs = BLOG_FAQ_OVERRIDES[params.slug];
-    const scripts = faqs?.length
-      ? [
-          {
-            type: "application/ld+json",
-            children: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: faqs.map((faq) => ({
-                "@type": "Question",
-                name: faq.question,
-                acceptedAnswer: { "@type": "Answer", text: faq.answer },
-              })),
-            }),
-          },
-        ]
-      : [];
-
     const post = loaderData;
     if (!post) {
-      return { scripts, links: [{ rel: "canonical", href: canonical }] };
+      return { links: [{ rel: "canonical", href: canonical }] };
     }
+
+    // Article/breadcrumb/FAQ/HowTo JSON-LD, server-rendered into the head.
+    const scripts = buildBlogPostSchemas({
+      title: post.title,
+      excerpt: post.meta_description || post.excerpt || "",
+      content: post.content || "",
+      coverImageUrl: post.cover_image_url,
+      authorName: post.author_name || "Westfield Team",
+      publishedAt: post.published_at || new Date().toISOString(),
+      updatedAt: post.published_at || new Date().toISOString(),
+      category: post.category || "Fulfillment",
+      tags: post.tags,
+      slug: post.slug,
+    }).map((schema) => ({
+      type: "application/ld+json",
+      children: JSON.stringify(schema),
+    }));
 
     const seoTitle = getBlogSeoTitle(post.slug, post.title);
     const socialTitle = post.title.replace(/\s*\|.*$/, "");

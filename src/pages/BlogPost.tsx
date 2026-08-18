@@ -6,12 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import StructuredData from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { BlogPostRenderer } from "@/components/blog/BlogPostRenderer";
-import { BlogPostSchema } from "@/components/blog/BlogPostSchema";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { AuthorBio } from "@/components/blog/AuthorBio";
@@ -97,20 +95,6 @@ const BlogPost = () => {
   return (
     <>
 
-      {/* Enhanced 2025-compliant JSON-LD Schema for Google Rich Results */}
-      <BlogPostSchema
-        title={post.title}
-        excerpt={post.meta_description || post.excerpt || ""}
-        content={post.content || ""}
-        coverImageUrl={post.cover_image_url || undefined}
-        authorName={post.author_name || "Westfield Team"}
-        authorBio={post.author_bio || "Expert team at Westfield Prep Center with years of experience in e-commerce fulfillment."}
-        publishedAt={post.published_at || new Date().toISOString()}
-        updatedAt={post.published_at || new Date().toISOString()}
-        category={post.category || "Fulfillment"}
-        tags={(post as any).tags || []}
-        slug={post.slug}
-      />
 
       <StructuredData type="breadcrumb" data={[
         { name: "Home", url: "https://westfieldprepcenter.com/" },
