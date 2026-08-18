@@ -417,7 +417,7 @@ const WestCoastFulfillment = () => {
 
             <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-end">
               <div className="lg:col-span-7">
-                <h1 className="text-4xl md:text-6xl lg:text-[4.25rem] font-bold tracking-[-0.035em] leading-[0.98] text-wc-ink">
+                <h1 className="text-4xl md:text-5xl lg:text-[3.6rem] font-bold tracking-[-0.035em] leading-[1.0] text-wc-ink">
                   <TranslatedText>West Coast 3PL and</TranslatedText>
                   <br />
                   <span className="wc-outline-text">
