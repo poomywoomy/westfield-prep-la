@@ -96,12 +96,6 @@ const BlogPost = () => {
     <>
 
 
-      <StructuredData type="breadcrumb" data={[
-        { name: "Home", url: "https://westfieldprepcenter.com/" },
-        { name: "Blog", url: "https://westfieldprepcenter.com/blog/" },
-        { name: post.title, url: `https://westfieldprepcenter.com/blog/${post.slug}` }
-      ]} />
-
       <div className="min-h-screen flex flex-col">
         <Header />
         <Breadcrumbs items={[
