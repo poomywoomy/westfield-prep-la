@@ -3,4 +3,12 @@ import Login from "@/pages/Login";
 
 export const Route = createFileRoute("/login")({
   component: Login,
+  head: () => ({
+    meta: [
+          {
+                "name": "robots",
+                "content": "noindex, nofollow"
+          }
+    ],
+  }),
 });

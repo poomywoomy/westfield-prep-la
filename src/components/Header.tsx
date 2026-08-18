@@ -83,9 +83,9 @@ const Header = () => {
     { path: "/sales-channels/shopify", name: "Shopify", icon: SiShopify, color: "text-[#5E8E3E]" },
     { path: "/sales-channels/amazon", name: "Amazon", icon: SiAmazon, color: "text-[#FF9900]" },
     { path: "/sales-channels/tiktok-shop", name: "TikTok Shop", icon: SiTiktok, color: "text-foreground" },
-    { path: "/sales-channels/walmart", name: "Walmart", icon: SiWalmart, color: "text-[#0057A0]" },
-    { path: "/sales-channels/etsy", name: "Etsy", icon: SiEtsy, color: "text-[#D5581D]" },
-    { path: "/sales-channels/woocommerce", name: "WooCommerce", icon: SiWoo, color: "text-[#674399]" },
+    { path: "/integrations", name: "Walmart", icon: SiWalmart, color: "text-[#0057A0]" },
+    { path: "/integrations", name: "Etsy", icon: SiEtsy, color: "text-[#D5581D]" },
+    { path: "/integrations", name: "WooCommerce", icon: SiWoo, color: "text-[#674399]" },
   ];
 
   return (
@@ -161,21 +161,21 @@ const Header = () => {
                         </div>
                         
                         <Link 
-                          to="/sales-channels/walmart" 
+                          to="/integrations" 
                           className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent cursor-pointer"
                         >
                           <SiWalmart className="mr-2 h-4 w-4 text-[#0057A0]" />
                           Walmart
                         </Link>
                         <Link 
-                          to="/sales-channels/etsy" 
+                          to="/integrations" 
                           className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent cursor-pointer"
                         >
                           <SiEtsy className="mr-2 h-4 w-4 text-[#D5581D]" />
                           Etsy
                         </Link>
                         <Link 
-                          to="/sales-channels/woocommerce" 
+                          to="/integrations" 
                           className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent cursor-pointer"
                         >
                           <SiWoo className="mr-2 h-4 w-4 text-[#674399]" />

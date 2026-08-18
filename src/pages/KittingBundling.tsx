@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -86,18 +85,6 @@ const KittingBundling = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Educational Kitting &amp; Bundling Services in Los Angeles CA</title>
-        <meta
-          name="description"
-          content="Get the best educational kitting and bundling services in Los Angeles, CA.Accurate assembly, careful packaging, and reliable fulfillment. Contact us today."
-        />
-        <meta
-          name="keywords"
-          content="3pl los angeles, kitting services, bundling, prep center, subscription box assembly, product kitting"
-        />
-        <link rel="canonical" href="https://westfieldprepcenter.com/kitting-bundling" />
-      </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqSchemaData} />
 

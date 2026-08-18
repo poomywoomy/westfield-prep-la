@@ -82,40 +82,7 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Los Angeles Fulfillment Center for Shopify and Amazon</title>
-        <meta
-          name="description"
-          content="Westfield Prep Center is a Los Angeles fulfillment center offering Shopify Amazon fulfillment, FBA prep, storage, &amp; fast ecommerce shipping. Get started today."
-        />
-        <meta name="robots" content="index, follow" />
-        <meta
-          name="keywords"
-          content="3pl shopify, shopify fulfillment center, amazon prep center, FBA prep center los angeles, 3pl pricing, DTC fulfillment, los angeles 3pl"
-        />
-        
-        <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
-        <meta name="geo.region" content="US-CA" />
-        <meta name="geo.position" content="34.0522;-118.2437" />
-        {/* Open Graph tags */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://westfieldprepcenter.com/" />
-        <meta property="og:site_name" content="Westfield Prep Center" />
-        <meta property="og:title" content="3PL Fulfillment for Shopify, Amazon & DTC Brands" />
-        <meta
-          property="og:description"
-          content="Shopify fulfillment, FBA prep & DTC logistics with real-time integrations. $1–2.50/unit."
-        />
-        <meta property="og:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@Westfield3PL" />
-        <meta name="twitter:creator" content="@Westfield3PL" />
-        <meta name="twitter:title" content="3PL Fulfillment for Shopify, Amazon & DTC Brands" />
-        <meta
-          name="twitter:description"
-          content="Westfield is a nationwide 3PL providing Shopify fulfillment, Amazon FBA prep, and DTC logistics. Transparent pricing and 24-hour turnaround."
-        />
-        <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
+<link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
       </Helmet>
       <StructuredData type="organization" />
       <StructuredData type="website" />

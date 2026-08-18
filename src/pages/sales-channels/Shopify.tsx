@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -68,15 +67,6 @@ const Shopify = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Shopify Fulfillment Center with Expert Order Management</title>
-        <meta name="description" content="Westfield Prep Center is a Shopify fulfillment center that offers efficient Shopify order management, inventory control, and scalable fulfillment solutions." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/sales-channels/shopify" />
-        <meta property="og:url" content="https://westfieldprepcenter.com/sales-channels/shopify" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Shopify Fulfillment Services | Westfield Prep Center" />
-        <meta property="og:description" content="Same-day Shopify fulfillment with QC photos and branded packaging. 400K+ orders fulfilled from Los Angeles." />
-      </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
 

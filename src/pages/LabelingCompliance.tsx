@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useNavigate } from "@/lib/router-compat";
-import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import StructuredData from "@/components/StructuredData";
@@ -52,25 +51,6 @@ const LabelingCompliance = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Labeling & Compliance | Los Angeles 3PL Prep Center</title>
-        <meta name="description" content="Expert labeling and compliance services at our LA prep center. 3PL FNSKU labeling, warning labels, and Amazon FBA compliance for e-commerce sellers." />
-        <meta name="keywords" content="3pl los angeles, labeling services, prep center, fnsku labels, amazon fba compliance, ecommerce labeling" />
-        <link rel="canonical" href="https://westfieldprepcenter.com/labeling-fnsku" />
-        
-        {/* Open Graph tags */}
-        <meta property="og:title" content="Labeling & Compliance | Los Angeles 3PL Prep Center" />
-        <meta property="og:description" content="Expert labeling and compliance services at our LA prep center. 3PL FNSKU labeling, warning labels, and Amazon FBA compliance." />
-        <meta property="og:url" content="https://westfieldprepcenter.com/labeling-fnsku" />
-        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-        <meta property="og:type" content="website" />
-        
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Labeling & Compliance Services | Westfield Prep Center" />
-        <meta name="twitter:description" content="FNSKU/barcodes, warning labels, carton labeling, and audit-ready documentation for e-commerce compliance." />
-        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-      </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
       

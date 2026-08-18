@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -86,18 +85,6 @@ const StorageWarehousing = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Warehousing and Fulfillment Services for Ecommerce USA</title>
-        <meta
-          name="description"
-          content="Warehouse in the USA for ecommerce offering storage and fulfillment solutions. Simplify inventory management and shipping with our reliable services. Start today!"
-        />
-        <meta
-          name="keywords"
-          content="3pl los angeles, los angeles 3pl, prep center, warehouse storage, pallet storage, climate controlled warehouse, ecommerce fulfillment"
-        />
-        <link rel="canonical" href="https://westfieldprepcenter.com/storage-warehousing" />
-      </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqSchemaData} />
 

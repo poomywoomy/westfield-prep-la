@@ -19,7 +19,6 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { ChatBot } from "@/components/ChatBot";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { TranslationLoadingOverlay } from "@/components/TranslationLoadingOverlay";
-import RouteCanonical from "@/components/RouteCanonical";
 import NotFound from "@/pages/NotFound";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 
@@ -139,7 +138,6 @@ function RootComponent() {
             <Sonner />
             <GoogleAnalytics />
             <TranslationLoadingOverlay />
-            <RouteCanonical />
             <Outlet />
             <ChatBot />
           </LanguageProvider>

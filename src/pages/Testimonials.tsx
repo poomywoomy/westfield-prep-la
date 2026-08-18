@@ -2,7 +2,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
-import { Helmet } from "@/lib/helmet-compat";
 import StructuredData from "@/components/StructuredData";
 import { Link } from "@/lib/router-compat";
 import { TranslatedText } from "@/components/TranslatedText";
@@ -49,28 +48,6 @@ const Testimonials = () => {
 
   return (
     <>
-      <Helmet>
-        <title>3PL Reviews | Los Angeles Prep Center Testimonials | Westfield</title>
-        <meta 
-          name="description" 
-          content="Read reviews from e-commerce brands using our Los Angeles 3PL and prep center services. See why sellers trust Westfield for Amazon FBA prep and Shopify fulfillment." 
-        />
-        <meta name="keywords" content="3pl reviews, prep center testimonials, los angeles 3pl reviews, amazon fba prep reviews, fulfillment center reviews" />
-        <link rel="canonical" href="https://westfieldprepcenter.com/testimonials" />
-        
-        {/* Open Graph tags */}
-        <meta property="og:title" content="3PL Reviews | Los Angeles Prep Center Testimonials" />
-        <meta property="og:description" content="Read reviews from e-commerce brands using our Los Angeles 3PL and prep center services. See why sellers trust Westfield." />
-        <meta property="og:url" content="https://westfieldprepcenter.com/testimonials" />
-        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-        <meta property="og:type" content="website" />
-        
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Customer Testimonials | Westfield Prep Center Reviews" />
-        <meta name="twitter:description" content="Read real reviews from satisfied customers. See why businesses trust Westfield Prep Center for fulfillment services." />
-        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-      </Helmet>
       
       <StructuredData type="breadcrumb" data={[
         { name: "Home", url: "https://westfieldprepcenter.com/" },

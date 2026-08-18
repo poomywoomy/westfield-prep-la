@@ -28,7 +28,10 @@ export function BlogPostSchema({
   tags,
   slug,
 }: BlogPostSchemaProps) {
-  const baseUrl = window.location.origin;
+  // SSR-safe: window is unavailable on the server.
+  const baseUrl =
+    typeof window !== "undefined" ? window.location.origin : "https://westfieldprepcenter.com";
+
   const articleUrl = `${baseUrl}/blog/${slug}`;
   
   // Calculate word count for reading time

@@ -1,6 +1,5 @@
 import { useNavigate } from "@/lib/router-compat";
 import { useEffect } from "react";
-import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { TranslatedText } from "@/components/TranslatedText";
@@ -14,15 +13,6 @@ const PrivacyPolicy = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Privacy Policy | Westfield Prep Center</title>
-        <meta 
-          name="description" 
-          content="Read our privacy policy to understand how Westfield Prep Center collects, uses, and protects your data. Effective October 1, 2025." 
-        />
-        <link rel="canonical" href="https://westfieldprepcenter.com/privacy" />
-        <meta name="robots" content="noindex, follow" />
-      </Helmet>
       
       <Header />
 

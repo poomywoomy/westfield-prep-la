@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -67,12 +66,6 @@ const ReceivingInspection = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{meta.title}</title>
-        <meta name="description" content={meta.description} />
-        <meta name="keywords" content="3pl los angeles, receiving inspection, prep center, quality control, qc inspection, amazon fba prep" />
-        <link rel="canonical" href={meta.canonical} />
-      </Helmet>
 
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqSchemaData} />

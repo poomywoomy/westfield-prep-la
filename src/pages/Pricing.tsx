@@ -1,6 +1,5 @@
 import { useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { Link } from "@/lib/router-compat";
-import { Helmet } from "@/lib/helmet-compat";
 import { motion, AnimatePresence, type Easing } from "framer-motion";
 import Lottie from "lottie-react";
 import Header from "@/components/Header";
@@ -212,34 +211,6 @@ const Pricing = () => {
 
   return (
     <>
-      <Helmet>
-        <title>3PL Fulfillment Pricing | Shopify & Amazon Sellers | Westfield</title>
-        <meta 
-          name="description" 
-          content="Transparent 3PL pricing for Shopify fulfillment, Amazon FBA & WFS prep, and DTC brands. Rates from $1.00–$2.50 per unit with a 24-hour turnaround. Calculate your ROI instantly." 
-        />
-        <link rel="canonical" href="https://westfieldprepcenter.com/pricing" />
-        
-        {/* Robots */}
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="Westfield Prep Center" />
-        <meta name="keywords" content="3PL pricing, Shopify fulfillment, Amazon FBA prep, DTC fulfillment, Los Angeles 3PL, fulfillment center pricing, pick and pack rates" />
-        
-        {/* Open Graph */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://westfieldprepcenter.com/pricing" />
-        <meta property="og:title" content="3PL Fulfillment Pricing | Shopify & Amazon Sellers" />
-        <meta property="og:description" content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.00–$2.50/unit. 24-hour turnaround." />
-        <meta property="og:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-        <meta property="og:site_name" content="Westfield Prep Center" />
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@Westfield3PL" />
-        <meta name="twitter:title" content="3PL Fulfillment Pricing | Shopify & Amazon Sellers" />
-        <meta name="twitter:description" content="Transparent 3PL pricing for Shopify fulfillment & Amazon FBA prep. $1.00–$2.50/unit. 24-hour turnaround." />
-        <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-      </Helmet>
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
       <StructuredData type="product" />
