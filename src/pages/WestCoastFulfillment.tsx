@@ -1,4 +1,3 @@
-import { Helmet } from "@/lib/helmet-compat";
 import { Link } from "@/lib/router-compat";
 import { generateMetaTags } from "@/utils/seo";
 import Header from "@/components/Header";
@@ -367,22 +366,6 @@ const WestCoastFulfillment = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{meta.title}</title>
-        <meta name="description" content={meta.description} />
-        <meta name="robots" content="index, follow" />
-        <meta name="geo.region" content="US-CA" />
-        <meta name="geo.position" content="34.0522;-118.2437" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={meta.ogTitle} />
-        <meta property="og:description" content={meta.ogDescription} />
-        <meta property="og:url" content={meta.ogUrl} />
-        <meta property="og:image" content={meta.ogImage} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={meta.twitterTitle} />
-        <meta name="twitter:description" content={meta.twitterDescription} />
-        <meta name="twitter:image" content={meta.twitterImage} />
-      </Helmet>
       <StructuredData type="organization" />
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />

@@ -1,6 +1,8 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
+import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 import { routeTree } from "./routeTree.gen";
+
 
 export const getRouter = () => {
   // Ported from the pre-migration App.tsx QueryClient configuration.
@@ -23,5 +25,8 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 0,
   });
 
-  return router;
+  // Dehydrates/hydrates the query cache across SSR so loader-fetched data
+  // (e.g. blog posts) renders in the server HTML.
+  return routerWithQueryClient(router, queryClient);
 };
+

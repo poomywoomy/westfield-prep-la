@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "@/lib/router-compat";
 import { useEffect } from "react";
-import { Helmet } from "@/lib/helmet-compat";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -498,40 +497,6 @@ const FAQ = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Comprehensive FAQ - Westfield Prep Center | Shopify, Amazon FBA & TikTok Shop</title>
-        <meta name="description" content="Get answers to 90+ questions about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, pricing, shipping, and e-commerce operations in Los Angeles." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/faq" />
-        
-        {/* Open Graph tags */}
-        <meta property="og:title" content="Comprehensive FAQ - Westfield Prep Center" />
-        <meta property="og:description" content="Get answers to 90+ questions about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, pricing, shipping, and e-commerce operations." />
-        <meta property="og:url" content="https://westfieldprepcenter.com/faq" />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-        
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Comprehensive FAQ - Westfield Prep Center" />
-        <meta name="twitter:description" content="Get answers to 90+ questions about Shopify fulfillment, Amazon FBA prep, TikTok Shop logistics, pricing, shipping, and e-commerce operations." />
-        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-
-        {/* Per-category FAQPage JSON-LD schemas */}
-        {faqCategories.map((cat, i) => (
-          <script key={`faq-schema-${i}`} type="application/ld+json">
-            {JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              "name": `${cat.title} FAQs`,
-              "mainEntity": cat.questions.map((q) => ({
-                "@type": "Question",
-                "name": q.question,
-                "acceptedAnswer": { "@type": "Answer", "text": q.answer },
-              })),
-            })}
-          </script>
-        ))}
-      </Helmet>
 
       <StructuredData 
         type="faq" 

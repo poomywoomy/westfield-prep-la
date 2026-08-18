@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -103,16 +102,6 @@ const OrderFulfillment = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{meta.title}</title>
-        <meta name="description" content={meta.description} />
-        <meta name="keywords" content="3pl los angeles, order fulfillment, prep center, ecommerce fulfillment, shopify fulfillment, same day shipping, pick and pack" />
-        <link rel="canonical" href={meta.canonical} />
-        <meta property="og:title" content={meta.ogTitle} />
-        <meta property="og:description" content={meta.ogDescription} />
-        <meta property="og:url" content={meta.ogUrl} />
-        <meta property="og:image" content={meta.ogImage} />
-      </Helmet>
 
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />

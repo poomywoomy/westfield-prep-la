@@ -34,10 +34,11 @@ function normalizeText(text: string): string {
   return text.trim().replace(/\s+/g, ' ');
 }
 
-// Load cache from localStorage
+// Load cache from localStorage (browser only — returns {} during SSR)
 function loadCacheFromStorage(): TranslationCache {
+  if (typeof window === 'undefined') return {};
   try {
-    const stored = localStorage.getItem(CACHE_STORAGE_KEY);
+    const stored = window.localStorage.getItem(CACHE_STORAGE_KEY);
     if (stored) {
       return JSON.parse(stored);
     }
@@ -66,22 +67,35 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState<string>('en');
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
   const [isDetecting, setIsDetecting] = useState(true);
-  const [translationCache, setTranslationCache] = useState<TranslationCache>(loadCacheFromStorage);
+  const [translationCache, setTranslationCache] = useState<TranslationCache>({});
   const [isTranslating, setIsTranslating] = useState(false);
   const [isLanguageTransitioning, setIsLanguageTransitioning] = useState(false);
 
   // Use refs to avoid recreating functions on every cache update
-  const translationCacheRef = useRef<TranslationCache>(loadCacheFromStorage());
+  const translationCacheRef = useRef<TranslationCache>({});
   const currentLanguageRef = useRef<string>('en');
   const pendingTranslationsRef = useRef<Map<string, Array<(result: string) => void>>>(new Map());
   const batchTimeoutRef = useRef<number | null>(null);
   const pendingCountRef = useRef<number>(0);
   const transitionTimeoutRef = useRef<number | null>(null);
+  const cacheHydratedRef = useRef(false);
+
+  // Hydrate the persisted cache after mount so SSR and first client render match
+  useEffect(() => {
+    const stored = loadCacheFromStorage();
+    cacheHydratedRef.current = true;
+    if (Object.keys(stored).length > 0) {
+      translationCacheRef.current = stored;
+      setTranslationCache((prev) => ({ ...stored, ...prev }));
+    }
+  }, []);
 
   // Sync refs with state
   useEffect(() => {
     translationCacheRef.current = translationCache;
-    saveCacheToStorage(translationCache);
+    if (cacheHydratedRef.current) {
+      saveCacheToStorage(translationCache);
+    }
   }, [translationCache]);
 
   useEffect(() => {

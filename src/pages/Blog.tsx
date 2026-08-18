@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "@/lib/helmet-compat";
+import { useQuery } from "@tanstack/react-query";
+import { blogPostsQueryOptions } from "@/lib/blogPostQuery";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -26,36 +27,15 @@ interface BlogPost {
 }
 
 const Blog = () => {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const { data: posts = [], isLoading: loading } = useQuery(blogPostsQueryOptions());
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
 
   useEffect(() => {
     filterPosts();
   }, [posts, selectedCategory, searchTerm]);
 
-  const fetchPosts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .select("*")
-        .eq("published", true)
-        .order("published_at", { ascending: false });
-
-      if (error) throw error;
-      setPosts(data || []);
-    } catch (error) {
-      console.error("Error fetching blog posts:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filterPosts = () => {
     let filtered = posts;
@@ -70,29 +50,11 @@ const Blog = () => {
           post.excerpt?.toLowerCase().includes(term)
       );
     }
-    setFilteredPosts(filtered);
+    setFilteredPosts(filtered as BlogPost[]);
   };
 
   return (
     <>
-      <Helmet>
-        <title>Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield</title>
-        <meta name="description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
-        <link rel="canonical" href="https://westfieldprepcenter.com/blog" />
-        
-        {/* Open Graph tags */}
-        <meta property="og:title" content="Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield" />
-        <meta property="og:description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
-        <meta property="og:url" content="https://westfieldprepcenter.com/blog" />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-        
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield" />
-        <meta name="twitter:description" content="Expert insights from our Los Angeles prep center. Learn about Amazon FBA prep, Shopify fulfillment, and e-commerce logistics best practices." />
-        <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png" />
-      </Helmet>
       <StructuredData type="collectionPage" data={{ posts: posts.slice(0, 10) }} />
 
       <Header />

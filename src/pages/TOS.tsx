@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "@/lib/router-compat";
 import { useEffect } from "react";
-import { Helmet } from "@/lib/helmet-compat";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
@@ -24,15 +23,6 @@ const TOS = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Terms of Service | Westfield Prep Center</title>
-        <meta 
-          name="description" 
-          content="Review our terms of service for e-commerce fulfillment and logistics. Updated September 30, 2025. Westfield Prep Center - DBA of Sathatham LLC." 
-        />
-        <link rel="canonical" href="https://westfieldprepcenter.com/terms" />
-        <meta name="robots" content="noindex, follow" />
-      </Helmet>
       
       <header className="bg-background shadow-xs sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">

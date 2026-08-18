@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import LabelingCompliance from "@/pages/LabelingCompliance";
 
-export const Route = createFileRoute("/labeling-fnsku")({
+// Legacy indexed URL restored after the migration; /labeling-fnsku stays live
+// and remains the canonical target declared inside the page itself.
+export const Route = createFileRoute("/labeling-compliance")({
   component: LabelingCompliance,
   head: () => ({
     meta: [

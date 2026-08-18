@@ -5,7 +5,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Share2, Twitter, Facebook, Linkedin, Mail, Link as LinkIcon, Check } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 
 interface ShareButtonsProps {
@@ -18,14 +18,21 @@ interface ShareButtonsProps {
 
 export const ShareButtons = ({ 
   title, 
-  url = window.location.href,
+  url,
   variant = "default",
   size = "default",
   showLabel = true 
 }: ShareButtonsProps) => {
   const [copied, setCopied] = useState(false);
-  const encodedUrl = encodeURIComponent(url);
+  // SSR-safe: window is unavailable on the server, so fall back after hydration.
+  const [currentUrl, setCurrentUrl] = useState(url ?? "");
+  useEffect(() => {
+    if (!url && typeof window !== "undefined") setCurrentUrl(window.location.href);
+  }, [url]);
+  const resolvedUrl = url ?? currentUrl;
+  const encodedUrl = encodeURIComponent(resolvedUrl);
   const encodedTitle = encodeURIComponent(title);
+
 
   const shareLinks = {
     twitter: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
@@ -36,7 +43,7 @@ export const ShareButtons = ({
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(resolvedUrl);
       setCopied(true);
       toast({
         title: "Link copied!",

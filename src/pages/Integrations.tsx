@@ -530,28 +530,7 @@ const Integrations = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Shopify & Amazon 3PL Integrations | Westfield Prep Center</title>
-        <meta
-          name="description"
-          content="Connect Shopify, Amazon, Walmart, and 20+ platforms to Westfield's 3PL. Real-time order sync, inventory visibility — no developers required."
-        />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://westfieldprepcenter.com/integrations" />
-        
-        <meta property="og:title" content="Shopify & Amazon 3PL Integrations | Westfield Prep Center" />
-        <meta property="og:description" content="Connect Shopify, Amazon, Walmart, and 20+ platforms to Westfield's 3PL. Real-time order sync, inventory visibility — no developers required." />
-        <meta property="og:url" content="https://westfieldprepcenter.com/integrations" />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-        <meta property="og:site_name" content="Westfield Prep Center" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@Westfield3PL" />
-        <meta name="twitter:title" content="Shopify & Amazon 3PL Integrations | Westfield Prep Center" />
-        <meta name="twitter:description" content="Connect Shopify, Amazon, Walmart, and 20+ platforms to Westfield's 3PL. Real-time order sync, inventory visibility." />
-        <meta name="twitter:image" content="https://westfieldprepcenter.com/hero-warehouse-optimized.webp" />
-        
-        <script type="application/ld+json">
+<script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@graph": [

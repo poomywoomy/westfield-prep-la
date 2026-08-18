@@ -1,5 +1,5 @@
 import { parseMarkdown } from "@/lib/markdownParser";
-import DOMPurify from 'dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 interface BlogPostRendererProps {
   content: string;
@@ -34,8 +34,8 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
 
   // Sanitize HTML to prevent XSS attacks (defense-in-depth).
   // No event-handler attributes (e.g. onerror) are allowed.
-  const enhancedHtml = DOMPurify.sanitize(htmlWithLazyLoad, {
-    ALLOWED_TAGS: [
+  const enhancedHtml = sanitizeHtml(htmlWithLazyLoad, {
+    allowedTags: [
       'h2', 'h3', 'h4', 'h5', 'h6',
       'p', 'a', 'ul', 'ol', 'li',
       'code', 'pre', 'img', 'picture', 'source', 'blockquote',
@@ -43,7 +43,14 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
       'table', 'thead', 'tbody', 'tr', 'th', 'td',
       'details', 'summary'
     ],
-    ALLOWED_ATTR: ['href', 'src', 'srcset', 'type', 'alt', 'title', 'class', 'id', 'loading', 'decoding', 'open']
+    allowedAttributes: {
+      '*': ['class', 'id', 'title'],
+      a: ['href'],
+      img: ['src', 'alt', 'loading', 'decoding'],
+      source: ['srcset', 'type'],
+      details: ['open'],
+    },
+    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
   });
   
   return (

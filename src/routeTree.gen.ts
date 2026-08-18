@@ -17,6 +17,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as InventoryManagementRouteImport } from './routes/inventory-management'
 import { Route as KittingBundlingRouteImport } from './routes/kitting-bundling'
+import { Route as LabelingComplianceRouteImport } from './routes/labeling-compliance'
 import { Route as LabelingFnskuRouteImport } from './routes/labeling-fnsku'
 import { Route as LaunchpadRouteImport } from './routes/launchpad'
 import { Route as LoginRouteImport } from './routes/login'
@@ -26,6 +27,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReceivingInspectionRouteImport } from './routes/receiving-inspection'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ReturnsProcessingRouteImport } from './routes/returns-processing'
+import { Route as ServiceBreakdownRouteImport } from './routes/service-breakdown'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ShopifyFulfillmentRouteImport } from './routes/shopify-fulfillment'
 import { Route as StorageWarehousingRouteImport } from './routes/storage-warehousing'
@@ -89,6 +91,11 @@ const KittingBundlingRoute = KittingBundlingRouteImport.update({
   path: '/kitting-bundling',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabelingComplianceRoute = LabelingComplianceRouteImport.update({
+  id: '/labeling-compliance',
+  path: '/labeling-compliance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LabelingFnskuRoute = LabelingFnskuRouteImport.update({
   id: '/labeling-fnsku',
   path: '/labeling-fnsku',
@@ -132,6 +139,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const ReturnsProcessingRoute = ReturnsProcessingRouteImport.update({
   id: '/returns-processing',
   path: '/returns-processing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServiceBreakdownRoute = ServiceBreakdownRouteImport.update({
+  id: '/service-breakdown',
+  path: '/service-breakdown',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesRoute = ServicesRouteImport.update({
@@ -254,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/integrations': typeof IntegrationsRoute
   '/inventory-management': typeof InventoryManagementRoute
   '/kitting-bundling': typeof KittingBundlingRoute
+  '/labeling-compliance': typeof LabelingComplianceRoute
   '/labeling-fnsku': typeof LabelingFnskuRoute
   '/launchpad': typeof LaunchpadRoute
   '/login': typeof LoginRoute
@@ -263,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/receiving-inspection': typeof ReceivingInspectionRoute
   '/reset-password': typeof ResetPasswordRoute
   '/returns-processing': typeof ReturnsProcessingRoute
+  '/service-breakdown': typeof ServiceBreakdownRoute
   '/services': typeof ServicesRoute
   '/shopify-fulfillment': typeof ShopifyFulfillmentRoute
   '/storage-warehousing': typeof StorageWarehousingRoute
@@ -295,6 +309,7 @@ export interface FileRoutesByTo {
   '/integrations': typeof IntegrationsRoute
   '/inventory-management': typeof InventoryManagementRoute
   '/kitting-bundling': typeof KittingBundlingRoute
+  '/labeling-compliance': typeof LabelingComplianceRoute
   '/labeling-fnsku': typeof LabelingFnskuRoute
   '/launchpad': typeof LaunchpadRoute
   '/login': typeof LoginRoute
@@ -304,6 +319,7 @@ export interface FileRoutesByTo {
   '/receiving-inspection': typeof ReceivingInspectionRoute
   '/reset-password': typeof ResetPasswordRoute
   '/returns-processing': typeof ReturnsProcessingRoute
+  '/service-breakdown': typeof ServiceBreakdownRoute
   '/services': typeof ServicesRoute
   '/shopify-fulfillment': typeof ShopifyFulfillmentRoute
   '/storage-warehousing': typeof StorageWarehousingRoute
@@ -337,6 +353,7 @@ export interface FileRoutesById {
   '/integrations': typeof IntegrationsRoute
   '/inventory-management': typeof InventoryManagementRoute
   '/kitting-bundling': typeof KittingBundlingRoute
+  '/labeling-compliance': typeof LabelingComplianceRoute
   '/labeling-fnsku': typeof LabelingFnskuRoute
   '/launchpad': typeof LaunchpadRoute
   '/login': typeof LoginRoute
@@ -346,6 +363,7 @@ export interface FileRoutesById {
   '/receiving-inspection': typeof ReceivingInspectionRoute
   '/reset-password': typeof ResetPasswordRoute
   '/returns-processing': typeof ReturnsProcessingRoute
+  '/service-breakdown': typeof ServiceBreakdownRoute
   '/services': typeof ServicesRoute
   '/shopify-fulfillment': typeof ShopifyFulfillmentRoute
   '/storage-warehousing': typeof StorageWarehousingRoute
@@ -380,6 +398,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/inventory-management'
     | '/kitting-bundling'
+    | '/labeling-compliance'
     | '/labeling-fnsku'
     | '/launchpad'
     | '/login'
@@ -389,6 +408,7 @@ export interface FileRouteTypes {
     | '/receiving-inspection'
     | '/reset-password'
     | '/returns-processing'
+    | '/service-breakdown'
     | '/services'
     | '/shopify-fulfillment'
     | '/storage-warehousing'
@@ -421,6 +441,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/inventory-management'
     | '/kitting-bundling'
+    | '/labeling-compliance'
     | '/labeling-fnsku'
     | '/launchpad'
     | '/login'
@@ -430,6 +451,7 @@ export interface FileRouteTypes {
     | '/receiving-inspection'
     | '/reset-password'
     | '/returns-processing'
+    | '/service-breakdown'
     | '/services'
     | '/shopify-fulfillment'
     | '/storage-warehousing'
@@ -462,6 +484,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/inventory-management'
     | '/kitting-bundling'
+    | '/labeling-compliance'
     | '/labeling-fnsku'
     | '/launchpad'
     | '/login'
@@ -471,6 +494,7 @@ export interface FileRouteTypes {
     | '/receiving-inspection'
     | '/reset-password'
     | '/returns-processing'
+    | '/service-breakdown'
     | '/services'
     | '/shopify-fulfillment'
     | '/storage-warehousing'
@@ -504,6 +528,7 @@ export interface RootRouteChildren {
   IntegrationsRoute: typeof IntegrationsRoute
   InventoryManagementRoute: typeof InventoryManagementRoute
   KittingBundlingRoute: typeof KittingBundlingRoute
+  LabelingComplianceRoute: typeof LabelingComplianceRoute
   LabelingFnskuRoute: typeof LabelingFnskuRoute
   LaunchpadRoute: typeof LaunchpadRoute
   LoginRoute: typeof LoginRoute
@@ -513,6 +538,7 @@ export interface RootRouteChildren {
   ReceivingInspectionRoute: typeof ReceivingInspectionRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReturnsProcessingRoute: typeof ReturnsProcessingRoute
+  ServiceBreakdownRoute: typeof ServiceBreakdownRoute
   ServicesRoute: typeof ServicesRoute
   ShopifyFulfillmentRoute: typeof ShopifyFulfillmentRoute
   StorageWarehousingRoute: typeof StorageWarehousingRoute
@@ -595,6 +621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KittingBundlingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/labeling-compliance': {
+      id: '/labeling-compliance'
+      path: '/labeling-compliance'
+      fullPath: '/labeling-compliance'
+      preLoaderRoute: typeof LabelingComplianceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/labeling-fnsku': {
       id: '/labeling-fnsku'
       path: '/labeling-fnsku'
@@ -656,6 +689,13 @@ declare module '@tanstack/react-router' {
       path: '/returns-processing'
       fullPath: '/returns-processing'
       preLoaderRoute: typeof ReturnsProcessingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/service-breakdown': {
+      id: '/service-breakdown'
+      path: '/service-breakdown'
+      fullPath: '/service-breakdown'
+      preLoaderRoute: typeof ServiceBreakdownRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services': {
@@ -824,6 +864,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrationsRoute: IntegrationsRoute,
   InventoryManagementRoute: InventoryManagementRoute,
   KittingBundlingRoute: KittingBundlingRoute,
+  LabelingComplianceRoute: LabelingComplianceRoute,
   LabelingFnskuRoute: LabelingFnskuRoute,
   LaunchpadRoute: LaunchpadRoute,
   LoginRoute: LoginRoute,
@@ -833,6 +874,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReceivingInspectionRoute: ReceivingInspectionRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ReturnsProcessingRoute: ReturnsProcessingRoute,
+  ServiceBreakdownRoute: ServiceBreakdownRoute,
   ServicesRoute: ServicesRoute,
   ShopifyFulfillmentRoute: ShopifyFulfillmentRoute,
   StorageWarehousingRoute: StorageWarehousingRoute,

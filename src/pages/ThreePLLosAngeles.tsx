@@ -1,4 +1,3 @@
-import { Helmet } from "@/lib/helmet-compat";
 import { Link } from "@/lib/router-compat";
 import { generateMetaTags } from "@/utils/seo";
 import Header from "@/components/Header";
@@ -79,18 +78,6 @@ const ThreePLLosAngeles = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{meta.title}</title>
-        <meta name="description" content={meta.description} />
-        <link rel="canonical" href={meta.canonical} />
-        <meta property="og:title" content={meta.ogTitle} />
-        <meta property="og:description" content={meta.ogDescription} />
-        <meta property="og:url" content={meta.ogUrl} />
-        <meta property="og:image" content={meta.ogImage} />
-        <meta name="twitter:title" content={meta.twitterTitle} />
-        <meta name="twitter:description" content={meta.twitterDescription} />
-        <meta name="twitter:image" content={meta.twitterImage} />
-      </Helmet>
       <StructuredData type="organization" />
       <StructuredData type="service" data={serviceData} />
       <StructuredData type="faq" data={faqData} />
