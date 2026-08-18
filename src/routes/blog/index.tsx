@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Blog from "@/pages/Blog";
+import { blogPostsQueryOptions } from "@/lib/blogPostQuery";
 
 export const Route = createFileRoute("/blog/")({
   component: Blog,
+  loader: ({ context }) => context.queryClient.ensureQueryData(blogPostsQueryOptions()),
   head: () => ({
     meta: [
           {

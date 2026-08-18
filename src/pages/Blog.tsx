@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { blogPostsQueryOptions } from "@/lib/blogPostQuery";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -25,36 +27,15 @@ interface BlogPost {
 }
 
 const Blog = () => {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const { data: posts = [], isLoading: loading } = useQuery(blogPostsQueryOptions());
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
 
   useEffect(() => {
     filterPosts();
   }, [posts, selectedCategory, searchTerm]);
 
-  const fetchPosts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .select("*")
-        .eq("published", true)
-        .order("published_at", { ascending: false });
-
-      if (error) throw error;
-      setPosts(data || []);
-    } catch (error) {
-      console.error("Error fetching blog posts:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filterPosts = () => {
     let filtered = posts;

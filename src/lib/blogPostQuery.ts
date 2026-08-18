@@ -39,3 +39,24 @@ export const blogPostQueryOptions = (slug: string) =>
     queryFn: () => fetchBlogPost(slug),
     staleTime: 60_000,
   });
+
+export async function fetchBlogPosts(): Promise<BlogPostRecord[]> {
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .select("*")
+    .eq("published", true)
+    .order("published_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching blog posts:", error);
+    return [];
+  }
+  return (data as BlogPostRecord[]) ?? [];
+}
+
+export const blogPostsQueryOptions = () =>
+  queryOptions({
+    queryKey: ["blog-posts"],
+    queryFn: fetchBlogPosts,
+    staleTime: 60_000,
+  });
