@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { MetricCounter } from "@/components/ui/metric-counter";
 import { Warehouse, Thermometer, BarChart3, Shield, CheckCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 
 const StorageContent = () => {
   const metrics = [

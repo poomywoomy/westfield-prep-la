@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "@/lib/router-compat";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,6 +41,7 @@ const ClientSettings = () => {
   }, [user]);
 
   const fetchClientData = async () => {
+    if (!user) return;
     const { data, error } = await supabase
       .from("clients")
       .select("id, first_name, last_name, company_name, email, phone_number, default_low_stock_threshold")
@@ -60,6 +61,7 @@ const ClientSettings = () => {
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     setIsSavingProfile(true);
 
     const { error } = await supabase

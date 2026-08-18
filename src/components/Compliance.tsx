@@ -27,7 +27,7 @@ const Compliance = () => {
             return (
               <div
                 key={i}
-                className="group bg-background rounded-2xl p-6 border border-border hover:border-secondary/40 hover:-translate-y-1 transition-all shadow-sm hover:shadow-xl"
+                className="group bg-background rounded-2xl p-6 border border-border hover:border-secondary/40 hover:-translate-y-1 transition-all shadow-xs hover:shadow-xl"
               >
                 <IconBadge size="lg">
                   <Icon className="w-7 h-7" />

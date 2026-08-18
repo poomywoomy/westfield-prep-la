@@ -51,7 +51,7 @@ const ShopifyMetrics = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={isVisible ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
+              className="text-center p-6 rounded-2xl bg-white/5 backdrop-blur-xs border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
             >
               <metric.icon className="h-12 w-12 text-[hsl(var(--shopify-page-accent))] mx-auto mb-4" />
               <div className="text-4xl md:text-5xl font-bold mb-2">

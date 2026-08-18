@@ -95,7 +95,7 @@ export function EmailRichTextEditor({ value, onChange, minHeight = "300px" }: Pr
       <Toolbar editor={editor} />
       <EditorContent
         editor={editor}
-        className="prose prose-sm max-w-none p-3 focus:outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[var(--min-h)]"
+        className="prose prose-sm max-w-none p-3 focus:outline-hidden [&_.ProseMirror]:outline-hidden [&_.ProseMirror]:min-h-[var(--min-h)]"
         style={{ ["--min-h" as any]: minHeight }}
       />
     </div>

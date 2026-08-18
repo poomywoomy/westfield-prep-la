@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Package, Zap, Shield, Clock, CheckCircle } from "lucide-react";
 
 const FulfillmentHero = () => {
@@ -121,7 +121,7 @@ const FulfillmentHero = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: 0.5 + idx * 0.1 }}
-                className="bg-slate-800/60 backdrop-blur-sm border border-blue-500/20 rounded-xl p-4 text-center"
+                className="bg-slate-800/60 backdrop-blur-xs border border-blue-500/20 rounded-xl p-4 text-center"
               >
                 <div className="text-2xl md:text-3xl font-bold text-blue-400">{stat.value}</div>
                 <div className="text-sm text-slate-400">{stat.label}</div>

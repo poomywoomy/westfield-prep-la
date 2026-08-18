@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Clock, Shield, MapPin, Tag, Package, Truck } from "lucide-react";
@@ -41,7 +41,7 @@ const AmazonChannelHero = () => {
 
             <motion.div className="flex flex-wrap justify-center lg:justify-start gap-3 mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
               {[{ icon: Clock, text: "Same-Day Receiving" }, { icon: Shield, text: "Full Compliance" }, { icon: MapPin, text: "LA Port Access" }].map((item, index) => (
-                <div key={index} className="flex items-center gap-2 px-4 py-2 bg-orange-100/80 backdrop-blur-sm rounded-full border border-orange-200/50">
+                <div key={index} className="flex items-center gap-2 px-4 py-2 bg-orange-100/80 backdrop-blur-xs rounded-full border border-orange-200/50">
                   <item.icon className="w-4 h-4 text-orange-600" />
                   <span className="text-sm font-medium text-orange-800"><TranslatedText>{item.text}</TranslatedText></span>
                 </div>
@@ -67,7 +67,7 @@ const AmazonChannelHero = () => {
 
           <div className="lg:col-span-2 hidden lg:flex flex-col gap-4">
             {featureCards.map((card, index) => (
-              <motion.div key={index} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }} whileHover={{ scale: 1.02, x: -5 }} className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-orange-100 hover:border-orange-300 transition-all duration-300 cursor-default">
+              <motion.div key={index} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }} whileHover={{ scale: 1.02, x: -5 }} className="bg-white/90 backdrop-blur-xs rounded-2xl p-5 shadow-lg border border-orange-100 hover:border-orange-300 transition-all duration-300 cursor-default">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/20"><card.icon className="w-6 h-6 text-white" /></div>
                   <div><h3 className="font-bold text-slate-900"><TranslatedText>{card.title}</TranslatedText></h3><p className="text-sm text-slate-500"><TranslatedText>{card.desc}</TranslatedText></p></div>

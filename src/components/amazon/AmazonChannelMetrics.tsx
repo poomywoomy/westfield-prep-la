@@ -31,7 +31,7 @@ const AmazonChannelMetrics = () => {
         </motion.div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {metrics.map((metric, index) => (
-            <motion.div key={index} initial={{ opacity: 0, y: 20 }} animate={isVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5, delay: index * 0.1 }} className="relative p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-orange-500/30 transition-all duration-300">
+            <motion.div key={index} initial={{ opacity: 0, y: 20 }} animate={isVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5, delay: index * 0.1 }} className="relative p-6 rounded-xl bg-white/5 backdrop-blur-xs border border-white/10 hover:bg-white/10 hover:border-orange-500/30 transition-all duration-300">
               <div className="text-center">
                 <div className="text-2xl md:text-3xl font-bold text-white mb-1">{metric.prefix}{isVisible ? <MetricCounter value={metric.value} duration={2000} suffix={metric.suffix} /> : `0${metric.suffix}`}</div>
                 <div className="text-sm text-white/60"><TranslatedText>{metric.label}</TranslatedText></div>

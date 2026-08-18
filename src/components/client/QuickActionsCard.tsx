@@ -14,7 +14,7 @@ export const QuickActionsCard = ({
   onContactSupport 
 }: QuickActionsCardProps) => {
   return (
-    <Card className="relative overflow-hidden shadow-sm">
+    <Card className="relative overflow-hidden shadow-xs">
       {/* Decorative glow */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-orange-100 dark:bg-orange-950/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none opacity-50" />
       

@@ -67,7 +67,7 @@ const InventoryCycleCounts = () => {
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
                 className="relative"
               >
-                <div className="bg-slate-800/50 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 text-center h-full hover:border-cyan-500/30 transition-colors">
+                <div className="bg-slate-800/50 backdrop-blur-xs border border-purple-500/20 rounded-2xl p-6 text-center h-full hover:border-cyan-500/30 transition-colors">
                   <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center mb-4">
                     <step.icon className="w-6 h-6 text-cyan-400" />
                   </div>

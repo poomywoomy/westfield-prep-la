@@ -180,10 +180,8 @@ export const StartBillingCycleDialog = ({
 
       // Check for Shopify product types without pricing
       try {
-        // Check for single products - @ts-ignore to bypass deep type instantiation error
-        // @ts-ignore
-        const { data: singleData } = await supabase
-          .from('skus')
+        // Check for single products (product_type column not yet in generated types)
+        const { data: singleData } = await (supabase.from('skus') as any)
           .select('id')
           .eq('client_id', client.id)
           .eq('product_type', 'single')
@@ -207,10 +205,8 @@ export const StartBillingCycleDialog = ({
           }
         }
 
-        // Check for kit products - @ts-ignore to bypass deep type instantiation error
-        // @ts-ignore
-        const { data: kitData } = await supabase
-          .from('skus')
+        // Check for kit products (product_type column not yet in generated types)
+        const { data: kitData } = await (supabase.from('skus') as any)
           .select('id')
           .eq('client_id', client.id)
           .eq('product_type', 'kit')

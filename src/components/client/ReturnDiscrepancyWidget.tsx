@@ -20,7 +20,7 @@ interface ReturnDiscrepancy {
   client_id: string;
   client_notes: string | null;
   qc_photo_urls: string[] | null;
-  created_at: string;
+  created_at: string | null;
   skus: {
     client_sku: string;
     title: string;

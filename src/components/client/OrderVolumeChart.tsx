@@ -32,21 +32,21 @@ export const OrderVolumeChart = ({ clientId }: OrderVolumeChartProps) => {
   
   const { data, loading } = useChartData(clientId, timeframe);
 
-  const currentData = data?.[activeDataset] || [];
+  const currentData: { name: string; value: number; date: Date }[] = data?.[activeDataset] || [];
   
   // Calculate tick interval for MTD, 30 and 90 day views
   const getXAxisTicks = () => {
     if (timeframe === 'mtd' && currentData.length > 0) {
       // Show every 2 days: 1, 3, 5, 7, 9...
-      return currentData.filter((_, i) => i % 2 === 0).map(d => d.name);
+      return currentData.filter((_, i: number) => i % 2 === 0).map(d => d.name);
     } else if (timeframe === '30days' && currentData.length > 0) {
       // Show exactly 15 evenly spaced ticks
       const step = Math.max(1, Math.floor(currentData.length / 15));
-      return currentData.filter((_, i) => i % step === 0).map(d => d.name);
+      return currentData.filter((_, i: number) => i % step === 0).map(d => d.name);
     } else if (timeframe === '90days' && currentData.length > 0) {
       // Show exactly 15 evenly spaced ticks
       const step = Math.max(1, Math.floor(currentData.length / 15));
-      return currentData.filter((_, i) => i % step === 0).map(d => d.name);
+      return currentData.filter((_, i: number) => i % step === 0).map(d => d.name);
     }
     return undefined; // Auto for other timeframes
   };

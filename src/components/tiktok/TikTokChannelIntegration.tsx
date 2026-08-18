@@ -1,10 +1,10 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Check, ArrowRight, RefreshCw, Package, Truck, Bell } from "lucide-react";
-import { SiTiktok } from "react-icons/si";
+import { SiTiktok } from "@/lib/react-icons-si";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { TranslatedText } from "@/components/TranslatedText";
 
 const integrationFeatures = [

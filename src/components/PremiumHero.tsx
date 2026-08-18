@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { ArrowRight, Calendar, Star, Shield, Zap, CheckCircle, Clock } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import CalendlyModal from "./CalendlyModal";
@@ -184,7 +184,7 @@ const PremiumHero = () => {
               </div>
 
               <div
-                className="absolute bottom-0 right-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/90 backdrop-blur-sm text-secondary-foreground shadow-xl animate-slide-up"
+                className="absolute bottom-0 right-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/90 backdrop-blur-xs text-secondary-foreground shadow-xl animate-slide-up"
                 style={{ animationDelay: "300ms" }}
               >
                 <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />

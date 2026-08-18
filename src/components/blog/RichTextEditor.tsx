@@ -249,8 +249,8 @@ export const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
       {/* Editor Content */}
       <EditorContent 
         editor={editor} 
-        className="prose prose-sm max-w-none p-6 min-h-[500px] focus:outline-none
-          [&_.ProseMirror]:outline-none
+        className="prose prose-sm max-w-none p-6 min-h-[500px] focus:outline-hidden
+          [&_.ProseMirror]:outline-hidden
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-[hsl(var(--blog-gray-blue))]
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left

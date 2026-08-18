@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import StructuredData from "@/components/StructuredData";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { TranslatedText } from "@/components/TranslatedText";
 
 const Testimonials = () => {
@@ -132,7 +132,7 @@ const Testimonials = () => {
                         {[...Array(review.rating)].map((_, i) => (
                           <Star 
                             key={i} 
-                            className="w-4 h-4 fill-secondary text-secondary drop-shadow-sm" 
+                            className="w-4 h-4 fill-secondary text-secondary drop-shadow-xs" 
                           />
                         ))}
                       </div>

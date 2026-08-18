@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { ArrowRight, Boxes, ShieldCheck, Clock } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
 import heroImg from "@/assets/amazon-v2/hero-pallet.jpg";
@@ -13,7 +13,7 @@ const HeroBento = () => {
       <div className="container mx-auto px-4 relative">
         <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="lg:col-span-7 flex flex-col justify-center">
-            <div className="inline-flex w-fit items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+            <div className="inline-flex w-fit items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xs">
               <Boxes className="h-3.5 w-3.5 text-[hsl(var(--orange-glow))]" />
               <span className="text-[10px] font-bold tracking-[0.22em] uppercase">
                 <TranslatedText>Amazon FBA Prep · Los Angeles, CA</TranslatedText>
@@ -34,7 +34,7 @@ const HeroBento = () => {
                 <TranslatedText>Get a custom quote</TranslatedText>
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/pricing" className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-semibold hover:bg-white/10 backdrop-blur-sm">
+              <Link to="/pricing" className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-semibold hover:bg-white/10 backdrop-blur-xs">
                 <TranslatedText>See pricing</TranslatedText>
               </Link>
             </div>

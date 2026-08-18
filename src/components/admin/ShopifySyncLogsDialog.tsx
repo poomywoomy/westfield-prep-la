@@ -14,7 +14,7 @@ interface SyncLog {
   created_at: string;
   sync_type: string;
   status: string;
-  products_synced: number;
+  products_synced: number | null;
   duration_ms: number | null;
   error_message: string | null;
   triggered_by: string | null;

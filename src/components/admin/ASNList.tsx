@@ -124,7 +124,7 @@ export const ASNList = () => {
     (asn.tracking_number && asn.tracking_number.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const getStatusColor = (status: string, isReturn: boolean) => {
+  const getStatusColor = (status: string | null, isReturn: boolean) => {
     if (isReturn) {
       switch (status) {
         case "issue": return "bg-orange-500 hover:bg-orange-600 text-white";
@@ -141,7 +141,7 @@ export const ASNList = () => {
     }
   };
 
-  const getStatusLabel = (status: string, isReturn: boolean) => {
+  const getStatusLabel = (status: string | null, isReturn: boolean) => {
     if (isReturn) {
       switch (status) {
         case "issue": return "Return - Pending";
@@ -378,8 +378,8 @@ export const ASNList = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(asn.status || '', isReturn)}>
-                        {getStatusLabel(asn.status || '', isReturn)}
+                      <Badge className={getStatusColor(asn.status, isReturn)}>
+                        {getStatusLabel(asn.status, isReturn)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

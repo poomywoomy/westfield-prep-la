@@ -163,7 +163,7 @@ export const PhotoLightbox = ({ photos, initialIndex = 0, open, onClose }: Photo
       </div>
 
       {/* Zoom controls - bottom center */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/60 rounded-lg px-4 py-2.5 backdrop-blur-sm">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/60 rounded-lg px-4 py-2.5 backdrop-blur-xs">
         <Button
           variant="ghost"
           size="icon"

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { ArrowRight, CheckCircle } from "lucide-react";
 
 const InventoryCTA = () => {
@@ -48,7 +48,7 @@ const InventoryCTA = () => {
           </p>
           
           {/* Demo Process */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-cyan-500/20 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
+          <div className="bg-slate-800/50 backdrop-blur-xs border border-cyan-500/20 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
             <p className="text-purple-200/80 mb-4">
               During your demo, we'll walk through your catalog, show how inventory would flow through our system, 
               and answer every question. Most demos take just 30 minutes—we respect your time and focus on your specific needs.

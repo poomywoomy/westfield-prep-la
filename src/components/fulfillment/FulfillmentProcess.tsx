@@ -90,7 +90,7 @@ const FulfillmentProcess = () => {
               >
                 {/* Content Card */}
                 <div className={`lg:w-[calc(50%-60px)] ${idx % 2 === 0 ? 'lg:pr-8 lg:text-right' : 'lg:pl-8 lg:text-left'}`}>
-                  <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:border-blue-500/30 transition-colors">
+                  <div className="bg-slate-800/50 backdrop-blur-xs border border-slate-700/50 rounded-2xl p-6 hover:border-blue-500/30 transition-colors">
                     <div className={`flex items-center gap-4 mb-4 ${idx % 2 === 0 ? 'lg:justify-end' : 'lg:justify-start'}`}>
                       <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
                         <step.icon className="w-6 h-6 text-blue-400" />

@@ -1,0 +1,25 @@
+{
+  "customizations": [
+    { "token": "--midnight-navy/--fulfillment-orange/--graphite-gray/--secondary-bg brand base", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "shadcn core set (background/foreground/card/popover/primary/secondary/muted/accent/destructive/border/input/ring/radius) light + dark", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--wc-* West Coast technical editorial tokens (7)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--shopify-* colors (9)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--sidebar-* tokens (8)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--blog-* colors light + dark (7)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--wcu-* Why Choose Us palette + legacy remaps (13)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--surface-navy*/--hairline/--orange-glow bento tokens (5)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".bento-grid-faint utility", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".bento-grain utility", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".wcu-paper-grain utility", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".animate-fade-up + fade-up keyframes", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".wc-outline-text + mobile stroke width", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "html scroll-behavior smooth", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "body font-inter + heading font-semibold base rules", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "fontFamily inter/serif/display/mono", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "colors.wc.* utility registration", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "colors.page-accent.* (6)", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "container center/2rem padding/1400px cap", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "keyframes+animations accordion-down/up, float, glow, slide-up, count-up, marquee", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "borderRadius lg/md/sm var(--radius) mapping", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" }
+  ]
+}

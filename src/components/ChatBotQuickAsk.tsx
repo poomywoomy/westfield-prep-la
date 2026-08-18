@@ -80,7 +80,7 @@ export const ChatBotQuickAsk = ({ visible, onQuestionClick }: ChatBotQuickAskPro
                   whileHover={{ scale: 1.02, y: -1 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onQuestionClick(question)}
-                  className="text-xs px-3.5 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200/80 text-gray-700 hover:bg-white hover:border-[hsl(28,100%,50%)]/30 hover:shadow-sm transition-all duration-200 text-left"
+                  className="text-xs px-3.5 py-2 rounded-full bg-white/80 backdrop-blur-xs border border-gray-200/80 text-gray-700 hover:bg-white hover:border-[hsl(28,100%,50%)]/30 hover:shadow-xs transition-all duration-200 text-left"
                 >
                   {question}
                 </motion.button>

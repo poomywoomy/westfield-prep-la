@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { Package, Database, PackageCheck, Truck, ArrowRight } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
@@ -76,7 +76,7 @@ const HowItWorksProcess = () => {
                     </div>
 
                     {/* Content card */}
-                    <div className="rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 p-7 md:p-8 hover:bg-white/10 hover:border-secondary/30 transition-all">
+                    <div className="rounded-2xl bg-white/5 backdrop-blur-xs border border-white/10 p-7 md:p-8 hover:bg-white/10 hover:border-secondary/30 transition-all">
                       <div className="flex items-center gap-3 mb-3">
                         <Icon className="w-6 h-6 text-secondary" />
                         <h3 className="text-2xl md:text-3xl font-bold tracking-tight">

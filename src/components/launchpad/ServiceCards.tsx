@@ -239,7 +239,7 @@ export const PhotoCard = ({ service, onOpen, index }: CardProps) => {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className="flex-1 aspect-[3/2] rounded-sm bg-[#2A140C]/80 relative overflow-hidden"
+            className="flex-1 aspect-[3/2] rounded-xs bg-[#2A140C]/80 relative overflow-hidden"
           >
             <div className="absolute inset-1 border border-[#C2654A]/30 rounded-[2px]" />
           </div>

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { ShoppingBag, ShoppingCart, Store, Music, Package, Building2, Palette, Zap, ArrowRight } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
 

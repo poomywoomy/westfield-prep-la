@@ -60,6 +60,7 @@ const ClientBillsView = () => {
   }, [user, selectedBill?.id]);
 
   const fetchData = async () => {
+    if (!user) return;
     try {
       const { data: client, error: clientError } = await supabase
         .from("clients")

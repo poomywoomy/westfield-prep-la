@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 
 const KittingContent = () => {
   const useCases = ["Subscription box assembly", "Holiday gift sets", "Product sample kits", "Influencer PR boxes", "Promotional bundles", "New customer welcome kits", "Loyalty program rewards", "Event swag bags"];

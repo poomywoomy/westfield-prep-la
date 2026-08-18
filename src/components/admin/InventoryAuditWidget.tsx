@@ -19,12 +19,12 @@ interface AuditEntry {
   difference: number;
   status: string;
   audit_timestamp: string;
-  auto_correction_attempted: boolean;
+  auto_correction_attempted: boolean | null;
   auto_correction_success: boolean | null;
   skus: {
     client_sku: string;
     title: string;
-  };
+  } | null;
 }
 
 export function InventoryAuditWidget({ clientId }: InventoryAuditWidgetProps) {
@@ -166,8 +166,8 @@ export function InventoryAuditWidget({ clientId }: InventoryAuditWidgetProps) {
               <div key={entry.id} className="border rounded-lg p-3">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
-                    <div className="font-medium text-sm">{entry.skus.client_sku}</div>
-                    <div className="text-xs text-muted-foreground">{entry.skus.title}</div>
+                    <div className="font-medium text-sm">{entry.skus?.client_sku ?? "Unknown"}</div>
+                    <div className="text-xs text-muted-foreground">{entry.skus?.title ?? ""}</div>
                   </div>
                   {getStatusBadge(entry)}
                 </div>

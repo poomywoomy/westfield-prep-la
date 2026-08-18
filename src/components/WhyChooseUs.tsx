@@ -1,6 +1,6 @@
 import { Clock, Camera, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { TranslatedText } from "@/components/TranslatedText";
 
 const reasons = [

@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { useEffect, useState, useRef, createElement, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 

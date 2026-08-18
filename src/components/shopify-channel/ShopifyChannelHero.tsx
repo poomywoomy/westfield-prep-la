@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { ArrowRight, CheckCircle, Package, Zap, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
@@ -106,7 +106,7 @@ const ShopifyChannelHero = () => {
             {trustPoints.map((point, index) => (
               <div 
                 key={index}
-                className="flex items-center gap-2 px-4 py-2 bg-lime-100/80 backdrop-blur-sm rounded-full border border-lime-200/50"
+                className="flex items-center gap-2 px-4 py-2 bg-lime-100/80 backdrop-blur-xs rounded-full border border-lime-200/50"
               >
                 <point.icon className="w-4 h-4 text-emerald-600" />
                 <span className="text-sm text-emerald-800 font-medium"><TranslatedText>{point.text}</TranslatedText></span>

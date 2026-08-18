@@ -1,5 +1,5 @@
 import { lazy, Suspense, useRef, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "@/lib/router-compat";
 import { X, Send, Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChatBot } from "@/hooks/useChatBot";
@@ -218,10 +218,10 @@ const ChatBotInner = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex items-start gap-2"
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[hsl(210,30%,12%)] to-[hsl(210,40%,20%)] flex items-center justify-center shadow-sm">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[hsl(210,30%,12%)] to-[hsl(210,40%,20%)] flex items-center justify-center shadow-xs">
                     <span className="text-xs font-bold text-white">W</span>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm border border-gray-100/80 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
+                  <div className="bg-white/90 backdrop-blur-xs border border-gray-100/80 rounded-2xl rounded-bl-md px-4 py-3 shadow-xs">
                     <div className="flex items-center gap-1">
                       <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                       <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -236,7 +236,7 @@ const ChatBotInner = () => {
             {/* Input area - Frosted glass */}
             <form
               onSubmit={handleSubmit}
-              className="p-3 border-t border-gray-200/80 bg-white/80 backdrop-blur-sm"
+              className="p-3 border-t border-gray-200/80 bg-white/80 backdrop-blur-xs"
             >
               <div className="flex gap-2">
                 <input
@@ -245,7 +245,7 @@ const ChatBotInner = () => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your question..."
-                  className="flex-1 px-4 py-3.5 text-base rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[hsl(28,100%,50%)]/30 focus:border-[hsl(28,100%,50%)]/50 transition-all placeholder:text-gray-400"
+                  className="flex-1 px-4 py-3.5 text-base rounded-xl border border-gray-200 bg-white focus:outline-hidden focus:ring-2 focus:ring-[hsl(28,100%,50%)]/30 focus:border-[hsl(28,100%,50%)]/50 transition-all placeholder:text-gray-400"
                   disabled={isLoading}
                 />
                 <motion.button

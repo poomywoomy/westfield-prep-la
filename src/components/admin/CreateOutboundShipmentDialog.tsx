@@ -310,7 +310,7 @@ export const CreateOutboundShipmentDialog = ({ open, onOpenChange, prefillData }
         .eq("sku_id", sku.sku_id)
         .maybeSingle();
       
-      if (!summary || summary.available < sku.quantity) {
+      if (!summary || (summary.available ?? 0) < sku.quantity) {
         errors.push(`Insufficient inventory for ${sku.client_sku}. Available: ${summary?.available || 0}, Requested: ${sku.quantity}`);
       }
     }

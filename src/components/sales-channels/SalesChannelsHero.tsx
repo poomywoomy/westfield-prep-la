@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { Boxes, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import {
   SiWalmart,
   SiTiktok,
   SiEtsy,
-} from "react-icons/si";
+} from "@/lib/react-icons-si";
 
 const floatingLogos = [
   { Icon: SiShopify, color: "#5E8E3E", delay: 0 },
@@ -49,7 +49,7 @@ const SalesChannelsHero = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: logo.delay, duration: 0.5 }}
-                className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20 hover:scale-110 transition-transform cursor-pointer"
+                className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-xs rounded-xl flex items-center justify-center border border-white/20 hover:scale-110 transition-transform cursor-pointer"
               >
                 <logo.Icon size={24} color={logo.color} className="md:w-7 md:h-7" />
               </motion.div>

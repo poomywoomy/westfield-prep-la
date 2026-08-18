@@ -133,7 +133,7 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
       setInventory([]);
     } else {
       // Fetch client names separately
-      const clientIds = [...new Set(data?.map(d => d.client_id) || [])];
+      const clientIds = [...new Set(data?.map(d => d.client_id).filter((id): id is string => !!id) || [])];
       const { data: clientsData } = await supabase
         .from("clients")
         .select("id, company_name")
@@ -141,7 +141,7 @@ export const InventorySummary = ({ onProcessReturn }: InventorySummaryProps) => 
       
       const clientMap = new Map(clientsData?.map(c => [c.id, c.company_name]) || []);
       // Fetch last activity for each SKU
-      const skuIds = [...new Set(data?.map(d => d.sku_id) || [])];
+      const skuIds = [...new Set(data?.map(d => d.sku_id).filter((id): id is string => !!id) || [])];
       const { data: activityData } = await supabase
         .from("inventory_ledger")
         .select("sku_id, created_at")

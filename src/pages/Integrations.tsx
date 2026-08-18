@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -67,8 +67,10 @@ import {
   SiUps,
   SiUsps,
   SiDeutschepost,
-} from "react-icons/si";
-import { IconType } from "react-icons";
+} from "@/lib/react-icons-si";
+import type { ComponentType, SVGProps } from "react";
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number; color?: string; className?: string; title?: string }>;
 
 // Brand colors for platforms
 const brandColors: Record<string, string> = {
@@ -108,7 +110,7 @@ const carrierColors: Record<string, string> = {
 };
 
 // Platform icon mapping
-const platformIcons: Record<string, IconType | null> = {
+const platformIcons: Record<string, IconComponent | null> = {
   shopify: SiShopify,
   shopifyPlus: SiShopify,
   amazon: SiAmazon,
@@ -141,7 +143,7 @@ const logoImages: Record<string, string> = {
 };
 
 // Carrier icon mapping
-const carrierIcons: Record<string, IconType | null> = {
+const carrierIcons: Record<string, IconComponent | null> = {
   dhl: SiDhl,
   fedex: SiFedex,
   ups: SiUps,
@@ -425,7 +427,7 @@ const IntegrationCard = ({
       variants={cardVariants}
       whileHover={{ y: -8, scale: 1.02 }}
       onClick={onClick}
-      className="group relative cursor-pointer rounded-2xl border bg-card hover:bg-card/80 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+      className="group relative cursor-pointer rounded-2xl border bg-card hover:bg-card/80 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden"
     >
       {/* Badge */}
       {integration.badge && (
@@ -442,7 +444,7 @@ const IntegrationCard = ({
 
       <div className="p-5 relative z-10">
         {/* Logo Container */}
-        <div className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 bg-background shadow-sm border mb-4">
+        <div className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 bg-background shadow-xs border mb-4">
           <IntegrationIcon integrationKey={integration.key} size={32} />
         </div>
 

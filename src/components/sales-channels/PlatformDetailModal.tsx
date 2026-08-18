@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Clock, Zap, ArrowRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,13 @@ import {
   SiBigcommerce,
   SiMagento,
   SiWix,
-} from "react-icons/si";
-import { IconType } from "react-icons";
+} from "@/lib/react-icons-si";
+import type { ComponentType, SVGProps } from "react";
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number; color?: string; className?: string; title?: string }>;
 import { PlatformData } from "./PlatformCard";
 
-const platformIcons: Record<string, IconType | null> = {
+const platformIcons: Record<string, IconComponent | null> = {
   shopify: SiShopify,
   amazon: SiAmazon,
   walmart: SiWalmart,
@@ -62,7 +64,7 @@ const PlatformDetailModal = ({ platform, open, onClose }: PlatformDetailModalPro
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50"
           />
 
           {/* Modal */}

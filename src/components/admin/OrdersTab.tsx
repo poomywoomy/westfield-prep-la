@@ -14,14 +14,14 @@ import { EnhancedOrderFulfillmentDialog } from "./EnhancedOrderFulfillmentDialog
 interface ShopifyOrder {
   id: string;
   shopify_order_id: string;
-  order_number: string;
-  customer_email: string;
-  customer_name: string;
-  total_price: number;
-  currency: string;
-  financial_status: string;
-  fulfillment_status: string;
-  created_at_shopify: string;
+  order_number: string | null;
+  customer_email: string | null;
+  customer_name: string | null;
+  total_price: number | null;
+  currency: string | null;
+  financial_status: string | null;
+  fulfillment_status: string | null;
+  created_at_shopify: string | null;
   client_id: string;
 }
 

@@ -146,6 +146,10 @@ export const MultiSKUReturnProcessingDialog = ({
         .limit(1);
       const locationId = locations?.[0]?.id;
 
+      if (!locationId) {
+        throw new Error("MAIN location not found for this client");
+      }
+
       // Process each SKU
       for (const row of processingRows) {
         // M3 FIX: Check for existing return entry (idempotency)

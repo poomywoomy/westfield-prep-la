@@ -15,7 +15,7 @@ const ShopifyTrustBar = () => {
           {metrics.map((metric, index) => (
             <div
               key={index}
-              className="animate-fade-up flex flex-col items-center text-center p-4 rounded-lg bg-white/60 backdrop-blur-sm border border-border/30 hover:border-[hsl(var(--shopify-page-accent))]/30 hover:shadow-md transition-all"
+              className="animate-fade-up flex flex-col items-center text-center p-4 rounded-lg bg-white/60 backdrop-blur-xs border border-border/30 hover:border-[hsl(var(--shopify-page-accent))]/30 hover:shadow-md transition-all"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <metric.icon className="h-6 w-6 md:h-8 md:w-8 text-[hsl(var(--shopify-page-accent))] mb-2" />

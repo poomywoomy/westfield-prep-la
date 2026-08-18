@@ -63,7 +63,7 @@ const ShopifyChannelMetrics = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={isVisible ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/25 hover:-translate-y-1 transition-all duration-300 group"
+              className="text-center p-8 rounded-2xl bg-white/5 backdrop-blur-xs border border-white/10 hover:bg-white/10 hover:border-white/25 hover:-translate-y-1 transition-all duration-300 group"
             >
               <metric.icon className="h-10 w-10 text-[hsl(var(--shopify-page-accent))] mx-auto mb-4 group-hover:scale-110 transition-transform" />
               <div className="text-4xl md:text-5xl font-bold mb-3">

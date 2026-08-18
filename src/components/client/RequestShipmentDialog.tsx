@@ -71,7 +71,7 @@ export const RequestShipmentDialog = ({ open, onOpenChange, clientId, onSuccess 
 
       if (invError) throw invError;
 
-      const skuIds = (inventoryData || []).map(item => item.sku_id);
+      const skuIds = (inventoryData || []).map(item => item.sku_id).filter((id): id is string => !!id);
       
       if (skuIds.length === 0) {
         setSKUs([]);

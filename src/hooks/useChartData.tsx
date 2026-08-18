@@ -90,6 +90,7 @@ export const useChartData = (clientId: string, timeframe: TimeframeType) => {
           const monthEnd = new Date(endDate.getFullYear(), i + 1, 0, 23, 59, 59, 999);
 
           const ordersCount = ordersData?.filter(o => {
+            if (!o.created_at_shopify) return false;
             const orderDate = new Date(o.created_at_shopify);
             return orderDate >= monthStart && orderDate <= monthEnd;
           }).length || 0;
@@ -128,6 +129,7 @@ export const useChartData = (clientId: string, timeframe: TimeframeType) => {
           }
 
           const ordersCount = ordersData?.filter(o => {
+            if (!o.created_at_shopify) return false;
             const orderDate = new Date(o.created_at_shopify);
             return orderDate >= dayStart && orderDate <= dayEnd;
           }).length || 0;

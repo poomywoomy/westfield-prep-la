@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { generateMetaTags } from "@/utils/seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -496,7 +496,7 @@ const WestCoastFulfillment = () => {
         {/* Jump links */}
         <nav
           aria-label="On this page"
-          className="py-4 bg-wc-paper/95 backdrop-blur-sm border-b border-wc-hairline sticky top-20 z-30"
+          className="py-4 bg-wc-paper/95 backdrop-blur-xs border-b border-wc-hairline sticky top-20 z-30"
         >
           <div className="container mx-auto px-6 md:px-12 max-w-6xl">
             <div className="flex gap-7 overflow-x-auto scrollbar-hide">

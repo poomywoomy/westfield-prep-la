@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { ShoppingCart, Package, Layers, ArrowRight, CheckCircle2 } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { TranslatedText } from "@/components/TranslatedText";
@@ -146,7 +146,7 @@ const UseCaseSection = () => {
                 aria-hidden="true"
               />
               <div className="relative">
-                <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center mx-auto mb-6">
+                <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/20 flex items-center justify-center mx-auto mb-6">
                   <Icon className="w-12 h-12 text-secondary" strokeWidth={1.5} />
                 </div>
                 <div className="text-7xl md:text-8xl font-bold tracking-tight text-white leading-none">

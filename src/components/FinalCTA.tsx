@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { Phone, Mail, ArrowRight } from "lucide-react";
 import { TranslatedText } from "./TranslatedText";

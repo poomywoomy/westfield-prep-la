@@ -94,7 +94,7 @@ const ReceivingPhotoGallery = () => {
                 />
                 
                 {/* Status Badge */}
-                <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
+                <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-xs ${
                   photo.status === "good" 
                     ? "bg-green-500/30 text-green-300 border border-green-400/40" 
                     : "bg-red-500/30 text-red-300 border border-red-400/40"

@@ -83,7 +83,7 @@ const StickyIntegrationsCTA = () => {
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
-            className="lg:hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-background/95 backdrop-blur-xs border-t border-border"
           >
             <div className="flex items-center gap-3 max-w-lg mx-auto">
               <Button

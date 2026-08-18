@@ -45,6 +45,7 @@ const ClientBillingTab = () => {
   }, [user]);
 
   const fetchBillingData = async () => {
+    if (!user) return;
     try {
       const { data: client, error: clientError } = await supabase
         .from("clients")

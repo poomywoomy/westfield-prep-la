@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Clock, Package, Star } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { TranslatedText } from "@/components/TranslatedText";
 
@@ -43,7 +43,7 @@ const TikTokChannelCaseStudy = () => {
                 <div className="md:w-1/2">
                   <div className="grid grid-cols-2 gap-4">
                     {caseMetrics.map((metric, index) => (
-                      <motion.div key={index} initial={{ opacity: 0, scale: 0.9 }} animate={isVisible ? { opacity: 1, scale: 1 } : {}} transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }} className="p-4 bg-white rounded-xl border border-pink-100 shadow-sm">
+                      <motion.div key={index} initial={{ opacity: 0, scale: 0.9 }} animate={isVisible ? { opacity: 1, scale: 1 } : {}} transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }} className="p-4 bg-white rounded-xl border border-pink-100 shadow-xs">
                         <metric.icon className="w-8 h-8 text-pink-500 mb-2" />
                         <div className="text-2xl font-bold text-foreground">{metric.value}</div>
                         <div className="text-sm font-medium text-foreground"><TranslatedText>{metric.label}</TranslatedText></div>

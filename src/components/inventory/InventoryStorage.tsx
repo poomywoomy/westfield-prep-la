@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Warehouse, Thermometer, ArrowRight } from "lucide-react";
 
 const InventoryStorage = () => {

@@ -60,7 +60,7 @@ const InventoryTechnology = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="group bg-slate-800/50 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-8 hover:border-cyan-500/30 transition-all duration-300"
+              className="group bg-slate-800/50 backdrop-blur-xs border border-purple-500/20 rounded-2xl p-8 hover:border-cyan-500/30 transition-all duration-300"
             >
               <div className="flex items-start gap-5">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center flex-shrink-0">

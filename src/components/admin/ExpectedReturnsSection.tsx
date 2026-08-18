@@ -13,7 +13,7 @@ interface ExpectedReturn {
   shopify_return_id: string;
   order_number: string | null;
   return_reason: string | null;
-  expected_qty: number;
+  expected_qty: number | null;
   line_items: any;
   created_at_shopify: string | null;
   client_id: string;
@@ -120,7 +120,7 @@ export const ExpectedReturnsSection = () => {
                       {ret.return_reason || "No reason provided"}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">{ret.expected_qty} units</Badge>
+                      <Badge variant="secondary">{ret.expected_qty ?? 0} units</Badge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {ret.created_at_shopify

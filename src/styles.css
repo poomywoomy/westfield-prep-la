@@ -1,0 +1,371 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Westfield Prep Center design system (ported from src/index.css + tailwind.config.ts).
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values as HSL fragments,
+ * consumed via hsl(var(--token)) exactly like the pre-migration setup.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Fonts (ported from tailwind.config.ts fontFamily) */
+  --font-inter: "Inter", sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-ring-offset-background: hsl(var(--background));
+
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  /* West Coast page: technical editorial tokens */
+  --color-wc-paper: hsl(var(--wc-paper));
+  --color-wc-paper-alt: hsl(var(--wc-paper-alt));
+  --color-wc-hairline: hsl(var(--wc-hairline));
+  --color-wc-hairline-strong: hsl(var(--wc-hairline-strong));
+  --color-wc-ink: hsl(var(--wc-ink));
+  --color-wc-ink-soft: hsl(var(--wc-ink-soft));
+  --color-wc-accent: hsl(var(--wc-accent));
+
+  /* Page accent palette (ported from tailwind.config.ts) */
+  --color-page-accent-teal: hsl(180 75% 50%);
+  --color-page-accent-amber: hsl(43 96% 56%);
+  --color-page-accent-purple: hsl(265 51% 51%);
+  --color-page-accent-ruby: hsl(350 89% 60%);
+  --color-page-accent-emerald: hsl(160 84% 39%);
+  --color-page-accent-cyan: hsl(192 60% 55%);
+
+  /* Keyframes + animations (ported from tailwind.config.ts) */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-glow: glow 2s ease-in-out infinite;
+  --animate-slide-up: slide-up 0.6s ease-out;
+  --animate-count-up: count-up 1s ease-out;
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  @keyframes glow {
+    0%,
+    100% {
+      box-shadow: 0 0 20px rgba(255, 136, 0, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(255, 136, 0, 0.6);
+    }
+  }
+  @keyframes slide-up {
+    0% {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes count-up {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+/* Container behaviour ported from tailwind.config.ts (center, 2rem padding, 1400px cap) */
+@utility container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (min-width: 1400px) {
+    max-width: 1400px;
+  }
+}
+
+:root {
+  /* Westfield Prep Center Color System */
+  --midnight-navy: 210 100% 7%; /* #0A0A23 */
+  --fulfillment-orange: 28 100% 50%; /* #FF7A00 */
+  --graphite-gray: 0 0% 30%; /* #4D4D4D */
+  --secondary-bg: 0 0% 96%; /* #F5F5F7 */
+
+  --background: 0 0% 100%;
+  --foreground: var(--midnight-navy);
+
+  --card: 0 0% 100%;
+  --card-foreground: var(--midnight-navy);
+
+  --popover: 0 0% 100%;
+  --popover-foreground: var(--midnight-navy);
+
+  /* Primary Colors */
+  --primary: var(--midnight-navy);
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary/Accent Colors */
+  --secondary: var(--fulfillment-orange);
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: var(--secondary-bg);
+  --muted-foreground: var(--graphite-gray);
+
+  --accent: 210 20% 94%;
+  --accent-foreground: 210 30% 12%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 210 20% 90%;
+  --input: 210 20% 90%;
+  --ring: 28 100% 50%;
+
+  --radius: 0.375rem;
+
+  /* West Coast page: technical editorial (light paper) tokens */
+  --wc-paper: 40 20% 99%;
+  --wc-paper-alt: 0 0% 100%;
+  --wc-hairline: 220 15% 86%;
+  --wc-hairline-strong: 222 47% 11%;
+  --wc-ink: var(--midnight-navy);
+  --wc-ink-soft: 220 14% 42%;
+  --wc-accent: var(--fulfillment-orange);
+
+  /* Professional Shopify-inspired colors */
+  --shopify-blue: 215 85% 50%;
+  --shopify-blue-dark: 215 85% 40%;
+  --shopify-teal: 175 75% 45%;
+  --shopify-teal-dark: 175 75% 35%;
+  --shopify-accent: 220 90% 96%;
+  --shopify-border: 220 25% 88%;
+
+  /* Shopify Page-Specific Colors */
+  --shopify-page-primary: 220 13% 17%; /* #1F2937 */
+  --shopify-page-accent: 25 95% 53%; /* #F97316 */
+  --shopify-page-light: 210 20% 98%; /* #F9FAFB */
+
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+
+  /* Blog-specific colors */
+  --blog-navy: 215 30% 15%;
+  --blog-orange: 28 100% 50%;
+  --blog-orange-hover: 28 100% 45%;
+  --blog-light-blue: 213 100% 97%;
+  --blog-gray-blue: 215 15% 30%;
+  --blog-muted-bg: 210 20% 96%;
+  --blog-shadow-glow: 0 12px 24px hsla(28, 100%, 50%, 0.25);
+
+  /* Why Choose Us — Soft Linen & Sunset (warm, premium, welcoming) */
+  --wcu-linen: 36 60% 96%;
+  --wcu-cream: 33 70% 92%;
+  --wcu-peach: 22 100% 88%;
+  --wcu-peach-deep: 20 95% 80%;
+  --wcu-sunset: 18 100% 62%;
+  --wcu-sunset-deep: 14 80% 50%;
+  --wcu-ink: 260 21% 18%;
+  --wcu-ink-soft: 260 12% 38%;
+  --wcu-line: 28 35% 84%;
+
+  /* Legacy wcu tokens remapped to the new warm palette so existing classes flip cleanly */
+  --wcu-bg-primary: 36 60% 96%;
+  --wcu-bg-secondary: 33 70% 92%;
+  --wcu-bg-card: 0 0% 100%;
+  --wcu-bg-dark-card: 22 100% 94%;
+
+  /* v2 Bento — Midnight Navy surfaces */
+  --surface-navy: 240 65% 8%; /* #0A0A23 */
+  --surface-navy-2: 224 38% 13%; /* #141432 */
+  --surface-navy-3: 222 32% 19%; /* #1F2A44 */
+  --hairline: 0 0% 100%; /* used at low alpha */
+  --orange-glow: 28 100% 50%;
+}
+
+.dark {
+  --background: 210 30% 8%;
+  --foreground: 0 0% 98%;
+
+  --card: 210 30% 10%;
+  --card-foreground: 0 0% 98%;
+
+  --popover: 210 30% 10%;
+  --popover-foreground: 0 0% 98%;
+
+  --primary: 0 0% 98%;
+  --primary-foreground: 210 30% 12%;
+
+  --secondary: 28 100% 50%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 210 30% 15%;
+  --muted-foreground: 210 10% 65%;
+
+  --accent: 210 30% 15%;
+  --accent-foreground: 0 0% 98%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 210 30% 20%;
+  --input: 210 30% 20%;
+  --ring: 28 100% 50%;
+
+  /* Blog-specific colors (dark mode) */
+  --blog-navy: 215 25% 90%;
+  --blog-orange: 28 100% 50%;
+  --blog-orange-hover: 28 100% 55%;
+  --blog-light-blue: 215 25% 18%;
+  --blog-gray-blue: 215 10% 80%;
+  --blog-muted-bg: 215 15% 14%;
+  --blog-shadow-glow: 0 12px 28px hsla(28, 100%, 50%, 0.35);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-inter);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.bento-grid-faint {
+  background-image:
+    linear-gradient(to right, hsl(0 0% 100% / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(0 0% 100% / 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.bento-grain {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+.wcu-paper-grain {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.14 0 0 0 0 0.22 0 0 0 0.45 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+}
+
+/* Performance-optimized CSS animations (replacing Framer Motion) */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+/* West Coast page: outlined display type (technical editorial) */
+.wc-outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px hsl(var(--wc-ink));
+  paint-order: stroke fill;
+}
+@media (max-width: 640px) {
+  .wc-outline-text {
+    -webkit-text-stroke-width: 1px;
+  }
+}

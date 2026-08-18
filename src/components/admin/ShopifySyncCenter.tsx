@@ -709,7 +709,7 @@ export function ShopifySyncCenter() {
 
       {/* Summary Metrics Row */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-2xl shadow-xs hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Stores</CardTitle>
             <Store className="h-5 w-5 text-muted-foreground" />
@@ -722,7 +722,7 @@ export function ShopifySyncCenter() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-2xl shadow-xs hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Products Synced</CardTitle>
             <Package className="h-5 w-5 text-muted-foreground" />
@@ -735,7 +735,7 @@ export function ShopifySyncCenter() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-2xl shadow-xs hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Auto-Syncs</CardTitle>
             <Activity className="h-5 w-5 text-muted-foreground" />
@@ -748,7 +748,7 @@ export function ShopifySyncCenter() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-2xl shadow-xs hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Last Sync</CardTitle>
             <Clock className="h-5 w-5 text-muted-foreground" />
@@ -767,7 +767,7 @@ export function ShopifySyncCenter() {
       </div>
 
       {/* Sync Health Indicators */}
-      <Card className="rounded-2xl shadow-sm">
+      <Card className="rounded-2xl shadow-xs">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
@@ -863,7 +863,7 @@ export function ShopifySyncCenter() {
       </Card>
 
       {/* Connected Stores Table */}
-      <Card className="rounded-2xl shadow-sm">
+      <Card className="rounded-2xl shadow-xs">
         <CardHeader>
           <CardTitle>Connected Stores</CardTitle>
           <CardDescription>Manage Shopify integrations for all clients</CardDescription>
@@ -1047,7 +1047,7 @@ export function ShopifySyncCenter() {
 
       {/* Inventory Tools */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="rounded-2xl shadow-sm">
+        <Card className="rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle className="text-base">Activate Location Inventory</CardTitle>
           </CardHeader>
@@ -1087,7 +1087,7 @@ export function ShopifySyncCenter() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm">
+        <Card className="rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle className="text-base">Dry-Run Reconcile</CardTitle>
           </CardHeader>
@@ -1128,7 +1128,7 @@ export function ShopifySyncCenter() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm">
+        <Card className="rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle className="text-base">Authoritative Push</CardTitle>
           </CardHeader>
@@ -1169,7 +1169,7 @@ export function ShopifySyncCenter() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm">
+        <Card className="rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle className="text-base">Inventory Audit</CardTitle>
           </CardHeader>
@@ -1193,7 +1193,7 @@ export function ShopifySyncCenter() {
 
       {/* Reconcile Results */}
       {reconcileResults && (
-        <Card className="rounded-2xl shadow-sm">
+        <Card className="rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle>Reconciliation Results</CardTitle>
           </CardHeader>
@@ -1231,7 +1231,7 @@ export function ShopifySyncCenter() {
       )}
 
       {/* Unmapped Products Section */}
-      <Card className="rounded-2xl shadow-sm">
+      <Card className="rounded-2xl shadow-xs">
         <CardHeader>
           <CardTitle>Unmapped Products</CardTitle>
           <CardDescription>Products that need SKU mapping</CardDescription>
@@ -1303,7 +1303,7 @@ export function ShopifySyncCenter() {
 
       {/* Audit Dashboard (Collapsible) */}
       <Collapsible open={auditExpanded} onOpenChange={setAuditExpanded}>
-        <Card className="rounded-2xl shadow-sm">
+        <Card className="rounded-2xl shadow-xs">
           <CollapsibleTrigger asChild>
             <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
               <div className="flex items-center justify-between">

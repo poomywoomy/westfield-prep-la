@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
-import { Link } from "react-router-dom";
-import { SiShopify, SiAmazon, SiTiktok } from "react-icons/si";
+import { Link } from "@/lib/router-compat";
+import { SiShopify, SiAmazon, SiTiktok } from "@/lib/react-icons-si";
 import { Store, ArrowRight } from "lucide-react";
 
 const FulfillmentChannels = () => {
