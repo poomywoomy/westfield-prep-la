@@ -17,7 +17,9 @@ export default {
         inter: ['Inter', 'sans-serif'],
         serif: ['"Fraunces"', 'Georgia', 'serif'],
         display: ['"Fraunces"', 'Georgia', 'serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
+
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
