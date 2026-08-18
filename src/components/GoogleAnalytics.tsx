@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@/lib/router-compat";
 import Header from "@/components/Header";

@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import { BLOG_FAQ_OVERRIDES } from "@/data/blogFaqOverrides";
 
 interface BlogPostSchemaProps {

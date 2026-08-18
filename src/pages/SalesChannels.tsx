@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@/lib/helmet-compat";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
