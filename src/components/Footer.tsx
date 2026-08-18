@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { MapPin, Phone, Mail, Linkedin, Instagram, Twitter } from "lucide-react";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import { TranslatedText } from "./TranslatedText";

@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Tag, Package, Shield, Box, Truck, Camera } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { TranslatedText } from "@/components/TranslatedText";
 
 const services = [

@@ -21,7 +21,7 @@ interface AdminASNDetailDialogProps {
 
 interface ASNHeader {
   asn_number: string;
-  status: string;
+  status: string | null;
   eta: string | null;
   received_at: string | null;
   created_at: string;
@@ -157,7 +157,8 @@ export function AdminASNDetailDialog({ open, onOpenChange, asnId, onSuccess }: A
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | null) => {
+    if (!status) return <Badge variant="secondary">Unknown</Badge>;
     const statusMap: Record<string, { label: string; className: string }> = {
       issue: { label: "Discrepancies", className: "bg-destructive text-destructive-foreground" },
       not_received: { label: "Not Received", className: "bg-background text-foreground border border-border" },

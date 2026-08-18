@@ -5,7 +5,7 @@ interface UseIntersectionObserverOptions extends IntersectionObserverInit {
 }
 
 export function useIntersectionObserver(
-  elementRef: RefObject<Element>,
+  elementRef: RefObject<Element | null>,
   {
     threshold = 0,
     root = null,

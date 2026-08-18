@@ -73,7 +73,7 @@ const TikTokChannelMetrics = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-pink-500/30 transition-all duration-300"
+              className="relative p-6 rounded-xl bg-white/5 backdrop-blur-xs border border-white/10 hover:bg-white/10 hover:border-pink-500/30 transition-all duration-300"
             >
               <div className="text-center">
                 <div className="text-2xl md:text-3xl font-bold text-white mb-1">

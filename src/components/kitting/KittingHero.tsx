@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Package, Gift, Layers, Sparkles, Clock, Users, Zap } from "lucide-react";
@@ -116,7 +116,7 @@ const KittingHero = () => {
             transition={{ delay: 0.3 }}
             className="relative"
           >
-            <div className="relative bg-slate-900/80 rounded-2xl border border-emerald-400/30 p-8 backdrop-blur-sm overflow-hidden">
+            <div className="relative bg-slate-900/80 rounded-2xl border border-emerald-400/30 p-8 backdrop-blur-xs overflow-hidden">
               {/* Assembly Animation */}
               <div className="relative h-64 flex items-center justify-center">
                 {/* Component Items */}

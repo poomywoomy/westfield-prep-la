@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { ArrowRight } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
 
@@ -24,7 +24,7 @@ const FinalCTA = () => {
                 <TranslatedText>Get a custom quote</TranslatedText>
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/pricing" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-semibold hover:bg-white/10 backdrop-blur-sm">
+              <Link to="/pricing" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-semibold hover:bg-white/10 backdrop-blur-xs">
                 <TranslatedText>See pricing</TranslatedText>
               </Link>
             </div>

@@ -17,7 +17,7 @@ interface ClientASNDetailDialogProps {
 
 interface ASNHeader {
   asn_number: string;
-  status: string;
+  status: string | null;
   eta: string | null;
   received_at: string | null;
   created_at: string;
@@ -65,12 +65,12 @@ interface ShopifyReturn {
   expected_qty: number | null;
   processed_qty: number | null;
   created_at_shopify: string | null;
-  synced_at: string;
+  synced_at: string | null;
 }
 
 // Helper function to determine ASN status with discrepancy logic
 function getASNStatusWithDiscrepancy(
-  status: string,
+  status: string | null,
   discrepancies: Discrepancy[]
 ): { label: string; className: string } {
   // If not closed, return normal status
@@ -81,7 +81,8 @@ function getASNStatusWithDiscrepancy(
       receiving: { label: "Receiving", className: "bg-orange-500 text-white" },
       received: { label: "Received", className: "bg-muted text-muted-foreground" },
     };
-    return statusMap[status] || { label: status.replace(/_/g, " "), className: "bg-muted text-muted-foreground" };
+    const safeStatus = status || "unknown";
+    return statusMap[safeStatus] || { label: safeStatus.replace(/_/g, " "), className: "bg-muted text-muted-foreground" };
   }
 
   // Check for discrepancies that warrant "Closed w/ Discrepancy" status
@@ -203,7 +204,7 @@ export function ClientASNDetailDialog({ open, onOpenChange, asnId }: ClientASNDe
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | null) => {
     const statusConfig = getASNStatusWithDiscrepancy(status, discrepancies);
     return <Badge className={statusConfig.className}>{statusConfig.label}</Badge>;
   };

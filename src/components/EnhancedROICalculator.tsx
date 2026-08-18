@@ -303,7 +303,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="bg-card border rounded-2xl p-6 md:p-8 shadow-sm space-y-8"
+              className="bg-card border rounded-2xl p-6 md:p-8 shadow-xs space-y-8"
             >
               {/* Channel */}
               <div>
@@ -444,7 +444,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                         htmlFor={`ff-${opt.id}`}
                         className={`cursor-pointer rounded-xl border px-3 py-3 transition-all ${
                           active
-                            ? "border-[#FF7A00] bg-[#FF7A00]/5 shadow-sm"
+                            ? "border-[#FF7A00] bg-[#FF7A00]/5 shadow-xs"
                             : "border-border hover:border-[#FF7A00]/40 hover:bg-muted/40"
                         }`}
                       >
@@ -870,7 +870,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
 
           {/* Email-report panel */}
           <div className="mt-10 md:mt-12 max-w-3xl mx-auto">
-            <div className="bg-card border rounded-2xl p-6 md:p-8 shadow-sm">
+            <div className="bg-card border rounded-2xl p-6 md:p-8 shadow-xs">
               {submitted ? (
                 <div className="text-center py-4">
                   <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto mb-3" />

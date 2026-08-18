@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { ArrowRight, Phone, Calendar, ChevronRight } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
 import { Button } from "@/components/ui/button";

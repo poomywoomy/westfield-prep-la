@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "@/lib/router-compat";
 import { getCanonicalUrl } from "@/utils/seo";
 
 const normalizePathname = (pathname: string) => {

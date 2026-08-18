@@ -83,7 +83,7 @@ const ShopifyChannelCaseStudy = () => {
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={isVisible ? { opacity: 1, scale: 1 } : {}}
                       transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
-                      className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center"
+                      className="bg-white/10 backdrop-blur-xs rounded-xl p-6 border border-white/20 text-center"
                     >
                       <metric.icon className="h-8 w-8 text-white/90 mx-auto mb-3" />
                       <div className="text-3xl font-bold text-white mb-1">{metric.value}</div>

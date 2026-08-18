@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { BarChart3, RefreshCw, Shield, Database } from "lucide-react";
 
 const InventoryHero = () => {

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Rocket, Sparkles, Zap, PackageCheck } from "lucide-react";
 import { TranslatedText } from "./TranslatedText";

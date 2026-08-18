@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "@/lib/router-compat";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { generateMetaTags } from "@/utils/seo";
-import { SiShopify, SiAmazon, SiTiktok, SiWalmart } from "react-icons/si";
+import { SiShopify, SiAmazon, SiTiktok, SiWalmart } from "@/lib/react-icons-si";
 import { LAUNCHPAD_SERVICES, getServiceBySlug, type LaunchpadService } from "@/components/launchpad/launchpadServices";
 import ServiceDetailModal from "@/components/launchpad/ServiceDetailModal";
 import { ServiceCard } from "@/components/launchpad/ServiceCards";
@@ -163,7 +163,7 @@ const Launchpad = () => {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
-                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1a1a1a]/15 bg-white/60 backdrop-blur-sm text-[#1a1a1a] text-[11px] font-semibold uppercase tracking-[0.2em] mb-8"
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1a1a1a]/15 bg-white/60 backdrop-blur-xs text-[#1a1a1a] text-[11px] font-semibold uppercase tracking-[0.2em] mb-8"
                 >
                   <Sparkles className="h-3.5 w-3.5 text-[#c97b54]" />
                   Westfield Launchpad
@@ -226,7 +226,7 @@ const Launchpad = () => {
                   ].map(({ Icon, label }) => (
                     <div
                       key={label}
-                      className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/50 border border-[#1a1a1a]/10 backdrop-blur-sm text-[#3a3a3a] text-xs font-medium"
+                      className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/50 border border-[#1a1a1a]/10 backdrop-blur-xs text-[#3a3a3a] text-xs font-medium"
                     >
                       <Icon className="h-4 w-4" />
                       {label}
@@ -252,7 +252,7 @@ const Launchpad = () => {
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-[#1a1a1a]/10 shadow-[0_30px_80px_-30px_rgba(26,26,26,0.18)] overflow-hidden">
+              <div className="rounded-2xl bg-white/70 backdrop-blur-xs border border-[#1a1a1a]/10 shadow-[0_30px_80px_-30px_rgba(26,26,26,0.18)] overflow-hidden">
                 <div className="grid lg:grid-cols-[340px_1fr]">
                   {/* Left rail */}
                   <div className="border-b lg:border-b-0 lg:border-r border-[#1a1a1a]/10 bg-[#f6f1ea]/60 p-3">
@@ -268,7 +268,7 @@ const Launchpad = () => {
                               onClick={() => setPickerSlug(s.slug)}
                               className={`group w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${
                                 isActive
-                                  ? "bg-white border-l-2 border-[#c97b54] shadow-sm"
+                                  ? "bg-white border-l-2 border-[#c97b54] shadow-xs"
                                   : "border-l-2 border-transparent hover:bg-white/60"
                               }`}
                             >

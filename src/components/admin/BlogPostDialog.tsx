@@ -57,7 +57,7 @@ export const BlogPostDialog = ({ open, onOpenChange, postId, onSuccess }: BlogPo
       const { data, error } = await supabase
         .from("blog_posts")
         .select("*")
-        .eq("id", postId)
+        .eq("id", postId ?? "")
         .single();
 
       if (error) throw error;
@@ -67,7 +67,7 @@ export const BlogPostDialog = ({ open, onOpenChange, postId, onSuccess }: BlogPo
         slug: data.slug,
         excerpt: data.excerpt || "",
         content: data.content || "",
-        published: data.published,
+        published: data.published ?? false,
         cover_image_url: data.cover_image_url || "",
         category: data.category || "General",
         tags: data.tags || [],

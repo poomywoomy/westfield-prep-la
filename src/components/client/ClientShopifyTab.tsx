@@ -52,6 +52,7 @@ export default function ClientShopifyTab() {
   }, [clientId]);
 
   const fetchStoreData = async () => {
+    if (!user) return;
     try {
       setLoading(true);
 

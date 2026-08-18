@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { RotateCcw, Camera, CheckCircle, Package, ArrowRight } from "lucide-react";
 
 const FulfillmentReturns = () => {
@@ -93,7 +93,7 @@ const FulfillmentReturns = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8">
+              <div className="bg-slate-800/50 backdrop-blur-xs border border-slate-700/50 rounded-2xl p-8">
                 <div className="text-center mb-8">
                   <div className="text-5xl font-bold text-blue-400 mb-2">24hr</div>
                   <div className="text-slate-400">Average return processing time</div>

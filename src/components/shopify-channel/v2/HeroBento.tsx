@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { ArrowRight, ShoppingBag, Sparkles, Clock } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
 import heroImg from "@/assets/shopify-v2/hero-warehouse.jpg";
@@ -23,7 +23,7 @@ const HeroBento = () => {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-7 flex flex-col justify-center"
           >
-            <div className="inline-flex w-fit items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+            <div className="inline-flex w-fit items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xs">
               <ShoppingBag className="h-3.5 w-3.5 text-[hsl(var(--orange-glow))]" />
               <span className="text-[10px] font-bold tracking-[0.22em] uppercase">
                 <TranslatedText>Shopify 3PL · Los Angeles, CA</TranslatedText>
@@ -54,7 +54,7 @@ const HeroBento = () => {
               </Link>
               <Link
                 to="/pricing"
-                className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-semibold hover:bg-white/10 transition-all backdrop-blur-sm"
+                className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-semibold hover:bg-white/10 transition-all backdrop-blur-xs"
               >
                 <TranslatedText>See pricing</TranslatedText>
               </Link>

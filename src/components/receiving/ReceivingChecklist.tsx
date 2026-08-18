@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Package, Barcode, Calendar, Box, Tag } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 
 const ReceivingChecklist = () => {
   const checklistItems = [

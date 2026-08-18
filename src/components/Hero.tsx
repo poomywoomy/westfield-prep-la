@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-warehouse-optimized.webp";
 import { ArrowRight, Shield, Clock, Award, TrendingUp } from "lucide-react";

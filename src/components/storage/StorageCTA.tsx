@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Warehouse, ArrowRight } from "lucide-react";
@@ -14,7 +14,7 @@ const StorageCTA = () => {
           <p className="text-lg md:text-xl text-cyan-100/80 mb-8 max-w-2xl mx-auto">Get a custom storage quote tailored to your inventory needs. Flexible terms, no long-term commitments, and pricing that scales with your business.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" onClick={() => navigate("/contact")} className="bg-white text-cyan-900 hover:bg-cyan-100 px-8 py-6 text-lg font-semibold group shadow-lg">Get a Quote<ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" /></Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/pricing")} className="border-2 border-white/50 bg-white/15 text-white hover:bg-white/25 px-8 py-6 text-lg font-semibold backdrop-blur-sm">View Pricing</Button>
+            <Button size="lg" variant="outline" onClick={() => navigate("/pricing")} className="border-2 border-white/50 bg-white/15 text-white hover:bg-white/25 px-8 py-6 text-lg font-semibold backdrop-blur-xs">View Pricing</Button>
           </div>
         </motion.div>
       </div>

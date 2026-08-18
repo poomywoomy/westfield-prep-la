@@ -82,7 +82,7 @@ export const TableOfContents = ({ content }: TableOfContentsProps) => {
   };
 
   return (
-    <nav className="sticky top-24 bg-card border rounded-lg p-6 shadow-sm">
+    <nav className="sticky top-24 bg-card border rounded-lg p-6 shadow-xs">
       <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-6">
         Table of Contents
       </h3>

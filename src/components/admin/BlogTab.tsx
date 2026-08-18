@@ -23,7 +23,7 @@ interface BlogPost {
   title: string;
   slug: string;
   excerpt: string | null;
-  published: boolean;
+  published: boolean | null;
   published_at: string | null;
   cover_image_url: string | null;
   created_at: string;

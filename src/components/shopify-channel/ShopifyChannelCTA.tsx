@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { ArrowRight, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 import { TranslatedText } from "@/components/TranslatedText";

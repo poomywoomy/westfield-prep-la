@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { CheckCircle } from "lucide-react";

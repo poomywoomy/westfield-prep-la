@@ -1,6 +1,7 @@
+import type { JSX } from "react";
 import { motion } from "framer-motion";
 import { Phone, Calendar, FileText } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { ChatMessage } from "@/hooks/useChatBot";
 
 interface ChatBotMessageProps {
@@ -45,7 +46,7 @@ const renderMessageWithCTAs = (content: string, onBookCall?: () => void): JSX.El
               window.open(CALENDLY_URL, "_blank");
               onBookCall?.();
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-white hover:shadow-md hover:scale-[1.02] transition-all duration-200"
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full bg-white/80 backdrop-blur-xs border border-gray-200 text-gray-700 hover:bg-white hover:shadow-md hover:scale-[1.02] transition-all duration-200"
           >
             <Calendar className="w-3.5 h-3.5" />
             Book a Call
@@ -86,7 +87,7 @@ export const ChatBotMessage = ({ message, onBookCall }: ChatBotMessageProps) => 
     >
       {/* Bot avatar */}
       {!isUser && (
-        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-[hsl(210,30%,12%)] to-[hsl(210,40%,20%)] flex items-center justify-center mr-2 mt-1 shadow-sm">
+        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-[hsl(210,30%,12%)] to-[hsl(210,40%,20%)] flex items-center justify-center mr-2 mt-1 shadow-xs">
           <span className="text-xs font-bold text-white">W</span>
         </div>
       )}
@@ -95,7 +96,7 @@ export const ChatBotMessage = ({ message, onBookCall }: ChatBotMessageProps) => 
         className={`max-w-[85%] px-4 py-3 ${
           isUser
             ? 'bg-gradient-to-br from-[hsl(28,100%,50%)] to-[hsl(28,100%,42%)] text-white rounded-2xl rounded-br-md shadow-md shadow-[hsl(28,100%,50%)]/20'
-            : 'bg-white/90 backdrop-blur-sm border border-gray-100/80 text-gray-800 rounded-2xl rounded-bl-md shadow-sm'
+            : 'bg-white/90 backdrop-blur-xs border border-gray-100/80 text-gray-800 rounded-2xl rounded-bl-md shadow-xs'
         }`}
       >
         {isUser ? (

@@ -1,5 +1,5 @@
 import { useEffect, useState, lazy, Suspense, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence, type Easing } from "framer-motion";
 import Lottie from "lottie-react";
@@ -318,7 +318,7 @@ const Pricing = () => {
 
             {/* Lottie Animation Behind Stats */}
             <div 
-              className="absolute inset-0 flex items-center justify-center opacity-20 blur-sm pointer-events-none overflow-hidden"
+              className="absolute inset-0 flex items-center justify-center opacity-20 blur-xs pointer-events-none overflow-hidden"
               role="img"
               aria-label={tSync("3PL shipping and fulfillment animation for Shopify and Amazon sellers")}
             >
@@ -365,7 +365,7 @@ const Pricing = () => {
                 <motion.div 
                   variants={itemVariants} 
                   whileHover={prefersReducedMotion ? {} : { scale: 1.03, y: -4 }}
-                  className="bg-card/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
+                  className="bg-card/80 backdrop-blur-xs rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
                 >
                   <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#F97316]">
                     {savedCalculation?.monthlyUnits?.toLocaleString() || "2M+"}
@@ -377,7 +377,7 @@ const Pricing = () => {
                 <motion.div 
                   variants={itemVariants}
                   whileHover={prefersReducedMotion ? {} : { scale: 1.03, y: -4 }}
-                  className="bg-card/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
+                  className="bg-card/80 backdrop-blur-xs rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
                 >
                   <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-green-500">
                     ${savedCalculation?.estimatedSavings?.toLocaleString() || "50K+"}
@@ -389,7 +389,7 @@ const Pricing = () => {
                 <motion.div 
                   variants={itemVariants}
                   whileHover={prefersReducedMotion ? {} : { scale: 1.03, y: -4 }}
-                  className="bg-card/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
+                  className="bg-card/80 backdrop-blur-xs rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
                 >
                   <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#0A66C2]">24hr</p>
                   <p className="text-xs md:text-sm text-muted-foreground mt-1"><TranslatedText>Avg. Turnaround</TranslatedText></p>
@@ -397,7 +397,7 @@ const Pricing = () => {
                 <motion.div 
                   variants={itemVariants}
                   whileHover={prefersReducedMotion ? {} : { scale: 1.03, y: -4 }}
-                  className="bg-card/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
+                  className="bg-card/80 backdrop-blur-xs rounded-2xl p-4 md:p-6 shadow-lg border hover:shadow-xl transition-all"
                 >
                   <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#F97316]">99.8%</p>
                   <p className="text-xs md:text-sm text-muted-foreground mt-1"><TranslatedText>Accuracy Rate</TranslatedText></p>
@@ -1006,7 +1006,7 @@ const Pricing = () => {
                     <AccordionItem 
                       key={index} 
                       value={`item-${index}`}
-                      className="bg-card border rounded-2xl px-4 md:px-6 shadow-sm hover:shadow-md transition-shadow"
+                      className="bg-card border rounded-2xl px-4 md:px-6 shadow-xs hover:shadow-md transition-shadow"
                     >
                       <AccordionTrigger className="text-left text-sm md:text-base hover:no-underline py-4">
                         <TranslatedText>{faq.question}</TranslatedText>
@@ -1055,7 +1055,7 @@ const Pricing = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: prefersReducedMotion ? 0 : 0.2 }}
-                  className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6"
+                  className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-xs px-4 py-2 rounded-full mb-6"
                 >
                   <Sparkles className="w-5 h-5 text-[#F97316]" />
                   <span className="font-bold text-sm md:text-base">

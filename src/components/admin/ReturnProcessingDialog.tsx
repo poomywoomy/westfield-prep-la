@@ -123,11 +123,15 @@ export const ReturnProcessingDialog = ({
         .limit(1);
       const locationId = locations?.[0]?.id;
 
+      if (!locationId) {
+        throw new Error("MAIN location not found for this client");
+      }
+
       // M3 FIX: Check for existing return entry (idempotency)
       const { data: existingReturn } = await supabase
         .from('inventory_ledger')
         .select('id')
-        .eq('source_ref', returnId)
+        .eq('source_ref', returnId ?? '')
         .eq('sku_id', skuId)
         .eq('transaction_type', 'RETURN')
         .maybeSingle();
@@ -214,7 +218,7 @@ export const ReturnProcessingDialog = ({
             status: "pending",
             qc_photo_urls: photoPaths.length > 0 ? photoPaths : null,
             client_notes: "Return processing - damaged units",
-          });
+          } as any);
         }
       }
 
@@ -229,7 +233,7 @@ export const ReturnProcessingDialog = ({
           source_type: "return",
           status: "pending",
           client_notes: "Return processing - missing units",
-        });
+        } as any);
       }
 
       // Update shopify_returns if this is from Shopify

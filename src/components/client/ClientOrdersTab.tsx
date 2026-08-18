@@ -29,6 +29,7 @@ export default function ClientOrdersTab() {
   }, [user]);
 
   const fetchOrders = async () => {
+    if (!user) return;
     try {
       setLoading(true);
 
@@ -63,6 +64,7 @@ export default function ClientOrdersTab() {
   };
 
   const handleSyncOrders = async () => {
+    if (!user) return;
     try {
       setSyncing(true);
 

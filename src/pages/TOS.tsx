@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "@/lib/router-compat";
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ const TOS = () => {
         <meta name="robots" content="noindex, follow" />
       </Helmet>
       
-      <header className="bg-background shadow-sm sticky top-0 z-50">
+      <header className="bg-background shadow-xs sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" onClick={handleLogoClick}>

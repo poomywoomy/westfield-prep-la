@@ -52,7 +52,7 @@ export default function TranslationsTab() {
         .select("*")
         .order("name");
       if (error) throw error;
-      return data;
+      return (data ?? []) as SupportedLanguage[];
     },
   });
 
@@ -77,7 +77,7 @@ export default function TranslationsTab() {
 
       const { data, error } = await query.limit(200);
       if (error) throw error;
-      return data;
+      return (data ?? []) as Translation[];
     },
   });
 

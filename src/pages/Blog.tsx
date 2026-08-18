@@ -17,10 +17,10 @@ interface BlogPost {
   id: string;
   title: string;
   slug: string;
-  excerpt: string;
-  published_at: string;
-  category?: string;
-  author_name?: string;
+  excerpt: string | null;
+  published_at: string | null;
+  category?: string | null;
+  author_name?: string | null;
   created_at: string;
   cover_image_url?: string | null;
 }
@@ -154,9 +154,9 @@ const Blog = () => {
                     title={filteredPosts[0].title}
                     slug={filteredPosts[0].slug}
                     excerpt={filteredPosts[0].excerpt || ""}
-                    publishedAt={filteredPosts[0].published_at}
-                    category={filteredPosts[0].category}
-                    authorName={filteredPosts[0].author_name}
+                    publishedAt={filteredPosts[0].published_at || filteredPosts[0].created_at}
+                    category={filteredPosts[0].category || undefined}
+                    authorName={filteredPosts[0].author_name || undefined}
                     coverImageUrl={filteredPosts[0].cover_image_url || undefined}
                     isFeatured={true}
                     priority={true}
@@ -177,9 +177,9 @@ const Blog = () => {
                       title={post.title}
                       slug={post.slug}
                       excerpt={post.excerpt || ""}
-                      publishedAt={post.published_at}
-                      category={post.category}
-                      authorName={post.author_name}
+                      publishedAt={post.published_at || post.created_at}
+                      category={post.category || undefined}
+                      authorName={post.author_name || undefined}
                       coverImageUrl={post.cover_image_url || undefined}
                       variant={variant}
                     />

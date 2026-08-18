@@ -88,6 +88,7 @@ export default function ClientProductsTab() {
   }, [searchTerm, products]);
 
   const fetchProducts = async () => {
+    if (!user) return;
     try {
       setLoading(true);
       

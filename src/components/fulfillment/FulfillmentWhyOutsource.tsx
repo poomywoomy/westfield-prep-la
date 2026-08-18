@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
 import { Clock, AlertTriangle, TrendingDown, Users, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 
 const FulfillmentWhyOutsource = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -62,7 +62,7 @@ const FulfillmentWhyOutsource = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="group relative bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700"
+              className="group relative bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700"
             >
               {/* Accent line */}
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-blue-400 rounded-l-2xl opacity-0 group-hover:opacity-100 transition-opacity" />

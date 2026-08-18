@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { TranslatedText } from "@/components/TranslatedText";

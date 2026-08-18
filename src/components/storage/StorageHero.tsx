@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Warehouse, Shield, Thermometer, Lock, Camera, Package } from "lucide-react";
@@ -47,7 +47,7 @@ const StorageHero = () => {
             animate={{ opacity: 1, x: 0 }}
             className="order-2 lg:order-1"
           >
-            <div className="relative bg-slate-900/80 rounded-2xl border border-cyan-400/30 p-6 backdrop-blur-sm">
+            <div className="relative bg-slate-900/80 rounded-2xl border border-cyan-400/30 p-6 backdrop-blur-xs">
               {/* Warehouse Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">

@@ -11,8 +11,10 @@ import {
   SiBigcommerce,
   SiMagento,
   SiWix,
-} from "react-icons/si";
-import { IconType } from "react-icons";
+} from "@/lib/react-icons-si";
+import type { ComponentType, SVGProps } from "react";
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number; color?: string; className?: string; title?: string }>;
 
 export interface PlatformData {
   key: string;
@@ -27,7 +29,7 @@ export interface PlatformData {
   brandColor: string;
 }
 
-const platformIcons: Record<string, IconType | null> = {
+const platformIcons: Record<string, IconComponent | null> = {
   shopify: SiShopify,
   amazon: SiAmazon,
   walmart: SiWalmart,

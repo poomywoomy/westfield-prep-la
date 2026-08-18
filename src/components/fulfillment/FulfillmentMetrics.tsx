@@ -65,7 +65,7 @@ const FulfillmentMetrics = () => {
               transition={{ duration: 0.5, delay: idx * 0.1 }}
               className="relative group"
             >
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 text-center h-full">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 text-center h-full">
                 {/* Neon glow effect on hover */}
                 <div className="absolute inset-0 rounded-2xl bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Zap, TrendingUp, Shield, Clock } from "lucide-react";
@@ -18,7 +18,7 @@ const TikTokChannelHero = () => {
   return (
     <section className="relative w-full overflow-hidden">
       <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 20% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(217, 70, 239, 0.12) 0%, transparent 50%), linear-gradient(135deg, #fdf2f8 0%, #faf5ff 50%, #fdf4ff 100%)` }} />
-      {floatingShapes.map((shape, index) => (<motion.div key={index} className={`absolute ${shape.color} rounded-full blur-sm`} style={{ width: shape.size, height: shape.size, left: shape.left, top: shape.top }} animate={{ y: [0, -15, 0], x: [0, 5, 0], scale: [1, 1.1, 1] }} transition={{ duration: 4 + index * 0.5, repeat: Infinity, ease: "easeInOut", delay: shape.delay }} />))}
+      {floatingShapes.map((shape, index) => (<motion.div key={index} className={`absolute ${shape.color} rounded-full blur-xs`} style={{ width: shape.size, height: shape.size, left: shape.left, top: shape.top }} animate={{ y: [0, -15, 0], x: [0, 5, 0], scale: [1, 1.1, 1] }} transition={{ duration: 4 + index * 0.5, repeat: Infinity, ease: "easeInOut", delay: shape.delay }} />))}
       <motion.div className="absolute w-8 h-8 bg-pink-300/20 rounded-lg rotate-12" style={{ left: "15%", top: "30%" }} animate={{ rotate: [12, -12, 12] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
       <motion.div className="absolute w-6 h-6 bg-purple-300/25 rounded-lg -rotate-12" style={{ right: "12%", top: "40%" }} animate={{ rotate: [-12, 12, -12] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} />
 
@@ -44,7 +44,7 @@ const TikTokChannelHero = () => {
 
           <motion.div className="flex flex-wrap justify-center gap-3 mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
             {[{ icon: Clock, text: "6hr Processing" }, { icon: Shield, text: "<1% Error Rate" }, { icon: TrendingUp, text: "Surge-Ready" }, { icon: Zap, text: "LA Fulfillment" }].map((item, index) => (
-              <div key={index} className="flex items-center gap-2 px-4 py-2 bg-pink-100/80 backdrop-blur-sm rounded-full border border-pink-200/50">
+              <div key={index} className="flex items-center gap-2 px-4 py-2 bg-pink-100/80 backdrop-blur-xs rounded-full border border-pink-200/50">
                 <item.icon className="w-4 h-4 text-pink-600" /><span className="text-sm font-medium text-pink-800"><TranslatedText>{item.text}</TranslatedText></span>
               </div>
             ))}

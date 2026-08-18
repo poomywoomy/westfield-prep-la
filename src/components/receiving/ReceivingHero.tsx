@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Camera, CheckCircle, Scan, Package, AlertTriangle } from "lucide-react";
@@ -100,7 +100,7 @@ const ReceivingHero = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <div className="relative bg-slate-900/80 rounded-2xl border border-purple-400/30 p-6 backdrop-blur-sm">
+            <div className="relative bg-slate-900/80 rounded-2xl border border-purple-400/30 p-6 backdrop-blur-xs">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />

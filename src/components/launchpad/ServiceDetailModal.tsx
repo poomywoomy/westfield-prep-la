@@ -5,7 +5,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { ArrowRight, CheckCircle2, Box, Camera, FileText } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { LaunchpadService } from "./launchpadServices";
 
@@ -209,7 +209,7 @@ const GalleryModal = ({ service, open, onOpenChange }: Props) => {
               return (
                 <div
                   key={d.title}
-                  className="rounded-xl bg-white/70 backdrop-blur border border-[#6B2E8C]/20 p-5 shadow-sm"
+                  className="rounded-xl bg-white/70 backdrop-blur border border-[#6B2E8C]/20 p-5 shadow-xs"
                 >
                   <div className="aspect-[16/9] rounded-md mb-4 bg-gradient-to-br from-[#F5ECF8] to-[#E5D2EE] border border-[#6B2E8C]/15 p-3 flex items-center justify-center overflow-hidden">
                     {i === 0 && (
@@ -537,9 +537,9 @@ const ContactSheetModal = ({ service, open, onOpenChange }: Props) => {
             ].map((f, i) => (
               <div
                 key={i}
-                className="flex-shrink-0 w-44 bg-[#3a1f15] p-2 rounded-sm border border-[#C2654A]/20"
+                className="flex-shrink-0 w-44 bg-[#3a1f15] p-2 rounded-xs border border-[#C2654A]/20"
               >
-                <div className="aspect-[3/4] bg-gradient-to-br from-[#5a2e1d] to-[#2A140C] rounded-sm flex items-center justify-center mb-2 relative overflow-hidden">
+                <div className="aspect-[3/4] bg-gradient-to-br from-[#5a2e1d] to-[#2A140C] rounded-xs flex items-center justify-center mb-2 relative overflow-hidden">
                   <div className="absolute top-1 left-1 text-[8px] font-mono text-[#C2654A]/70">F-{String(i + 1).padStart(2, "0")}</div>
                   <svg viewBox="0 0 60 80" className="w-3/4 h-3/4 text-[#F1DDD2]/55" role="img" aria-label={f.label}>
                     {f.glyph === "hero" && (
@@ -601,11 +601,11 @@ const ContactSheetModal = ({ service, open, onOpenChange }: Props) => {
           {/* mini gantt */}
           <div className="mt-4 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[9px] font-mono text-[#C2654A] items-center">
             <span>PRE-PRO</span>
-            <div className="h-2 rounded-sm bg-[#C2654A]/30 relative"><div className="absolute left-0 top-0 bottom-0 w-1/4 bg-[#C2654A] rounded-sm" /></div>
+            <div className="h-2 rounded-xs bg-[#C2654A]/30 relative"><div className="absolute left-0 top-0 bottom-0 w-1/4 bg-[#C2654A] rounded-xs" /></div>
             <span>SHOOT</span>
-            <div className="h-2 rounded-sm bg-[#C2654A]/30 relative"><div className="absolute left-1/4 top-0 bottom-0 w-2/4 bg-[#C2654A] rounded-sm" /></div>
+            <div className="h-2 rounded-xs bg-[#C2654A]/30 relative"><div className="absolute left-1/4 top-0 bottom-0 w-2/4 bg-[#C2654A] rounded-xs" /></div>
             <span>DELIVERY</span>
-            <div className="h-2 rounded-sm bg-[#C2654A]/30 relative"><div className="absolute left-3/4 top-0 bottom-0 w-1/4 bg-[#C2654A] rounded-sm" /></div>
+            <div className="h-2 rounded-xs bg-[#C2654A]/30 relative"><div className="absolute left-3/4 top-0 bottom-0 w-1/4 bg-[#C2654A] rounded-xs" /></div>
           </div>
         </div>
         <div className="px-10 py-7 grid sm:grid-cols-2 gap-6">

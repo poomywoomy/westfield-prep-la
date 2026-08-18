@@ -1,6 +1,6 @@
 import { Zap, Clock, Globe, Building2, Users, Warehouse, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { TranslatedText } from "./TranslatedText";
 
 const services = [

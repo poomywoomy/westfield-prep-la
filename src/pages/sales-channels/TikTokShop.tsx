@@ -13,7 +13,7 @@ import TikTokChannelMetrics from "@/components/tiktok/TikTokChannelMetrics";
 import TikTokChannelIntegration from "@/components/tiktok/TikTokChannelIntegration";
 import TikTokChannelCaseStudy from "@/components/tiktok/TikTokChannelCaseStudy";
 import TikTokChannelFAQ from "@/components/tiktok/TikTokChannelFAQ";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Heart, Gift, Video } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";

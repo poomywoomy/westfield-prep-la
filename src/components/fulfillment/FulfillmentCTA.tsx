@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { ArrowRight, CheckCircle } from "lucide-react";
 
 const FulfillmentCTA = () => {
@@ -41,7 +41,7 @@ const FulfillmentCTA = () => {
           </p>
           
           {/* Testimonial */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-blue-500/20 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
+          <div className="bg-slate-800/50 backdrop-blur-xs border border-blue-500/20 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
             <p className="text-slate-300 italic mb-4">
               "Switching to Westfield cut our shipping errors by 95% and freed up 20 hours per week. 
               Our customers are happier, and we can finally focus on growing instead of packing boxes."

@@ -76,7 +76,7 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
       if (invError) console.error('Error fetching inventory summary:', invError);
 
       // Fetch SKU details and client threshold
-      const skuIds = inventorySummary?.map(i => i.sku_id) || [];
+      const skuIds = inventorySummary?.map(i => i.sku_id).filter((id): id is string => !!id) || [];
       let lowStockItems: any[] = [];
       
       if (skuIds.length > 0) {
@@ -89,7 +89,7 @@ export function ClientInventoryActivityLog({ clientId }: ClientInventoryActivity
         const defaultThreshold = clientResult.data?.default_low_stock_threshold || 10;
         
         lowStockItems = inventorySummary?.map(inv => {
-          const sku = skuMap.get(inv.sku_id);
+          const sku = inv.sku_id ? skuMap.get(inv.sku_id) : undefined;
           return {
             sku_id: inv.sku_id,
             client_sku: inv.client_sku,

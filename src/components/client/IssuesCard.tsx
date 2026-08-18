@@ -84,7 +84,7 @@ export const IssuesCard = ({
 
   if (totalCount === 0) {
     return (
-      <Card className="p-6 bg-white border-l-4 border-l-green-600 shadow-sm">
+      <Card className="p-6 bg-white border-l-4 border-l-green-600 shadow-xs">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-green-100 rounded-full">
             <CheckCircle className="h-6 w-6 text-green-600" />
@@ -101,7 +101,7 @@ export const IssuesCard = ({
 
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-      <Card className={`p-6 bg-white border-l-4 ${colorMap[borderColor].border} shadow-sm hover:shadow-md transition-shadow`}>
+      <Card className={`p-6 bg-white border-l-4 ${colorMap[borderColor].border} shadow-xs hover:shadow-md transition-shadow`}>
         <CollapsibleTrigger asChild>
           <div className="flex items-center justify-between cursor-pointer">
             <div className="flex items-center gap-3">

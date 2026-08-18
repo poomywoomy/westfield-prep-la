@@ -24,7 +24,7 @@ interface BillingItem {
   service_name: string;
   unit_price: number;
   quantity: number;
-  section_type?: string;
+  section_type?: string | null;
   item_type: string;
 }
 
@@ -135,6 +135,12 @@ const BillingEntryDialog = ({
       setCurrentCycle(cycle || null);
       setStatementStart(cycle?.statement_start_date || "");
       setStatementEnd(cycle?.statement_end_date || "");
+
+      if (!cycle) {
+        setBillingItems([]);
+        setPayments([]);
+        return;
+      }
 
       // Load existing billing items
       const { data: items, error: itemsError } = await supabase

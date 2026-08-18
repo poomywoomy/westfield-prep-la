@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, ArrowRight } from "lucide-react";
@@ -10,7 +10,7 @@ interface RelatedPost {
   title: string;
   slug: string;
   excerpt: string | null;
-  published_at: string;
+  published_at: string | null;
   category: string | null;
 }
 
@@ -112,9 +112,11 @@ export const RelatedPosts = ({ currentPostId, category }: RelatedPostsProps) => 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          <time dateTime={post.published_at}>
-                            {format(new Date(post.published_at), "MMM dd, yyyy")}
-                          </time>
+                          {post.published_at && (
+                            <time dateTime={post.published_at}>
+                              {format(new Date(post.published_at), "MMM dd, yyyy")}
+                            </time>
+                          )}
                         </div>
                         <ArrowRight className="w-4 h-4 text-[hsl(var(--blog-orange))] transition-transform group-hover:translate-x-1" />
                       </div>

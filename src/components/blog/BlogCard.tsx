@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Calendar, ArrowRight, TrendingUp, MoveRight } from "lucide-react";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

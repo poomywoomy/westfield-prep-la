@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Package, ArrowRight, CheckCircle, XCircle, DollarSign, RotateCcw } from "lucide-react";

@@ -137,7 +137,7 @@ export const ShareButtons = ({
           </Button>
 
           {/* Native Share (if available) */}
-          {navigator.share && (
+          {typeof navigator.share === "function" && (
             <Button
               onClick={nativeShare}
               variant="outline"

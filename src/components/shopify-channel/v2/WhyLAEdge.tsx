@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Anchor, Clock4, DollarSign, Users } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
 import portImg from "@/assets/shopify-v2/port-la.jpg";

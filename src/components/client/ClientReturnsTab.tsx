@@ -25,7 +25,7 @@ interface ShopifyReturn {
   expected_qty: number | null;
   processed_qty: number | null;
   created_at_shopify: string | null;
-  synced_at: string;
+  synced_at: string | null;
 }
 
 interface ManualReturn {
@@ -167,7 +167,7 @@ export function ClientReturnsTab({ clientId }: ClientReturnsTabProps) {
       }
       if (statusFilter !== "all" && ret.status?.toLowerCase() !== statusFilter) return false;
       if (dateFrom || dateTo) {
-        const returnDate = ret.created_at_shopify ? new Date(ret.created_at_shopify) : new Date(ret.synced_at);
+        const returnDate = ret.created_at_shopify ? new Date(ret.created_at_shopify) : (ret.synced_at ? new Date(ret.synced_at) : new Date(0));
         if (dateFrom && returnDate < startOfDay(parseISO(dateFrom))) return false;
         if (dateTo && returnDate > endOfDay(parseISO(dateTo))) return false;
       }
@@ -344,7 +344,7 @@ export function ClientReturnsTab({ clientId }: ClientReturnsTabProps) {
                           <TableCell className="text-muted-foreground text-sm">
                             {ret.created_at_shopify 
                               ? format(new Date(ret.created_at_shopify), "MMM d, yyyy")
-                              : format(new Date(ret.synced_at), "MMM d, yyyy")}
+                              : ret.synced_at ? format(new Date(ret.synced_at), "MMM d, yyyy") : "-"}
                           </TableCell>
                         </TableRow>
                       ))}

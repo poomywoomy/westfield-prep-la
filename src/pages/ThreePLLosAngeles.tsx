@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { generateMetaTags } from "@/utils/seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -106,7 +106,7 @@ const ThreePLLosAngeles = () => {
               {/* Icon + H1 */}
               <div className="flex items-center justify-center gap-4">
                 <MapPin className="w-12 h-12 text-primary flex-shrink-0" />
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-wide text-foreground leading-[1.1] border-l-4 border-primary pl-6 shadow-sm">
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-wide text-foreground leading-[1.1] border-l-4 border-primary pl-6 shadow-xs">
                   <TranslatedText>3PL in Los Angeles</TranslatedText>
                 </h1>
               </div>

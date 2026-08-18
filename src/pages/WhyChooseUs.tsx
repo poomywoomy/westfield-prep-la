@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
-import { SiShopify, SiAmazon, SiWalmart, SiTiktok } from "react-icons/si";
+import { SiShopify, SiAmazon, SiWalmart, SiTiktok } from "@/lib/react-icons-si";
 import {
   CheckCircle2,
   Camera,
@@ -314,7 +314,7 @@ const FAQItem = ({ q, a }: { q: string; a: string }) => {
   return (
     <div className="border-b border-[hsl(var(--wcu-line))] last:border-0">
       <button
-        className="w-full py-6 text-left flex items-center justify-between hover:text-[hsl(var(--wcu-sunset-deep))] transition-colors focus:outline-none"
+        className="w-full py-6 text-left flex items-center justify-between hover:text-[hsl(var(--wcu-sunset-deep))] transition-colors focus:outline-hidden"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="font-semibold text-lg text-[hsl(var(--wcu-ink))] pr-8">{q}</span>
@@ -492,7 +492,7 @@ const WhyChooseUs = () => {
               <div className="flex flex-col lg:flex-row items-center gap-16">
                 <div className="lg:w-1/2">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(var(--wcu-peach)/0.6)] text-[hsl(var(--wcu-ink))] text-xs font-semibold mb-4">
-                    <span className="w-1.5 h-1.5 rounded-sm bg-[hsl(var(--wcu-sunset))]" />
+                    <span className="w-1.5 h-1.5 rounded-xs bg-[hsl(var(--wcu-sunset))]" />
                     Proprietary Technology
                   </div>
                   <h3 className="text-3xl md:text-4xl font-bold mb-6 text-[hsl(var(--wcu-ink))]">
@@ -582,7 +582,7 @@ const WhyChooseUs = () => {
               <div className="flex flex-col lg:flex-row-reverse items-center gap-16">
                 <div className="lg:w-1/2">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(var(--wcu-peach)/0.6)] text-[hsl(var(--wcu-ink))] text-xs font-semibold mb-4">
-                    <span className="w-1.5 h-1.5 rounded-sm bg-[hsl(var(--wcu-sunset))]" />
+                    <span className="w-1.5 h-1.5 rounded-xs bg-[hsl(var(--wcu-sunset))]" />
                     Strategic Geography
                   </div>
                   <h3 className="text-3xl md:text-4xl font-bold mb-6 text-[hsl(var(--wcu-ink))]">
@@ -643,7 +643,7 @@ const WhyChooseUs = () => {
               <div>
                 <div className="text-center max-w-2xl mx-auto mb-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(var(--wcu-peach)/0.6)] text-[hsl(var(--wcu-ink))] text-xs font-semibold mb-4">
-                    <span className="w-1.5 h-1.5 rounded-sm bg-[hsl(var(--wcu-sunset))]" />
+                    <span className="w-1.5 h-1.5 rounded-xs bg-[hsl(var(--wcu-sunset))]" />
                     Our Journey With You
                   </div>
                   <h3 className="text-3xl md:text-4xl font-bold mb-3 text-[hsl(var(--wcu-ink))]">
@@ -661,7 +661,7 @@ const WhyChooseUs = () => {
               <div>
                 <div className="text-center max-w-2xl mx-auto mb-10">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(var(--wcu-peach)/0.6)] text-[hsl(var(--wcu-ink))] text-xs font-semibold mb-4">
-                    <span className="w-1.5 h-1.5 rounded-sm bg-[hsl(var(--wcu-sunset))]" />
+                    <span className="w-1.5 h-1.5 rounded-xs bg-[hsl(var(--wcu-sunset))]" />
                     Ecosystem
                   </div>
                   <h3 className="text-3xl md:text-4xl font-bold mb-4 text-[hsl(var(--wcu-ink))]">

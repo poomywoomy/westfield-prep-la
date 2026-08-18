@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { SiShopify } from "react-icons/si";
+import { useNavigate } from "@/lib/router-compat";
+import { SiShopify } from "@/lib/react-icons-si";
 import westfieldLogo from "@/assets/westfield-logo.png";
 import { TranslatedText } from "@/components/TranslatedText";
 
@@ -108,7 +108,7 @@ const ShopifyChannelIntegration = () => {
                 
                 <div className="space-y-6">
                   {/* Sync Animation */}
-                  <div className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <div className="flex items-center justify-between bg-white/10 backdrop-blur-xs rounded-xl p-4 border border-white/20">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-[#96BF48] rounded-lg flex items-center justify-center">
                         <SiShopify className="text-white w-6 h-6" />
@@ -136,11 +136,11 @@ const ShopifyChannelIntegration = () => {
 
                   {/* Live Data */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                    <div className="bg-white/10 backdrop-blur-xs rounded-xl p-4 border border-white/20">
                       <div className="text-3xl font-bold">147</div>
                       <div className="text-sm opacity-80"><TranslatedText>Orders Today</TranslatedText></div>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                    <div className="bg-white/10 backdrop-blur-xs rounded-xl p-4 border border-white/20">
                       <div className="text-3xl font-bold">98.9%</div>
                       <div className="text-sm opacity-80"><TranslatedText>Sync Success</TranslatedText></div>
                     </div>

@@ -95,10 +95,10 @@ const ValueProposition = () => {
               const Icon = b.icon;
               // Mix styles: solid white / outlined / orange-accented
               const variants = [
-                "bg-background border border-border shadow-sm",
+                "bg-background border border-border shadow-xs",
                 "bg-muted border border-border",
-                "bg-background border-t-4 border-t-secondary border-x border-b border-border shadow-sm",
-                "bg-background border border-border shadow-sm",
+                "bg-background border-t-4 border-t-secondary border-x border-b border-border shadow-xs",
+                "bg-background border border-border shadow-xs",
                 "bg-muted border border-border",
               ];
               return (

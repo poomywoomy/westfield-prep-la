@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "react-router-dom";
-import { SiShopify, SiAmazon } from "react-icons/si";
+import { Link } from "@/lib/router-compat";
+import { SiShopify, SiAmazon } from "@/lib/react-icons-si";
 
 const ReturnsIntegrations = () => {
   return (

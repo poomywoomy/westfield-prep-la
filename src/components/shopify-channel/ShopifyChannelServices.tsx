@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { TranslatedText } from "@/components/TranslatedText";
 
 const ShopifyChannelServices = () => {
