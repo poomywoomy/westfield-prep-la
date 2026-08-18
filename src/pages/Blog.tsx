@@ -50,7 +50,7 @@ const Blog = () => {
           post.excerpt?.toLowerCase().includes(term)
       );
     }
-    setFilteredPosts(filtered);
+    setFilteredPosts(filtered as BlogPost[]);
   };
 
   return (

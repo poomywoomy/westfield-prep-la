@@ -15,6 +15,7 @@ export interface BlogPostRecord {
   category: string | null;
   meta_description: string | null;
   read_time_minutes: number | null;
+  created_at?: string;
   tags?: string[] | null;
 }
 
