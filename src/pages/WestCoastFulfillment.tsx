@@ -152,7 +152,6 @@ const WestCoastFulfillment = () => {
     "West Coast Fulfillment Services | 3PL in Los Angeles",
     "West Coast fulfillment center in Los Angeles. 1 to 2 day ground delivery across the western US, port-adjacent container receiving, and Shopify, Amazon, and TikTok Shop integration.",
     "/west-coast-fulfillment",
-    "/la-port-logistics.jpg",
   );
 
   const serviceData = {
