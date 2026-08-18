@@ -45,6 +45,7 @@ const SalesChannelShopify = lazy(() => import("./pages/sales-channels/Shopify"))
 const SalesChannelTikTokShop = lazy(() => import("./pages/sales-channels/TikTokShop"));
 const ThreePLLosAngeles = lazy(() => import("./pages/ThreePLLosAngeles"));
 const Integrations = lazy(() => import("./pages/Integrations"));
+const WestCoastFulfillment = lazy(() => import("./pages/WestCoastFulfillment"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,6 +85,7 @@ const App = () => {
                 <Route path="/why-choose-us" element={<WhyChooseUs />} />
                 <Route path="/launchpad" element={<Launchpad />} />
                 <Route path="/3pl-los-angeles" element={<ThreePLLosAngeles />} />
+                <Route path="/west-coast-fulfillment" element={<WestCoastFulfillment />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 

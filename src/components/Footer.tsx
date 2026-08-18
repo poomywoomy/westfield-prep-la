@@ -153,6 +153,9 @@ const Footer = () => {
                 <Link to="/3pl-los-angeles" className="block text-sm text-white/80 hover:text-secondary transition-colors">
                   <TranslatedText>3PL Los Angeles</TranslatedText>
                 </Link>
+                <Link to="/west-coast-fulfillment" className="block text-sm text-white/80 hover:text-secondary transition-colors">
+                  <TranslatedText>West Coast Fulfillment</TranslatedText>
+                </Link>
                 <Link to="/testimonials" className="block text-sm text-white/80 hover:text-secondary transition-colors">
                   <TranslatedText>Testimonials</TranslatedText>
                 </Link>
