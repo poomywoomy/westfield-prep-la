@@ -91,7 +91,7 @@ const Header = () => {
   return (
     <>
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 overflow-x-hidden ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 ${
           isScrolled ? "bg-background shadow-md" : "bg-background/95 backdrop-blur-xs"
         }`}
       >
@@ -120,7 +120,7 @@ const Header = () => {
               </Link>
               
               {/* Sales Channels Dropdown - Hover-based */}
-              <NavigationMenu>
+              <NavigationMenu className="isolate z-[60]">
                 <NavigationMenuList>
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className="bg-transparent hover:bg-transparent data-[state=open]:bg-transparent text-foreground hover:text-primary font-medium text-sm h-auto p-0">
