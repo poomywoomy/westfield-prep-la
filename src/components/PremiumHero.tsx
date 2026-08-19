@@ -73,7 +73,7 @@ const PremiumHero = () => {
                 </span>
                 <br />
                 <span className="text-secondary">
-                  <TranslatedText>+ Amazon-Ready 3PL</TranslatedText>
+                  <TranslatedText>+ Amazon-Ready 3PL sdd</TranslatedText>
                 </span>
               </h1>
 
@@ -98,9 +98,7 @@ const PremiumHero = () => {
                   <TranslatedText>SOC2 Ready</TranslatedText>
                 </div>
                 <span className="h-4 w-px bg-white/25" />
-                <TranslatedText className="text-sm font-semibold">
-                  Trusted by 500+ brands
-                </TranslatedText>
+                <TranslatedText className="text-sm font-semibold">Trusted by 500+ brands</TranslatedText>
               </div>
 
               {/* CTAs */}
@@ -151,9 +149,7 @@ const PremiumHero = () => {
               <div className="absolute top-4 right-0 w-64 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/25 p-5 shadow-2xl animate-slide-up">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
-                  <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-white/80">
-                    Live Accuracy
-                  </span>
+                  <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-white/80">Live Accuracy</span>
                 </div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-5xl font-bold text-white tracking-tight">99.8</span>
@@ -170,9 +166,7 @@ const PremiumHero = () => {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <Zap className="w-3.5 h-3.5 text-secondary" />
-                  <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-white/80">
-                    Turnaround
-                  </span>
+                  <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-white/80">Turnaround</span>
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-5xl font-bold text-white tracking-tight">24</span>
