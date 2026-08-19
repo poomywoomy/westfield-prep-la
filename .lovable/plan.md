@@ -1,25 +1,28 @@
-# Fix: header sub-menu hidden behind the hero banner
+# Fix: main menu dropdown not appearing correctly on hover
 
 ## Problem
 
-The "Sales Channels" (and other) dropdown menus open inside the fixed header, but the header itself has a horizontal-overflow clip applied to it. A clip on one axis also clips the other axis, so the dropdown panel gets cut off / appears to sit behind the hero banner instead of floating over it.
+When hovering a main-menu item with a sub-menu (e.g. "Sales Channels"), the dropdown panel does not display cleanly over the page. Two things cause this:
+
+1. The fixed header clips overflow, so a panel that extends below the header bar gets cut off.
+2. The dropdown viewport has no explicit z-index of its own, so hero/banner content can paint over it.
 
 ## Fix
 
-1. Remove the overflow clipping from the `<header>` element in `src/components/Header.tsx`, so dropdown panels can extend below the header bar.
-2. Keep the original horizontal-scroll protection (added earlier to stop the page clipping on the right) by moving it to the page wrapper instead of the header.
-3. Make the dropdown panel layering explicit: the navigation menu wrapper gets its own stacking context and the dropdown content/viewport sits above the hero (z-index above the header's own level).
+1. Remove the overflow clipping from the `<header>` element so the hover panel can extend below the header bar, and keep the horizontal-scroll protection by applying it at the page/body level instead.
+2. Give the navigation menu wrapper its own stacking context and put the dropdown viewport above the header layer, so the panel always floats over the banner.
+3. Confirm the panel anchors directly under its trigger and stays open while the pointer moves from the trigger into the panel.
 
 ## Files touched
 
-- `src/components/Header.tsx` — drop `overflow-x-hidden` from the header element; add explicit stacking/z-index to the `NavigationMenu` wrapper.
-- `src/components/ui/navigation-menu.tsx` — give the dropdown viewport container a z-index so it renders above hero content on every page.
-- Global styles (`src/styles.css`) — apply the horizontal overflow guard at the page/body level so nothing else regresses.
+- `src/components/Header.tsx` — drop `overflow-x-hidden` from the header; add explicit stacking/z-index to the `NavigationMenu` wrapper.
+- `src/components/ui/navigation-menu.tsx` — add a z-index to the dropdown viewport container so it renders above page content everywhere.
+- Global styles (`src/styles.css`) — page-level horizontal overflow guard so the earlier right-edge clipping fix is preserved.
 
 ## Out of scope
 
-No changes to menu items, labels, links, hero content, or any metadata.
+No changes to menu items, labels, links, hero/banner content, or any metadata.
 
 ## Verification
 
-Open the homepage and hover "Sales Channels" plus any other dropdown: the panel should render fully over the hero banner with no clipping, and the page should still have no horizontal scrollbar at desktop and mobile widths.
+On the homepage, hover each menu item that has a sub-menu: the panel renders fully over the banner, anchored under its trigger, and stays open while moving the mouse into it. Page still has no horizontal scrollbar at desktop and mobile widths.
