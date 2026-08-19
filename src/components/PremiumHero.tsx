@@ -73,7 +73,7 @@ const PremiumHero = () => {
                 </span>
                 <br />
                 <span className="text-secondary">
-                  <TranslatedText>+ Amazon-Ready 3PL</TranslatedText>
+                  <TranslatedText>+ Amazon-Ready 3PLmaskdm</TranslatedText>
                 </span>
               </h1>
 
