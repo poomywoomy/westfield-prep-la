@@ -120,7 +120,7 @@ const Header = () => {
               </Link>
               
               {/* Sales Channels Dropdown - Hover-based */}
-              <NavigationMenu>
+              <NavigationMenu className="isolate z-[60]">
                 <NavigationMenuList>
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className="bg-transparent hover:bg-transparent data-[state=open]:bg-transparent text-foreground hover:text-primary font-medium text-sm h-auto p-0">
