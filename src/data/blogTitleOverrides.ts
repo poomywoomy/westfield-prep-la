@@ -22,6 +22,7 @@ export const BLOG_TITLE_OVERRIDES: Record<string, string> = {
   'why-3pl-warehousing-los-angeles-smart-business-investment': '3PL Warehousing Los Angeles Is a Smart Business Investment',
   'how-fulfillment-center-los-angeles-california-supports-business-growth': 'How Fulfillment Center Los Angeles California Boosts Growth',
   'why-los-angeles-smart-base-ecommerce-companies-3pls': 'Why Los Angeles Is Ideal for Ecommerce Companies and 3PLs',
+  'how-los-angeles-fulfillment-center-helps-ecommerce-brands-ship-fast': 'LA Fulfillment Center for Ecommerce Brands | Westfield Prep',
 };
 
 export function getBlogSeoTitle(slug: string, title: string): string {
