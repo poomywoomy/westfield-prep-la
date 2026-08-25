@@ -1,42 +1,38 @@
-# SSR Verification Report + Fix for Schema Markup
+# New Blog Post: 10 Reasons to Choose Ecommerce Fulfillment Services USA
 
-## Short answer: yes, the site is now server-side rendered
+Publish the PDF content as a new blog post, matching the existing blog style, SEO setup, and schema handling.
 
-I fetched the live pages the same way Google's crawler does (raw HTML, no JavaScript executed). Confirmed on https://westfieldprepcenter.com:
+## Post details
 
-| Page | Status | Title in raw HTML | Description | Canonical | H1 | Body content |
-|---|---|---|---|---|---|---|
-| `/` | 200 | Yes, page-specific | Yes | Yes, self-referencing | Yes | Yes (174 KB) |
-| `/pricing` | 200 | Yes, page-specific | Yes | Yes | Yes | Yes (154 KB) |
-| `/faq` | 200 | Yes | Yes | Yes | Yes | Yes + FAQPage schema |
-| `/blog` | 200 | Yes | Yes | Yes | Yes | Yes, all post links (575 KB) |
-| `/blog/how-los-angeles-fulfillment-center-helps-ecommerce-brands-ship-fast` | 200 | Custom SEO title | Yes | Yes | Yes | Full article, 2,816 words, plus BlogPosting + BreadcrumbList + FAQPage schema |
+- Hero title: "10 Reasons to Choose Ecommerce Fulfillment Services USA for Startup Operations"
+- Meta title: "10 Ways Ecommerce Fulfillment Services Help LA Startups"
+- Meta description: "Learn how ecommerce fulfillment services USA help Los Angeles startups save time, improve accuracy, simplify Amazon FBA prep, and scale their online business."
+- Slug: `10-reasons-choose-ecommerce-fulfillment-services-usa-startups`
+- Category and tags aligned with existing fulfillment posts (keywords: ecommerce fulfillment services USA, 3PL for startups, amazon fba prep center near me, ecommerce fulfillment Los Angeles)
 
-Before the switch, all of that arrived empty and was filled in by JavaScript after load. Now it is in the source itself.
+## Content
 
-## The one real gap I found
+All 10 numbered sections plus "Why Los Angeles Is a Strong Location", "How Westfield Prep Center Supports Ecommerce Brands", "Conclusion", and the 5-question FAQ block, written exactly as in the PDF (no em dashes, no added claims).
 
-Non-blog pages (homepage, pricing, service pages, contact, and so on) still have **zero JSON-LD structured data in the raw HTML**. The schema exists and works in the browser, but it is emitted by a client-side component (`StructuredData.tsx`), so it never reaches view-source. That means the LocalBusiness / Organization / Service / Review schema on those pages is invisible to a crawler that does not execute JavaScript.
+## Internal links
 
-Blog posts and the FAQ page are already fine, since their schema was moved into the server-rendered head during the migration.
+- "ecommerce fulfillment services USA" (intro) → https://westfieldprepcenter.com/
+- "3PL for startups" (section 2) → https://westfieldprepcenter.com/blog/why-3pl-fulfillment-is-essential-for-startups-scaling-with-amazon-fba
+- "amazon fba prep center near me" (section 4) → https://maps.app.goo.gl/n88ChGHJ8QrW16M58
+- "ecommerce fulfillment Los Angeles" (section 7) → existing LA fulfillment blog post, keeping the same pattern used on recent posts
 
-## Plan to close the gap
+## Image
 
-1. Move each page's schema payload out of the client-side component and into that route's server-rendered head, using the exact same JSON objects that exist today. No wording, values, or schema types change - the same markup simply moves from "after JavaScript" to "in the source".
-2. Cover every page currently using the component: homepage, pricing, contact, why-choose-us, testimonials, all service pages, all sales-channel pages, 3PL Los Angeles, West Coast fulfillment, service breakdown, blog index.
-3. Keep the client-side render in place where it does no harm, or remove it per page once the server version is confirmed, so nothing is duplicated in the final HTML.
-4. Verify by fetching each page's raw HTML and confirming exactly one copy of each expected schema block, then spot-check with Google's Rich Results Test.
+Hero image from the top of the PDF (warehouse worker packing boxes) uploaded to the `blog-images` storage bucket with a slug-matched filename, then set as the post cover image with descriptive alt text.
 
-## Explanation you can forward to your SEO consultant
+## FAQ and schema
 
-> The site was rebuilt on TanStack Start with server-side rendering. Every page is now delivered as complete HTML from the server: title, meta description, canonical, Open Graph and Twitter tags, headings, and full body copy are all present in view-source before any JavaScript runs. Blog articles render their full text server-side, and blog posts plus the FAQ page also emit their JSON-LD (BlogPosting, BreadcrumbList, FAQPage) in the source.
->
-> How to verify without special tools: open a page, do View Source (not Inspect Element - Inspect shows the post-JavaScript DOM, which looks correct even on a client-rendered site), and search for the title and a sentence of body copy. Or run `curl -s https://westfieldprepcenter.com/pricing`. Both show fully populated HTML. Google Search Console's URL Inspection "View crawled page" will show the same.
->
-> One item is still outstanding: on non-blog pages the LocalBusiness/Organization/Service schema is currently injected client-side, so it does not appear in view-source yet. We are moving it into the server-rendered head with no changes to its contents.
+- FAQ rendered on the page as interactive collapsible items, matching other posts.
+- The 5 PDF questions added to `src/data/blogFaqOverrides.ts` so the `FAQPage` JSON-LD is server-rendered into the page head (visible in view source).
+- Article, breadcrumb, and FAQ schemas continue to come from the existing blog schema builder.
 
 ## Technical notes
 
-- Metadata is emitted via each route's `head()` in `src/routes/*`; canonicals are leaf-level only, so no duplicates.
-- Blog posts server-render through a route loader plus `ensureQueryData` with `routerWithQueryClient`, so HTML and hydration share one fetch.
-- The schema migration reuses the existing objects in `src/components/StructuredData.tsx` verbatim, passed to `head().scripts` as `application/ld+json`, mirroring how `src/data/faqSchemas.ts` and `src/data/blogFaqOverrides.ts` already work.
+- Insert the post row into `blog_posts` via migration (published, dated today).
+- Add the meta title override to `src/data/blogTitleOverrides.ts` so the head title differs from the hero H1.
+- No changes to shared blog components, header, footer, or other posts.
