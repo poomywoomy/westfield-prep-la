@@ -100,40 +100,34 @@ function drawSectionHeader(doc: jsPDF, title: string, subtitle: string, y: numbe
 }
 
 function drawServiceItem(doc: jsPDF, item: { service_name: string; service_price: number; notes?: string }, y: number): number {
-  y = checkPageBreak(doc, y);
+  y = checkPageBreak(doc, y, 262);
 
+  // Service name (wraps) + right-aligned price on the first baseline
   doc.setFontSize(10);
   doc.setFont(undefined!, 'bold');
   doc.setTextColor(30, 30, 30);
-  doc.text(item.service_name, 24, y);
-  doc.text(`$${item.service_price.toFixed(2)}`, 175, y, { align: "right" });
-  y += 5;
+  const nameLines: string[] = doc.splitTextToSize(item.service_name || "", 118);
+  doc.text(nameLines, 24, y);
+  doc.text(`$${item.service_price.toFixed(2)}`, 186, y, { align: "right" });
+  y += nameLines.length * 5;
 
-  // Billing note
-  const billingNote = STORAGE_BILLING_NOTES[item.service_name];
-  if (billingNote) {
-    doc.setFontSize(7.5);
-    doc.setFont(undefined!, 'normal');
-    doc.setTextColor(MEDIUM_GRAY.r, MEDIUM_GRAY.g, MEDIUM_GRAY.b);
-    doc.text(billingNote, 28, y);
-    y += 4;
-  }
-
-  // Notes
+  // Notes (single source of truth: the line item note)
   if (item.notes) {
-    doc.setFontSize(7.5);
+    y += 1.5;
+    doc.setFontSize(8);
     doc.setFont(undefined!, 'normal');
-    doc.setTextColor(100, 100, 100);
-    const splitNotes = doc.splitTextToSize(item.notes, 145);
-    doc.text(splitNotes, 28, y);
-    y += (splitNotes.length * 3.5) + 1;
+    doc.setTextColor(115, 115, 115);
+    const splitNotes: string[] = doc.splitTextToSize(item.notes, 140);
+    doc.text(splitNotes, 28, y, { lineHeightFactor: 1.35 });
+    y += splitNotes.length * 4;
   }
 
   // Light separator line
+  y += 3;
   doc.setDrawColor(230, 230, 230);
   doc.setLineWidth(0.2);
-  doc.line(24, y + 1, 186, y + 1);
-  y += 4;
+  doc.line(24, y, 186, y);
+  y += 5;
 
   return y;
 }
