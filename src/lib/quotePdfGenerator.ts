@@ -188,11 +188,9 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
   if (data.phone) { doc.text(data.phone, rx, cy); cy += 5; }
   if (data.orderVolume) {
     doc.setFont(undefined!, 'bold');
-    const volumeLabel = "Monthly Order Volume:";
-    doc.text(volumeLabel, rx, cy);
-    const labelWidth = doc.getTextWidth(volumeLabel);
+    doc.text("Monthly Order Volume:", rx, cy);
     doc.setFont(undefined!, 'normal');
-    doc.text(data.orderVolume, rx + labelWidth + 2, cy);
+    doc.text(data.orderVolume, rx + 43, cy);
   }
 
   // Date line
