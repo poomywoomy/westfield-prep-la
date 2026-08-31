@@ -66,7 +66,8 @@ function checkPageBreak(doc: jsPDF, y: number, threshold: number = 270): number 
 }
 
 function drawSectionHeader(doc: jsPDF, title: string, subtitle: string, y: number): number {
-  y = checkPageBreak(doc, y, 260);
+  // Keep header + subtitle + at least one row together
+  y = checkPageBreak(doc, y, 235);
 
   // Navy accent bar
   doc.setFillColor(NAVY.r, NAVY.g, NAVY.b);
@@ -76,25 +77,25 @@ function drawSectionHeader(doc: jsPDF, title: string, subtitle: string, y: numbe
   doc.setFont(undefined!, 'bold');
   doc.setTextColor(NAVY.r, NAVY.g, NAVY.b);
   doc.text(title, 26, y + 5);
-  y += 10;
+  y += 11;
 
   if (subtitle) {
     doc.setFontSize(8);
     doc.setFont(undefined!, 'normal');
     doc.setTextColor(MEDIUM_GRAY.r, MEDIUM_GRAY.g, MEDIUM_GRAY.b);
     doc.text(subtitle, 26, y);
-    y += 5;
+    y += 6;
   }
 
   // Table header row
   doc.setFillColor(ACCENT_GRAY.r, ACCENT_GRAY.g, ACCENT_GRAY.b);
-  doc.rect(20, y, 170, 7, 'F');
+  doc.rect(20, y, 170, 8, 'F');
   doc.setFontSize(8);
   doc.setFont(undefined!, 'bold');
   doc.setTextColor(80, 80, 80);
-  doc.text("SERVICE", 24, y + 5);
-  doc.text("PRICE", 175, y + 5, { align: "right" });
-  y += 10;
+  doc.text("SERVICE", 24, y + 5.4);
+  doc.text("PRICE", 186, y + 5.4, { align: "right" });
+  y += 13;
 
   return y;
 }
