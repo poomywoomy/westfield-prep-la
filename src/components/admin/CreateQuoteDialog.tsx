@@ -95,6 +95,17 @@ const DEFAULT_PRICES: Record<string, number> = {
   "Carton Usage": 0,
 };
 
+const VOLUME_OPTIONS = [
+  { value: "0-1000", label: "0–1,000 orders/month" },
+  { value: "1001-2500", label: "1,001–2,500 orders/month" },
+  { value: "2501-5000", label: "2,501–5,000 orders/month" },
+  { value: "5001-10000", label: "5,001–10,000 orders/month" },
+  { value: "10000-plus", label: "10,000+ orders/month" },
+];
+
+const volumeLabel = (value: string) =>
+  VOLUME_OPTIONS.find(o => o.value === value)?.label;
+
 const MARKETPLACE_SERVICES = [
   "FNSKU Label",
   "Polybox+Label",
@@ -296,6 +307,7 @@ export function CreateQuoteDialog({
   const [manualContactName, setManualContactName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
   const [manualPhone, setManualPhone] = useState("");
+  const [orderVolume, setOrderVolume] = useState("0-1000");
   const [minimumSpendTier, setMinimumSpendTier] = useState("250_then_500");
   const [customMinimumAmount, setCustomMinimumAmount] = useState("");
   const [customIntroAmount, setCustomIntroAmount] = useState("");
@@ -442,6 +454,7 @@ export function CreateQuoteDialog({
         contactName: manualContactName || undefined,
         email: manualEmail || undefined,
         phone: manualPhone || undefined,
+        orderVolume: volumeLabel(orderVolume),
         date: new Date().toLocaleDateString(),
         standardOperations: standardItems.map(i => ({ service_name: i.service_name, service_price: i.service_price, notes: i.notes })),
         fulfillmentSections: fulfillmentSections.map(s => ({ type: s.type, items: s.items.map(i => ({ service_name: i.service_name, service_price: i.service_price, notes: i.notes })) })),
@@ -493,6 +506,7 @@ export function CreateQuoteDialog({
     setManualContactName("");
     setManualEmail("");
     setManualPhone("");
+    setOrderVolume("0-1000");
     setMinimumSpendTier("250_then_500");
     setCustomMinimumAmount("");
     setCustomIntroAmount("");
@@ -615,6 +629,21 @@ export function CreateQuoteDialog({
                     value={manualPhone}
                     onChange={(e) => setManualPhone(e.target.value)}
                   />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="order-volume" className="text-xs">Monthly order volume</Label>
+                  <Select value={orderVolume} onValueChange={setOrderVolume}>
+                    <SelectTrigger id="order-volume">
+                      <SelectValue placeholder="Select volume" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VOLUME_OPTIONS.map(opt => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </section>
@@ -954,6 +983,9 @@ export function CreateQuoteDialog({
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
                   {manualContactName.trim() || manualEmail.trim() || "No contact details"}
+                </p>
+                <p className="mt-1 truncate text-xs text-muted-foreground">
+                  {volumeLabel(orderVolume)}
                 </p>
               </div>
 
