@@ -95,6 +95,17 @@ const DEFAULT_PRICES: Record<string, number> = {
   "Carton Usage": 0,
 };
 
+const VOLUME_OPTIONS = [
+  { value: "0-1000", label: "0–1,000 orders/month" },
+  { value: "1001-2500", label: "1,001–2,500 orders/month" },
+  { value: "2501-5000", label: "2,501–5,000 orders/month" },
+  { value: "5001-10000", label: "5,001–10,000 orders/month" },
+  { value: "10000-plus", label: "10,000+ orders/month" },
+];
+
+const volumeLabel = (value: string) =>
+  VOLUME_OPTIONS.find(o => o.value === value)?.label;
+
 const MARKETPLACE_SERVICES = [
   "FNSKU Label",
   "Polybox+Label",
@@ -296,6 +307,7 @@ export function CreateQuoteDialog({
   const [manualContactName, setManualContactName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
   const [manualPhone, setManualPhone] = useState("");
+  const [orderVolume, setOrderVolume] = useState("0-1000");
   const [minimumSpendTier, setMinimumSpendTier] = useState("250_then_500");
   const [customMinimumAmount, setCustomMinimumAmount] = useState("");
   const [customIntroAmount, setCustomIntroAmount] = useState("");
