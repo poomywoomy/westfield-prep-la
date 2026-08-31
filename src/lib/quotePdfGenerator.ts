@@ -41,6 +41,7 @@ interface QuotePDFData {
   contactName?: string;
   email?: string;
   phone?: string;
+  orderVolume?: string;
   date: string;
   standardOperations?: Array<{ service_name: string; service_price: number; notes?: string }>;
   fulfillmentSections?: Array<{ type: string; items: Array<{ service_name: string; service_price: number; notes?: string }> }>;

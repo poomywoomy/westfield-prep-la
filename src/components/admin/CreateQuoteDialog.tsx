@@ -984,6 +984,9 @@ export function CreateQuoteDialog({
                 <p className="truncate text-xs text-muted-foreground">
                   {manualContactName.trim() || manualEmail.trim() || "No contact details"}
                 </p>
+                <p className="mt-1 truncate text-xs text-muted-foreground">
+                  {volumeLabel(orderVolume)}
+                </p>
               </div>
 
               <div className="h-px bg-border" />
