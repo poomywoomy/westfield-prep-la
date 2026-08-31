@@ -241,8 +241,8 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
     doc.setLineWidth(0.8);
     doc.setFillColor(250, 251, 255);
     
-    const splitSpend = doc.splitTextToSize(spendText, 155);
-    const boxHeight = 12 + (splitSpend.length * 4);
+    const splitSpend = doc.splitTextToSize(spendText, 152);
+    const boxHeight = 16 + (splitSpend.length * 4.4);
     
     doc.roundedRect(20, y, 170, boxHeight, 2, 2, 'FD');
     
@@ -256,7 +256,7 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
     doc.setFontSize(8);
     doc.setFont(undefined!, 'normal');
     doc.setTextColor(50, 50, 50);
-    doc.text(splitSpend, 28, y + 14);
+    doc.text(splitSpend, 28, y + 14, { lineHeightFactor: 1.4 });
     
     y += boxHeight + 8;
   }
@@ -276,13 +276,13 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
     doc.setFontSize(9);
     doc.setFont(undefined!, 'normal');
     doc.setTextColor(50, 50, 50);
-    const splitComments = doc.splitTextToSize(data.additionalComments, 165);
-    doc.text(splitComments, 24, y);
-    y += (splitComments.length * 4) + 8;
+    const splitComments = doc.splitTextToSize(data.additionalComments, 162);
+    doc.text(splitComments, 24, y, { lineHeightFactor: 1.4 });
+    y += (splitComments.length * 4.6) + 10;
   }
 
   // ── Disclaimers ──
-  y = checkPageBreak(doc, y, 220);
+  y = checkPageBreak(doc, y, 215);
 
   doc.setDrawColor(220, 220, 220);
   doc.setLineWidth(0.3);
@@ -295,15 +295,15 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
 
   const disclaimer1 = "All pricing provided in this quote is based on the unit volumes disclosed at the time of issuance. If the number of units received, stored, or processed fluctuates materially (up or down), Westfield Prep Center reserves the right to adjust pricing to reflect the updated volume and service requirements. Please contact us if your monthly inbound or stored unit counts change and you wish to request a re-evaluation of this quote.";
   const split1 = doc.splitTextToSize(disclaimer1, 170);
-  doc.text(split1, 20, y);
-  y += (split1.length * 3.5) + 4;
+  doc.text(split1, 20, y, { lineHeightFactor: 1.4 });
+  y += (split1.length * 4.2) + 6;
 
   y = checkPageBreak(doc, y, 250);
 
   const disclaimer2 = "If there are any materials that we are missing that will be used in your brand's shipment operations, or if we are missing anything or made any mistake, please let us know so we can adjust the quote accordingly.";
   const split2 = doc.splitTextToSize(disclaimer2, 170);
-  doc.text(split2, 20, y);
-  y += (split2.length * 3.5) + 8;
+  doc.text(split2, 20, y, { lineHeightFactor: 1.4 });
+  y += (split2.length * 4.2) + 8;
 
   // ── Footer ──
   const pageCount = doc.getNumberOfPages();
