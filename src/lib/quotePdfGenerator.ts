@@ -191,7 +191,7 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
     doc.text("Monthly Order Volume: ", rx, cy);
     const labelWidth = doc.getTextWidth("Monthly Order Volume: ");
     doc.setFont(undefined!, 'normal');
-    doc.text(data.orderVolume, rx + labelWidth, cy);
+    doc.text(data.orderVolume, rx + labelWidth + 1, cy);
   }
 
   // Date line
