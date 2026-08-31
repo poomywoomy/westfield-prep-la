@@ -4,13 +4,6 @@ const NAVY = { r: 13, g: 33, b: 66 };
 const ACCENT_GRAY = { r: 245, g: 245, b: 248 };
 const MEDIUM_GRAY = { r: 120, g: 120, b: 120 };
 
-const STORAGE_BILLING_NOTES: Record<string, string> = {
-  "Small Bin Storage": "Per small bin, per month",
-  "Medium Bin Storage": "Per medium bin, per month",
-  "Large Bin Storage": "Per large bin, per month",
-  "Pallet Storage": "Per pallet, per month",
-  "Shelf Storage": "Per shelf, per month"
-};
 
 const PALLET_PREFIX = "The minimum monthly payment is dictated by the stored pallet amount. ";
 const EXCLUSION_SUFFIX = " Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.";
@@ -66,7 +59,8 @@ function checkPageBreak(doc: jsPDF, y: number, threshold: number = 270): number 
 }
 
 function drawSectionHeader(doc: jsPDF, title: string, subtitle: string, y: number): number {
-  y = checkPageBreak(doc, y, 260);
+  // Keep header + subtitle + at least one row together
+  y = checkPageBreak(doc, y, 235);
 
   // Navy accent bar
   doc.setFillColor(NAVY.r, NAVY.g, NAVY.b);
@@ -76,64 +70,58 @@ function drawSectionHeader(doc: jsPDF, title: string, subtitle: string, y: numbe
   doc.setFont(undefined!, 'bold');
   doc.setTextColor(NAVY.r, NAVY.g, NAVY.b);
   doc.text(title, 26, y + 5);
-  y += 10;
+  y += 11;
 
   if (subtitle) {
     doc.setFontSize(8);
     doc.setFont(undefined!, 'normal');
     doc.setTextColor(MEDIUM_GRAY.r, MEDIUM_GRAY.g, MEDIUM_GRAY.b);
     doc.text(subtitle, 26, y);
-    y += 5;
+    y += 6;
   }
 
   // Table header row
   doc.setFillColor(ACCENT_GRAY.r, ACCENT_GRAY.g, ACCENT_GRAY.b);
-  doc.rect(20, y, 170, 7, 'F');
+  doc.rect(20, y, 170, 8, 'F');
   doc.setFontSize(8);
   doc.setFont(undefined!, 'bold');
   doc.setTextColor(80, 80, 80);
-  doc.text("SERVICE", 24, y + 5);
-  doc.text("PRICE", 175, y + 5, { align: "right" });
-  y += 10;
+  doc.text("SERVICE", 24, y + 5.4);
+  doc.text("PRICE", 186, y + 5.4, { align: "right" });
+  y += 13;
 
   return y;
 }
 
 function drawServiceItem(doc: jsPDF, item: { service_name: string; service_price: number; notes?: string }, y: number): number {
-  y = checkPageBreak(doc, y);
+  y = checkPageBreak(doc, y, 262);
 
+  // Service name (wraps) + right-aligned price on the first baseline
   doc.setFontSize(10);
   doc.setFont(undefined!, 'bold');
   doc.setTextColor(30, 30, 30);
-  doc.text(item.service_name, 24, y);
-  doc.text(`$${item.service_price.toFixed(2)}`, 175, y, { align: "right" });
-  y += 5;
+  const nameLines: string[] = doc.splitTextToSize(item.service_name || "", 118);
+  doc.text(nameLines, 24, y);
+  doc.text(`$${item.service_price.toFixed(2)}`, 186, y, { align: "right" });
+  y += nameLines.length * 5;
 
-  // Billing note
-  const billingNote = STORAGE_BILLING_NOTES[item.service_name];
-  if (billingNote) {
-    doc.setFontSize(7.5);
-    doc.setFont(undefined!, 'normal');
-    doc.setTextColor(MEDIUM_GRAY.r, MEDIUM_GRAY.g, MEDIUM_GRAY.b);
-    doc.text(billingNote, 28, y);
-    y += 4;
-  }
-
-  // Notes
+  // Notes (single source of truth: the line item note)
   if (item.notes) {
-    doc.setFontSize(7.5);
+    y += 1.5;
+    doc.setFontSize(8);
     doc.setFont(undefined!, 'normal');
-    doc.setTextColor(100, 100, 100);
-    const splitNotes = doc.splitTextToSize(item.notes, 145);
-    doc.text(splitNotes, 28, y);
-    y += (splitNotes.length * 3.5) + 1;
+    doc.setTextColor(115, 115, 115);
+    const splitNotes: string[] = doc.splitTextToSize(item.notes, 140);
+    doc.text(splitNotes, 28, y, { lineHeightFactor: 1.35 });
+    y += splitNotes.length * 4;
   }
 
   // Light separator line
+  y += 3;
   doc.setDrawColor(230, 230, 230);
   doc.setLineWidth(0.2);
-  doc.line(24, y + 1, 186, y + 1);
-  y += 4;
+  doc.line(24, y, 186, y);
+  y += 5;
 
   return y;
 }
@@ -253,8 +241,8 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
     doc.setLineWidth(0.8);
     doc.setFillColor(250, 251, 255);
     
-    const splitSpend = doc.splitTextToSize(spendText, 155);
-    const boxHeight = 12 + (splitSpend.length * 4);
+    const splitSpend = doc.splitTextToSize(spendText, 152);
+    const boxHeight = 16 + (splitSpend.length * 4.4);
     
     doc.roundedRect(20, y, 170, boxHeight, 2, 2, 'FD');
     
@@ -268,7 +256,7 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
     doc.setFontSize(8);
     doc.setFont(undefined!, 'normal');
     doc.setTextColor(50, 50, 50);
-    doc.text(splitSpend, 28, y + 14);
+    doc.text(splitSpend, 28, y + 14, { lineHeightFactor: 1.4 });
     
     y += boxHeight + 8;
   }
@@ -288,13 +276,13 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
     doc.setFontSize(9);
     doc.setFont(undefined!, 'normal');
     doc.setTextColor(50, 50, 50);
-    const splitComments = doc.splitTextToSize(data.additionalComments, 165);
-    doc.text(splitComments, 24, y);
-    y += (splitComments.length * 4) + 8;
+    const splitComments = doc.splitTextToSize(data.additionalComments, 162);
+    doc.text(splitComments, 24, y, { lineHeightFactor: 1.4 });
+    y += (splitComments.length * 4.6) + 10;
   }
 
   // ── Disclaimers ──
-  y = checkPageBreak(doc, y, 220);
+  y = checkPageBreak(doc, y, 215);
 
   doc.setDrawColor(220, 220, 220);
   doc.setLineWidth(0.3);
@@ -307,15 +295,15 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
 
   const disclaimer1 = "All pricing provided in this quote is based on the unit volumes disclosed at the time of issuance. If the number of units received, stored, or processed fluctuates materially (up or down), Westfield Prep Center reserves the right to adjust pricing to reflect the updated volume and service requirements. Please contact us if your monthly inbound or stored unit counts change and you wish to request a re-evaluation of this quote.";
   const split1 = doc.splitTextToSize(disclaimer1, 170);
-  doc.text(split1, 20, y);
-  y += (split1.length * 3.5) + 4;
+  doc.text(split1, 20, y, { lineHeightFactor: 1.4 });
+  y += (split1.length * 4.2) + 6;
 
   y = checkPageBreak(doc, y, 250);
 
   const disclaimer2 = "If there are any materials that we are missing that will be used in your brand's shipment operations, or if we are missing anything or made any mistake, please let us know so we can adjust the quote accordingly.";
   const split2 = doc.splitTextToSize(disclaimer2, 170);
-  doc.text(split2, 20, y);
-  y += (split2.length * 3.5) + 8;
+  doc.text(split2, 20, y, { lineHeightFactor: 1.4 });
+  y += (split2.length * 4.2) + 8;
 
   // ── Footer ──
   const pageCount = doc.getNumberOfPages();
