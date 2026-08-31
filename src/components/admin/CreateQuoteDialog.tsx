@@ -59,7 +59,7 @@ const AUTO_NOTES: Record<string, string> = {
   "Polybag Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Carton Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Single Product": "Per order, pick and pack for single-item orders",
-  "Kitting": "Per kit assembled, combining components into a single unit",
+  "Kitting": "Per kit assembled, bundling all units including promotional inserts into a single sellable unit",
   "Bubble Wrapping": "Per unit, bubble wrapped for shipping protection. Charge is only applied if applicable to the product",
   "Palletizing": "Per pallet, building and wrapping pallets for shipment",
   "Pick & Pack": "Per order, picking items and packing for shipment",
@@ -89,6 +89,8 @@ const DEFAULT_PRICES: Record<string, number> = {
   "Bubble Wrap": 0.50,
   "Bubble Wrapping": 0.50,
   "Bundling": 0.50,
+  "Single Product": 2.50,
+  "Kitting": 3.00,
   "Additional Label": 0.20,
   "Carton Usage": 0,
 };
