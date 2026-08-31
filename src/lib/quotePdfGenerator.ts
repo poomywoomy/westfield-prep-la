@@ -157,8 +157,9 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
 
   // ── Info section with gray background ──
   const infoY = 48;
+  const infoHeight = data.orderVolume ? 38 : 32;
   doc.setFillColor(ACCENT_GRAY.r, ACCENT_GRAY.g, ACCENT_GRAY.b);
-  doc.roundedRect(15, infoY, 180, 32, 2, 2, 'F');
+  doc.roundedRect(15, infoY, 180, infoHeight, 2, 2, 'F');
 
   // Left - Business info
   doc.setFontSize(9);
@@ -184,19 +185,27 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
   let cy = infoY + 18;
   if (data.contactName) { doc.text(data.contactName, rx, cy); cy += 5; }
   if (data.email) { doc.text(data.email, rx, cy); cy += 5; }
-  if (data.phone) { doc.text(data.phone, rx, cy); }
+  if (data.phone) { doc.text(data.phone, rx, cy); cy += 5; }
+  if (data.orderVolume) {
+    doc.setFont(undefined!, 'bold');
+    doc.text("Monthly Order Volume: ", rx, cy);
+    const labelWidth = doc.getTextWidth("Monthly Order Volume: ");
+    doc.setFont(undefined!, 'normal');
+    doc.text(data.orderVolume, rx + labelWidth, cy);
+  }
 
   // Date line
+  const footerBase = infoY + infoHeight;
   doc.setFontSize(8);
   doc.setTextColor(MEDIUM_GRAY.r, MEDIUM_GRAY.g, MEDIUM_GRAY.b);
-  doc.text(`Date: ${data.date}`, 22, infoY + 38);
+  doc.text(`Date: ${data.date}`, 22, footerBase + 6);
 
   // Accent line
   doc.setDrawColor(NAVY.r, NAVY.g, NAVY.b);
   doc.setLineWidth(0.5);
-  doc.line(15, infoY + 42, 195, infoY + 42);
+  doc.line(15, footerBase + 10, 195, footerBase + 10);
 
-  let y = infoY + 50;
+  let y = footerBase + 18;
 
   // ── Content sections ──
   if (data.isTeamQuote && data.teamQuoteItems?.length) {
