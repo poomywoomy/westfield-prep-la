@@ -157,7 +157,7 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
 
   // ── Info section with gray background ──
   const infoY = 48;
-  const infoHeight = data.orderVolume ? 38 : 32;
+  const infoHeight = data.orderVolume ? 42 : 32;
   doc.setFillColor(ACCENT_GRAY.r, ACCENT_GRAY.g, ACCENT_GRAY.b);
   doc.roundedRect(15, infoY, 180, infoHeight, 2, 2, 'F');
 
@@ -189,8 +189,9 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
   if (data.orderVolume) {
     doc.setFont(undefined!, 'bold');
     doc.text("Monthly Order Volume:", rx, cy);
+    cy += 5;
     doc.setFont(undefined!, 'normal');
-    doc.text(data.orderVolume, rx + 43, cy);
+    doc.text(data.orderVolume, rx, cy);
   }
 
   // Date line
