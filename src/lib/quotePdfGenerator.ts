@@ -4,13 +4,6 @@ const NAVY = { r: 13, g: 33, b: 66 };
 const ACCENT_GRAY = { r: 245, g: 245, b: 248 };
 const MEDIUM_GRAY = { r: 120, g: 120, b: 120 };
 
-const STORAGE_BILLING_NOTES: Record<string, string> = {
-  "Small Bin Storage": "Per small bin, per month",
-  "Medium Bin Storage": "Per medium bin, per month",
-  "Large Bin Storage": "Per large bin, per month",
-  "Pallet Storage": "Per pallet, per month",
-  "Shelf Storage": "Per shelf, per month"
-};
 
 const PALLET_PREFIX = "The minimum monthly payment is dictated by the stored pallet amount. ";
 const EXCLUSION_SUFFIX = " Shipping costs, carton usage fees, and polybag usage fees are excluded from this calculation.";
