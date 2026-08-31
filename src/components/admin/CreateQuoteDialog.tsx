@@ -35,7 +35,7 @@ const STANDARD_SERVICES = [
   "Medium Bin Storage",
   "Large Bin Storage",
   "Shelf Storage",
-  "Returns Handling",
+  "Returns and Removal Order Handling",
   "Custom Entry"
 ];
 
@@ -51,18 +51,18 @@ const AUTO_NOTES: Record<string, string> = {
   "Account Startup Fee": "One-time charge for WMS training, WMS usage, and account support",
   "Pallet Receiving": "Per pallet received and checked into warehouse",
   "Carton Receiving": "Per carton received and checked into warehouse",
-  "Returns Handling": "Covers receiving, inspection, client consultation on disposition, and processing of return actions",
+  "Returns and Removal Order Handling": "Covers receiving, inspection, client consultation on disposition, and processing of return actions",
   "FNSKU Label": "Per unit, applied to each product for Amazon FBA compliance",
   "Polybox+Label": "Per unit, polybagged and labeled for marketplace compliance",
-  "Bubble Wrap": "Per unit, bubble wrapped for protection during transit",
-  "Bundling": "Per bundle, combining multiple items into a single sellable unit",
+  "Bubble Wrap": "Per unit, bubble wrapped for protection during transit. Charge is only applied if applicable to the product",
+  "Bundling": "Per bundle, combining multiple items into a single sellable unit. Charge is only applied if applicable to the product",
   "Additional Label": "Per label, any extra labeling beyond standard requirements",
   "Shipment Box": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Polybag Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Carton Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Single Product": "Per order, pick and pack for single-item orders",
   "Kitting": "Per kit assembled, combining components into a single unit",
-  "Bubble Wrapping": "Per unit, bubble wrapped for shipping protection",
+  "Bubble Wrapping": "Per unit, bubble wrapped for shipping protection. Charge is only applied if applicable to the product",
   "Palletizing": "Per pallet, building and wrapping pallets for B2B or wholesale shipments",
   "Pick & Pack": "Per order, picking items and packing for shipment",
   "Base Order Fee": "Covers dropping the order, printing the packing slip, and staging the box",
@@ -79,7 +79,7 @@ const DEFAULT_PRICES: Record<string, number> = {
   "Large Bin Storage": 6,
   "Pallet Storage": 25,
   "Shelf Storage": 20,
-  "Returns Handling": 1,
+  "Returns and Removal Order Handling": 1,
   "Carton Receiving": 3,
   "Pallet Receiving": 50,
   "Base Order Fee": 10,
@@ -127,6 +127,12 @@ const MINIMUM_SPEND_TIERS: Record<string, string> = {
   "500": "$500/mo flat",
   "1000": "$1,000/mo flat",
   "custom": "Custom Tier (intro + ongoing)"
+};
+
+const CHANNEL_DEFAULT_SERVICES: Partial<Record<FulfillmentSection["type"], string[]>> = {
+  "Amazon FBA": MARKETPLACE_SERVICES.filter((s) => s !== "Custom Entry"),
+  "Walmart WFS": MARKETPLACE_SERVICES.filter((s) => s !== "Custom Entry"),
+  "TikTok Shop": SELF_FULFILLMENT_SERVICES.filter((s) => s !== "Custom Entry"),
 };
 
 const CHANNEL_TYPES: FulfillmentSection["type"][] = [
@@ -325,10 +331,17 @@ export function CreateQuoteDialog({
   };
 
   const addFulfillmentSection = (type: FulfillmentSection["type"]) => {
+    const defaults = CHANNEL_DEFAULT_SERVICES[type] ?? [];
     setFulfillmentSections([...fulfillmentSections, {
       id: crypto.randomUUID(),
       type,
-      items: []
+      items: defaults.map((service) => ({
+        id: crypto.randomUUID(),
+        service_name: service,
+        service_price: DEFAULT_PRICES[service] || 0,
+        notes: AUTO_NOTES[service] || "",
+        isEditing: false,
+      }))
     }]);
   };
 
@@ -513,7 +526,7 @@ export function CreateQuoteDialog({
       }
       onOpenChange(isOpen);
     }}>
-      <DialogContent className="flex max-h-[92vh] w-[calc(100vw-2rem)] max-w-6xl flex-col gap-0 overflow-hidden p-0">
+      <DialogContent className="flex h-[94vh] max-h-[94vh] w-[calc(100vw-1.5rem)] max-w-[1500px] flex-col gap-0 overflow-hidden p-0 sm:max-w-[1500px]">
         <DialogHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border px-6 py-4">
           <div className="min-w-0">
             <DialogTitle className="truncate text-lg">Create Quote</DialogTitle>
@@ -559,21 +572,21 @@ export function CreateQuoteDialog({
               <StepHeader step={1} title="Client" hint="All fields optional" />
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <Label htmlFor="company-name" className="text-xs">Company name</Label>
-                  <Input
-                    id="company-name"
-                    placeholder="Acme Brands LLC"
-                    value={manualClientName}
-                    onChange={(e) => setManualClientName(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
                   <Label htmlFor="contact-name" className="text-xs">Contact name</Label>
                   <Input
                     id="contact-name"
                     placeholder="Jane Doe"
                     value={manualContactName}
                     onChange={(e) => setManualContactName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="company-name" className="text-xs">Company name</Label>
+                  <Input
+                    id="company-name"
+                    placeholder="Acme Brands LLC"
+                    value={manualClientName}
+                    onChange={(e) => setManualClientName(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1.5">
