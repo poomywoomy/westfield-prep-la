@@ -22,7 +22,7 @@ interface LineItem {
 
 interface FulfillmentSection {
   id: string;
-  type: "Amazon FBA" | "Walmart WFS" | "TikTok Shop" | "Self Fulfillment" | "B2B";
+  type: "Marketplace Fulfillment" | "Direct to Consumer" | "B2B";
   items: LineItem[];
 }
 
@@ -34,7 +34,7 @@ const STANDARD_SERVICES = [
   "Small Bin Storage",
   "Medium Bin Storage",
   "Large Bin Storage",
-  "Shelf Storage",
+  "Palletizing",
   "Returns and Removal Order Handling",
   "Custom Entry"
 ];
@@ -43,8 +43,7 @@ const STORAGE_BILLING_NOTES: Record<string, string> = {
   "Small Bin Storage": "Per small bin, per month",
   "Medium Bin Storage": "Per medium bin, per month",
   "Large Bin Storage": "Per large bin, per month",
-  "Pallet Storage": "Per pallet, per month",
-  "Shelf Storage": "Per shelf, per month"
+  "Pallet Storage": "Per pallet, per month"
 };
 
 const AUTO_NOTES: Record<string, string> = {
@@ -57,13 +56,12 @@ const AUTO_NOTES: Record<string, string> = {
   "Bubble Wrap": "Per unit, bubble wrapped for protection during transit. Charge is only applied if applicable to the product",
   "Bundling": "Per bundle, combining multiple items into a single sellable unit. Charge is only applied if applicable to the product",
   "Additional Label": "Per label, any extra labeling beyond standard requirements",
-  "Shipment Box": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Polybag Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Carton Usage": "Client will be charged for materials used at Westfield pricing, depends on size utilized",
   "Single Product": "Per order, pick and pack for single-item orders",
   "Kitting": "Per kit assembled, combining components into a single unit",
   "Bubble Wrapping": "Per unit, bubble wrapped for shipping protection. Charge is only applied if applicable to the product",
-  "Palletizing": "Per pallet, building and wrapping pallets for B2B or wholesale shipments",
+  "Palletizing": "Per pallet, building and wrapping pallets for shipment",
   "Pick & Pack": "Per order, picking items and packing for shipment",
   "Base Order Fee": "Covers dropping the order, printing the packing slip, and staging the box",
   "Per-Unit Pick Fee": "Per unit picked from inventory for B2B orders",
@@ -78,7 +76,7 @@ const DEFAULT_PRICES: Record<string, number> = {
   "Medium Bin Storage": 5,
   "Large Bin Storage": 6,
   "Pallet Storage": 25,
-  "Shelf Storage": 20,
+  "Palletizing": 25,
   "Returns and Removal Order Handling": 1,
   "Carton Receiving": 3,
   "Pallet Receiving": 50,
@@ -86,6 +84,13 @@ const DEFAULT_PRICES: Record<string, number> = {
   "Per-Unit Pick Fee": 0.15,
   "Case/Carton Picking": 3,
   "Hourly Rate (VAS/B2B Prep)": 45,
+  "FNSKU Label": 0.70,
+  "Polybox+Label": 1.30,
+  "Bubble Wrap": 0.50,
+  "Bubble Wrapping": 0.50,
+  "Bundling": 0.50,
+  "Additional Label": 0.20,
+  "Carton Usage": 0,
 };
 
 const MARKETPLACE_SERVICES = [
@@ -94,12 +99,11 @@ const MARKETPLACE_SERVICES = [
   "Bubble Wrap",
   "Bundling",
   "Additional Label",
-  "Shipment Box",
   "Carton Usage",
   "Custom Entry"
 ];
 
-const SELF_FULFILLMENT_SERVICES = [
+const DTC_SERVICES = [
   "Single Product",
   "Bundling",
   "Kitting",
@@ -117,7 +121,6 @@ const B2B_SERVICES = [
   "Pick & Pack",
   "Palletizing",
   "Bubble Wrapping",
-  "Shipment Box",
   "Carton Usage",
   "Custom Entry"
 ];
@@ -129,17 +132,20 @@ const MINIMUM_SPEND_TIERS: Record<string, string> = {
   "custom": "Custom Tier (intro + ongoing)"
 };
 
+// Services that must always be added manually, never auto-populated
+const MANUAL_ONLY_SERVICES = ["Additional Label", "Bubble Wrap", "Bubble Wrapping"];
+
+const autoDefaults = (services: string[]) =>
+  services.filter((s) => s !== "Custom Entry" && !MANUAL_ONLY_SERVICES.includes(s));
+
 const CHANNEL_DEFAULT_SERVICES: Partial<Record<FulfillmentSection["type"], string[]>> = {
-  "Amazon FBA": MARKETPLACE_SERVICES.filter((s) => s !== "Custom Entry"),
-  "Walmart WFS": MARKETPLACE_SERVICES.filter((s) => s !== "Custom Entry"),
-  "TikTok Shop": SELF_FULFILLMENT_SERVICES.filter((s) => s !== "Custom Entry"),
+  "Marketplace Fulfillment": autoDefaults(MARKETPLACE_SERVICES),
+  "Direct to Consumer": autoDefaults(DTC_SERVICES),
 };
 
 const CHANNEL_TYPES: FulfillmentSection["type"][] = [
-  "Amazon FBA",
-  "Walmart WFS",
-  "TikTok Shop",
-  "Self Fulfillment",
+  "Marketplace Fulfillment",
+  "Direct to Consumer",
   "B2B",
 ];
 
@@ -497,7 +503,7 @@ export function CreateQuoteDialog({
 
   const getServiceOptions = (sectionType?: FulfillmentSection["type"]) => {
     if (!sectionType) return STANDARD_SERVICES;
-    if (sectionType === "Self Fulfillment" || sectionType === "TikTok Shop") return SELF_FULFILLMENT_SERVICES;
+    if (sectionType === "Direct to Consumer") return DTC_SERVICES;
     if (sectionType === "B2B") return B2B_SERVICES;
     return MARKETPLACE_SERVICES;
   };

@@ -216,10 +216,10 @@ export async function generateQuotePDF(data: QuotePDFData, logoSrc: string): Pro
     if (data.fulfillmentSections?.length) {
       for (const section of data.fulfillmentSections) {
         if (section.items.length > 0) {
-          const subtitle = section.type === "Amazon FBA"
-            ? "Standard prep services for FBA shipments."
-            : section.type === "Self Fulfillment"
-            ? "Prep, pack, and ship for non-FBA or DTC orders."
+          const subtitle = section.type === "Marketplace Fulfillment"
+            ? "Standard prep services for marketplace shipments."
+            : section.type === "Direct to Consumer"
+            ? "Prep, pack, and ship for direct to consumer orders."
             : `${section.type} fulfillment services.`;
           y = drawSectionHeader(doc, section.type, subtitle, y);
           for (const item of section.items) {
