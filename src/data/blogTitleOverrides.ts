@@ -25,6 +25,7 @@ export const BLOG_TITLE_OVERRIDES: Record<string, string> = {
   'how-los-angeles-fulfillment-center-helps-ecommerce-brands-ship-fast': 'LA Fulfillment Center for Ecommerce Brands | Westfield Prep',
   '10-reasons-choose-ecommerce-fulfillment-services-usa-startup-operations': '10 Ways Ecommerce Fulfillment Services Help LA Startups',
   'from-storage-to-delivery-smarter-fulfillment-ecommerce-growth': 'Storage and Fulfillment Services for Faster Ecommerce Growth',
+  'how-los-angeles-fulfillment-services-improve-shopify-orders': 'How Los Angeles Fulfillment Services Improve Shopify Orders',
 };
 
 export function getBlogSeoTitle(slug: string, title: string): string {
