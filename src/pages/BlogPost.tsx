@@ -145,6 +145,10 @@ const BlogPost = () => {
                           'how-fulfillment-center-los-angeles-california-supports-business-growth': {
                             dateTime: '2026-08-12',
                             display: 'August 12, 2026'
+                          },
+                          'how-los-angeles-fulfillment-services-improve-shopify-orders': {
+                            dateTime: '2026-09-03',
+                            display: 'September 03, 2026'
                           }
                         };
                         const override = slugDates[post.slug];
@@ -184,6 +188,10 @@ const BlogPost = () => {
                         'how-fulfillment-center-los-angeles-california-supports-business-growth': {
                           dateTime: '2026-08-12',
                           display: 'August 12, 2026'
+                        },
+                        'how-los-angeles-fulfillment-services-improve-shopify-orders': {
+                          dateTime: '2026-09-03',
+                          display: 'September 03, 2026'
                         }
                       };
                       const override = slugDates[post.slug];
