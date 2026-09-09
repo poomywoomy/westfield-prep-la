@@ -221,5 +221,32 @@ export const BLOG_FAQ_OVERRIDES: Record<string, BlogFaqItem[]> = {
         "Yes, we offer short and long-term storage for overflow inventory, seasonal stock, or products waiting on removal orders, so you're not scrambling for space during your busiest months.",
     },
   ],
+  "why-growing-shopify-amazon-sellers-need-3pl-fulfillment-partner": [
+    {
+      question: "What is 3PL fulfillment and how does it work?",
+      answer:
+        "3PL, or third-party logistics, means outsourcing your storage, packing, and shipping to a specialized fulfillment center. Your inventory is stored at their facility, and they handle receiving, order fulfillment, and shipping on your behalf.",
+    },
+    {
+      question: "How does Shopify order tracking work with a 3PL?",
+      answer:
+        "Once your 3PL ships an order, tracking information is automatically synced back to your Shopify store, so customers receive real-time updates without any manual work on your end.",
+    },
+    {
+      question: "Can a 3PL handle both Shopify and Amazon orders together?",
+      answer:
+        "Yes. Most modern 3PLs, including Westfield Prep Center, integrate with multiple sales channels so inventory and orders stay synced across Shopify, Amazon, and other platforms from one system.",
+    },
+    {
+      question: "Is a 3PL a good fit for small businesses just starting out?",
+      answer:
+        "Absolutely. Small business fulfillment services are designed to scale with you, so you only pay for the storage and services you actually need as your order volume grows.",
+    },
+    {
+      question: "Why choose a fulfillment center in Los Angeles specifically?",
+      answer:
+        "A West Coast location near major ports means faster inbound shipping, quicker order processing, and reduced transit times to a large portion of U.S. customers — which can lower overall shipping costs.",
+    },
+  ],
 };
 

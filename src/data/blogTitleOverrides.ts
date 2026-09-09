@@ -27,6 +27,7 @@ export const BLOG_TITLE_OVERRIDES: Record<string, string> = {
   'from-storage-to-delivery-smarter-fulfillment-ecommerce-growth': 'Storage and Fulfillment Services for Faster Ecommerce Growth',
   'how-los-angeles-fulfillment-services-improve-shopify-orders': 'How Los Angeles Fulfillment Services Improve Shopify Orders',
   '7-reasons-westfield-prep-center-best-prep-center-amazon-fba-los-angeles': 'Amazon FBA Prep Center Los Angeles | Fast & Compliant',
+  'why-growing-shopify-amazon-sellers-need-3pl-fulfillment-partner': 'Why Growing Shopify & Amazon Sellers Need a 3PL Partner',
 };
 
 
