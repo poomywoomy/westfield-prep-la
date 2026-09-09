@@ -26,7 +26,9 @@ export const BLOG_TITLE_OVERRIDES: Record<string, string> = {
   '10-reasons-choose-ecommerce-fulfillment-services-usa-startup-operations': '10 Ways Ecommerce Fulfillment Services Help LA Startups',
   'from-storage-to-delivery-smarter-fulfillment-ecommerce-growth': 'Storage and Fulfillment Services for Faster Ecommerce Growth',
   'how-los-angeles-fulfillment-services-improve-shopify-orders': 'How Los Angeles Fulfillment Services Improve Shopify Orders',
+  '7-reasons-westfield-prep-center-best-prep-center-amazon-fba-los-angeles': 'Amazon FBA Prep Center Los Angeles | Fast & Compliant',
 };
+
 
 export function getBlogSeoTitle(slug: string, title: string): string {
   return BLOG_TITLE_OVERRIDES[slug] ?? title.replace(/\s*\|.*$/, "");
