@@ -194,4 +194,32 @@ export const BLOG_FAQ_OVERRIDES: Record<string, BlogFaqItem[]> = {
         "Yes, a full-service provider like Westfield Prep Center manages standard Shopify orders and custom kitting projects together seamlessly.",
     },
   ],
+  "7-reasons-westfield-prep-center-best-prep-center-amazon-fba-los-angeles": [
+    {
+      question: "What does a prep center for Amazon FBA actually do?",
+      answer:
+        "A prep center receives your inventory, inspects it, applies FNSKU labels, adds required poly bags, handles bundling if needed, and ships everything directly to Amazon's fulfillment centers in a compliant, ready-to-sell condition.",
+    },
+    {
+      question: "Why does a fulfillment center in Los Angeles matter for FBA sellers?",
+      answer:
+        "Los Angeles is minutes from the Port of LA and Long Beach and close to several major Amazon fulfillment centers. That proximity means faster receiving, lower shipping costs, and quicker restocks compared to prep centers located further inland.",
+    },
+    {
+      question: "Is Westfield Prep Center a good fit for small or new sellers?",
+      answer:
+        "Yes. We work with sellers of all sizes, from small businesses shipping a handful of boxes to larger brands moving full containers. Our flexible workflows make us a practical fulfillment center for small businesses just getting started.",
+    },
+    {
+      question: "What happens if my inventory doesn't meet Amazon's prep requirements?",
+      answer:
+        "Amazon can charge inbound defect fees, delay your shipment, or even suppress your listing until the issue is fixed. That's why working with an experienced prep center matters - it helps you avoid these costly setbacks altogether.",
+    },
+    {
+      question: "Do you offer storage in addition to prep services?",
+      answer:
+        "Yes, we offer short and long-term storage for overflow inventory, seasonal stock, or products waiting on removal orders, so you're not scrambling for space during your busiest months.",
+    },
+  ],
 };
+
