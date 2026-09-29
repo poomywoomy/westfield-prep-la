@@ -122,13 +122,12 @@ export async function generateMaterialsPricingPDF(data: MaterialsPricingPDFData,
     y = ensureSpace(doc, y, 14);
     y = drawSectionTitle(doc, y, "Additional Comments");
     y = drawParagraph(doc, y, data.comments);
-    y += 3;
   }
 
-  y = ensureSpace(doc, y, 14);
+  y = ensureSpace(doc, y, 11);
   doc.setDrawColor(225, 227, 233);
   doc.line(MARGIN, y, PAGE_W - MARGIN, y);
-  y += 6;
+  y += 5;
   drawParagraph(
     doc,
     y,
