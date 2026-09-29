@@ -13,6 +13,8 @@ import { AppSidebarAdmin } from "@/components/app-sidebar-admin";
 
 const ClientsTab = lazy(() => import("@/components/admin/ClientsTab"));
 const OneTimeQuotesTab = lazy(() => import("@/components/admin/OneTimeQuotesTab"));
+const ShippingZoneMapsTab = lazy(() => import("@/components/admin/ShippingZoneMapsTab"));
+const MaterialsPricingTab = lazy(() => import("@/components/admin/MaterialsPricingTab"));
 const DocumentGeneratorTab = lazy(() => import("@/components/admin/DocumentGeneratorTab"));
 const BlogTab = lazy(() => import("@/components/admin/BlogTab").then(m => ({ default: m.BlogTab })));
 const BlogResearchTab = lazy(() => import("@/components/admin/BlogResearchTab"));
@@ -139,6 +141,12 @@ const AdminDashboard = () => {
               </TabsContent>
               <TabsContent value="one-time-quotes">
                 <Suspense fallback={tabSpinner}><OneTimeQuotesTab /></Suspense>
+              </TabsContent>
+              <TabsContent value="shipping-zones">
+                <Suspense fallback={tabSpinner}><ShippingZoneMapsTab /></Suspense>
+              </TabsContent>
+              <TabsContent value="materials-pricing">
+                <Suspense fallback={tabSpinner}><MaterialsPricingTab /></Suspense>
               </TabsContent>
               <TabsContent value="blog">
                 <Suspense fallback={tabSpinner}><BlogTab /></Suspense>

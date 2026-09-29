@@ -1,4 +1,4 @@
-import { Users, PenSquare, FileSignature, Search, Globe, Newspaper, Languages, UserPlus, Receipt, Mail, Calendar, Presentation } from "lucide-react";
+import { Users, PenSquare, FileSignature, Search, Globe, Newspaper, Languages, UserPlus, Receipt, Mail, Calendar, Presentation, Map, Package } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +29,8 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
   const menuItems = [
     { id: "clients", label: "Clients", icon: Users },
     { id: "one-time-quotes", label: "One-Time Quotes", icon: Receipt },
+    { id: "shipping-zones", label: "Shipping Zone Maps", icon: Map },
+    { id: "materials-pricing", label: "Materials Pricing", icon: Package },
     { id: "blog", label: "Blog", icon: PenSquare },
     { id: "blog-research", label: "Blog Research", icon: Search },
     { id: "seo-audit", label: "SEO Audit", icon: Globe },
@@ -38,7 +40,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
     { id: "documents", label: "Documents", icon: FileSignature },
     { id: "gmail", label: "Gmail", icon: Mail },
     { id: "calendar", label: "Calendar", icon: Calendar },
-    { id: "slides", label: "Slides", icon: Presentation },
+    { id: "slides", label: "Slides", icon: Presentation, Map, Package },
   ];
 
   return (
