@@ -82,8 +82,8 @@ export function CreateMaterialsPricingDialog({ open, onOpenChange, existing, onS
       <DialogContent className="max-w-6xl max-h-[92vh] overflow-y-auto">
         <DialogHeader><DialogTitle>{existing ? "Edit" : "Create"} Materials Pricing</DialogTitle></DialogHeader>
 
-        <div className="grid lg:grid-cols-[minmax(0,1fr),260px] gap-5 py-2">
-          <div className="space-y-6">
+        <div className="grid gap-5 py-2 xl:grid-cols-4">
+          <div className="space-y-6 xl:col-span-3">
             <section className="space-y-3">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">01 · Client</h3>
               <DocClientSection value={client} onChange={setClient} open={open} />
@@ -95,40 +95,40 @@ export function CreateMaterialsPricingDialog({ open, onOpenChange, existing, onS
                 <Button size="sm" variant="secondary" className="h-8" onClick={() => setLines((l) => [...l, newLine()])}><Plus className="h-4 w-4 mr-1" />Add material</Button>
               </div>
               <div className="overflow-hidden rounded-md border">
-                <div className="hidden lg:grid grid-cols-[1.35fr,1.1fr,0.8fr,0.7fr,0.65fr,72px] gap-2 border-b bg-muted/50 px-3 py-2 text-[11px] font-semibold uppercase text-muted-foreground">
-                  <span>Material</span><span>Size</span><span>Unit</span><span>Price</span><span>Qty</span><span className="text-center">Actions</span>
+                <div className="hidden md:grid grid-cols-12 gap-2 border-b bg-muted/50 px-3 py-2 text-[11px] font-semibold uppercase text-muted-foreground">
+                  <span className="col-span-3">Material</span><span className="col-span-3">Size</span><span className="col-span-2">Unit</span><span className="col-span-2">Price</span><span>Qty</span><span className="text-center">Actions</span>
                 </div>
                 {lines.map((l, index) => (
                   <div key={l.id} className={index ? "border-t" : ""}>
-                    <div className="grid grid-cols-2 gap-2 p-3 lg:grid-cols-[1.35fr,1.1fr,0.8fr,0.7fr,0.65fr,72px] lg:items-start lg:px-3 lg:py-2">
-                      <div className="col-span-2 space-y-1 lg:col-span-1">
-                        <Label className="text-[11px] text-muted-foreground lg:sr-only">Material</Label>
+                    <div className="grid grid-cols-2 gap-2 p-3 md:grid-cols-12 md:items-start md:px-3 md:py-2">
+                      <div className="col-span-2 space-y-1 md:col-span-3">
+                        <Label className="text-[11px] text-muted-foreground md:sr-only">Material</Label>
                         <Select value={l.type} onValueChange={(v) => pickType(l.id, v)}>
                           <SelectTrigger className="h-9"><SelectValue placeholder="Select material" /></SelectTrigger>
                           <SelectContent>{MATERIALS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
                         </Select>
                         {l.type === "Custom" && <Input className="h-9" placeholder="Custom material name" value={l.material} onChange={(e) => upd(l.id, { material: e.target.value })} />}
                       </div>
-                      <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground lg:sr-only">Size (optional)</Label>
+                      <div className="space-y-1 md:col-span-3">
+                        <Label className="text-[11px] text-muted-foreground md:sr-only">Size (optional)</Label>
                         <Input className="h-9" value={l.size || ""} disabled={!WITH_SIZE.has(l.type)} placeholder={WITH_SIZE.has(l.type) ? '12x10x8"' : "Not used"} onChange={(e) => upd(l.id, { size: e.target.value })} />
                       </div>
-                      <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground lg:sr-only">Unit</Label>
+                      <div className="space-y-1 md:col-span-2">
+                        <Label className="text-[11px] text-muted-foreground md:sr-only">Unit</Label>
                         <Select value={l.unit} onValueChange={(v) => upd(l.id, { unit: v })}>
                           <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                           <SelectContent>{UNITS.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground lg:sr-only">Price ($)</Label>
+                      <div className="space-y-1 md:col-span-2">
+                        <Label className="text-[11px] text-muted-foreground md:sr-only">Price ($)</Label>
                         <Input className="h-9" aria-label="Price" type="number" min="0" step="0.01" placeholder="$0.00" value={l.unit_price || ""} onChange={(e) => upd(l.id, { unit_price: parseFloat(e.target.value) || 0 })} />
                       </div>
-                      <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground lg:sr-only">Quantity (optional)</Label>
+                      <div className="space-y-1 md:col-span-1">
+                        <Label className="text-[11px] text-muted-foreground md:sr-only">Quantity (optional)</Label>
                         <Input className="h-9" aria-label="Quantity" type="number" min="0" placeholder="Optional" value={l.quantity ?? ""} onChange={(e) => upd(l.id, { quantity: e.target.value === "" ? null : parseFloat(e.target.value) })} />
                       </div>
-                      <div className="col-span-2 flex h-9 items-center justify-end gap-1 lg:col-span-1 lg:justify-center">
+                      <div className="col-span-2 flex h-9 items-center justify-end gap-1 md:col-span-1 md:justify-center">
                         <Button variant={l.notes ? "secondary" : "ghost"} size="icon" className="h-8 w-8" title={openNotes.has(l.id) ? "Hide note" : "Add note"} aria-label={openNotes.has(l.id) ? "Hide note" : "Add note"} onClick={() => toggleNotes(l.id)}><StickyNote className="h-4 w-4" /></Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" title="Remove material" aria-label="Remove material" onClick={() => setLines((ls) => ls.filter((x) => x.id !== l.id))}><Trash2 className="h-4 w-4" /></Button>
                       </div>
@@ -149,7 +149,7 @@ export function CreateMaterialsPricingDialog({ open, onOpenChange, existing, onS
             </section>
           </div>
 
-          <aside className="rounded-md border bg-muted/40 p-3 space-y-2 lg:sticky lg:top-0 self-start text-sm">
+          <aside className="rounded-md border bg-muted/40 p-3 space-y-2 self-start text-sm xl:sticky xl:top-0">
             <div className="font-semibold">Summary</div>
             {lines.filter((l) => l.material).length === 0 && <p className="text-xs text-muted-foreground">No materials yet.</p>}
             {lines.filter((l) => l.material).map((l) => (
