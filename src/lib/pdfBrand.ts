@@ -9,7 +9,7 @@ export const TEXT = { r: 40, g: 42, b: 52 };
 export const PAGE_W = 210;
 export const MARGIN = 15;
 export const CONTENT_W = PAGE_W - MARGIN * 2;
-export const BOTTOM_LIMIT = 272;
+export const BOTTOM_LIMIT = 276;
 
 export interface PdfParty {
   clientName: string;

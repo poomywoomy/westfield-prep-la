@@ -109,19 +109,19 @@ export async function generateShippingZoneMapPDF(data: ShippingZoneMapPDFData, l
   y += 8;
 
   if (data.handlingNote) {
-    y = ensureSpace(doc, y, 20);
+    y = ensureSpace(doc, y, 14);
     y = drawSectionTitle(doc, y, "Handling & Markup");
     y = drawParagraph(doc, y, data.handlingNote);
     y += 3;
   }
   if (data.comments) {
-    y = ensureSpace(doc, y, 20);
+    y = ensureSpace(doc, y, 14);
     y = drawSectionTitle(doc, y, "Additional Comments");
     y = drawParagraph(doc, y, data.comments);
     y += 3;
   }
 
-  y = ensureSpace(doc, y, 18);
+  y = ensureSpace(doc, y, 14);
   doc.setDrawColor(225, 227, 233);
   doc.line(MARGIN, y, PAGE_W - MARGIN, y);
   y += 6;

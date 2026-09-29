@@ -60,12 +60,15 @@ export async function generateMaterialsPricingPDF(data: MaterialsPricingPDFData,
 
   let total = 0;
   data.lines.forEach((l, idx) => {
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(7.5);
     const noteLines = l.notes ? doc.splitTextToSize(l.notes, CONTENT_W - 12) : [];
+    doc.setFontSize(9);
     const sizeLines = doc.splitTextToSize(l.size || "-", cUnit - cSize - 4);
+    doc.setFont("helvetica", "bold");
     const matLines = doc.splitTextToSize(l.material || "-", cSize - cMaterial - 4);
     const mainLines = Math.max(sizeLines.length, matLines.length);
-    const rowH = 5 + mainLines * 4.5 + (noteLines.length ? noteLines.length * 3.6 + 1.5 : 0) + 2.5;
+    const rowH = 5 + mainLines * 5 + (noteLines.length ? noteLines.length * 3.6 + 1.5 : 0) + 2.5;
     if (y + rowH > 272) {
       doc.addPage();
       y = 20;
@@ -79,7 +82,7 @@ export async function generateMaterialsPricingPDF(data: MaterialsPricingPDFData,
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.setTextColor(TEXT.r, TEXT.g, TEXT.b);
-    doc.text(doc.splitTextToSize(l.material || "-", cSize - cMaterial - 4), cMaterial, base, { lineHeightFactor: 1.4 });
+    doc.text(matLines, cMaterial, base, { lineHeightFactor: 1.4 });
     doc.setFont("helvetica", "normal");
     doc.text(sizeLines, cSize, base, { lineHeightFactor: 1.4 });
     doc.text(l.unit || "each", cUnit, base);
@@ -94,7 +97,7 @@ export async function generateMaterialsPricingPDF(data: MaterialsPricingPDFData,
     if (noteLines.length) {
       doc.setFontSize(7.5);
       doc.setTextColor(MUTED.r, MUTED.g, MUTED.b);
-      doc.text(noteLines, cMaterial, base + mainLines * 4.5 + 0.5, { lineHeightFactor: 1.35 });
+      doc.text(noteLines, cMaterial, base + (mainLines - 1) * 5 + 5, { lineHeightFactor: 1.35 });
     }
     doc.setDrawColor(228, 230, 236);
     doc.setLineWidth(0.2);
@@ -116,13 +119,13 @@ export async function generateMaterialsPricingPDF(data: MaterialsPricingPDFData,
   y += 10;
 
   if (data.comments) {
-    y = ensureSpace(doc, y, 20);
+    y = ensureSpace(doc, y, 14);
     y = drawSectionTitle(doc, y, "Additional Comments");
     y = drawParagraph(doc, y, data.comments);
     y += 3;
   }
 
-  y = ensureSpace(doc, y, 18);
+  y = ensureSpace(doc, y, 14);
   doc.setDrawColor(225, 227, 233);
   doc.line(MARGIN, y, PAGE_W - MARGIN, y);
   y += 6;
