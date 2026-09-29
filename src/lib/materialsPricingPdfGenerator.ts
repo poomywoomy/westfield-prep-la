@@ -116,12 +116,12 @@ export async function generateMaterialsPricingPDF(data: MaterialsPricingPDFData,
     doc.text(money(total), PAGE_W - MARGIN - 4, y + 7.2, { align: "right" });
     y += 11;
   }
-  y += 10;
+  y += 8;
 
   if (data.comments) {
     y = ensureSpace(doc, y, 14);
     y = drawSectionTitle(doc, y, "Additional Comments");
-    y = drawParagraph(doc, y, data.comments);
+    y = drawParagraph(doc, y, data.comments) + 2;
   }
 
   y = ensureSpace(doc, y, 11);

@@ -111,12 +111,12 @@ export async function generateShippingZoneMapPDF(data: ShippingZoneMapPDFData, l
   if (data.handlingNote) {
     y = ensureSpace(doc, y, 14);
     y = drawSectionTitle(doc, y, "Handling & Markup");
-    y = drawParagraph(doc, y, data.handlingNote);
+    y = drawParagraph(doc, y, data.handlingNote) + 3;
   }
   if (data.comments) {
     y = ensureSpace(doc, y, 14);
     y = drawSectionTitle(doc, y, "Additional Comments");
-    y = drawParagraph(doc, y, data.comments);
+    y = drawParagraph(doc, y, data.comments) + 2;
   }
 
   y = ensureSpace(doc, y, 11);
