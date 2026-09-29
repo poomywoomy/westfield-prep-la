@@ -7,6 +7,8 @@ import { Plus, RefreshCw } from "lucide-react";
 import CreateClientDialog from "./CreateClientDialog";
 import { CreateQuoteDialog } from "./CreateQuoteDialog";
 import { CreateOneTimeQuoteDialog } from "./CreateOneTimeQuoteDialog";
+import { CreateShippingZoneMapDialog } from "./CreateShippingZoneMapDialog";
+import { CreateMaterialsPricingDialog } from "./CreateMaterialsPricingDialog";
 import ClientsList from "./ClientsList";
 
 const ClientsTab = () => {
@@ -15,6 +17,8 @@ const ClientsTab = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showQuoteDialog, setShowQuoteDialog] = useState(false);
   const [showOneTimeQuoteDialog, setShowOneTimeQuoteDialog] = useState(false);
+  const [showZoneDialog, setShowZoneDialog] = useState(false);
+  const [showMaterialsDialog, setShowMaterialsDialog] = useState(false);
   const { toast } = useToast();
 
   const fetchClients = async () => {
@@ -70,7 +74,7 @@ const ClientsTab = () => {
             <CardTitle>Clients Management</CardTitle>
             <CardDescription>Create and manage client accounts</CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap justify-end">
             <Button 
               variant="outline" 
               onClick={fetchClients}
@@ -90,6 +94,14 @@ const ClientsTab = () => {
             <Button onClick={() => setShowOneTimeQuoteDialog(true)} variant="outline">
               <Plus className="mr-2 h-4 w-4" />
               Create One-Time Quote
+            </Button>
+            <Button onClick={() => setShowZoneDialog(true)} variant="outline">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Shipping Zone Map
+            </Button>
+            <Button onClick={() => setShowMaterialsDialog(true)} variant="outline">
+              <Plus className="mr-2 h-4 w-4" />
+              Materials Pricing
             </Button>
           </div>
         </div>
@@ -117,6 +129,8 @@ const ClientsTab = () => {
         open={showOneTimeQuoteDialog}
         onOpenChange={setShowOneTimeQuoteDialog}
       />
+      <CreateShippingZoneMapDialog open={showZoneDialog} onOpenChange={setShowZoneDialog} />
+      <CreateMaterialsPricingDialog open={showMaterialsDialog} onOpenChange={setShowMaterialsDialog} />
     </Card>
   );
 };

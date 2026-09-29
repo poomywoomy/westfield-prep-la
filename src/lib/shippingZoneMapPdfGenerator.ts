@@ -43,12 +43,6 @@ export async function generateShippingZoneMapPDF(data: ShippingZoneMapPDFData, l
     const i = z - 1;
     const x = MARGIN + (i % cols) * (boxW + gap);
     const by = y + Math.floor(i / cols) * (boxH + gap);
-    const t = i / 7;
-    doc.setFillColor(
-      Math.round(255 - (255 - NAVY.r) * t * 0.15),
-      Math.round(246 - 20 * t),
-      Math.round(238 - 10 * t),
-    );
     doc.setFillColor(LIGHT.r, LIGHT.g, LIGHT.b);
     doc.roundedRect(x, by, boxW, boxH, 1.5, 1.5, "F");
     doc.setFillColor(ORANGE.r, ORANGE.g, ORANGE.b);
