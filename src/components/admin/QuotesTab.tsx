@@ -55,7 +55,7 @@ const QuotesTab = () => {
       toast({ title: "Error", description: "Failed to fetch quotes", variant: "destructive" });
       return;
     }
-    setQuotes(data || []);
+    setQuotes((data || []).filter((q: any) => !['shipping_zone_map','materials_pricing'].includes(q.quote_data?.quote_type)));
   };
 
   const handleDeleteQuote = async () => {
