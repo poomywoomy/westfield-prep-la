@@ -47,13 +47,15 @@ export function useNavigate(): NavigateFn {
       return;
     }
     const { pathname, search, hash } = parseTo(to);
+    // `to` is a free-form string from react-router call sites; cast past the
+    // route-tree param requirements since paths may be unregistered here.
     tsNav({
       to: pathname,
       search: search as never,
       hash,
       state: options?.state as never,
       replace: options?.replace,
-    });
+    } as never);
   }, [tsNav, router]) as NavigateFn;
 }
 
