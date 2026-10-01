@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider, dehydrate, hydrate } from "@tanstack/react-query";
-import { createRouter, isRedirect } from "@tanstack/react-router";
+import { createRouter, isRedirect, type AnyRouter, type Redirect } from "@tanstack/react-router";
 import { Fragment, type ReactNode, type ComponentType } from "react";
 import { routeTree } from "./routeTree.gen";
 
@@ -8,14 +8,7 @@ import { routeTree } from "./routeTree.gen";
  * rewritten for the current router API (options.dehydrate / options.hydrate /
  * options.Wrap) after the package stopped tracking the router version.
  */
-function routerWithQueryClient<
-  T extends { options: Record<string, unknown> } & {
-    isServer: boolean;
-    state: { location: { href: string } };
-    navigate: (opts: unknown) => void;
-    resolveRedirect: (err: unknown) => { options: unknown };
-  },
->(router: T, queryClient: QueryClient) {
+function routerWithQueryClient(router: AnyRouter, queryClient: QueryClient) {
   const ogOptions = router.options;
 
   router.options = {
@@ -53,23 +46,25 @@ function routerWithQueryClient<
   const ogMutationCacheConfig = queryClient.getMutationCache().config;
   queryClient.getMutationCache().config = {
     ...ogMutationCacheConfig,
-    onError: (error, _variables, _context, _mutation) => {
+    onError: (error: unknown) => {
       if (isRedirect(error)) {
-        error.options._fromLocation = router.state.location;
+        const redirect = error as Redirect;
+        redirect.options._fromLocation = router.state.location;
         return router.navigate(router.resolveRedirect(error).options);
       }
-      return ogMutationCacheConfig.onError?.(error as never, _variables, _context, _mutation);
+      return ogMutationCacheConfig.onError?.(error as never);
     },
   };
   const ogQueryCacheConfig = queryClient.getQueryCache().config;
   queryClient.getQueryCache().config = {
     ...ogQueryCacheConfig,
-    onError: (error, _query) => {
+    onError: (error: unknown) => {
       if (isRedirect(error)) {
-        error.options._fromLocation = router.state.location;
+        const redirect = error as Redirect;
+        redirect.options._fromLocation = router.state.location;
         return router.navigate(router.resolveRedirect(error).options);
       }
-      return ogQueryCacheConfig.onError?.(error as never, _query);
+      return ogQueryCacheConfig.onError?.(error as never);
     },
   };
 
