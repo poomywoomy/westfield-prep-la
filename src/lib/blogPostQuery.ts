@@ -55,6 +55,38 @@ export async function fetchBlogPosts(): Promise<BlogPostRecord[]> {
   return (data as BlogPostRecord[]) ?? [];
 }
 
+export interface RelatedPostRecord {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  published_at: string | null;
+  category: string | null;
+}
+
+export async function fetchRelatedPosts(slug: string): Promise<RelatedPostRecord[]> {
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .select("id, title, slug, excerpt, published_at, category")
+    .eq("published", true)
+    .neq("slug", slug)
+    .order("published_at", { ascending: false })
+    .limit(3);
+
+  if (error) {
+    console.error("Error fetching related posts:", error);
+    return [];
+  }
+  return (data as RelatedPostRecord[]) ?? [];
+}
+
+export const relatedPostsQueryOptions = (slug: string) =>
+  queryOptions({
+    queryKey: ["related-posts", slug],
+    queryFn: () => fetchRelatedPosts(slug),
+    staleTime: 60_000,
+  });
+
 export const blogPostsQueryOptions = () =>
   queryOptions({
     queryKey: ["blog-posts"],

@@ -1,21 +1,13 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@/lib/router-compat";
-import { supabase } from "@/integrations/supabase/client";
+import { relatedPostsQueryOptions } from "@/lib/blogPostQuery";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
-
-interface RelatedPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  published_at: string | null;
-  category: string | null;
-}
+import type { RelatedPostRecord } from "@/lib/blogPostQuery";
 
 interface RelatedPostsProps {
-  currentPostId: string;
+  currentSlug: string;
   category?: string | null;
 }
 
@@ -32,42 +24,12 @@ const getCategoryGradient = (category?: string | null) => {
   return gradients[key as keyof typeof gradients] || 'from-[hsl(215,25%,20%)] via-[hsl(215,20%,35%)] to-[hsl(215,20%,45%)]';
 };
 
-export const RelatedPosts = ({ currentPostId, category }: RelatedPostsProps) => {
-  const [posts, setPosts] = useState<RelatedPost[]>([]);
-  const [loading, setLoading] = useState(true);
+// Data comes from the route loader, so related-post internal links render in
+// the server HTML (crawlers previously saw an empty section here).
+export const RelatedPosts = ({ currentSlug, category }: RelatedPostsProps) => {
+  const { data: posts = [], isLoading } = useQuery(relatedPostsQueryOptions(currentSlug));
 
-  useEffect(() => {
-    fetchRelatedPosts();
-  }, [currentPostId, category]);
-
-  const fetchRelatedPosts = async () => {
-    try {
-      let query = supabase
-        .from("blog_posts")
-        .select("id, title, slug, excerpt, published_at, category")
-        .eq("published", true)
-        .neq("id", currentPostId)
-        .order("published_at", { ascending: false })
-        .limit(3);
-
-      // Prefer posts in the same category
-      if (category) {
-        query = query.eq("category", category);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      setPosts(data || []);
-    } catch (error) {
-      console.error("Error fetching related posts:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading || posts.length === 0) return null;
+  if (isLoading || posts.length === 0) return null;
 
   return (
     <section className="py-12 bg-muted/30">
@@ -76,9 +38,10 @@ export const RelatedPosts = ({ currentPostId, category }: RelatedPostsProps) => 
           <h2 className="text-3xl font-bold mb-8 text-center">Related Articles</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {posts.map((post) => {
-              const gradient = getCategoryGradient(post.category);
+              const relatedPost = post as RelatedPostRecord;
+              const gradient = getCategoryGradient(relatedPost.category);
               return (
-                <Link key={post.id} to={`/blog/${post.slug}`} className="group">
+                <Link key={relatedPost.id} to={`/blog/${relatedPost.slug}`} className="group">
                   <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden border-2 border-transparent hover:border-[hsl(var(--blog-orange))]">
                     {/* Gradient Header */}
                     <div className={`relative h-24 bg-gradient-to-br ${gradient} overflow-hidden`}>
@@ -93,28 +56,28 @@ export const RelatedPosts = ({ currentPostId, category }: RelatedPostsProps) => 
                           )`
                         }} />
                       </div>
-                      {post.category && (
+                      {relatedPost.category && (
                         <div className="absolute top-3 left-4 backdrop-blur-md bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg border border-white/30">
-                          {post.category}
+                          {relatedPost.category}
                         </div>
                       )}
                     </div>
 
                     <CardContent className="p-6">
                       <h3 className="font-bold text-xl mb-3 group-hover:text-[hsl(var(--blog-orange))] transition-colors line-clamp-2 leading-tight">
-                        {post.title}
+                        {relatedPost.title}
                       </h3>
-                      {post.excerpt && (
+                      {relatedPost.excerpt && (
                         <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
-                          {post.excerpt}
+                          {relatedPost.excerpt}
                         </p>
                       )}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          {post.published_at && (
-                            <time dateTime={post.published_at}>
-                              {format(new Date(post.published_at), "MMM dd, yyyy")}
+                          {relatedPost.published_at && (
+                            <time dateTime={relatedPost.published_at}>
+                              {format(new Date(relatedPost.published_at), "MMM dd, yyyy")}
                             </time>
                           )}
                         </div>

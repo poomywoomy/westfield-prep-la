@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import BlogPost from "@/pages/BlogPost";
 import { getBlogSeoTitle } from "@/data/blogTitleOverrides";
-import { blogPostQueryOptions } from "@/lib/blogPostQuery";
+import { blogPostQueryOptions, relatedPostsQueryOptions } from "@/lib/blogPostQuery";
 import { buildBlogPostSchemas } from "@/lib/blogSchemas";
 
 const SITE = "https://westfieldprepcenter.com";
@@ -11,7 +11,11 @@ const SITE = "https://westfieldprepcenter.com";
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogPost,
   loader: ({ params, context }) =>
-    context.queryClient.ensureQueryData(blogPostQueryOptions(params.slug)),
+    Promise.all([
+      context.queryClient.ensureQueryData(blogPostQueryOptions(params.slug)),
+      // Pre-fetch related posts so internal links render in the server HTML.
+      context.queryClient.ensureQueryData(relatedPostsQueryOptions(params.slug)),
+    ]),
   head: ({ params, loaderData }) => {
     const canonical = `${SITE}/blog/${params.slug}`;
     const post = loaderData;
