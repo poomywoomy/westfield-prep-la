@@ -1,8 +1,80 @@
-import { QueryClient } from "@tanstack/react-query";
-import { createRouter } from "@tanstack/react-router";
-import { routerWithQueryClient } from "@tanstack/react-router-with-query";
+import { QueryClient, QueryClientProvider, dehydrate, hydrate } from "@tanstack/react-query";
+import { createRouter, isRedirect } from "@tanstack/react-router";
+import { Fragment, type ReactNode, type ComponentType } from "react";
 import { routeTree } from "./routeTree.gen";
 
+/**
+ * Local port of @tanstack/react-router-with-query's routerWithQueryClient,
+ * rewritten for the current router API (options.dehydrate / options.hydrate /
+ * options.Wrap) after the package stopped tracking the router version.
+ */
+function routerWithQueryClient<
+  T extends { options: Record<string, unknown> } & {
+    isServer: boolean;
+    state: { location: { href: string } };
+    navigate: (opts: unknown) => void;
+    resolveRedirect: (err: unknown) => { options: unknown };
+  },
+>(router: T, queryClient: QueryClient) {
+  const ogOptions = router.options;
+
+  router.options = {
+    ...ogOptions,
+    Wrap: ({ children }: { children?: ReactNode }) => {
+      const OGWrap = (ogOptions.Wrap as ComponentType<{ children?: ReactNode }> | undefined) || Fragment;
+      return (
+        <QueryClientProvider client={queryClient}>
+          <OGWrap>{children}</OGWrap>
+        </QueryClientProvider>
+      );
+    },
+    dehydrate: async () => {
+      const ogDehydrated = await (ogOptions.dehydrate as (() => Promise<unknown> | unknown) | undefined)?.();
+      return {
+        ...(ogDehydrated as object | undefined),
+        dehydratedQueryClient: dehydrate(queryClient, {
+          shouldDehydrateQuery: (query) => query.state.status === "success",
+          shouldDehydrateMutation: () => false,
+        }),
+      };
+    },
+    hydrate: async (dehydrated: unknown) => {
+      await (ogOptions.hydrate as ((d: unknown) => Promise<void> | void) | undefined)?.(dehydrated);
+      const dehydratedQueryClient = (dehydrated as { dehydratedQueryClient?: unknown } | undefined)
+        ?.dehydratedQueryClient;
+      if (dehydratedQueryClient) {
+        hydrate(queryClient, dehydratedQueryClient as never);
+      }
+    },
+  };
+
+  // Preserve the adapter's redirect-on-error behavior: thrown redirects from
+  // queries/mutations navigate instead of surfacing as errors.
+  const ogMutationCacheConfig = queryClient.getMutationCache().config;
+  queryClient.getMutationCache().config = {
+    ...ogMutationCacheConfig,
+    onError: (error, _variables, _context, _mutation) => {
+      if (isRedirect(error)) {
+        error.options._fromLocation = router.state.location;
+        return router.navigate(router.resolveRedirect(error).options);
+      }
+      return ogMutationCacheConfig.onError?.(error as never, _variables, _context, _mutation);
+    },
+  };
+  const ogQueryCacheConfig = queryClient.getQueryCache().config;
+  queryClient.getQueryCache().config = {
+    ...ogQueryCacheConfig,
+    onError: (error, _query) => {
+      if (isRedirect(error)) {
+        error.options._fromLocation = router.state.location;
+        return router.navigate(router.resolveRedirect(error).options);
+      }
+      return ogQueryCacheConfig.onError?.(error as never, _query);
+    },
+  };
+
+  return router;
+}
 
 export const getRouter = () => {
   // Ported from the pre-migration App.tsx QueryClient configuration.
@@ -29,4 +101,3 @@ export const getRouter = () => {
   // (e.g. blog posts) renders in the server HTML.
   return routerWithQueryClient(router, queryClient);
 };
-
