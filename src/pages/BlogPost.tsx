@@ -271,7 +271,7 @@ const BlogPost = () => {
           </section>
 
           {/* Related Posts */}
-          <RelatedPosts currentPostId={post.id} category={post.category} />
+          <RelatedPosts currentSlug={post.slug} category={post.category} />
 
           {/* CTA Section */}
           <section className="relative py-20 overflow-hidden">
