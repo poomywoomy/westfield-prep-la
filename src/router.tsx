@@ -64,7 +64,7 @@ function routerWithQueryClient(router: AnyRouter, queryClient: QueryClient) {
         redirect.options._fromLocation = router.state.location;
         return router.navigate(router.resolveRedirect(error).options);
       }
-      return ogQueryCacheConfig.onError?.(error as never);
+      return (ogQueryCacheConfig.onError as ((...args: unknown[]) => void) | undefined)?.(error);
     },
   };
 
