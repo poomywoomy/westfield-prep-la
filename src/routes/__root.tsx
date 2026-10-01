@@ -7,6 +7,7 @@ import {
   Outlet,
   Scripts,
   useRouter,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { HelmetProvider } from "@/lib/helmet-compat";
 
