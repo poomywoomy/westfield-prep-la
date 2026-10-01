@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { blogPostsQueryOptions } from "@/lib/blogPostQuery";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,16 +28,12 @@ interface BlogPost {
 
 const Blog = () => {
   const { data: posts = [], isLoading: loading } = useQuery(blogPostsQueryOptions());
-  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    filterPosts();
-  }, [posts, selectedCategory, searchTerm]);
-
-
-  const filterPosts = () => {
+  // Derived during render so SSR outputs every post link — the previous
+  // useEffect + state pattern rendered an empty grid for crawlers.
+  const filteredPosts = useMemo(() => {
     let filtered = posts;
     if (selectedCategory !== "All") {
       filtered = filtered.filter((post) => post.category === selectedCategory);
@@ -50,8 +46,8 @@ const Blog = () => {
           post.excerpt?.toLowerCase().includes(term)
       );
     }
-    setFilteredPosts(filtered as BlogPost[]);
-  };
+    return filtered as BlogPost[];
+  }, [posts, selectedCategory, searchTerm]);
 
   return (
     <>

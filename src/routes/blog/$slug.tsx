@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import BlogPost from "@/pages/BlogPost";
 import { getBlogSeoTitle } from "@/data/blogTitleOverrides";
-import { blogPostQueryOptions } from "@/lib/blogPostQuery";
+import { blogPostQueryOptions, relatedPostsQueryOptions } from "@/lib/blogPostQuery";
 import { buildBlogPostSchemas } from "@/lib/blogSchemas";
 
 const SITE = "https://westfieldprepcenter.com";
@@ -10,8 +10,14 @@ const SITE = "https://westfieldprepcenter.com";
 // the pre-migration BLOG_FAQ_OVERRIDES injection plugin in vite.config.ts.
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogPost,
-  loader: ({ params, context }) =>
-    context.queryClient.ensureQueryData(blogPostQueryOptions(params.slug)),
+  loader: async ({ params, context }) => {
+    // Pre-fetch related posts so internal links render in the server HTML.
+    const [post] = await Promise.all([
+      context.queryClient.ensureQueryData(blogPostQueryOptions(params.slug)),
+      context.queryClient.ensureQueryData(relatedPostsQueryOptions(params.slug)).catch(() => []),
+    ]);
+    return post;
+  },
   head: ({ params, loaderData }) => {
     const canonical = `${SITE}/blog/${params.slug}`;
     const post = loaderData;
