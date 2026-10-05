@@ -22,6 +22,7 @@ const FAQAccordion = lazy(() => import("@/components/FAQAccordion"));
 const FinalCTA = lazy(() => import("@/components/FinalCTA"));
 const Compliance = lazy(() => import("@/components/Compliance"));
 const StatsStrip = lazy(() => import("@/components/StatsStrip"));
+const BuiltForScale = lazy(() => import("@/components/BuiltForScale"));
 
 const BlogPreview = lazy(() => import("@/components/BlogPreview"));
 const LaunchpadCallout = lazy(() => import("@/components/LaunchpadCallout"));
@@ -96,6 +97,11 @@ const Index = () => {
           {/* Stats Strip */}
           <Suspense fallback={<div className="min-h-[280px]" aria-hidden="true" />}>
             <StatsStrip />
+          </Suspense>
+
+          {/* Built for Scale */}
+          <Suspense fallback={<div className="min-h-[500px]" aria-hidden="true" />}>
+            <BuiltForScale />
           </Suspense>
 
           {/* Use Case Section - NEW CRO Component */}
