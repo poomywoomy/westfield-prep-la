@@ -48,6 +48,7 @@ interface CalcInputs {
   hourlyValue: number;
   errorRatePct: number;
   returnRatePct: number;
+  returnsPerMonth: number;
 }
 
 // Industry-average 3PL pricing — used as autofill / safe defaults
@@ -72,7 +73,17 @@ const defaultInputs: CalcInputs = {
   hourlyValue: 25,
   errorRatePct: 2,
   returnRatePct: 5,
+  returnsPerMonth: 20,
 };
+
+// Westfield DTC pick & pack tiers (per order) + one-time bundle fee per multi-item order
+export const pickPackTier = (orders: number): { base: number; bundle: number } => {
+  if (orders <= 500) return { base: 2.85, bundle: 0.7 };
+  if (orders <= 1000) return { base: 2.45, bundle: 0.45 };
+  if (orders <= 5000) return { base: 1.9, bundle: 0.35 };
+  return { base: 1.7, bundle: 0.25 };
+};
+const RETURN_FEE = 1;
 
 // Westfield tiered per-unit rate (volume-based)
 const westfieldRate = (monthlyUnits: number): number => {
@@ -103,12 +114,17 @@ function useRoiMath(i: CalcInputs) {
     const fbaUnits = fbaPrepEvents * Math.max(1, i.avgUnitsPerPreppedItem);
     const monthlyUnits = dtcUnits + fbaUnits;
 
-    const ourRate = westfieldRate(monthlyUnits);
-    const hasMultiUnit =
-      (includeDtc && i.avgUnitsPerOrder > 1) || (includeFba && i.avgUnitsPerPreppedItem > 1);
-    const multiUnitSurcharge = hasMultiUnit ? 0.5 : 0;
-    const ourEffectiveRate = ourRate + multiUnitSurcharge;
-    const estimatedMonthlyCost = monthlyUnits * ourEffectiveRate;
+    const tier = pickPackTier(dtcOrders);
+    const bundleShare = Math.min(1, Math.max(0, i.avgUnitsPerOrder - 1));
+    const bundleOrders = dtcOrders * bundleShare;
+    const singleOrders = dtcOrders - bundleOrders;
+    const dtcCost = dtcOrders * tier.base + bundleOrders * tier.bundle;
+    const ourRate = westfieldRate(fbaUnits);
+    const fbaCost = fbaUnits * (ourRate + (i.avgUnitsPerPreppedItem > 1 ? 0.5 : 0));
+    const returnsCount = Math.max(0, i.returnsPerMonth);
+    const returnsCost = returnsCount * RETURN_FEE;
+    const estimatedMonthlyCost = dtcCost + fbaCost + returnsCost;
+    const ourEffectiveRate = dtcOrders > 0 ? dtcCost / dtcOrders : ourRate;
 
     // Outsource share governs how much time savings is credited
     const outsourceShare = i.fulfillment === "self" ? 1 : i.fulfillment === "hybrid" ? 0.5 : 0;
@@ -139,7 +155,7 @@ function useRoiMath(i: CalcInputs) {
     const errorsAvoided = monthlyUnits * cappedErrorRate * 8;
 
     // Returns processed cheaper: $4/return delta vs. self-handling
-    const returnsSavings = monthlyUnits * (i.returnRatePct / 100) * 4 * (outsourceShare > 0 ? 1 : 0.5);
+    const returnsSavings = returnsCount * 4 * (outsourceShare > 0 ? 1 : 0.5);
 
     let totalMonthly = threePLDelta + timeRecovered + errorsAvoided + returnsSavings;
     // Sanity cap: never claim more than 2× the current 3PL spend (when comparing 3PLs)
@@ -152,6 +168,13 @@ function useRoiMath(i: CalcInputs) {
 
     return {
       monthlyUnits,
+      tier,
+      singleOrders,
+      bundleOrders,
+      dtcCost,
+      fbaCost,
+      returnsCount,
+      returnsCost,
       ourRate,
       ourEffectiveRate,
       estimatedMonthlyCost,
@@ -234,6 +257,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
           avgUnitsPerPreppedItem: inputs.avgUnitsPerPreppedItem,
           currentErrorRate: inputs.errorRatePct,
           returnRate: inputs.returnRatePct,
+          returnsPerMonth: inputs.returnsPerMonth,
           hoursSpentWeekly: inputs.hoursPerWeek,
           currentCostPerOrder: String(inputs.currentPerUnitRate),
           currentFbaPrepPerUnit: inputs.currentFbaPrepPerUnit,
@@ -480,7 +504,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                     className="text-lg font-medium"
                   />
                 </div>
-                <div>
+                {inputs.fulfillment !== "other-3pl" && (<div>
                   <Label htmlFor="teamSize" className="text-sm font-semibold mb-2 block">
                     <TranslatedText>People helping with fulfillment</TranslatedText>
                   </Label>
@@ -495,7 +519,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                     }
                     className="text-lg font-medium"
                   />
-                </div>
+                </div>)}
               </div>
 
               {/* Conditional: detailed 3PL pricing */}
@@ -683,20 +707,16 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                   )}
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <Label className="text-sm font-semibold">
-                      <TranslatedText>Return rate</TranslatedText>
-                    </Label>
-                    <span className="text-sm font-mono text-[#FF7A00]">
-                      {inputs.returnRatePct.toFixed(1)}%
-                    </span>
-                  </div>
-                  <Slider
-                    value={[inputs.returnRatePct]}
-                    onValueChange={([v]) => set("returnRatePct", v)}
+                  <Label htmlFor="returnsPerMonth" className="text-sm font-semibold mb-2 block">
+                    <TranslatedText>Returns per month</TranslatedText>
+                  </Label>
+                  <Input
+                    id="returnsPerMonth"
+                    type="number"
                     min={0}
-                    max={20}
-                    step={0.5}
+                    value={inputs.returnsPerMonth || ""}
+                    onChange={(e) => set("returnsPerMonth", Math.max(0, Number(e.target.value) || 0))}
+                    className="text-lg font-medium"
                   />
                 </div>
               </div>
@@ -824,7 +844,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                   <BreakdownRow
                     label="Returns processed cheaper"
                     value={roi.returnsSavings}
-                    formula={`${num(roi.monthlyUnits)} units × ${inputs.returnRatePct.toFixed(1)}% × $4 delta`}
+                    formula={`${num(roi.returnsCount)} returns × $4 delta`}
                   />
                 </div>
               </div>
@@ -840,7 +860,7 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground">
-                      <TranslatedText>Per-unit rate</TranslatedText>
+                      <TranslatedText>Avg per order</TranslatedText>
                     </p>
                     <p className="text-lg font-semibold text-[#FF7A00]">
                       ${roi.ourEffectiveRate.toFixed(2)}
@@ -848,10 +868,9 @@ const EnhancedROICalculator = ({ variant = "pricing" }: EnhancedROICalculatorPro
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground mt-3">
-                  <TranslatedText>Based on volume tier.</TranslatedText>
-                  {inputs.avgUnitsPerOrder > 1 && (
-                    <> <TranslatedText>Includes $0.50 multi-unit surcharge.</TranslatedText></>
-                  )}
+                  {`${num(roi.singleOrders)} single orders × $${roi.tier.base.toFixed(2)} + ${num(roi.bundleOrders)} bundle orders × $${(roi.tier.base + roi.tier.bundle).toFixed(2)}`}
+                  {roi.fbaCost > 0 && ` + FBA prep ${usd(roi.fbaCost)}`}
+                  {` + ${num(roi.returnsCount)} returns × $1.00`}
                 </p>
               </div>
 
