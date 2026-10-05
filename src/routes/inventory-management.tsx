@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import InventoryManagement from "@/pages/InventoryManagement";
 
+import { faqData, serviceData } from "@/data/pageContent/InventoryManagement";
+import { serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/inventory-management")({
   component: InventoryManagement,
   head: () => ({
@@ -53,6 +56,7 @@ export const Route = createFileRoute("/inventory-management")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqData)]),
     links: [
           {
                 "rel": "canonical",

@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import SalesChannelAmazon from "@/pages/sales-channels/Amazon";
 
+import { faqData, serviceData } from "@/data/pageContent/Amazon";
+import { serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/sales-channels/amazon")({
   component: SalesChannelAmazon,
   head: () => ({
@@ -29,6 +32,7 @@ export const Route = createFileRoute("/sales-channels/amazon")({
                 "content": "website"
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqData)]),
     links: [
           {
                 "rel": "canonical",

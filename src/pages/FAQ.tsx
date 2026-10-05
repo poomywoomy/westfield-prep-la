@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/collapsible";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import logo from "@/assets/westfield-logo.png";
-import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { TranslatedText } from "@/components/TranslatedText";
 
@@ -498,10 +497,6 @@ const FAQ = () => {
   return (
     <>
 
-      <StructuredData 
-        type="faq" 
-        data={faqCategories.flatMap(category => category.questions)}
-      />
       
       <div className="min-h-screen bg-background">
         <header className="bg-background shadow-xs sticky top-0 z-50">

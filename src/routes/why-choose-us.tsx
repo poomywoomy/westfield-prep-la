@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import WhyChooseUs from "@/pages/WhyChooseUs";
 
+import { serviceSchema, breadcrumbSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/why-choose-us")({
   component: WhyChooseUs,
   head: () => ({
@@ -49,6 +51,7 @@ export const Route = createFileRoute("/why-choose-us")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([serviceSchema({ name: "Boutique Fulfillment Services", description: "White-glove prep center and fulfillment services in Los Angeles, specializing in Amazon FBA prep, Shopify fulfillment, and multi-channel e-commerce logistics with same-day processing and photo-proof QC." }), breadcrumbSchema([{ label: "Home", path: "/" }, { label: "Why Choose Us", path: "/why-choose-us" }])]),
     links: [
           {
                 "rel": "canonical",

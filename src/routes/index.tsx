@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Index from "@/pages/Index";
 
+import { faqData } from "@/data/pageContent/Index";
+import { organizationSchema, websiteSchema, localBusinessSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
@@ -77,6 +80,7 @@ export const Route = createFileRoute("/")({
                 "content": "https://westfieldprepcenter.com/hero-warehouse-optimized.webp"
           }
     ],
+    scripts: ldScripts([organizationSchema(), websiteSchema(), localBusinessSchema(), faqSchema(faqData)]),
     links: [{ rel: "canonical", href: "https://westfieldprepcenter.com/" }],
   }),
 });

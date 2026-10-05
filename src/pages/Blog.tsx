@@ -4,7 +4,6 @@ import { blogPostsQueryOptions } from "@/lib/blogPostQuery";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import StructuredData from "@/components/StructuredData";
 import { CategoryFilter } from "@/components/blog/CategoryFilter";
 import { SearchBar } from "@/components/blog/SearchBar";
 import { NewsletterSignup } from "@/components/blog/NewsletterSignup";
@@ -51,7 +50,6 @@ const Blog = () => {
 
   return (
     <>
-      <StructuredData type="collectionPage" data={{ posts: posts.slice(0, 10) }} />
 
       <Header />
 

@@ -99,7 +99,7 @@ export function BlogPostSchema({
         "contactPoint": {
           "@type": "ContactPoint",
           "contactType": "Customer Service",
-          "email": "info@westfieldprep.com"
+          "email": "info@westfieldprepcenter.com"
         }
       }
     ]

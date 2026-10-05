@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ThreePLLosAngeles from "@/pages/ThreePLLosAngeles";
 
+import { faqData, serviceData } from "@/data/pageContent/ThreePLLosAngeles";
+import { organizationSchema, serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/3pl-los-angeles")({
   component: ThreePLLosAngeles,
   head: () => ({
@@ -53,6 +56,7 @@ export const Route = createFileRoute("/3pl-los-angeles")({
                 "content": "/la-port-logistics.jpg"
           }
     ],
+    scripts: ldScripts([organizationSchema(), serviceSchema(serviceData), faqSchema(faqData)]),
     links: [
           {
                 "rel": "canonical",

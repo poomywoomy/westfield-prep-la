@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import OrderFulfillment from "@/pages/OrderFulfillment";
 
+import { faqData, serviceData } from "@/data/pageContent/OrderFulfillment";
+import { serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/order-fulfillment")({
   component: OrderFulfillment,
   head: () => ({
@@ -53,6 +56,7 @@ export const Route = createFileRoute("/order-fulfillment")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqData)]),
     links: [
           {
                 "rel": "canonical",

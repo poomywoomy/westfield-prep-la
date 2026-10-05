@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Testimonials from "@/pages/Testimonials";
 
+import { breadcrumbSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/testimonials")({
   component: Testimonials,
   head: () => ({
@@ -53,6 +55,7 @@ export const Route = createFileRoute("/testimonials")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([breadcrumbSchema([{ label: "Home", path: "/" }, { label: "Testimonials", path: "/testimonials" }])]),
     links: [
           {
                 "rel": "canonical",

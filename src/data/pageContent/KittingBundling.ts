@@ -1,0 +1,72 @@
+// Page content data shared between the page component and its route fact sheet.
+
+export const serviceData = {
+  serviceType: "Service",
+  name: "Kitting & Bundling Services - Los Angeles 3PL Prep Center",
+  description:
+    "Custom kitting and bundling at our LA 3PL prep center. Multi-SKU kits, gift sets, and promotional bundles with photo-proof QC.",
+  features: ["Multi-SKU Kits", "Gift Sets", "Promotional Bundles", "Photo-Proof QC", "3PL Services"],
+};
+
+export const faqSchemaData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What types of kitting services do you offer?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "We offer multi-SKU kits, gift sets, promotional bundles, subscription box assembly, influencer PR boxes, and custom branded packaging.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How long does kit assembly take?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Standard kit assembly takes 1-3 business days depending on complexity and volume. Rush assembly is available for urgent needs.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do you provide photos of completed kits?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Every kit is photographed during QC to ensure accuracy. Photos are available in your dashboard for verification.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I provide custom packaging materials?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Absolutely. Send us your branded boxes, tissue paper, inserts, and we'll assemble kits to your exact specifications.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What's the minimum order for kitting?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Built for scaling brands. We handle production runs from 1,000 to 100,000+ units, with the systems and staffing to keep up.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How do you handle kit component shortages?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "We alert you immediately when any component runs low. You can set reorder thresholds per SKU in your dashboard.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can you store kit components separately?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Components are stored individually and only assembled when you trigger a kitting order or when inventory thresholds are met.",
+      },
+    },
+  ],
+};

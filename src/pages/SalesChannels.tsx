@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Footer from "@/components/Footer";
-import StructuredData from "@/components/StructuredData";
 import SalesChannelsHero from "@/components/sales-channels/SalesChannelsHero";
 import PlatformCard, { PlatformData } from "@/components/sales-channels/PlatformCard";
 import PlatformDetailModal from "@/components/sales-channels/PlatformDetailModal";
@@ -30,7 +29,6 @@ const SalesChannels = () => {
 
   return (
     <>
-      <StructuredData type="itemList" data={{ platforms: allPlatforms }} />
 
       <div className="min-h-screen flex flex-col">
         <Header />

@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ReturnsProcessing from "@/pages/ReturnsProcessing";
 
+import { faqSchemaData, serviceData } from "@/data/pageContent/ReturnsProcessing";
+import { serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/returns-processing")({
   component: ReturnsProcessing,
   head: () => ({
@@ -53,6 +56,7 @@ export const Route = createFileRoute("/returns-processing")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqSchemaData)]),
     links: [
           {
                 "rel": "canonical",

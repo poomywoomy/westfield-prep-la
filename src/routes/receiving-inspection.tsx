@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ReceivingInspection from "@/pages/ReceivingInspection";
 
+import { faqSchemaData, serviceData } from "@/data/pageContent/ReceivingInspection";
+import { serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/receiving-inspection")({
   component: ReceivingInspection,
   head: () => ({
@@ -53,6 +56,7 @@ export const Route = createFileRoute("/receiving-inspection")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqSchemaData)]),
     links: [
           {
                 "rel": "canonical",

@@ -1,3 +1,4 @@
+import { collectionPageSchema, ldScripts, type CollectionPost } from "@/data/pageSchemas";
 import { createFileRoute } from "@tanstack/react-router";
 import Blog from "@/pages/Blog";
 import { blogPostsQueryOptions } from "@/lib/blogPostQuery";
@@ -5,7 +6,7 @@ import { blogPostsQueryOptions } from "@/lib/blogPostQuery";
 export const Route = createFileRoute("/blog/")({
   component: Blog,
   loader: ({ context }) => context.queryClient.ensureQueryData(blogPostsQueryOptions()),
-  head: () => ({
+  head: ({ loaderData }) => ({
     meta: [
           {
                 "title": "Prep Center Blog | E-Commerce Tips & Fulfillment Insights - Westfield"
@@ -51,6 +52,7 @@ export const Route = createFileRoute("/blog/")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([collectionPageSchema(Array.isArray(loaderData) ? (loaderData as CollectionPost[]).slice(0, 30) : [])]),
     links: [
           {
                 "rel": "canonical",

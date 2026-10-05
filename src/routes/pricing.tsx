@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Pricing from "@/pages/Pricing";
 
+import { faqData, serviceData } from "@/data/pageContent/Pricing";
+import { productSchema, serviceSchema, faqSchema, breadcrumbSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/pricing")({
   component: Pricing,
   head: () => ({
@@ -69,6 +72,7 @@ export const Route = createFileRoute("/pricing")({
                 "content": "https://westfieldprepcenter.com/hero-warehouse-optimized.webp"
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqData), productSchema(), breadcrumbSchema([{ label: "Home", path: "/" }, { label: "3PL Pricing", path: "/pricing" }])]),
     links: [
           {
                 "rel": "canonical",

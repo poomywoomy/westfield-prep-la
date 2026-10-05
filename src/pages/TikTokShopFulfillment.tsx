@@ -4,7 +4,6 @@ import { Helmet } from "@/lib/helmet-compat";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Reviews from "@/components/Reviews";
-import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,22 +13,12 @@ import ResultsSnapshot from "@/components/ResultsSnapshot";
 import { Zap, Video, Package, Truck, Sparkles, TrendingUp, Camera, CheckCircle, Users, Clock, Award, Boxes } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
 
+
+
 const TikTokShopFulfillment = () => {
   const navigate = useNavigate();
 
-  const faqData = [
-    { question: "Can you handle viral spikes in orders?", answer: "Absolutely. We're built for TikTok's rapid pace and can scale quickly to handle sudden surges from viral content." },
-    { question: "What about creator-friendly unboxing?", answer: "We specialize in packaging that looks amazing on camera with custom branding, tissue paper, stickers, and thank-you notes." },
-    { question: "How fast can you fulfill trending products?", answer: "Orders placed before 2 PM PST ship same-day. We prioritize speed to capitalize on viral moments." },
-    { question: "Do you offer photo documentation?", answer: "Yes, every order includes photo-proof QC documentation so you can verify quality before shipping." }
-  ];
 
-  const serviceData = {
-    serviceType: "FulfillmentService",
-    name: "TikTok Shop Fulfillment",
-    description: "Fast FBT workflows, creator-friendly packaging, and reliable shipping for TikTok Shop sellers.",
-    features: ["Rapid Turnaround", "Creator-Ready Packaging", "Flexible Kitting", "Fast Shipping", "Viral-Ready Scaling"]
-  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -44,8 +33,6 @@ const TikTokShopFulfillment = () => {
         <meta property="og:url" content="https://westfieldprepcenter.com/tiktok-shop-fulfillment" />
         <meta property="og:type" content="article" />
       </Helmet>
-      <StructuredData type="service" data={serviceData} />
-      <StructuredData type="faq" data={faqData} />
       
       <div className="min-h-screen flex flex-col">
         <Header />

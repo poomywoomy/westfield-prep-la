@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Launchpad from "@/pages/Launchpad";
 
+import { faqs } from "@/data/pageContent/Launchpad";
+import { faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/launchpad")({
   component: Launchpad,
   head: () => ({
@@ -53,6 +56,7 @@ export const Route = createFileRoute("/launchpad")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a })))]),
     links: [
           {
                 "rel": "canonical",

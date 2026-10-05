@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import StorageWarehousing from "@/pages/StorageWarehousing";
 
+import { faqSchemaData, serviceData } from "@/data/pageContent/StorageWarehousing";
+import { serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/storage-warehousing")({
   component: StorageWarehousing,
   head: () => ({
@@ -17,6 +20,7 @@ export const Route = createFileRoute("/storage-warehousing")({
                 "content": "3pl los angeles, los angeles 3pl, prep center, warehouse storage, pallet storage, climate controlled warehouse, ecommerce fulfillment"
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqSchemaData)]),
     links: [
           {
                 "rel": "canonical",
