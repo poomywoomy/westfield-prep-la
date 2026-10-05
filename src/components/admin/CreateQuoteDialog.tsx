@@ -96,12 +96,32 @@ const DEFAULT_PRICES: Record<string, number> = {
 };
 
 const VOLUME_OPTIONS = [
-  { value: "0-1000", label: "0–1,000 orders/month" },
+  { value: "0-500", label: "0–500 orders/month" },
+  { value: "501-1000", label: "501–1,000 orders/month" },
   { value: "1001-2500", label: "1,001–2,500 orders/month" },
   { value: "2501-5000", label: "2,501–5,000 orders/month" },
   { value: "5001-10000", label: "5,001–10,000 orders/month" },
   { value: "10000-plus", label: "10,000+ orders/month" },
 ];
+
+// Volume-based pricing for DTC pick & pack and one-time bundle fee
+const VOLUME_TIER_PRICES: Record<string, { single: number; bundle: number }> = {
+  "0-500": { single: 2.85, bundle: 0.7 },
+  "501-1000": { single: 2.45, bundle: 0.45 },
+  "1001-2500": { single: 1.9, bundle: 0.35 },
+  "2501-5000": { single: 1.9, bundle: 0.35 },
+  "5001-10000": { single: 1.7, bundle: 0.25 },
+  "10000-plus": { single: 1.7, bundle: 0.25 },
+};
+
+const tierPrice = (volume: string, service: string): number | undefined => {
+  const t = VOLUME_TIER_PRICES[volume];
+  if (!t) return undefined;
+  if (service === "Single Product") return t.single;
+  if (service === "Bundling") return t.bundle;
+  if (service === "Returns and Removal Order Handling") return 1;
+  return undefined;
+};
 
 const volumeLabel = (value: string) =>
   VOLUME_OPTIONS.find(o => o.value === value)?.label;
@@ -307,7 +327,7 @@ export function CreateQuoteDialog({
   const [manualContactName, setManualContactName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
   const [manualPhone, setManualPhone] = useState("");
-  const [orderVolume, setOrderVolume] = useState("0-1000");
+  const [orderVolume, setOrderVolume] = useState("0-500");
   const [minimumSpendTier, setMinimumSpendTier] = useState("250_then_500");
   const [customMinimumAmount, setCustomMinimumAmount] = useState("");
   const [customIntroAmount, setCustomIntroAmount] = useState("");
@@ -319,6 +339,17 @@ export function CreateQuoteDialog({
 
   const [isTeamQuote, setIsTeamQuote] = useState(false);
   const [teamQuoteItems, setTeamQuoteItems] = useState<LineItem[]>([]);
+
+  const handleVolumeChange = (volume: string) => {
+    setOrderVolume(volume);
+    const apply = (item: LineItem): LineItem => {
+      const p = tierPrice(volume, item.service_name);
+      return p === undefined ? item : { ...item, service_price: p };
+    };
+    setStandardItems(prev => prev.map(apply));
+    setTeamQuoteItems(prev => prev.map(apply));
+    setFulfillmentSections(prev => prev.map(sec => ({ ...sec, items: sec.items.map(apply) })));
+  };
 
   const addStandardItem = () => {
     setStandardItems([...standardItems, {
@@ -342,8 +373,8 @@ export function CreateQuoteDialog({
         if (!item.notes && AUTO_NOTES[value]) {
           updated.notes = AUTO_NOTES[value];
         }
-        if (item.service_price === 0 && DEFAULT_PRICES[value]) {
-          updated.service_price = DEFAULT_PRICES[value];
+        if (item.service_price === 0 && (tierPrice(orderVolume, value) ?? DEFAULT_PRICES[value])) {
+          updated.service_price = (tierPrice(orderVolume, value) ?? DEFAULT_PRICES[value]);
         }
       }
       return updated;
@@ -358,7 +389,7 @@ export function CreateQuoteDialog({
       items: defaults.map((service) => ({
         id: crypto.randomUUID(),
         service_name: service,
-        service_price: DEFAULT_PRICES[service] || 0,
+        service_price: (tierPrice(orderVolume, service) ?? DEFAULT_PRICES[service]) || 0,
         notes: AUTO_NOTES[service] || "",
         isEditing: false,
       }))
@@ -403,8 +434,8 @@ export function CreateQuoteDialog({
                 if (!item.notes && AUTO_NOTES[value]) {
                   updated.notes = AUTO_NOTES[value];
                 }
-                if (item.service_price === 0 && DEFAULT_PRICES[value]) {
-                  updated.service_price = DEFAULT_PRICES[value];
+                if (item.service_price === 0 && (tierPrice(orderVolume, value) ?? DEFAULT_PRICES[value])) {
+                  updated.service_price = (tierPrice(orderVolume, value) ?? DEFAULT_PRICES[value]);
                 }
               }
               return updated;
@@ -489,7 +520,7 @@ export function CreateQuoteDialog({
       .map(service => ({
         id: crypto.randomUUID(),
         service_name: service,
-        service_price: DEFAULT_PRICES[service] || 0,
+        service_price: (tierPrice(orderVolume, service) ?? DEFAULT_PRICES[service]) || 0,
         notes: AUTO_NOTES[service] || "",
         isEditing: false,
       }));
@@ -506,7 +537,7 @@ export function CreateQuoteDialog({
     setManualContactName("");
     setManualEmail("");
     setManualPhone("");
-    setOrderVolume("0-1000");
+    setOrderVolume("0-500");
     setMinimumSpendTier("250_then_500");
     setCustomMinimumAmount("");
     setCustomIntroAmount("");
@@ -632,7 +663,7 @@ export function CreateQuoteDialog({
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label htmlFor="order-volume" className="text-xs">Monthly order volume</Label>
-                  <Select value={orderVolume} onValueChange={setOrderVolume}>
+                  <Select value={orderVolume} onValueChange={handleVolumeChange}>
                     <SelectTrigger id="order-volume">
                       <SelectValue placeholder="Select volume" />
                     </SelectTrigger>
