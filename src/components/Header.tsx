@@ -116,7 +116,7 @@ const Header = () => {
               </Link>
               
               <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium text-sm flex items-center gap-1 whitespace-nowrap">
-                <span className="text-secondary"><TranslatedText>See Your Savings</TranslatedText></span>
+                <span className="text-secondary"><TranslatedText>Pricing</TranslatedText></span>
               </Link>
               
               {/* Sales Channels Dropdown - Hover-based */}
@@ -200,16 +200,8 @@ const Header = () => {
                 <TranslatedText>Integrations</TranslatedText>
               </Link>
 
-              <Link to="/why-choose-us" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
-                <TranslatedText>Why Choose Us</TranslatedText>
-              </Link>
-
               <Link to="/launchpad" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
                 <TranslatedText>Launchpad</TranslatedText>
-              </Link>
-
-              <Link to="/testimonials" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
-                <TranslatedText>Testimonials</TranslatedText>
               </Link>
 
               <Link to="/blog" className="text-foreground hover:text-primary transition-colors font-medium text-sm whitespace-nowrap">
@@ -284,7 +276,7 @@ const Header = () => {
                         onClick={() => handleMobileNavClick("/pricing")}
                         className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left text-secondary"
                       >
-                        <TranslatedText>See Your Savings</TranslatedText>
+                        <TranslatedText>Pricing</TranslatedText>
                       </button>
                       
                       {/* Sales Channels Accordion */}
@@ -324,24 +316,10 @@ const Header = () => {
                       </button>
                       
                       <button
-                        onClick={() => handleMobileNavClick("/why-choose-us")}
-                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
-                      >
-                        <TranslatedText>Why Choose Us</TranslatedText>
-                      </button>
-
-                      <button
                         onClick={() => handleMobileNavClick("/launchpad")}
                         className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
                       >
                         <TranslatedText>Launchpad</TranslatedText>
-                      </button>
-                      
-                      <button
-                        onClick={() => handleMobileNavClick("/testimonials")}
-                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent transition-colors text-left"
-                      >
-                        <TranslatedText>Testimonials</TranslatedText>
                       </button>
                       
                       <button
