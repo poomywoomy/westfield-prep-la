@@ -1,7 +1,13 @@
 import { useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { Link } from "@/lib/router-compat";
 import { motion, AnimatePresence, type Easing } from "framer-motion";
-import Lottie from "lottie-react";
+import LottiePkg from "lottie-react";
+
+// Vite resolves lottie-react's browser field to its UMD build, whose default
+// export is the module namespace rather than the component itself. Unwrap it so
+// <Lottie /> always receives a renderable component.
+const Lottie = ((LottiePkg as unknown as { default?: typeof LottiePkg }).default ??
+  LottiePkg) as typeof LottiePkg;
 import Header from "@/components/Header";
 import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
