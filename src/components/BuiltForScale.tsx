@@ -1,4 +1,4 @@
-import { useNavigate } from "@/lib/router-compat";
+import { useNavigate, Link } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { Truck, Boxes, Users, ArrowRight } from "lucide-react";
 import { TranslatedText } from "./TranslatedText";
@@ -118,6 +118,16 @@ const BuiltForScale = () => {
             <TranslatedText>See Pricing</TranslatedText>
           </Button>
         </div>
+
+        <p className="mt-6 text-sm">
+          <Link
+            to="/about"
+            className="inline-flex items-center gap-1.5 font-semibold text-white underline decoration-secondary decoration-2 underline-offset-4 hover:text-secondary transition-colors"
+          >
+            <TranslatedText>Meet the team behind the operation</TranslatedText>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </p>
       </div>
     </section>
   );
