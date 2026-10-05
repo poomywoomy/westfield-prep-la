@@ -2,7 +2,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
-import StructuredData from "@/components/StructuredData";
 import { Link } from "@/lib/router-compat";
 import { TranslatedText } from "@/components/TranslatedText";
 
@@ -49,10 +48,6 @@ const Testimonials = () => {
   return (
     <>
       
-      <StructuredData type="breadcrumb" data={[
-        { name: "Home", url: "https://westfieldprepcenter.com/" },
-        { name: "Testimonials", url: "https://westfieldprepcenter.com/testimonials/" }
-      ]} />
       
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-muted/20 to-background">
         <Header />

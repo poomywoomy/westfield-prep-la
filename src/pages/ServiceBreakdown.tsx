@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CheckCircle2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import StructuredData from "@/components/StructuredData";
 
 const ServiceBreakdown = () => {
   const navigate = useNavigate();

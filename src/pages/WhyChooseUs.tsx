@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 import Header from "@/components/Header";
-import StructuredData from "@/components/StructuredData";
 import Footer from "@/components/Footer";
 import { SiShopify, SiAmazon, SiWalmart, SiTiktok } from "@/lib/react-icons-si";
 import {
@@ -336,22 +335,7 @@ const WhyChooseUs = () => {
   return (
     <>
 
-      <StructuredData
-        type="service"
-        data={{
-          name: "Boutique Fulfillment Services",
-          description:
-            "White-glove prep center and fulfillment services in Los Angeles. Specializing in Amazon FBA prep, Shopify fulfillment, and multi-channel e-commerce logistics with same-day processing and photo-proof QC.",
-        }}
-      />
 
-      <StructuredData
-        type="breadcrumb"
-        data={[
-          { name: "Home", url: "https://westfieldprepcenter.com/" },
-          { name: "Why Choose Us", url: "https://westfieldprepcenter.com/why-choose-us/" },
-        ]}
-      />
 
       <div className="min-h-screen bg-[hsl(var(--wcu-linen))] text-[hsl(var(--wcu-ink))] font-sans selection:bg-[hsl(var(--wcu-sunset))] selection:text-white">
         <Header />

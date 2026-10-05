@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import StructuredData from "@/components/StructuredData";
 import { generateMetaTags } from "@/utils/seo";
 import ReceivingHero from "@/components/receiving/ReceivingHero";
 import ReceivingPainPoints from "@/components/receiving/ReceivingPainPoints";
@@ -10,6 +9,9 @@ import ReceivingTimeline from "@/components/receiving/ReceivingTimeline";
 import ReceivingPhotoGallery from "@/components/receiving/ReceivingPhotoGallery";
 import ReceivingFAQ from "@/components/receiving/ReceivingFAQ";
 import ReceivingCTA from "@/components/receiving/ReceivingCTA";
+
+
+
 
 const ReceivingInspection = () => {
   useEffect(() => {
@@ -22,53 +24,11 @@ const ReceivingInspection = () => {
     "/receiving-inspection"
   );
 
-  const serviceData = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "name": "Receiving & Inspection Services",
-    "description": "Quality control and receiving inspection with photo documentation",
-    "provider": {
-      "@type": "Organization",
-      "name": "Westfield Prep Center"
-    }
-  };
 
-  const faqSchemaData = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "What's included in receiving service?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Full receiving includes shipment verification, unit counting, condition inspection, photography, and immediate inventory updates."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How fast are shipments processed?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Most shipments are processed within 4 hours of arrival. Same-day inventory updates are standard for all receiving."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Do you provide photos of all items?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, we photograph 100% of received units. Photos are available in your dashboard for 30 days."
-        }
-      }
-    ]
-  };
 
   return (
     <>
 
-      <StructuredData type="service" data={serviceData} />
-      <StructuredData type="faq" data={faqSchemaData} />
 
       <div className="min-h-screen flex flex-col">
         <Header />

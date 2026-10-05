@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import WestCoastFulfillment from "@/pages/WestCoastFulfillment";
 
+import { faqData, serviceData } from "@/data/pageContent/WestCoastFulfillment";
+import { organizationSchema, serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/west-coast-fulfillment")({
   component: WestCoastFulfillment,
   head: () => ({
@@ -53,6 +56,7 @@ export const Route = createFileRoute("/west-coast-fulfillment")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([organizationSchema(), serviceSchema(serviceData), faqSchema(faqData)]),
     links: [
           {
                 "rel": "canonical",

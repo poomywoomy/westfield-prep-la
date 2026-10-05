@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import SalesChannelShopify from "@/pages/sales-channels/Shopify";
 
+import { faqData, serviceData } from "@/data/pageContent/Shopify";
+import { serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/sales-channels/shopify")({
   component: SalesChannelShopify,
   head: () => ({
@@ -29,6 +32,7 @@ export const Route = createFileRoute("/sales-channels/shopify")({
                 "content": "Same-day Shopify fulfillment with QC photos and branded packaging. 400K+ orders fulfilled from Los Angeles."
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqData)]),
     links: [
           {
                 "rel": "canonical",

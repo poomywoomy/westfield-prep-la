@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import SalesChannelTikTokShop from "@/pages/sales-channels/TikTokShop";
 
+import { faqs } from "@/data/pageContent/TikTokShop";
+import { softwareSchema, serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/sales-channels/tiktok-shop")({
   component: SalesChannelTikTokShop,
   head: () => ({
@@ -29,6 +32,7 @@ export const Route = createFileRoute("/sales-channels/tiktok-shop")({
                 "content": "website"
           }
     ],
+    scripts: ldScripts([serviceSchema({ name: "TikTok Shop Fulfillment", description: "Professional TikTok Shop fulfillment services with real-time order sync, surge capacity, and rapid pick/pack for viral demand in Los Angeles." }), faqSchema(faqs), softwareSchema()]),
     links: [
           {
                 "rel": "canonical",

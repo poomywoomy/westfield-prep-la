@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import StructuredData from "@/components/StructuredData";
 import TrustStrip from "@/components/sales-channels/TrustStrip";
 import StickyCTA from "@/components/sales-channels/StickyCTA";
 import TikTokChannelHero from "@/components/tiktok/TikTokChannelHero";
@@ -17,20 +16,6 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, Heart, Gift, Video } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
 
-const faqs = [
-  {
-    question: "How do you connect to TikTok Shop?",
-    answer: "We integrate via established middleware platforms and APIs. Setup takes 24-48 hours.",
-  },
-  {
-    question: "Can you handle viral order spikes?",
-    answer: "Absolutely. We maintain surge capacity specifically for TikTok sellers with 10x scaling ability.",
-  },
-  {
-    question: "What's your average processing time?",
-    answer: "Our average is 6 hours from order receipt to shipment. Same-day shipping is typical.",
-  },
-];
 
 const TikTokShop = () => {
   useEffect(() => {
@@ -40,16 +25,6 @@ const TikTokShop = () => {
   return (
     <>
 
-      <StructuredData
-        type="service"
-        data={{
-          name: "TikTok Shop Fulfillment",
-          description:
-            "Professional TikTok Shop fulfillment services with real-time order sync, surge capacity, and rapid pick/pack for viral demand in Los Angeles.",
-        }}
-      />
-      <StructuredData type="faq" data={{ faqs }} />
-      <StructuredData type="software" />
 
       <div className="min-h-screen flex flex-col">
         <Header />

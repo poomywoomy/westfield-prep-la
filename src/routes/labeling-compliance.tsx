@@ -3,6 +3,9 @@ import LabelingCompliance from "@/pages/LabelingCompliance";
 
 // Legacy indexed URL restored after the migration; /labeling-fnsku stays live
 // and remains the canonical target declared inside the page itself.
+import { faqData, serviceData } from "@/data/pageContent/LabelingCompliance";
+import { serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/labeling-compliance")({
   component: LabelingCompliance,
   head: () => ({
@@ -55,6 +58,7 @@ export const Route = createFileRoute("/labeling-compliance")({
                 "content": "https://storage.googleapis.com/gpt-engineer-file-uploads/bXqmPMMaXvQ7FVHXCE76ed3moJI3/social-images/social-1759478221094-Westfield_Prep_Center_Logo_Square.png"
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqData)]),
     links: [
           {
                 "rel": "canonical",

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as R3plLosAngelesRouteImport } from './routes/3pl-los-angeles'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AmazonFbaPrepRouteImport } from './routes/amazon-fba-prep'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -59,6 +60,11 @@ const IndexRoute = IndexRouteImport.update({
 const R3plLosAngelesRoute = R3plLosAngelesRouteImport.update({
   id: '/3pl-los-angeles',
   path: '/3pl-los-angeles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AmazonFbaPrepRoute = AmazonFbaPrepRouteImport.update({
@@ -260,6 +266,7 @@ const SalesChannelsTiktokShopRoute = SalesChannelsTiktokShopRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/3pl-los-angeles': typeof R3plLosAngelesRoute
+  '/about': typeof AboutRoute
   '/amazon-fba-prep': typeof AmazonFbaPrepRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -303,6 +310,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/3pl-los-angeles': typeof R3plLosAngelesRoute
+  '/about': typeof AboutRoute
   '/amazon-fba-prep': typeof AmazonFbaPrepRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -347,6 +355,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/3pl-los-angeles': typeof R3plLosAngelesRoute
+  '/about': typeof AboutRoute
   '/amazon-fba-prep': typeof AmazonFbaPrepRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -392,6 +401,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/3pl-los-angeles'
+    | '/about'
     | '/amazon-fba-prep'
     | '/contact'
     | '/faq'
@@ -435,6 +445,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/3pl-los-angeles'
+    | '/about'
     | '/amazon-fba-prep'
     | '/contact'
     | '/faq'
@@ -478,6 +489,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/3pl-los-angeles'
+    | '/about'
     | '/amazon-fba-prep'
     | '/contact'
     | '/faq'
@@ -522,6 +534,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R3plLosAngelesRoute: typeof R3plLosAngelesRoute
+  AboutRoute: typeof AboutRoute
   AmazonFbaPrepRoute: typeof AmazonFbaPrepRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
@@ -577,6 +590,13 @@ declare module '@tanstack/react-router' {
       path: '/3pl-los-angeles'
       fullPath: '/3pl-los-angeles'
       preLoaderRoute: typeof R3plLosAngelesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/amazon-fba-prep': {
@@ -858,6 +878,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R3plLosAngelesRoute: R3plLosAngelesRoute,
+  AboutRoute: AboutRoute,
   AmazonFbaPrepRoute: AmazonFbaPrepRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,

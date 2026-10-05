@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Integrations from "@/pages/Integrations";
 
+import { softwareSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/integrations")({
   component: Integrations,
   head: () => ({
@@ -61,6 +63,7 @@ export const Route = createFileRoute("/integrations")({
                 "content": "https://westfieldprepcenter.com/hero-warehouse-optimized.webp"
           }
     ],
+    scripts: ldScripts([softwareSchema()]),
     links: [
           {
                 "rel": "canonical",

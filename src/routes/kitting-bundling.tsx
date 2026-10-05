@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import KittingBundling from "@/pages/KittingBundling";
 
+import { faqSchemaData, serviceData } from "@/data/pageContent/KittingBundling";
+import { serviceSchema, faqSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/kitting-bundling")({
   component: KittingBundling,
   head: () => ({
@@ -17,6 +20,7 @@ export const Route = createFileRoute("/kitting-bundling")({
                 "content": "3pl los angeles, kitting services, bundling, prep center, subscription box assembly, product kitting"
           }
     ],
+    scripts: ldScripts([serviceSchema(serviceData), faqSchema(faqSchemaData)]),
     links: [
           {
                 "rel": "canonical",

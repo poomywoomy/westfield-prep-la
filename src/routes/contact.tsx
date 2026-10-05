@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Contact from "@/pages/Contact";
 
+import { organizationSchema, contactSchema, ldScripts } from "@/data/pageSchemas";
+
 export const Route = createFileRoute("/contact")({
   component: Contact,
   head: () => ({
@@ -61,6 +63,7 @@ export const Route = createFileRoute("/contact")({
                 "content": "https://westfieldprepcenter.com/hero-warehouse-optimized.webp"
           }
     ],
+    scripts: ldScripts([organizationSchema(), contactSchema()]),
     links: [
           {
                 "rel": "canonical",
