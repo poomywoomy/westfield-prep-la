@@ -25,8 +25,8 @@ const PremiumHero = () => {
           <img
             src="/hero-warehouse-optimized.webp"
             alt="Westfield Prep Center loading dock and warehouse interior in Los Angeles"
-            // @ts-expect-error - lowercase fetchpriority is the correct HTML attribute
-            fetchpriority="high"
+            
+            fetchPriority="high"
             width={1920}
             height={1080}
             className="w-full h-full object-cover opacity-90"
