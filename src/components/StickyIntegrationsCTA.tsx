@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Calendar, Zap, X } from "lucide-react";
@@ -32,7 +32,7 @@ const StickyIntegrationsCTA = () => {
   };
 
   return (
-    <>
+    <Fragment>
       {/* Desktop Sticky Sidebar */}
       <AnimatePresence>
         {isVisible && (
@@ -106,7 +106,7 @@ const StickyIntegrationsCTA = () => {
       </AnimatePresence>
 
       <CalendlyModal open={calendlyOpen} onOpenChange={setCalendlyOpen} />
-    </>
+    </Fragment>
   );
 };
 
