@@ -15,9 +15,11 @@ function routerWithQueryClient(router: AnyRouter, queryClient: QueryClient) {
     ...ogOptions,
     Wrap: ({ children }: { children?: ReactNode }) => {
       const OGWrap = ogOptions.Wrap as ComponentType<{ children?: ReactNode }> | undefined;
+      // No Fragment fallback: the editor's element tagger injects a tracking
+      // prop onto JSX elements, and Fragment rejects any prop but key/children.
       return (
         <QueryClientProvider client={queryClient}>
-          {OGWrap ? <OGWrap>{children}</OGWrap> : <Fragment>{children}</Fragment>}
+          {OGWrap ? <OGWrap>{children}</OGWrap> : children}
         </QueryClientProvider>
       );
     },
