@@ -90,8 +90,8 @@ export const BlogCard = ({ id, title, slug, excerpt, publishedAt, category, auth
                 className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                 loading={priority ? "eager" : "lazy"}
                 decoding="async"
-                // @ts-expect-error - lowercase fetchpriority is the correct HTML attribute
-                fetchpriority={priority ? "high" : "auto"}
+                
+                fetchPriority={priority ? "high" : "auto"}
                 onLoad={() => setImageLoaded(true)}
                 onError={(e) => {
                   if (onImgError) onImgError(e);

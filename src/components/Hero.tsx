@@ -32,8 +32,8 @@ const Hero = () => {
         <img
           src={heroImage}
           alt="Modern warehouse interior at Westfield Prep Center Los Angeles"
-          // @ts-expect-error - lowercase fetchpriority is the correct HTML attribute
-          fetchpriority="high"
+          
+          fetchPriority="high"
           width="1920"
           height="1080"
           className="w-full h-full object-cover opacity-10"

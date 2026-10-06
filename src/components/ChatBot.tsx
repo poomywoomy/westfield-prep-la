@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef, useEffect, useState } from "react";
+import { Fragment, lazy, Suspense, useRef, useEffect, useState} from "react";
 import { useLocation } from "@/lib/router-compat";
 import { X, Send, Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -121,7 +121,7 @@ const ChatBotInner = () => {
   const showQuickAsk = messages.length === 0 && !hasUserSentMessage;
 
   return (
-    <>
+    <Fragment>
       {/* Floating button */}
       <ChatBotButton isOpen={isOpen} greeting={greeting} onClick={toggleChat} />
 
@@ -266,7 +266,7 @@ const ChatBotInner = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </Fragment>
   );
 };
 

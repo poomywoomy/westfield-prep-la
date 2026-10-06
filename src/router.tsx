@@ -14,10 +14,12 @@ function routerWithQueryClient(router: AnyRouter, queryClient: QueryClient) {
   router.options = {
     ...ogOptions,
     Wrap: ({ children }: { children?: ReactNode }) => {
-      const OGWrap = (ogOptions.Wrap as ComponentType<{ children?: ReactNode }> | undefined) || Fragment;
+      const OGWrap = ogOptions.Wrap as ComponentType<{ children?: ReactNode }> | undefined;
+      // No Fragment fallback: the editor's element tagger injects a tracking
+      // prop onto JSX elements, and Fragment rejects any prop but key/children.
       return (
         <QueryClientProvider client={queryClient}>
-          <OGWrap>{children}</OGWrap>
+          {OGWrap ? <OGWrap>{children}</OGWrap> : children}
         </QueryClientProvider>
       );
     },

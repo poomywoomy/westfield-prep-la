@@ -119,8 +119,8 @@ const BlogPost = () => {
                     className="w-full h-full object-cover"
                     loading="eager"
                     decoding="async"
-                    // @ts-expect-error - lowercase fetchpriority is the correct HTML attribute
-                    fetchpriority="high"
+                    
+                    fetchPriority="high"
                     onError={(e) => {
                       const fallback = buildWebpFallbackOnError(post.cover_image_url);
                       if (fallback) {

@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Link } from "@/lib/router-compat";
 import { ChevronRight } from "lucide-react";
 import { Helmet } from "@/lib/helmet-compat";
@@ -38,7 +39,7 @@ const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
   } : null;
 
   return (
-    <>
+    <Fragment>
       {shouldRenderSchema && (
         <Helmet>
           <script type="application/ld+json">
@@ -70,7 +71,7 @@ const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
           </ol>
         </div>
       </nav>
-    </>
+    </Fragment>
   );
 };
 

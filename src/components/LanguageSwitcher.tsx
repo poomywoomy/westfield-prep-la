@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   DropdownMenu,
@@ -32,17 +33,17 @@ export function LanguageSwitcher({ variant = 'default', className = '' }: Langua
           disabled={isDetecting}
         >
           {currentLang ? (
-            <>
+            <Fragment>
               <span className="text-base">{currentLang.flag_emoji}</span>
               {variant !== 'compact' && (
                 <span className="hidden sm:inline">{currentLang.native_name}</span>
               )}
-            </>
+            </Fragment>
           ) : (
-            <>
+            <Fragment>
               <Globe className="h-4 w-4" />
               {variant !== 'compact' && <span>Language</span>}
-            </>
+            </Fragment>
           )}
         </Button>
       </DropdownMenuTrigger>
