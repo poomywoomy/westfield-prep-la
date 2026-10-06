@@ -19,6 +19,7 @@ const Contact = () => {
         <Header />
 
         <main className="pt-32">
+          <h1 className="sr-only">Contact Westfield Prep Center</h1>
           <ContactForm />
         </main>
 
