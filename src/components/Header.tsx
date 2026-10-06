@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect} from "react";
 import { Link, useLocation, useNavigate } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { Phone, Calendar, ChevronDown, Menu, X } from "lucide-react";
@@ -89,7 +89,7 @@ const Header = () => {
   ];
 
   return (
-    <>
+    <Fragment>
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 ${
           isScrolled ? "bg-background shadow-md" : "bg-background/95 backdrop-blur-xs"
@@ -395,7 +395,7 @@ const Header = () => {
       </header>
 
       <CalendlyModal open={calendlyOpen} onOpenChange={setCalendlyOpen} />
-    </>
+    </Fragment>
   );
 };
 
