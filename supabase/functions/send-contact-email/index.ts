@@ -135,6 +135,22 @@ const handler = async (req: Request): Promise<Response> => {
     const recipientEmail = RECIPIENT_EMAIL;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Store every submission so no lead is lost even if email delivery fails
+    const { error: insertError } = await supabase.from('contact_submissions').insert({
+      full_name: name,
+      business_name: business,
+      email,
+      phone,
+      service_type: serviceType,
+      marketplaces: marketplaces ?? null,
+      orders_per_month: unitsPerMonth ?? null,
+      comments,
+    });
+    if (insertError) {
+      console.error("Failed to store contact submission:", insertError);
+    }
+
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
     const rateLimitKey = `contact_form:${clientIp}`;
     const windowStart = new Date(Date.now() - 3600000);
