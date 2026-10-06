@@ -864,6 +864,45 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_submissions: {
+        Row: {
+          business_name: string | null
+          comments: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          marketplaces: string[] | null
+          orders_per_month: string | null
+          phone: string | null
+          service_type: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          comments?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          marketplaces?: string[] | null
+          orders_per_month?: string | null
+          phone?: string | null
+          service_type?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          comments?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          marketplaces?: string[] | null
+          orders_per_month?: string | null
+          phone?: string | null
+          service_type?: string | null
+        }
+        Relationships: []
+      }
       credits: {
         Row: {
           amount_cents: number
