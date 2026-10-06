@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from "react";
+import { Fragment,  useEffect, lazy, Suspense } from "react";
 import { Helmet } from "@/lib/helmet-compat";
 import { useNavigate } from "@/lib/router-compat";
 import Header from "@/components/Header";
@@ -49,7 +49,7 @@ const Index = () => {
 
 
   return (
-    <>
+    <Fragment>
       <Helmet>
 <link rel="preload" as="image" href="/hero-warehouse-optimized.webp" />
       </Helmet>
@@ -135,7 +135,7 @@ const Index = () => {
       </div>
 
       <Footer />
-    </>
+    </Fragment>
   );
 };
 

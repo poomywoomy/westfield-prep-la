@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense, useMemo } from "react";
+import { Fragment,  useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { Link } from "@/lib/router-compat";
 import { motion, AnimatePresence, type Easing } from "framer-motion";
 import LottiePkg from "lottie-react";
@@ -179,7 +179,7 @@ const Pricing = () => {
   );
 
   return (
-    <>
+    <Fragment>
 
       {/* Scroll-Persistent Sticky CTA (Desktop Only) */}
       <AnimatePresence>
@@ -1087,7 +1087,7 @@ const Pricing = () => {
         <Footer />
         <ExitIntentModal />
       </div>
-    </>
+    </Fragment>
   );
 };
 

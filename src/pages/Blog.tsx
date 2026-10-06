@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment,  useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { blogPostsQueryOptions } from "@/lib/blogPostQuery";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,7 +49,7 @@ const Blog = () => {
   }, [posts, selectedCategory, searchTerm]);
 
   return (
-    <>
+    <Fragment>
 
       <Header />
 
@@ -100,7 +100,7 @@ const Blog = () => {
               <h3 className="text-2xl font-bold mb-2"><TranslatedText>No Articles Found</TranslatedText></h3>
             </div>
           ) : (
-            <>
+            <Fragment>
               {/* Featured Post - Full Width */}
               {filteredPosts.length > 0 && (
                 <div className="mb-12">
@@ -142,7 +142,7 @@ const Blog = () => {
                   );
                 })}
               </div>
-            </>
+            </Fragment>
           )}
         </div>
       </section>
@@ -157,7 +157,7 @@ const Blog = () => {
       </section>
 
       <Footer />
-    </>
+    </Fragment>
   );
 };
 

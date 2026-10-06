@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Fragment,  useEffect } from "react";
 import { useNavigate, Link } from "@/lib/router-compat";
 import Header from "@/components/Header";
 import ContactForm from "@/components/ContactForm";
@@ -13,7 +13,7 @@ const Contact = () => {
   }, []);
 
   return (
-    <>
+    <Fragment>
       
       <div className="min-h-screen bg-background">
         <Header />
@@ -24,7 +24,7 @@ const Contact = () => {
 
         <Footer />
       </div>
-    </>
+    </Fragment>
   );
 };
 
