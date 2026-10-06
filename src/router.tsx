@@ -14,10 +14,10 @@ function routerWithQueryClient(router: AnyRouter, queryClient: QueryClient) {
   router.options = {
     ...ogOptions,
     Wrap: ({ children }: { children?: ReactNode }) => {
-      const OGWrap = (ogOptions.Wrap as ComponentType<{ children?: ReactNode }> | undefined) || Fragment;
+      const OGWrap = ogOptions.Wrap as ComponentType<{ children?: ReactNode }> | undefined;
       return (
         <QueryClientProvider client={queryClient}>
-          <OGWrap>{children}</OGWrap>
+          {OGWrap ? <OGWrap>{children}</OGWrap> : <Fragment>{children}</Fragment>}
         </QueryClientProvider>
       );
     },
