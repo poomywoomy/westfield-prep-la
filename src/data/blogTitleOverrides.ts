@@ -30,6 +30,7 @@ export const BLOG_TITLE_OVERRIDES: Record<string, string> = {
   'why-growing-shopify-amazon-sellers-need-3pl-fulfillment-partner': 'Why Growing Shopify & Amazon Sellers Need a 3PL Partner',
   'what-are-best-ecommerce-fulfillment-services-for-startups': 'Best Fulfillment Center for Small Businesses & Amazon FBA',
   'top-10-fulfillment-services-los-angeles-scale-ecommerce-business': 'Fulfillment Service Los Angeles for E-commerce Brands',
+  'how-can-storage-and-fulfillment-services-improve-your-ecommerce-business': 'Order Fulfillment Center & Storage Services | Westfield Prep',
 };
 
 
