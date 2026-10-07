@@ -29,6 +29,7 @@ export const BLOG_TITLE_OVERRIDES: Record<string, string> = {
   '7-reasons-westfield-prep-center-best-prep-center-amazon-fba-los-angeles': 'Amazon FBA Prep Center Los Angeles | Fast & Compliant',
   'why-growing-shopify-amazon-sellers-need-3pl-fulfillment-partner': 'Why Growing Shopify & Amazon Sellers Need a 3PL Partner',
   'what-are-best-ecommerce-fulfillment-services-for-startups': 'Best Fulfillment Center for Small Businesses & Amazon FBA',
+  'top-10-fulfillment-services-los-angeles-scale-ecommerce-business': 'Fulfillment Service Los Angeles for E-commerce Brands',
 };
 
 
