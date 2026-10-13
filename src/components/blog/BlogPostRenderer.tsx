@@ -55,7 +55,7 @@ export const BlogPostRenderer = ({ content }: BlogPostRendererProps) => {
   
   return (
     <div
-      className="prose prose-lg max-w-none animate-fade-in
+      className="prose prose-lg max-w-none animate-fade-in [&>table]:table-fixed [&>table]:break-words [&>table]:[overflow-wrap:anywhere]
         [&>h1]:text-[hsl(var(--blog-navy))] [&>h1]:font-bold [&>h1]:text-4xl [&>h1]:mb-6 [&>h1]:mt-2 [&>h1]:border-l-4 [&>h1]:border-[hsl(var(--blog-orange))] [&>h1]:pl-4
         [&>h2]:text-[hsl(var(--blog-navy))] [&>h2]:font-bold [&>h2]:text-3xl [&>h2]:mb-4 [&>h2]:mt-10 [&>h2]:border-l-4 [&>h2]:border-[hsl(var(--blog-orange))] [&>h2]:pl-4
         [&>h3]:text-[hsl(var(--blog-navy))] [&>h3]:font-bold [&>h3]:text-2xl [&>h3]:mb-3 [&>h3]:mt-8 [&>h3]:border-l-4 [&>h3]:border-[hsl(var(--blog-orange))] [&>h3]:pl-4
