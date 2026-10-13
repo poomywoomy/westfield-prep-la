@@ -5,6 +5,28 @@ export interface BlogFaqItem {
 
 // Exact FAQ copy supplied for posts that require a fixed schema payload.
 export const BLOG_FAQ_OVERRIDES: Record<string, BlogFaqItem[]> = {
+  "amazon-fba-vs-dedicated-3pl-multi-channel-ecommerce-brand": [
+    {
+      question: "Is Amazon FBA better than using a 3PL?",
+      answer: "Neither is better in every case. FBA is great for Amazon orders and Prime eligibility. A 3PL gives you flexibility across several channels and handles prep. Many brands use both.",
+    },
+    {
+      question: "What does an Amazon FBA prep center do?",
+      answer: "It receives your inventory and prepares it to Amazon's rules, including FNSKU labels, polybagging, carton prep and pallet building. It then ships the inventory to Amazon fulfillment centers.",
+    },
+    {
+      question: "Can one warehouse handle both Shopify and Amazon orders?",
+      answer: "Yes. A 3PL like Westfield can store your stock in one place, ship Shopify orders directly and prep replenishment shipments for Amazon.",
+    },
+    {
+      question: "How much does Amazon third party fulfillment cost?",
+      answer: "Pricing depends on volume and services. Westfield uses transparent per-unit and per-pallet pricing with no hidden fees. You can get a custom quote in 24 hours.",
+    },
+    {
+      question: "Why choose a Los Angeles prep center for Amazon FBA?",
+      answer: "A Los Angeles facility sits near major ports and West Coast Amazon fulfillment centers, which can speed up check-ins and keep transit costs down.",
+    },
+  ],
   "top-10-fulfillment-services-los-angeles-scale-ecommerce-business": [
     {
       question: "What is a fulfillment service in Los Angeles?",
