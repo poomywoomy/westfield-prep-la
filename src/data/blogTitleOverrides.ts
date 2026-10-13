@@ -1,6 +1,7 @@
 // Slug-specific SEO title overrides, shared by the blog route head (SSR)
 // and the blog post page so both emit identical values.
 export const BLOG_TITLE_OVERRIDES: Record<string, string> = {
+  '7-reasons-choose-3pl-amazon-fba-ecommerce-fulfillment-los-angeles': '3PL for Amazon FBA & Ecommerce Fulfillment in Los Angeles',
   'amazon-fba-vs-dedicated-3pl-multi-channel-ecommerce-brand': 'Amazon FBA vs 3PL for Multi-Channel Brands | Westfield Prep',
   'why-3pl-fulfillment-is-essential-for-startups-scaling-with-amazon-fba': '3PL Fulfillment for Startups Scaling with Amazon FBA',
   '3pl-fulfillment-startups-scaling-amazon-fba': '3PL Fulfillment for Startups Scaling with Amazon FBA',

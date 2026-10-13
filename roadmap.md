@@ -1,4 +1,4 @@
-# New PDF blog
-- [x] Add the PDF article and original cover image with the four requested links.
-- [x] Add exact SEO title and five FAQ schema entries.
-- [x] Verify the post, main blog listing, image, links, and head schemas.
+# October 14 PDF blog
+- [x] Add the original article, cover image, and five requested links.
+- [x] Add exact metadata, four PDF FAQs and matching head schema.
+- [x] Verify October 14 date on the post and listing, image, links, and mobile layout.
