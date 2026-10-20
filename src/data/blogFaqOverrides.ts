@@ -5,6 +5,13 @@ export interface BlogFaqItem {
 
 // Exact FAQ copy supplied for posts that require a fixed schema payload.
 export const BLOG_FAQ_OVERRIDES: Record<string, BlogFaqItem[]> = {
+  "third-party-logistics-companies-los-angeles-choose-right-3pl": [
+    { question: "What do third-party logistics providers do?", answer: "They receive and store your inventory, pick and pack customer orders and ship them for you. Many also handle returns, labeling and custom packaging." },
+    { question: "How do I choose the right 3PL for my online store?", answer: "Check integration with your store, clear pricing, inventory accuracy, shipping speed and customer support. Also consider location, since it affects delivery time and cost." },
+    { question: "Does a 3PL connect directly with Shopify?", answer: "Yes. Most modern 3PLs sync with Shopify so orders, tracking numbers and stock levels update automatically, with no manual entry." },
+    { question: "Can a 3PL fulfill orders for TikTok Shop and Amazon?", answer: "Yes. A good 3PL can ship orders from several sales channels using the same inventory, and it can prep products for Amazon too." },
+    { question: "Is a 3PL too expensive for a small business?", answer: "Usually not. You pay only for the services you use, and you avoid the cost of rent, staff and packing supplies. Many small brands find it cheaper than doing it themselves." },
+  ],
   "7-reasons-choose-3pl-amazon-fba-ecommerce-fulfillment-los-angeles": [
     { question: "What does a 3PL for Amazon FBA do?", answer: "It receives your inventory, preps it to Amazon's requirements and ships it to Amazon fulfillment centers so it is accepted without delays." },
     { question: "Why choose an Amazon FBA prep center in Los Angeles?", answer: "Los Angeles is close to major ports and carrier hubs, which speeds up receiving and shortens the trip to California Amazon fulfillment centers." },

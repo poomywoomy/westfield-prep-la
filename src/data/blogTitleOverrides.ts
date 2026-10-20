@@ -33,6 +33,7 @@ export const BLOG_TITLE_OVERRIDES: Record<string, string> = {
   'what-are-best-ecommerce-fulfillment-services-for-startups': 'Best Fulfillment Center for Small Businesses & Amazon FBA',
   'top-10-fulfillment-services-los-angeles-scale-ecommerce-business': 'Fulfillment Service Los Angeles for E-commerce Brands',
   'how-can-storage-and-fulfillment-services-improve-your-ecommerce-business': 'Order Fulfillment Center & Storage Services | Westfield Prep',
+  'third-party-logistics-companies-los-angeles-choose-right-3pl': 'Third Party Logistics Companies LA: How to Choose a 3PL',
 };
 
 
