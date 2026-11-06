@@ -47,7 +47,7 @@ const SERVICE_AREA = [
 
 const OPENING_HOURS = {
   "@type": "OpeningHoursSpecification",
-  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
   opens: "08:00",
   closes: "17:00",
   timeZone: "America/Los_Angeles",
@@ -173,8 +173,6 @@ export const contactSchema = (): Schema => ({
         "Wednesday",
         "Thursday",
         "Friday",
-        "Saturday",
-        "Sunday",
       ],
       opens: "08:00",
       closes: "17:00",
