@@ -10,7 +10,7 @@ const ShopifyChannelHero = () => {
     { icon: Zap, text: "Same-Day Shipping" },
     { icon: Package, text: "Branded Packaging" },
     { icon: BarChart3, text: "Real-Time Sync" },
-    { icon: CheckCircle, text: "99.6% Accuracy" },
+    { icon: CheckCircle, text: "99.8% Accuracy" },
   ];
 
   return (

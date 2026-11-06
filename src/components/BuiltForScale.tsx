@@ -19,8 +19,8 @@ const BuiltForScale = () => {
       icon: Boxes,
       title: "Built for throughput",
       description:
-        "Dock-to-ship capacity that absorbs order spikes without slowing down. 2M+ orders shipped for 100+ brands — and counting.",
-      stat: "2M+",
+        "Dock-to-ship capacity that absorbs order spikes without slowing down. 2 million orders shipped annually for 75+ brands — and counting.",
+      stat: "2M",
       statLabel: "Orders shipped",
     },
     {

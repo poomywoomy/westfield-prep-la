@@ -14,7 +14,7 @@ const ShopifyValueGrid = () => {
     {
       icon: Zap,
       title: "Lightning Speed",
-      description: "Orders in by 2PM ship same day.",
+      description: "Orders in by 2 PM PT ship same day.",
     },
     {
       icon: Gift,

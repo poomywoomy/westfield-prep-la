@@ -4,7 +4,7 @@ import { TranslatedText } from "@/components/TranslatedText";
 const cases = [
   { industry: "Electronics & accessories", challenge: "High-value SKUs needed photo QC for every unit.", outcome: "Zero damage claims · 100% FBA compliance" },
   { industry: "Supplements & health", challenge: "Lot tracking + expiration date labeling at scale.", outcome: "100% Amazon compliance · zero restricted inventory" },
-  { industry: "Toys & games", challenge: "Q4 rush demanded same-day pallet forwarding.", outcome: "99% same-day ship rate during peak" },
+  { industry: "Toys & games", challenge: "Q4 rush demanded same-day pallet forwarding.", outcome: "97% same-day ship rate during peak" },
 ];
 
 const ResultsBento = () => {

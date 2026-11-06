@@ -10,7 +10,7 @@ const FAQAccordion = () => {
 
   const faqs = [
     { question: "What kind of brands do you work with?", answer: "We're purpose-built for scaling ecommerce brands shipping 1,000+ orders per month, up to 50,000+. Our platform, pricing, and operations are designed around that volume band — pricing scales with your volume, so you only pay for what you use." },
-    { question: "What's your order turnaround time?", answer: "We process orders within 24 hours of receiving them. Orders placed before 2 PM PST typically ship same-day. Our efficient operations and LA location ensure fast delivery times for your customers." },
+    { question: "What's your order turnaround time?", answer: "We process orders within 24 hours of receiving them. Orders placed before 2 PM PT typically ship same-day. Our efficient operations and LA location ensure fast delivery times for your customers." },
     { question: "What e-commerce platforms do you support?", answer: "We work with all major platforms including Shopify, Amazon (FBA and FBM), WooCommerce, BigCommerce, TikTok Shop, Walmart, Etsy, eBay, and more. If you're on a platform not listed, contact us — we likely support it." },
     { question: "How does pricing work?", answer: "Our pricing is transparent and straightforward: receiving fees, storage per cubic foot, and pick & pack fees per order. No setup fees, no hidden charges. We provide custom quotes based on your specific needs so you know exactly what to expect." },
     { question: "Can you handle returns?", answer: "Yes, we provide complete returns management. We receive returned products, inspect them, and either restock or dispose per your instructions. You'll receive reports on all returns processed." },

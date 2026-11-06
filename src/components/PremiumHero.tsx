@@ -98,7 +98,7 @@ const PremiumHero = () => {
                   <TranslatedText>SOC2 Ready</TranslatedText>
                 </div>
                 <span className="h-4 w-px bg-white/25" />
-                <TranslatedText className="text-sm font-semibold">Trusted by 500+ brands</TranslatedText>
+                <TranslatedText className="text-sm font-semibold">Trusted by 75+ brands</TranslatedText>
               </div>
 
               {/* CTAs */}
@@ -156,7 +156,7 @@ const PremiumHero = () => {
                   <span className="text-2xl font-bold text-secondary">%</span>
                 </div>
                 <p className="text-xs text-white/75 mt-1">
-                  <TranslatedText>across 2M+ orders shipped</TranslatedText>
+                  <TranslatedText>across 2 million orders shipped annually</TranslatedText>
                 </p>
               </div>
 

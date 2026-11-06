@@ -1095,7 +1095,7 @@ const Integrations = () => {
               variants={fadeUpVariants}
               className="text-sm opacity-75"
             >
-              <TranslatedText>Trusted by 100+ e-commerce brands | 2M+ orders shipped | Same-day turnaround</TranslatedText>
+              <TranslatedText>Trusted by 75+ e-commerce brands | 2 million orders shipped annually | Same-day turnaround</TranslatedText>
             </motion.p>
           </motion.div>
         </div>

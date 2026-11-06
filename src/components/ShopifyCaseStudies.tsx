@@ -16,7 +16,7 @@ const ShopifyCaseStudies = () => {
       badge: "Beauty & Skincare",
       challenge: "Flash-sale chaos with high volume spikes",
       solution: "Fast check-in + branded packaging workflow",
-      result: "99.9% accuracy, 50% faster throughput",
+      result: "99.8% accuracy, 50% faster throughput",
     },
     {
       industry: "Apparel",

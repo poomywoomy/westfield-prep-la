@@ -78,9 +78,9 @@ export const APPROVED_FAQ: FAQItem[] = [
   { 
     category: "Services", 
     question: "Do you support Shopify fulfillment?", 
-    answer: "Yes! We provide same-day Shopify order fulfillment for orders placed before 2 PM PST. We offer branded packaging, custom inserts, and 99.8% accuracy rate.",
+    answer: "Yes! We provide same-day Shopify order fulfillment for orders placed before 2 PM PT. We offer branded packaging, custom inserts, and 99.8% accuracy rate.",
     alternateAnswers: [
-      "Shopify fulfillment? That's our bread and butter. Same-day shipping for orders before 2 PM PST, branded packaging options, and a 99.8% accuracy rate.",
+      "Shopify fulfillment? That's our bread and butter. Same-day shipping for orders before 2 PM PT, branded packaging options, and a 99.8% accuracy rate.",
       "We're big on Shopify — same-day fulfillment, custom packaging, and an accuracy rate that keeps your customers happy."
     ]
   },
@@ -114,30 +114,30 @@ export const APPROVED_FAQ: FAQItem[] = [
   { 
     category: "Turnaround", 
     question: "How fast is receiving and shipping?", 
-    answer: "We pride ourselves on same-day turnaround for orders placed before 2 PM PST. Our boutique size allows us to process significantly faster than larger prep centers.",
+    answer: "We pride ourselves on same-day turnaround for orders placed before 2 PM PT. Our boutique size allows us to process significantly faster than larger prep centers.",
     alternateAnswers: [
-      "Speed is our strength — orders before 2 PM PST ship same day. Being boutique-sized means we move a lot faster than the big warehouses.",
-      "Same-day shipping for orders in by 2 PM PST. Our smaller operation is built for speed, not bureaucracy."
+      "Speed is our strength — orders before 2 PM PT ship same day. Being boutique-sized means we move a lot faster than the big warehouses.",
+      "Same-day shipping for orders in by 2 PM PT. Our smaller operation is built for speed, not bureaucracy."
     ]
   },
   { 
     category: "Turnaround", 
     question: "How quickly do you turn orders around?", 
-    answer: "Orders placed before 2 PM PST ship the same business day. Our boutique operation is built for speed — we process much faster than big-box fulfillment centers.",
+    answer: "Orders placed before 2 PM PT ship the same business day. Our boutique operation is built for speed — we process much faster than big-box fulfillment centers.",
     alternateAnswers: [
-      "Same-day for orders before 2 PM PST. We're intentionally smaller so we can move faster than the mega-warehouses.",
-      "Fast! 2 PM PST is our cutoff for same-day shipping. Being boutique means no red tape slowing things down."
+      "Same-day for orders before 2 PM PT. We're intentionally smaller so we can move faster than the mega-warehouses.",
+      "Fast! 2 PM PT is our cutoff for same-day shipping. Being boutique means no red tape slowing things down."
     ]
   },
   { 
     category: "Turnaround", 
     question: "What is your same-day cutoff time?", 
-    answer: "Orders placed before 2 PM PST ship the same business day. Orders placed after 2 PM PST will ship the next business day." 
+    answer: "Orders placed before 2 PM PT ship the same business day. Orders placed after 2 PM PT will ship the next business day." 
   },
   { 
     category: "Turnaround", 
     question: "What are your business hours?", 
-    answer: "Our warehouse operates Monday through Friday, 8:00 AM to 5:00 PM Pacific Time. Same-day shipping cutoff is 2:00 PM PST." 
+    answer: "Our warehouse operates Monday through Friday, 8:00 AM to 5:00 PM Pacific Time. Same-day shipping cutoff is 2:00 PM PT." 
   },
   { 
     category: "Turnaround", 

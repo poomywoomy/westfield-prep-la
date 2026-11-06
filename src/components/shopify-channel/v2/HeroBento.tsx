@@ -64,7 +64,7 @@ const HeroBento = () => {
             <div className="mt-10 grid grid-cols-3 gap-4 max-w-lg">
               {[
                 { v: "400K+", l: "Orders shipped" },
-                { v: "99.2%", l: "Same-day rate" },
+                { v: "97%", l: "Same-day rate" },
                 { v: "<24h", l: "Onboarding" },
               ].map((s) => (
                 <div key={s.l} className="border-l border-white/10 pl-4">

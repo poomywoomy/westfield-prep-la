@@ -76,7 +76,7 @@ const FAQ = () => {
       questions: [
         {
           question: "What are your business hours?",
-          answer: "Our warehouse operates Monday through Friday, 8:00 AM to 5:00 PM Pacific Time. We process orders during business hours and offer after-hours emergency support for urgent situations. Same-day shipping cutoff is 2:00 PM PST."
+          answer: "Our warehouse operates Monday through Friday, 8:00 AM to 5:00 PM Pacific Time. We process orders during business hours and offer after-hours emergency support for urgent situations. Same-day shipping cutoff is 2:00 PM PT."
         },
         {
           question: "How can I contact customer support?",
@@ -100,7 +100,7 @@ const FAQ = () => {
         },
         {
           question: "Do you provide customer support after hours?",
-          answer: "While our standard business hours are Monday-Friday 8 AM to 5 PM PST, we offer emergency support for urgent situations. Your dedicated account manager can be reached for critical issues, and we monitor systems 24/7 to ensure your orders are processed smoothly."
+          answer: "While our standard business hours are Monday-Friday 8 AM to 5 PM PT, we offer emergency support for urgent situations. Your dedicated account manager can be reached for critical issues, and we monitor systems 24/7 to ensure your orders are processed smoothly."
         }
       ]
     },
@@ -156,7 +156,7 @@ const FAQ = () => {
       questions: [
         {
           question: "What are your same-day cutoff times?",
-          answer: "Orders placed before 2 PM PST ship the same business day. Orders placed after 2 PM PST will ship the next business day. This applies to all our fulfillment services including Shopify, Amazon FBA, TikTok Shop, and DTC orders."
+          answer: "Orders placed before 2 PM PT ship the same business day. Orders placed after 2 PM PT will ship the next business day. This applies to all our fulfillment services including Shopify, Amazon FBA, TikTok Shop, and DTC orders."
         },
         {
           question: "Can you handle custom packaging and branded inserts?",
@@ -164,7 +164,7 @@ const FAQ = () => {
         },
         {
           question: "Do you offer same-day Shopify order processing?",
-          answer: "Yes! Orders received before 2 PM PST are picked, packed, and shipped the same day. This fast turnaround is one of our key advantages as a boutique fulfillment center."
+          answer: "Yes! Orders received before 2 PM PT are picked, packed, and shipped the same day. This fast turnaround is one of our key advantages as a boutique fulfillment center."
         },
         {
           question: "What's your accuracy rate for Shopify order fulfillment?",
@@ -280,7 +280,7 @@ const FAQ = () => {
         },
         {
           question: "How fast can you fulfill trending products?",
-          answer: "With our 2 PM PST same-day cutoff, trending products ordered in the morning ship the same day. We understand the importance of speed in social commerce and prioritize rapid fulfillment for viral items."
+          answer: "With our 2 PM PT same-day cutoff, trending products ordered in the morning ship the same day. We understand the importance of speed in social commerce and prioritize rapid fulfillment for viral items."
         },
         {
           question: "Can you handle influencer collaboration orders?",
@@ -348,11 +348,11 @@ const FAQ = () => {
       questions: [
         {
           question: "What are your turnaround times?",
-          answer: "As a boutique operation, we pride ourselves on same-day turnaround for orders placed before 2 PM PST. Our team allows us to process and ship significantly faster than larger prep centers. Rush services are available for urgent shipments, with an additional 30-60% fee."
+          answer: "As a boutique operation, we pride ourselves on same-day turnaround for orders placed before 2 PM PT. Our team allows us to process and ship significantly faster than larger prep centers. Rush services are available for urgent shipments, with an additional 30-60% fee."
         },
         {
           question: "What is your same-day cutoff time?",
-          answer: "Orders placed before 2 PM PST ship the same business day. Orders placed after 2 PM PST will ship the next business day. This applies to all our fulfillment services including Shopify, Amazon FBA, TikTok Shop, and DTC orders."
+          answer: "Orders placed before 2 PM PT ship the same business day. Orders placed after 2 PM PT will ship the next business day. This applies to all our fulfillment services including Shopify, Amazon FBA, TikTok Shop, and DTC orders."
         },
         {
           question: "What's your turnaround time for urgent Amazon prep?",
@@ -364,7 +364,7 @@ const FAQ = () => {
         },
         {
           question: "What's your on-time ship rate?",
-          answer: "We maintain a 99.5% on-time ship rate for orders placed before our 2 PM PST cutoff. Our boutique size allows us to maintain exceptional speed and reliability."
+          answer: "We maintain a 97% same-day ship rate for orders placed before our 2 PM PT cutoff. Our boutique size allows us to maintain exceptional speed and reliability."
         },
         {
           question: "Can you handle weekend or holiday orders?",

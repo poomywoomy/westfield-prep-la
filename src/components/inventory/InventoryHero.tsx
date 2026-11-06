@@ -38,7 +38,7 @@ const InventoryHero = () => {
             className="flex flex-wrap justify-center gap-4 mb-8"
           >
             {[
-              { icon: Shield, text: "99.9% Accuracy" },
+              { icon: Shield, text: "99.8% Accuracy" },
               { icon: RefreshCw, text: "Real-Time Sync" },
               { icon: Database, text: "10,000+ SKUs" }
             ].map((badge, idx) => (

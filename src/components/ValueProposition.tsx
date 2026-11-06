@@ -48,11 +48,11 @@ const ValueProposition = () => {
               <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
                 <div className="flex items-center gap-2">
                   <div className="h-1 w-10 bg-primary rounded-full" />
-                  <span className="text-sm font-bold text-primary">100+ Brands</span>
+                  <span className="text-sm font-bold text-primary">75+ Brands</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-1 w-10 bg-secondary rounded-full" />
-                  <span className="text-sm font-bold text-secondary">2M+ Orders / yr</span>
+                  <span className="text-sm font-bold text-secondary">2M Orders / yr</span>
                 </div>
               </div>
             </div>

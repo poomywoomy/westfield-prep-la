@@ -16,7 +16,7 @@ const TrustBadges = () => {
     {
       icon: Zap,
       title: "Same-Day Turnaround",
-      description: "Orders Before 2pm PST"
+      description: "Orders Before 2 PM PT"
     },
     {
       icon: Camera,

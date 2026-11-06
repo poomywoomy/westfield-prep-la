@@ -66,7 +66,7 @@ const FinalCTA = () => {
           </div>
 
           <p className="text-sm text-white/65">
-            <TranslatedText>Trusted by 100+ e-commerce brands · 2M+ orders shipped · Same-day turnaround, every time</TranslatedText>
+            <TranslatedText>Trusted by 75+ e-commerce brands · 2 million orders shipped annually · Same-day turnaround, every time</TranslatedText>
           </p>
         </div>
       </div>

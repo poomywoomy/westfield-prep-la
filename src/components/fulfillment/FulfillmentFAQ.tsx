@@ -15,7 +15,7 @@ const FulfillmentFAQ = () => {
   const faqs = [
     {
       question: "What is your order cutoff time for same-day shipping?",
-      answer: "Orders received by 2 PM PST ship the same day, Monday through Saturday. Orders after 2 PM ship the next business day. During peak seasons like Q4, we sometimes extend hours to accommodate higher volumes."
+      answer: "Orders received by 2 PM PT ship the same day, Monday through Saturday. Orders after 2 PM ship the next business day. During peak seasons like Q4, we sometimes extend hours to accommodate higher volumes."
     },
     {
       question: "What e-commerce platforms do you integrate with?",
@@ -39,7 +39,7 @@ const FulfillmentFAQ = () => {
     },
     {
       question: "Can you handle rush or expedited orders?",
-      answer: "Yes. We offer priority processing for time-sensitive orders. Rush orders received by 12 PM PST can ship same-day via expedited carriers. Additional fees apply for rush handling, and we'll work with you on carrier selection for the fastest delivery."
+      answer: "Yes. We offer priority processing for time-sensitive orders. Rush orders received by 12 PM PT can ship same-day via expedited carriers. Additional fees apply for rush handling, and we'll work with you on carrier selection for the fastest delivery."
     }
   ];
 

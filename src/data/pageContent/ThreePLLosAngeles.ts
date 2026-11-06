@@ -26,7 +26,7 @@ export const faqData = [
   {
     question: "How quickly can you receive inventory at your LA facility?",
     answer:
-      "We offer same-day container processing for shipments received before 2PM PST. Most domestic freight is processed and inventoried within 24 hours of arrival at our Los Angeles warehouse.",
+      "We offer same-day container processing for shipments received before 2 PM PT. Most domestic freight is processed and inventoried within 24 hours of arrival at our Los Angeles warehouse.",
   },
   {
     question: "Do you integrate with Shopify stores?",

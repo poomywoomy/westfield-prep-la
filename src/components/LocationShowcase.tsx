@@ -90,7 +90,7 @@ const LocationShowcase = () => {
             </h2>
             <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
               <TranslatedText>
-                Closer to the port. Faster to the customer. 15+ years and 2M+ orders later, we know exactly why LA is the smartest place to base your fulfillment.
+                Closer to the port. Faster to the customer. 15+ years and 2 million orders a year, we know exactly why LA is the smartest place to base your fulfillment.
               </TranslatedText>
             </p>
 
@@ -109,7 +109,7 @@ const LocationShowcase = () => {
                 { icon: TrendingUp, text: "West Coast Hub" },
                 { icon: Globe, text: "Asia-Pacific Gateway" },
                 { icon: Truck, text: "Nationwide" },
-                { icon: Zap, text: "Same-Day Cutoff 2pm" },
+                { icon: Zap, text: "Same-Day Cutoff 2 PM PT" },
                 { icon: MapPin, text: "Los Angeles, CA" },
               ].map((b, i) => (
                 <span
