@@ -21,7 +21,7 @@ export const faqData = {
       "name": "What is your order cutoff time for same-day shipping?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Orders received by 2 PM PT ship the same day, Monday through Saturday. Orders after 2 PM ship the next business day."
+        "text": "Orders received by 2 PM PT ship the same day, Monday through Friday. Orders after 2 PM ship the next business day."
       }
     },
     {

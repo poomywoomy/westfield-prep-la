@@ -24,7 +24,7 @@ export const faqData = [
   {
     question: "Can you handle Seller Fulfilled Prime (SFP)?",
     answer:
-      "Yes. Same-day processing, weekend shipping, and 2-day delivery capabilities nationwide via discounted carrier rates. We help SFP sellers maintain on-time shipment and delivery metrics so you keep the Prime badge.",
+      "Yes. same-day processing, and 2-day delivery capabilities nationwide via discounted carrier rates. We help SFP sellers maintain on-time shipment and delivery metrics so you keep the Prime badge.",
   },
   {
     question: "Do you offer expiration date labeling for consumables?",
