@@ -5,7 +5,7 @@ const ShopifyTrustBar = () => {
     { icon: Star, label: "5.0/5 Google Rated", value: "5.0/5" },
     { icon: Package, label: "400,000+ Orders Fulfilled", value: "400K+" },
     { icon: Camera, label: "100% QC Photo Coverage", value: "100%" },
-    { icon: Truck, label: "99.2% Same-Day Ship Rate", value: "99.2%" },
+    { icon: Truck, label: "97% Same-Day Ship Rate", value: "97%" },
   ];
 
   return (

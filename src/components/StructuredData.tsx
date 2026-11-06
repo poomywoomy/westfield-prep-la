@@ -22,7 +22,7 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
           email: "info@westfieldprepcenter.com",
           openingHoursSpecification: {
             "@type": "OpeningHoursSpecification",
-            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             opens: "08:00",
             closes: "17:00"
           }
@@ -61,7 +61,7 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
         openingHoursSpecification: [
           {
             "@type": "OpeningHoursSpecification",
-            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             opens: "08:00",
             closes: "17:00",
             timeZone: "America/Los_Angeles"

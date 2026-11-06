@@ -8,7 +8,7 @@ const FulfillmentHero = () => {
 
   const stats = [
     { value: "99.8%", label: "Accuracy Rate" },
-    { value: "2PM", label: "Same-Day Cutoff" },
+    { value: "2 PM PT", label: "Same-Day Cutoff" },
     { value: "4.5hr", label: "Avg Processing" },
     { value: "10K+", label: "Monthly Orders" }
   ];
@@ -47,7 +47,7 @@ const FulfillmentHero = () => {
           >
             {[
               { icon: Shield, text: "99.8% Accuracy" },
-              { icon: Clock, text: "2PM Same-Day Cutoff" },
+              { icon: Clock, text: "2 PM PT Same-Day Cutoff" },
               { icon: Zap, text: "4.5hr Avg Processing" }
             ].map((badge, idx) => (
               <div 

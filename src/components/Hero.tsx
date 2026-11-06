@@ -12,7 +12,7 @@ const Hero = () => {
   };
 
   const stats = [
-    { value: "2M+", label: "Orders Fulfilled" },
+    { value: "2M", label: "Orders Shipped Annually" },
     { value: "100+", label: "Active Clients" },
     { value: "99.8%", label: "Accuracy Rate" },
     { value: "15+", label: "Years in Business" },

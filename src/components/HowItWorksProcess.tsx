@@ -9,7 +9,7 @@ const HowItWorksProcess = () => {
   const steps = [
     { icon: Package, number: "01", title: "Receive", description: "Ship it to us, we handle the rest. Same-day receiving with complete photo documentation so you know exactly what arrived.", stat: "Same-Day", statLabel: "Processing" },
     { icon: Database, number: "02", title: "Store", description: "Your products, organized and tracked in real-time. Strategic placement means faster picking and fewer errors.", stat: "Real-Time", statLabel: "Tracking" },
-    { icon: PackageCheck, number: "03", title: "Fulfill", description: "When orders hit, we move. Same-day turnaround with quality checks that catch mistakes before customers do.", stat: "99.9%", statLabel: "Order Accuracy" },
+    { icon: PackageCheck, number: "03", title: "Fulfill", description: "When orders hit, we move. Same-day turnaround with quality checks that catch mistakes before customers do.", stat: "99.8%", statLabel: "Order Accuracy" },
     { icon: Truck, number: "04", title: "Ship", description: "Best carrier for speed and cost, automatically selected. Your customers get tracking, you get peace of mind.", stat: "2-Day", statLabel: "West Coast" },
   ];
 

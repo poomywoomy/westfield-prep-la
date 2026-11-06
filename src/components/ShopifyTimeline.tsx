@@ -43,7 +43,7 @@ const ShopifyTimeline = () => {
       number: 6,
       icon: Truck,
       title: "Same-Day Ship",
-      description: "Orders before 2PM ship that day",
+      description: "Orders before 2 PM PT ship that day",
     },
   ];
 

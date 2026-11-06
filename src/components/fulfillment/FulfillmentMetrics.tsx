@@ -35,7 +35,7 @@ const FulfillmentMetrics = () => {
       value: 2,
       suffix: "PM",
       label: "Same-Day Cutoff",
-      description: "PST, Monday through Saturday"
+      description: "PT, Monday through Friday"
     }
   ];
 

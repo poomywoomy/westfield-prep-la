@@ -53,7 +53,7 @@ const InventoryCycleCounts = () => {
             Cycle Count Process
           </h2>
           <p className="text-lg text-purple-200/70 max-w-2xl mx-auto">
-            Continuous counting means continuous accuracy. Here's how we maintain 99.9% precision.
+            Continuous counting means continuous accuracy. Here's how we maintain 99.8% precision.
           </p>
         </motion.div>
 

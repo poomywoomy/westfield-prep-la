@@ -669,9 +669,9 @@ const WhyChooseUs = () => {
                 <div className="grid grid-cols-2 gap-4">
                   {[
                     { icon: CheckCircle2, value: "0%", label: "Chargeback Rate" },
-                    { icon: Tag, value: "99.7%", label: "Label Accuracy" },
+                    { icon: Tag, value: "99.8%", label: "Label Accuracy" },
                     { icon: Clock, value: "24hr", label: "Prep Turnaround" },
-                    { icon: Box, value: "2M+", label: "Units Prepped", ribbon: true },
+                    { icon: Box, value: "2M", label: "Orders Shipped Annually", ribbon: true },
                   ].map(({ icon: Icon, value, label, ribbon }) => (
                     <div
                       key={label}

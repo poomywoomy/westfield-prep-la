@@ -41,7 +41,7 @@ const FulfillmentProcess = () => {
       step: "05",
       title: "Ship",
       description: "We select the optimal carrier based on your preferences and destination. Labels are generated and packages staged for pickup.",
-      timing: "Same day by 2PM"
+      timing: "Same day by 2 PM PT"
     },
     {
       icon: Bell,

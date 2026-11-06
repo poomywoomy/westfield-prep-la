@@ -152,7 +152,7 @@ const TikTokShopFulfillment = () => {
                 {[
                   { icon: Camera, title: "Unboxing-Ready Packaging", desc: "Premium packaging materials designed to look amazing on camera with custom branding and inserts", color: "from-pink-500 to-pink-600" },
                   { icon: TrendingUp, title: "Viral Surge Scaling", desc: "Rapid capacity scaling to handle sudden order spikes from viral videos and trending products", color: "from-cyan-500 to-cyan-600" },
-                  { icon: Clock, title: "Same-Day Processing", desc: "Orders before 2 PM PST ship same-day to capitalize on trending moments", color: "from-yellow-500 to-yellow-600" },
+                  { icon: Clock, title: "Same-Day Processing", desc: "Orders before 2 PM PT ship same-day to capitalize on trending moments", color: "from-yellow-500 to-yellow-600" },
                   { icon: Users, title: "Influencer Partnerships", desc: "Special handling for influencer collaborations and limited-edition creator drops", color: "from-pink-600 to-pink-700" },
                   { icon: Award, title: "Quality Photo Proof", desc: "Documented QC photos for every order so you can share quality with customers", color: "from-cyan-600 to-cyan-700" },
                   { icon: Boxes, title: "Flash Drop Support", desc: "Rapid kitting and fulfillment for surprise drops and limited-time offers", color: "from-yellow-600 to-yellow-700" },
@@ -184,7 +184,7 @@ const TikTokShopFulfillment = () => {
                   { step: 2, title: "Auto Order Sync", desc: "Orders automatically imported from TikTok Shop in real-time", icon: Zap },
                   { step: 3, title: "Creator-Ready Pick & Pack", desc: "Fast picking with camera-friendly packaging, branded inserts, and custom materials", icon: Video },
                   { step: 4, title: "Photo Documentation", desc: "Quality control photos captured for every order before shipping", icon: Camera },
-                  { step: 5, title: "Same-Day Shipping", desc: "Orders placed before 2 PM PST ship same business day", icon: Truck },
+                  { step: 5, title: "Same-Day Shipping", desc: "Orders placed before 2 PM PT ship same business day", icon: Truck },
                   { step: 6, title: "Live Tracking Updates", desc: "Real-time tracking synced back to TikTok Shop and customer notifications", icon: TrendingUp },
                 ].map((item) => (
                   <Card key={item.step} className="border-l-4 border-l-pink-500 hover:border-l-cyan-500 hover:shadow-lg transition-all duration-300 group">
@@ -297,7 +297,7 @@ const TikTokShopFulfillment = () => {
                   <AccordionItem value="item-3">
                     <AccordionTrigger>How fast can you fulfill trending products?</AccordionTrigger>
                     <AccordionContent>
-                      Orders placed before 2 PM PST ship same-day. We prioritize speed to capitalize on viral moments.
+                      Orders placed before 2 PM PT ship same-day. We prioritize speed to capitalize on viral moments.
                     </AccordionContent>
                   </AccordionItem>
                   <AccordionItem value="item-4">

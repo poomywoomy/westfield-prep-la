@@ -21,7 +21,7 @@ export const faqData = {
       "name": "What is your order cutoff time for same-day shipping?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Orders received by 2 PM PST ship the same day, Monday through Saturday. Orders after 2 PM ship the next business day."
+        "text": "Orders received by 2 PM PT ship the same day, Monday through Friday. Orders after 2 PM ship the next business day."
       }
     },
     {
@@ -69,7 +69,7 @@ export const faqData = {
       "name": "Can you handle rush or expedited orders?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Rush orders received by 12 PM PST can ship same-day via expedited carriers. Additional fees apply for rush handling."
+        "text": "Yes. Rush orders received by 12 PM PT can ship same-day via expedited carriers. Additional fees apply for rush handling."
       }
     }
   ]

@@ -26,9 +26,9 @@ const Footer = () => {
               </p>
               <div className="pt-2">
                 <p className="text-sm text-secondary font-semibold">
-                  <TranslatedText>Open 7 Days a Week</TranslatedText>
+                  <TranslatedText>Monday–Friday</TranslatedText>
                 </p>
-                <p className="text-sm text-white/90">8am - 5pm PT</p>
+                <p className="text-sm text-white/90">8 AM – 5 PM PT</p>
               </div>
               
               {/* Social Media Links */}

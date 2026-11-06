@@ -15,7 +15,7 @@ const ShopifyChannelServices = () => {
     {
       icon: Package,
       title: "Pick & Pack Fulfillment",
-      description: "Every order picked accurately, packed professionally, and shipped same-day when received before 2PM. We handle single items, multi-SKU orders, and complex bundles with equal precision.",
+      description: "Every order picked accurately, packed professionally, and shipped same-day when received before 2 PM PT. We handle single items, multi-SKU orders, and complex bundles with equal precision.",
       link: "/order-fulfillment",
       linkText: "Learn about fulfillment →",
     },

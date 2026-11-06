@@ -42,8 +42,8 @@ const ShopifyChannelTimeline = () => {
       number: 5,
       icon: Truck,
       title: "Same-Day Shipping",
-      description: "Orders received before 2PM Pacific ship that day. Tracking numbers sync back to Shopify. Customers get shipping confirmations.",
-      time: "Before 2PM cutoff",
+      description: "Orders received before 2 PM PT ship that day. Tracking numbers sync back to Shopify. Customers get shipping confirmations.",
+      time: "Before 2 PM PT cutoff",
     },
     {
       number: 6,

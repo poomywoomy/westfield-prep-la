@@ -42,7 +42,7 @@ const faqCategories = [
     questions: [
       {
         question: "What are your business hours?",
-        answer: "Our warehouse operates Monday through Friday, 8:00 AM to 5:00 PM Pacific Time. We process orders during business hours and offer after-hours emergency support for urgent situations. Same-day shipping cutoff is 2:00 PM PST."
+        answer: "Our warehouse operates Monday through Friday, 8:00 AM to 5:00 PM Pacific Time. We process orders during business hours and offer after-hours emergency support for urgent situations. Same-day shipping cutoff is 2:00 PM PT."
       },
       {
         question: "How can I contact customer support?",
@@ -66,7 +66,7 @@ const faqCategories = [
       },
       {
         question: "Do you provide customer support after hours?",
-        answer: "While our standard business hours are Monday-Friday 8 AM to 5 PM PST, we offer emergency support for urgent situations. Your dedicated account manager can be reached for critical issues, and we monitor systems 24/7 to ensure your orders are processed smoothly."
+        answer: "While our standard business hours are Monday-Friday 8 AM to 5 PM PT, we offer emergency support for urgent situations. Your dedicated account manager can be reached for critical issues, and we monitor systems 24/7 to ensure your orders are processed smoothly."
       }
     ]
   },
@@ -258,7 +258,7 @@ const faqCategories = [
       },
       {
         question: "How does Shopify order fulfillment work?",
-        answer: "Once integrated, orders from your Shopify store automatically appear in our fulfillment queue. We pick, pack, and ship orders the same day (for orders placed before 2 PM PST), and tracking numbers are automatically updated in Shopify and sent to your customers."
+        answer: "Once integrated, orders from your Shopify store automatically appear in our fulfillment queue. We pick, pack, and ship orders the same day (for orders placed before 2 PM PT), and tracking numbers are automatically updated in Shopify and sent to your customers."
       },
       {
         question: "Can you use branded packaging for Shopify orders?",
@@ -266,7 +266,7 @@ const faqCategories = [
       },
       {
         question: "What's your fulfillment speed for Shopify orders?",
-        answer: "Orders placed before 2 PM PST ship same-day. Orders placed after 2 PM PST ship the next business day. We maintain a 99.5% on-time ship rate for all Shopify fulfillment orders."
+        answer: "Orders placed before 2 PM PT ship same-day. Orders placed after 2 PM PT ship the next business day. We maintain a 97% same-day ship rate for all Shopify fulfillment orders."
       },
       {
         question: "Do you handle Shopify returns?",

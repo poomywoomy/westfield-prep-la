@@ -36,7 +36,7 @@ const FulfillmentCTA = () => {
             Ready to Scale Your Fulfillment?
           </h2>
           <p className="text-xl text-slate-300 mb-6 max-w-2xl mx-auto">
-            Join 500+ brands that trust Westfield Prep Center for their e-commerce fulfillment. 
+            Join 75+ brands that trust Westfield Prep Center for their e-commerce fulfillment. 
             Get a custom quote in 24 hours.
           </p>
           

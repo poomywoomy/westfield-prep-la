@@ -56,7 +56,7 @@ const BillingEntryDialog = ({
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  // Get current month in PST/PDT timezone
+  // Get current month in PT/PDT timezone
   const getCurrentMonthPST = () => {
     const now = new Date();
     const pstDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
@@ -77,7 +77,7 @@ const BillingEntryDialog = ({
 
   useEffect(() => {
     if (open) {
-      // Reset selected month when dialog opens - use PST timezone
+      // Reset selected month when dialog opens - use PT timezone
       const currentMonth = getCurrentMonthPST();
       setSelectedMonth(currentMonth);
       loadBillingData();

@@ -14,7 +14,7 @@ export const faqData = [
   },
   { 
     question: "Do you support Shopify integrations?", 
-    answer: "Yes, we offer native Shopify integration for real-time inventory and order sync, with no additional charge. Orders sync automatically and ship same-day when received before 2 PM PST." 
+    answer: "Yes, we offer native Shopify integration for real-time inventory and order sync, with no additional charge. Orders sync automatically and ship same-day when received before 2 PM PT." 
   },
   { 
     question: "What are your Amazon FBA prep rates?", 

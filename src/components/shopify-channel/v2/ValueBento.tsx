@@ -27,11 +27,11 @@ const ValueBento = () => {
             </h3>
             <p className="mt-3 text-white/70 max-w-md">
               <TranslatedText>
-                Orders flow from Shopify into our pick queue automatically. 99.2% ship same business day, every business day.
+                Orders flow from Shopify into our pick queue automatically. 97% ship same business day, every business day.
               </TranslatedText>
             </p>
             <div className="mt-6 flex items-center gap-6 text-xs uppercase tracking-wider text-white/50">
-              <div><span className="block text-2xl text-white font-bold normal-case tracking-tight">99.2%</span>same-day</div>
+              <div><span className="block text-2xl text-white font-bold normal-case tracking-tight">99.8%</span>same-day</div>
               <div><span className="block text-2xl text-white font-bold normal-case tracking-tight">&lt;5 min</span>order to picker</div>
             </div>
           </BentoTile>

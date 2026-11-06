@@ -9,7 +9,7 @@ const AmazonChannelHero = () => {
   const featureCards = [
     { icon: Tag, title: "FNSKU Labeling", desc: "100% compliant labels" },
     { icon: Clock, title: "24hr Turnaround", desc: "Fast prep processing" },
-    { icon: CheckCircle, title: "99.7% Accuracy", desc: "Quality guaranteed" },
+    { icon: CheckCircle, title: "99.8% Accuracy", desc: "Quality guaranteed" },
   ];
 
   return (
@@ -35,7 +35,7 @@ const AmazonChannelHero = () => {
 
             <motion.p className="text-lg md:text-xl text-slate-600 mb-6 max-w-2xl mx-auto lg:mx-0 leading-relaxed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
               <TranslatedText>Expert prep, labeling, and fulfillment services that keep your Amazon account compliant and your inventory moving. Trusted by</TranslatedText>{" "}
-              <Link to="/why-choose-us" className="text-orange-600 hover:text-orange-700 underline underline-offset-2 font-medium transition-colors"><TranslatedText>500+ sellers</TranslatedText></Link>{" "}
+              <Link to="/why-choose-us" className="text-orange-600 hover:text-orange-700 underline underline-offset-2 font-medium transition-colors"><TranslatedText>75+ sellers</TranslatedText></Link>{" "}
               <TranslatedText>shipping millions of units annually.</TranslatedText>
             </motion.p>
 

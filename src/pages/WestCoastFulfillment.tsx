@@ -358,7 +358,7 @@ const WestCoastFulfillment = () => {
           <div className="container mx-auto px-6 md:px-12 max-w-6xl">
             <div className="grid grid-cols-2 md:grid-cols-4">
               {[
-                { stat: "2M+", label: "Units processed" },
+                { stat: "2M", label: "Orders shipped annually" },
                 { stat: "100+", label: "E-commerce brands" },
                 { stat: "1 to 2 days", label: "West Coast delivery" },
                 { stat: "Same day", label: "Order turnaround" },
