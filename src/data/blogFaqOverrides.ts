@@ -381,4 +381,26 @@ export const BLOG_FAQ_OVERRIDES: Record<string, BlogFaqItem[]> = {
       answer: "Yes. Fulfillment services for startups can help growing businesses access professional warehouse operations without building and managing their own fulfillment facility.",
     },
   ],
+  "shopify-market-based-shipping-2027": [
+    {
+      question: "What is Shopify market-based shipping?",
+      answer: "It is a plain-language search term for Shopify's move to shipping options by market, also called market-driven shipping. Merchant shipping setup moves from delivery profiles into Markets, where shipping options hold rates with product and location conditions.",
+    },
+    {
+      question: "When does Shopify market-based shipping become the default?",
+      answer: "Opt-in began on October 1, 2026. Shopify is rolling the setup out in stages, and it becomes the default experience for all shops by July 1, 2027.",
+    },
+    {
+      question: "Do Shopify shipping rates still add together?",
+      answer: "Within one flat or order amount shipping option, only the highest matching rate is charged once. Weight-based and carrier or app calculated rates are calculated per shipment, so split shipment charges can add together. Separate shipping options can also add together.",
+    },
+    {
+      question: "What happens when an order ships in more than one package?",
+      answer: "Qualified checkouts show that the order will arrive in multiple shipments. If the same flat or order amount shipping option covers those shipments, the customer pays the highest matching rate once and additional covered shipments are labeled Included.",
+    },
+    {
+      question: "Do all Shopify stores get ship and pickup in one order?",
+      answer: "No, not on identical terms. It began as a Test Drive for Shopify Plus and Enterprise. Shopify expands it to eligible shops with shipping and pickup enabled, with eligible shops receiving it by default by July 1, 2027.",
+    },
+  ],
 };
