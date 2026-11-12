@@ -34,7 +34,8 @@ export const BLOG_TITLE_OVERRIDES: Record<string, string> = {
   'top-10-fulfillment-services-los-angeles-scale-ecommerce-business': 'Fulfillment Service Los Angeles for E-commerce Brands',
   'how-can-storage-and-fulfillment-services-improve-your-ecommerce-business': 'Order Fulfillment Center & Storage Services | Westfield Prep',
   'third-party-logistics-companies-los-angeles-choose-right-3pl': 'Third Party Logistics Companies LA: How to Choose a 3PL',
-  'shopify-market-based-shipping-2027': 'Shopify Market-Based Shipping Changes for July 1, 2027',
+  "shopify-market-based-shipping-2027":
+    "Shopify Market-Based Shipping Changes for July 1, 2027",
 };
 
 
