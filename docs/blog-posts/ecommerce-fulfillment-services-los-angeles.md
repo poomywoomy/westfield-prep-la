@@ -46,7 +46,7 @@ Unclear product acceptance rules can leave a seller arranging an unexpected tran
 
 A move can become difficult when nobody agrees on how remaining goods will leave. Discuss stock removal and account closure before starting service. Knowing the required notice, preparation steps, and applicable charges helps you plan a future change without last-minute uncertainty.
 
-## Frequently Asked Questions
+## FAQs
 
 ### How much will fulfillment cost for my Los Angeles store?
 

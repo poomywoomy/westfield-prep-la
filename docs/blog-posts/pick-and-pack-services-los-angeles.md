@@ -44,7 +44,7 @@ A sales promotion can create more orders than your usual schedule allows. Discus
 
 When responsibility is unclear, a packing concern can turn into repeated explanations. Discuss the agreed instructions and how to report concerns before work begins. A shared reference gives both sides a practical basis for reviewing what happened and responding.
 
-## Frequently Asked Questions
+## FAQs
 
 ### What are the benefits of outsourcing if I prepare orders from a small Los Angeles office?
 

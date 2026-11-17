@@ -46,7 +46,7 @@ Extra travel after a container reaches port can add avoidable trucking expense. 
 
 Long warehouse commitments can become a burden when your business changes direction. Westfield offers month-to-month storage terms, so you can discuss space needs as plans change. Confirm your service agreement before booking space for your next stock delivery.
 
-## Frequently Asked Questions
+## FAQs
 
 ### How do I choose a 3PL company in Los Angeles before expanding?
 

@@ -46,7 +46,7 @@ An unresolved issue wastes more time when nobody knows who owns it. We agree on 
 
 Leaving a provider should not leave you unsure about retrieving your goods. Discuss stock release arrangements with us before starting, including notice requirements and collection steps. Clear exit terms help your store plan a future change without avoidable uncertainty later.
 
-## Frequently Asked Questions
+## FAQs
 
 ### 1. How do I outsource Shopify order fulfillment when I currently ship from home?
 

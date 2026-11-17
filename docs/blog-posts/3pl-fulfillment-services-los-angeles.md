@@ -50,7 +50,7 @@ Repeating the same issue to different support agents wastes working time. You ge
 
 A long agreement can leave you paying for support your business no longer needs. Our flexible terms let you review the arrangement as your plans change. Discuss the notice requirements upfront, so you understand your options before signing an agreement.
 
-## Frequently Asked Questions
+## FAQs
 
 ### How to choose a 3PL fulfillment center when comparing Los Angeles providers?
 

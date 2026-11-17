@@ -41,7 +41,7 @@ Vague promises make it difficult to judge whether a provider is doing the agreed
 
 Unexpected changes to your agreed process can create work for your own team. We discuss requested changes before adding them to the service plan, helping you understand the effect on your account and decide whether the change suits your business.
 
-## Frequently Asked Questions
+## FAQs
 
 ### Can I use a warehouse if my online store takes preorders?
 

@@ -44,7 +44,7 @@ Mixing your goods with another seller’s stock can make ownership harder to est
 
 Giving too many people access to customer details creates avoidable concerns. Our approach to Multichannel Fulfillment in Los Angeles starts with discussing what information order handling needs. Clear access expectations help your business ask informed questions before sharing customer records.
 
-## Frequently Asked Questions
+## FAQs
 
 ### What is multichannel fulfillment if I already sell through several online stores?
 
