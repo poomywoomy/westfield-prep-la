@@ -85,3 +85,5 @@ An address change may be possible before the parcel reaches the carrier. The ava
 ### Is using a Los Angeles fulfillment provider the same as Amazon FBA?
 
 No, using an independent fulfillment provider is a different arrangement from enrolling products in Amazon FBA. Amazon FBA uses Amazon’s fulfillment network under its program requirements. An independent provider works under a separate service agreement and may handle orders from several stores. If you sell on Amazon, confirm how each order will be fulfilled and what your listings will tell buyers. Do not assume that using a local warehouse automatically gives your products Prime eligibility. 
+
+*Cover photo: [Claudio Schwarz](https://unsplash.com/@purzlbaum) / [Unsplash](https://unsplash.com), stock image.*

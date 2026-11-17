@@ -107,3 +107,5 @@ If you are considering 3PL providers in Los Angeles businesses use for these goo
 Agree who can approve changes before several employees begin managing the warehouse account.
 
 If purchasing, customer service, and finance all need involvement, ask whether each person can receive an appropriate level of access. Decide who may request stock disposal, change instructions, or approve additional work. Confirm how former employees lose access when they leave. Clear approval rules help prevent conflicting requests and give both your business and the Los Angeles warehouse an agreed process for account decisions.
+
+*Cover photo: [Barrett Ward](https://unsplash.com/@barrettward) / [Unsplash](https://unsplash.com), stock image.*

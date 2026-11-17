@@ -111,3 +111,5 @@ Westfield Prep Center describes its facility as closed to unannounced public vis
 Responsibility depends on the service agreement, the cause of the loss, and the applicable insurance coverage.
 
 Ask for the liability terms before sending valuable stock. Confirm any claim limits, reporting deadlines, exclusions, and documents required to support a claim. Keep purchase invoices and declared stock values available. Having insurance does not mean every loss receives full reimbursement, so check whether your own policy should cover any remaining exposure while goods are stored in Los Angeles.
+
+*Cover photo: [CHUTTERSNAP](https://unsplash.com/@chuttersnap) / [Unsplash](https://unsplash.com), stock image.*

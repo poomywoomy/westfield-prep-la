@@ -107,3 +107,5 @@ Check prepaid plans separately from orders charged at each renewal. A prepaid or
 Yes, pickup orders can stay separate when your Shopify locations and order rules are configured correctly.
 
 A Los Angeles store offering collection should confirm that the warehouse connection checks the delivery method before accepting a shipping request. Otherwise, a purchase intended for pickup could be sent out as a parcel. Test one collection order and one shipped order before launch. Make sure each reaches the right location and triggers the appropriate customer notification. 
+
+*Cover photo: [Bench Accounting](https://unsplash.com/@benchaccounting) / [Unsplash](https://unsplash.com), stock image.*

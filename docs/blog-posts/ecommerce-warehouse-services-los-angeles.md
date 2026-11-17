@@ -102,3 +102,5 @@ Agree on how each month's insert will be identified and when the previous versio
 Yes, if both providers and your store follow a planned transfer schedule.
 
 Decide which location will handle new orders during the move and when the old location will stop accepting work. Reconcile the transferred quantities before making that stock available for sale again. Keep enough goods available to cover orders during the change where possible. Confirm how outstanding orders and tracking records will be handled, so customers are not left waiting while responsibility moves between providers.
+
+*Cover photo: [Alberto Rodríguez](https://unsplash.com/@albertorodriguez) / [Unsplash](https://unsplash.com), stock image.*

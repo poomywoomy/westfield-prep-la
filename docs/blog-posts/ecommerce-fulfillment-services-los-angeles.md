@@ -107,3 +107,5 @@ Show that policy before checkout so buyers understand when to expect each item. 
 Your business should own the customer response while the responsible party investigates the carrier's delivery record.
 
 Ask the buyer to check the delivery location, household members, and building reception where relevant. Then review the tracking details and request delivery evidence if available. Your agreement should identify who submits carrier claims and what records are required. Set a clear internal deadline for deciding on a replacement or refund, so the customer receives an answer while the investigation continues.
+
+*Cover photo: [Adrian Sulyok](https://unsplash.com/@sulyok_imaging) ([sulyokimaging.ro](https://www.sulyokimaging.ro)) / [Unsplash](https://unsplash.com), stock image.*

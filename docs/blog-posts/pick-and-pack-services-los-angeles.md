@@ -105,3 +105,5 @@ When reviewing Pick and Pack Fulfillment Services, share typical item counts and
 Products with special handling requirements need a suitability review before you send them.
 
 If your catalog includes liquids, batteries, food, or items requiring temperature control, describe them fully when requesting service. Ask what the facility can accept and what restrictions apply to preparation and carrier handoff. Do not assume ordinary warehouse arrangements cover every product category. Get the provider’s acceptance in writing and resolve any labeling or handling questions before arranging an incoming delivery.
+
+*Cover photo: [Luke Heibert](https://unsplash.com/@lukeheibert) / [Unsplash](https://unsplash.com), stock image.*
