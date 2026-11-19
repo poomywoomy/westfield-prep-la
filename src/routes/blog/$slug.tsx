@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import BlogPost from "@/pages/BlogPost";
 import { getBlogSeoTitle } from "@/data/blogTitleOverrides";
+import { MIGRATED_SERVICE_REDIRECTS } from "@/data/migratedServicePages";
 import { blogPostQueryOptions, relatedPostsQueryOptions } from "@/lib/blogPostQuery";
 import { buildBlogPostSchemas } from "@/lib/blogSchemas";
 
@@ -10,6 +11,12 @@ const SITE = "https://westfieldprepcenter.com";
 // the pre-migration BLOG_FAQ_OVERRIDES injection plugin in vite.config.ts.
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogPost,
+  beforeLoad: ({ params }) => {
+    const destination = MIGRATED_SERVICE_REDIRECTS[`/blog/${params.slug}`];
+    if (destination) {
+      throw redirect({ href: destination, statusCode: 301 });
+    }
+  },
   loader: async ({ params, context }) => {
     // Pre-fetch related posts so internal links render in the server HTML.
     const [post] = await Promise.all([

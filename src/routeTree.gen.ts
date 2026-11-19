@@ -10,10 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as R3plFulfillmentServicesLosAngelesRouteImport } from './routes/3pl-fulfillment-services-los-angeles'
 import { Route as R3plLosAngelesRouteImport } from './routes/3pl-los-angeles'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AmazonFbaPrepRouteImport } from './routes/amazon-fba-prep'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as EcommerceFulfillmentServicesLosAngelesRouteImport } from './routes/ecommerce-fulfillment-services-los-angeles'
+import { Route as EcommerceWarehouseServicesLosAngelesRouteImport } from './routes/ecommerce-warehouse-services-los-angeles'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as InventoryManagementRouteImport } from './routes/inventory-management'
@@ -22,7 +25,9 @@ import { Route as LabelingComplianceRouteImport } from './routes/labeling-compli
 import { Route as LabelingFnskuRouteImport } from './routes/labeling-fnsku'
 import { Route as LaunchpadRouteImport } from './routes/launchpad'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MultichannelFulfillmentSupportLosAngelesSellersRouteImport } from './routes/multichannel-fulfillment-support-los-angeles-sellers'
 import { Route as OrderFulfillmentRouteImport } from './routes/order-fulfillment'
+import { Route as PickAndPackServicesLosAngelesRouteImport } from './routes/pick-and-pack-services-los-angeles'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReceivingInspectionRouteImport } from './routes/receiving-inspection'
@@ -31,10 +36,12 @@ import { Route as ReturnsProcessingRouteImport } from './routes/returns-processi
 import { Route as ServiceBreakdownRouteImport } from './routes/service-breakdown'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ShopifyFulfillmentRouteImport } from './routes/shopify-fulfillment'
+import { Route as ShopifyFulfillmentSupportLosAngelesStoresRouteImport } from './routes/shopify-fulfillment-support-los-angeles-stores'
 import { Route as StorageWarehousingRouteImport } from './routes/storage-warehousing'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
 import { Route as ThankYouRouteImport } from './routes/thank-you'
+import { Route as ThirdPartyLogisticsLosAngelesRouteImport } from './routes/third-party-logistics-los-angeles'
 import { Route as TiktokShopFulfillmentRouteImport } from './routes/tiktok-shop-fulfillment'
 import { Route as WalmartFulfillmentRouteImport } from './routes/walmart-fulfillment'
 import { Route as WestCoastFulfillmentRouteImport } from './routes/west-coast-fulfillment'
@@ -57,6 +64,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const R3plFulfillmentServicesLosAngelesRoute =
+  R3plFulfillmentServicesLosAngelesRouteImport.update({
+    id: '/3pl-fulfillment-services-los-angeles',
+    path: '/3pl-fulfillment-services-los-angeles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const R3plLosAngelesRoute = R3plLosAngelesRouteImport.update({
   id: '/3pl-los-angeles',
   path: '/3pl-los-angeles',
@@ -77,6 +90,18 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EcommerceFulfillmentServicesLosAngelesRoute =
+  EcommerceFulfillmentServicesLosAngelesRouteImport.update({
+    id: '/ecommerce-fulfillment-services-los-angeles',
+    path: '/ecommerce-fulfillment-services-los-angeles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const EcommerceWarehouseServicesLosAngelesRoute =
+  EcommerceWarehouseServicesLosAngelesRouteImport.update({
+    id: '/ecommerce-warehouse-services-los-angeles',
+    path: '/ecommerce-warehouse-services-los-angeles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
@@ -117,11 +142,23 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MultichannelFulfillmentSupportLosAngelesSellersRoute =
+  MultichannelFulfillmentSupportLosAngelesSellersRouteImport.update({
+    id: '/multichannel-fulfillment-support-los-angeles-sellers',
+    path: '/multichannel-fulfillment-support-los-angeles-sellers',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const OrderFulfillmentRoute = OrderFulfillmentRouteImport.update({
   id: '/order-fulfillment',
   path: '/order-fulfillment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PickAndPackServicesLosAngelesRoute =
+  PickAndPackServicesLosAngelesRouteImport.update({
+    id: '/pick-and-pack-services-los-angeles',
+    path: '/pick-and-pack-services-los-angeles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -162,6 +199,12 @@ const ShopifyFulfillmentRoute = ShopifyFulfillmentRouteImport.update({
   path: '/shopify-fulfillment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopifyFulfillmentSupportLosAngelesStoresRoute =
+  ShopifyFulfillmentSupportLosAngelesStoresRouteImport.update({
+    id: '/shopify-fulfillment-support-los-angeles-stores',
+    path: '/shopify-fulfillment-support-los-angeles-stores',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const StorageWarehousingRoute = StorageWarehousingRouteImport.update({
   id: '/storage-warehousing',
   path: '/storage-warehousing',
@@ -182,6 +225,12 @@ const ThankYouRoute = ThankYouRouteImport.update({
   path: '/thank-you',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ThirdPartyLogisticsLosAngelesRoute =
+  ThirdPartyLogisticsLosAngelesRouteImport.update({
+    id: '/third-party-logistics-los-angeles',
+    path: '/third-party-logistics-los-angeles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TiktokShopFulfillmentRoute = TiktokShopFulfillmentRouteImport.update({
   id: '/tiktok-shop-fulfillment',
   path: '/tiktok-shop-fulfillment',
@@ -265,10 +314,13 @@ const SalesChannelsTiktokShopRoute = SalesChannelsTiktokShopRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/3pl-fulfillment-services-los-angeles': typeof R3plFulfillmentServicesLosAngelesRoute
   '/3pl-los-angeles': typeof R3plLosAngelesRoute
   '/about': typeof AboutRoute
   '/amazon-fba-prep': typeof AmazonFbaPrepRoute
   '/contact': typeof ContactRoute
+  '/ecommerce-fulfillment-services-los-angeles': typeof EcommerceFulfillmentServicesLosAngelesRoute
+  '/ecommerce-warehouse-services-los-angeles': typeof EcommerceWarehouseServicesLosAngelesRoute
   '/faq': typeof FaqRoute
   '/integrations': typeof IntegrationsRoute
   '/inventory-management': typeof InventoryManagementRoute
@@ -277,7 +329,9 @@ export interface FileRoutesByFullPath {
   '/labeling-fnsku': typeof LabelingFnskuRoute
   '/launchpad': typeof LaunchpadRoute
   '/login': typeof LoginRoute
+  '/multichannel-fulfillment-support-los-angeles-sellers': typeof MultichannelFulfillmentSupportLosAngelesSellersRoute
   '/order-fulfillment': typeof OrderFulfillmentRoute
+  '/pick-and-pack-services-los-angeles': typeof PickAndPackServicesLosAngelesRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/receiving-inspection': typeof ReceivingInspectionRoute
@@ -286,10 +340,12 @@ export interface FileRoutesByFullPath {
   '/service-breakdown': typeof ServiceBreakdownRoute
   '/services': typeof ServicesRoute
   '/shopify-fulfillment': typeof ShopifyFulfillmentRoute
+  '/shopify-fulfillment-support-los-angeles-stores': typeof ShopifyFulfillmentSupportLosAngelesStoresRoute
   '/storage-warehousing': typeof StorageWarehousingRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
   '/thank-you': typeof ThankYouRoute
+  '/third-party-logistics-los-angeles': typeof ThirdPartyLogisticsLosAngelesRoute
   '/tiktok-shop-fulfillment': typeof TiktokShopFulfillmentRoute
   '/walmart-fulfillment': typeof WalmartFulfillmentRoute
   '/west-coast-fulfillment': typeof WestCoastFulfillmentRoute
@@ -309,10 +365,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/3pl-fulfillment-services-los-angeles': typeof R3plFulfillmentServicesLosAngelesRoute
   '/3pl-los-angeles': typeof R3plLosAngelesRoute
   '/about': typeof AboutRoute
   '/amazon-fba-prep': typeof AmazonFbaPrepRoute
   '/contact': typeof ContactRoute
+  '/ecommerce-fulfillment-services-los-angeles': typeof EcommerceFulfillmentServicesLosAngelesRoute
+  '/ecommerce-warehouse-services-los-angeles': typeof EcommerceWarehouseServicesLosAngelesRoute
   '/faq': typeof FaqRoute
   '/integrations': typeof IntegrationsRoute
   '/inventory-management': typeof InventoryManagementRoute
@@ -321,7 +380,9 @@ export interface FileRoutesByTo {
   '/labeling-fnsku': typeof LabelingFnskuRoute
   '/launchpad': typeof LaunchpadRoute
   '/login': typeof LoginRoute
+  '/multichannel-fulfillment-support-los-angeles-sellers': typeof MultichannelFulfillmentSupportLosAngelesSellersRoute
   '/order-fulfillment': typeof OrderFulfillmentRoute
+  '/pick-and-pack-services-los-angeles': typeof PickAndPackServicesLosAngelesRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/receiving-inspection': typeof ReceivingInspectionRoute
@@ -330,10 +391,12 @@ export interface FileRoutesByTo {
   '/service-breakdown': typeof ServiceBreakdownRoute
   '/services': typeof ServicesRoute
   '/shopify-fulfillment': typeof ShopifyFulfillmentRoute
+  '/shopify-fulfillment-support-los-angeles-stores': typeof ShopifyFulfillmentSupportLosAngelesStoresRoute
   '/storage-warehousing': typeof StorageWarehousingRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
   '/thank-you': typeof ThankYouRoute
+  '/third-party-logistics-los-angeles': typeof ThirdPartyLogisticsLosAngelesRoute
   '/tiktok-shop-fulfillment': typeof TiktokShopFulfillmentRoute
   '/walmart-fulfillment': typeof WalmartFulfillmentRoute
   '/west-coast-fulfillment': typeof WestCoastFulfillmentRoute
@@ -354,10 +417,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/3pl-fulfillment-services-los-angeles': typeof R3plFulfillmentServicesLosAngelesRoute
   '/3pl-los-angeles': typeof R3plLosAngelesRoute
   '/about': typeof AboutRoute
   '/amazon-fba-prep': typeof AmazonFbaPrepRoute
   '/contact': typeof ContactRoute
+  '/ecommerce-fulfillment-services-los-angeles': typeof EcommerceFulfillmentServicesLosAngelesRoute
+  '/ecommerce-warehouse-services-los-angeles': typeof EcommerceWarehouseServicesLosAngelesRoute
   '/faq': typeof FaqRoute
   '/integrations': typeof IntegrationsRoute
   '/inventory-management': typeof InventoryManagementRoute
@@ -366,7 +432,9 @@ export interface FileRoutesById {
   '/labeling-fnsku': typeof LabelingFnskuRoute
   '/launchpad': typeof LaunchpadRoute
   '/login': typeof LoginRoute
+  '/multichannel-fulfillment-support-los-angeles-sellers': typeof MultichannelFulfillmentSupportLosAngelesSellersRoute
   '/order-fulfillment': typeof OrderFulfillmentRoute
+  '/pick-and-pack-services-los-angeles': typeof PickAndPackServicesLosAngelesRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/receiving-inspection': typeof ReceivingInspectionRoute
@@ -375,10 +443,12 @@ export interface FileRoutesById {
   '/service-breakdown': typeof ServiceBreakdownRoute
   '/services': typeof ServicesRoute
   '/shopify-fulfillment': typeof ShopifyFulfillmentRoute
+  '/shopify-fulfillment-support-los-angeles-stores': typeof ShopifyFulfillmentSupportLosAngelesStoresRoute
   '/storage-warehousing': typeof StorageWarehousingRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
   '/thank-you': typeof ThankYouRoute
+  '/third-party-logistics-los-angeles': typeof ThirdPartyLogisticsLosAngelesRoute
   '/tiktok-shop-fulfillment': typeof TiktokShopFulfillmentRoute
   '/walmart-fulfillment': typeof WalmartFulfillmentRoute
   '/west-coast-fulfillment': typeof WestCoastFulfillmentRoute
@@ -400,10 +470,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/3pl-fulfillment-services-los-angeles'
     | '/3pl-los-angeles'
     | '/about'
     | '/amazon-fba-prep'
     | '/contact'
+    | '/ecommerce-fulfillment-services-los-angeles'
+    | '/ecommerce-warehouse-services-los-angeles'
     | '/faq'
     | '/integrations'
     | '/inventory-management'
@@ -412,7 +485,9 @@ export interface FileRouteTypes {
     | '/labeling-fnsku'
     | '/launchpad'
     | '/login'
+    | '/multichannel-fulfillment-support-los-angeles-sellers'
     | '/order-fulfillment'
+    | '/pick-and-pack-services-los-angeles'
     | '/pricing'
     | '/privacy'
     | '/receiving-inspection'
@@ -421,10 +496,12 @@ export interface FileRouteTypes {
     | '/service-breakdown'
     | '/services'
     | '/shopify-fulfillment'
+    | '/shopify-fulfillment-support-los-angeles-stores'
     | '/storage-warehousing'
     | '/terms'
     | '/testimonials'
     | '/thank-you'
+    | '/third-party-logistics-los-angeles'
     | '/tiktok-shop-fulfillment'
     | '/walmart-fulfillment'
     | '/west-coast-fulfillment'
@@ -444,10 +521,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/3pl-fulfillment-services-los-angeles'
     | '/3pl-los-angeles'
     | '/about'
     | '/amazon-fba-prep'
     | '/contact'
+    | '/ecommerce-fulfillment-services-los-angeles'
+    | '/ecommerce-warehouse-services-los-angeles'
     | '/faq'
     | '/integrations'
     | '/inventory-management'
@@ -456,7 +536,9 @@ export interface FileRouteTypes {
     | '/labeling-fnsku'
     | '/launchpad'
     | '/login'
+    | '/multichannel-fulfillment-support-los-angeles-sellers'
     | '/order-fulfillment'
+    | '/pick-and-pack-services-los-angeles'
     | '/pricing'
     | '/privacy'
     | '/receiving-inspection'
@@ -465,10 +547,12 @@ export interface FileRouteTypes {
     | '/service-breakdown'
     | '/services'
     | '/shopify-fulfillment'
+    | '/shopify-fulfillment-support-los-angeles-stores'
     | '/storage-warehousing'
     | '/terms'
     | '/testimonials'
     | '/thank-you'
+    | '/third-party-logistics-los-angeles'
     | '/tiktok-shop-fulfillment'
     | '/walmart-fulfillment'
     | '/west-coast-fulfillment'
@@ -488,10 +572,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/3pl-fulfillment-services-los-angeles'
     | '/3pl-los-angeles'
     | '/about'
     | '/amazon-fba-prep'
     | '/contact'
+    | '/ecommerce-fulfillment-services-los-angeles'
+    | '/ecommerce-warehouse-services-los-angeles'
     | '/faq'
     | '/integrations'
     | '/inventory-management'
@@ -500,7 +587,9 @@ export interface FileRouteTypes {
     | '/labeling-fnsku'
     | '/launchpad'
     | '/login'
+    | '/multichannel-fulfillment-support-los-angeles-sellers'
     | '/order-fulfillment'
+    | '/pick-and-pack-services-los-angeles'
     | '/pricing'
     | '/privacy'
     | '/receiving-inspection'
@@ -509,10 +598,12 @@ export interface FileRouteTypes {
     | '/service-breakdown'
     | '/services'
     | '/shopify-fulfillment'
+    | '/shopify-fulfillment-support-los-angeles-stores'
     | '/storage-warehousing'
     | '/terms'
     | '/testimonials'
     | '/thank-you'
+    | '/third-party-logistics-los-angeles'
     | '/tiktok-shop-fulfillment'
     | '/walmart-fulfillment'
     | '/west-coast-fulfillment'
@@ -533,10 +624,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  R3plFulfillmentServicesLosAngelesRoute: typeof R3plFulfillmentServicesLosAngelesRoute
   R3plLosAngelesRoute: typeof R3plLosAngelesRoute
   AboutRoute: typeof AboutRoute
   AmazonFbaPrepRoute: typeof AmazonFbaPrepRoute
   ContactRoute: typeof ContactRoute
+  EcommerceFulfillmentServicesLosAngelesRoute: typeof EcommerceFulfillmentServicesLosAngelesRoute
+  EcommerceWarehouseServicesLosAngelesRoute: typeof EcommerceWarehouseServicesLosAngelesRoute
   FaqRoute: typeof FaqRoute
   IntegrationsRoute: typeof IntegrationsRoute
   InventoryManagementRoute: typeof InventoryManagementRoute
@@ -545,7 +639,9 @@ export interface RootRouteChildren {
   LabelingFnskuRoute: typeof LabelingFnskuRoute
   LaunchpadRoute: typeof LaunchpadRoute
   LoginRoute: typeof LoginRoute
+  MultichannelFulfillmentSupportLosAngelesSellersRoute: typeof MultichannelFulfillmentSupportLosAngelesSellersRoute
   OrderFulfillmentRoute: typeof OrderFulfillmentRoute
+  PickAndPackServicesLosAngelesRoute: typeof PickAndPackServicesLosAngelesRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ReceivingInspectionRoute: typeof ReceivingInspectionRoute
@@ -554,10 +650,12 @@ export interface RootRouteChildren {
   ServiceBreakdownRoute: typeof ServiceBreakdownRoute
   ServicesRoute: typeof ServicesRoute
   ShopifyFulfillmentRoute: typeof ShopifyFulfillmentRoute
+  ShopifyFulfillmentSupportLosAngelesStoresRoute: typeof ShopifyFulfillmentSupportLosAngelesStoresRoute
   StorageWarehousingRoute: typeof StorageWarehousingRoute
   TermsRoute: typeof TermsRoute
   TestimonialsRoute: typeof TestimonialsRoute
   ThankYouRoute: typeof ThankYouRoute
+  ThirdPartyLogisticsLosAngelesRoute: typeof ThirdPartyLogisticsLosAngelesRoute
   TiktokShopFulfillmentRoute: typeof TiktokShopFulfillmentRoute
   WalmartFulfillmentRoute: typeof WalmartFulfillmentRoute
   WestCoastFulfillmentRoute: typeof WestCoastFulfillmentRoute
@@ -583,6 +681,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/3pl-fulfillment-services-los-angeles': {
+      id: '/3pl-fulfillment-services-los-angeles'
+      path: '/3pl-fulfillment-services-los-angeles'
+      fullPath: '/3pl-fulfillment-services-los-angeles'
+      preLoaderRoute: typeof R3plFulfillmentServicesLosAngelesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/3pl-los-angeles': {
@@ -611,6 +716,20 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ecommerce-fulfillment-services-los-angeles': {
+      id: '/ecommerce-fulfillment-services-los-angeles'
+      path: '/ecommerce-fulfillment-services-los-angeles'
+      fullPath: '/ecommerce-fulfillment-services-los-angeles'
+      preLoaderRoute: typeof EcommerceFulfillmentServicesLosAngelesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ecommerce-warehouse-services-los-angeles': {
+      id: '/ecommerce-warehouse-services-los-angeles'
+      path: '/ecommerce-warehouse-services-los-angeles'
+      fullPath: '/ecommerce-warehouse-services-los-angeles'
+      preLoaderRoute: typeof EcommerceWarehouseServicesLosAngelesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -669,11 +788,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/multichannel-fulfillment-support-los-angeles-sellers': {
+      id: '/multichannel-fulfillment-support-los-angeles-sellers'
+      path: '/multichannel-fulfillment-support-los-angeles-sellers'
+      fullPath: '/multichannel-fulfillment-support-los-angeles-sellers'
+      preLoaderRoute: typeof MultichannelFulfillmentSupportLosAngelesSellersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/order-fulfillment': {
       id: '/order-fulfillment'
       path: '/order-fulfillment'
       fullPath: '/order-fulfillment'
       preLoaderRoute: typeof OrderFulfillmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pick-and-pack-services-los-angeles': {
+      id: '/pick-and-pack-services-los-angeles'
+      path: '/pick-and-pack-services-los-angeles'
+      fullPath: '/pick-and-pack-services-los-angeles'
+      preLoaderRoute: typeof PickAndPackServicesLosAngelesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -732,6 +865,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopifyFulfillmentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shopify-fulfillment-support-los-angeles-stores': {
+      id: '/shopify-fulfillment-support-los-angeles-stores'
+      path: '/shopify-fulfillment-support-los-angeles-stores'
+      fullPath: '/shopify-fulfillment-support-los-angeles-stores'
+      preLoaderRoute: typeof ShopifyFulfillmentSupportLosAngelesStoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/storage-warehousing': {
       id: '/storage-warehousing'
       path: '/storage-warehousing'
@@ -758,6 +898,13 @@ declare module '@tanstack/react-router' {
       path: '/thank-you'
       fullPath: '/thank-you'
       preLoaderRoute: typeof ThankYouRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/third-party-logistics-los-angeles': {
+      id: '/third-party-logistics-los-angeles'
+      path: '/third-party-logistics-los-angeles'
+      fullPath: '/third-party-logistics-los-angeles'
+      preLoaderRoute: typeof ThirdPartyLogisticsLosAngelesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tiktok-shop-fulfillment': {
@@ -877,10 +1024,16 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  R3plFulfillmentServicesLosAngelesRoute:
+    R3plFulfillmentServicesLosAngelesRoute,
   R3plLosAngelesRoute: R3plLosAngelesRoute,
   AboutRoute: AboutRoute,
   AmazonFbaPrepRoute: AmazonFbaPrepRoute,
   ContactRoute: ContactRoute,
+  EcommerceFulfillmentServicesLosAngelesRoute:
+    EcommerceFulfillmentServicesLosAngelesRoute,
+  EcommerceWarehouseServicesLosAngelesRoute:
+    EcommerceWarehouseServicesLosAngelesRoute,
   FaqRoute: FaqRoute,
   IntegrationsRoute: IntegrationsRoute,
   InventoryManagementRoute: InventoryManagementRoute,
@@ -889,7 +1042,10 @@ const rootRouteChildren: RootRouteChildren = {
   LabelingFnskuRoute: LabelingFnskuRoute,
   LaunchpadRoute: LaunchpadRoute,
   LoginRoute: LoginRoute,
+  MultichannelFulfillmentSupportLosAngelesSellersRoute:
+    MultichannelFulfillmentSupportLosAngelesSellersRoute,
   OrderFulfillmentRoute: OrderFulfillmentRoute,
+  PickAndPackServicesLosAngelesRoute: PickAndPackServicesLosAngelesRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ReceivingInspectionRoute: ReceivingInspectionRoute,
@@ -898,10 +1054,13 @@ const rootRouteChildren: RootRouteChildren = {
   ServiceBreakdownRoute: ServiceBreakdownRoute,
   ServicesRoute: ServicesRoute,
   ShopifyFulfillmentRoute: ShopifyFulfillmentRoute,
+  ShopifyFulfillmentSupportLosAngelesStoresRoute:
+    ShopifyFulfillmentSupportLosAngelesStoresRoute,
   StorageWarehousingRoute: StorageWarehousingRoute,
   TermsRoute: TermsRoute,
   TestimonialsRoute: TestimonialsRoute,
   ThankYouRoute: ThankYouRoute,
+  ThirdPartyLogisticsLosAngelesRoute: ThirdPartyLogisticsLosAngelesRoute,
   TiktokShopFulfillmentRoute: TiktokShopFulfillmentRoute,
   WalmartFulfillmentRoute: WalmartFulfillmentRoute,
   WestCoastFulfillmentRoute: WestCoastFulfillmentRoute,

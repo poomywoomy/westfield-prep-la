@@ -108,6 +108,48 @@ const Footer = () => {
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
                   </span>
                 </Link>
+                <Link to="/3pl-fulfillment-services-los-angeles" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
+                  <span className="relative">
+                    <TranslatedText>3PL Fulfillment</TranslatedText>
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+                <Link to="/ecommerce-fulfillment-services-los-angeles" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
+                  <span className="relative">
+                    <TranslatedText>Ecommerce Fulfillment</TranslatedText>
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+                <Link to="/ecommerce-warehouse-services-los-angeles" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
+                  <span className="relative">
+                    <TranslatedText>Ecommerce Warehousing</TranslatedText>
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+                <Link to="/multichannel-fulfillment-support-los-angeles-sellers" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
+                  <span className="relative">
+                    <TranslatedText>Multichannel Fulfillment</TranslatedText>
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+                <Link to="/pick-and-pack-services-los-angeles" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
+                  <span className="relative">
+                    <TranslatedText>Pick & Pack</TranslatedText>
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+                <Link to="/shopify-fulfillment-support-los-angeles-stores" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
+                  <span className="relative">
+                    <TranslatedText>Shopify Fulfillment Support</TranslatedText>
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
+                <Link to="/third-party-logistics-los-angeles" className="block text-sm text-white/80 hover:text-secondary transition-colors relative group">
+                  <span className="relative">
+                    <TranslatedText>Third-Party Logistics</TranslatedText>
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
+                  </span>
+                </Link>
               </div>
             </div>
 
