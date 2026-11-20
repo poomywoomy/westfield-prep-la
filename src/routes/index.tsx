@@ -8,7 +8,6 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { name: "google-site-verification", content: "9Zg95SAW3c9WNZGpC5zrV8v51tVxxun7T3_Iyg8cOjw" },
       {
         title: "Los Angeles Fulfillment Center for Shopify and Amazon",
       },
