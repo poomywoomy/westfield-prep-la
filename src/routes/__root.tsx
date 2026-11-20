@@ -109,6 +109,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <meta name="google-site-verification" content="9Zg95SAW3c9WNZGpC5zrV8v51tVxxun7T3_Iyg8cOjw" />
       </head>
       <body>
         {children}
@@ -160,9 +161,7 @@ function RootErrorComponent({ error, reset }: ErrorComponentProps) {
     <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-6">
       <div className="max-w-md w-full text-center space-y-4">
         <h1 className="text-xl font-semibold">This page didn't load</h1>
-        <p className="text-muted-foreground">
-          Something went wrong on our end. You can try again or head back home.
-        </p>
+        <p className="text-muted-foreground">Something went wrong on our end. You can try again or head back home.</p>
         <div className="flex items-center justify-center gap-3">
           <button
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
